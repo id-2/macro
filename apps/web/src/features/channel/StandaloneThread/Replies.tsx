@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createMemo, For, type ParentProps, Show } from 'solid-js';
 import { Message, type MessageActions, type MessageData } from '../Message';
 import { Thread } from '../Thread';

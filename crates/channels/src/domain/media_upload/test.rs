@@ -11,7 +11,7 @@ struct FakeStore {
 impl StaticMediaStore for FakeStore {
     async fn reserve(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         file_name: &str,
         content_type: &str,
     ) -> anyhow::Result<StaticMediaReservation> {
@@ -30,8 +30,8 @@ impl StaticMediaStore for FakeStore {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap()
 }
 
 fn upload(file_name: &str, content_type: Option<&str>) -> NewChannelMediaUpload {

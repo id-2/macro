@@ -51,7 +51,7 @@ import {
   $mergeCells,
   $unmergeCell,
 } from '@lexical/table';
-import type { ElementName } from '@macro-inc/lexical-core';
+import type { ElementName } from '@rox-one/lexical-core';
 import {
   Button,
   type ButtonSize,

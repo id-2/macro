@@ -2,7 +2,7 @@ use super::*;
 
 async fn assert_compacted(pool: &Pool<Postgres>, attempt: SendAttemptId) -> anyhow::Result<()> {
     let row = sqlx::query!(
-        "SELECT request, prepared_content, restore_body_html, restore_body_text, restore_body_macro FROM email_send_attempts WHERE attempt_id = $1",
+        "SELECT request, prepared_content, restore_body_html, restore_body_text, restore_body_rox FROM email_send_attempts WHERE attempt_id = $1",
         attempt.0,
     ).fetch_one(pool).await?;
     let request = row
@@ -13,7 +13,7 @@ async fn assert_compacted(pool: &Pool<Postgres>, attempt: SendAttemptId) -> anyh
     assert!(row.prepared_content.is_none());
     assert!(row.restore_body_html.is_none());
     assert!(row.restore_body_text.is_none());
-    assert!(row.restore_body_macro.is_none());
+    assert!(row.restore_body_rox.is_none());
     Ok(())
 }
 
@@ -25,7 +25,7 @@ async fn cancellation_and_delivery_clear_content_without_losing_replay_identity(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let cancelled = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let cancelled = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), cancelled, prepared())
         .await?;
     repo.cancel_send(&actor(), link(), cancelled).await?;
@@ -44,7 +44,7 @@ async fn cancellation_and_delivery_clear_content_without_losing_replay_identity(
         SendAttemptStatus::Cancelled
     );
 
-    let sent = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let sent = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), sent, prepared_generation(2))
         .await?;
     email_db_client::messages::update::mark_message_as_sent(
@@ -81,7 +81,7 @@ async fn deleting_an_active_message_retains_delivery_content_and_job(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     assert!(!email_db_client::messages::delete::delete_db_message(&pool, message()).await?);

@@ -18,7 +18,7 @@ use entity_access::domain::models::{
 };
 use entity_access::domain::ports::EntityAccessService;
 use item_filters::CrmCompanyFilters;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::user::UserContext;
 use models_opensearch::SearchEntityType;
 use models_search::crm_company::{CrmCompanySearchDomain, CrmCompanySearchResponseItem};
@@ -48,7 +48,7 @@ pub(in crate::api::search) async fn resolve_crm_team_receipt(
     if !include_crm {
         return Ok(None);
     }
-    let user_id = MacroUserIdStr::try_from(user_context.user_id.clone())
+    let user_id = RoxUserIdStr::try_from(user_context.user_id.clone())
         .map_err(|_| SearchError::InvalidUserId(user_context.user_id.clone()))?;
     let Some(team) = ctx
         .entity_access_service

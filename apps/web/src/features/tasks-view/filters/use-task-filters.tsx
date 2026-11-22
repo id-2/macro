@@ -31,13 +31,13 @@ import {
 import { taskPeopleSource, taskViewerOption } from './task-people-options';
 
 const AI_FILTER_STALE_MESSAGE =
-  'The account or filters changed. Try the request again.';
+  'Аккаунт или фильтры изменились. Повторите запрос.';
 const AI_FILTER_UNAVAILABLE_MESSAGE =
-  'AI filtering is unavailable right now. Try again in a moment.';
+  'Фильтр с ИИ сейчас недоступен. Попробуйте чуть позже.';
 const AI_FILTER_UNREADABLE_MESSAGE =
-  'The AI reply could not be read. Try rephrasing your request.';
+  'Ответ ИИ не удалось прочитать. Переформулируйте запрос.';
 const AI_FILTER_NOTHING_MATCHED_MESSAGE =
-  'Nothing in that request maps to a filter. Try naming a status, priority, person, or tag.';
+  'В запросе нет того, что можно отфильтровать. Назовите статус, приоритет, человека или тег.';
 
 export type TaskFilterGroupId =
   | 'status'
@@ -119,7 +119,7 @@ export function useTaskFilters() {
     (): ListFilterGroup<TaskFilterGroupId, string>[] => [
       {
         id: 'status',
-        label: 'Status',
+        label: 'Статус',
         options: withUnavailable(
           'status',
           TASK_STATUS_OPTIONS.map((option) => ({
@@ -135,7 +135,7 @@ export function useTaskFilters() {
       },
       {
         id: 'priority',
-        label: 'Priority',
+        label: 'Приоритет',
         options: withUnavailable(
           'priority',
           TASK_PRIORITY_OPTIONS.map((option) => ({
@@ -151,25 +151,25 @@ export function useTaskFilters() {
       },
       {
         id: 'due_date',
-        label: 'Due date',
+        label: 'Срок',
         selectionMode: 'single',
         defaultOptionId: 'any',
         options: [
-          { id: 'any', label: 'Any due date' },
+          { id: 'any', label: 'Любой срок' },
           ...TASK_DUE_DATE_BUCKETS,
-          { id: 'has_due_date', label: 'Has due date' },
+          { id: 'has_due_date', label: 'Есть срок' },
           {
             id: 'range',
             label:
               state.dueDate?.type === 'range'
-                ? `Custom range (${state.dueDate.start ?? 'Any'} – ${state.dueDate.end ?? 'Any'})`
-                : 'Custom range…',
+                ? `Свой диапазон (${state.dueDate.start ?? 'любая'} – ${state.dueDate.end ?? 'любая'})`
+                : 'Свой диапазон…',
           },
         ],
       },
       {
         id: 'assignees',
-        label: 'Assignee',
+        label: 'Исполнитель',
         searchPlaceholder: assigneePicker.placeholder(),
         options: assigneeOptions(),
         footer: <AssigneePickerStatus picker={assigneePicker} />,
@@ -177,8 +177,8 @@ export function useTaskFilters() {
       },
       {
         id: 'created-by',
-        label: 'Created by',
-        searchPlaceholder: 'Search creators...',
+        label: 'Автор',
+        searchPlaceholder: 'Поиск авторов...',
         options: peopleOptions('created-by'),
         createSource: createPeopleSource,
       },

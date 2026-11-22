@@ -7,7 +7,7 @@ import {
 } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { viewportWidth } from '../../utils/utilBreakpoint';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 
 const mobile = () => viewportWidth() < 700;
 
@@ -259,7 +259,7 @@ function ComparisonHeader(props: { column: ComparisonColumn; macro: boolean }) {
         <Show
           when={props.column.icon}
           fallback={
-            <MacroMarkIcon
+            <RoxMarkIcon
               aria-hidden="true"
               style={{
                 color: 'var(--comparison-accent, var(--a0))',

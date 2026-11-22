@@ -3,7 +3,7 @@
 use std::future::Future;
 use std::time::Duration;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::model::{
     NotionDataSource, NotionId, NotionPage, NotionUser, PageMarkdown, Paged, RowsPage, SearchHit,
@@ -100,6 +100,6 @@ pub trait NotionConnections: Send + Sync + 'static {
     /// Notion (or turned it off).
     fn for_user(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<Self::Api>, NotionError>> + Send;
 }

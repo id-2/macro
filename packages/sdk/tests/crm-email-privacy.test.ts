@@ -11,7 +11,7 @@ import {
   type CrmEmailPolicyToken,
   type CrmEmailRuleSet,
   Macro,
-} from '../src/macro';
+} from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -281,7 +281,7 @@ test('an unknown untyped rule kind is rejected before sending a sharing request'
       idempotencyKey,
     }),
   ).rejects.toMatchObject({
-    name: 'MacroError',
+    name: 'RoxError',
     message: 'Unknown email inclusion rule kind.',
   });
   expect(calls).toBe(0);
@@ -297,7 +297,7 @@ test('an unknown server rule kind is rejected without fetching target content', 
     });
   });
   await expect(macro.crm.emailPrivacy.get()).rejects.toMatchObject({
-    name: 'MacroError',
+    name: 'RoxError',
     message: 'Unknown email inclusion rule kind.',
   });
   expect(requests).toEqual(['GET /crm/email-privacy/policy']);
@@ -366,7 +366,7 @@ test('a superseded preview cannot read or cancel its replacement', async () => {
   const old = await macro.crm.emailPrivacy.preview();
   expect(old).toBeDefined();
   await expect(old?.get()).rejects.toMatchObject({
-    name: 'MacroNotFoundError',
+    name: 'RoxNotFoundError',
   });
   await old?.cancel();
   expect(requests).toEqual([

@@ -2,7 +2,7 @@
 import { mediaPlugin } from '@core/component/LexicalMarkdown/plugins/media';
 import { staticFileIdEndpoint } from '@core/constant/servers';
 import { $dfs } from '@lexical/utils';
-import { $isImageNode, $isVideoNode } from '@macro-inc/lexical-core';
+import { $isImageNode, $isVideoNode } from '@rox-one/lexical-core';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import type { LexicalEditor } from 'lexical';
 import type { ComponentProps } from 'solid-js';

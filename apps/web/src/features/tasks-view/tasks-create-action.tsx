@@ -98,13 +98,13 @@ export function TasksCreateAction(props: {
         class="w-96 max-w-[calc(100vw-2rem)] p-4"
       >
         <Dialog.Title class="mb-3 text-base font-semibold">
-          Choose a parent task
+          Выберите родительскую задачу
         </Dialog.Title>
         <PropertyEntitySelector
           config={{
             isMultiSelect: false,
             specificEntityType: EntityType.TASK,
-            placeholder: 'Search tasks',
+            placeholder: 'Поиск задач',
           }}
           onClose={() => setParentPickerOpen(false)}
           selectedOptions={() => new Set<string>()}

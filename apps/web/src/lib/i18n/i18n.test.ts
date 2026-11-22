@@ -22,6 +22,59 @@ function translationFor(code: Language): PartialDictionary {
 
 type Message = string | PluralMessage;
 
+const PLURAL_FORMS: ReadonlySet<string> = new Set([
+  'zero',
+  'one',
+  'two',
+  'few',
+  'many',
+  'other',
+]);
+
+/** A plural message holds only plural forms; anything else is a group. */
+function isPluralMessage(value: object): value is PluralMessage {
+  const keys = Object.keys(value);
+  return keys.length > 0 && keys.every((key) => PLURAL_FORMS.has(key));
+}
+
+/**
+ * Every message in a catalogue at any depth, keyed `namespace.group.message`:
+ * groups (like `settingsNotifications.events`) nest as deep as the dictionary
+ * does, and only their leaves are messages to compare.
+ */
+function collectMessages(
+  node: unknown,
+  prefix: string,
+  out: Map<string, Message>
+): void {
+  if (typeof node === 'string') {
+    out.set(prefix, node);
+    return;
+  }
+  if (typeof node !== 'object' || node === null) return;
+  if (isPluralMessage(node)) {
+    out.set(prefix, node);
+    return;
+  }
+  for (const [name, child] of Object.entries(node)) {
+    collectMessages(child, prefix ? `${prefix}.${name}` : name, out);
+  }
+}
+
+/** The English message at a dotted key, or undefined when it is a group or absent. */
+function englishMessage(key: string): Message | undefined {
+  let node: unknown = en;
+  for (const segment of key.split('.')) {
+    if (typeof node !== 'object' || node === null) return undefined;
+    node = (node as Record<string, unknown>)[segment];
+  }
+  if (typeof node === 'string') return node;
+  if (typeof node === 'object' && node !== null && isPluralMessage(node)) {
+    return node;
+  }
+  return undefined;
+}
+
 const PLACEHOLDER = /\{\{\s*(\w+)\s*\}\}/g;
 
 function texts(message: Message): string[] {
@@ -139,32 +192,25 @@ describe('translations', () => {
       const stray: string[] = [];
       const mismatched: string[] = [];
       const wrongForms: string[] = [];
-      for (const [namespace, messages] of Object.entries(translation)) {
-        for (const [message, translated] of Object.entries(messages ?? {})) {
-          const key = `${namespace}.${message}`;
-          const english = (
-            en[namespace as keyof typeof en] as
-              | Record<string, Message>
-              | undefined
-          )?.[message];
-          if (english === undefined || translated === undefined) {
-            stray.push(key);
-            continue;
-          }
-          if (
-            placeholders(translated).join() !== placeholders(english).join()
-          ) {
-            mismatched.push(key);
-          }
-          // A plural message stays plural, with exactly the language's forms.
-          const forms =
-            typeof translated === 'string'
-              ? []
-              : Object.keys(translated).sort();
-          const expected =
-            typeof english === 'string' ? [] : [...categories].sort();
-          if (forms.join() !== expected.join()) wrongForms.push(key);
+      const translatedMessages = new Map<string, Message>();
+      collectMessages(translation, '', translatedMessages);
+      for (const [key, translated] of translatedMessages) {
+        const english = englishMessage(key);
+        if (english === undefined) {
+          stray.push(key);
+          continue;
         }
+        if (placeholders(translated).join() !== placeholders(english).join()) {
+          mismatched.push(key);
+        }
+        // A plural message stays plural, with exactly the language's forms.
+        const forms =
+          typeof translated === 'string'
+            ? []
+            : Object.keys(translated).sort();
+        const expected =
+          typeof english === 'string' ? [] : [...categories].sort();
+        if (forms.join() !== expected.join()) wrongForms.push(key);
       }
       expect(stray).toEqual([]);
       expect(mismatched).toEqual([]);

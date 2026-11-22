@@ -1,7 +1,7 @@
 use super::*;
 
 async fn execute_initiative_query(harness: &TestHarness, query: &str) -> async_graphql::Response {
-    let viewer = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+    let viewer = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
     harness
         .schema
         .execute(

@@ -212,7 +212,7 @@ pub struct ApiMessage {
     pub labels: Vec<ApiMessageLabel>,
     pub body_text: Option<String>,
     pub body_html_sanitized: Option<String>,
-    pub body_macro: Option<String>,
+    pub body_rox: Option<String>,
     pub body_replyless: Option<String>,
     pub attachments: Vec<ApiMessageAttachment>,
     pub attachments_draft: Vec<ApiAttachmentDraft>,
@@ -255,7 +255,7 @@ impl From<Message> for ApiMessage {
             labels: m.labels.into_iter().map(ApiMessageLabel::from).collect(),
             body_text: m.body_text,
             body_html_sanitized: m.body_html_sanitized,
-            body_macro: m.body_macro,
+            body_rox: m.body_rox,
             body_replyless: m.body_replyless,
             attachments: m
                 .attachments

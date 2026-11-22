@@ -1224,7 +1224,7 @@ where
         &self,
         session_id: AgentSessionId,
         action_id: AgentActionId,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     ) -> Result<CommandOutcome> {
         self.revalidate_queue(session_id).await?;
         queue_result(self.queues.move_to_front(session_id, action_id), session_id)?;
@@ -1270,7 +1270,7 @@ where
         session_id: AgentSessionId,
         action_id: AgentActionId,
         action: &AgentAction,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
         announce: Option<AnnounceOrigin>,
     ) -> Result<()> {
         self.revalidate_queue(session_id).await?;

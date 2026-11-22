@@ -32,7 +32,7 @@ use agent_client_protocol::RawJsonRpcMessage;
 use agent_client_protocol::schema::v1::SessionId;
 use agent_runtime_protocol::domain::action::{AgentAction, AgentActionId};
 use agent_runtime_protocol::domain::schema::v0::ToRuntimeMessage;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::fold::FoldMachineImpl;
 use super::ingestion::{LogCursor, LogIngestion};
@@ -71,7 +71,7 @@ pub enum FoldInput {
 pub struct Speculation {
     action_id: AgentActionId,
     action: AgentAction,
-    user_id: Option<MacroUserIdStr<'static>>,
+    user_id: Option<RoxUserIdStr<'static>>,
 }
 
 impl Speculation {
@@ -83,7 +83,7 @@ impl Speculation {
     pub fn new(
         action_id: AgentActionId,
         action: AgentAction,
-        user_id: Option<MacroUserIdStr<'static>>,
+        user_id: Option<RoxUserIdStr<'static>>,
     ) -> Self {
         Self {
             action_id,

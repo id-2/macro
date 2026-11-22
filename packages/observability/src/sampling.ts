@@ -18,7 +18,7 @@ import { ATTR_SAMPLING_CLASS, ATTR_SAMPLING_RATE } from './constants';
  * Applications name their sampling classes by augmenting this interface:
  *
  * ```ts
- * declare module '@macro-inc/observability' {
+ * declare module '@rox-one/observability' {
  *   interface TelemetryRegister {
  *     samplingClass: 'always' | 'perf';
  *   }
@@ -89,7 +89,7 @@ export interface SpanRecord {
 }
 
 /** Marks a context whose next span is already known to be dropped. */
-const DROPPED_KEY = createContextKey('@macro-inc/observability/dropped');
+const DROPPED_KEY = createContextKey('@rox-one/observability/dropped');
 
 function randomTraceId(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(16));

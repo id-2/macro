@@ -17,15 +17,15 @@ use std::{future::Future, sync::Arc};
 
 use chrono::Utc;
 use email::domain::{
-    events::{EmailMacroEvent, EmailTopicEvent},
+    events::{EmailRoxEvent, EmailTopicEvent},
     focus::{
         ClassifyOutcome, DueDateExtractor, FocusClassifier, FocusEnrollment, FocusNotifier,
         FocusService, FocusStore, ProfileSource,
     },
 };
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
 use rdkafka::{Message as _, consumer::CommitMode};
 use rootcause::Report;
@@ -39,7 +39,7 @@ mod classifications;
 #[cfg(test)]
 mod test;
 
-macro_event_broker::declare_topics!(FocusEvent: EmailMacroEvent);
+rox_event_broker::declare_topics!(FocusEvent: EmailRoxEvent);
 
 struct EmailFocusGroup;
 
@@ -185,7 +185,7 @@ where
     let consumer = KafkaEventConsumer::<EmailFocusGroup>::from_env(brokers)?;
     let consumer =
         KafkaConsumerAdapter::<EmailFocusGroup, ()>::new(consumer).subscribe::<FocusEvent>()?;
-    let consumer = MacroEventConsumerService::new(consumer);
+    let consumer = RoxEventConsumerService::new(consumer);
     tracing::info!(
         topics = ?FocusEvent::topics(),
         group = EmailFocusGroup::GROUP_NAME,
@@ -207,7 +207,7 @@ where
         };
         let span = kafka_util::consumer_span(message.inner(), EmailFocusGroup::GROUP_NAME);
         let thread_id = match message.decode_payload() {
-            Ok(FocusEvent::EmailMacroEvent(event)) => thread_to_classify(&event.event().event),
+            Ok(FocusEvent::EmailRoxEvent(event)) => thread_to_classify(&event.event().event),
             Err(_) => {
                 // Decode errors can echo payload text; log only that it happened.
                 tracing::warn!(parent: &span, "undecodable email event skipped");

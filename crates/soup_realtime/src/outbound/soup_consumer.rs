@@ -10,24 +10,24 @@ mod test;
 use std::time::Duration;
 
 use kafka_util::{InitialOffset, KafkaEventConsumer, Ungrouped};
-use macro_event_broker::{
-    EventBrokerError, KafkaConsumerAdapter, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    EventBrokerError, KafkaConsumerAdapter, RoxEventCollection, RoxEventConsumerService,
 };
 use rdkafka::message::Message as _;
 use rootcause::prelude::{Report, ResultExt as _};
 
 use crate::domain::{
-    models::{SoupMacroEvent, SoupRealtimeMessage},
+    models::{SoupRoxEvent, SoupRealtimeMessage},
     ports::SoupRealtimeConsumer,
 };
 
 /// Maximum time to wait for Soup topic metadata during partition assignment.
 const TOPIC_METADATA_TIMEOUT: Duration = Duration::from_secs(10);
 
-type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredMacroEvent>;
-type SoupEventConsumer = MacroEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
+type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredRoxEvent>;
+type SoupEventConsumer = RoxEventConsumerService<DeclaredRoxEvent, IndependentKafkaConsumer>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: SoupMacroEvent);
+rox_event_broker::declare_topics!(DeclaredRoxEvent: SoupRoxEvent);
 
 /// Independent consumer of recipient-targeted Soup messages.
 ///
@@ -50,7 +50,7 @@ impl SoupTopicConsumer {
                 .context("failed to assign realtime Soup topic partitions")?;
 
         tracing::info!(
-            topics = ?DeclaredMacroEvent::topics(),
+            topics = ?DeclaredRoxEvent::topics(),
             "independent realtime Soup consumer listening"
         );
 
@@ -97,7 +97,7 @@ impl SoupTopicConsumer {
             };
 
             return match event {
-                DeclaredMacroEvent::SoupMacroEvent(event) => Ok(event.into_message()),
+                DeclaredRoxEvent::SoupRoxEvent(event) => Ok(event.into_message()),
             };
         }
     }

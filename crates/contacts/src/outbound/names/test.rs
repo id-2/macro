@@ -10,7 +10,7 @@ use crate::{
     },
     outbound::{gateway::ConnectionGatewayNotifier, repository::DbContactsRepository},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::sync::Arc;
 
 #[sqlx::test(
@@ -27,7 +27,7 @@ async fn enriched_pages_preserve_profile_precedence_and_private_address_book_nam
     );
     let first = service
         .contact_page(
-            MacroUserIdStr::try_from_email("first@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("first@example.com").unwrap(),
             None,
             ContactPageSize::DEFAULT,
         )
@@ -35,7 +35,7 @@ async fn enriched_pages_preserve_profile_precedence_and_private_address_book_nam
         .unwrap();
     let second = service
         .contact_page(
-            MacroUserIdStr::try_from_email("second@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("second@example.com").unwrap(),
             None,
             ContactPageSize::DEFAULT,
         )
@@ -72,7 +72,7 @@ async fn enriched_pages_preserve_profile_precedence_and_private_address_book_nam
     let search = ContactSearch::new("first private").unwrap();
     let first_matches = service
         .search_contacts(
-            MacroUserIdStr::try_from_email("first@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("first@example.com").unwrap(),
             &search,
             None,
             ContactPageSize::DEFAULT,
@@ -86,7 +86,7 @@ async fn enriched_pages_preserve_profile_precedence_and_private_address_book_nam
     );
     let second_matches = service
         .search_contacts(
-            MacroUserIdStr::try_from_email("second@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("second@example.com").unwrap(),
             &search,
             None,
             ContactPageSize::DEFAULT,
@@ -102,13 +102,13 @@ async fn enriched_pages_preserve_profile_precedence_and_private_address_book_nam
             "unknown@example.com",
             "first@example.com",
         ]
-        .map(|email| MacroUserIdStr::try_from_email(email).unwrap())
+        .map(|email| RoxUserIdStr::try_from_email(email).unwrap())
         .to_vec(),
     )
     .unwrap();
     let resolved = service
         .lookup_contacts(
-            MacroUserIdStr::try_from_email("first@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("first@example.com").unwrap(),
             &lookup,
         )
         .await
@@ -129,7 +129,7 @@ async fn enriched_pages_preserve_profile_precedence_and_private_address_book_nam
         .execute(&pool).await.unwrap();
     let renamed = service
         .contact_page(
-            MacroUserIdStr::try_from_email("first@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("first@example.com").unwrap(),
             None,
             ContactPageSize::DEFAULT,
         )
@@ -170,7 +170,7 @@ async fn canonical_lookup_keeps_paged_identity_and_viewer_private_names_for_lega
     );
     let lookup = ContactLookup::new(
         ["external@example.com", "profile@example.com"]
-            .map(|email| MacroUserIdStr::try_from_email(email).unwrap())
+            .map(|email| RoxUserIdStr::try_from_email(email).unwrap())
             .to_vec(),
     )
     .unwrap();
@@ -179,7 +179,7 @@ async fn canonical_lookup_keeps_paged_identity_and_viewer_private_names_for_lega
         ("first@example.com", "First Private"),
         ("second@example.com", "Second Private"),
     ] {
-        let viewer = MacroUserIdStr::try_from_email(email).unwrap();
+        let viewer = RoxUserIdStr::try_from_email(email).unwrap();
         let page = service
             .contact_page(viewer.clone(), None, ContactPageSize::DEFAULT)
             .await
@@ -203,7 +203,7 @@ async fn canonical_lookup_keeps_paged_identity_and_viewer_private_names_for_lega
     assert!(
         service
             .lookup_contacts(
-                MacroUserIdStr::try_from_email("stranger@example.com").unwrap(),
+                RoxUserIdStr::try_from_email("stranger@example.com").unwrap(),
                 &lookup
             )
             .await
@@ -215,7 +215,7 @@ async fn canonical_lookup_keeps_paged_identity_and_viewer_private_names_for_lega
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn name_reads_are_bounded_and_empty_batches_are_valid(pool: PgPool) {
     let reader = DbContactNames::new(pool);
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     assert!(
         reader
             .contact_names(viewer.clone(), &[])

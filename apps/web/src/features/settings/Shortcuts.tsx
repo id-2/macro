@@ -879,235 +879,235 @@ function Keyboard(props: { keys?: string[] }): JSX.Element {
 
 const shortcutSections: ShortcutSection[] = [
   {
-    title: 'Core',
+    title: 'Основное',
     items: [
       {
         keys: [`${cmdOrCtrl}+k`],
         codes: [CmdOrCtrl, 'KeyK'],
-        description: 'Open the command menu',
+        description: 'Открыть меню команд',
       },
       {
         keys: [`${cmdOrCtrl}+f`],
         codes: [CmdOrCtrl, 'KeyF'],
-        description: 'Search in current view',
+        description: 'Искать в текущем виде',
       },
-      { keys: ['c'], codes: ['KeyC'], description: 'Open the create menu' },
+      { keys: ['c'], codes: ['KeyC'], description: 'Открыть меню создания' },
       {
         keys: [`${cmdOrCtrl}+;`],
         codes: [CmdOrCtrl, 'Semicolon'],
-        description: 'Open settings panel',
+        description: 'Открыть панель настроек',
       },
-      { keys: ['/'], codes: ['Slash'], description: 'Go to search view' },
+      { keys: ['/'], codes: ['Slash'], description: 'Перейти к поиску' },
       {
         keys: [`${cmdOrCtrl}+j`],
         codes: [CmdOrCtrl, 'KeyJ'],
-        description: 'Focus AI chat',
+        description: 'Перейти в чат с ИИ',
       },
       {
         keys: ['g'],
         codes: ['KeyG'],
         description:
-          'Go to a view: then h Home, i Notifications (Home without them), a Agents, e Email (Signal), s Sent, f Files, d Documents, t Tasks, r Calendar, c Channels, o Customers; ? lists every letter, including those behind flags',
+          'Перейти к виду: затем h — Главная, i — Уведомления (Главная без них), a — Агенты, e — Почта (Важное), s — Отправленные, f — Файлы, d — Документы, t — Задачи, r — Календарь, c — Каналы, o — Клиенты; ? показывает все буквы, в том числе скрытые за флагами',
       },
       {
         keys: ['?'],
         codes: ['ShiftLeft', 'Slash'],
-        description: 'Show shortcuts for the current view',
+        description: 'Показать сочетания текущего вида',
       },
     ],
   },
   {
-    title: 'Splits',
+    title: 'Панели',
     items: [
       {
         keys: ['opt+['],
         codes: ['AltLeft', 'BracketLeft'],
-        description: 'Go back in current split',
+        description: 'Назад в текущей панели',
       },
       {
         keys: ['opt+]'],
         codes: ['AltLeft', 'BracketRight'],
-        description: 'Go forward in current split',
+        description: 'Вперёд в текущей панели',
       },
       {
         keys: ['shift+arrowleft'],
         codes: ['ShiftLeft', 'ArrowLeft'],
-        description: 'Focus split to the left',
+        description: 'Перейти к панели слева',
       },
       {
         keys: ['shift+arrowright'],
         codes: ['ShiftLeft', 'ArrowRight'],
-        description: 'Focus split to the right',
+        description: 'Перейти к панели справа',
       },
       {
         keys: ['shift+arrowup'],
         codes: ['ShiftLeft', 'ArrowUp'],
-        description: 'Focus split above',
+        description: 'Перейти к панели сверху',
       },
       {
         keys: ['shift+arrowdown'],
         codes: ['ShiftLeft', 'ArrowDown'],
-        description: 'Focus split below',
+        description: 'Перейти к панели снизу',
       },
       {
         keys: ['cmd+escape'],
         codes: ['MetaLeft', 'Escape'],
-        description: 'Back to list / close split',
+        description: 'К списку или закрыть панель',
       },
       {
         keys: ['shift+escape'],
         codes: ['ShiftLeft', 'Escape'],
-        description: 'Spotlight split',
+        description: 'Выделить панель',
       },
-      { keys: ['\\'], codes: ['Backslash'], description: 'Create a split' },
+      { keys: ['\\'], codes: ['Backslash'], description: 'Создать панель' },
       {
         keys: ['|'],
         codes: ['ShiftLeft', 'Backslash'],
-        description: 'Create a split below',
+        description: 'Создать панель снизу',
       },
     ],
   },
   {
-    title: 'Unified List',
+    title: 'Общий список',
     items: [
       {
         keys: ['enter'],
         codes: ['Enter'],
-        description: 'Open item in current split',
+        description: 'Открыть элемент в текущей панели',
       },
       {
         keys: ['shift+enter'],
         codes: ['ShiftLeft', 'Enter'],
-        description: 'Open item in a new split',
+        description: 'Открыть элемент в новой панели',
       },
       {
         keys: ['opt+enter'],
         codes: ['AltLeft', 'Enter'],
-        description: 'Open item in place of the preview',
+        description: 'Открыть элемент вместо предпросмотра',
       },
-      { keys: ['arrowup'], codes: ['ArrowUp'], description: 'Move up' },
-      { keys: ['arrowdown'], codes: ['ArrowDown'], description: 'Move down' },
+      { keys: ['arrowup'], codes: ['ArrowUp'], description: 'Вверх' },
+      { keys: ['arrowdown'], codes: ['ArrowDown'], description: 'Вниз' },
       {
         keys: ['shift+arrowup'],
         codes: ['ShiftLeft', 'ArrowUp'],
-        description: 'Select up',
+        description: 'Выделить вверх',
       },
       {
         keys: ['shift+arrowdown'],
         codes: ['ShiftLeft', 'ArrowDown'],
-        description: 'Select down',
+        description: 'Выделить вниз',
       },
       {
         keys: ['arrowleft'],
         codes: ['ArrowLeft'],
-        description: 'Collapse item',
+        description: 'Свернуть элемент',
       },
       {
         keys: ['arrowright'],
         codes: ['ArrowRight'],
-        description: 'Expand item',
+        description: 'Развернуть элемент',
       },
-      { keys: ['space'], codes: ['Space'], description: 'Preview item' },
-      { keys: ['f'], codes: ['KeyF'], description: 'Open filter menu' },
-      { keys: ['x'], codes: ['KeyX'], description: 'Select items' },
-      { keys: ['e'], codes: ['KeyE'], description: 'Mark done' },
-      { keys: ['u'], codes: ['KeyU'], description: 'Mark unread' },
+      { keys: ['space'], codes: ['Space'], description: 'Предпросмотр элемента' },
+      { keys: ['f'], codes: ['KeyF'], description: 'Открыть меню фильтра' },
+      { keys: ['x'], codes: ['KeyX'], description: 'Выбрать элементы' },
+      { keys: ['e'], codes: ['KeyE'], description: 'Отметить выполненным' },
+      { keys: ['u'], codes: ['KeyU'], description: 'Отметить непрочитанным' },
       {
         keys: ['shift+u'],
         codes: ['ShiftLeft', 'KeyU'],
-        description: 'Mark read',
+        description: 'Отметить прочитанным',
       },
       {
         keys: ['#'],
         codes: ['ShiftLeft', 'Digit3'],
-        description: 'Delete email',
+        description: 'Удалить письмо',
       },
     ],
   },
   {
-    title: 'Email',
+    title: 'Почта',
     items: [
-      { keys: ['s'], codes: ['KeyS'], description: 'Star or unstar' },
+      { keys: ['s'], codes: ['KeyS'], description: 'Поставить или снять звёздочку' },
       {
         keys: ['shift+m'],
         codes: ['ShiftLeft', 'KeyM'],
-        description: 'Mute or unmute',
+        description: 'Заглушить или снять заглушение',
       },
-      { keys: ['z'], codes: ['KeyZ'], description: 'Undo the last action' },
+      { keys: ['z'], codes: ['KeyZ'], description: 'Отменить последнее действие' },
       {
         keys: ['escape'],
         codes: ['Escape'],
-        description: 'Back to the list, then to Signal',
+        description: 'К списку, затем к «Важное»',
       },
       {
         keys: ['n', 'arrowdown'],
         codes: ['KeyN'],
-        description: 'Next message',
+        description: 'Следующее письмо',
       },
       {
         keys: ['p', 'arrowup'],
         codes: ['KeyP'],
-        description: 'Previous message',
+        description: 'Предыдущее письмо',
       },
       {
         keys: ['o'],
         codes: ['KeyO'],
-        description: 'Expand or collapse message',
+        description: 'Развернуть или свернуть письмо',
       },
       {
         keys: ['shift+o'],
         codes: ['ShiftLeft', 'KeyO'],
-        description: 'Expand all messages',
+        description: 'Развернуть все письма',
       },
       {
         keys: [`${cmdOrCtrl}+arrowup`],
         codes: [CmdOrCtrl, 'ArrowUp'],
-        description: 'Jump to top of list',
+        description: 'В начало списка',
       },
       {
         keys: [`${cmdOrCtrl}+arrowdown`],
         codes: [CmdOrCtrl, 'ArrowDown'],
-        description: 'Jump to bottom of list',
+        description: 'В конец списка',
       },
       {
         keys: ['shift+v'],
         codes: ['ShiftLeft', 'KeyV'],
-        description: 'Show or hide the reading pane',
+        description: 'Показать или скрыть область чтения',
       },
     ],
   },
   {
-    title: 'Email drafts',
+    title: 'Черновики писем',
     items: [
       {
         keys: [`shift+${cmdOrCtrl}+.`, `shift+${cmdOrCtrl}+d`],
         codes: ['ShiftLeft', CmdOrCtrl, 'Period'],
-        description: 'Discard draft',
+        description: 'Удалить черновик',
       },
       {
         keys: [`shift+${cmdOrCtrl}+u`],
         codes: ['ShiftLeft', CmdOrCtrl, 'KeyU'],
-        description: 'Attach files',
+        description: 'Прикрепить файлы',
       },
       {
         keys: [`shift+${cmdOrCtrl}+x`],
         codes: ['ShiftLeft', CmdOrCtrl, 'KeyX'],
-        description: 'Strikethrough',
+        description: 'Зачёркнутый',
       },
       {
         keys: [`shift+${cmdOrCtrl}+7`],
         codes: ['ShiftLeft', CmdOrCtrl, 'Digit7'],
-        description: 'Numbered list',
+        description: 'Нумерованный список',
       },
       {
         keys: [`shift+${cmdOrCtrl}+8`],
         codes: ['ShiftLeft', CmdOrCtrl, 'Digit8'],
-        description: 'Bulleted list',
+        description: 'Маркированный список',
       },
       {
         keys: [`shift+${cmdOrCtrl}+9`],
         codes: ['ShiftLeft', CmdOrCtrl, 'Digit9'],
-        description: 'Quote',
+        description: 'Цитата',
       },
     ],
   },
@@ -1159,7 +1159,7 @@ function ShortcutSectionComponent(props: { section: ShortcutSection }) {
     <SettingsSection title={props.section.title}>
       <div class="divide-y divide-ink/5">
         <For each={props.section.items}>
-          {(item) => <ShortcutRow item={item} spacer="or" />}
+          {(item) => <ShortcutRow item={item} spacer="или" />}
         </For>
       </div>
     </SettingsSection>
@@ -1169,12 +1169,12 @@ function ShortcutSectionComponent(props: { section: ShortcutSection }) {
 export function Shortcuts() {
   return (
     <SettingsPage
-      title="Keyboard shortcuts"
-      description="Quick ways to navigate, search, and work in Rox."
+      title="Сочетания клавиш"
+      description="Быстрые способы перемещаться, искать и работать в Rox."
     >
       <SettingsSurface class="px-5 py-4">
         <details>
-          <summary class="text-sm text-ink/60">Keyboard preview</summary>
+          <summary class="text-sm text-ink/60">Предпросмотр клавиатуры</summary>
           <div class="pt-4">
             <Keyboard keys={hoveredCodes()} />
           </div>

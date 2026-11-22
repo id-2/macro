@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   type EntityDetailTarget,
   entityDetailTarget,
@@ -179,7 +180,7 @@ export function createDriveHostActions(options: {
         preferNewSplit: event.shiftKey,
       });
       if (result.status === 'reused' && result.owner !== result.sourceOwner) {
-        toast.alert('Content already open');
+        toast.alert(t('nav.contentAlreadyOpen'));
       }
     },
 

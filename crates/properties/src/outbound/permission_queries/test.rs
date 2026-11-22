@@ -1,6 +1,6 @@
 use super::*;
 use crate::outbound::{entity_properties_get_query, entity_property_queries};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_properties::service::property_value::PropertyValue;
 
 const OWNER: &str = "macro|user1@test.com";

@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import { afterEach, expect, it, vi } from 'vitest';
 import { profileDatabasePhase, traceDatabaseFrame } from './profile';
 

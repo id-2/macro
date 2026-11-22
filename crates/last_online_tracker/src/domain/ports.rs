@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 pub trait SystemTime: Send + Sync + 'static {
@@ -9,12 +9,12 @@ pub trait SystemTime: Send + Sync + 'static {
 pub trait LastOnlineRepo: Send + Sync + 'static {
     fn set_last_online(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         now: DateTime<Utc>,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     fn get_last_online(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<DateTime<Utc>>, Report>> + Send;
 }

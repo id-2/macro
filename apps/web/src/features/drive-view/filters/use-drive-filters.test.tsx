@@ -1,3 +1,4 @@
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { ListFilterDropdown } from '@app/components/view-shell/ListDropdowns';
 import {
   cleanup,
@@ -7,7 +8,7 @@ import {
   waitFor,
 } from '@solidjs/testing-library';
 import { createSignal } from 'solid-js';
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, expect, it, vi } from 'vitest';
 import type { DriveState } from '../core/types';
 import { createDriveState } from '../primitives/drive-state';
 import { useDriveFilters } from './use-drive-filters';
@@ -59,6 +60,8 @@ afterEach(() => {
   motionStyles.remove();
   vi.unstubAllGlobals();
 });
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 it.each(['pointer', 'keyboard'])(
   'keeps the Drive Type submenu mounted while toggling file types, then adds and closes (%s)',
@@ -135,3 +138,5 @@ it.each(['pointer', 'keyboard'])(
     expect(value().facets.type).toEqual(['file-pdf']);
   }
 );
+
+

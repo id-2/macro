@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use attachment::{AttachmentContent, Attachments, ResolutionError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use uuid::Uuid;
 
@@ -37,7 +37,7 @@ struct Service {
 impl AttachmentService for Service {
     async fn resolve_attachments<'a>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&'a Entity<'a>]>,
     ) -> Attachments<'a> {
         let entity = ids[0];
@@ -100,7 +100,7 @@ impl AttachmentService for Service {
 fn principal() -> CreationPrincipal {
     CreationPrincipal::BotForUser {
         bot: bot_id::MACRO_AI_BOT_ID,
-        user: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        user: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
     }
 }
 

@@ -127,9 +127,9 @@ function ConnectionsContent(props: IntegrationsViewProps) {
       }
       const outcome = await connectPipedreamApp({ appSlug });
       if (outcome === 'unsupported')
-        toast.failure('Connectors are not available on this deployment');
+        toast.failure('Коннекторы недоступны в этой установке');
     } catch {
-      toast.failure(`Failed to connect ${appSlug}`);
+      toast.failure(`Не удалось подключить ${appSlug}`);
     }
   }
   const slackConnected = () =>
@@ -148,7 +148,7 @@ function ConnectionsContent(props: IntegrationsViewProps) {
           keyed
           fallback={
             <SettingsPage
-              title="Integrations"
+              title="Интеграции"
               bodyClass="mt-6 gap-4"
               contentClass="max-w-none px-8"
             >
@@ -158,17 +158,17 @@ function ConnectionsContent(props: IntegrationsViewProps) {
                   class="flex items-center gap-3 text-sm text-ink-muted"
                 >
                   {error()
-                    ? "Couldn't load agent tools."
-                    : "Some connections couldn't be loaded."}
+                    ? 'Не удалось загрузить инструменты агента.'
+                    : 'Некоторые подключения не удалось загрузить.'}
                   <Button variant="secondary" size="sm" onClick={retry}>
-                    Retry
+                    Повторить
                   </Button>
                 </div>
               </Show>
               <Show
                 when={ready() || error()}
                 fallback={
-                  <p class="text-sm text-ink-muted">Loading integrations…</p>
+                  <p class="text-sm text-ink-muted">Загрузка интеграций…</p>
                 }
               >
                 <Suspense>
@@ -191,7 +191,7 @@ function ConnectionsContent(props: IntegrationsViewProps) {
       <Show
         when={ready()}
         fallback={
-          <p class="text-sm text-ink-muted">Loading Slack connection…</p>
+          <p class="text-sm text-ink-muted">Загрузка подключения Slack…</p>
         }
       >
         <Suspense>
@@ -326,8 +326,8 @@ function IntegrationsOverview(
       <div class="flex items-center gap-2">
         <SearchBar
           size="sm"
-          label="Search integrations"
-          placeholder="Search integrations"
+          label="Поиск интеграций"
+          placeholder="Поиск интеграций"
           value={query()}
           onValueChange={search}
           onEscape={() => search('')}
@@ -339,13 +339,13 @@ function IntegrationsOverview(
             size="md"
             onClick={() => setAddingCustom(true)}
           >
-            <PlusIcon class="size-4" /> Add custom
+            <PlusIcon class="size-4" /> Добавить свой
           </Button>
         </Show>
       </div>
       <div
         role="table"
-        aria-label="Integrations"
+        aria-label="Интеграции"
         class="@container/integrations -mx-3 flex min-w-0 flex-col"
       >
         <IntegrationsListHeader />
@@ -376,7 +376,7 @@ function IntegrationsOverview(
         </div>
         <Show when={nothingMatches()}>
           <p class="px-3 py-6 text-sm text-ink-muted">
-            No integrations match “{query().trim()}”.
+            Нет интеграций по запросу «{query().trim()}».
           </p>
         </Show>
       </div>

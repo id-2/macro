@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { fireAndForget } from '@core/util/fireAndForget';
 import InfoIcon from '@icon/system/regular/info.svg';
@@ -88,19 +89,15 @@ export function TeamStep(props: {
 
   return (
     <TeamSetup
-      title={referring() ? 'Invite friends.' : undefined}
-      subtitle={
-        referring()
-          ? 'Get $10 of AI credit for each person who signs up.'
-          : undefined
-      }
+      title={referring() ? t('onboarding.inviteFriends') : undefined}
+      subtitle={referring() ? t('onboarding.inviteFriendsSubtitle') : undefined}
     >
       <Switch>
         <Match when={team.state().t === 'error'}>
           <TeamLoadError onRetry={team.retry} />
         </Match>
         <Match when={team.state().t === 'loading'}>
-          <TeamStatus message="Loading your team…" />
+          <TeamStatus message={t('onboarding.loadingTeam')} />
         </Match>
         <Match when={onTeam(team.state())} keyed>
           {(name) => (
@@ -127,7 +124,7 @@ export function TeamStep(props: {
         <Match when={team.state().t === 'create'}>
           <Show
             when={seed()}
-            fallback={<TeamStatus message="Finding your teammates…" />}
+            fallback={<TeamStatus message={t('onboarding.findingTeammates')} />}
           >
             {(ready) => (
               <Show
@@ -190,7 +187,7 @@ function RecommendedSwitch(props: {
           <span class="text-xs text-ink sm:text-sm">
             {props.children}
             <span class="ml-1 whitespace-nowrap rounded bg-ink/5 px-1 py-0.5 align-middle text-[9px] text-ink-muted opacity-60 sm:ml-2 sm:px-1.5 sm:text-[10px]">
-              recommended
+              {t('onboarding.recommended')}
             </span>
           </span>
         }
@@ -275,7 +272,7 @@ function TeamForm(props: {
         name={form.name()}
         emails={form.slots()}
         disabled={form.pending() || props.finishing}
-        hint="Invite teammates now for $10 AI credit each"
+        hint={t('onboarding.inviteTeammatesHint')}
         onNameChange={form.setName}
         onEmailChange={form.setSlot}
         onRemoveEmail={form.removeSlot}
@@ -287,10 +284,10 @@ function TeamForm(props: {
               <RecommendedSwitch
                 checked={form.allowDomainJoin()}
                 onChange={form.setAllowDomainJoin}
-                infoLabel="About domain join"
-                info={`Anyone who signs up with an @${domain()} email joins this team automatically. You can turn this off later in Settings.`}
+                infoLabel={t('onboarding.aboutDomainJoin')}
+                info={t('onboarding.domainJoinInfo', { domain: domain() })}
               >
-                Allow @{domain()} emails to join
+                {t('onboarding.allowDomainJoin', { domain: domain() })}
               </RecommendedSwitch>
               {/* The notice invites colleagues to join by domain, so it
                   reads as off and can't be turned on without domain join. */}
@@ -298,10 +295,10 @@ function TeamForm(props: {
                 checked={form.notifyDomain()}
                 disabled={!form.allowDomainJoin()}
                 onChange={form.setNotifyDomain}
-                infoLabel="About the team email"
-                info={`We'll email your @${domain()} contacts who aren't on Rox yet to let them know the team exists. Needs domain join on.`}
+                infoLabel={t('onboarding.aboutTeamEmail')}
+                info={t('onboarding.teamEmailInfo', { domain: domain() })}
               >
-                Notify your team via email
+                {t('onboarding.notifyTeamEmail')}
               </RecommendedSwitch>
             </div>
           )}
@@ -310,12 +307,14 @@ function TeamForm(props: {
       <ContinueButton
         label={
           props.finishing
-            ? 'Opening your workspace…'
+            ? t('onboarding.openingWorkspace')
             : form.pending()
-              ? 'Creating workspace…'
+              ? t('onboarding.creatingWorkspace')
               : form.invites().length > 0
-                ? `Create team & invite ${form.invites().length}`
-                : 'Create team'
+                ? t('onboarding.createTeamAndInvite', {
+                    count: form.invites().length,
+                  })
+                : t('onboarding.createTeam')
         }
         disabled={!form.canCreate() || props.finishing}
         onClick={() => fireAndForget(form.create(), 'onboarding')}
@@ -345,7 +344,7 @@ function ReferralForm(props: {
         <InviteEmailList
           id="referral"
           emails={form.slots()}
-          person="Friend"
+          person="friend"
           placeholder="friend@example.com"
           onEmailChange={form.setSlot}
           onRemoveEmail={form.removeSlot}
@@ -355,18 +354,18 @@ function ReferralForm(props: {
       <ContinueButton
         label={
           props.finishing
-            ? 'Opening your workspace…'
+            ? t('onboarding.openingWorkspace')
             : form.sending()
-              ? 'Sending invites…'
+              ? t('onboarding.sendingInvites')
               : count() === 0
-                ? 'Send invites'
-                : `Send ${count()} ${count() === 1 ? 'invite' : 'invites'}`
+                ? t('onboarding.sendInvites')
+                : t('onboarding.sendInvitesCount', { count: count() })
         }
         disabled={count() === 0 || form.sending() || props.finishing}
         onClick={() => fireAndForget(form.send(), 'onboarding')}
         secondary={
           <SecondaryButton
-            label="Copy referral link"
+            label={t('onboarding.copyReferralLink')}
             icon={<LinkIcon class="size-5 shrink-0" aria-hidden="true" />}
             disabled={form.copying() || props.finishing}
             onClick={() => fireAndForget(form.copyLink(), 'onboarding')}

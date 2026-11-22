@@ -1,11 +1,11 @@
 use super::*;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
 fn connection() -> Connection {
     Connection {
-        id: macro_uuid::generate_uuid_v7(),
-        namespace: macro_uuid::generate_uuid_v7(),
-        user_id: MacroUserIdStr::parse_from_str("macro|owner@test.com")
+        id: rox_uuid::generate_uuid_v7(),
+        namespace: rox_uuid::generate_uuid_v7(),
+        user_id: RoxUserIdStr::parse_from_str("macro|owner@test.com")
             .unwrap()
             .into_owned(),
         account_id: "apn_account".into(),

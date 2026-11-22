@@ -1,7 +1,7 @@
 use super::*;
 
-fn agent() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|ada-1@example.com".to_owned()).unwrap()
+fn agent() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|ada-1@example.com".to_owned()).unwrap()
 }
 
 #[test]

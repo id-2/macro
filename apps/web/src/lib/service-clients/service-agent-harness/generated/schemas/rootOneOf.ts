@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { RootOneOfType } from './rootOneOfType';
 
 /**
@@ -14,5 +14,5 @@ import type { RootOneOfType } from './rootOneOfType';
 export type RootOneOf = {
   type: RootOneOfType;
   /** Who. */
-  user: MacroUserIdStr;
+  user: RoxUserIdStr;
 };

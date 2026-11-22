@@ -55,6 +55,9 @@ export function SetupField(props: { class?: string; children: JSX.Element }) {
   );
 }
 
+// Published installer is still this macro-inc raw URL. Checked 2026-11-19:
+// https://raw.githubusercontent.com/rox-one/rox/main/crates/coding_agent_worker/install/install.sh
+// returns 404, and install.sh in this repo still downloads releases from macro-inc/macro.
 const INSTALL_SCRIPT_BASE =
   'https://raw.githubusercontent.com/macro-inc/macro/main/crates/coding_agent_worker/install';
 
@@ -76,42 +79,44 @@ export function RuntimeSetupSteps(props: { children: JSX.Element }) {
     <>
       <Show when={isDesktopPlatform()}>
         <p class="mb-6 rounded-lg border border-edge-muted bg-ink/[0.025] px-3 py-2 text-sm text-ink-muted">
-          Setting up this computer? The desktop app bundles roxd — use the{' '}
-          <span class="font-medium text-ink">This computer</span> card on the
-          Machines page instead; no download or pairing code needed. The steps
-          below connect a different machine.
+          Настраиваете этот компьютер? В приложении для рабочего стола уже есть
+          roxd — на странице «Машины» откройте карточку{' '}
+          <span class="font-medium text-ink">Этот компьютер</span>. Скачивать
+          ничего не нужно, код сопряжения не понадобится. Шаги ниже подключают
+          другую машину.
         </p>
       </Show>
-      <ol aria-label="Machine setup steps" class="list-none">
-        <SetupStep number={1} title="Install roxd">
-          <p>On macOS or Linux, run in a terminal:</p>
+      <ol aria-label="Шаги настройки машины" class="list-none">
+        <SetupStep number={1} title="Установите roxd">
+          <p>На macOS или Linux выполните в терминале:</p>
           <SetupCommand
             prompt="$"
             command={`curl -fsSL ${INSTALL_SCRIPT_BASE}/install.sh | sh`}
           />
-          <p>On Windows, run in PowerShell:</p>
+          <p>В Windows выполните в PowerShell:</p>
           <SetupCommand
             prompt=">"
             command={`irm ${INSTALL_SCRIPT_BASE}/install.ps1 | iex`}
           />
-          <p>Run it again later to update roxd.</p>
+          <p>Позже запустите ту же команду ещё раз, чтобы обновить roxd.</p>
         </SetupStep>
-        <SetupStep number={2} title="Run roxd">
+        <SetupStep number={2} title="Запустите roxd">
           <p>
-            Open a terminal in the folder where roxd should keep its
-            configuration and run:
+            Откройте терминал в папке, где roxd должен хранить свои настройки, и
+            выполните:
           </p>
           <SetupCommand prompt="$" command="roxd" />
           <p>
-            Choose your agent, workspace, and access in Quickstart, then select{' '}
-            <span class="font-medium text-ink">Create and pair</span>. Keep
-            roxd running.
+            В окне «Быстрый старт» выберите агента, рабочую папку и доступ,
+            затем нажмите{' '}
+            <span class="font-medium text-ink">Создать и привязать</span>. Не
+            закрывайте roxd.
           </p>
         </SetupStep>
-        <SetupStep number={3} title="Enter your pairing code">
+        <SetupStep number={3} title="Введите код сопряжения">
           <p>
-            Enter the device code from your terminal to review and connect this
-            machine.
+            Введите код устройства из терминала, чтобы проверить и подключить
+            эту машину.
           </p>
           {props.children}
         </SetupStep>

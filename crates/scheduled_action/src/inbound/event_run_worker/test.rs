@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::event_runs::{ConfigurationRevision, PendingEventRun, dispatch::DispatchResult};
 use chrono::Utc;
-use macro_uuid::generate_uuid_v7;
+use rox_uuid::generate_uuid_v7;
 use rootcause::Report;
 use serde_json::json;
 use std::sync::{

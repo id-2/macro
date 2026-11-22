@@ -3,9 +3,9 @@
 use std::sync::Arc;
 
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 
 use crate::domain::{
@@ -60,7 +60,7 @@ impl<E: EntityAccessService, Cgw: ConnectionGateway> ConnectionService
                             None
                         }
                     })
-                    .collect::<Vec<MacroUserId<Lowercase<'a>>>>()
+                    .collect::<Vec<RoxUserId<Lowercase<'a>>>>()
             }
             entity_access::domain::models::EntityAccessAuth::Bot(_)
             | entity_access::domain::models::EntityAccessAuth::Unauthenticated
@@ -86,7 +86,7 @@ impl<E: EntityAccessService, Cgw: ConnectionGateway> ConnectionService
     #[tracing::instrument(skip(self, message), err)]
     async fn send_channel_message<'a>(
         &self,
-        users: &[MacroUserIdStr<'a>],
+        users: &[RoxUserIdStr<'a>],
         message_type: &str,
         message: serde_json::Value,
     ) -> Result<(), ConnectionError> {

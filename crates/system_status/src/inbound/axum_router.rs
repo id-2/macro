@@ -19,7 +19,7 @@ use std::sync::Arc;
 use axum::{
     Json, Router, extract::FromRef, http::StatusCode, response::IntoResponse, routing::get,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use serde::Serialize;
 use utoipa::ToSchema;
@@ -61,7 +61,7 @@ pub struct SystemStatusRouterState<T, Auth> {
     /// The system status service implementation.
     pub service: Arc<T>,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, Auth> Clone for SystemStatusRouterState<T, Auth> {
@@ -73,7 +73,7 @@ impl<T, Auth> Clone for SystemStatusRouterState<T, Auth> {
     }
 }
 
-impl<T, Auth> FromRef<SystemStatusRouterState<T, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Auth> FromRef<SystemStatusRouterState<T, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &SystemStatusRouterState<T, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -83,7 +83,7 @@ impl<T, Auth> FromRef<SystemStatusRouterState<T, Auth>> for MacroAuthorizationSt
 pub fn system_status_router<T, Auth, S>(state: SystemStatusRouterState<T, Auth>) -> Router<S>
 where
     T: SystemStatusService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()

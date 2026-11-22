@@ -10,7 +10,7 @@ import { AccessBadge } from '@components/app/split-layout/components/SplitLabel'
 import { Permissions } from '@core/component/SharePermissions';
 import { ENABLE_MARKDOWN_SIDE_PANEL } from '@core/constant/featureFlags';
 import { isMobile } from '@core/mobile/isMobile';
-import type { SyncSourceStatus } from '@macro-inc/collaboration/collab/source';
+import type { SyncSourceStatus } from '@rox-one/collaboration/collab/source';
 import { type Accessor, Show } from 'solid-js';
 import { markdownDocumentBlockName } from '../../component/MarkdownDetailBreadcrumbItem';
 import { useMarkdownName } from '../../component/MarkdownNameProvider';

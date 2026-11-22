@@ -3,8 +3,8 @@ use entity_access::domain::{
     models::{AdminTeamRole, Entity, EntityAccessReceipt, EntityPermission, EntityType},
     ports::EntityAccessService,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::cowlike::CowLike;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::cowlike::CowLike;
 use serde::{Deserialize, Serialize};
 use teams::domain::{model::SetTeamMemberPlanError, team_repo::TeamService};
 use utoipa::ToSchema;
@@ -50,7 +50,7 @@ pub struct ChangePlanResponse {
 #[tracing::instrument(skip(ctx, user), err, fields(user_id = %user.authorization.user.macro_user_id, plan = ?req.plan))]
 pub async fn change_plan(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(req): Json<ChangePlanRequest>,
 ) -> Result<Json<ChangePlanResponse>, StripeOperationError> {
     let user_id = &user.authorization.user.macro_user_id;

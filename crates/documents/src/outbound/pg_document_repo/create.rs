@@ -1,7 +1,7 @@
 use document_sub_type::DocumentSubType;
 use entity_registry::BotFacts;
 use entity_registry_db_utils::{NewEntityRecord, OwnedEntityRegistrar, RegisteredEntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::{DocumentMetadata, FileType, VersionIDWithTimeStamps};
 use model_owner::Owner;
 use models_permissions::share_permission::SharePermissionV2;
@@ -28,7 +28,7 @@ pub async fn insert_document_row(
     updated_at: &chrono::DateTime<chrono::Utc>,
 ) -> Result<uuid::Uuid, DocumentError> {
     // Generate id if one is not provided
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let document_id: uuid::Uuid = if let Some(id) = document_id { *id } else { id };
 
     // Insert document (with or without user-provided ID)
@@ -210,7 +210,7 @@ pub async fn set_share_permission(
 pub async fn insert_history(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     document_id: &uuid::Uuid,
-    history_user: Option<&MacroUserIdStr<'_>>,
+    history_user: Option<&RoxUserIdStr<'_>>,
     created_at: &chrono::DateTime<chrono::Utc>,
 ) -> Result<(), sqlx::Error> {
     if let Some(user_id) = history_user {

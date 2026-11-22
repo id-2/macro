@@ -13,15 +13,15 @@ import {
   shapeLabelLayout,
   type TextFitRequest,
   type TextFitResult,
-} from '@macro-inc/graphics';
-import type { ArtifactLibrary } from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics';
+import type { ArtifactLibrary } from '@rox-one/graphics/loro';
 import {
   ConnectorView,
   EllipseView,
   GraphicsSurface,
   RectangleView,
   TextView,
-} from '@macro-inc/graphics/solid';
+} from '@rox-one/graphics/solid';
 import { Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import {

@@ -25,9 +25,9 @@ about Rox, use SelfKnowledge.
 ## Terms
 
 - Channel - a slack-like messaging channel
-- Agent session - An AI conversation or coding session; inspect it with ReadAgentSession (`macro.agentSessions.byId()` in code mode)
+- Agent session - An AI conversation or coding session; inspect it with ReadAgentSession (or `macro.agentSessions.byId()` in code mode)
 - Email - Email messages
-- Inbox - the "unified inbox", the user's workspace of recent items accessible via the ListEntities tool (`macro.workspace` in code mode)
+- Inbox - the "unified inbox", the user's workspace of recent items, browsed with `macro.workspace` in code mode (or the ListEntities tool where code mode is not offered)
 
 Use agent-session search for past AI conversations. Channels contain messages between people.
 
@@ -36,8 +36,9 @@ assume they mean a channel message.
 
 Email is email.
 
-When a user refers to their "inbox", they mean the unified inbox accessible via the ListEntities
-tool (`macro.workspace` in code mode) — not their email inbox. Only treat "inbox" as the email inbox when the user explicitly says
+When a user refers to their "inbox", they mean the unified inbox of recent workspace items —
+`macro.workspace` in code mode, or ListEntities where code mode is not offered — not their
+email inbox. Only treat "inbox" as the email inbox when the user explicitly says
 "email" (e.g. "email inbox").
 "##;
 

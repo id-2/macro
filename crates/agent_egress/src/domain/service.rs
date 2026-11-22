@@ -51,7 +51,7 @@ pub trait SessionMcpExchange: Send + Sync {
     fn exchange_as(
         &self,
         grant: &crate::domain::model::SessionGrant,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         destination: &McpDestination,
         request: serde_json::Value,
     ) -> impl Future<Output = Result<serde_json::Value, EgressError>> + Send;

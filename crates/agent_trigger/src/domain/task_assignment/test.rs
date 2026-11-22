@@ -1,10 +1,10 @@
 use super::*;
 use crate::domain::sources::{MessageTriggerEvents, TriggerEvents};
 use chrono::Utc;
-use macro_event_broker::{Event, MacroEvent, MacroEventCollection};
+use rox_event_broker::{Event, RoxEvent, RoxEventCollection};
 use messages::domain::ports::MessageError;
 use models_properties::EntityReference;
-use properties::domain::events::{PropertyMacroEvent, PropertyTopicEvent};
+use properties::domain::events::{PropertyRoxEvent, PropertyTopicEvent};
 
 fn brief() -> TaskBrief {
     TaskBrief {
@@ -60,7 +60,7 @@ fn update() -> EntityPropertyUpdatedMetadata {
         entity_id: "task-1".to_owned(),
         entity_type: EntityType::Task,
         property_definition_id: SystemPropertyKey::Assignees.uuid(),
-        actor_user_id: Some(MacroUserIdStr::try_from_email("assigner@example.com").unwrap()),
+        actor_user_id: Some(RoxUserIdStr::try_from_email("assigner@example.com").unwrap()),
         actor: None,
         on_behalf_of: None,
         source: None,
@@ -121,7 +121,7 @@ fn only_task_assignees_with_an_invoking_user_trigger() {
     updated = update();
     updated.actor_user_id = None;
     assert!(TaskAssignment::from_update(Uuid::now_v7(), &updated).is_none());
-    updated.on_behalf_of = Some(MacroUserIdStr::try_from_email("delegator@example.com").unwrap());
+    updated.on_behalf_of = Some(RoxUserIdStr::try_from_email("delegator@example.com").unwrap());
     assert_eq!(
         TaskAssignment::from_update(Uuid::now_v7(), &updated)
             .unwrap()
@@ -244,7 +244,7 @@ async fn deleted_or_unrelated_discussions_cannot_start_a_session() {
             2 => message.thread_id = Some(Uuid::now_v7()),
             _ => {
                 message.sender_id = channel_sender::ChannelSender::new_from_user(
-                    MacroUserIdStr::try_from_email("other@example.com").unwrap(),
+                    RoxUserIdStr::try_from_email("other@example.com").unwrap(),
                 )
             }
         }
@@ -304,7 +304,7 @@ fn removing_then_reassigning_starts_a_new_assignment() {
 fn the_trigger_source_also_decodes_task_assignments() {
     let event_id = Uuid::now_v7();
     let event = || {
-        PropertyMacroEvent::from_event(
+        PropertyRoxEvent::from_event(
             "task-1".to_owned(),
             Event::with_event_id(
                 event_id,
@@ -312,7 +312,7 @@ fn the_trigger_source_also_decodes_task_assignments() {
             ),
         )
     };
-    let message = MessageTriggerEvents::PropertyMacroEvent(event()).into_trigger();
+    let message = MessageTriggerEvents::PropertyRoxEvent(event()).into_trigger();
     assert!(MessageTriggerEvents::topics().contains(&"macro.properties"));
     assert!(message.posted.is_none());
     assert_eq!(message.assignment.unwrap().event_id, event_id);
@@ -321,13 +321,13 @@ fn the_trigger_source_also_decodes_task_assignments() {
 #[derive(Default)]
 struct RecordedEvents(std::sync::Mutex<Vec<serde_json::Value>>);
 
-impl MacroEventBroker for RecordedEvents {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordedEvents {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<
-        tokio::task::JoinHandle<Result<(), macro_event_broker::EventBrokerError>>,
-        macro_event_broker::EventBrokerError,
+        tokio::task::JoinHandle<Result<(), rox_event_broker::EventBrokerError>>,
+        rox_event_broker::EventBrokerError,
     > {
         self.0
             .lock()
@@ -485,7 +485,7 @@ fn an_assignment_made_by_a_person_is_theirs() {
         assignment.origin,
         TriggerOrigin::TaskAssigned {
             by: Caller::Person {
-                user: MacroUserIdStr::try_from_email("assigner@example.com").unwrap(),
+                user: RoxUserIdStr::try_from_email("assigner@example.com").unwrap(),
             },
             task: "task-1".to_owned(),
         }
@@ -494,7 +494,7 @@ fn an_assignment_made_by_a_person_is_theirs() {
 
 #[test]
 fn an_assignment_an_agent_made_for_a_person_names_the_agent() {
-    let user = MacroUserIdStr::try_from_email("assigner@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("assigner@example.com").unwrap();
     let updated = EntityPropertyUpdatedMetadata {
         actor_user_id: None,
         actor: Some(channel_sender::ChannelSender::new_from_bot(BotId::TEST_B)),
@@ -532,7 +532,7 @@ fn agents_a_task_inherits_from_its_project_say_so() {
         assignment.origin,
         TriggerOrigin::ProjectInherited {
             by: Caller::Person {
-                user: MacroUserIdStr::try_from_email("assigner@example.com").unwrap(),
+                user: RoxUserIdStr::try_from_email("assigner@example.com").unwrap(),
             },
             task: "task-1".to_owned(),
             project,

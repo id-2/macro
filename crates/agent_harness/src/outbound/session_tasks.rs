@@ -12,11 +12,11 @@ use documents::domain::ports::DocumentService;
 use entity_access::domain::models::{AccessError, EntityType, ViewAccessLevel};
 use entity_access::domain::ports::EntityAccessService;
 use github::domain::models::{
-    GithubKey, MacroTaskId, TeamTaskReference, pull_request_task_reference,
+    GithubKey, RoxTaskId, TeamTaskReference, pull_request_task_reference,
 };
 use github::domain::ports::GithubSyncRepo;
 use github::domain::service::PullRequestTaskLinkService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use agent_session::domain::session_task::{
     PullRequestState, SessionTaskError, TaskDirectory, TaskDocumentId, TaskFacts, TaskPullRequest,
@@ -46,7 +46,7 @@ where
 {
     async fn view(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> Result<
         (
@@ -81,7 +81,7 @@ where
 {
     async fn task(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> Result<TaskFacts, SessionTaskError> {
         let (receipt, document) = self.view(viewer, task).await?;
@@ -90,7 +90,7 @@ where
             .get_task_identity(receipt, &document)
             .await
             .map_err(document_error)?;
-        let short = MacroTaskId::from_short_uuid(&identity.short_id).ok_or_else(|| {
+        let short = RoxTaskId::from_short_uuid(&identity.short_id).ok_or_else(|| {
             SessionTaskError::Unavailable(rootcause::report!(
                 "task short id {} is not a short uuid",
                 identity.short_id
@@ -109,7 +109,7 @@ where
 
     async fn pull_requests(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> Result<Vec<TaskPullRequest>, SessionTaskError> {
         let (receipt, document) = self.view(viewer, task).await?;
@@ -197,7 +197,7 @@ impl<Repo: GithubSyncRepo> TaskPullRequestLinker for GithubTaskPullRequestLinker
             return Err(malformed());
         };
         let number: u64 = number.parse().map_err(|_| malformed())?;
-        let short = MacroTaskId::from_short_uuid(&task.short_id).ok_or_else(|| {
+        let short = RoxTaskId::from_short_uuid(&task.short_id).ok_or_else(|| {
             SessionTaskError::Unavailable(rootcause::report!(
                 "task short id {} is not a short uuid",
                 task.short_id

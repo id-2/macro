@@ -7,7 +7,7 @@ mod test;
 
 use std::{future::Future, str::FromStr};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_file_type::FileType;
 use uuid::Uuid;
 
@@ -92,7 +92,7 @@ pub trait StaticMediaStore: Send + Sync + 'static {
     /// declaring `content_type`.
     fn reserve(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         file_name: &str,
         content_type: &str,
     ) -> impl Future<Output = anyhow::Result<StaticMediaReservation>> + Send;
@@ -114,7 +114,7 @@ impl<S: StaticMediaStore> ChannelMediaUploads<S> {
     #[tracing::instrument(skip_all, err)]
     pub async fn reserve(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         upload: NewChannelMediaUpload,
     ) -> Result<ChannelMediaUpload, ChannelMediaUploadError> {
         let file_name = upload.file_name.trim();

@@ -21,7 +21,7 @@ use std::collections::HashMap;
 use models_databases::position::{Position, PositionError, key_between};
 use uuid::Uuid;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::DataType;
 use properties::domain::database_definition_writer::{
     DatabaseDefinitionWriter, NewDatabaseDefinition,
@@ -373,7 +373,7 @@ where
         &self,
         database_id: Option<DatabaseId>,
         definition: &QueryDefinition,
-        created_by: &MacroUserIdStr<'_>,
+        created_by: &RoxUserIdStr<'_>,
     ) -> Result<SavedQuery, Self::Error> {
         self.insert_query(database_id, definition, created_by.as_ref())
             .await
@@ -406,7 +406,7 @@ where
             .create_database_definition_in(
                 &mut transaction,
                 NewDatabaseDefinition {
-                    id: macro_uuid::generate_uuid_v7(),
+                    id: rox_uuid::generate_uuid_v7(),
                     database_id: database.id.into_uuid(),
                     name: first_table.title_column,
                     data_type: DataType::String,

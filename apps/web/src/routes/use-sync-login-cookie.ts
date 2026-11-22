@@ -1,8 +1,4 @@
-import {
-  getLoginCookieOptions,
-  syncLoginStorage,
-  updateCookie,
-} from '@core/util/cookies';
+import { syncLoginStorage, writeLoginHint } from '@core/util/cookies';
 import { thrownResultErrorHasCode } from '@core/util/result';
 import { useUserInfoQuery } from '@queries/auth/user-info';
 import { setEmailOutboxSession } from '@queries/email/outbox-session';
@@ -25,8 +21,7 @@ export function useSyncLoginCookie() {
       (accountId) => {
         if (accountId === undefined) return;
         const authenticated = accountId !== false;
-        const { value, ...options } = getLoginCookieOptions(authenticated);
-        updateCookie('login', value, options);
+        writeLoginHint(authenticated);
         syncLoginStorage(authenticated);
         setGraphqlSoupSessionActive(authenticated);
         setEmailOutboxSession(accountId || undefined);

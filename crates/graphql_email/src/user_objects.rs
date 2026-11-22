@@ -6,7 +6,7 @@ use email::domain::models::{
     UserEmailLink, UserEmailLinkSettings, UserProvider,
 };
 use email::domain::ports::EmailUserService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 mod senders;
@@ -159,7 +159,7 @@ pub struct GraphqlEmailLink<S: EmailUserService> {
     #[graphql(skip)]
     service: Arc<S>,
     #[graphql(skip)]
-    viewer: MacroUserIdStr<'static>,
+    viewer: RoxUserIdStr<'static>,
     #[graphql(skip)]
     link_id: Uuid,
     /// Whether drafts from this account's own sender are classified as Signal.
@@ -198,7 +198,7 @@ pub struct GraphqlEmailLink<S: EmailUserService> {
 
 impl<S: EmailUserService> GraphqlEmailLink<S> {
     /// Attach the authenticated identity for lazy sender discovery.
-    pub fn new(link: UserEmailLink, service: Arc<S>, viewer: MacroUserIdStr<'static>) -> Self {
+    pub fn new(link: UserEmailLink, service: Arc<S>, viewer: RoxUserIdStr<'static>) -> Self {
         Self {
             service,
             viewer,

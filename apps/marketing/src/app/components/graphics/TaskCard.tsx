@@ -16,7 +16,7 @@ import type { Component, JSX } from 'solid-js';
 import { For, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import IconGithub from '../../../assets/icons/icon-github.svg';
-import { MacroMarkIcon } from './MacroMarkIcon';
+import { RoxMarkIcon } from './RoxMarkIcon';
 
 // ---------------------------------------------------------------------------
 // A single task, drawn as the product draws it — the same panel the lifecycle
@@ -146,7 +146,7 @@ const AgentFace = (p: { size: number }) => (
     class="tcp-disc"
     style={{ background: '#000', height: `${p.size}px`, width: `${p.size}px` }}
   >
-    <MacroMarkIcon
+    <RoxMarkIcon
       style={{
         color: 'var(--a0)',
         display: 'block',

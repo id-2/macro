@@ -137,7 +137,7 @@ export function Harness(
     try {
       await deleteHarnessMutation.mutateAsync({ harnessId: current.id });
       setRemovingHarness(undefined);
-      toast.success('Machine removed');
+      toast.success('Машина удалена');
     } catch (error) {
       if (thrownResultErrorHasCode(error, 'NOT_FOUND')) {
         // Already gone, e.g. removed elsewhere: the list just needs to catch up.
@@ -145,7 +145,7 @@ export function Harness(
         fireAndForget(invalidateHarnesses(), 'harness-settings');
         return;
       }
-      toast.failure(failureMessage(error, 'Failed to remove machine'));
+      toast.failure(failureMessage(error, 'Не удалось удалить машину'));
     } finally {
       setRemoving(false);
     }
@@ -161,10 +161,10 @@ export function Harness(
     try {
       await saveCursorApiKey.mutateAsync(apiKey);
       setCursorApiKey('');
-      toast.success('Cursor connected');
+      toast.success('Cursor подключён');
     } catch (error) {
       toast.failure(
-        failureMessage(error, 'Failed to save your Cursor API key')
+        failureMessage(error, 'Не удалось сохранить ключ API Cursor')
       );
     }
   };
@@ -172,18 +172,18 @@ export function Harness(
   const handleDisconnectCursor = async () => {
     if (disconnectCursor.isPending) return;
     const confirmed = await confirmDialog({
-      title: 'Disconnect Cursor?',
-      body: "Remove your Cursor connection from Rox? This removes Rox's copy of the API key but does not revoke it in Cursor.",
-      confirmLabel: 'Disconnect',
+      title: 'Отключить Cursor?',
+      body: 'Убрать подключение Cursor из Rox? Копия ключа API в Rox удалится, но в самом Cursor ключ не отзовётся.',
+      confirmLabel: 'Отключить',
       tone: 'danger',
     });
     if (!confirmed || disconnectCursor.isPending) return;
     try {
       await disconnectCursor.mutateAsync();
       setCursorApiKey('');
-      toast.success('Cursor disconnected');
+      toast.success('Cursor отключён');
     } catch (error) {
-      toast.failure(failureMessage(error, 'Failed to disconnect Cursor'));
+      toast.failure(failureMessage(error, 'Не удалось отключить Cursor'));
     }
   };
 
@@ -192,11 +192,11 @@ export function Harness(
       <Show when={!pairingDialog()}>
         <SettingsSearchTarget result={highlight()}>
           <SettingsPage
-            title="Machines"
-            description="Providers and machines your agents can run on."
+            title="Машины"
+            description="Поставщики и машины, на которых могут работать агенты."
             signpost={<TutorialPill tutorial="roxd" class="mt-1 self-start" />}
             onBack={props.onBack}
-            backLabel={props.backLabel ?? 'Agents'}
+            backLabel={props.backLabel ?? 'Агенты'}
             actions={
               <Button
                 variant="primary"
@@ -204,7 +204,7 @@ export function Harness(
                 onClick={() => setPairingDialog({})}
               >
                 <PlusIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-                New machine
+                Новая машина
               </Button>
             }
           >
@@ -247,7 +247,7 @@ export function Harness(
             <LocalRuntimeCard />
             <div>
               <h2 class="mb-3 px-6 text-sm font-semibold text-ink">
-                Built-in machines
+                Встроенные машины
               </h2>
               <SettingsCard inset="wide">
                 <MachineSection>
@@ -260,12 +260,12 @@ export function Harness(
                         {MACRO_HARNESS_NAME}
                       </h2>
                       <span class="inline-flex h-5 shrink-0 items-center whitespace-nowrap rounded-md bg-success-bg px-2 text-[11px]/none font-medium text-success">
-                        Built in
+                        Встроено
                       </span>
                     </div>
                     <p class="mt-1 text-sm text-ink-muted">
-                      Rox in house fast and powerful agent. Uses official Rox
-                      tools and MCPs to get the job done.
+                      Собственный быстрый и мощный агент Rox. Пользуется
+                      официальными инструментами Rox и MCP.
                     </p>
                   </div>
                 </MachineSection>
@@ -281,13 +281,13 @@ export function Harness(
                       </h2>
                       <Show when={cursorRegistered()}>
                         <span class="inline-flex h-5 shrink-0 items-center whitespace-nowrap rounded-md bg-success-bg px-2 text-[11px]/none font-medium text-success">
-                          Connected
+                          Подключено
                         </span>
                       </Show>
                     </div>
                     <p class="mt-1 text-sm text-ink-muted">
-                      Bring your own Cursor subscription to Rox. Manage Cursor
-                      Cloud sessions directly in the app.
+                      Подключите свою подписку Cursor к Rox. Сессии Cursor
+                      Cloud можно вести прямо в приложении.
                     </p>
 
                     <Show
@@ -298,8 +298,8 @@ export function Harness(
                       fallback={
                         <p class="mt-4 text-xs text-ink-muted">
                           {cursorStatus.isError
-                            ? 'Could not load your Cursor connection. Try refreshing this page.'
-                            : 'Loading…'}
+                            ? 'Не удалось загрузить подключение Cursor. Обновите страницу.'
+                            : 'Загрузка…'}
                         </p>
                       }
                     >
@@ -311,7 +311,7 @@ export function Harness(
                               for="cursor-harness-api-key"
                               class="text-xs text-ink"
                             >
-                              API key
+                              Ключ API
                             </label>
                             <div class="flex items-center gap-2 mobile:flex-col mobile:items-stretch">
                               <ApiKeyInput
@@ -338,12 +338,12 @@ export function Harness(
                                 }
                                 onClick={handleSaveCursorApiKey}
                               >
-                                Save
+                                Сохранить
                               </Button>
                             </div>
                             <p class="text-xs text-ink-extra-muted">
-                              Create an API key in Cursor and paste it here. Rox
-                              stores it encrypted.
+                              Создайте ключ API в Cursor и вставьте его сюда. Rox
+                              хранит его в зашифрованном виде.
                             </p>
                           </div>
                         }
@@ -351,21 +351,21 @@ export function Harness(
                         <div class="mt-4 flex flex-col gap-3">
                           <div class="flex w-full max-w-60 flex-col gap-1.5">
                             <span class="text-xs font-medium text-ink">
-                              Default model
+                              Модель по умолчанию
                             </span>
                             <CursorDefaultModel />
                           </div>
                           <p class="text-xs text-ink-extra-muted">
-                            The model new `@cursor` sessions start on.
-                            Recommended models stay up top; everything else is
-                            behind More models.
+                            Модель, с которой начинаются новые сессии `@cursor`.
+                            Рекомендуемые — сверху, остальные скрыты за пунктом
+                            «Ещё модели».
                           </p>
                         </div>
 
                         <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
                           <p class="flex-1 basis-56 text-xs text-ink-extra-muted">
-                            Disconnecting removes Rox's copy of the key but does
-                            not revoke it in Cursor.
+                            Отключение удаляет копию ключа в Rox, но не отзывает
+                            его в Cursor.
                           </p>
                           <Button
                             type="button"
@@ -375,7 +375,7 @@ export function Harness(
                             disabled={disconnectCursor.isPending}
                             onClick={handleDisconnectCursor}
                           >
-                            Disconnect
+                            Отключить
                           </Button>
                         </div>
                       </Show>
@@ -442,7 +442,7 @@ function HarnessRenameDialog(props: {
       });
       props.onClose();
     } catch (error) {
-      toast.failure(failureMessage(error, 'Failed to rename machine'));
+      toast.failure(failureMessage(error, 'Не удалось переименовать машину'));
     }
   };
 
@@ -459,7 +459,7 @@ function HarnessRenameDialog(props: {
       <Panel depth={2} class="rounded-xl text-ink">
         <Panel.Header class="px-5 py-3">
           <Dialog.Title class="text-sm font-semibold">
-            Rename machine
+            Переименовать машину
           </Dialog.Title>
         </Panel.Header>
         <form
@@ -470,7 +470,7 @@ function HarnessRenameDialog(props: {
         >
           <Panel.Body class="flex flex-col gap-1.5 p-5">
             <label for="harness-rename" class="text-xs font-medium text-ink">
-              Name
+              Название
             </label>
             <Input
               id="harness-rename"
@@ -489,7 +489,7 @@ function HarnessRenameDialog(props: {
               disabled={patchHarness.isPending}
               onClick={props.onClose}
             >
-              Cancel
+              Отмена
             </Button>
             <Button
               type="submit"
@@ -497,7 +497,7 @@ function HarnessRenameDialog(props: {
               size="sm"
               disabled={!canSave()}
             >
-              {patchHarness.isPending ? 'Saving…' : 'Save'}
+              {patchHarness.isPending ? 'Сохранение…' : 'Сохранить'}
             </Button>
           </Panel.Footer>
         </form>
@@ -523,13 +523,13 @@ function HarnessRemoveDialog(props: {
       <Panel depth={2} class="rounded-xl text-ink">
         <Panel.Header class="px-5 py-3">
           <Dialog.Title class="text-sm font-semibold">
-            Remove {props.harnessName}?
+            Удалить {props.harnessName}?
           </Dialog.Title>
         </Panel.Header>
         <Panel.Body class="p-5">
           <Dialog.Description class="text-sm leading-5 text-ink-muted">
-            Agents using this machine will stop running until it's reconnected.
-            roxd on it will need to pair again.
+            Агенты на этой машине остановятся, пока её снова не подключат.
+            roxd на ней нужно будет сопрячь заново.
           </Dialog.Description>
         </Panel.Body>
         <Panel.Footer class="justify-end gap-2 px-5 py-3">
@@ -540,7 +540,7 @@ function HarnessRemoveDialog(props: {
             disabled={props.pending}
             onClick={props.onClose}
           >
-            Cancel
+            Отмена
           </Button>
           <Button
             type="button"
@@ -549,7 +549,7 @@ function HarnessRemoveDialog(props: {
             disabled={props.pending}
             onClick={props.onConfirm}
           >
-            {props.pending ? 'Removing…' : 'Remove machine'}
+            {props.pending ? 'Удаление…' : 'Удалить машину'}
           </Button>
         </Panel.Footer>
       </Panel>

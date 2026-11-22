@@ -1,7 +1,7 @@
 //! Compose persisted context; only explicit edits and scheduled jobs can write it.
 use super::{models::*, ports::*};
 use chrono::{Duration, NaiveDate, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use tracing::Instrument;
 
@@ -33,7 +33,7 @@ impl<R> MemoryServiceImpl<R> {
 
 impl<R: ComposedMemoryRepo> MemoryService for MemoryServiceImpl<R> {
     #[tracing::instrument(skip_all, err)]
-    async fn get_memory(&self, user: MacroUserIdStr<'static>) -> Result<Option<Memory>> {
+    async fn get_memory(&self, user: RoxUserIdStr<'static>) -> Result<Option<Memory>> {
         // Retain the deployed method contract, but reads no longer spawn generation.
         self.repo.enroll(&user).await?;
         let selected = self.repo.latest_activity(&user).await?;
@@ -63,7 +63,7 @@ impl<R: ComposedMemoryRepo> MemoryService for MemoryServiceImpl<R> {
 
     /// Private memory is always read as the authenticated caller.
     #[tracing::instrument(skip_all, err)]
-    async fn explicit(&self, user: &MacroUserIdStr<'_>) -> Result<ExplicitMemory> {
+    async fn explicit(&self, user: &RoxUserIdStr<'_>) -> Result<ExplicitMemory> {
         self.repo.enroll(user).await?;
         self.repo.explicit(user).await
     }
@@ -72,7 +72,7 @@ impl<R: ComposedMemoryRepo> MemoryService for MemoryServiceImpl<R> {
     #[tracing::instrument(skip_all, err)]
     async fn update_memory(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         revision: i64,
         edit: &MemoryEdit,
     ) -> Result<ExplicitMemory> {
@@ -94,8 +94,8 @@ impl<R: ComposedMemoryRepo> MemoryService for MemoryServiceImpl<R> {
     #[tracing::instrument(skip_all, err)]
     async fn get_user_activity(
         &self,
-        caller: MacroUserIdStr<'static>,
-        user: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         start: NaiveDate,
         end: NaiveDate,
     ) -> Result<Vec<Activity>> {
@@ -155,7 +155,7 @@ impl<R: ComposedMemoryRepo> MemoryServiceImpl<R> {
         fields(date = %date, kept = tracing::field::Empty, inactive = tracing::field::Empty),
         err
     )]
-    pub async fn refresh(&self, user: MacroUserIdStr<'static>, date: NaiveDate) -> Result<()> {
+    pub async fn refresh(&self, user: RoxUserIdStr<'static>, date: NaiveDate) -> Result<()> {
         let Some(snapshot) = self.pending(&user, date).await? else {
             return Ok(());
         };
@@ -266,7 +266,7 @@ impl<R: ComposedMemoryRepo> MemoryServiceImpl<R> {
     #[tracing::instrument(skip_all, fields(through = %through), err)]
     pub async fn refresh_through(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         through: NaiveDate,
     ) -> Result<()> {
         self.repo.enroll(&user).await?;
@@ -365,7 +365,7 @@ impl<R: ComposedMemoryRepo> MemoryServiceImpl<R> {
 
     /// Commit whatever pieces of `date` passed review and move past the day.
     #[tracing::instrument(skip_all, fields(date = %date, kept = tracing::field::Empty), err)]
-    async fn give_up(&self, user: MacroUserIdStr<'static>, date: NaiveDate) -> Result<()> {
+    async fn give_up(&self, user: RoxUserIdStr<'static>, date: NaiveDate) -> Result<()> {
         let Some(snapshot) = self.pending(&user, date).await? else {
             return Ok(());
         };
@@ -390,7 +390,7 @@ impl<R: ComposedMemoryRepo> MemoryServiceImpl<R> {
     /// The snapshot to build `date` on, or `None` when the day is already done.
     async fn pending(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         date: NaiveDate,
     ) -> Result<Option<MemorySnapshot>> {
         if date >= Utc::now().date_naive() {
@@ -415,7 +415,7 @@ impl<R: ComposedMemoryRepo> MemoryServiceImpl<R> {
     /// Staged pieces of `date`, counted on the current span's `kept` field.
     async fn staged(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         date: NaiveDate,
     ) -> Result<StagedPieces> {
         let staged = self.repo.staged(user, date).await?;
@@ -426,7 +426,7 @@ impl<R: ComposedMemoryRepo> MemoryServiceImpl<R> {
         Ok(staged)
     }
 
-    async fn team_ids(&self, user: &MacroUserIdStr<'static>) -> Result<Vec<macro_uuid::Uuid>> {
+    async fn team_ids(&self, user: &RoxUserIdStr<'static>) -> Result<Vec<rox_uuid::Uuid>> {
         Ok(self
             .teams
             .members(user)
@@ -439,7 +439,7 @@ impl<R: ComposedMemoryRepo> MemoryServiceImpl<R> {
     /// A rollup, reused from `staged` when an earlier attempt already passed it.
     async fn report(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         date: NaiveDate,
         staged: &StagedPieces,
         granularity: Granularity,

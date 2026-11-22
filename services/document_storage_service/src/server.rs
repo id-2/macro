@@ -130,19 +130,19 @@ use initiative::{
     outbound::PgInitiativeRepo,
 };
 use lexical_client::LexicalClient;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, PgBotAuthorizationRepo, PgBotAuthorizer, PgHarnessAuthorizationRepo,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, PgBotAuthorizationRepo, PgBotAuthorizer, PgHarnessAuthorizationRepo,
     PgHarnessAuthorizer, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_env_var::maybe_env_vars;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
-use macro_service_urls::{
+use rox_env_var::maybe_env_vars;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
+use rox_service_urls::{
     AiEditingWorkerUrl, ConnectionGatewayUrl, LexicalServiceUrl, StaticFileServiceUrl,
     SyncServiceUrl,
 };
-use macro_sha_count_client::Redis;
+use rox_sha_count_client::Redis;
 use notification::domain::service::{
     NotificationReaderService, PlatformArnConfig, SqsNotificationIngress,
     WebSocketNotificationConsumerService,
@@ -220,9 +220,9 @@ maybe_env_vars! {
 /// Published warehouse address for LiveKit Cloud, when one can be opened
 /// from outside this machine. The in-network name `localstack` is not used.
 fn recording_warehouse_endpoint() -> Option<String> {
-    let candidate = macro_aws_config::LocalAwsPublicUrl::new()
+    let candidate = rox_aws_config::LocalAwsPublicUrl::new()
         .map(|url| url.as_ref().to_owned())
-        .or_else(|| macro_aws_config::LocalAwsUrl::new().map(|url| url.as_ref().to_owned()))?;
+        .or_else(|| rox_aws_config::LocalAwsUrl::new().map(|url| url.as_ref().to_owned()))?;
     call::domain::models::cloud_reachable_warehouse_endpoint(&candidate).map(str::to_owned)
 }
 
@@ -235,7 +235,7 @@ pub fn run() -> impl Future<Output = anyhow::Result<()>> {
 async fn run_server() -> anyhow::Result<()> {
     let env = Environment::new_or_prod();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
@@ -303,18 +303,18 @@ async fn run_server() -> anyhow::Result<()> {
     );
     tracing::trace!("initialized dynamodb client");
 
-    let s3_client = macro_aws_config::s3_client().await;
+    let s3_client = rox_aws_config::s3_client().await;
 
     tracing::trace!("initialized s3 client");
 
-    let search_event_queue = macro_queues::SearchEventQueue::new();
-    let document_delete_queue = macro_queues::DocumentDeleteQueue::new();
-    let contacts_queue = macro_queues::ContactsQueue::new();
-    let notification_queue = macro_queues::NotificationIngressQueue::new();
-    let gmail_ops_queue = macro_queues::GmailOpsQueue::new();
-    let email_scheduled_queue = macro_queues::EmailScheduledQueue::new();
-    let reminder_dispatch_queue = macro_queues::ReminderDispatchQueue::new();
-    let calendar_reminder_dispatch_queue = macro_queues::CalendarReminderDispatchQueue::new();
+    let search_event_queue = rox_queues::SearchEventQueue::new();
+    let document_delete_queue = rox_queues::DocumentDeleteQueue::new();
+    let contacts_queue = rox_queues::ContactsQueue::new();
+    let notification_queue = rox_queues::NotificationIngressQueue::new();
+    let gmail_ops_queue = rox_queues::GmailOpsQueue::new();
+    let email_scheduled_queue = rox_queues::EmailScheduledQueue::new();
+    let reminder_dispatch_queue = rox_queues::ReminderDispatchQueue::new();
+    let calendar_reminder_dispatch_queue = rox_queues::CalendarReminderDispatchQueue::new();
     let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(&aws_config))
         .search_event_queue(&search_event_queue)
         .document_delete_queue(&document_delete_queue)
@@ -323,7 +323,7 @@ async fn run_server() -> anyhow::Result<()> {
         .email_scheduled_queue(&email_scheduled_queue);
     let webhook_event_queue = webhook::outbound::SqsWebhookQueue::new(
         Arc::new(sqs_client.clone()),
-        macro_queues::WebhookEventQueue::new().to_string(),
+        rox_queues::WebhookEventQueue::new().to_string(),
         config.webhook_queue_max_messages,
         config.webhook_queue_wait_time_seconds,
     );
@@ -388,7 +388,7 @@ async fn run_server() -> anyhow::Result<()> {
         ));
     }
     let import_jobs = ai_tools::ImportJobs::new();
-    let macro_event_broker = MacroEventBrokerService::new(
+    let macro_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
@@ -408,8 +408,8 @@ async fn run_server() -> anyhow::Result<()> {
         ai_tools::pipedream_client_from_env()?,
     ));
 
-    let authorization_service: AuthorizationService = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(jwt_validation_args.clone()),
+    let authorization_service: AuthorizationService = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(jwt_validation_args.clone()),
         InternalAuthConfig {
             api_key: dss_auth_key.as_ref().to_string(),
             default_user_id: Some(MACRO_INTERNAL_USER_ID.to_string()),
@@ -420,7 +420,7 @@ async fn run_server() -> anyhow::Result<()> {
     .with_harness_authorizer(PgHarnessAuthorizer::new(PgHarnessAuthorizationRepo::new(
         db.clone(),
     )));
-    let authorization_state = MacroAuthorizationState::new(Arc::new(authorization_service));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(authorization_service));
     let harnesses_service = harnesses::domain::service::HarnessServiceImpl::new(
         PgHarnessRepo::new(db.clone()),
         hosted_runtimes::outbound::pg::PgComputerAgents::new(db.clone()),
@@ -474,7 +474,7 @@ async fn run_server() -> anyhow::Result<()> {
             .authentication_service_secret_key
             .as_ref()
             .to_string(),
-        macro_service_urls::AuthServiceUrl::new()?.to_string(),
+        rox_service_urls::AuthServiceUrl::new()?.to_string(),
     ));
     let email_service = EmailServiceImpl::new(
         EmailPgRepo::new(db.clone()),
@@ -602,7 +602,7 @@ async fn run_server() -> anyhow::Result<()> {
             .document_storage_service_presigned_url_browser_cache_expiry_seconds,
     };
     let s3_upload_adapter = S3UploadUrlAdapter::new(
-        macro_aws_config::s3_client().await,
+        rox_aws_config::s3_client().await,
         config.document_storage_bucket.as_ref(),
         config.docx_document_upload_bucket.as_ref(),
     );
@@ -652,7 +652,7 @@ async fn run_server() -> anyhow::Result<()> {
     let project_service = Arc::new(ProjectServiceImpl::new(
         PgProjectRepo::new(db.clone(), owned_entity_registrar.clone()),
         S3ProjectUploadAdapter::new(
-            macro_aws_config::s3_client().await,
+            rox_aws_config::s3_client().await,
             config.document_storage_bucket.as_ref(),
             config.docx_document_upload_bucket.as_ref(),
             config.upload_staging_bucket.as_ref(),
@@ -762,7 +762,7 @@ async fn run_server() -> anyhow::Result<()> {
                 )),
                 PgGithubPullRequestRepo::new(db.clone()),
                 S3GithubPullRequestPatchStore::new(
-                    macro_aws_config::s3_client().await,
+                    rox_aws_config::s3_client().await,
                     config.github_pull_request_patch_bucket.to_string(),
                 ),
             ),
@@ -1387,7 +1387,7 @@ async fn run_server() -> anyhow::Result<()> {
         }
     });
 
-    // MacroConfig reads the shared OPENAI_API_KEY from Doppler's APP_SECRETS_JSON
+    // RoxConfig reads the shared OPENAI_API_KEY from Doppler's APP_SECRETS_JSON
     // or the local environment. Validate once before constructing consumers.
     let openai_api_key = config.openai_api_key.as_ref().to_owned();
     anyhow::ensure!(
@@ -1496,7 +1496,7 @@ async fn run_server() -> anyhow::Result<()> {
     )
     .with_sharing(messages::outbound::pg_discussion_context::PgDiscussionContext(db.clone()));
     let annotation_service = Arc::new(messages::domain::annotations::AnnotationService::new(
-        macro_db_client::annotations::repository::PgAnnotationRepository(db.clone()),
+        rox_db_client::annotations::repository::PgAnnotationRepository(db.clone()),
         (*entity_access_service).clone(),
         discussion_delivery.clone(),
     ));
@@ -1669,7 +1669,7 @@ async fn run_server() -> anyhow::Result<()> {
                         .authentication_service_secret_key
                         .as_ref()
                         .to_string(),
-                    macro_service_urls::AuthServiceUrl::new()?.to_string(),
+                    rox_service_urls::AuthServiceUrl::new()?.to_string(),
                 ),
             ),
         )),
@@ -1756,7 +1756,7 @@ async fn run_server() -> anyhow::Result<()> {
     let document_files = Arc::new(
         documents_hex::outbound::s3_document_files::S3DocumentFiles::new(
             db.clone(),
-            macro_aws_config::s3_client().await,
+            rox_aws_config::s3_client().await,
             config.document_storage_bucket.to_string(),
         ),
     );
@@ -1817,7 +1817,7 @@ async fn run_server() -> anyhow::Result<()> {
             slack_limits,
         ),
         slack_integration::outbound::s3_storage::S3ImportStorage::new(
-            macro_aws_config::s3_client().await,
+            rox_aws_config::s3_client().await,
             config.upload_staging_bucket.as_ref().to_owned(),
             slack_limits,
         )
@@ -2305,7 +2305,7 @@ async fn run_server() -> anyhow::Result<()> {
             channels_service.clone(),
             message_commands.clone(),
             entity_access_service.clone(),
-            macro_service_urls::AppServiceUrl::new()?,
+            rox_service_urls::AppServiceUrl::new()?,
         ),
     ));
     let user_api_key_service = Arc::new(UserApiKeyServiceImpl::new(PgUserApiKeysRepo::new(
@@ -2361,7 +2361,7 @@ async fn run_server() -> anyhow::Result<()> {
     let graphql_calendar_mutation_context = graphql_calendar::CalendarGraphqlMutationContext::new(
         Arc::new(
             calendar_events::outbound::calendar_service_mutations::CalendarServiceMutations::new(
-                macro_service_urls::CalendarServiceUrl::new()
+                rox_service_urls::CalendarServiceUrl::new()
                     .context("calendar service url")?
                     .to_string(),
                 config.internal_api_key.to_string(),

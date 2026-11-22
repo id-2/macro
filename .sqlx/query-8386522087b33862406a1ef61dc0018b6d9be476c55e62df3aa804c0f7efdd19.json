@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO crm_email_consent (team_id, user_id, link_id, enabled)\n        VALUES ($1, 'macro|u3@gamma.test', $2, TRUE)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8386522087b33862406a1ef61dc0018b6d9be476c55e62df3aa804c0f7efdd19"
+}

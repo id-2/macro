@@ -1,6 +1,6 @@
 import { t } from '@app/lib/i18n';
 import { throwOnErr } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   assertQueryAccount,
   captureQueryAccount,

@@ -327,10 +327,7 @@ fragment SoupItemPreviewFields on GraphqlSoupEntity {
 		createdAt
 		updatedAt
 	}
-	... on GraphqlSoupTeam {
-		teamName: name
-		ownerId
-	}
+
 	... on GraphqlSoupForeignEntity {
 		foreignEntityId
 		foreignEntitySource
@@ -709,12 +706,7 @@ fragment SoupNotificationNavigationMetadataFields on GraphqlNotifEvent {
 		calendarEventJoinRequestEventId: eventId
 		calendarEventJoinRequestTitle: title
 	}
-	... on GraphqlPasswordAccessRequestedMetadata {
-		passwordAccessRequestedRequestId: requestId
-		passwordAccessRequestedTeamId: teamId
-		passwordAccessRequestedItemId: itemId
-		passwordAccessRequestedItemName: itemName
-	}
+
 	... on GraphqlAiResponseMetadata {
 		aiResponseSummary: summary
 		aiResponseMessageId: messageId

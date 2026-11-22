@@ -1,7 +1,10 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { formatCompactRelativeTimestamp, formatTimestamp } from './timestamp';
 
 const NOW = new Date('2026-09-07T12:00:00.000Z');
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 describe('formatCompactRelativeTimestamp', () => {
   beforeEach(() => {

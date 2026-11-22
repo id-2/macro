@@ -17,27 +17,27 @@ use crate::domain::{
     ports::{PullRequestSessions, SoupRealtimeService},
     service::SoupRealtimeServiceImpl,
 };
-use call::domain::events::{CallMacroEvent, CallTopicEvent};
+use call::domain::events::{CallRoxEvent, CallTopicEvent};
 use channels::domain::{
-    broker_events::{ChannelMacroEvent, ChannelTopicEvent},
+    broker_events::{ChannelRoxEvent, ChannelTopicEvent},
     models::ReferencedShareItemType,
 };
-use chat::domain::events::{ChatMacroEvent, ChatTopicEvent};
-use documents::domain::events::{DocumentMacroEvent, DocumentTopicEvent, InteractionReason};
-use email::domain::events::{EmailMacroEvent, EmailTopicEvent};
-use github_pull_requests::broker::{GithubPullRequestMacroEvent, GithubPullRequestTopicEvent};
-use initiative::domain::events::{InitiativeMacroEvent, InitiativeTopicEvent};
+use chat::domain::events::{ChatRoxEvent, ChatTopicEvent};
+use documents::domain::events::{DocumentRoxEvent, DocumentTopicEvent, InteractionReason};
+use email::domain::events::{EmailRoxEvent, EmailTopicEvent};
+use github_pull_requests::broker::{GithubPullRequestRoxEvent, GithubPullRequestTopicEvent};
+use initiative::domain::events::{InitiativeRoxEvent, InitiativeTopicEvent};
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
 use messages::domain::models::MessageParent;
-use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
+use messages::outbound::broker::{MessageRoxEvent, MessageTopicEvent};
 use model_entity::{Entity, EntityType};
 use models_properties::EntityType as PropertyEntityType;
 use models_properties::service::property_value::PropertyValue;
-use projects::domain::events::{ProjectMacroEvent, ProjectTopicEvent};
-use properties::domain::events::{PropertyMacroEvent, PropertyTopicEvent};
+use projects::domain::events::{ProjectRoxEvent, ProjectTopicEvent};
+use properties::domain::events::{PropertyRoxEvent, PropertyTopicEvent};
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message as _};
 use rootcause::prelude::{Report, ResultExt as _};
@@ -55,22 +55,22 @@ impl GroupName for SoupRealtimeConsumerGroup {
     const INITIAL_OFFSET: InitialOffset = InitialOffset::Latest;
 }
 
-type SoupRealtimeKafkaAdapter = KafkaConsumerAdapter<SoupRealtimeConsumerGroup, DeclaredMacroEvent>;
+type SoupRealtimeKafkaAdapter = KafkaConsumerAdapter<SoupRealtimeConsumerGroup, DeclaredRoxEvent>;
 type SoupRealtimeKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, SoupRealtimeKafkaAdapter>;
+    RoxEventConsumerService<DeclaredRoxEvent, SoupRealtimeKafkaAdapter>;
 
-macro_event_broker::declare_topics!(
-    DeclaredMacroEvent:
-        GithubPullRequestMacroEvent,
-        DocumentMacroEvent,
-        ProjectMacroEvent,
-        ChatMacroEvent,
-        EmailMacroEvent,
-        ChannelMacroEvent,
-        MessageMacroEvent,
-        PropertyMacroEvent,
-        InitiativeMacroEvent,
-        CallMacroEvent,
+rox_event_broker::declare_topics!(
+    DeclaredRoxEvent:
+        GithubPullRequestRoxEvent,
+        DocumentRoxEvent,
+        ProjectRoxEvent,
+        ChatRoxEvent,
+        EmailRoxEvent,
+        ChannelRoxEvent,
+        MessageRoxEvent,
+        PropertyRoxEvent,
+        InitiativeRoxEvent,
+        CallRoxEvent,
 );
 
 fn entity(entity_type: EntityType, entity_id: impl ToString) -> Entity<'static> {
@@ -585,9 +585,9 @@ fn patches_from_property_event(event: &PropertyTopicEvent) -> Vec<SoupRealtimePa
     }
 }
 
-fn patches_from_event(event: &DeclaredMacroEvent) -> Vec<SoupRealtimePatch> {
+fn patches_from_event(event: &DeclaredRoxEvent) -> Vec<SoupRealtimePatch> {
     match event {
-        DeclaredMacroEvent::GithubPullRequestMacroEvent(event) => {
+        DeclaredRoxEvent::GithubPullRequestRoxEvent(event) => {
             let GithubPullRequestTopicEvent::Updated(change) = &event.event().event;
             change
                 .foreign_entity_ids
@@ -595,29 +595,29 @@ fn patches_from_event(event: &DeclaredMacroEvent) -> Vec<SoupRealtimePatch> {
                 .map(|id| update(EntityType::ForeignEntity, id))
                 .collect()
         }
-        DeclaredMacroEvent::DocumentMacroEvent(event) => {
+        DeclaredRoxEvent::DocumentRoxEvent(event) => {
             patches_from_document_event(&event.event().event)
         }
-        DeclaredMacroEvent::ProjectMacroEvent(event) => {
+        DeclaredRoxEvent::ProjectRoxEvent(event) => {
             patches_from_project_event(&event.event().event)
         }
-        DeclaredMacroEvent::ChatMacroEvent(event) => patches_from_chat_event(&event.event().event),
-        DeclaredMacroEvent::EmailMacroEvent(event) => {
+        DeclaredRoxEvent::ChatRoxEvent(event) => patches_from_chat_event(&event.event().event),
+        DeclaredRoxEvent::EmailRoxEvent(event) => {
             patches_from_email_event(&event.event().event)
         }
-        DeclaredMacroEvent::ChannelMacroEvent(event) => {
+        DeclaredRoxEvent::ChannelRoxEvent(event) => {
             patches_from_channel_event(&event.event().event)
         }
-        DeclaredMacroEvent::InitiativeMacroEvent(event) => {
+        DeclaredRoxEvent::InitiativeRoxEvent(event) => {
             patches_from_initiative_event(&event.event().event)
         }
-        DeclaredMacroEvent::MessageMacroEvent(event) => {
+        DeclaredRoxEvent::MessageRoxEvent(event) => {
             patches_from_message_event(&event.event().event)
         }
-        DeclaredMacroEvent::PropertyMacroEvent(event) => {
+        DeclaredRoxEvent::PropertyRoxEvent(event) => {
             patches_from_property_event(&event.event().event)
         }
-        DeclaredMacroEvent::CallMacroEvent(event) => patches_from_call_event(&event.event().event),
+        DeclaredRoxEvent::CallRoxEvent(event) => patches_from_call_event(&event.event().event),
     }
 }
 
@@ -659,11 +659,11 @@ enum EventOutcome {
 async fn process_event<S: SoupRealtimeService, L: PullRequestSessions>(
     service: &S,
     sessions: &L,
-    event: &DeclaredMacroEvent,
+    event: &DeclaredRoxEvent,
     commit: impl FnOnce(),
 ) -> EventOutcome {
     let mut patches = patches_from_event(event);
-    if let DeclaredMacroEvent::GithubPullRequestMacroEvent(event) = event {
+    if let DeclaredRoxEvent::GithubPullRequestRoxEvent(event) = event {
         let GithubPullRequestTopicEvent::Updated(update) = &event.event().event;
         match Retry::start(notify_retry_strategy(), || {
             crate::domain::service::pull_request_patches(
@@ -774,11 +774,11 @@ impl SoupRealtimeServiceImpl {
     ) -> Result<(), Report> {
         let consumer = KafkaEventConsumer::<SoupRealtimeConsumerGroup>::from_env(brokers)?;
         let consumer = KafkaConsumerAdapter::<SoupRealtimeConsumerGroup, ()>::new(consumer)
-            .subscribe::<DeclaredMacroEvent>()
+            .subscribe::<DeclaredRoxEvent>()
             .context("failed to subscribe to Soup-affecting entity topics")?;
         let consumer = SoupRealtimeKafkaConsumer::new(consumer);
         tracing::info!(
-            topics = ?DeclaredMacroEvent::topics(),
+            topics = ?DeclaredRoxEvent::topics(),
             group = SoupRealtimeConsumerGroup::GROUP_NAME,
             "realtime Soup entity consumer listening"
         );

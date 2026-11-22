@@ -202,7 +202,7 @@ where
     pub(super) async fn list_in<G: ScheduledActionGrants>(
         &self,
         grants: &G,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         scope: ListScope,
     ) -> Result<Vec<ScheduledAction>> {
         if let ListScope::ChildrenOf(parent) = scope {

@@ -5,7 +5,7 @@ use channel_sender::ChannelSender;
 use chrono::{TimeZone, Utc};
 use entity_access::domain::models::{EntityAccessAuth, EntityAccessReceipt, EntityType};
 use lexical_client::LexicalClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::{MessageCommands, MessageReader},
     models::{
@@ -209,7 +209,7 @@ fn context_with(
 }
 
 fn request() -> RequestContext {
-    RequestContext::new(MacroUserIdStr::try_from(USER.to_owned()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from(USER.to_owned()).unwrap())
 }
 
 /// The write went to the document as the tool actor bot on the user's behalf.

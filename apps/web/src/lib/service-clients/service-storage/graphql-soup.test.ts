@@ -470,7 +470,7 @@ vi.mock('@graphql-cache/scope', () => ({
 vi.mock('@graphql-cache/exchange/normalized-cache-exchange', () => ({
   normalizedCacheExchange: mocks.normalizedCacheExchange,
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     error: mocks.telemetryError,
     warn: mocks.telemetryWarn,
@@ -1097,7 +1097,7 @@ describe('GraphQL Soup browser cache session gate', () => {
     expect(payload.query).toContain('@include');
     expect(payload.variables).toEqual({ includeId: true });
     expect(
-      new Headers(transport.headers).get('x-macro-mail-cache-profile')
+      new Headers(transport.headers).get('x-rox-mail-cache-profile')
     ).toBe('soup-mail-v5');
     expect(new Headers(transport.headers).get('traceparent')).toBe(
       mocks.traceparent

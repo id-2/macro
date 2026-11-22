@@ -5,7 +5,7 @@ use axum::{
     http::header,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use uuid::Uuid;
 
@@ -48,7 +48,7 @@ impl utoipa::ToSchema for EmlFile {}
 #[tracing::instrument(skip(ctx, authorization, headers), fields(eml_bytes = tracing::field::Empty), err)]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     headers: axum::http::HeaderMap,
     Path(id): Path<Uuid>,
 ) -> Result<Response, AttachmentApiError> {
@@ -59,7 +59,7 @@ pub async fn handler(
     tracing::Span::current().record("eml_bytes", source.bytes.len());
     // The raw message carries the code itself; a program reads Macro's
     // sign-in emails only redacted, through the JSON message routes.
-    if macro_authorization::is_program_run(authorization.authorization.user.attribution(), &headers)
+    if rox_authorization::is_program_run(authorization.authorization.user.attribution(), &headers)
         && models_email::sign_in_email::is_macro_sign_in_eml(&source.bytes)
     {
         return Ok((

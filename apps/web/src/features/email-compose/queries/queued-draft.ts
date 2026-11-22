@@ -2,6 +2,7 @@ import {
   draftContactInput,
   type GraphqlSaveEmailDraftArgs,
 } from '@queries/email/graphql/draft';
+import { readBodyRox } from '@queries/email/body-rox-compat';
 import type { DraftClientHandles } from '../context/compose-capabilities';
 import { decodeBase64Utf8 } from '../core/decode-base64';
 import type { EmailDraft } from '../core/email-draft';
@@ -46,7 +47,7 @@ export function queuedDraftSaveArgs({
     bcc: (draft.bcc ?? []).map(draftContactInput),
     bodyHtml: draft.body_html ?? undefined,
     bodyText: draft.body_text ?? undefined,
-    bodyMacro: draft.body_macro ?? undefined,
+    bodyRox: readBodyRox(draft) ?? undefined,
     senderLinkId,
     senderEmail: draft.sender_email ?? senderEmail,
     // Responses carry the body unencoded; mutation input retains base64.

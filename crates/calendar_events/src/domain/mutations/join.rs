@@ -7,7 +7,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     pub(super) async fn answer_join_request(

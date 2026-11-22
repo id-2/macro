@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{PgRemindersRepo, RemindersRepoErr};
@@ -11,7 +11,7 @@ use crate::domain::{
 impl PgRemindersRepo {
     pub(super) async fn read_email_candidates(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         thread_ids: Option<&[Uuid]>,
         cursor: Option<EmailReminderCursor>,
         as_of: DateTime<Utc>,

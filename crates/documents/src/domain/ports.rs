@@ -19,7 +19,7 @@ use entity_access::domain::models::{
     OwnerAccessLevel, ViewAccessLevel,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::{ContentType, DocumentBasic, DocumentMetadata, FileType};
 use model_owner::{CreationPrincipal, Owner};
 use models_permissions::share_permission::SharePermissionV2;
@@ -317,7 +317,7 @@ pub trait DocumentRepo: Send + Sync + 'static {
     fn get_project_owner(
         &self,
         project_id: &str,
-    ) -> impl Future<Output = Result<MacroUserIdStr<'static>, Self::Err>> + Send;
+    ) -> impl Future<Output = Result<RoxUserIdStr<'static>, Self::Err>> + Send;
 
     /// Get the name of a project by ID.
     fn get_project_name(
@@ -410,7 +410,7 @@ pub trait TaskPropertiesPort: Send + Sync + 'static {
     fn update_task_status(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        credited_user: Option<&MacroUserIdStr<'static>>,
+        credited_user: Option<&RoxUserIdStr<'static>>,
         source: Option<&PropertyChangeSource>,
         status: &str,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
@@ -480,7 +480,7 @@ pub async fn task_property_edit_receipt<A: EntityAccessService>(
 pub async fn credited_task_edit_receipt<A: EntityAccessService>(
     entity_access: &A,
     access: &EntityAccessReceipt<EditAccessLevel>,
-    credited_user: Option<&MacroUserIdStr<'static>>,
+    credited_user: Option<&RoxUserIdStr<'static>>,
 ) -> EntityAccessReceipt<EditAccessLevel> {
     let Some(user) = credited_user else {
         return access.clone();
@@ -650,7 +650,7 @@ pub trait DocumentService: Send + Sync + 'static {
     fn update_task_status(
         &self,
         entity_access_receipt: EntityAccessReceipt<EditAccessLevel>,
-        credited_user: Option<MacroUserIdStr<'static>>,
+        credited_user: Option<RoxUserIdStr<'static>>,
         source: Option<PropertyChangeSource>,
         status: &str,
     ) -> impl Future<Output = Result<(), DocumentError>> + Send;

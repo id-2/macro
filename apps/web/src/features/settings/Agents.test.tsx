@@ -2,6 +2,7 @@
  * @vitest-environment jsdom
  */
 
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { Model } from '@core/component/AI/constant/model';
 import { displayName } from '@core/constant/brand';
 import { useAgentModelsQueries } from '@queries/agents/models';
@@ -324,6 +325,9 @@ vi.mock('@queries/pipedream-connectors', () => ({
 
 beforeAll(() => {
   vi.stubGlobal('scrollTo', vi.fn());
+  // The settings pages render Russian; pin it so the browser's language
+  // cannot decide what these assertions see.
+  setInterfaceLanguage('ru');
 });
 
 beforeEach(() => {
@@ -379,15 +383,21 @@ const ROXD_HARNESS = {
   shared_team_ids: [],
 } satisfies Harness;
 
+const MACROD_HARNESS = {
+  ...ROXD_HARNESS,
+  id: '7c2e4f6a-1b3d-4e5f-8a9b-0c1d2e3f4a5b',
+  kind: 'macrod',
+} satisfies Harness;
+
 describe('Agents', () => {
   it('opens the new-agent form from a link and clears the action on cancel', () => {
     updateSearchParams({ createAgent: 'true' });
     render(() => <Agents {...agentsPageProps} />);
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     expect(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     ).toBeTruthy();
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Отмена' }));
     expect(setSearchParams).toHaveBeenCalledWith(
       { createAgent: undefined },
       { replace: true }
@@ -430,24 +440,24 @@ describe('Agents', () => {
           </Suspense>
         </QueryClientProvider>
       ));
-      fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-      fireEvent.click(screen.getByRole('radio', { name: 'In Cursor' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+      fireEvent.click(screen.getByRole('radio', { name: 'В Cursor' }));
       expect(screen.queryByText('Settings suspended')).toBeNull();
-      expect(screen.getByText('Loading models…')).toBeTruthy();
+      expect(screen.getByText('Загрузка моделей…')).toBeTruthy();
       expect(
-        (screen.getByLabelText('Default model') as HTMLButtonElement).disabled
+        (screen.getByLabelText('Модель по умолчанию') as HTMLButtonElement).disabled
       ).toBe(true);
 
       if (outcome === 'error') {
         rejectModels(new Error('Cursor is unavailable'));
         await waitFor(() =>
           expect(
-            screen.getByText(/Could not load models for Cursor/)
+            screen.getByText(/Не удалось загрузить модели для Cursor/)
           ).toBeTruthy()
         );
         expect(screen.queryByText('Settings suspended')).toBeNull();
         expect(
-          screen.getByRole('button', { name: 'Retry models for Cursor' })
+          screen.getByRole('button', { name: 'Повторить загрузку моделей для Cursor' })
         ).toBeTruthy();
       } else {
         resolveModels({
@@ -466,7 +476,7 @@ describe('Agents', () => {
         );
         expect(screen.queryByText('Settings suspended')).toBeNull();
         expect(
-          (screen.getByLabelText('Default model') as HTMLButtonElement).disabled
+          (screen.getByLabelText('Модель по умолчанию') as HTMLButtonElement).disabled
         ).toBe(false);
       }
       view.unmount();
@@ -477,17 +487,17 @@ describe('Agents', () => {
   it('lists the built-in global Rox agent as a team agent', () => {
     render(() => <Agents {...agentsPageProps} />);
 
-    const list = screen.getByRole('region', { name: 'Your agents' });
+    const list = screen.getByRole('region', { name: 'Ваши агенты' });
 
     expect(within(list).getByText(displayName)).toBeTruthy();
     expect(
       within(list)
         .getAllByText(/^@/)
         .map((tag) => tag.textContent)
-    ).toEqual(['@macro']);
-    expect(within(list).getByText('Team')).toBeTruthy();
+    ).toEqual(['@rox']);
+    expect(within(list).getByText('Команда')).toBeTruthy();
     expect(
-      within(list).getByText(`In ${displayName} · Sonnet 5.5 · All channels`)
+      within(list).getByText(`В ${displayName} · Rox R1 Max · Все каналы`)
     ).toBeTruthy();
     expect(
       within(list).queryByRole('button', { name: `Delete ${displayName}` })
@@ -503,8 +513,8 @@ describe('Agents', () => {
     try {
       const view = render(() => <Agents {...agentsPageProps} />);
       expect(
-        within(screen.getByRole('region', { name: 'Your agents' })).getByText(
-          'Loading agents…'
+        within(screen.getByRole('region', { name: 'Ваши агенты' })).getByText(
+          'Загрузка агентов…'
         )
       ).toBeTruthy();
       view.unmount();
@@ -513,8 +523,8 @@ describe('Agents', () => {
       agentMocks.query.isError = true;
       render(() => <Agents {...agentsPageProps} />);
       expect(
-        within(screen.getByRole('region', { name: 'Your agents' })).getByText(
-          'Could not load your agents. Try refreshing this page.'
+        within(screen.getByRole('region', { name: 'Ваши агенты' })).getByText(
+          'Не удалось загрузить агентов. Обновите страницу.'
         )
       ).toBeTruthy();
     } finally {
@@ -534,10 +544,10 @@ describe('Agents', () => {
         onManageRuntimes={onManageRuntimes}
       />
     ));
-    fireEvent.click(screen.getByRole('button', { name: 'Connect Cursor' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Подключить Cursor' }));
     expect(onCursor).toHaveBeenCalledOnce();
     fireEvent.click(
-      screen.getByRole('button', { name: 'Set up your own agent' })
+      screen.getByRole('button', { name: 'Настроить своего агента' })
     );
     expect(onSetUpRuntime).toHaveBeenCalledOnce();
     view.unmount();
@@ -551,12 +561,30 @@ describe('Agents', () => {
         onManageRuntimes={onManageRuntimes}
       />
     ));
-    fireEvent.click(screen.getByRole('button', { name: 'Manage Cursor' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Управлять Cursor' }));
     expect(onCursor).toHaveBeenCalledTimes(2);
     fireEvent.click(
-      screen.getByRole('button', { name: 'Manage paired machines' })
+      screen.getByRole('button', { name: 'Управлять машинами' })
     );
     expect(onManageRuntimes).toHaveBeenCalledOnce();
+  });
+
+  it('describes the Cursor and own-agent cards in Russian', () => {
+    render(() => <Agents {...agentsPageProps} />);
+
+    expect(screen.getByText('Подключить Cursor')).toBeTruthy();
+    expect(
+      screen.getByText('Запускайте агентов в Rox на своей подписке Cursor.')
+    ).toBeTruthy();
+    expect(screen.getByText('Свой агент')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Подключите Claude Code, Codex или другого локального агента через roxd.'
+      )
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('button', { name: 'Настроить своего агента' })
+    ).toBeTruthy();
   });
 
   it('groups server agents into team and private sections', () => {
@@ -601,32 +629,32 @@ describe('Agents', () => {
 
     render(() => <Agents {...agentsPageProps} />);
 
-    const list = screen.getByRole('region', { name: 'Your agents' });
+    const list = screen.getByRole('region', { name: 'Ваши агенты' });
 
     // Rox first, then team agents, then private agents.
     expect(
       within(list)
         .getAllByText(/^@/)
         .map((tag) => tag.textContent)
-    ).toEqual(['@macro', '@release-helper', '@bug-fixer']);
+    ).toEqual(['@rox', '@release-helper', '@bug-fixer']);
     expect(within(list).queryByText('Coordinates releases.')).toBeNull();
     expect(within(list).queryByText('Finds and fixes bugs.')).toBeNull();
 
     const releaseRow = within(list).getByText('Release helper').parentElement
       ?.parentElement as HTMLElement;
-    expect(within(releaseRow).getByText('Team')).toBeTruthy();
+    expect(within(releaseRow).getByText('Команда')).toBeTruthy();
     expect(
       within(releaseRow).getByText(
-        `In ${displayName} · Sonnet 5.5 · #engineering`
+        `В ${displayName} · Sonnet 5.5 · #engineering`
       )
     ).toBeTruthy();
 
     const bugFixerRow = within(list).getByText('Bug fixer').parentElement
       ?.parentElement as HTMLElement;
-    expect(within(bugFixerRow).getByText('Private')).toBeTruthy();
+    expect(within(bugFixerRow).getByText('Личный')).toBeTruthy();
     expect(
       within(bugFixerRow).getByText(
-        `In ${displayName} · Sonnet 5.5 · All channels`
+        `В ${displayName} · Sonnet 5.5 · Все каналы`
       )
     ).toBeTruthy();
   });
@@ -686,22 +714,22 @@ describe('Agents', () => {
     ];
 
     render(() => <Agents {...agentsPageProps} />);
-    const list = screen.getByRole('region', { name: 'Your agents' });
+    const list = screen.getByRole('region', { name: 'Ваши агенты' });
 
     expect(
-      within(list).getByText('In Cursor · cursor-small · All channels')
+      within(list).getByText('В Cursor · cursor-small · Все каналы')
     ).toBeTruthy();
     expect(
-      within(list).getByText('On your machine · Dev box · codex · All channels')
+      within(list).getByText('На вашем компьютере · Dev box · codex · Все каналы')
     ).toBeTruthy();
     expect(
-      within(list).getByText('Disconnected machine · codex · All channels')
+      within(list).getByText('Отключённый компьютер · codex · Все каналы')
     ).toBeTruthy();
   });
 
   it("names the model a machine's default choice runs", () => {
     harnessMocks.query.data = [MACROD_HARNESS];
-    modelMocks.queries[`macrod:${MACROD_HARNESS.id}`] = successfulModels([
+    modelMocks.queries[`roxd:${MACROD_HARNESS.id}`] = successfulModels([
       { id: 'default', name: 'Default (recommended)', description: 'Opus 4.8' },
       { id: 'sonnet', name: 'Sonnet', description: 'Sonnet 4.6' },
     ]);
@@ -725,11 +753,11 @@ describe('Agents', () => {
     ];
 
     render(() => <Agents {...agentsPageProps} />);
-    const list = screen.getByRole('region', { name: 'Your agents' });
+    const list = screen.getByRole('region', { name: 'Ваши агенты' });
 
     expect(
       within(list).getByText(
-        'On your machine · Dev box · Opus 4.8 (default) · All channels'
+        'На вашем компьютере · Dev box · Opus 4.8 (default) · Все каналы'
       )
     ).toBeTruthy();
   });
@@ -759,10 +787,10 @@ describe('Agents', () => {
 
     expect(screen.queryByText('Shared Reviewer')).toBeNull();
     expect(
-      within(screen.getByRole('region', { name: 'Your agents' }))
+      within(screen.getByRole('region', { name: 'Ваши агенты' }))
         .getAllByText(/^@/)
         .map((tag) => tag.textContent)
-    ).toEqual(['@macro']);
+    ).toEqual(['@rox']);
   });
 
   it("does not list another team's mentionable agent in Settings", () => {
@@ -824,43 +852,43 @@ describe('Agents', () => {
       }
     );
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Grungus' }));
-    const form = screen.getByRole('region', { name: 'Edit agent' });
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Grungus' }));
+    const form = screen.getByRole('region', { name: 'Изменить агента' });
     const file = new File(['avatar'], 'avatar.png', { type: 'image/png' });
     fireEvent.change(form.querySelector('input[type="file"]')!, {
       target: { files: [file] },
     });
     expect(avatarMocks.upload).toHaveBeenCalledWith(file);
-    expect(screen.getByRole('button', { name: 'Save changes' })).toHaveProperty(
+    expect(screen.getByRole('button', { name: 'Сохранить изменения' })).toHaveProperty(
       'disabled',
       true
     );
-    expect(screen.getByRole('button', { name: 'Uploading…' })).toHaveProperty(
+    expect(screen.getByRole('button', { name: 'Загрузка…' })).toHaveProperty(
       'disabled',
       true
     );
     expect(
-      screen.getByRole('img', { name: 'Grungus avatar' }).getAttribute('src')
+      screen.getByRole('img', { name: 'Аватар: Grungus' }).getAttribute('src')
     ).toBe(originalAvatar);
 
     finishUpload(uploadedAvatar);
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: 'Save changes' })
+        screen.getByRole('button', { name: 'Сохранить изменения' })
       ).toHaveProperty('disabled', false)
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить изменения' }));
     await waitFor(() =>
       expect(agentMocks.update).toHaveBeenCalledWith(
         expect.objectContaining({ avatarUrl: uploadedAvatar, teamId: 'team-1' })
       )
     );
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Edit Grungus' })).toBeTruthy()
+      expect(screen.getByRole('button', { name: 'Изменить Grungus' })).toBeTruthy()
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Grungus' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Grungus' }));
     expect(
-      screen.getByRole('img', { name: 'Grungus avatar' }).getAttribute('src')
+      screen.getByRole('img', { name: 'Аватар: Grungus' }).getAttribute('src')
     ).toBe(uploadedAvatar);
   });
 
@@ -869,12 +897,12 @@ describe('Agents', () => {
       new Error('Failed to upload file')
     );
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-    fireEvent.input(screen.getByLabelText('Name'), {
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+    fireEvent.input(screen.getByLabelText('Имя'), {
       target: { value: 'Grungus' },
     });
     const input = screen
-      .getByRole('region', { name: 'New agent' })
+      .getByRole('region', { name: 'Новый агент' })
       .querySelector('input[type="file"]')!;
     const file = new File(['avatar'], 'avatar.png', { type: 'image/png' });
     fireEvent.change(input, { target: { files: [file] } });
@@ -883,15 +911,15 @@ describe('Agents', () => {
         'Failed to upload file'
       )
     );
-    expect(screen.getByLabelText('Name')).toHaveProperty('value', 'Grungus');
-    expect(screen.getByRole('button', { name: 'Upload' })).toHaveProperty(
+    expect(screen.getByLabelText('Имя')).toHaveProperty('value', 'Grungus');
+    expect(screen.getByRole('button', { name: 'Загрузить' })).toHaveProperty(
       'disabled',
       false
     );
     fireEvent.change(input, { target: { files: [file] } });
     await waitFor(() =>
       expect(
-        screen.getByRole('img', { name: 'Grungus avatar' }).getAttribute('src')
+        screen.getByRole('img', { name: 'Аватар: Grungus' }).getAttribute('src')
       ).toBe('https://static.example/avatar.png')
     );
   });
@@ -919,29 +947,29 @@ describe('Agents', () => {
     ];
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Bug fixer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Bug fixer' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    expect(screen.getByRole('heading', { name: 'Edit agent' })).toBeTruthy();
-    expect(within(dialog).getByLabelText('Name')).toHaveProperty(
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    expect(screen.getByRole('heading', { name: 'Изменить агента' })).toBeTruthy();
+    expect(within(dialog).getByLabelText('Имя')).toHaveProperty(
       'value',
       'Bug fixer'
     );
-    expect(within(dialog).getByLabelText('@tag')).toHaveProperty(
+    expect(within(dialog).getByLabelText('Тег')).toHaveProperty(
       'value',
       'bug-fixer'
     );
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
-    expect(within(dialog).getByLabelText('Specific channels')).toHaveProperty(
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
+    expect(within(dialog).getByLabelText('Конкретные каналы')).toHaveProperty(
       'checked',
       true
     );
 
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Bug resolver' },
     });
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Save changes' })
+      within(dialog).getByRole('button', { name: 'Сохранить изменения' })
     );
 
     await waitFor(() => {
@@ -961,7 +989,7 @@ describe('Agents', () => {
         mcp: { scope: 'owner_connections' },
         teamId: undefined,
       });
-      expect(agentMocks.toastSuccess).toHaveBeenCalledWith('Agent updated');
+      expect(agentMocks.toastSuccess).toHaveBeenCalledWith('Агент обновлён');
       expect(screen.queryByRole('dialog')).toBeNull();
     });
   });
@@ -990,7 +1018,7 @@ describe('Agents', () => {
 
     render(() => <Agents {...agentsPageProps} />);
 
-    expect(screen.getByRole('heading', { name: 'Edit agent' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Изменить агента' })).toBeTruthy();
     expect(agentSettingsRequest()).toBeUndefined();
   });
 
@@ -1019,26 +1047,26 @@ describe('Agents', () => {
 
     render(() => <Agents {...agentsPageProps} />);
 
-    expect(screen.getByRole('button', { name: 'Edit Bug fixer' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Изменить Bug fixer' })).toBeTruthy();
     expect(
-      screen.queryByRole('button', { name: 'Delete Bug fixer' })
+      screen.queryByRole('button', { name: 'Удалить Bug fixer' })
     ).toBeNull();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Bug fixer' }));
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    expect(within(dialog).getByLabelText('Team')).toHaveProperty(
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Bug fixer' }));
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    expect(within(dialog).getByLabelText('Команда')).toHaveProperty(
       'checked',
       true
     );
-    expect(within(dialog).getByLabelText('Private')).toHaveProperty(
+    expect(within(dialog).getByLabelText('Личный')).toHaveProperty(
       'disabled',
       true
     );
     expect(
-      within(dialog).getByText('Only the agent creator can make it private.')
+      within(dialog).getByText('Сделать его личным может только создатель агента.')
     ).toBeTruthy();
     expect(
-      within(dialog).queryByRole('button', { name: 'Delete agent' })
+      within(dialog).queryByRole('button', { name: 'Удалить агента' })
     ).toBeNull();
   });
 
@@ -1066,11 +1094,11 @@ describe('Agents', () => {
     ];
 
     const view = render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Bug fixer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Bug fixer' }));
     expect(
       within(
-        screen.getByRole('region', { name: /^(New|Edit) agent$/ })
-      ).getByLabelText('Private')
+        screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ })
+      ).getByLabelText('Личный')
     ).toHaveProperty('disabled', false);
     view.unmount();
 
@@ -1078,33 +1106,33 @@ describe('Agents', () => {
     agentMocks.isTeamOwner = true;
     const ownerView = render(() => <Agents {...agentsPageProps} />);
     expect(
-      screen.getByRole('button', { name: 'Delete Bug fixer' })
+      screen.getByRole('button', { name: 'Удалить Bug fixer' })
     ).toBeTruthy();
     ownerView.unmount();
 
     agentMocks.isTeamOwner = false;
     agentMocks.isTeamAdmin = true;
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Bug fixer' }));
-    const editor = screen.getByRole('region', { name: 'Edit agent' });
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Bug fixer' }));
+    const editor = screen.getByRole('region', { name: 'Изменить агента' });
     fireEvent.click(
-      within(editor).getByRole('button', { name: 'Delete agent' })
+      within(editor).getByRole('button', { name: 'Удалить агента' })
     );
     expect(agentMocks.delete).not.toHaveBeenCalled();
     fireEvent.click(
       within(screen.getByRole('dialog')).getByRole('button', {
-        name: 'Cancel',
+        name: 'Отмена',
       })
     );
     expect(screen.queryByRole('dialog')).toBeNull();
-    expect(screen.getByRole('region', { name: 'Edit agent' })).toBeTruthy();
+    expect(screen.getByRole('region', { name: 'Изменить агента' })).toBeTruthy();
 
     fireEvent.click(
-      within(editor).getByRole('button', { name: 'Delete agent' })
+      within(editor).getByRole('button', { name: 'Удалить агента' })
     );
     fireEvent.click(
       within(screen.getByRole('dialog')).getByRole('button', {
-        name: 'Delete agent',
+        name: 'Удалить агента',
       })
     );
     await waitFor(() => {
@@ -1112,7 +1140,7 @@ describe('Agents', () => {
         agentId: 'agent-1',
         channelIds: [],
       });
-      expect(screen.queryByRole('region', { name: 'Edit agent' })).toBeNull();
+      expect(screen.queryByRole('region', { name: 'Изменить агента' })).toBeNull();
     });
   });
 
@@ -1139,14 +1167,14 @@ describe('Agents', () => {
     ];
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Delete Bug fixer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Удалить Bug fixer' }));
 
     const dialog = screen.getByRole('dialog');
-    expect(within(dialog).getByText('Delete Bug fixer?')).toBeTruthy();
+    expect(within(dialog).getByText('Удалить Bug fixer?')).toBeTruthy();
     expect(agentMocks.delete).not.toHaveBeenCalled();
 
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Delete agent' })
+      within(dialog).getByRole('button', { name: 'Удалить агента' })
     );
 
     await waitFor(() => {
@@ -1154,22 +1182,22 @@ describe('Agents', () => {
         agentId: 'agent-1',
         channelIds: ['channel-engineering'],
       });
-      expect(agentMocks.toastSuccess).toHaveBeenCalledWith('Agent deleted');
+      expect(agentMocks.toastSuccess).toHaveBeenCalledWith('Агент удалён');
       expect(screen.queryByRole('dialog')).toBeNull();
     });
   });
 
   it('offers agent configuration without description and only connected harnesses', () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     expect(
-      screen.getByText('Name it, tell it what to do, and pick where it runs.')
+      screen.getByText('Назовите его, объясните, что делать, и выберите, где он работает.')
     ).toBeTruthy();
 
     expect(
-      within(dialog).getByRole('button', { name: 'Upload avatar' })
+      within(dialog).getByRole('button', { name: 'Загрузить аватар' })
     ).toBeTruthy();
     const avatarInput = dialog.querySelector(
       'input[type="file"]'
@@ -1183,31 +1211,31 @@ describe('Agents', () => {
     });
     expect(within(dialog).queryByText('agent-avatar.png')).toBeNull();
     expect(
-      within(dialog).getByText('Optional · square images work best')
+      within(dialog).getByText('Необязательно · лучше квадратные изображения')
     ).toBeTruthy();
-    expect(within(dialog).getByLabelText('Name')).toBeTruthy();
-    expect(within(dialog).getByLabelText('@tag')).toBeTruthy();
-    expect(within(dialog).queryByLabelText('Description')).toBeNull();
+    expect(within(dialog).getByLabelText('Имя')).toBeTruthy();
+    expect(within(dialog).getByLabelText('Тег')).toBeTruthy();
+    expect(within(dialog).queryByLabelText('Описание')).toBeNull();
     expect(within(dialog).getByLabelText('Instructions')).toBeTruthy();
     expect(
-      within(dialog).getByRole('radio', { name: `In ${displayName}` })
+      within(dialog).getByRole('radio', { name: `В ${displayName}` })
     ).toHaveProperty('checked', true);
     expect(
-      within(dialog).getByRole('radio', { name: 'In Cursor' })
+      within(dialog).getByRole('radio', { name: 'В Cursor' })
     ).toHaveProperty('disabled', true);
     expect(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     ).toHaveProperty('disabled', true);
-    expect(within(dialog).queryByLabelText('Machine')).toBeNull();
-    expect(within(dialog).getAllByLabelText('Default model')).toHaveLength(1);
-    expect(within(dialog).getByText('Who can use it')).toBeTruthy();
-    expect(within(dialog).getByRole('group', { name: 'Share' })).toBeTruthy();
+    expect(within(dialog).queryByLabelText('Компьютер')).toBeNull();
+    expect(within(dialog).getAllByLabelText('Модель по умолчанию')).toHaveLength(1);
+    expect(within(dialog).getByText('Кто может пользоваться')).toBeTruthy();
+    expect(within(dialog).getByRole('group', { name: 'Доступ' })).toBeTruthy();
 
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
     expect(
-      within(dialog).getByRole('group', { name: 'Channels' })
+      within(dialog).getByRole('group', { name: 'Каналы' })
     ).toBeTruthy();
-    fireEvent.click(within(dialog).getByLabelText('Specific channels'));
+    fireEvent.click(within(dialog).getByLabelText('Конкретные каналы'));
     const channelSearch =
       within(dialog).getByPlaceholderText('Search channels…');
     fireEvent.input(channelSearch, { target: { value: 'gen' } });
@@ -1216,82 +1244,82 @@ describe('Agents', () => {
 
   it('offers Connect Cursor instead of an unconnected Cursor option', () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: 'New agent' });
-    const cursor = within(dialog).getByRole('radio', { name: 'In Cursor' });
+    const dialog = screen.getByRole('region', { name: 'Новый агент' });
+    const cursor = within(dialog).getByRole('radio', { name: 'В Cursor' });
     expect(cursor).toHaveProperty('disabled', true);
     expect(
-      within(dialog).getByRole('button', { name: 'Connect Cursor' })
+      within(dialog).getByRole('button', { name: 'Подключить Cursor' })
     ).toBeTruthy();
     expect(
-      within(dialog).getByRole('radio', { name: `In ${displayName}` })
+      within(dialog).getByRole('radio', { name: `В ${displayName}` })
     ).toHaveProperty('checked', true);
   });
 
   it('offers harness setup instead of an unpaired harness option', () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: 'New agent' });
+    const dialog = screen.getByRole('region', { name: 'Новый агент' });
     const ownHarness = within(dialog).getByRole('radio', {
-      name: 'On your machine',
+      name: 'На вашем компьютере',
     });
     expect(ownHarness).toHaveProperty('disabled', true);
     expect(
-      within(dialog).getByRole('button', { name: 'Set up your own machine' })
+      within(dialog).getByRole('button', { name: 'Настроить свой компьютер' })
     ).toBeTruthy();
-    expect(within(dialog).queryByLabelText('Machine')).toBeNull();
+    expect(within(dialog).queryByLabelText('Компьютер')).toBeNull();
   });
 
-  it('keeps mention, permission, and channel choices collapsed under Advanced', () => {
+  it('keeps mention, permission, and channel choices collapsed under advanced settings', () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: 'New agent' });
-    const toggle = within(dialog).getByRole('button', { name: 'Show' });
+    const dialog = screen.getByRole('region', { name: 'Новый агент' });
+    const toggle = within(dialog).getByRole('button', { name: 'Показать' });
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
     expect(
       within(dialog).getByText(
-        'Chat agent · All channels · Your connected apps'
+        'Чат-агент · Все каналы · Ваши подключённые приложения'
       )
     ).toBeTruthy();
-    expect(within(dialog).queryByLabelText('Chat agent')).toBeNull();
+    expect(within(dialog).queryByLabelText('Чат-агент')).toBeNull();
     expect(
-      within(dialog).queryByRole('group', { name: 'Channels' })
+      within(dialog).queryByRole('group', { name: 'Каналы' })
     ).toBeNull();
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('true');
-    expect(toggle.textContent).toBe('Hide');
+    expect(toggle.textContent).toBe('Скрыть');
     expect(
-      within(dialog).getByRole('group', { name: 'Answering a mention' })
+      within(dialog).getByRole('group', { name: 'Ответ на упоминание' })
     ).toBeTruthy();
-    expect(within(dialog).getByLabelText('Chat agent')).toHaveProperty(
+    expect(within(dialog).getByLabelText('Чат-агент')).toHaveProperty(
       'checked',
       true
     );
     expect(
-      within(dialog).getByRole('group', { name: 'Channels' })
+      within(dialog).getByRole('group', { name: 'Каналы' })
     ).toBeTruthy();
-    fireEvent.click(within(dialog).getByLabelText('Specific channels'));
+    fireEvent.click(within(dialog).getByLabelText('Конкретные каналы'));
     expect(
-      within(dialog).getByText('Chat agent · 0 channels · Your connected apps')
+      within(dialog).getByText('Чат-агент · 0 каналов · Ваши подключённые приложения')
     ).toBeTruthy();
 
     fireEvent.click(toggle);
     expect(toggle.getAttribute('aria-expanded')).toBe('false');
-    expect(within(dialog).queryByLabelText('Chat agent')).toBeNull();
+    expect(within(dialog).queryByLabelText('Чат-агент')).toBeNull();
   });
 
   it('explains why team sharing is disabled without a team', () => {
     agentMocks.currentTeam = null;
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    const teamOption = within(dialog).getByLabelText('Team');
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    const teamOption = within(dialog).getByLabelText('Команда');
     expect(teamOption).toHaveProperty('disabled', true);
     expect(
       teamOption.closest('label')?.classList.contains('cursor-not-allowed')
@@ -1300,25 +1328,25 @@ describe('Agents', () => {
     expect(teamOption.classList.contains('opacity-50')).toBe(true);
     expect(
       within(dialog).getByText(
-        'Team agents need a team owner. Create or join a team in Team settings to enable this option.'
+        'Для командных агентов нужен владелец команды. Создайте команду или вступите в неё в настройках команды, чтобы включить этот вариант.'
       )
     ).toBeTruthy();
   });
 
   it('persists creation through the agents API', async () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Bug fixer' },
     });
     fireEvent.input(within(dialog).getByLabelText('Instructions'), {
       target: { value: 'Fix the **root cause** and add tests.' },
     });
-    fireEvent.click(within(dialog).getByLabelText('Team'));
+    fireEvent.click(within(dialog).getByLabelText('Команда'));
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
 
     await waitFor(() => {
@@ -1336,25 +1364,25 @@ describe('Agents', () => {
         mcp: { scope: 'owner_connections' },
         teamId: 'team-1',
       });
-      expect(agentMocks.toastSuccess).toHaveBeenCalledWith('Agent created');
+      expect(agentMocks.toastSuccess).toHaveBeenCalledWith('Агент создан');
       expect(screen.queryByRole('dialog')).toBeNull();
     });
   });
 
   it("saves a new agent's API key after the agent, for its model's provider", async () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Bug fixer' },
     });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Add key' }));
-    fireEvent.input(within(dialog).getByLabelText('Anthropic API key'), {
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Добавить ключ' }));
+    fireEvent.input(within(dialog).getByLabelText('Ключ API Anthropic'), {
       target: { value: 'sk-ant-api03-abc' },
     });
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
 
     await waitFor(() => {
@@ -1368,27 +1396,27 @@ describe('Agents', () => {
 
   it('offers an optional API key without asking for one', async () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    expect(within(dialog).queryByLabelText('Anthropic API key')).toBeNull();
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    expect(within(dialog).queryByLabelText('Ключ API Anthropic')).toBeNull();
     expect(
       within(dialog).getByText(
-        `Runs on ${displayName} usage unless you add one.`
+        `Работает за счёт использования ${displayName}, пока вы не добавите свой.`
       )
     ).toBeTruthy();
 
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Add key' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Добавить ключ' }));
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Cancel API key' })
+      within(dialog).getByRole('button', { name: 'Отменить ключ API' })
     );
-    expect(within(dialog).queryByLabelText('Anthropic API key')).toBeNull();
+    expect(within(dialog).queryByLabelText('Ключ API Anthropic')).toBeNull();
 
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Bug fixer' },
     });
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
     await waitFor(() => {
       expect(screen.queryByRole('dialog')).toBeNull();
@@ -1423,16 +1451,16 @@ describe('Agents', () => {
     };
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Bug fixer' }));
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Bug fixer' }));
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     const field = within(dialog).getByLabelText(
-      'Anthropic API key'
+      'Ключ API Anthropic'
     ) as HTMLInputElement;
     expect(field.placeholder).toBe('sk-ant-••••••••••••');
 
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Remove' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Убрать' }));
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Save changes' })
+      within(dialog).getByRole('button', { name: 'Сохранить изменения' })
     );
     await waitFor(() => {
       expect(apiKeyMocks.remove).toHaveBeenCalledWith('agent-1');
@@ -1462,16 +1490,16 @@ describe('Agents', () => {
     ];
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Bug fixer' }));
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Bug fixer' }));
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
 
-    expect(within(dialog).queryByLabelText('Anthropic API key')).toBeNull();
+    expect(within(dialog).queryByLabelText('Ключ API Anthropic')).toBeNull();
     expect(
-      within(dialog).queryByRole('button', { name: 'Add key' })
+      within(dialog).queryByRole('button', { name: 'Добавить ключ' })
     ).toBeNull();
     expect(
       within(dialog).getByText(
-        'Agent API keys are part of the Premium and Max plans.'
+        'Ключи API агента входят в тарифы Premium и Max.'
       )
     ).toBeTruthy();
   });
@@ -1487,31 +1515,31 @@ describe('Agents', () => {
     ]);
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    const cursor = within(dialog).getByRole('radio', { name: 'In Cursor' });
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    const cursor = within(dialog).getByRole('radio', { name: 'В Cursor' });
     expect(cursor).toHaveProperty('disabled', false);
     expect(
-      within(dialog).queryByRole('button', { name: 'Connect Cursor' })
+      within(dialog).queryByRole('button', { name: 'Подключить Cursor' })
     ).toBeNull();
     expect(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     ).toHaveProperty('disabled', true);
 
     fireEvent.click(cursor);
     expect(cursor).toHaveProperty('checked', true);
 
-    const defaultModel = within(dialog).getByLabelText('Default model');
+    const defaultModel = within(dialog).getByLabelText('Модель по умолчанию');
     expect(modelOptions(defaultModel).getAllByRole('menuitem')).toHaveLength(2);
     expect(defaultModel.textContent).toBe('Cursor Small');
     chooseModelOption(defaultModel, 'Cursor Large');
     expect(defaultModel.textContent).toBe('Cursor Large');
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Coding agent' },
     });
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
     await waitFor(() =>
       expect(agentMocks.create).toHaveBeenCalledWith(
@@ -1535,12 +1563,12 @@ describe('Agents', () => {
 
     render(() => <Agents {...agentsPageProps} />);
 
-    const dialog = screen.getByRole('region', { name: 'New agent' });
+    const dialog = screen.getByRole('region', { name: 'Новый агент' });
     const where = within(dialog).getByTestId('computer-where-it-runs');
     expect(where.dataset.harnessId).toBe('computer-harness');
     expect(where.dataset.checked).toBe('true');
     expect(
-      within(dialog).getByRole('radio', { name: `In ${displayName}` })
+      within(dialog).getByRole('radio', { name: `В ${displayName}` })
     ).toHaveProperty('checked', false);
     expect(agentSettingsRequest()).toBeUndefined();
   });
@@ -1549,25 +1577,25 @@ describe('Agents', () => {
     harnessMocks.query.data = [ROXD_HARNESS];
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     expect(
-      within(dialog).getByRole('radio', { name: `In ${displayName}` })
+      within(dialog).getByRole('radio', { name: `В ${displayName}` })
     ).toHaveProperty('checked', true);
     expect(
-      within(dialog).getByRole('radio', { name: 'In Cursor' })
+      within(dialog).getByRole('radio', { name: 'В Cursor' })
     ).toHaveProperty('disabled', true);
     const ownHarness = within(dialog).getByRole('radio', {
-      name: 'On your machine',
+      name: 'На вашем компьютере',
     });
     expect(ownHarness).toHaveProperty('disabled', false);
     expect(
-      within(dialog).queryByRole('button', { name: 'Set up your own machine' })
+      within(dialog).queryByRole('button', { name: 'Настроить свой компьютер' })
     ).toBeNull();
 
     fireEvent.click(ownHarness);
-    const harness = within(dialog).getByLabelText('Machine');
+    const harness = within(dialog).getByLabelText('Компьютер');
     expect(harness).toHaveProperty('textContent', 'Dev box');
     expect(selectOptions(harness).getAllByRole('option')).toHaveLength(1);
     expect(
@@ -1601,31 +1629,31 @@ describe('Agents', () => {
       </QueryClientProvider>
     ));
     await waitFor(() => expect(fetchHarnesses).toHaveBeenCalledOnce());
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     fireEvent.click(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     );
-    const harness = within(dialog).getByLabelText('Machine');
+    const harness = within(dialog).getByLabelText('Компьютер');
     expect(
       selectOptions(harness).getByRole('option', { name: 'Dev box' })
     ).toBeTruthy();
     chooseSelectOption(harness, 'Dev box');
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Coding agent' },
     });
 
     for (let refresh = 0; refresh < 2; refresh++) {
       await client.refetchQueries({ queryKey });
       expect(harness).toHaveProperty('textContent', 'Dev box');
-      expect(within(dialog).getByLabelText('Default model')).toHaveProperty(
+      expect(within(dialog).getByLabelText('Модель по умолчанию')).toHaveProperty(
         'textContent',
         'Codex model'
       );
     }
     expect(fetchHarnesses).toHaveBeenCalledTimes(3);
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
     await waitFor(() =>
       expect(agentMocks.create).toHaveBeenCalledWith(
@@ -1673,33 +1701,33 @@ describe('Agents', () => {
     };
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     expect(within(dialog).getByText('Sonnet 5.5')).toBeTruthy();
 
-    fireEvent.click(within(dialog).getByRole('radio', { name: 'In Cursor' }));
+    fireEvent.click(within(dialog).getByRole('radio', { name: 'В Cursor' }));
     expect(
-      within(dialog).getByText(/Could not load models for Cursor/)
+      within(dialog).getByText(/Не удалось загрузить модели для Cursor/)
     ).toBeTruthy();
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Retry models for Cursor' })
+      within(dialog).getByRole('button', { name: 'Повторить загрузку моделей для Cursor' })
     );
     expect(retry).toHaveBeenCalledOnce();
 
     // The first paired harness is picked when the option is chosen.
     fireEvent.click(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     );
-    const harness = within(dialog).getByLabelText('Machine');
+    const harness = within(dialog).getByLabelText('Компьютер');
     expect(harness).toHaveProperty('textContent', 'Dev box');
     expect(
       within(dialog).getByText(
-        'Model selection is unsupported by this machine.'
+        'Этот компьютер не поддерживает выбор модели.'
       )
     ).toBeTruthy();
 
     chooseSelectOption(harness, 'Loading box');
-    expect(within(dialog).getByText('Loading models…')).toBeTruthy();
+    expect(within(dialog).getByText('Загрузка моделей…')).toBeTruthy();
   });
 
   it('uses the discovered model selector for roxd harnesses', () => {
@@ -1713,14 +1741,14 @@ describe('Agents', () => {
     );
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     fireEvent.click(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     );
 
-    const defaultModel = within(dialog).getByLabelText('Default model');
+    const defaultModel = within(dialog).getByLabelText('Модель по умолчанию');
     expect(defaultModel.tagName).toBe('BUTTON');
     expect(defaultModel).toHaveProperty('textContent', 'Codex');
     expect(modelOptions(defaultModel).getAllByRole('menuitem')).toHaveLength(2);
@@ -1737,13 +1765,13 @@ describe('Agents', () => {
     );
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     fireEvent.click(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     );
 
-    expect(within(dialog).getByLabelText('Default model')).toHaveProperty(
+    expect(within(dialog).getByLabelText('Модель по умолчанию')).toHaveProperty(
       'textContent',
       'Claude Code'
     );
@@ -1757,20 +1785,20 @@ describe('Agents', () => {
     );
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     fireEvent.click(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     );
 
-    const defaultModel = within(dialog).getByLabelText('Default model');
+    const defaultModel = within(dialog).getByLabelText('Модель по умолчанию');
     expect(defaultModel).toHaveProperty(
       'textContent',
-      'provider-default (unavailable)'
+      'provider-default (недоступен)'
     );
     expect(
       modelOptions(defaultModel).getByRole('menuitem', {
-        name: 'provider-default (unavailable)',
+        name: 'provider-default (недоступен)',
       })
     ).toBeTruthy();
   });
@@ -1783,17 +1811,17 @@ describe('Agents', () => {
     );
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Bug fixer' },
     });
     fireEvent.click(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     );
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
 
     await waitFor(() => {
@@ -1823,28 +1851,28 @@ describe('Agents', () => {
     );
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Chatty' },
     });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
     // Rox's in-memory runtime chats; a roxd harness codes.
-    expect(within(dialog).getByLabelText('Chat agent')).toHaveProperty(
+    expect(within(dialog).getByLabelText('Чат-агент')).toHaveProperty(
       'checked',
       true
     );
     fireEvent.click(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     );
-    expect(within(dialog).getByLabelText('Coding agent')).toHaveProperty(
+    expect(within(dialog).getByLabelText('Агент для кода')).toHaveProperty(
       'checked',
       true
     );
-    fireEvent.click(within(dialog).getByLabelText('Chat agent'));
+    fireEvent.click(within(dialog).getByLabelText('Чат-агент'));
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
 
     await waitFor(() => {
@@ -1876,22 +1904,22 @@ describe('Agents', () => {
     ];
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Bug fixer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Bug fixer' }));
 
     const defaultModel = within(
-      screen.getByRole('region', { name: /^(New|Edit) agent$/ })
-    ).getByLabelText('Default model');
+      screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ })
+    ).getByLabelText('Модель по умолчанию');
     expect(defaultModel).toHaveProperty(
       'textContent',
-      'retired-model (saved, unavailable)'
+      'retired-model (сохранён, недоступен)'
     );
     fireEvent.keyDown(defaultModel, { key: 'Enter' });
-    fireEvent.input(screen.getByRole('textbox', { name: 'Search models' }), {
+    fireEvent.input(screen.getByRole('textbox', { name: 'Поиск моделей' }), {
       target: { value: 'retired' },
     });
     expect(
       screen.getByRole('menuitem', {
-        name: /^retired-model \(saved, unavailable\)/,
+        name: /^retired-model \(сохранён, недоступен\)/,
       })
     ).toBeTruthy();
   });
@@ -1924,17 +1952,17 @@ describe('Agents', () => {
     ];
 
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Bug fixer' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Bug fixer' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     expect(
-      within(dialog).getByRole('radio', { name: 'On your machine' })
+      within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
     ).toHaveProperty('checked', true);
-    expect(within(dialog).getByLabelText('Machine')).toHaveProperty(
+    expect(within(dialog).getByLabelText('Компьютер')).toHaveProperty(
       'textContent',
       'Dev box'
     );
-    const defaultModel = within(dialog).getByLabelText('Default model');
+    const defaultModel = within(dialog).getByLabelText('Модель по умолчанию');
     expect(defaultModel.tagName).toBe('BUTTON');
     expect(defaultModel).toHaveProperty('textContent', 'Harness default');
   });
@@ -1967,35 +1995,35 @@ describe('Agents', () => {
 
   it('defaults new agents to the owner connections policy', () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     expect(
       within(dialog).getByText(
-        'Chat agent · All channels · Your connected apps'
+        'Чат-агент · Все каналы · Ваши подключённые приложения'
       )
     ).toBeTruthy();
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
     expect(
-      within(dialog).getByLabelText('Use my connected apps')
+      within(dialog).getByLabelText('Использовать мои подключённые приложения')
     ).toHaveProperty('checked', true);
     expect(within(dialog).queryByLabelText('Search connectors')).toBeNull();
   });
 
   it('picks apps from the whole catalog, shows the viewer connection state, and persists them', async () => {
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Triage bot' },
     });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
-    fireEvent.click(within(dialog).getByLabelText('Specific apps'));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
+    fireEvent.click(within(dialog).getByLabelText('Конкретные приложения'));
 
     // An explicit selection with nothing in it is not something to save.
     expect(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     ).toHaveProperty('disabled', true);
 
     within(dialog).getByLabelText('Search connectors').focus();
@@ -2026,7 +2054,7 @@ describe('Agents', () => {
     // Unconnected picks never block saving: the agent's author chooses the
     // apps, each person connects their own.
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
     await waitFor(() => {
       expect(agentMocks.create).toHaveBeenCalledWith(
@@ -2044,20 +2072,20 @@ describe('Agents', () => {
     agentMocks.update.mockClear();
     agentMocks.query.data = [linearAgent];
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Edit Triage bot' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Изменить Triage bot' }));
 
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
     expect(
-      within(dialog).getByText('Chat agent · All channels · 2 selected apps')
+      within(dialog).getByText('Чат-агент · Все каналы · Выбрано 2 приложения')
     ).toBeTruthy();
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
-    expect(within(dialog).getByLabelText('Specific apps')).toHaveProperty(
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
+    expect(within(dialog).getByLabelText('Конкретные приложения')).toHaveProperty(
       'checked',
       true
     );
     expect(within(dialog).getAllByLabelText('Not connected')).toHaveLength(2);
     // Team agents say out loud that connections are per person.
-    expect(within(dialog).getByText(/Connections are personal/)).toBeTruthy();
+    expect(within(dialog).getByText(/Подключения личные/)).toBeTruthy();
 
     // Linear is listed first; its row carries the first Connect action.
     fireEvent.click(
@@ -2078,7 +2106,7 @@ describe('Agents', () => {
       within(dialog).getByRole('button', { name: 'Remove Notion' })
     );
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Save changes' })
+      within(dialog).getByRole('button', { name: 'Сохранить изменения' })
     );
     await waitFor(() => {
       expect(agentMocks.update).toHaveBeenCalledWith(
@@ -2099,17 +2127,17 @@ it('requires prompts unless the harness operator permits bypass', async () => {
     { id: 'claude-code', name: 'Claude Code' },
   ]);
   render(() => <Agents {...agentsPageProps} />);
-  fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-  const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+  fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+  const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
   fireEvent.click(
-    within(dialog).getByRole('radio', { name: 'On your machine' })
+    within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
   );
-  fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
-  expect(within(dialog).getByLabelText('Always prompt')).toHaveProperty(
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
+  expect(within(dialog).getByLabelText('Всегда спрашивать')).toHaveProperty(
     'checked',
     true
   );
-  expect(within(dialog).queryByLabelText('Always bypass')).toBeNull();
+  expect(within(dialog).queryByLabelText('Всегда пропускать')).toBeNull();
 });
 
 it('offers bypass only after harness consent and resets the choice on harness change', async () => {
@@ -2121,27 +2149,27 @@ it('offers bypass only after harness consent and resets the choice on harness ch
     { id: 'claude-code', name: 'Claude Code' },
   ]);
   render(() => <Agents {...agentsPageProps} />);
-  fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-  const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
+  fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+  const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
   fireEvent.click(
-    within(dialog).getByRole('radio', { name: 'On your machine' })
+    within(dialog).getByRole('radio', { name: 'На вашем компьютере' })
   );
-  fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
-  expect(within(dialog).getByLabelText('Always prompt')).toHaveProperty(
+  fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
+  expect(within(dialog).getByLabelText('Всегда спрашивать')).toHaveProperty(
     'checked',
     true
   );
-  fireEvent.click(within(dialog).getByLabelText('Always bypass'));
-  expect(within(dialog).getByLabelText('Always bypass')).toHaveProperty(
+  fireEvent.click(within(dialog).getByLabelText('Всегда пропускать'));
+  expect(within(dialog).getByLabelText('Всегда пропускать')).toHaveProperty(
     'checked',
     true
   );
-  chooseSelectOption(within(dialog).getByLabelText('Machine'), 'Prompt only');
-  expect(within(dialog).getByLabelText('Always prompt')).toHaveProperty(
+  chooseSelectOption(within(dialog).getByLabelText('Компьютер'), 'Prompt only');
+  expect(within(dialog).getByLabelText('Всегда спрашивать')).toHaveProperty(
     'checked',
     true
   );
-  expect(within(dialog).queryByLabelText('Always bypass')).toBeNull();
+  expect(within(dialog).queryByLabelText('Всегда пропускать')).toBeNull();
 });
 
 it.each(['in-memory', 'cursor'])(
@@ -2153,26 +2181,26 @@ it.each(['in-memory', 'cursor'])(
     ]);
     agentMocks.create.mockClear();
     render(() => <Agents {...agentsPageProps} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Add agent' }));
-    const dialog = screen.getByRole('region', { name: /^(New|Edit) agent$/ });
-    fireEvent.input(within(dialog).getByLabelText('Name'), {
+    fireEvent.click(screen.getByRole('button', { name: 'Добавить агента' }));
+    const dialog = screen.getByRole('region', { name: /^(Новый агент|Изменить агента)$/ });
+    fireEvent.input(within(dialog).getByLabelText('Имя'), {
       target: { value: 'Built-in agent' },
     });
     fireEvent.click(
       within(dialog).getByRole('radio', {
         name: {
-          'in-memory': `In ${displayName}`,
-          cursor: 'In Cursor',
+          'in-memory': `В ${displayName}`,
+          cursor: 'В Cursor',
         }[harness]!,
       })
     );
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Show' }));
-    expect(within(dialog).getByLabelText('Chat agent')).toBeTruthy();
-    expect(within(dialog).queryByText('Permission requests')).toBeNull();
-    expect(within(dialog).queryByLabelText('Always prompt')).toBeNull();
-    expect(within(dialog).queryByLabelText('Always bypass')).toBeNull();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Показать' }));
+    expect(within(dialog).getByLabelText('Чат-агент')).toBeTruthy();
+    expect(within(dialog).queryByText('Запросы разрешений')).toBeNull();
+    expect(within(dialog).queryByLabelText('Всегда спрашивать')).toBeNull();
+    expect(within(dialog).queryByLabelText('Всегда пропускать')).toBeNull();
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Create agent' })
+      within(dialog).getByRole('button', { name: 'Создать агента' })
     );
     await waitFor(() => {
       expect(agentMocks.create).toHaveBeenCalledWith(

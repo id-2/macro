@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { Button, Dialog, Panel } from '@ui';
 import { createMemo, createSignal, For, Show } from 'solid-js';
@@ -29,7 +30,7 @@ export function CrmListDialog(props: {
       await props.onSave(name().trim(), ids());
       props.onClose();
     } catch {
-      setError('Could not save this list. Please try again.');
+      setError(t('crm.couldNotSaveList'));
     } finally {
       setPending(false);
     }
@@ -41,7 +42,7 @@ export function CrmListDialog(props: {
       await props.onDelete();
       props.onClose();
     } catch {
-      setError('Could not delete this list. Please try again.');
+      setError(t('crm.couldNotDeleteList'));
     } finally {
       setPending(false);
     }
@@ -56,26 +57,25 @@ export function CrmListDialog(props: {
         <Panel.Body>
           <form class="flex flex-col gap-4 p-5" onSubmit={save}>
             <Dialog.Title class="text-base font-semibold">
-              {props.initial ? 'Edit list' : 'New list'}
+              {props.initial ? t('crm.editList') : t('crm.newList')}
             </Dialog.Title>
             <Dialog.Description class="text-sm text-ink-muted">
-              A personal collection. Add companies without changing their stage
-              or owner.
+              {t('crm.listDescription')}
             </Dialog.Description>
             <label class="flex flex-col gap-1.5 text-sm">
-              List name
+              {t('crm.listName')}
               <input
                 required
                 maxlength={100}
                 value={name()}
                 onInput={(e) => setName(e.currentTarget.value)}
-                placeholder="e.g. Design partners"
+                placeholder={t('crm.listNamePlaceholder')}
                 class="rounded-lg border border-edge-muted bg-input px-3 py-2 outline-none focus:border-accent"
               />
             </label>
             <input
-              aria-label="Find companies for list"
-              placeholder="Find companies…"
+              aria-label={t('crm.findCompaniesForList')}
+              placeholder={t('crm.findCompanies')}
               value={search()}
               onInput={(e) => setSearch(e.currentTarget.value)}
               class="rounded-lg border border-edge-muted bg-input px-3 py-2 text-sm outline-none focus:border-accent"
@@ -103,13 +103,13 @@ export function CrmListDialog(props: {
               <Show when={!filtered().length}>
                 <p class="py-3 text-sm text-ink-muted">
                   {props.loading
-                    ? 'Loading companies…'
-                    : 'No matching companies'}
+                    ? t('crm.loadingCompanies')
+                    : t('crm.noMatchingCompanies')}
                 </p>
               </Show>
             </div>
             <p class="text-xs text-ink-muted">
-              {ids().length} selected · Browse up to 500 recent companies
+              {t('crm.selectedCompanies', { count: ids().length })}
             </p>
             <Show when={error()}>
               <p role="alert" class="text-sm text-failure">
@@ -123,7 +123,7 @@ export function CrmListDialog(props: {
                   disabled={pending()}
                   onClick={() => fireAndForget(remove(), 'crm')}
                 >
-                  Delete list
+                  {t('crm.deleteList')}
                 </Button>
               </Show>
               <Button
@@ -132,14 +132,14 @@ export function CrmListDialog(props: {
                 disabled={pending()}
                 onClick={props.onClose}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 type="submit"
                 variant="secondary"
                 disabled={pending() || !name().trim()}
               >
-                {pending() ? 'Saving…' : 'Save list'}
+                {pending() ? t('crm.saving') : t('crm.saveList')}
               </Button>
             </div>
           </form>

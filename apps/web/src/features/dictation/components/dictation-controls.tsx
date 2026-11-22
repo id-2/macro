@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import CheckIcon from '@icon/system/regular/check.svg?component-solid';
 import MicrophoneIcon from '@icon/system/regular/microphone.svg?component-solid';
@@ -36,7 +37,7 @@ export function DictationPanel(props: { dictation: DictationController }) {
       <div
         class="absolute inset-0 z-10 flex items-center gap-2 rounded-[inherit] bg-composer px-[9.375px] text-composer-ink"
         role="group"
-        aria-label="Dictation"
+        aria-label={t('agentChat.dictation')}
         onKeyDown={(event) => {
           if (event.key === 'Escape') {
             event.preventDefault();
@@ -53,15 +54,15 @@ export function DictationPanel(props: { dictation: DictationController }) {
             role="status"
           >
             {match(props.dictation.phase())
-              .with('starting', () => 'Starting…')
-              .with('finishing', () => 'Finishing…')
-              .with('review', () => 'Ready')
-              .otherwise(() => 'Listening…')}
+              .with('starting', () => t('agentChat.dictationStarting'))
+              .with('finishing', () => t('agentChat.dictationFinishing'))
+              .with('review', () => t('agentChat.dictationReady'))
+              .otherwise(() => t('agentChat.dictationListening'))}
           </span>
         </div>
         <Button
-          aria-label="Cancel dictation"
-          tooltip="Cancel dictation"
+          aria-label={t('agentChat.cancelDictation')}
+          tooltip={t('agentChat.cancelDictation')}
           variant="ghost"
           size="icon-md"
           class="text-composer-ink"
@@ -75,8 +76,8 @@ export function DictationPanel(props: { dictation: DictationController }) {
           <XIcon class="size-4 touch:size-6 shrink-0 pointer-events-none" />
         </Button>
         <Button
-          aria-label="Use dictation"
-          tooltip="Use dictation"
+          aria-label={t('agentChat.useDictation')}
+          tooltip={t('agentChat.useDictation')}
           variant="ghost"
           size="icon-md"
           class="text-composer-ink"

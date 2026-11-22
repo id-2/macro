@@ -1,1 +1,1 @@
-export * from '@macro-inc/spreadsheet/spreadsheet-schema';
+export * from '@rox-one/spreadsheet/spreadsheet-schema';

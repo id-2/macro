@@ -368,14 +368,14 @@ fn an_echoed_credential_never_reaches_the_sandbox() {
 }
 
 /// The staff gate is an exact match on the parsed domain part, and the
-/// parser behind `MacroUserIdStr` is what makes the lookalikes
+/// parser behind `RoxUserIdStr` is what makes the lookalikes
 /// unrepresentable - a suffixed domain is a different domain, a second `@`
 /// or a trailing dot is not an email, and casing normalizes before the
 /// compare rather than defeating it.
 #[test]
 fn the_staff_gate_admits_exactly_the_macro_domain() {
     for staff in ["wolf@rox.one", "wolf@ROX.ONE", "wolf+agents@rox.one"] {
-        let owner = MacroUserIdStr::try_from_email(staff).expect(staff);
+        let owner = RoxUserIdStr::try_from_email(staff).expect(staff);
         assert!(is_macro_staff(&owner), "refused {staff}");
     }
 
@@ -385,7 +385,7 @@ fn the_staff_gate_admits_exactly_the_macro_domain() {
         "evil@xrox.one",
         "evil@rox.org",
     ] {
-        let owner = MacroUserIdStr::try_from_email(visitor).expect(visitor);
+        let owner = RoxUserIdStr::try_from_email(visitor).expect(visitor);
         assert!(!is_macro_staff(&owner), "admitted {visitor}");
     }
 
@@ -397,7 +397,7 @@ fn the_staff_gate_admits_exactly_the_macro_domain() {
         "not-an-email",
     ] {
         assert!(
-            MacroUserIdStr::try_from_email(not_an_email).is_err(),
+            RoxUserIdStr::try_from_email(not_an_email).is_err(),
             "parsed {not_an_email}"
         );
     }

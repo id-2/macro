@@ -34,7 +34,7 @@ async fn no_pr_branch_is_persistent_idempotent_and_owner_scoped() {
     let realtime = RecordingRealtime::new();
     let service = SessionWorkingBranchService::new(repo.clone(), realtime.clone());
     let owner = session.owner_user().unwrap();
-    let other = MacroUserIdStr::try_from_email("other@example.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@example.com").unwrap();
     assert!(matches!(
         service
             .set_working_branch(

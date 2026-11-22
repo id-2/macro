@@ -116,24 +116,24 @@ const tagOption = (
 export const TASK_STATUS_OPTIONS = [
   statusOption(
     'not-started',
-    'Not started',
+    'Не начато',
     PROPERTY_OPTION_IDS.STATUS.NOT_STARTED
   ),
   statusOption(
     'in-progress',
-    'In progress',
+    'В работе',
     PROPERTY_OPTION_IDS.STATUS.IN_PROGRESS
   ),
-  statusOption('in-review', 'In review', PROPERTY_OPTION_IDS.STATUS.IN_REVIEW),
-  statusOption('completed', 'Completed', PROPERTY_OPTION_IDS.STATUS.COMPLETED),
-  statusOption('canceled', 'Canceled', PROPERTY_OPTION_IDS.STATUS.CANCELED),
+  statusOption('in-review', 'На проверке', PROPERTY_OPTION_IDS.STATUS.IN_REVIEW),
+  statusOption('completed', 'Завершено', PROPERTY_OPTION_IDS.STATUS.COMPLETED),
+  statusOption('canceled', 'Отменено', PROPERTY_OPTION_IDS.STATUS.CANCELED),
 ];
 
 export const TASK_PRIORITY_OPTIONS = [
-  priorityOption('urgent', 'Urgent', PROPERTY_OPTION_IDS.PRIORITY.URGENT),
-  priorityOption('high', 'High', PROPERTY_OPTION_IDS.PRIORITY.HIGH),
-  priorityOption('medium', 'Medium', PROPERTY_OPTION_IDS.PRIORITY.MEDIUM),
-  priorityOption('low', 'Low', PROPERTY_OPTION_IDS.PRIORITY.LOW),
+  priorityOption('urgent', 'Срочно', PROPERTY_OPTION_IDS.PRIORITY.URGENT),
+  priorityOption('high', 'Высокий', PROPERTY_OPTION_IDS.PRIORITY.HIGH),
+  priorityOption('medium', 'Средний', PROPERTY_OPTION_IDS.PRIORITY.MEDIUM),
+  priorityOption('low', 'Низкий', PROPERTY_OPTION_IDS.PRIORITY.LOW),
 ];
 
 export const TASK_FACETS: Facet<
@@ -147,7 +147,7 @@ export const TASK_FACETS: Facet<
     options: (id) =>
       TASK_STATUS_OPTIONS.find((option) => option.id === id) ??
       (z.string().guid().safeParse(id).success
-        ? statusOption(id, 'Unavailable status', id)
+        ? statusOption(id, 'Статус недоступен', id)
         : undefined),
   },
   {
@@ -156,7 +156,7 @@ export const TASK_FACETS: Facet<
     options: (id) =>
       TASK_PRIORITY_OPTIONS.find((option) => option.id === id) ??
       (z.string().guid().safeParse(id).success
-        ? priorityOption(id, 'Unavailable priority', id)
+        ? priorityOption(id, 'Приоритет недоступен', id)
         : undefined),
   },
   {

@@ -8,7 +8,7 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use lexical_client::LexicalClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::{
@@ -37,7 +37,7 @@ impl<D, A> DocumentSkillReader<D, A> {
 impl<D: DocumentService, A: EntityAccessService> SkillReader for DocumentSkillReader<D, A> {
     async fn authorize(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         document_id: Uuid,
     ) -> Result<EntityAccessReceipt<ViewAccessLevel>, SkillError> {
         self.access

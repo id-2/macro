@@ -1,7 +1,7 @@
 use entity_access::domain::models::AccessError;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_owner::Owner;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -22,8 +22,8 @@ use crate::outbound::postgres::test::{TestRepo, test_repo};
 const OWNER: &str = "macro|test@example.com";
 const TEAM_ID: Uuid = Uuid::from_u128(0xb2222222_2222_2222_2222_222222222222);
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap().into_owned()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap().into_owned()
 }
 
 async fn create_chat(repo: &TestRepo, name: &str) -> String {

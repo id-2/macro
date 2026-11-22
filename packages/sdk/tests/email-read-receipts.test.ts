@@ -1,7 +1,7 @@
 import { afterEach, expect, mock, spyOn, test } from 'bun:test';
 import type { ThreadReadReceipts } from '../generated/email/types.gen';
 import { EmailMessage } from '../src/entities/email/message';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 afterEach(() => mock.restore());
 

@@ -3,7 +3,7 @@ import type {
   MemoryEdit,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 export type { ExplicitMemory, MemoryEdit };
 
@@ -11,7 +11,7 @@ export type { ExplicitMemory, MemoryEdit };
  * The acting user's private explicit memory: the preferences and facts they
  * asked AI to remember, one per line.
  *
- * @routing Use when the user asks to remember, correct or forget something, or to see what AI remembers about them; not what someone worked on (`macro.activity`, `User.activity`).
+ * @routing Use when the user asks to remember, correct or forget something, or to see what AI remembers about them; not what someone worked on (`rox.activity`, `User.activity`).
  *
  * @agent Change memory only when the user explicitly asks to remember,
  * correct or forget something; never save inferred preferences. Read first:
@@ -20,14 +20,14 @@ export type { ExplicitMemory, MemoryEdit };
  * before retrying. Private or sensitive additions are rejected with 422.
  */
 export class MemoryNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Read the acting user's explicit memory and its revision; `content` is
    * newline-separated, and edits address its one-based lines.
    *
    * @example
-   * const memory = await macro.memory.read();
+   * const memory = await rox.memory.read();
    * const lines = memory.content.split('\n');
    *
    * @readonly
@@ -45,9 +45,9 @@ export class MemoryNamespace {
    * retrying. Insert at `lines.length + 1` to append.
    *
    * @example
-   * const memory = await macro.memory.read();
+   * const memory = await rox.memory.read();
    * const lines = memory.content ? memory.content.split('\n') : [];
-   * await macro.memory.edit(
+   * await rox.memory.edit(
    *   { action: 'insert', line: lines.length + 1, content: 'Prefers metric units' },
    *   memory.revision,
    * );

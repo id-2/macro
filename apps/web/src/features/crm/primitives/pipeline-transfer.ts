@@ -1,5 +1,6 @@
+import { t } from '@app/lib/i18n';
 import type { CellWrite } from '@core/database-sql/generated/types';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { type Accessor, createSignal, onCleanup } from 'solid-js';
 import {
   databaseCsvMessage,
@@ -189,7 +190,7 @@ export function createPipelineImport(
         primaryColumnId: pipeline.primaryColumnId,
       }).match(setPlan, (failure) => setError(pipelineImportMessage(failure)));
     } catch {
-      setError('Could not read this pipeline. Please try again.');
+      setError(t('crm.pipelineReadFailed'));
     } finally {
       setReading(false);
     }
@@ -229,7 +230,7 @@ export function createPipelineImport(
       setError(
         cause instanceof PipelineImportRefusal
           ? cause.message
-          : 'Could not finish the import. Retry to add the rows that are still missing.'
+          : t('crm.importFinishFailed')
       );
     }
     try {

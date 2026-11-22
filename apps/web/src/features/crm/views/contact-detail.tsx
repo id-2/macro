@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { TraceFlow, usePending } from '@app/observability/flow';
 import { SidePanel } from '@components/app/side-panel';
 import { createMemo, Match, onCleanup, Show, Suspense, Switch } from 'solid-js';
@@ -107,10 +108,10 @@ function ContactContent(props: ContactProps) {
               <RecordFilesSection scope={scope()} />
             </Match>
             <Match when={section() === 'tasks'}>
-              <Suspense fallback={<CrmListSkeleton label="Loading tasks" />}>
+              <Suspense fallback={<CrmListSkeleton label={t('crm.loadingTasks')} />}>
                 <Show
                   when={scope()}
-                  fallback={<CrmListSkeleton label="Loading tasks" />}
+                  fallback={<CrmListSkeleton label={t('crm.loadingTasks')} />}
                 >
                   {(current) => <context.RecordTasks scope={current()} />}
                 </Show>
@@ -127,7 +128,7 @@ function ContactContent(props: ContactProps) {
         contact={contact()}
         onOpenCompany={props.onOpenCompany}
       />
-      <SidePanel.Section id="contact-references" title="References" order={20}>
+      <SidePanel.Section id="contact-references" title={t('crm.references')} order={20}>
         <RecordReferencesSection scope={scope()} />
       </SidePanel.Section>
     </SidePanel.Layout>

@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::service::test::fakes::*;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::sync::atomic::Ordering;
 
 fn fixture() -> (
@@ -13,7 +13,7 @@ fn fixture() -> (
     let repository = Arc::new(FakeRepository::new());
     let provider = Arc::new(FakeProvider::new());
     let actor = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|import@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|import@example.test")
             .unwrap()
             .into_owned(),
     };

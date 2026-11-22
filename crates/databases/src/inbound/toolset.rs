@@ -21,7 +21,7 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::cast::SpelledColumnType;
 use models_properties::shared::DataType;
 use schemars::JsonSchema;
@@ -83,7 +83,7 @@ impl<Service: DatabasesService, EntityAccess: EntityAccessService>
 
     /// The requesting user, as the service's query surface understands them,
     /// with this context's agent acting for them.
-    pub(crate) fn viewer(&self, user_id: &MacroUserIdStr<'static>) -> Viewer {
+    pub(crate) fn viewer(&self, user_id: &RoxUserIdStr<'static>) -> Viewer {
         Viewer {
             user_id: user_id.clone(),
             acting_bot: Some(self.actor),
@@ -93,7 +93,7 @@ impl<Service: DatabasesService, EntityAccess: EntityAccessService>
     /// Prove the caller may read `database_id`.
     pub(crate) async fn view_receipt(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         database_id: DatabaseId,
     ) -> Result<EntityAccessReceipt<ViewAccessLevel>, ToolCallError> {
         self.receipt::<ViewAccessLevel>(user_id, database_id, "read")
@@ -103,7 +103,7 @@ impl<Service: DatabasesService, EntityAccess: EntityAccessService>
     /// Prove the caller may change `database_id`'s schema.
     pub(crate) async fn edit_receipt(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         database_id: DatabaseId,
     ) -> Result<EntityAccessReceipt<EditAccessLevel>, ToolCallError> {
         self.receipt::<EditAccessLevel>(user_id, database_id, "edit")
@@ -114,7 +114,7 @@ impl<Service: DatabasesService, EntityAccess: EntityAccessService>
     /// current table version or label rather than asking the model for it.
     pub(crate) async fn current_schema(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         database_id: DatabaseId,
     ) -> Result<DatabaseDetail, ToolCallError> {
         let receipt = self.view_receipt(user_id, database_id).await?;
@@ -128,7 +128,7 @@ impl<Service: DatabasesService, EntityAccess: EntityAccessService>
     /// data write of the tools goes through here.
     pub(crate) async fn apply(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         database_id: DatabaseId,
         batch: OpBatch,
     ) -> Result<Vec<OpResult>, ToolCallError> {
@@ -143,7 +143,7 @@ impl<Service: DatabasesService, EntityAccess: EntityAccessService>
     /// missing grant, and a failed check each send the model somewhere else.
     async fn receipt<Permission: RequiredPermission>(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         database_id: DatabaseId,
         verb: &str,
     ) -> Result<EntityAccessReceipt<Permission>, ToolCallError> {

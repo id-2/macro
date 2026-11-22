@@ -6,15 +6,15 @@
 
 use std::{future::Future, pin::Pin};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Someone joined a team because of `inviter`.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct InviteRewardEvent {
     /// Who earned the reward: the invite's sender or the link's creator.
-    pub inviter: MacroUserIdStr<'static>,
+    pub inviter: RoxUserIdStr<'static>,
     /// Who joined.
-    pub joined: MacroUserIdStr<'static>,
+    pub joined: RoxUserIdStr<'static>,
     /// A stable key for this join, so a retried join never pays twice.
     pub event_key: String,
 }

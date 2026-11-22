@@ -8,7 +8,7 @@ async fn preserve_attempt(pool: Pool<Postgres>, unconfirmed: bool) -> anyhow::Re
         .await?
         .unwrap();
     assert!(cached.is_draft);
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let mut input = prepared();
     input.undo_delay_secs = 0;
     repo.admit_send(&actor(), link(), attempt, input).await?;
@@ -52,7 +52,7 @@ async fn preserve_attempt(pool: Pool<Postgres>, unconfirmed: bool) -> anyhow::Re
         repo.admit_send(
             &actor(),
             link(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             prepared()
         )
         .await
@@ -88,7 +88,7 @@ async fn trash_rechecks_draft_state_after_admission(pool: Pool<Postgres>) -> any
         .await?
         .unwrap();
     assert!(cached.is_draft);
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let mut input = prepared();
     input.undo_delay_secs = 0;
     repo.admit_send(&actor(), link(), attempt, input).await?;

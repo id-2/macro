@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { SidePanel } from '@components/app/side-panel';
 import { fireAndForget } from '@core/util/fireAndForget';
 import ListIcon from '@icon/system/regular/list-bullets.svg';
@@ -32,18 +33,18 @@ export function CompanyListsSection(props: { companyId: string }) {
         included,
       });
     } catch {
-      setError('Could not update list membership. Please try again.');
+      setError(t('crm.couldNotUpdateListMembership'));
     }
   }
   return (
-    <SidePanel.Section id="company-lists" title="Lists" order={40} defaultOpen>
+    <SidePanel.Section id="company-lists" title={t('crm.lists')} order={40} defaultOpen>
       <div class="flex flex-col gap-3">
         <Show when={team.isError || lists.query.isError}>
           <div
             role="alert"
             class="flex items-center justify-between gap-2 text-xs text-ink-muted"
           >
-            <span>Could not load lists.</span>
+            <span>{t('crm.couldNotLoadLists')}</span>
             <Button
               variant="ghost"
               size="xs"
@@ -52,23 +53,23 @@ export function CompanyListsSection(props: { companyId: string }) {
                 fireAndForget(lists.query.refetch(), 'crm');
               }}
             >
-              Retry
+              {t('crm.retry')}
             </Button>
           </div>
         </Show>
         <Show when={team.isLoading || (!!teamId() && lists.query.isLoading)}>
-          <p class="text-xs text-ink-muted">Loading lists…</p>
+          <p class="text-xs text-ink-muted">{t('crm.loadingLists')}</p>
         </Show>
         <Show when={lists.query.isSuccess && teamId()}>
           <Show
             when={memberships().length}
             fallback={
-              <p class="text-xs text-ink-muted">Not in any lists yet.</p>
+              <p class="text-xs text-ink-muted">{t('crm.notInAnyLists')}</p>
             }
           >
             <div
               class="flex flex-wrap gap-1.5"
-              aria-label="Company list memberships"
+              aria-label={t('crm.companyListMemberships')}
             >
               <For each={memberships()}>
                 {(list) => (
@@ -90,23 +91,23 @@ export function CompanyListsSection(props: { companyId: string }) {
             aria-expanded={editing()}
             onClick={() => setEditing(!editing())}
           >
-            {editing() ? 'Done' : 'Manage lists'}
+            {editing() ? t('crm.done') : t('crm.manageLists')}
           </Button>
           <Show when={editing()}>
             <p class="text-xs text-ink-muted">
-              Your personal company lists. Changes save immediately.
+              {t('crm.listsHint')}
             </p>
             <Show
               when={lists.lists().length}
               fallback={
                 <p class="text-xs text-ink-muted">
-                  Create a list in the CRM sidebar to get started.
+                  {t('crm.createListHint')}
                 </p>
               }
             >
               <input
-                aria-label="Find company lists"
-                placeholder="Find a list…"
+                aria-label={t('crm.findCompanyLists')}
+                placeholder={t('crm.findAList')}
                 value={search()}
                 onInput={(event) => setSearch(event.currentTarget.value)}
                 class="w-full rounded-lg border border-edge-muted bg-input px-2.5 py-1.5 text-sm outline-none focus:border-accent"

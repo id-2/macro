@@ -2,9 +2,9 @@ import type { VisibleCalendar } from '@queries/calendar/calendars';
 import type { CalendarPeriodView, CalendarSource } from '../types';
 
 const CALENDAR_PERIOD_LABELS = {
-  dayGridMonth: 'Month',
-  timeGridWeek: 'Week',
-  timeGridDay: 'Day',
+  dayGridMonth: 'Месяц',
+  timeGridWeek: 'Неделя',
+  timeGridDay: 'День',
 } satisfies Record<CalendarPeriodView, string>;
 
 /** Human-readable label for a calendar period view. */

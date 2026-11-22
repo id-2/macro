@@ -13,7 +13,7 @@ async fn insert_cell(
     sqlx::query!(
         "INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values)
          VALUES ($1, $2, 'DATABASE_ROW', $3, jsonb_build_object('type', 'String', 'value', $4::text))",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         row,
         definition,
         value,
@@ -123,7 +123,7 @@ async fn a_cell_of_a_column_of_another_table_is_refused(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn a_cell_of_a_missing_row_is_refused(pool: PgPool) {
     let (_, _, name) = fixture(&pool).await;
-    let missing = macro_uuid::generate_uuid_v7().to_string();
+    let missing = rox_uuid::generate_uuid_v7().to_string();
 
     let inserted = insert_cell(&pool, &missing, name, "Sam").await;
     assert_eq!(

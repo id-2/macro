@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type { OperationResult } from '@urql/core';
 
 // Result-local context never enters GraphQL extensions, storage, or the wire.

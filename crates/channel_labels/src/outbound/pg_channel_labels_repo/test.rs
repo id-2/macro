@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -12,8 +12,8 @@ mod team_channels;
 const USER_A: &str = "macro|labels-a@rox.one";
 const USER_B: &str = "macro|labels-b@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 async fn insert_user(pool: &PgPool, id: &str) {
@@ -463,8 +463,8 @@ async fn private_and_team_assignments_do_not_overwrite_each_other(pool: PgPool) 
     insert_user(&pool, USER_B).await;
     let team_id = insert_team(&pool, USER_A).await;
     let team = ChannelLabelsScope::Team(team_id);
-    let a = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
-    let b = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_B.to_owned()).unwrap());
+    let a = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let b = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_B.to_owned()).unwrap());
     let channel = insert_team_channel(&pool, "Shared", team_id, USER_A, &[USER_A, USER_B]).await;
     let repo = PgChannelLabelsRepo::new(pool);
     let team_label = written(
@@ -519,7 +519,7 @@ async fn private_and_team_assignments_do_not_overwrite_each_other(pool: PgPool) 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn create_with_invalid_channel_leaves_no_partial_label_or_moves(pool: PgPool) {
     insert_user(&pool, USER_A).await;
-    let scope = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let scope = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let team_id = insert_team(&pool, USER_A).await;
     let channel = insert_team_channel(&pool, "Mine", team_id, USER_A, &[USER_A]).await;
     let dm = insert_channel(&pool, None, "direct_message", USER_A, &[USER_A]).await;
@@ -566,7 +566,7 @@ async fn create_with_invalid_channel_leaves_no_partial_label_or_moves(pool: PgPo
 async fn smart_tags_overlap_manual_groups_and_follow_channel_changes(pool: PgPool) {
     use crate::domain::models::ChannelLabelRule;
     insert_user(&pool, USER_A).await;
-    let scope = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let scope = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let repo = PgChannelLabelsRepo::new(pool.clone());
     let team_id = insert_team(&pool, USER_A).await;
     let channel = insert_team_channel(&pool, "Acme SUPPORT", team_id, USER_A, &[USER_A]).await;
@@ -734,7 +734,7 @@ async fn transfer_preserves_identity_and_moves_conflicting_destination_assignmen
     insert_user(&pool, USER_B).await;
     let team_id = insert_team(&pool, USER_A).await;
     let team = ChannelLabelsScope::Team(team_id);
-    let personal = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let personal = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let shared = insert_team_channel(&pool, "Shared", team_id, USER_A, &[USER_A, USER_B]).await;
     let hidden = insert_team_channel(&pool, "Hidden", team_id, USER_B, &[USER_B]).await;
     let repo = PgChannelLabelsRepo::new(pool.clone());
@@ -812,7 +812,7 @@ async fn transfer_rejects_hidden_and_ineligible_members_and_name_collisions(pool
     insert_user(&pool, USER_B).await;
     let team_id = insert_team(&pool, USER_A).await;
     let team = ChannelLabelsScope::Team(team_id);
-    let personal = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let personal = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let shared = insert_team_channel(&pool, "Shared", team_id, USER_A, &[USER_A]).await;
     let other_team = insert_team(&pool, USER_B).await;
     let ineligible = insert_team_channel(&pool, "Other", other_team, USER_A, &[USER_A]).await;
@@ -894,7 +894,7 @@ async fn sharing_smart_tag_rejects_personal_matches_outside_team(pool: PgPool) {
     insert_user(&pool, USER_B).await;
     let team_id = insert_team(&pool, USER_A).await;
     let team = ChannelLabelsScope::Team(team_id);
-    let personal = ChannelLabelsScope::User(MacroUserIdStr::try_from(USER_A.to_owned()).unwrap());
+    let personal = ChannelLabelsScope::User(RoxUserIdStr::try_from(USER_A.to_owned()).unwrap());
     let channel = insert_team_channel(&pool, "Support", team_id, USER_A, &[USER_A]).await;
     let other_team = insert_team(&pool, USER_B).await;
     let ineligible =

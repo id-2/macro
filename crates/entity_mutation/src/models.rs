@@ -1,4 +1,4 @@
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashSet;
 
 use model_entity::{Entity, EntityType};
@@ -8,7 +8,7 @@ use models_permissions::share_permission::UpdateSharePermissionRequestV2;
 #[derive(Clone, Debug)]
 pub struct EntityMutationActor {
     /// Stable Rox user id.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Organization id attached to the authenticated request, when present.
     pub organization_id: Option<i64>,
 }

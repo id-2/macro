@@ -1,4 +1,4 @@
-import { fitTextLayout } from '@macro-inc/graphics';
+import { fitTextLayout } from '@rox-one/graphics';
 import { describe, expect, it, vi } from 'vitest';
 import { canvasRevision } from './revision';
 import {

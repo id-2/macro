@@ -1,3 +1,4 @@
+import { interfaceLanguageReady, setInterfaceLanguage } from '@app/lib/i18n';
 import type { InputAttachmentData } from '@channel/Input/types';
 import { CURSOR_BOT_ID } from '@core/constant/cursorAgent';
 import { MACRO_CODER_BOT_ID } from '@core/constant/macroCoder';
@@ -10,7 +11,7 @@ import {
   within,
 } from '@solidjs/testing-library';
 import { createRoot, createSignal, For, type JSX } from 'solid-js';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ComposerMode } from '../core/mode';
 import {
   buildAgentRoster,
@@ -284,7 +285,7 @@ function page(
       onOpenRoster={vi.fn()}
     />
   ));
-  const chat = screen.queryByRole('radio', { name: 'Chat' });
+  const chat = screen.queryByRole('radio', { name: 'Чат' });
   if (mode === undefined && startInChat && chat) fireEvent.click(chat);
   return onStart;
 }
@@ -306,7 +307,7 @@ async function hoverAgent(name: string) {
   openAgents();
   // Chat mode's root menu has its own model search; Code mode's does not.
   const before = screen.queryAllByRole('textbox', {
-    name: 'Search models',
+    name: 'Поиск моделей',
   }).length;
   const event = new MouseEvent('pointermove', { bubbles: true });
   Object.defineProperty(event, 'pointerType', { value: 'mouse' });
@@ -315,11 +316,11 @@ async function hoverAgent(name: string) {
     .dispatchEvent(event);
   await waitFor(() =>
     expect(
-      screen.getAllByRole('textbox', { name: 'Search models' })
+      screen.getAllByRole('textbox', { name: 'Поиск моделей' })
     ).toHaveLength(before + 1)
   );
   const search = screen
-    .getAllByRole('textbox', { name: 'Search models' })
+    .getAllByRole('textbox', { name: 'Поиск моделей' })
     .at(-1);
   if (!search) throw new Error('Agent model search did not open');
   return within(search.closest('[role="menu"]') as HTMLElement);
@@ -327,6 +328,10 @@ async function hoverAgent(name: string) {
 
 describe('agent-led new conversation', () => {
   let motionStyles: HTMLStyleElement;
+  beforeAll(async () => {
+    setInterfaceLanguage('ru');
+    await interfaceLanguageReady(1000);
+  });
   beforeEach(() => {
     mocks.capabilitiesPending = false;
     mocks.freePlan = false;
@@ -394,7 +399,7 @@ describe('agent-led new conversation', () => {
     const send = page();
     fireEvent.click(screen.getByRole('button', { name: 'Agent' }));
     await screen.findByRole('textbox', { name: 'Search agents and models' });
-    const frontier = within(screen.getByRole('group', { name: 'Suggested' }));
+    const frontier = within(screen.getByRole('group', { name: 'Рекомендуемые' }));
     expect(
       frontier.getAllByRole('button').map((item) => item.textContent?.trim())
     ).toEqual([
@@ -402,10 +407,9 @@ describe('agent-led new conversation', () => {
       'Sonnet 5.5',
       'GPT-5.6',
       'GPT-6 Astra',
-      'Gemini 3.8 Flash',
     ]);
     expect(screen.queryByRole('group', { name: 'Google' })).toBeNull();
-    expect(screen.getByRole('button', { name: 'More models' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Другие модели' })).toBeTruthy();
     expect(screen.queryByText('Recommended')).toBeNull();
     fireEvent.input(
       screen.getByRole('textbox', { name: 'Search agents and models' }),
@@ -444,7 +448,7 @@ describe('agent-led new conversation', () => {
     page();
     for (let attempt = 0; attempt < 2; attempt++) {
       openAgents();
-      const search = screen.getByRole('textbox', { name: 'Search models' });
+      const search = screen.getByRole('textbox', { name: 'Поиск моделей' });
       await waitFor(() => expect(document.activeElement).toBe(search));
       fireEvent.input(search, { target: { value: 'Sonnet' } });
       expect(screen.getByTitle('Sonnet 5.5')).toBeTruthy();
@@ -456,34 +460,34 @@ describe('agent-led new conversation', () => {
     startInChat = false;
     page();
     expect(
-      (screen.getByRole('radio', { name: 'Auto' }) as HTMLInputElement).checked
+      (screen.getByRole('radio', { name: 'Авто' }) as HTMLInputElement).checked
     ).toBe(true);
     expect(
-      screen.getByRole('heading', { name: 'What should we work on?' })
+      screen.getByRole('heading', { name: 'Обкашляем вопросики?' })
     ).toBeTruthy();
     expect(screen.queryByRole('button', { name: 'Agent' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Repository' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Репозиторий' })).toBeNull();
   });
   it('offers only Chat and Code without the Auto flag', () => {
     mocks.autoEnabled = false;
     const send = page();
-    expect(screen.queryByRole('radio', { name: 'Auto' })).toBeNull();
+    expect(screen.queryByRole('radio', { name: 'Авто' })).toBeNull();
     expect(
-      (screen.getByRole('radio', { name: 'Chat' }) as HTMLInputElement).checked
+      (screen.getByRole('radio', { name: 'Чат' }) as HTMLInputElement).checked
     ).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(mocks.chooseAgentMode).not.toHaveBeenCalled();
     expect(send).toHaveBeenCalledWith(
       expect.objectContaining({
         botId: undefined,
-        modelOverride: 'chat-default',
+        modelOverride: 'groq/gpt-oss-120b',
       })
     );
   });
   it('sends a coding prompt in Auto to the usual coding agent with its defaults', async () => {
     mocks.chooseAgentMode.mockResolvedValueOnce('code');
     const send = page(true, [], false, [], undefined);
-    fireEvent.click(screen.getByRole('radio', { name: 'Auto' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Авто' }));
     fireEvent.input(screen.getByRole('textbox', { name: 'Draft' }), {
       target: { value: 'Fix the login bug' },
     });
@@ -500,7 +504,7 @@ describe('agent-led new conversation', () => {
   it('sends any other prompt in Auto to the chat agent with its model', async () => {
     mocks.chooseAgentMode.mockResolvedValueOnce('chat');
     const send = page();
-    fireEvent.click(screen.getByRole('radio', { name: 'Auto' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Авто' }));
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     await waitFor(() => expect(send).toHaveBeenCalledTimes(1));
     expect(send).toHaveBeenCalledWith({
@@ -508,39 +512,39 @@ describe('agent-led new conversation', () => {
       prompt: 'Prompt',
       botId: undefined,
       repoUrl: undefined,
-      modelOverride: 'chat-default',
+      modelOverride: 'groq/gpt-oss-120b',
     });
   });
   it('skips the choice in Auto when no coding agent can start', () => {
     const send = page(false);
-    fireEvent.click(screen.getByRole('radio', { name: 'Auto' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Авто' }));
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(mocks.chooseAgentMode).not.toHaveBeenCalled();
     expect(send).toHaveBeenCalledWith(
       expect.objectContaining({
         botId: undefined,
-        modelOverride: 'chat-default',
+        modelOverride: 'groq/gpt-oss-120b',
       })
     );
   });
   it('starts in a remembered Chat and switches to Code from the composer', async () => {
     const send = page();
     expect(
-      screen.getByRole('heading', { name: 'What should we work on?' })
+      screen.getByRole('heading', { name: 'Обкашляем вопросики?' })
     ).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Model' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Модель' })).toBeNull();
     expect(screen.getByRole('button', { name: 'Agent' }).textContent).toContain(
-      'Chat default'
+      'Rox R1 Max'
     );
     expect(
-      (screen.getByRole('radio', { name: 'Chat' }) as HTMLInputElement).checked
+      (screen.getByRole('radio', { name: 'Чат' }) as HTMLInputElement).checked
     ).toBe(true);
-    expect(screen.queryByRole('button', { name: 'Repository' })).toBeNull();
-    fireEvent.click(screen.getByRole('radio', { name: 'Code' }));
+    expect(screen.queryByRole('button', { name: 'Репозиторий' })).toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: 'Код' }));
     expect(
-      screen.getByRole('heading', { name: 'What should we build?' })
+      screen.getByRole('heading', { name: 'Что соберём?' })
     ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
     openAgents();
     expect(screen.getByRole('menuitem', { name: /Cursor/ })).toBeTruthy();
     expect(
@@ -548,17 +552,17 @@ describe('agent-led new conversation', () => {
     ).toBeNull();
     fireEvent.keyDown(document, { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
-    fireEvent.click(screen.getByRole('radio', { name: 'Chat' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Чат' }));
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenCalledWith({
       onFailure: expect.any(Function),
       prompt: 'Prompt',
       botId: undefined,
       repoUrl: undefined,
-      modelOverride: 'chat-default',
+      modelOverride: 'groq/gpt-oss-120b',
     });
   });
-  it('flags a send before the model catalog loads as a model fallback', () => {
+  it('sends the house model while the catalog is still loading', () => {
     mocks.modelsPending = true;
     const send = page();
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
@@ -567,7 +571,7 @@ describe('agent-led new conversation', () => {
       prompt: 'Prompt',
       botId: undefined,
       repoUrl: undefined,
-      modelFallback: true,
+      modelOverride: 'groq/gpt-oss-120b',
     });
   });
   it('selects a coding agent, keeps the draft, and only sends the repository to coding agents', async () => {
@@ -575,22 +579,22 @@ describe('agent-led new conversation', () => {
     fireEvent.input(screen.getByRole('textbox', { name: 'Draft' }), {
       target: { value: 'Shared draft' },
     });
-    fireEvent.click(screen.getByRole('radio', { name: 'Code' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Код' }));
     await selectAgent(/Cursor/);
     expect(
-      screen.getByRole('heading', { name: 'What should we build?' })
+      screen.getByRole('heading', { name: 'Что соберём?' })
     ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
+    expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Репозиторий' }));
     fireEvent.click(screen.getByRole('option', { name: 'macro-inc/macro' }));
     // The listed repository's own default branch, until one is chosen.
     expect(
-      screen.getByRole('button', { name: 'Branch' }).textContent
+      screen.getByRole('button', { name: 'Ветка' }).textContent
     ).toContain('develop');
-    fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ветка' }));
     fireEvent.click(screen.getByRole('option', { name: 'feature/home' }));
-    fireEvent.click(screen.getByRole('radio', { name: 'Chat' }));
-    expect(screen.queryByRole('button', { name: 'Repository' })).toBeNull();
+    fireEvent.click(screen.getByRole('radio', { name: 'Чат' }));
+    expect(screen.queryByRole('button', { name: 'Репозиторий' })).toBeNull();
     expect(
       (screen.getByRole('textbox', { name: 'Draft' }) as HTMLInputElement).value
     ).toBe('Shared draft');
@@ -600,10 +604,10 @@ describe('agent-led new conversation', () => {
       prompt: 'Shared draft',
       botId: undefined,
       repoUrl: undefined,
-      modelOverride: 'chat-default',
+      modelOverride: 'groq/gpt-oss-120b',
     });
-    fireEvent.click(screen.getByRole('radio', { name: 'Code' }));
-    expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('radio', { name: 'Код' }));
+    expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
       botId: CURSOR_BOT_ID,
@@ -616,11 +620,11 @@ describe('agent-led new conversation', () => {
   it('offers only chat agents in Work and keeps the composer compact', async () => {
     const send = page(true, [], false, [], 'chat');
     expect(
-      screen.getByRole('heading', { name: 'What should we work on?' })
+      screen.getByRole('heading', { name: 'Обкашляем вопросики?' })
     ).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Repository' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Репозиторий' })).toBeNull();
     openAgents();
-    expect(screen.getByRole('group', { name: 'Suggested' })).toBeTruthy();
+    expect(screen.getByRole('group', { name: 'Рекомендуемые' })).toBeTruthy();
     expect(screen.queryByRole('menuitem', { name: /Cursor/ })).toBeNull();
     fireEvent.keyDown(document, { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
@@ -630,15 +634,15 @@ describe('agent-led new conversation', () => {
       prompt: 'Prompt',
       botId: undefined,
       repoUrl: undefined,
-      modelOverride: 'chat-default',
+      modelOverride: 'groq/gpt-oss-120b',
     });
   });
   it('offers only coding agents in Code and opens the repository drawer', async () => {
     const send = page(true, [], false, [], 'code');
     expect(
-      screen.getByRole('heading', { name: 'What should we build?' })
+      screen.getByRole('heading', { name: 'Что соберём?' })
     ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
     openAgents();
     expect(screen.getByRole('menuitem', { name: /Cursor/ })).toBeTruthy();
     expect(
@@ -806,10 +810,10 @@ describe('agent-led new conversation', () => {
     mocks.recentUrls = ['https://github.com/macro-inc/macro'];
     const send = page(true, [], false, [], 'code');
     expect(
-      screen.getByRole('button', { name: 'Repository' }).textContent
-    ).toContain('Auto-detect');
+      screen.getByRole('button', { name: 'Репозиторий' }).textContent
+    ).toContain('Определять автоматически');
     expect(
-      screen.getByRole('button', { name: 'Repository' }).textContent
+      screen.getByRole('button', { name: 'Репозиторий' }).textContent
     ).not.toContain('macro-inc/macro');
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
@@ -829,7 +833,7 @@ describe('agent-led new conversation', () => {
     mocks.recentIds = [CURSOR_BOT_ID];
     const send = page(true, [], false, [], 'code');
     expect(
-      screen.getByRole('button', { name: 'Repository' }).textContent
+      screen.getByRole('button', { name: 'Репозиторий' }).textContent
     ).toContain('macro-inc/macro');
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
@@ -850,8 +854,8 @@ describe('agent-led new conversation', () => {
     });
     mocks.recentIds = [CURSOR_BOT_ID];
     const send = page(true, [], false, [], 'code');
-    fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
-    fireEvent.click(screen.getByRole('option', { name: 'Auto-detect' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Репозиторий' }));
+    fireEvent.click(screen.getByRole('option', { name: 'Определять автоматически' }));
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
       botId: CURSOR_BOT_ID,
@@ -877,8 +881,8 @@ describe('agent-led new conversation', () => {
     mocks.recentIds = [CURSOR_BOT_ID];
     const send = page(true, [], false, [], 'code');
     expect(
-      screen.getByRole('button', { name: 'Repository' }).textContent
-    ).toContain('Auto-detect');
+      screen.getByRole('button', { name: 'Репозиторий' }).textContent
+    ).toContain('Определять автоматически');
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
       botId: CURSOR_BOT_ID,
@@ -897,10 +901,10 @@ describe('agent-led new conversation', () => {
     }));
     settings.select('https://github.com/macro-inc/macro');
     expect(
-      screen.getByRole('button', { name: 'Repository' }).textContent
+      screen.getByRole('button', { name: 'Репозиторий' }).textContent
     ).toContain('macro-inc/macro');
-    fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
-    fireEvent.click(screen.getByRole('option', { name: 'Auto-detect' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Репозиторий' }));
+    fireEvent.click(screen.getByRole('option', { name: 'Определять автоматически' }));
     settings.select(undefined);
     settings.select('https://github.com/macro-inc/macro');
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
@@ -916,30 +920,30 @@ describe('agent-led new conversation', () => {
   it('refuses an unlisted repository and starts a listed one on its default branch', async () => {
     const send = page(true, [], false, [], 'code');
     await selectAgent(/Cursor/);
-    fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Репозиторий' }));
     fireEvent.input(
-      screen.getByRole('combobox', { name: 'Search repositories' }),
+      screen.getByRole('combobox', { name: 'Поиск репозиториев' }),
       {
         target: { value: 'macro-inc/other' },
       }
     );
     expect(screen.queryAllByRole('option')).toHaveLength(0);
-    expect(screen.getByText(/No repositories match/).textContent).toContain(
+    expect(screen.getByText(/Нет репозиториев по запросу/).textContent).toContain(
       'macro-inc/other'
     );
     fireEvent.input(
-      screen.getByRole('combobox', { name: 'Search repositories' }),
+      screen.getByRole('combobox', { name: 'Поиск репозиториев' }),
       { target: { value: '' } }
     );
     fireEvent.click(screen.getByRole('option', { name: 'macro-inc/macro' }));
     expect(
-      screen.getByRole('button', { name: 'Branch' }).textContent
+      screen.getByRole('button', { name: 'Ветка' }).textContent
     ).toContain('develop');
-    fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
-    fireEvent.input(screen.getByRole('combobox', { name: 'Search branches' }), {
+    fireEvent.click(screen.getByRole('button', { name: 'Ветка' }));
+    fireEvent.input(screen.getByRole('combobox', { name: 'Поиск ветвей' }), {
       target: { value: 'feature/other' },
     });
-    fireEvent.click(screen.getByRole('option', { name: 'Use feature/other' }));
+    fireEvent.click(screen.getByRole('option', { name: 'Использовать feature/other' }));
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
       botId: CURSOR_BOT_ID,
@@ -965,7 +969,7 @@ describe('agent-led new conversation', () => {
       prompt: 'Prompt',
       botId: 'saved-agent',
       repoUrl: undefined,
-      modelOverride: 'google/gemini-3.8-flash',
+      modelOverride: 'groq/gpt-oss-120b',
     });
   });
   it.each(['codex-cloud', 'future-runtime'])(
@@ -989,12 +993,12 @@ describe('agent-led new conversation', () => {
         'code'
       );
       await selectAgent(/Cursor/);
-      fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
+      fireEvent.click(screen.getByRole('button', { name: 'Репозиторий' }));
       fireEvent.click(screen.getByRole('option', { name: 'macro-inc/macro' }));
       await selectAgent(/Cloud reviewer/);
-      expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
-      expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
-      expect(screen.getByRole('button', { name: 'Branch' })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
+      expect(screen.getByRole('button', { name: 'Ветка' })).toBeTruthy();
       fireEvent.click(screen.getByRole('button', { name: 'Send' }));
       expect(send).toHaveBeenCalledWith({
         onFailure: expect.any(Function),
@@ -1021,13 +1025,13 @@ describe('agent-led new conversation', () => {
       'code'
     );
     await selectAgent(/Cursor/);
-    fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Репозиторий' }));
     fireEvent.click(screen.getByRole('option', { name: 'macro-inc/macro' }));
     expect(
-      screen.getByRole('button', { name: 'Branch' }).textContent
+      screen.getByRole('button', { name: 'Ветка' }).textContent
     ).toContain('develop');
     await selectAgent(/Laptop agent/);
-    const branch = screen.getByRole('button', { name: 'Branch' });
+    const branch = screen.getByRole('button', { name: 'Ветка' });
     expect(branch.textContent).toContain('main');
     expect(branch.hasAttribute('disabled')).toBe(true);
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
@@ -1189,7 +1193,7 @@ describe('agent-led new conversation', () => {
         await screen.findByRole('dialog');
       }
       const create = within(picker).getByRole(touch ? 'button' : 'menuitem', {
-        name: 'Create agent',
+        name: 'Создать агента',
       });
       if (touch) fireEvent.click(create);
       else {
@@ -1205,7 +1209,7 @@ describe('agent-led new conversation', () => {
   it('focuses model search when hovering an agent submenu', async () => {
     page(true, [], false, [], 'code');
     const submenu = await hoverAgent('Cursor');
-    const search = submenu.getByRole('textbox', { name: 'Search models' });
+    const search = submenu.getByRole('textbox', { name: 'Поиск моделей' });
     await waitFor(() => expect(document.activeElement).toBe(search));
 
     fireEvent.input(search, { target: { value: 'GPT' } });
@@ -1236,14 +1240,14 @@ describe('agent-led new conversation', () => {
     expect(screen.getByRole('button', { name: 'Agent' }).title).toContain(
       'GPT-5'
     );
-    expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
     openAgents();
     fireEvent.keyDown(screen.getByRole('menuitem', { name: /^Cursor/ }), {
       key: 'ArrowRight',
     });
     await waitFor(() =>
       expect(
-        screen.getAllByRole('textbox', { name: 'Search models' })
+        screen.getAllByRole('textbox', { name: 'Поиск моделей' })
       ).toHaveLength(1)
     );
     expect(
@@ -1281,7 +1285,7 @@ describe('agent-led new conversation', () => {
     expect(screen.getByRole('button', { name: 'Agent' }).title).toContain(
       'Sonnet 5.5'
     );
-    fireEvent.click(screen.getByRole('radio', { name: 'Code' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Код' }));
     expect(screen.getByRole('button', { name: 'Agent' }).title).toContain(
       'Cursor default'
     );
@@ -1295,15 +1299,15 @@ describe('agent-led new conversation', () => {
       },
     ]);
     openAgents();
-    const modelsGroup = screen.getByRole('group', { name: 'Suggested' });
+    const modelsGroup = screen.getByRole('group', { name: 'Рекомендуемые' });
     const agentsGroup = screen.getByRole('group', { name: 'Your agents' });
     expect(
       modelsGroup.compareDocumentPosition(agentsGroup) &
         Node.DOCUMENT_POSITION_FOLLOWING
     ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     expect(screen.queryByRole('group', { name: 'Coding agents' })).toBeNull();
-    const search = screen.getByRole('textbox', { name: 'Search models' });
-    expect(screen.getByRole('menuitem', { name: /More models/ })).toBeTruthy();
+    const search = screen.getByRole('textbox', { name: 'Поиск моделей' });
+    expect(screen.getByRole('menuitem', { name: /Другие модели/ })).toBeTruthy();
     expect(screen.queryByRole('group', { name: 'Z.ai' })).toBeNull();
     fireEvent.input(search, { target: { value: 'GLM' } });
     expect(screen.getByTitle('GLM 5.3')).toBeTruthy();
@@ -1311,7 +1315,7 @@ describe('agent-led new conversation', () => {
     fireEvent.input(search, { target: { value: '' } });
     expect(screen.queryByRole('menuitem', { name: /Cursor/ })).toBeNull();
     expect(screen.queryByRole('menuitem', { name: /^Rox/ })).toBeNull();
-    const models = within(screen.getByRole('group', { name: 'Suggested' }));
+    const models = within(screen.getByRole('group', { name: 'Рекомендуемые' }));
     expect(
       models.queryByRole('menuitem', { name: /Cursor default/ })
     ).toBeNull();
@@ -1320,7 +1324,6 @@ describe('agent-led new conversation', () => {
       'Sonnet 5.5',
       'GPT-5.6',
       'GPT-6 Astra',
-      'Gemini 3.8 Flash',
     ]);
     const sonnet = models.getByTitle('Sonnet 5.5');
     expect(
@@ -1341,7 +1344,7 @@ describe('agent-led new conversation', () => {
     expect(
       trigger.querySelector('[data-ai-provider="anthropic"] svg')
     ).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Repository' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Репозиторий' })).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenLastCalledWith({
       onFailure: expect.any(Function),
@@ -1388,14 +1391,14 @@ describe('agent-led new conversation', () => {
     fireEvent.click(sonnet);
     fireEvent.keyDown(sonnet, { key: 'Enter' });
 
-    const search = screen.getByRole('textbox', { name: 'Search models' });
+    const search = screen.getByRole('textbox', { name: 'Поиск моделей' });
     fireEvent.input(search, { target: { value: 'GLM' } });
     const flash = screen.getByTitle('GLM 5.3 Flash');
     expect(flash.getAttribute('aria-disabled')).toBe('true');
     fireEvent.click(flash);
     fireEvent.input(search, { target: { value: '' } });
 
-    const more = screen.getByRole('menuitem', { name: 'More models' });
+    const more = screen.getByRole('menuitem', { name: 'Другие модели' });
     more.focus();
     fireEvent.keyDown(more, { key: 'ArrowRight' });
     const extra = await screen.findByTitle('GLM 5.3 Flash');
@@ -1415,19 +1418,19 @@ describe('agent-led new conversation', () => {
     mocks.preferredInmemModel = 'anthropic/claude-sonnet-5-5';
     const send = page();
     expect(screen.getByRole('button', { name: 'Agent' }).title).toBe(
-      'Gemini 3.8 Flash'
+      'Rox R1 Max'
     );
     openAgents();
     await waitFor(() => expect(screen.getByRole('menu')).toBeTruthy());
     expect(screen.queryByTitle('Sonnet 5.5')).toBeNull();
     expect(
-      within(screen.getByRole('menu')).getByTitle('Gemini 3.8 Flash')
+      within(screen.getByRole('menu')).getByTitle('Rox R1 Max')
     ).toBeTruthy();
     fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' });
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(send).toHaveBeenCalledWith(
       expect.objectContaining({
-        modelOverride: 'google/gemini-3.8-flash',
+        modelOverride: 'groq/gpt-oss-120b',
       })
     );
   });
@@ -1437,15 +1440,15 @@ describe('agent-led new conversation', () => {
     expect(screen.getByRole('button', { name: 'Agent' }).title).toContain(
       'Cursor'
     );
-    expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
   });
   it('keeps the most recent agent while its connection status loads', () => {
     mocks.recentIds = [CURSOR_BOT_ID];
     page(false, [], true, [], 'code');
     expect(
-      screen.getByRole('heading', { name: 'What should we build?' })
+      screen.getByRole('heading', { name: 'Что соберём?' })
     ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Репозиторий' })).toBeTruthy();
   });
   it('offers Cursor setup when disconnected without switching to an unavailable agent', async () => {
     page(false, [], false, [], 'code');
@@ -1516,7 +1519,7 @@ describe('agent-led new conversation', () => {
     };
     const send = page(true, [], false, [], 'code');
     await pickGpt5();
-    fireEvent.keyDown(screen.getByRole('button', { name: 'Effort: Low' }), {
+    fireEvent.keyDown(screen.getByRole('button', { name: /^Усилие: Low/ }), {
       key: 'ArrowDown',
     });
     fireEvent.keyDown(await screen.findByRole('menuitem', { name: 'Ultra' }), {
@@ -1541,7 +1544,7 @@ describe('agent-led new conversation', () => {
     cleanup();
     const remounted = page(true, [], false, [], 'code');
     await pickGpt5();
-    expect(screen.getByRole('button', { name: 'Effort: Ultra' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Усилие: Ultra' })).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
     expect(remounted).toHaveBeenLastCalledWith(
       expect.objectContaining({
@@ -1714,4 +1717,23 @@ it('clears delivered attachments after switching away and back to the submitting
   expect(screen.getByTestId('attachments').textContent).toBe('sent.txt');
   start.mock.calls[0][0].onDelivered();
   expect(screen.getByTestId('attachments').textContent).toBe('');
+});
+
+it('uses the English labels when the interface language is English', async () => {
+  setInterfaceLanguage('en');
+  try {
+    await interfaceLanguageReady(1000);
+    page(true, [], false, [], 'code');
+    expect(screen.getByRole('button', { name: 'Repository' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
+    expect(
+      screen.getByRole('combobox', { name: 'Search repositories' })
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('option', { name: 'Auto-detect' })
+    ).toBeTruthy();
+  } finally {
+    setInterfaceLanguage('ru');
+    await interfaceLanguageReady(1000);
+  }
 });

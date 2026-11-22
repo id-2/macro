@@ -58,7 +58,9 @@ x-local-e2e-env: &local-e2e-env
 
 services:
   authentication-service:
-    environment: *local-e2e-env
+    environment:
+      <<: *local-e2e-env
+      PASSWORDLESS_RETURN_CODE: "true"
   connection_gateway:
     environment: *local-e2e-env
   contacts_service:

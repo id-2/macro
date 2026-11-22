@@ -16,10 +16,10 @@ jsonwebtoken = { workspace = true }
 lru = { workspace = true }
 lazy-regex = { workspace = true }
 password_import = { path = "../password_import" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 feature_flags = { path = "../feature_flags" }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = ["axum"] }
-macro_db_client = { path = "../macro_db_client" }
+rox_authorization = { path = "../rox_authorization", default-features = false, features = ["axum"] }
+rox_db_client = { path = "../rox_db_client" }
 sha2 = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -39,7 +39,7 @@ opentelemetry_sdk = { workspace = true, features = ["trace"] }
 opentelemetry-otlp = { workspace = true }
 url = { workspace = true }
 tokio = { workspace = true, features = ["test-util"] }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 model_user = { path = "../model_user" }
 tower = { workspace = true }
 tracing-subscriber = { workspace = true }

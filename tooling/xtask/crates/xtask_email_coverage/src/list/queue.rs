@@ -110,7 +110,7 @@ fn check_consumed_queues(
 
 #[derive(Default)]
 struct ConsumedQueues {
-    /// Variable → queue type, from `let x = macro_queues::XQueue::new();`.
+    /// Variable → queue type, from `let x = rox_queues::XQueue::new();`.
     queue_types: BTreeMap<String, String>,
     /// The variable each `SQSWorker::new(client, x.to_string(), ..)` reads
     /// its queue from.

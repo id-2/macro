@@ -1,5 +1,5 @@
-import { type Bounds, worldBounds } from '@macro-inc/graphics';
-import { Telemetry } from '@macro-inc/observability';
+import { type Bounds, worldBounds } from '@rox-one/graphics';
+import { Telemetry } from '@rox-one/observability';
 import {
   generateText,
   hasToolCall,
@@ -122,7 +122,7 @@ export async function editCanvas(
   instructions: string,
   model: LanguageModel,
   signal: AbortSignal,
-  editorName = 'Macro',
+  editorName = 'Rox',
   options: CanvasAgentOptions = {}
 ) {
   const SYSTEM = options.artifacts

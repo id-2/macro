@@ -5,7 +5,7 @@ import type {
   BookingSchedule,
 } from '../../../generated/calendar/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Team } from '../teams/team';
 import { User } from '../users/user';
 import { Booking } from './booking';
@@ -54,13 +54,13 @@ export interface BookingInsightsQuery extends BookingScope {
 }
 
 /**
- * Booking links (`macro.calendar.booking`): reusable booking pages, the
+ * Booking links (`rox.calendar.booking`): reusable booking pages, the
  * settings behind them, the meetings guests book through them, and their
  * statistics. Personal unless a `team` is given; any team member can read and
  * edit a team's.
  */
 export class BookingNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * List and search the user's booking links (or a team's), with their full

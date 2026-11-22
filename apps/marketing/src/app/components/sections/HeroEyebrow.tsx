@@ -1,5 +1,5 @@
 import type { Accessor } from 'solid-js';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 
 // The small brand tag that sits above each hero headline — the Rox mark
 // followed by the product name in a spaced, uppercase Inter cap. Shared by
@@ -23,7 +23,7 @@ export function HeroEyebrow(props: {
         'text-transform': 'uppercase',
       }}
     >
-      <MacroMarkIcon
+      <RoxMarkIcon
         style={{
           color: 'var(--a0)',
           display: 'block',

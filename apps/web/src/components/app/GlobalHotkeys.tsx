@@ -39,7 +39,7 @@ import Plus from '@icon/system/regular/plus.svg';
 import LogoutIcon from '@icon/system/regular/sign-out.svg';
 import Upload from '@icon/system/regular/upload.svg';
 import UserIcon from '@icon/system/regular/user.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useMutationUndoContext } from '@queries/undo';
 import { debounce } from '@solid-primitives/scheduled';
 import { ThemeChips } from '@theme/components/ThemeChips';
@@ -643,7 +643,7 @@ export default function GlobalShortcuts() {
   if (LOCAL_ONLY) {
     registerHotkey({
       scopeId: 'global',
-      description: 'Open hotkey debugger',
+      description: () => t('commands.hotkeyDebugger'),
       tags: ['debug', 'dev', 'hotkey'],
       keyDownHandler: () => {
         openWithSplit(
@@ -679,7 +679,7 @@ export default function GlobalShortcuts() {
     // '?' arrives as shift+/ and prints back as '?'.
     hotkey: 'shift+/',
     scopeId: 'global',
-    description: 'Show keyboard shortcuts',
+    description: () => t('commands.showKeyboardShortcuts'),
     keywords: ['hotkeys', 'keys', 'help', 'cheat sheet'],
     // Only the key: run from the command menu, the sheet would describe the
     // menu rather than the view it was opened from.

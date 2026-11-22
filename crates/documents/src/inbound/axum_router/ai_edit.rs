@@ -16,7 +16,7 @@ use entity_access::{
     domain::{models::EditAccessLevel, ports::EntityAccessService},
     inbound::axum_extractors::DocumentAccessExtractor,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model::document::DocumentBasic;
 
 /// What to change, in words.
@@ -124,7 +124,7 @@ impl IntoResponse for DocumentAiEditError {
 pub async fn ai_edit_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

@@ -3,6 +3,7 @@ import { runCreateAction } from '@app/features/command/Launcher';
 import { SidebarRoutineSuggestions } from '@app/features/routine-suggestions/routine-suggestions';
 import { SlackImportSidebar } from '@app/features/slack-import/slack-import-sidebar';
 import { DEBUG_SETTING_KEYS, useDebugSetting } from '@app/lib/debugSettings';
+import { t } from '@app/lib/i18n';
 import { openNewChannelModal } from '@channel/CreateChannelModal';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { createScrollTopFade } from '@core/util/createScrollTopFade';
@@ -150,7 +151,7 @@ function ExpandedHeader(props: { search: ChannelRailSearch }) {
       >
         <div class="flex min-w-0 items-center gap-1">
           <ViewSidebar.CloseButton />
-          <ViewSidebar.Title>Chat</ViewSidebar.Title>
+          <ViewSidebar.Title>{t('nav.chat')}</ViewSidebar.Title>
         </div>
       </ViewSidebar.Header>
       <ViewSidebar.Primary class="flex flex-col gap-3">

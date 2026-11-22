@@ -16,7 +16,7 @@ import type {
   TextPos,
 } from '@core/pptx-engine/types';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   type Accessor,
   batch,

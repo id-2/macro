@@ -1,11 +1,13 @@
+import { SERVER_HOSTS } from '@core/constant/servers';
 import { fireAndForget } from '@core/util/fireAndForget';
+import { getMacroApiToken } from '@service-auth/fetch';
 import {
   type RoxdStatus,
   roxdDetectAgents,
   roxdStart,
   roxdStatus,
   onRoxdStatus,
-} from '@macro/tauri/roxd';
+} from '@rox/tauri/roxd';
 import {
   fetchAgentsList,
   useCreateAgentMutation,
@@ -38,14 +40,19 @@ async function waitForRunning(
       resolveRunning(status);
     } else if (status.phase === 'error') {
       rejectRunning(
-        new Error(status.lastError ?? 'This computer stopped running agents.')
+        new Error(
+          status.lastError ?? 'Этот компьютер перестал запускать агентов.'
+        )
       );
     }
   };
 
   const unlisten = await onRoxdStatus(handle);
   const timer = setTimeout(
-    () => rejectRunning(new Error('Connecting this computer took too long.')),
+    () =>
+      rejectRunning(
+        new Error('Подключение этого компьютера заняло слишком много времени.')
+      ),
     CONNECT_TIMEOUT_MS
   );
   try {
@@ -58,12 +65,40 @@ async function waitForRunning(
   }
 }
 
+/**
+ * The deployment this bundle is signed in to, in the form the daemon needs.
+ * Both sides must name the same services: the app approves the pairing code
+ * through its own session, and the daemon claims it here.
+ */
+export function localRuntimeDeployment() {
+  const apiUrl = SERVER_HOSTS['agent-harness'];
+  const storageUrl = SERVER_HOSTS['document-storage-service'];
+  // Pairing links open the web app on the same deployment.
+  const webUrl = `${new URL(apiUrl).origin}/app`;
+  return { apiUrl, storageUrl, webUrl };
+}
+
 /** The production capabilities: the Tauri bridge and the agent queries. */
 export function useSetupCapabilities(): SetupCapabilities {
   const createAgent = useCreateAgentMutation();
   return {
     detectAgents: roxdDetectAgents,
-    startDaemon: roxdStart,
+    startDaemon: async (options) => {
+      // The daemon confirms its own pairing code with this session, so the
+      // setup flow does not depend on the web page confirming it later.
+      // Without one it falls back to the app-wide pairing approver.
+      let approvalToken: string | undefined;
+      try {
+        approvalToken = await getMacroApiToken();
+      } catch {
+        approvalToken = undefined;
+      }
+      return await roxdStart({
+        ...options,
+        ...localRuntimeDeployment(),
+        approvalToken,
+      });
+    },
     waitForRunning,
     allowPermissionBypass: async (harnessId) => {
       await patchHarness({ harnessId, allowPermissionBypass: true });

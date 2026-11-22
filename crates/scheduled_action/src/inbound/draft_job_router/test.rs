@@ -6,9 +6,9 @@ use anyhow::Result;
 use axum::Router;
 use axum::http::StatusCode;
 use chrono::Utc;
-use macro_authorization::MacroAuthorizationState;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_authorization::RoxAuthorizationState;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde_json::{Value, json};
 
 use super::{RoutineDraftJobRouterState, routine_draft_job_router};
@@ -22,12 +22,12 @@ use crate::inbound::draft_router::{RoutineDraftRouterState, routine_draft_router
 /// Keeps each started job, drafting, under its owner, and the job each
 /// owner's client id started.
 #[derive(Default)]
-struct Jobs(Mutex<HashMap<Uuid, (MacroUserIdStr<'static>, DraftJob)>>);
+struct Jobs(Mutex<HashMap<Uuid, (RoxUserIdStr<'static>, DraftJob)>>);
 
 impl RoutineDraftJobService for Jobs {
     async fn start(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         client_id: Uuid,
         request: DraftRequest,
         _: DraftContext,
@@ -66,7 +66,7 @@ impl RoutineDraftJobService for Jobs {
         Ok(job)
     }
 
-    async fn jobs(&self, owner: MacroUserIdStr<'static>) -> Result<Vec<DraftJob>> {
+    async fn jobs(&self, owner: RoxUserIdStr<'static>) -> Result<Vec<DraftJob>> {
         Ok(self
             .0
             .lock()
@@ -77,14 +77,14 @@ impl RoutineDraftJobService for Jobs {
             .collect())
     }
 
-    async fn job(&self, owner: MacroUserIdStr<'static>, id: Uuid) -> Result<DraftJob> {
+    async fn job(&self, owner: RoxUserIdStr<'static>, id: Uuid) -> Result<DraftJob> {
         match self.0.lock().unwrap().get(&id) {
             Some((by, job)) if *by == owner => Ok(job.clone()),
             _ => Err(DraftJobError::NotFound.into()),
         }
     }
 
-    async fn discard(&self, owner: MacroUserIdStr<'static>, id: Uuid) -> Result<()> {
+    async fn discard(&self, owner: RoxUserIdStr<'static>, id: Uuid) -> Result<()> {
         let mut jobs = self.0.lock().unwrap();
         match jobs.get(&id) {
             Some((by, _)) if *by == owner => {
@@ -102,7 +102,7 @@ struct Drafts;
 impl RoutineDraftService for Drafts {
     async fn draft(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: DraftRequest,
         _: DraftContext,
     ) -> Result<Draft> {
@@ -116,7 +116,7 @@ impl RoutineDraftService for Drafts {
 fn router() -> Router {
     routine_draft_job_router(RoutineDraftJobRouterState {
         service: Arc::new(Jobs::default()),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuth)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuth)),
     })
 }
 
@@ -137,7 +137,7 @@ fn start_as(client_id: Uuid, description: &str) -> Value {
 
 /// A new start's body.
 fn start(description: &str) -> Value {
-    start_as(macro_uuid::generate_uuid_v7(), description)
+    start_as(rox_uuid::generate_uuid_v7(), description)
 }
 
 const JOBS: &str = "/scheduled-actions/draft-jobs";
@@ -146,7 +146,7 @@ const JOBS: &str = "/scheduled-actions/draft-jobs";
 async fn starts_lists_reads_and_discards_the_callers_drafts() {
     let app = router();
 
-    let client_id = macro_uuid::generate_uuid_v7();
+    let client_id = rox_uuid::generate_uuid_v7();
     let (status, job) = request(
         &app,
         "POST",
@@ -272,7 +272,7 @@ async fn its_paths_live_beside_the_routine_routes() {
     let app = crate::inbound::axum_router::test::router(false)
         .merge(routine_draft_router(RoutineDraftRouterState {
             service: Arc::new(Drafts),
-            authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuth)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuth)),
         }))
         .merge(router());
 

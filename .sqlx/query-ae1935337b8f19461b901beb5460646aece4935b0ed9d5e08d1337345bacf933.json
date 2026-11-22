@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO email_contacts (id, link_id, email_address, name, created_at, updated_at)\n        VALUES ($1, $2, 'only@u3.test', NULL, NOW(), NOW())\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ae1935337b8f19461b901beb5460646aece4935b0ed9d5e08d1337345bacf933"
+}

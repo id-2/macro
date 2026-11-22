@@ -236,7 +236,7 @@ async fn delayed_lookup_cannot_overwrite_reconnected_token() {
         .get_multiplexed_async_connection()
         .await
         .expect("GitHub integration tests require local Redis or REDIS_URL; see docs/development/database.md");
-    let identity = macro_uuid::generate_uuid_v7();
+    let identity = rox_uuid::generate_uuid_v7();
     // Legacy identity-only entries must not be used for another account.
     let legacy_key = format!("github_access_token_key:{identity}");
     conn.set_ex::<_, _, ()>(&legacy_key, "wrong-account-token", 60)

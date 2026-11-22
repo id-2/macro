@@ -9,8 +9,8 @@ use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use axum::routing::{get, post};
 use axum::{Json, Router};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
 use serde::Deserialize;
 use suggestions::domain::model::GenerationTrigger;
@@ -32,27 +32,27 @@ pub trait StartGeneration: Send + Sync + 'static {
     /// Start the person's onboarding generation.
     fn start_onboarding(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> impl Future<Output = Result<bool, GenerationError>> + Send;
 
     /// Start the fresh suggestions the person asked for.
     fn regenerate(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> impl Future<Output = Result<(), GenerationError>> + Send;
 
     /// The person's generations now.
     fn overview(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<GenerationOverview, GenerationError>> + Send;
 
     /// The person loaded the app in `timezone`.
     fn seen(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> impl Future<Output = Result<(), GenerationError>> + Send;
 
@@ -60,7 +60,7 @@ pub trait StartGeneration: Send + Sync + 'static {
     /// answered with them.
     fn routine_suggestions(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<RoutineSuggestions, GenerationError>> + Send;
 }
 
@@ -69,7 +69,7 @@ pub struct GenerationRouterState<S, Auth> {
     /// The generation service.
     pub service: Arc<S>,
     /// Who is calling.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for GenerationRouterState<S, Auth> {
@@ -81,7 +81,7 @@ impl<S, Auth> Clone for GenerationRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<GenerationRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<GenerationRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &GenerationRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -91,7 +91,7 @@ impl<S, Auth> FromRef<GenerationRouterState<S, Auth>> for MacroAuthorizationStat
 pub fn generation_router<S, Auth, St>(state: GenerationRouterState<S, Auth>) -> Router<St>
 where
     S: StartGeneration,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Send + Sync,
 {
     Router::new()
@@ -166,12 +166,12 @@ impl IntoResponse for GenerationApiError {
 /// Start the caller's onboarding generation, once their inbox is connected.
 pub async fn start_generation<S, Auth>(
     State(state): State<GenerationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(query): Query<GenerateQuery>,
 ) -> Result<Json<GenerationStarted>, GenerationApiError>
 where
     S: StartGeneration,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let started = state
         .service
@@ -192,7 +192,7 @@ where
 {
     async fn start_onboarding(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> Result<bool, GenerationError> {
         let outcome = self
@@ -203,7 +203,7 @@ where
 
     async fn regenerate(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> Result<(), GenerationError> {
         self.regenerate(user, timezone).await
@@ -211,14 +211,14 @@ where
 
     async fn overview(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> Result<GenerationOverview, GenerationError> {
         self.overview(user).await
     }
 
     async fn seen(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> Result<(), GenerationError> {
         self.seen(user, timezone).await
@@ -226,7 +226,7 @@ where
 
     async fn routine_suggestions(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> Result<RoutineSuggestions, GenerationError> {
         self.routine_suggestions(user).await
     }
@@ -247,12 +247,12 @@ where
 /// The caller loaded the app in their time zone.
 pub async fn seen<S, Auth>(
     State(state): State<GenerationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(query): Query<GenerateQuery>,
 ) -> Result<StatusCode, GenerationApiError>
 where
     S: StartGeneration,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service
@@ -277,11 +277,11 @@ where
 /// The caller's suggestion generations now.
 pub async fn overview<S, Auth>(
     State(state): State<GenerationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
 ) -> Result<Json<GenerationOverview>, GenerationApiError>
 where
     S: StartGeneration,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let overview = state
         .service
@@ -310,12 +310,12 @@ where
 /// while one of their generations runs.
 pub async fn regenerate<S, Auth>(
     State(state): State<GenerationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(query): Query<GenerateQuery>,
 ) -> Result<(StatusCode, Json<GenerationStarted>), GenerationApiError>
 where
     S: StartGeneration,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service
@@ -333,12 +333,12 @@ where
 /// suggestions, as that route did. Not in the API spec.
 pub async fn legacy_generate<S, Auth>(
     State(state): State<GenerationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(query): Query<GenerateQuery>,
 ) -> Result<Json<RoutineSuggestions>, GenerationApiError>
 where
     S: StartGeneration,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let user = &user.authorization.macro_user_id;
     state

@@ -1,5 +1,5 @@
 import { normalizedCacheResultMetadata } from '@graphql-cache/exchange/normalized-cache-exchange';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { MailAccountsDocument } from '@service-storage/graphql/generated/graphql';
 import { getGraphqlSoupClient } from '@service-storage/graphql-soup';
 import { createRequest } from '@urql/core';

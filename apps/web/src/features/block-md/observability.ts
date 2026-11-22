@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type { LoroDoc } from 'loro-crdt';
 
 export function stampLoroSnapshotState(span: Span, doc: LoroDoc): void {

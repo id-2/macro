@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use chrono::Utc;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_ai_projection::AiProjectionQueueMessage;
 
 use crate::domain::{
@@ -55,7 +55,7 @@ struct MockGenerator {
 impl ProjectionGenerator for MockGenerator {
     async fn generate(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         request: GenerationRequest<'_>,
     ) -> Result<String, AiProjectionError> {
         self.calls.lock().unwrap().push((
@@ -304,7 +304,7 @@ impl AiProjectionRepository for MockRepo {
 
     async fn user_has_permission(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _permission: &str,
     ) -> Result<bool, AiProjectionError> {
         Ok(self.has_permission)
@@ -312,14 +312,14 @@ impl AiProjectionRepository for MockRepo {
 
     async fn get_user_team_ids(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<uuid::Uuid>, AiProjectionError> {
         Ok(self.team_ids.clone())
     }
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|test@rox.one")
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|test@rox.one")
         .unwrap()
         .into_owned()
 }

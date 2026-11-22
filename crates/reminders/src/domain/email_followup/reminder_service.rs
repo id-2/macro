@@ -5,7 +5,7 @@ use crate::domain::{
     ports::{Clock, RemindersService},
 };
 use email::domain::followup::EmailFollowupMailbox;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Application-facing service for email snoozes.
@@ -58,14 +58,14 @@ impl<
 
     async fn get_email_followup(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread: Uuid,
     ) -> Result<Option<EmailFollowup>, ReminderError> {
         self.email.get(user, thread).await
     }
     async fn execute_email_followup(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread: Uuid,
         command: EmailFollowupCommand,
     ) -> Result<EmailFollowup, ReminderError> {

@@ -4,7 +4,7 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use graphql_common::parse_id;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 
 use crate::{
@@ -19,7 +19,7 @@ use crate::{
 pub async fn resolve_database_activity<Reader, Access>(
     ctx: &Context<'_>,
     access: &Access,
-    viewer: &MacroUserIdStr<'static>,
+    viewer: &RoxUserIdStr<'static>,
     database_id: ID,
     limit: Option<i32>,
 ) -> async_graphql::Result<Vec<GraphqlActivityEvent>>
@@ -50,7 +50,7 @@ where
 pub async fn resolve_form_activity<Reader, Access>(
     ctx: &Context<'_>,
     access: &Access,
-    viewer: &MacroUserIdStr<'static>,
+    viewer: &RoxUserIdStr<'static>,
     form_id: ID,
     limit: Option<i32>,
 ) -> async_graphql::Result<Vec<GraphqlActivityEvent>>
@@ -87,7 +87,7 @@ struct Timeline {
 async fn resolve_entity_activity<Level, Reader, Access>(
     ctx: &Context<'_>,
     access: &Access,
-    viewer: &MacroUserIdStr<'static>,
+    viewer: &RoxUserIdStr<'static>,
     timeline: Timeline,
     entity_id: ID,
     limit: Option<i32>,

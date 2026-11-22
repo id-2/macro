@@ -3,7 +3,7 @@ use crate::domain::{
     calendar_invitation_parser::parse_invitation_parts, invitation_resolution::ThreadInvitation,
 };
 use entity_access::domain::models::EntityType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::sync::Mutex;
 
@@ -56,7 +56,7 @@ impl CalendarSnapshotImporter for Importer {
 
 fn receipt(thread_id: Uuid) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::try_from_email("reader@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("reader@example.com").unwrap(),
         &thread_id.to_string(),
         EntityType::EmailThread,
     )

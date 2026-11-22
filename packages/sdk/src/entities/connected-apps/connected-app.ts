@@ -5,7 +5,7 @@ import type {
   ConnectedToolResult as ConnectedToolResultRecord,
 } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { CodeExecution } from '../agent-sessions/code-execution';
 
 export type { ConnectedAppKind };
@@ -27,7 +27,7 @@ export type ConnectedToolResult = {
  */
 export class ConnectedApp {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The running execution this app is reached through. */
     readonly execution: CodeExecution,
     /** `app` for a connected app, `custom` for a custom MCP server. */
@@ -40,7 +40,7 @@ export class ConnectedApp {
 
   /** The apps `execution`'s session agent was given. */
   static async list(
-    client: MacroClient,
+    client: RoxClient,
     execution: CodeExecution,
   ): Promise<ConnectedApp[]> {
     const records = unwrap(
@@ -58,7 +58,7 @@ export class ConnectedApp {
 
   /** @internal A handle for an app record the harness answered. */
   static fromRecord(
-    client: MacroClient,
+    client: RoxClient,
     execution: CodeExecution,
     record: ConnectedAppRecord,
   ): ConnectedApp {
@@ -77,7 +77,7 @@ export class ConnectedApp {
    * most 20). `unsearched` lists apps whose tools could not be read.
    */
   static async searchTools(
-    client: MacroClient,
+    client: RoxClient,
     execution: CodeExecution,
     query: string,
   ): Promise<{ matches: ConnectedTool[]; unsearched: ConnectedApp[] }> {
@@ -148,7 +148,7 @@ export class ConnectedApp {
 export class ConnectedTool {
   /** @internal */
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The app serving this tool. */
     readonly app: ConnectedApp,
     /** The tool's name on its server. */
@@ -161,7 +161,7 @@ export class ConnectedTool {
 
   /** @internal A handle for a tool record the harness answered. */
   static fromRecord(
-    client: MacroClient,
+    client: RoxClient,
     app: ConnectedApp,
     record: ConnectedToolRecord,
   ): ConnectedTool {

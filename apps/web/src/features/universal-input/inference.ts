@@ -1,4 +1,4 @@
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { universalInputClient } from '@service-agent-harness/universal-input';
 import { UniversalInputRequestError } from '@service-agent-harness/universal-input-error';
 import {

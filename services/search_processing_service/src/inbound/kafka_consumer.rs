@@ -42,20 +42,20 @@ use std::{
     time::Duration,
 };
 
-use ::agent_session::domain::events::AgentSessionLifecycleMacroEvent;
-use ::call::domain::events::CallMacroEvent;
-use ::chat::domain::events::ChatMacroEvent;
-use ::email::domain::events::EmailMacroEvent;
-use calendar_events::domain::events::CalendarMacroEvent;
-use channels::domain::broker_events::ChannelMacroEvent;
-use documents::domain::events::DocumentMacroEvent;
+use ::agent_session::domain::events::AgentSessionLifecycleRoxEvent;
+use ::call::domain::events::CallRoxEvent;
+use ::chat::domain::events::ChatRoxEvent;
+use ::email::domain::events::EmailRoxEvent;
+use calendar_events::domain::events::CalendarRoxEvent;
+use channels::domain::broker_events::ChannelRoxEvent;
+use documents::domain::events::DocumentRoxEvent;
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer, consumer_span, record_span_error};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection, RoxEventConsumerService,
 };
-use messages::outbound::broker::MessageMacroEvent;
-use projects::domain::events::ProjectMacroEvent;
-use properties::domain::events::PropertyMacroEvent;
+use messages::outbound::broker::MessageRoxEvent;
+use projects::domain::events::ProjectRoxEvent;
+use properties::domain::events::PropertyRoxEvent;
 use rdkafka::{
     consumer::CommitMode,
     message::{BorrowedMessage, Message as _},
@@ -91,22 +91,22 @@ impl GroupName for SearchProcessingConsumerGroup {
 }
 
 type SearchProcessingKafkaAdapter =
-    KafkaConsumerAdapter<SearchProcessingConsumerGroup, DeclaredMacroEvent>;
+    KafkaConsumerAdapter<SearchProcessingConsumerGroup, DeclaredRoxEvent>;
 type SearchProcessingKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, SearchProcessingKafkaAdapter>;
+    RoxEventConsumerService<DeclaredRoxEvent, SearchProcessingKafkaAdapter>;
 
-macro_event_broker::declare_topics!(
-    DeclaredMacroEvent:
-        AgentSessionLifecycleMacroEvent,
-        CalendarMacroEvent,
-        CallMacroEvent,
-        ChannelMacroEvent,
-        ChatMacroEvent,
-        DocumentMacroEvent,
-        EmailMacroEvent,
-        MessageMacroEvent,
-        ProjectMacroEvent,
-        PropertyMacroEvent,
+rox_event_broker::declare_topics!(
+    DeclaredRoxEvent:
+        AgentSessionLifecycleRoxEvent,
+        CalendarRoxEvent,
+        CallRoxEvent,
+        ChannelRoxEvent,
+        ChatRoxEvent,
+        DocumentRoxEvent,
+        EmailRoxEvent,
+        MessageRoxEvent,
+        ProjectRoxEvent,
+        PropertyRoxEvent,
 );
 
 /// Number of sequential workers events are sharded across by ordering key.
@@ -129,7 +129,7 @@ const PROCESSING_RETRY_BASE_DELAY: Duration = Duration::from_secs(1);
 
 /// A decoded search-processing event and its Kafka coordinates.
 struct ReceivedEvent {
-    event: DeclaredMacroEvent,
+    event: DeclaredRoxEvent,
     partition: i32,
     offset: i64,
     /// Wire type of `event`, e.g. `email.thread_backfilled`.
@@ -213,55 +213,55 @@ where
 /// id), except email events, which are produced with a link-scoped key and
 /// instead shard by thread so one inbox's backlog can spread across the worker
 /// pool.
-fn ordering_key(event: &DeclaredMacroEvent) -> Cow<'_, str> {
+fn ordering_key(event: &DeclaredRoxEvent) -> Cow<'_, str> {
     match event {
-        DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) => Cow::Borrowed(event.key()),
-        DeclaredMacroEvent::CalendarMacroEvent(event) => Cow::Borrowed(event.key()),
-        DeclaredMacroEvent::CallMacroEvent(event) => Cow::Borrowed(event.key()),
-        DeclaredMacroEvent::ChannelMacroEvent(event) => Cow::Borrowed(event.key()),
-        DeclaredMacroEvent::ChatMacroEvent(event) => Cow::Borrowed(event.key()),
-        DeclaredMacroEvent::DocumentMacroEvent(event) => Cow::Borrowed(event.key()),
-        DeclaredMacroEvent::EmailMacroEvent(event) => email_ordering_key(event),
-        DeclaredMacroEvent::MessageMacroEvent(event) => Cow::Borrowed(event.key()),
-        DeclaredMacroEvent::ProjectMacroEvent(event) => Cow::Borrowed(event.key()),
-        DeclaredMacroEvent::PropertyMacroEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::CalendarRoxEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::CallRoxEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::ChannelRoxEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::ChatRoxEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::DocumentRoxEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::EmailRoxEvent(event) => email_ordering_key(event),
+        DeclaredRoxEvent::MessageRoxEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::ProjectRoxEvent(event) => Cow::Borrowed(event.key()),
+        DeclaredRoxEvent::PropertyRoxEvent(event) => Cow::Borrowed(event.key()),
     }
 }
 
 /// Whether processing `event` can change the search index.
-fn changes_search_index(event: &DeclaredMacroEvent) -> bool {
+fn changes_search_index(event: &DeclaredRoxEvent) -> bool {
     match event {
-        DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) => {
+        DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) => {
             agent_session::changes_search_projection(event)
         }
-        DeclaredMacroEvent::CalendarMacroEvent(_)
-        | DeclaredMacroEvent::CallMacroEvent(_)
-        | DeclaredMacroEvent::ChannelMacroEvent(_)
-        | DeclaredMacroEvent::ChatMacroEvent(_)
-        | DeclaredMacroEvent::DocumentMacroEvent(_)
-        | DeclaredMacroEvent::EmailMacroEvent(_)
-        | DeclaredMacroEvent::MessageMacroEvent(_)
-        | DeclaredMacroEvent::ProjectMacroEvent(_)
-        | DeclaredMacroEvent::PropertyMacroEvent(_) => true,
+        DeclaredRoxEvent::CalendarRoxEvent(_)
+        | DeclaredRoxEvent::CallRoxEvent(_)
+        | DeclaredRoxEvent::ChannelRoxEvent(_)
+        | DeclaredRoxEvent::ChatRoxEvent(_)
+        | DeclaredRoxEvent::DocumentRoxEvent(_)
+        | DeclaredRoxEvent::EmailRoxEvent(_)
+        | DeclaredRoxEvent::MessageRoxEvent(_)
+        | DeclaredRoxEvent::ProjectRoxEvent(_)
+        | DeclaredRoxEvent::PropertyRoxEvent(_) => true,
     }
 }
 
 /// Key of an event whose processing only rereads its entity's current state,
 /// so a queued reread already covers it.
-fn coalescible_reread_key(event: &DeclaredMacroEvent) -> Option<String> {
+fn coalescible_reread_key(event: &DeclaredRoxEvent) -> Option<String> {
     match event {
-        DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) => {
+        DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) => {
             Some(agent_session::reread_key(event))
         }
-        DeclaredMacroEvent::CalendarMacroEvent(_)
-        | DeclaredMacroEvent::CallMacroEvent(_)
-        | DeclaredMacroEvent::ChannelMacroEvent(_)
-        | DeclaredMacroEvent::ChatMacroEvent(_)
-        | DeclaredMacroEvent::DocumentMacroEvent(_)
-        | DeclaredMacroEvent::EmailMacroEvent(_)
-        | DeclaredMacroEvent::MessageMacroEvent(_)
-        | DeclaredMacroEvent::ProjectMacroEvent(_)
-        | DeclaredMacroEvent::PropertyMacroEvent(_) => None,
+        DeclaredRoxEvent::CalendarRoxEvent(_)
+        | DeclaredRoxEvent::CallRoxEvent(_)
+        | DeclaredRoxEvent::ChannelRoxEvent(_)
+        | DeclaredRoxEvent::ChatRoxEvent(_)
+        | DeclaredRoxEvent::DocumentRoxEvent(_)
+        | DeclaredRoxEvent::EmailRoxEvent(_)
+        | DeclaredRoxEvent::MessageRoxEvent(_)
+        | DeclaredRoxEvent::ProjectRoxEvent(_)
+        | DeclaredRoxEvent::PropertyRoxEvent(_) => None,
     }
 }
 
@@ -386,7 +386,7 @@ impl WorkerPool {
 }
 
 fn attach_event_coordinates<E>(
-    decoded: Result<DeclaredMacroEvent, E>,
+    decoded: Result<DeclaredRoxEvent, E>,
     partition: i32,
     offset: i64,
     span: tracing::Span,
@@ -407,7 +407,7 @@ fn attach_event_coordinates<E>(
 /// still be marked failed.
 fn receive_record<M: rdkafka::Message, E>(
     message: &M,
-    decode: impl FnOnce() -> Result<DeclaredMacroEvent, E>,
+    decode: impl FnOnce() -> Result<DeclaredRoxEvent, E>,
 ) -> (tracing::Span, Result<ReceivedEvent, E>) {
     let span = consumer_span(message, SearchProcessingConsumerGroup::GROUP_NAME);
     let decoded = span.in_scope(decode);
@@ -426,59 +426,59 @@ fn receive_record<M: rdkafka::Message, E>(
 
 /// The search entity an event acts on, safe to record: every producer key
 /// except entity properties', which can name a user.
-fn entity_id(event: &DeclaredMacroEvent) -> Option<Cow<'_, str>> {
+fn entity_id(event: &DeclaredRoxEvent) -> Option<Cow<'_, str>> {
     match event {
-        DeclaredMacroEvent::PropertyMacroEvent(_) => None,
+        DeclaredRoxEvent::PropertyRoxEvent(_) => None,
         _ => Some(ordering_key(event)),
     }
 }
 
 /// The event's wire type, e.g. `email.thread_backfilled`.
-fn event_type(event: &DeclaredMacroEvent) -> &'static str {
+fn event_type(event: &DeclaredRoxEvent) -> &'static str {
     match event {
-        DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) => event.event().event.name(),
-        DeclaredMacroEvent::CalendarMacroEvent(event) => {
+        DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) => event.event().event.name(),
+        DeclaredRoxEvent::CalendarRoxEvent(event) => {
             calendar_event::index_action(&event.event().event).1
         }
-        DeclaredMacroEvent::CallMacroEvent(event) => {
+        DeclaredRoxEvent::CallRoxEvent(event) => {
             describe_call_event(&event.event().event).event_type
         }
-        DeclaredMacroEvent::ChannelMacroEvent(event) => {
+        DeclaredRoxEvent::ChannelRoxEvent(event) => {
             describe_channel_event(&event.event().event).event_type
         }
-        DeclaredMacroEvent::ChatMacroEvent(event) => {
+        DeclaredRoxEvent::ChatRoxEvent(event) => {
             describe_chat_event(&event.event().event).event_type
         }
-        DeclaredMacroEvent::DocumentMacroEvent(event) => {
+        DeclaredRoxEvent::DocumentRoxEvent(event) => {
             describe_document_event(&event.event().event).event_type
         }
-        DeclaredMacroEvent::EmailMacroEvent(event) => {
+        DeclaredRoxEvent::EmailRoxEvent(event) => {
             describe_email_event(&event.event().event).event_type
         }
-        DeclaredMacroEvent::MessageMacroEvent(event) => {
+        DeclaredRoxEvent::MessageRoxEvent(event) => {
             describe_message_event(&event.event().event).event_type
         }
-        DeclaredMacroEvent::ProjectMacroEvent(event) => {
+        DeclaredRoxEvent::ProjectRoxEvent(event) => {
             describe_project_event(&event.event().event).event_type
         }
-        DeclaredMacroEvent::PropertyMacroEvent(event) => {
+        DeclaredRoxEvent::PropertyRoxEvent(event) => {
             describe_property_event(&event.event().event).event_type
         }
     }
 }
 
-fn event_id(event: &DeclaredMacroEvent) -> Uuid {
+fn event_id(event: &DeclaredRoxEvent) -> Uuid {
     match event {
-        DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::CalendarMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::CallMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::ChannelMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::ChatMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::DocumentMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::EmailMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::MessageMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::ProjectMacroEvent(event) => event.event().event_id,
-        DeclaredMacroEvent::PropertyMacroEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::CalendarRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::CallRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::ChannelRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::ChatRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::DocumentRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::EmailRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::MessageRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::ProjectRoxEvent(event) => event.event().event_id,
+        DeclaredRoxEvent::PropertyRoxEvent(event) => event.event().event_id,
     }
 }
 
@@ -486,7 +486,7 @@ fn event_id(event: &DeclaredMacroEvent) -> Uuid {
 fn record_event_identity(span: &tracing::Span, received: &ReceivedEvent) {
     span.record("macro.event.id", field::display(event_id(&received.event)));
     span.record("macro.event.type", received.event_type);
-    if let DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) = &received.event {
+    if let DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) = &received.event {
         span.record(
             "agent.session.id",
             field::display(event.event().event.session_id()),
@@ -544,7 +544,7 @@ where
 
 async fn process_event(
     context: &KafkaProcessingContext,
-    event: &DeclaredMacroEvent,
+    event: &DeclaredRoxEvent,
     partition: i32,
     offset: i64,
 ) -> EventOutcome {
@@ -552,13 +552,13 @@ async fn process_event(
     let opensearch_client = context.opensearch_client.as_ref();
 
     match event {
-        DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) => {
+        DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) => {
             agent_session::process_agent_session_event(context, event).await
         }
-        DeclaredMacroEvent::CallMacroEvent(event) => {
+        DeclaredRoxEvent::CallRoxEvent(event) => {
             process_call_event(db, opensearch_client, event, partition, offset).await
         }
-        DeclaredMacroEvent::CalendarMacroEvent(event) => {
+        DeclaredRoxEvent::CalendarRoxEvent(event) => {
             if !context.calendar_search_enabled {
                 // The offset is committed either way, so a change that arrives
                 // while the flag is off is not replayed when it flips — the
@@ -572,25 +572,25 @@ async fn process_event(
             }
             process_calendar_event(context, event, partition, offset).await
         }
-        DeclaredMacroEvent::ChannelMacroEvent(event) => {
+        DeclaredRoxEvent::ChannelRoxEvent(event) => {
             process_channel_event(db, opensearch_client, event, partition, offset).await
         }
-        DeclaredMacroEvent::ChatMacroEvent(event) => {
+        DeclaredRoxEvent::ChatRoxEvent(event) => {
             process_chat_event(db, opensearch_client, event, partition, offset).await
         }
-        DeclaredMacroEvent::DocumentMacroEvent(event) => {
+        DeclaredRoxEvent::DocumentRoxEvent(event) => {
             process_document_event(context, event, partition, offset).await
         }
-        DeclaredMacroEvent::MessageMacroEvent(event) => {
+        DeclaredRoxEvent::MessageRoxEvent(event) => {
             process_message_event(db, opensearch_client, event, partition, offset).await
         }
-        DeclaredMacroEvent::EmailMacroEvent(event) => {
+        DeclaredRoxEvent::EmailRoxEvent(event) => {
             process_email_event(db, opensearch_client, event, partition, offset).await
         }
-        DeclaredMacroEvent::ProjectMacroEvent(event) => {
+        DeclaredRoxEvent::ProjectRoxEvent(event) => {
             process_project_event(db, opensearch_client, event, partition, offset).await
         }
-        DeclaredMacroEvent::PropertyMacroEvent(event) => {
+        DeclaredRoxEvent::PropertyRoxEvent(event) => {
             process_property_event(db, opensearch_client, event, partition, offset).await
         }
     }
@@ -736,11 +736,11 @@ pub(crate) async fn run_event_consumer(
 ) -> Result<(), Report> {
     let consumer = KafkaEventConsumer::<SearchProcessingConsumerGroup>::from_env(brokers)?;
     let consumer = KafkaConsumerAdapter::<SearchProcessingConsumerGroup, ()>::new(consumer)
-        .subscribe::<DeclaredMacroEvent>()
+        .subscribe::<DeclaredRoxEvent>()
         .context("failed to subscribe to search processing event topics")?;
     let consumer = SearchProcessingKafkaConsumer::new(consumer);
     tracing::info!(
-        topics = ?DeclaredMacroEvent::topics(),
+        topics = ?DeclaredRoxEvent::topics(),
         group = SearchProcessingConsumerGroup::GROUP_NAME,
         "search processing event consumer listening"
     );

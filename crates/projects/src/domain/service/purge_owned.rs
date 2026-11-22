@@ -6,7 +6,7 @@ mod test;
 
 use entity_access::domain::models::{EntityAccessReceipt, EntityType, OwnerAccessLevel};
 use entity_access_management::domain::ports::EntityAccessManagementService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use model_owner::Owner;
 use rootcause::{Report, prelude::*};
 use shared_entity_registry::{OwnedPurgeOutcome, PurgeOwnedEntity};
@@ -28,7 +28,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     #[tracing::instrument(
         skip(self, expected_owner),

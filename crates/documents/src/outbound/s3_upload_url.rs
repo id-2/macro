@@ -39,7 +39,7 @@ impl S3UploadUrlAdapter {
 impl PresignedUploadUrlPort for S3UploadUrlAdapter {
     #[tracing::instrument(skip(self), err)]
     async fn delete_object(&self, key: &str) -> anyhow::Result<()> {
-        if macro_aws_config::is_local_aws() {
+        if rox_aws_config::is_local_aws() {
             return Ok(());
         }
         self.client
@@ -87,7 +87,7 @@ impl PresignedUploadUrlPort for S3UploadUrlAdapter {
 
     #[tracing::instrument(skip(self), err)]
     async fn copy_object(&self, source_key: &str, destination_key: &str) -> anyhow::Result<()> {
-        if macro_aws_config::is_local_aws() {
+        if rox_aws_config::is_local_aws() {
             return Ok(());
         }
 
@@ -137,7 +137,7 @@ impl PresignedUploadUrlPort for S3UploadUrlAdapter {
 
     #[tracing::instrument(skip(self, bytes), err)]
     async fn upload_snapshot(&self, document_id: &str, bytes: Vec<u8>) -> anyhow::Result<()> {
-        if macro_aws_config::is_local_aws() {
+        if rox_aws_config::is_local_aws() {
             return Ok(());
         }
 
@@ -178,5 +178,5 @@ async fn put_presigned_url(
         .presigned(PresigningConfig::expires_in(expiry_duration)?)
         .await?;
 
-    Ok(macro_aws_config::transform_aws_url(presigned_url.uri()))
+    Ok(rox_aws_config::transform_aws_url(presigned_url.uri()))
 }

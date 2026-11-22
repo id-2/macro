@@ -2,7 +2,7 @@ import { err, ok } from 'neverthrow';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const telemetryError = vi.hoisted(() => vi.fn());
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   NOOP_SPAN: {},
   Telemetry: { error: telemetryError },
 }));

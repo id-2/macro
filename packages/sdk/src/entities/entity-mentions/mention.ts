@@ -1,16 +1,16 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 /** A stored mention connecting two resources. */
 export class EntityMention {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Mention identity. */
     readonly id: string,
   ) {}
 
   /** Construct a mention handle for removal. */
-  static byId(client: MacroClient, id: string): EntityMention {
+  static byId(client: RoxClient, id: string): EntityMention {
     return new EntityMention(client, id);
   }
 

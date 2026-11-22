@@ -12,7 +12,7 @@ The migrations leave the triggers off: `source_items_install_triggers()` and
 
 ## Start here
 
-- `crates/macro_db_client/migrations/*_source_items.sql`: the table, its read
+- `crates/rox_db_client/migrations/*_source_items.sql`: the table, its read
   index and the trigger functions, which record changes per statement and
   rewrite rows at commit under per-bucket mutex rows (header comment).
 - `fixtures/triggers.sql`: installs the triggers; every test that writes inputs

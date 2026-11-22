@@ -43,7 +43,7 @@ async fn send(
 fn app(vault: crate::domain::agent::test::Vault) -> Router {
     agent_router(AgentRouterState {
         service: Arc::new(vault.service),
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
     })
 }
 
@@ -78,11 +78,11 @@ async fn typed_failures_keep_their_codes() {
     // An admitted key with a bad wake keeps its specific 400 code.
     let admitted = vault();
     *admitted.directory.agent.lock().unwrap() = Some(DirectoryAgent {
-        agent_user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(KEY_USER)
+        agent_user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(KEY_USER)
             .unwrap()
             .into_owned(),
         team_id: TeamId(Uuid::from_u128(0x7e)),
-        owner_user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(KEY_USER)
+        owner_user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(KEY_USER)
             .unwrap()
             .into_owned(),
         enabled: true,

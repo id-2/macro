@@ -3,7 +3,7 @@
 use super::{models::*, ports::*, timeline::*};
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EntityAccessReceipt, EntityType, RequiredPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sha2::{Digest, Sha256};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -55,7 +55,7 @@ impl<P: ChatProvider> ExternalChatService<P> {
     /// the existing one.
     pub async fn add(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         request: &AddChat,
         authority: SendAuthority,
     ) -> ExternalChatResult<ChatRef> {
@@ -340,7 +340,7 @@ fn receipt_chat<T: RequiredPermission>(
 /// The person and chat of a receipt held by a person.
 fn receipt_scope<T: RequiredPermission>(
     access: &EntityAccessReceipt<T>,
-) -> ExternalChatResult<(&MacroUserIdStr<'static>, Uuid)> {
+) -> ExternalChatResult<(&RoxUserIdStr<'static>, Uuid)> {
     let user = access
         .get_authenticated_user()
         .map_err(|_| ExternalChatError::Forbidden)?;

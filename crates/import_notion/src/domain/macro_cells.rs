@@ -8,7 +8,7 @@
 use std::collections::{HashMap, HashSet};
 
 use chrono::{DateTime, NaiveDate, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{
     CellValue, CellWrite, ColumnChange, ColumnId, ColumnKind, DatabaseOp, EntityKind, EntityRef,
     NewColumn, NewOption, OptionId, OptionRef, TableId,
@@ -34,7 +34,7 @@ pub struct Person {
     /// Their email, when Notion shared it.
     pub email: Option<String>,
     /// Their Rox account, when the email matched a team member.
-    pub macro_user: Option<MacroUserIdStr<'static>>,
+    pub macro_user: Option<RoxUserIdStr<'static>>,
 }
 
 /// The Rox columns a data source's properties become.

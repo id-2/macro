@@ -13,8 +13,8 @@ use axum::{
     routing::{get, post, put},
 };
 use chrono::{DateTime, Utc};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
@@ -23,7 +23,7 @@ use uuid::Uuid;
 /// Shared services for either read or settings routes.
 pub struct CalendarTeamRouterState<S, A> {
     service: Arc<S>,
-    authorization_state: MacroAuthorizationState<A>,
+    authorization_state: RoxAuthorizationState<A>,
 }
 impl<S, A> Clone for CalendarTeamRouterState<S, A> {
     fn clone(&self) -> Self {
@@ -35,14 +35,14 @@ impl<S, A> Clone for CalendarTeamRouterState<S, A> {
 }
 impl<S, A> CalendarTeamRouterState<S, A> {
     /// Compose the domain service and authentication boundary.
-    pub fn new(service: Arc<S>, authorization_state: MacroAuthorizationState<A>) -> Self {
+    pub fn new(service: Arc<S>, authorization_state: RoxAuthorizationState<A>) -> Self {
         Self {
             service,
             authorization_state,
         }
     }
 }
-impl<S, A> FromRef<CalendarTeamRouterState<S, A>> for MacroAuthorizationState<A> {
+impl<S, A> FromRef<CalendarTeamRouterState<S, A>> for RoxAuthorizationState<A> {
     fn from_ref(state: &CalendarTeamRouterState<S, A>) -> Self {
         state.authorization_state.clone()
     }
@@ -51,7 +51,7 @@ impl<S, A> FromRef<CalendarTeamRouterState<S, A>> for MacroAuthorizationState<A>
 /// Storage-service reads; all masking is performed by the domain service.
 pub fn team_calendar_router<
     S: CalendarTeamService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
     T: Send + Sync + 'static,
 >(
     state: CalendarTeamRouterState<S, A>,
@@ -69,7 +69,7 @@ pub fn team_calendar_router<
 /// Calendar-service settings; no Google ACL or provider event writes.
 pub fn team_calendar_settings_router<
     S: CalendarTeamService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
     T: Send + Sync + 'static,
 >(
     state: CalendarTeamRouterState<S, A>,
@@ -178,9 +178,9 @@ impl From<rootcause::Report> for TeamCalendarApiError {
 
 /// Query authorized projections in a bounded viewport.
 #[utoipa::path(get, path="/calendar-events/team", params(TeamCalendarQuery), responses((status=200, body=TeamCalendarPage)), tag="calendar_events")]
-pub async fn list_team_calendar<S: CalendarTeamService, A: MacroAuthorizationService>(
+pub async fn list_team_calendar<S: CalendarTeamService, A: RoxAuthorizationService>(
     State(state): State<CalendarTeamRouterState<S, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Query(query): Query<TeamCalendarQuery>,
 ) -> Result<Json<TeamCalendarPage>, TeamCalendarApiError> {
     let cursor = query
@@ -205,9 +205,9 @@ pub async fn list_team_calendar<S: CalendarTeamService, A: MacroAuthorizationSer
 /// Merge the requester's and selected teammates' busy time in a bounded window.
 #[utoipa::path(post, path="/calendar-events/team/availability", request_body=TeamAvailabilityRequest, responses((status=200, body=TeamAvailability), (status=400, description="Invalid window or more than 100 teammates"), (status=404, description="Team calendar sharing is disabled")), tag="calendar_events")]
 #[tracing::instrument(skip_all, fields(selected = body.user_ids.as_ref().map(Vec::len)), err(Debug))]
-pub async fn get_team_availability<S: CalendarTeamService, A: MacroAuthorizationService>(
+pub async fn get_team_availability<S: CalendarTeamService, A: RoxAuthorizationService>(
     State(state): State<CalendarTeamRouterState<S, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Json(body): Json<TeamAvailabilityRequest>,
 ) -> Result<Json<TeamAvailability>, TeamCalendarApiError> {
     let range = team_range(body.start, body.end)?;
@@ -245,9 +245,9 @@ fn team_range(
 
 /// Read the authenticated user's sharing choice.
 #[utoipa::path(get, path="/team-sharing", responses((status=200, body=TeamCalendarSharingBody)), tag="calendar_events")]
-pub async fn get_team_sharing<S: CalendarTeamService, A: MacroAuthorizationService>(
+pub async fn get_team_sharing<S: CalendarTeamService, A: RoxAuthorizationService>(
     State(state): State<CalendarTeamRouterState<S, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
 ) -> Result<Json<TeamCalendarSharingBody>, TeamCalendarApiError> {
     Ok(Json(TeamCalendarSharingBody {
         sharing: state
@@ -259,9 +259,9 @@ pub async fn get_team_sharing<S: CalendarTeamService, A: MacroAuthorizationServi
 
 /// Set the authenticated user's sharing choice.
 #[utoipa::path(put, path="/team-sharing", request_body=TeamCalendarSharingBody, responses((status=200, body=TeamCalendarSharingBody)), tag="calendar_events")]
-pub async fn set_team_sharing<S: CalendarTeamService, A: MacroAuthorizationService>(
+pub async fn set_team_sharing<S: CalendarTeamService, A: RoxAuthorizationService>(
     State(state): State<CalendarTeamRouterState<S, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Json(body): Json<TeamCalendarSharingBody>,
 ) -> Result<Json<TeamCalendarSharingBody>, TeamCalendarApiError> {
     Ok(Json(TeamCalendarSharingBody {
@@ -274,9 +274,9 @@ pub async fn set_team_sharing<S: CalendarTeamService, A: MacroAuthorizationServi
 
 /// List calendars and their personal-availability inclusion.
 #[utoipa::path(get, path="/availability-calendars", responses((status=200, body=AvailabilityCalendarsResponse)), tag="calendar_events")]
-pub async fn get_availability_calendars<S: CalendarTeamService, A: MacroAuthorizationService>(
+pub async fn get_availability_calendars<S: CalendarTeamService, A: RoxAuthorizationService>(
     State(state): State<CalendarTeamRouterState<S, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
 ) -> Result<Json<AvailabilityCalendarsResponse>, TeamCalendarApiError> {
     Ok(Json(AvailabilityCalendarsResponse {
         calendars: state
@@ -288,9 +288,9 @@ pub async fn get_availability_calendars<S: CalendarTeamService, A: MacroAuthoriz
 
 /// Change which source calendars normally occupy this user's time.
 #[utoipa::path(put, path="/availability-calendars/{calendar_id}", params(("calendar_id"=Uuid, Path)), request_body=AvailabilityCalendarBody, responses((status=204)), tag="calendar_events")]
-pub async fn set_availability_calendar<S: CalendarTeamService, A: MacroAuthorizationService>(
+pub async fn set_availability_calendar<S: CalendarTeamService, A: RoxAuthorizationService>(
     State(state): State<CalendarTeamRouterState<S, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Path(calendar): Path<Uuid>,
     Json(body): Json<AvailabilityCalendarBody>,
 ) -> Result<StatusCode, TeamCalendarApiError> {

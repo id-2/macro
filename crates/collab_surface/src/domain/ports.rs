@@ -1,8 +1,8 @@
 //! Ports (trait contracts) for the collab-surface domain.
 
 use entity_access::domain::models::{AnyEntityPermission, EntityAccessReceipt};
-use macro_sync_service_jwt::DocumentPermissionToken;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_sync_service_jwt::DocumentPermissionToken;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use uuid::Uuid;
 
@@ -152,7 +152,7 @@ pub trait CollabSurfaceService: Send + Sync + 'static {
     /// session as success.
     fn ensure_surface(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         parent_receipt: EntityAccessReceipt<AnyEntityPermission>,
         id: Uuid,
         initial_markdown: String,
@@ -163,7 +163,7 @@ pub trait CollabSurfaceService: Send + Sync + 'static {
     /// [`CollabSurfaceService::get_parent`]).
     fn get_surface(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         parent_receipt: EntityAccessReceipt<AnyEntityPermission>,
         id: Uuid,
     ) -> impl Future<Output = Result<CollabSurface, CollabSurfaceError>> + Send;
@@ -186,7 +186,7 @@ pub trait CollabSurfaceService: Send + Sync + 'static {
     /// ([`CollabSurfaceError::IdReserved`]), whenever it was bound.
     fn mint_token(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         parent_receipt: EntityAccessReceipt<AnyEntityPermission>,
         id: Uuid,
     ) -> impl Future<Output = Result<DocumentPermissionToken, CollabSurfaceError>> + Send;
@@ -199,7 +199,7 @@ pub trait CollabSurfaceService: Send + Sync + 'static {
     /// surface unmintable, which cuts off all access.
     fn delete_surface(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         parent_receipt: EntityAccessReceipt<AnyEntityPermission>,
         id: Uuid,
     ) -> impl Future<Output = Result<(), CollabSurfaceError>> + Send;

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_messages SET provider_folder_id = CASE provider_id WHEN 'inbox-message' THEN 'inbox-id' ELSE 'archive-id' END WHERE link_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3c3ee22cf01693aba716dbd9b380c986780315ce69a6c6c14375f350732468f2"
+}

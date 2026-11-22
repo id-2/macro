@@ -12,7 +12,7 @@ use crate::domain::{
     models::{EmailErr, Link, ResolvedSendingInbox, SendingInboxRequest, UserProvider},
     ports::EmailRepo,
 };
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 
 use super::EmailServiceImpl;
 
@@ -26,7 +26,7 @@ where
 {
     pub(crate) async fn resolve_sending_inbox_impl(
         &self,
-        macro_id: MacroUserIdStr<'_>,
+        macro_id: RoxUserIdStr<'_>,
         request: SendingInboxRequest<'_>,
     ) -> Result<ResolvedSendingInbox, EmailErr> {
         let accessible_inboxes = self
@@ -89,7 +89,7 @@ where
     async fn inbox_with_alias(
         &self,
         inboxes: &[Link],
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         address: &str,
     ) -> Result<(usize, EmailStr<'static>), EmailErr> {
         let mut owned_first: Vec<(usize, &Link)> = inboxes
@@ -179,7 +179,7 @@ fn requested_address(requested: Option<&str>) -> Option<&str> {
 /// domains treat addresses. An inbox the caller owns wins over one delegated
 /// to them, so an address reachable through two accounts resolves to the
 /// same one every time instead of by row order.
-fn inbox_by_address(inboxes: &[Link], caller: &MacroUserIdStr<'_>, address: &str) -> Option<usize> {
+fn inbox_by_address(inboxes: &[Link], caller: &RoxUserIdStr<'_>, address: &str) -> Option<usize> {
     let at_address = |inbox: &&Link| inbox.email_address.0.as_ref().eq_ignore_ascii_case(address);
     inboxes
         .iter()
@@ -192,7 +192,7 @@ fn inbox_by_address(inboxes: &[Link], caller: &MacroUserIdStr<'_>, address: &str
 /// reach. A delegated inbox is `is_primary` for *its* owner, so the macro-id
 /// guard is what keeps a teammate's mailbox from becoming the caller's
 /// default sender.
-fn default_inbox(inboxes: &[Link], caller: &MacroUserIdStr<'_>) -> Option<usize> {
+fn default_inbox(inboxes: &[Link], caller: &RoxUserIdStr<'_>) -> Option<usize> {
     let owned = |inbox: &Link| inbox.macro_id.as_ref() == caller.as_ref();
     inboxes
         .iter()

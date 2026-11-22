@@ -12,8 +12,8 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use fusionauth::{FusionAuthClient, error::FusionAuthClientError};
-use macro_auth::{
-    error::MacroAuthError,
+use rox_auth::{
+    error::RoxAuthError,
     middleware::decode_jwt::{
         JwtValidationArgs, validate_fusionauth_access_token_allow_expired,
         validate_macro_access_token,
@@ -37,7 +37,7 @@ pub enum RefreshError {
     #[allow(dead_code)]
     RefreshInProgress,
     #[error("access token without macro claims was issued too recently to refresh")]
-    MissingMacroClaimsCooldown,
+    MissingRoxClaimsCooldown,
     #[error("invalid refresh token")]
     InvalidRefreshToken,
     #[error("unauthorized")]
@@ -49,7 +49,7 @@ impl IntoResponse for RefreshError {
         let status_code = match self {
             RefreshError::InternalServerError => StatusCode::INTERNAL_SERVER_ERROR,
             RefreshError::InvalidRefreshToken => StatusCode::BAD_REQUEST,
-            RefreshError::RefreshInProgress | RefreshError::MissingMacroClaimsCooldown => {
+            RefreshError::RefreshInProgress | RefreshError::MissingRoxClaimsCooldown => {
                 StatusCode::TOO_MANY_REQUESTS
             }
             RefreshError::Unauthorized => StatusCode::UNAUTHORIZED,
@@ -63,7 +63,7 @@ impl IntoResponse for RefreshError {
 /// You can either have your access token and refresh token in the cookies or in the request
 /// headers
 /// Authorization: Bearer <access_token>
-/// x-macro-refresh-token: <refresh_token>
+/// x-rox-refresh-token: <refresh_token> (or the pre-rename x-macro-refresh-token)
 /// This returns the cookies with the new access and refresh token
 #[utoipa::path(
         post,
@@ -93,7 +93,7 @@ pub async fn handler(
                 refresh_token: token_context.refresh_token.clone(),
             }));
         }
-        Err(MacroAuthError::JwtExpired) => {}
+        Err(RoxAuthError::JwtExpired) => {}
         // FusionAuth issues the token without the Rox claims when the JWT populate lambda
         // fails; refreshing runs the lambda again.
         Err(e) => {
@@ -104,7 +104,7 @@ pub async fn handler(
                         < MISSING_MACRO_CLAIMS_REFRESH_COOLDOWN =>
                 {
                     tracing::info!(error=?e, "access token without macro claims is too new to refresh");
-                    return Err(RefreshError::MissingMacroClaimsCooldown);
+                    return Err(RefreshError::MissingRoxClaimsCooldown);
                 }
                 Ok(_) => {
                     tracing::info!(error=?e, "refreshing access token without macro claims");

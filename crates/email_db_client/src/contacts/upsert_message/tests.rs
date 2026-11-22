@@ -1,6 +1,6 @@
 use super::*;
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_email::db::contact::ContactPhotoless;
 use sqlx::{Pool, Postgres};
 
@@ -336,7 +336,7 @@ async fn insert_new_contacts_overlapping_batches_do_not_deadlock(
 
     let link_id = Uuid::parse_str("00000000-0000-0000-0000-00000000001a")?;
     let contact = |email: &str| ContactPhotoless {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         link_id,
         email_address: email.to_string(),
         name: None,
@@ -356,7 +356,7 @@ async fn insert_new_contacts_overlapping_batches_do_not_deadlock(
     // hold an address the other still needs at the moment the gate opens.
     let mut gate = pool.begin().await?;
     sqlx::query("INSERT INTO email_contacts (id, link_id, email_address) VALUES ($1, $2, $3)")
-        .bind(macro_uuid::generate_uuid_v7())
+        .bind(rox_uuid::generate_uuid_v7())
         .bind(link_id)
         .bind("gate@example.com")
         .execute(&mut *gate)

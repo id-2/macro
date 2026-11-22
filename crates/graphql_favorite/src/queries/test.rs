@@ -47,7 +47,7 @@ impl RecordingReader {
 impl FavoriteQueryReader for RecordingReader {
     async fn list_favorites(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         filter: &FavoriteFilter,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         self.requested_users
@@ -85,7 +85,7 @@ impl QueryRoot {
         ctx: &Context<'_>,
         filter: Option<FavoritesFilterInput>,
     ) -> async_graphql::Result<Vec<GraphqlFavorite>> {
-        let user_id = MacroUserIdStr::parse_from_str(USER_ID).expect("valid user id");
+        let user_id = RoxUserIdStr::parse_from_str(USER_ID).expect("valid user id");
         resolve_favorites::<RecordingReader>(
             ctx,
             &user_id,

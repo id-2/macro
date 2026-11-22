@@ -90,7 +90,7 @@ async fn search_metadata(
         Ok(AgentSessionSearchMetadata {
             id: row.id,
             name: row.name,
-            owner_id: macro_user_id::user_id::MacroUserIdStr::try_from(row.owner_id)
+            owner_id: rox_user_id::user_id::RoxUserIdStr::try_from(row.owner_id)
                 .map_err(|error| sqlx::Error::Decode(Box::new(error)))?,
             bot_id: row.bot_id,
             created_at: row.created_at,

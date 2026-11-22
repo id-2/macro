@@ -4,8 +4,8 @@ use entity_access::domain::models::EntityType as AccessEntityType;
 use entity_access::domain::models::{
     Entity, EntityAccessReceipt, EntityPermission, EntityType, MemberTeamRole, TeamRole,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use properties::domain::model::TaskAssignedNotification;
 use properties::domain::model::{EditReceipt, ViewReceipt};
 use properties::{NotificationService, PermissionService, PropertiesPgRepo, PropertiesServiceImpl};
@@ -23,7 +23,7 @@ impl PermissionService for NoPermissions {
 
     async fn mint_view_receipt<'a>(
         &self,
-        _user_id: Option<&'a MacroUserIdStr<'a>>,
+        _user_id: Option<&'a RoxUserIdStr<'a>>,
         _entity_id: &str,
         _entity_type: AccessEntityType,
     ) -> Result<ViewReceipt, Self::Err> {
@@ -32,7 +32,7 @@ impl PermissionService for NoPermissions {
 
     async fn mint_edit_receipt<'a>(
         &self,
-        _user_id: &MacroUserIdStr<'a>,
+        _user_id: &RoxUserIdStr<'a>,
         _entity_id: &str,
         _entity_type: AccessEntityType,
     ) -> Result<EditReceipt, Self::Err> {
@@ -41,7 +41,7 @@ impl PermissionService for NoPermissions {
 
     async fn grant_permissions_to_task<'a>(
         &self,
-        _user_ids: &[MacroUserIdStr<'a>],
+        _user_ids: &[RoxUserIdStr<'a>],
         _task_id: &str,
     ) -> Result<(), Self::Err> {
         unimplemented!("stage definitions never grant task permissions")
@@ -76,7 +76,7 @@ fn store(pool: &PgPool) -> Store {
 async fn team_receipt(pool: &PgPool, email: &str) -> CrmTeamReceipt<MemberTeamRole> {
     let team_id = Uuid::now_v7();
     seed_team(pool, team_id, email).await.expect("seed team");
-    let user = MacroUserIdStr::parse_from_str(email).unwrap().into_owned();
+    let user = RoxUserIdStr::parse_from_str(email).unwrap().into_owned();
     CrmTeamReceipt::from_team_receipt(
         EntityAccessReceipt::<MemberTeamRole>::try_new_authenticated_user(
             user,

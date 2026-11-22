@@ -41,7 +41,7 @@ use item_filters::{
         properties::{EntityRefId, PropertiesLiteral, PropertyEntityType, PropertyMatchValue},
     },
 };
-use macro_user_id::{cowlike::CowLike, email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, email::EmailStr, user_id::RoxUserIdStr};
 use model_file_type::FileType;
 use model_owner::Owner;
 use notification_state::graphql::GraphqlNotificationState;
@@ -171,8 +171,8 @@ fn parse_id(id: ID, field: &str) -> InputResult<Uuid> {
 }
 
 /// Parse a Rox user id with a field-specific error.
-fn parse_macro_user_id(value: String, field: &str) -> InputResult<MacroUserIdStr<'static>> {
-    MacroUserIdStr::parse_from_str(&value)
+fn parse_macro_user_id(value: String, field: &str) -> InputResult<RoxUserIdStr<'static>> {
+    RoxUserIdStr::parse_from_str(&value)
         .map(CowLike::into_owned)
         .map_err(|err| InputError::new(format!("invalid {field} `{value}`: {err}")))
 }

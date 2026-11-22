@@ -5,10 +5,10 @@ import type {
   CreateAgentRequest,
   PatchAgentRequest,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { Harness } from '../harnesses/harness';
 import type { Team } from '../teams/team';
 
@@ -91,14 +91,14 @@ export type AgentApps =
  * built-in personas such as Cursor have none, and are listed with
  * {@link AgentNamespace.coding}.
  */
-export class Agent extends MacroEntity<AgentRecord> {
+export class Agent extends RoxEntity<AgentRecord> {
   /** Construct a lazy agent handle. */
-  static byId(client: MacroClient, id: string): Agent {
+  static byId(client: RoxClient, id: string): Agent {
     return new Agent(client, id);
   }
 
   /** Seed from a listed or created agent. */
-  static from(client: MacroClient, record: AgentRecord): Agent {
+  static from(client: RoxClient, record: AgentRecord): Agent {
     return new Agent(client, record.bot.id, record);
   }
 
@@ -107,7 +107,7 @@ export class Agent extends MacroEntity<AgentRecord> {
       (a) => a.bot.id === this.id,
     );
     if (!record)
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `Agent ${this.id} is not a configurable agent you can manage. Built-in personas such as Cursor have no settings; read the coding personas you can start with agents.coding().`,
       );
     return record;

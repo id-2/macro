@@ -6,6 +6,7 @@
  * the same face.
  */
 
+import { t } from '@app/lib/i18n';
 import { GithubPullRequestStatusIcon } from '@app/features/block-pr/side-panel/github-pull-request';
 import { pullRequestGithubUrl } from '@app/features/block-pr/util/pr-github-url';
 import {
@@ -98,7 +99,7 @@ function GithubFallback(props: { url: string; number?: number }): JSX.Element {
       title={
         props.number != null
           ? `Open #${props.number} on GitHub`
-          : 'Open pull request on GitHub'
+          : t('agentChat.openPullRequestOnGithub')
       }
       onClick={(event) => event.stopPropagation()}
     >
@@ -134,7 +135,7 @@ function EntityChip(props: {
             title() ??
             (props.number != null
               ? `Open #${props.number}`
-              : 'Open pull request')
+              : t('agentChat.openPullRequest'))
           }
           {...navHandlers}
         >

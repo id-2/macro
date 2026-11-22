@@ -128,7 +128,8 @@ const NODE_BUILTINS: &[&str] = &[
 ];
 
 /// Every program's requests go through the bootstrap's `fetch`, which marks
-/// them as the program's (`x-macro-code-execution`) so an API can tell them
+/// them as the program's (`x-rox-code-execution`, also accepted under its
+/// earlier `x-macro-code-execution` name) so an API can tell them
 /// from the person's own. Any other Node built-in could open its own
 /// connection with the run's token unmarked, so every built-in not in
 /// [`NODE_ALLOWED`] resolves to unavailable.mjs, which throws. Timer modules,
@@ -137,7 +138,7 @@ const NODE_BUILTINS: &[&str] = &[
 /// as its `node:` form.
 fn import_map(unattended: bool) -> String {
     let mut imports = serde_json::Map::new();
-    imports.insert("@macro-inc/sdk".into(), "./sdk.mjs".into());
+    imports.insert("@rox-one/sdk".into(), "./sdk.mjs".into());
     if !unattended {
         imports.insert("handlebars".into(), "./handlebars.mjs".into());
     }

@@ -65,7 +65,7 @@ pub fn message_from_row(
         labels,
         body_text: row.body_text,
         body_html_sanitized: row.body_html_sanitized,
-        body_macro: row.body_macro,
+        body_rox: row.body_rox,
         body_replyless,
         attachments,
         attachments_draft,

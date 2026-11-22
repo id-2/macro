@@ -1,9 +1,9 @@
 use crate::domain::models::{
-    CatalogEntry, CatalogPage, ConnectApp, ConnectToken, ConnectionProvider, MacroUserIdStr,
+    CatalogEntry, CatalogPage, ConnectApp, ConnectToken, ConnectionProvider, RoxUserIdStr,
     McpServer, PipedreamAccount, PipedreamConnection,
 };
 use crate::domain::ports::{
-    ConnectRollout, ConnectedAppProxy, ConnectorCapabilities, ConnectorDirectory, MacroConnect,
+    ConnectRollout, ConnectedAppProxy, ConnectorCapabilities, ConnectorDirectory, RoxConnect,
     McpConnection, PipedreamConnect, ProxyResponse,
 };
 use crate::domain::service::discovery::ConnectorTool;
@@ -18,7 +18,7 @@ mod test;
 /// Connect when configured.
 ///
 /// A user the `macro-connect` rollout is on for is on Connect alone
-/// ([`MacroConnect::connect_only`]): directory, tool listings, and every
+/// ([`RoxConnect::connect_only`]): directory, tool listings, and every
 /// stored connection go through Connect, and a Pipedream connection they
 /// still hold is refused until they reconnect the app through Connect.
 /// Nothing falls back to Pipedream. Everyone else stays on Pipedream, except
@@ -52,7 +52,7 @@ impl<P, C> ConnectorBackends<P, C> {
     }
 
     /// Connect, when `user_id` is on Connect alone.
-    async fn connect_for_user(&self, user_id: &MacroUserIdStr<'static>) -> Option<&C> {
+    async fn connect_for_user(&self, user_id: &RoxUserIdStr<'static>) -> Option<&C> {
         let (Some(connect), Some(rollout)) = (&self.connect, &self.rollout) else {
             return None;
         };
@@ -136,7 +136,7 @@ impl<P: ConnectedAppProxy, C: ConnectedAppProxy> ConnectedAppProxy for Connector
 }
 
 /// Pipedream's own account API, for users still on Pipedream; callers check
-/// [`MacroConnect::connect_only`] first.
+/// [`RoxConnect::connect_only`] first.
 impl<P: PipedreamConnect, C: Send + Sync + 'static> PipedreamConnect for ConnectorBackends<P, C> {
     async fn create_connect_token(&self, external_user_id: &str) -> anyhow::Result<ConnectToken> {
         self.pipedream.create_connect_token(external_user_id).await
@@ -166,7 +166,7 @@ impl<P: ConnectorDirectory, C: ConnectorDirectory> ConnectorDirectory for Connec
     /// directory.
     async fn search(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         search: Option<&str>,
         cursor: Option<&str>,
         limit: u32,
@@ -180,7 +180,7 @@ impl<P: ConnectorDirectory, C: ConnectorDirectory> ConnectorDirectory for Connec
     /// From the same directory as [`search`](Self::search).
     async fn retrieve(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Option<CatalogEntry>> {
         match self.connect_for_user(user_id).await {
@@ -197,7 +197,7 @@ impl<P: ConnectorCapabilities, C: ConnectorCapabilities> ConnectorCapabilities
     /// their Connect connection), else Pipedream's, which needs none.
     async fn tools(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Vec<ConnectorTool>> {
         match self.connect_for_user(user_id).await {
@@ -207,8 +207,8 @@ impl<P: ConnectorCapabilities, C: ConnectorCapabilities> ConnectorCapabilities
     }
 }
 
-impl<P: Send + Sync + 'static, C: MacroConnect> MacroConnect for ConnectorBackends<P, C> {
-    async fn connect_only(&self, user_id: &MacroUserIdStr<'static>) -> bool {
+impl<P: Send + Sync + 'static, C: RoxConnect> RoxConnect for ConnectorBackends<P, C> {
+    async fn connect_only(&self, user_id: &RoxUserIdStr<'static>) -> bool {
         self.connect_for_user(user_id).await.is_some()
     }
 
@@ -221,7 +221,7 @@ impl<P: Send + Sync + 'static, C: MacroConnect> MacroConnect for ConnectorBacken
 
     async fn create_connect_session(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app: &ConnectApp,
     ) -> anyhow::Result<String> {
         match &self.connect {
@@ -232,7 +232,7 @@ impl<P: Send + Sync + 'static, C: MacroConnect> MacroConnect for ConnectorBacken
 
     async fn is_connected(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_id: &str,
     ) -> anyhow::Result<bool> {
         match &self.connect {
@@ -243,7 +243,7 @@ impl<P: Send + Sync + 'static, C: MacroConnect> MacroConnect for ConnectorBacken
 
     async fn delete_connection(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_id: &str,
     ) -> anyhow::Result<()> {
         match &self.connect {

@@ -165,7 +165,7 @@ pub async fn create_property_option(
 ) -> anyhow::Result<PropertyOption> {
     insert_property_option(
         pool,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         property_definition_id,
         display_order,
         value,
@@ -243,7 +243,7 @@ pub async fn get_or_create_property_option(
 
     match insert_property_option(
         pool,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         property_definition_id,
         display_order,
         value.clone(),
@@ -601,7 +601,7 @@ pub async fn replace_property_options(
         let ids: Vec<Uuid> = plan
             .insert
             .iter()
-            .map(|_| macro_uuid::generate_uuid_v7())
+            .map(|_| rox_uuid::generate_uuid_v7())
             .collect();
         let (number_values, string_values): (Vec<Option<f64>>, Vec<Option<String>>) =
             plan.insert.iter().map(|i| i.value.to_db_values()).unzip();

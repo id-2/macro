@@ -57,7 +57,7 @@ impl SendMessageRequest {
                 .collect(),
             body_text: msg.body_text,
             body_html: msg.body_html,
-            body_macro: msg.body_macro,
+            body_rox: msg.body_rox,
             headers_json: msg.headers_json,
             send_time: None,
             include_signature: msg.include_signature,

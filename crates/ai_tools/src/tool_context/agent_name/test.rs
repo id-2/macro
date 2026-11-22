@@ -3,9 +3,9 @@ use bots::{
     domain::{models::CreateBotRequest, service::BotServiceImpl},
     outbound::pg_bots_repo::PgBotsRepo,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
@@ -23,11 +23,11 @@ async fn agents_are_named_by_their_own_bot_rows(pool: PgPool) -> anyhow::Result<
     .bind(macro_user_id)
     .execute(&pool)
     .await?;
-    let owner = MacroUserIdStr::try_from("macro|owner@example.com".to_owned())?;
+    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned())?;
 
     let bots = BotServiceImpl::new(
         PgBotsRepo::new(pool.clone()),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         harnesses::domain::ports::MockHarnessTeamAgents::new(),
     );
     let grunk = bots

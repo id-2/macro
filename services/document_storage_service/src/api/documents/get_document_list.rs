@@ -4,7 +4,7 @@ use crate::{
 };
 use axum::extract::State;
 use axum::{http::StatusCode, response::IntoResponse};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::{
     document::response::GetDocumentListResult,
     response::{GenericErrorResponse, GenericResponse},
@@ -25,10 +25,10 @@ use model::{
 #[tracing::instrument(skip(ctx, user), fields(user_id=?user.authorization.user.macro_user_id))]
 pub async fn get_document_list_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> impl IntoResponse {
     let document_search_response_date: Vec<GetDocumentListResult> =
-        match macro_db_client::document::get_document_list(
+        match rox_db_client::document::get_document_list(
             ctx.db.clone(),
             user.authorization.user.macro_user_id.as_ref(),
         )

@@ -65,5 +65,5 @@ export function authenticateWhatsAppPasskey(
 
 /** A deep link that opens this pairing in Rox desktop, by id only. */
 export function desktopPairingUrl(pairingId: string): string {
-  return `macro:///external?whatsappPairing=${encodeURIComponent(pairingId)}`;
+  return `rox:///external?whatsappPairing=${encodeURIComponent(pairingId)}`;
 }

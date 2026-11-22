@@ -97,7 +97,7 @@ async fn account_classification_and_current_role_facts_come_from_postgres(pool: 
     let (repository, actor, record) = folder_fixture(pool).await;
     let team = record.metadata.team_id;
     let missing =
-        MacroUserIdStr::parse_from_str("macro|missing@example.test").expect("missing fixture");
+        RoxUserIdStr::parse_from_str("macro|missing@example.test").expect("missing fixture");
     assert!(
         repository
             .is_human(&actor.user_id)

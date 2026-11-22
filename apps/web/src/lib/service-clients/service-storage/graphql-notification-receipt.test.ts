@@ -1,7 +1,7 @@
 import { normalizedCacheExchange } from '@graphql-cache/exchange/normalized-cache-exchange';
 import { createNoopCacheHost } from '@graphql-cache/host/noop-host';
 import type { CacheHost } from '@graphql-cache/host/types';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import {
   createClient,
   type Exchange,

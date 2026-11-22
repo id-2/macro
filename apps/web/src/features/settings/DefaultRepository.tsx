@@ -4,6 +4,7 @@ import {
 } from '@app/features/agents-view/core/repository';
 import { createPreferredRepository } from '@app/features/agents-view/primitives/preferred-repository';
 import { createReachableRepositories } from '@app/features/agents-view/queries/reachable-repositories';
+import { t } from '@app/lib/i18n';
 import { useSettingsState } from '@core/constant/SettingsState';
 import { useUserId } from '@core/context/user';
 import { Button } from '@ui';
@@ -29,7 +30,7 @@ export function DefaultRepository() {
     !listedPreference();
   const options = () => {
     const options = [
-      { id: 'auto', name: 'Auto-detect' },
+      { id: 'auto', name: t('common.autoDetect') },
       ...reachable
         .repositories()
         .map((repo) => ({ id: repo.url, name: repositoryLabel(repo.url) })),
@@ -38,40 +39,43 @@ export function DefaultRepository() {
     if (saved && !listedPreference())
       options.push({
         id: saved,
-        name: `${repositoryLabel(saved)}${unavailable() ? ' (unavailable)' : ''}`,
+        name: unavailable()
+          ? t('settingsAgents.repositoryUnavailable', {
+              name: repositoryLabel(saved),
+            })
+          : repositoryLabel(saved),
       });
     return options;
   };
 
   return (
     <SettingsRow
-      label="Default repository"
-      description="Preselect a GitHub repository for new coding conversations on this device. Auto-detect chooses from your prompt and recent work."
+      label={t('settingsAgents.defaultRepository')}
+      description={t('settingsAgents.defaultRepositoryDescription')}
     >
       <div class="w-full min-w-0 max-w-sm">
         <SettingsSelect
-          label="Default repository"
+          label={t('settingsAgents.defaultRepository')}
           options={options()}
           value={listedPreference()?.url ?? preferred.repository() ?? 'auto'}
           onChange={(id) => preferred.select(id === 'auto' ? undefined : id)}
         />
         <Show when={reachable.loading()}>
           <p class="mt-2 text-xs text-ink-muted" role="status">
-            Loading repositories…
+            {t('settingsAgents.loadingRepositories')}
           </p>
         </Show>
         <Show when={reachable.error()}>
           <p class="mt-2 text-xs text-ink-muted" role="status">
-            Could not load GitHub repositories.
+            {t('settingsAgents.repositoriesFailed')}
           </p>
           <Button variant="ghost" size="sm" onClick={reachable.retry}>
-            Retry
+            {t('settingsAgents.retry')}
           </Button>
         </Show>
         <Show when={unavailable()}>
           <p class="mt-2 text-xs text-ink-muted" role="status">
-            This repository is no longer accessible. New conversations will use
-            Auto-detect until you choose another repository or restore access.
+            {t('settingsAgents.repositoryInaccessible')}
           </p>
         </Show>
         <Show
@@ -86,7 +90,7 @@ export function DefaultRepository() {
             size="sm"
             onClick={() => openSettings('Connected')}
           >
-            Connect GitHub
+            {t('common.connectGitHub')}
           </Button>
         </Show>
       </div>

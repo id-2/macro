@@ -39,7 +39,7 @@ pub fn endpoint_rows(instance: &Instance) -> Vec<(&'static str, String, u16)> {
         (
             "postgres",
             format!(
-                "postgres://user:password@localhost:{}/macrodb",
+                "postgres://user:password@localhost:{}/roxdb",
                 instance.port(Port::Postgres)
             ),
             instance.port(Port::Postgres),
@@ -63,7 +63,7 @@ pub fn logs_command(instance: &Instance, generated_env: &Path) -> String {
     let base_compose = repo_root.join("docker/docker-compose.yml");
     let override_compose = instance.artifact_dir().join("docker-compose.override.yml");
     format!(
-        "MACRO_ENV_FILE={:?} docker compose --project-directory {:?} -p {} -f {:?} -f {:?} --env-file {:?} logs -f",
+        "ROX_ENV_FILE={:?} docker compose --project-directory {:?} -p {} -f {:?} -f {:?} --env-file {:?} logs -f",
         generated_env,
         repo_root,
         instance.project_name(),
@@ -129,7 +129,7 @@ pub fn print(
         Style::new()
             .green()
             .bold()
-            .apply_to(format!("✓ macro {} stack ready", mode.label()))
+            .apply_to(format!("✓ rox {} stack ready", mode.label()))
     );
     row("mode", mode.label().to_string());
     row(
@@ -255,7 +255,7 @@ fn dd_logs_url() -> Option<String> {
 }
 
 fn dd_env() -> String {
-    macro_env_var::maybe_read_env("DD_ENV").unwrap_or_else(|| "local".into())
+    rox_env_var::maybe_read_env("DD_ENV").unwrap_or_else(|| "local".into())
 }
 
 /// Whether something is listening on `port` on localhost.

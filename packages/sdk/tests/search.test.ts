@@ -6,7 +6,7 @@ import { Message } from '../src/entities/channels/message';
 import { Chat } from '../src/entities/chats/chat';
 import { Document } from '../src/entities/documents/document';
 import { EmailThread } from '../src/entities/email/thread';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {

@@ -5,7 +5,7 @@ vi.mock('@queries/email/read-state', () => ({
 import { withEntityNotifications } from '@app/features/soup/entity-notifications';
 import type { EntityData, GithubPullRequestEntity } from '@entity/types/entity';
 import { unreadFilterFn } from '@entity/utils/filter';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { markRowNotificationsSeenOnOpen } from '@notifications/mark-row-seen';
 import { createRoot } from 'solid-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';

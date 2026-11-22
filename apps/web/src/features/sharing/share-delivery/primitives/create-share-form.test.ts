@@ -20,7 +20,7 @@ type RecordedSpan = {
 
 const traces = vi.hoisted((): RecordedSpan[] => []);
 
-vi.mock('@macro-inc/observability', () => {
+vi.mock('@rox-one/observability', () => {
   type Operation = (span: ReturnType<typeof recorder>) => Promise<unknown>;
   const open = (name: string): RecordedSpan => ({
     name,

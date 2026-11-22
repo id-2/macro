@@ -1,5 +1,5 @@
 import type { IUser } from '@core/user/types';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { hashKey } from '@tanstack/solid-query';
 import type { readContactDirectory } from './directory';
 

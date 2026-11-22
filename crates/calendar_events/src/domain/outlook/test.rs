@@ -103,18 +103,18 @@ struct Broker {
     failing: Vec<Uuid>,
 }
 
-impl macro_event_broker::MacroEventBroker for Broker {
-    fn send_event<E: macro_event_broker::MacroEvent + ?Sized>(
+impl rox_event_broker::RoxEventBroker for Broker {
+    fn send_event<E: rox_event_broker::RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<
-        tokio::task::JoinHandle<Result<(), macro_event_broker::EventBrokerError>>,
-        macro_event_broker::EventBrokerError,
+        tokio::task::JoinHandle<Result<(), rox_event_broker::EventBrokerError>>,
+        rox_event_broker::EventBrokerError,
     > {
         let fails = self.failing.iter().any(|id| event.key() == id.to_string());
         Ok(tokio::spawn(async move {
             if fails {
-                Err(macro_event_broker::EventBrokerError::MissingMessageKey)
+                Err(rox_event_broker::EventBrokerError::MissingMessageKey)
             } else {
                 Ok(())
             }

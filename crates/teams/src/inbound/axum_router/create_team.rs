@@ -1,6 +1,6 @@
 use axum::{Json, extract::State};
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 
 use crate::domain::{
     model::{CreateTeamError, Team},
@@ -38,9 +38,9 @@ fn default_allow_domain_join() -> bool {
     ),
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: TeamService, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn handler<T: TeamService, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<TeamRouterState<T, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<CreateTeamRequest>,
 ) -> Result<Json<Team>, CreateTeamError> {
     let user = &user.authorization.user;

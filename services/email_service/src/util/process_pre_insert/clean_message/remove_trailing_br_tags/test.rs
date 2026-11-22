@@ -43,7 +43,7 @@ fn message_with_html(html: &str) -> service::message::Message {
         headers_json: None,
         created_at: Default::default(),
         labels: vec![],
-        body_macro: None,
+        body_rox: None,
         updated_at: Default::default(),
     }
 }

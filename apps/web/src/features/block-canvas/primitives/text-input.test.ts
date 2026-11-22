@@ -1,5 +1,5 @@
-import { createGraphicsEditor, insertShapesCommand } from '@macro-inc/graphics';
-import { attachCameraControls } from '@macro-inc/graphics/browser';
+import { createGraphicsEditor, insertShapesCommand } from '@rox-one/graphics';
+import { attachCameraControls } from '@rox-one/graphics/browser';
 import { createRoot } from 'solid-js';
 import { afterEach, expect, it, vi } from 'vitest';
 import { createCanvasState } from './create-canvas-state';

@@ -26,7 +26,7 @@ use entity_access_management::{
     domain::service::EntityAccessManagementServiceImpl, outbound::PgRepository,
 };
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::prelude::*;
 use serde_json::Value;
 use std::sync::Arc;
@@ -97,7 +97,7 @@ impl EmailTools {
         name: &str,
         input: &Value,
     ) -> Result<Result<Value, String>, Report> {
-        let user_id = MacroUserIdStr::try_from(user.macro_id().to_owned())
+        let user_id = RoxUserIdStr::try_from(user.macro_id().to_owned())
             .map_err(|error| report!("{} is not a Macro user id: {error}", user.macro_id()))?;
         let result = email_toolset::<Service, NoOpGmailTokenProvider, Access>()
             .try_tool_call(

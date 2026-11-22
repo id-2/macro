@@ -7,7 +7,7 @@ import type {
   SpreadsheetReadResponse,
   SpreadsheetRequest,
   SpreadsheetResponse,
-} from '@macro-inc/spreadsheet/ai-types';
+} from '@rox-one/spreadsheet/ai-types';
 import { LoroDoc } from 'loro-crdt';
 import { Miniflare, type WebSocket } from 'miniflare';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';

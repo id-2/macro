@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import XIcon from '@icon/system/regular/x.svg';
 import { Button, Dialog, InputGroup, Surface, TextField } from '@ui';
 import { Show } from 'solid-js';
@@ -42,22 +43,22 @@ export function AutoReloadDialog(props: {
       <Surface depth={2} class="relative rounded-xl">
         <div class="flex max-h-[85dvh] flex-col gap-6 overflow-y-auto p-6">
           <Dialog.Title class="pr-8 text-xl font-semibold text-ink">
-            Auto-Reload
+            {t('settingsUsage.autoReloadTitle')}
           </Dialog.Title>
           <Dialog.Description class="sr-only">
-            Set balance thresholds and a monthly spending limit for automatic
-            credit purchases.
+            {t('settingsUsage.autoReloadDescription')}
           </Dialog.Description>
           <Show when={props.sharedWithTeam}>
             <p class="text-sm text-ink-muted">
-              Auto-reload adds credits to your team’s shared balance.
+              {t('settingsUsage.autoReloadSharedNote')}
             </p>
           </Show>
           <TextField value={props.minimum} onChange={props.onMinimum}>
-            <TextField.Label>Minimum balance</TextField.Label>
+            <TextField.Label>
+              {t('settingsUsage.minimumBalance')}
+            </TextField.Label>
             <TextField.Description>
-              Automatically purchase credits when my balance drops below this
-              amount.
+              {t('settingsUsage.minimumBalanceDescription')}
             </TextField.Description>
             <InputGroup size="xl">
               <TextField.Input
@@ -69,9 +70,11 @@ export function AutoReloadDialog(props: {
             </InputGroup>
           </TextField>
           <TextField value={props.target} onChange={props.onTarget}>
-            <TextField.Label>Target balance</TextField.Label>
+            <TextField.Label>
+              {t('settingsUsage.targetBalance')}
+            </TextField.Label>
             <TextField.Description>
-              Bring my balance back to this amount if I hit my minimum.
+              {t('settingsUsage.targetBalanceDescription')}
             </TextField.Description>
             <InputGroup size="xl">
               <TextField.Input
@@ -83,25 +86,28 @@ export function AutoReloadDialog(props: {
             </InputGroup>
           </TextField>
           <TextField value={props.maximum} onChange={props.onMaximum}>
-            <TextField.Label>Maximum monthly spend (optional)</TextField.Label>
+            <TextField.Label>
+              {t('settingsUsage.maximumSpend')}
+            </TextField.Label>
             <TextField.Description>
-              Limit the total amount of credits purchased through auto-reload
-              each month. Leave blank for no limit.
+              {t('settingsUsage.maximumSpendDescription')}
             </TextField.Description>
             <InputGroup size="xl">
               <TextField.Input
                 as={InputGroup.Input}
                 inputMode="decimal"
                 class="text-sm"
-                placeholder="No limit."
+                placeholder={t('settingsUsage.noLimit')}
               />
               <InputGroup.Addon aria-hidden="true">$</InputGroup.Addon>
             </InputGroup>
           </TextField>
           <div class="flex flex-col gap-2">
-            <h3 class="text-sm font-medium text-ink">Payment method</h3>
+            <h3 class="text-sm font-medium text-ink">
+              {t('settingsUsage.paymentMethod')}
+            </h3>
             <p class="text-xs text-ink-muted">
-              Choose or add a payment method in your billing portal.
+              {t('settingsUsage.paymentMethodDescription')}
             </p>
             <Button
               class="self-start"
@@ -113,18 +119,16 @@ export function AutoReloadDialog(props: {
               onClick={props.onPaymentMethods}
             >
               {props.paymentMethodsPending
-                ? 'Opening billing portal…'
-                : 'Manage payment methods'}
+                ? t('settingsUsage.openingBillingPortal')
+                : t('settingsUsage.managePaymentMethods')}
             </Button>
           </div>
           <div class="rounded-xl border border-edge-muted p-4">
             <h3 class="text-sm font-semibold text-ink">
-              Your card will be automatically charged
+              {t('settingsUsage.cardChargedTitle')}
             </h3>
             <p class="mt-2 text-sm text-ink-muted">
-              Enabling auto-reload will charge your card every time you drop
-              below your minimum balance. You can disable it in settings at any
-              time.
+              {t('settingsUsage.cardChargedBody')}
             </p>
           </div>
           <Show when={props.notice}>
@@ -142,7 +146,7 @@ export function AutoReloadDialog(props: {
               when={props.enabled}
               fallback={
                 <Button variant="ghost" onClick={props.onClose}>
-                  Cancel
+                  {t('settingsUsage.cancel')}
                 </Button>
               }
             >
@@ -151,7 +155,7 @@ export function AutoReloadDialog(props: {
                 disabled={props.disabled || props.pending}
                 onClick={props.onTurnOff}
               >
-                Turn off
+                {t('settingsUsage.turnOff')}
               </Button>
             </Show>
             <Button
@@ -160,16 +164,16 @@ export function AutoReloadDialog(props: {
               onClick={props.onSave}
             >
               {props.pending
-                ? 'Saving…'
+                ? t('settingsUsage.saving')
                 : props.enabled
-                  ? 'Save'
-                  : 'Turn on auto-reload'}
+                  ? t('settingsUsage.save')
+                  : t('settingsUsage.turnOnAutoReload')}
             </Button>
           </div>
         </div>
         <Button
-          aria-label="Close Auto-Reload"
-          tooltip="Close Auto-Reload"
+          aria-label={t('settingsUsage.closeAutoReload')}
+          tooltip={t('settingsUsage.closeAutoReload')}
           class="absolute right-4 top-4"
           size="icon-sm"
           variant="ghost"

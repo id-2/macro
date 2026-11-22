@@ -432,6 +432,17 @@ export const settingsRoute = defineRoute({
   externalSearch: ['pair', 'createAgent'],
 });
 
+/**
+ * The account portal: profile, security, connected email addresses and the
+ * interface language on one page, with a URL of its own (`/account`) so it can
+ * be reached directly from either app host.
+ */
+export const accountRoute = defineRoute({
+  id: 'account',
+  path: 'account',
+  claim: () => ({ namespace: 'component', id: 'account' }),
+});
+
 // The Agents list and its conversations share one workspace mount, so picking
 // a conversation swaps the pane beside the sidebar instead of rebuilding both.
 const AGENTS_WORKSPACE_MOUNT = 'agents-workspace';

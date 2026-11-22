@@ -15,8 +15,8 @@ use frecency::domain::{
     ports::FrecencyQueryService,
 };
 use item_filters::ast::email::EmailLiteral;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_pagination::{CollectBy, PaginateOn, PaginatedCursor, Query, SimpleSortMethod};
 use std::collections::{HashMap, HashSet};
@@ -47,7 +47,7 @@ fn page_limit(requested: Option<u32>) -> u32 {
 async fn get_frecency_scores<U: FrecencyQueryService>(
     service: &U,
     include_frecency: bool,
-    user_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+    user_id: rox_user_id::user_id::RoxUserIdStr<'_>,
     ids: &[model_entity::Entity<'_>],
 ) -> Result<HashMap<AggregateId<'static>, FrecencyData>, frecency::domain::models::FrecencyQueryErr>
 {
@@ -172,7 +172,7 @@ where
     #[tracing::instrument(err, skip(self, receipts), fields(thread_count = receipts.len()))]
     pub(crate) async fn get_email_thread_previews_by_receipts_impl(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
     ) -> Result<Vec<EnrichedEmailThreadPreview>, EmailErr> {
         let thread_ids = email_thread_ids_from_receipts(receipts)?;
@@ -197,7 +197,7 @@ where
     #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id))]
     pub(crate) async fn get_owned_email_thread_preview_impl(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<Option<EnrichedEmailThreadPreview>, EmailErr> {
         let Some(link) = self
@@ -228,7 +228,7 @@ where
     )]
     async fn thread_previews_by_id(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         threads: Vec<(Uuid, Uuid)>,
     ) -> Result<Vec<EnrichedEmailThreadPreview>, EmailErr> {
         if threads.is_empty() {
@@ -293,7 +293,7 @@ where
     pub(crate) async fn get_link_by_auth_id_and_macro_id_impl(
         &self,
         auth_id: &str,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Option<crate::domain::models::Link>, EmailErr> {
         Ok(self
             .email_repo
@@ -378,7 +378,7 @@ where
 /// it, as the CRM list renders teammates' threads, and the exact id filter
 /// keeps the widened inbox scope from admitting any other thread.
 fn authorized_threads_request(
-    viewer: MacroUserIdStr<'static>,
+    viewer: RoxUserIdStr<'static>,
     view: PreviewViewStandardLabel,
     thread_ids: Vec<Uuid>,
     link_ids: Vec<Uuid>,

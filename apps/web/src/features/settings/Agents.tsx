@@ -17,12 +17,12 @@ import { ENABLE_AGENT_DMS } from '@core/constant/featureFlags';
 import {
   MACRO_AGENT_BOT_ID,
   MACRO_AGENT_NAME,
-  MACRO_HARNESS_NAME,
 } from '@core/constant/macroAgent';
 import { MACRO_NEW_BOT_ID } from '@core/constant/macroNew';
 import { useChannelsContext } from '@core/context/channels';
 import { useUserId } from '@core/context/user';
 import { fireAndForget } from '@core/util/fireAndForget';
+import { thrownResultErrorHasCode } from '@core/util/result';
 import { RoxMark } from '@core/component/RoxMark';
 import ArrowLeftIcon from '@icon/system/regular/arrow-left.svg';
 import ChatIcon from '@icon/system/regular/chat-circle.svg';
@@ -52,6 +52,7 @@ import {
   buildAgentModelTargets,
   useAgentModelsQueries,
 } from '@queries/agents/models';
+import { providerCredentialRejectedMessage } from '@queries/agents/probe-errors';
 import { useCursorApiKeyStatusQuery } from '@queries/auth/cursor-api-key';
 import { useRunnableHarnessesQuery } from '@queries/harnesses/harnesses';
 import { usePipedreamConnectedSlugs } from '@queries/pipedream-connectors';
@@ -144,10 +145,33 @@ type ChannelOption = ReturnType<typeof botAssignableChannelOptions>[number];
 
 /** The model id a runtime lists for its own default choice (Claude Code's). */
 const DEFAULT_HARNESS_MODEL = 'default';
+/**
+ * The in-Rox catalog is a probe of agent-harness. When that probe is missing
+ * (the service is down, or it returns no models) the row still offers the
+ * house model. An auth failure is not a missing catalog.
+ */
+const ROX_HOUSE_CATALOG = {
+  status: 'available' as const,
+  currentModel: Model.roxR1Max,
+  models: [
+    {
+      id: Model.roxR1Max,
+      name: modelLabel(Model.roxR1Max),
+    },
+  ],
+};
+
+function catalogRequestIsAuthError(error: unknown): boolean {
+  return (
+    thrownResultErrorHasCode(error, 'UNAUTHORIZED') ||
+    thrownResultErrorHasCode(error, 'FORBIDDEN') ||
+    providerCredentialRejectedMessage(error) !== undefined
+  );
+}
 
 const IN_MEMORY_HARNESS: ConnectedHarness = {
   id: 'in-memory',
-  name: MACRO_HARNESS_NAME,
+  name: `Агент ${displayName}`,
   kind: 'builtin',
   allowPermissionBypass: true,
   target: { harness: 'in-memory' },
@@ -156,11 +180,11 @@ const IN_MEMORY_HARNESS: ConnectedHarness = {
 const MACRO_AGENT: AgentSummary = {
   id: MACRO_AGENT_BOT_ID,
   name: MACRO_AGENT_NAME,
-  tag: 'macro',
+  tag: 'rox',
   instructions: '',
-  whereItRuns: `In ${MACRO_AGENT_NAME}`,
-  defaultModel: MODEL_PRETTYNAME[Model.sonnet55],
-  channelSummary: 'All channels',
+  whereItRuns: `В ${MACRO_AGENT_NAME}`,
+  defaultModel: MODEL_PRETTYNAME[Model.roxR1Max],
+  channelSummary: 'Все каналы',
   share: 'Team',
 };
 
@@ -254,8 +278,8 @@ export function Agents(props: {
           // that is turned off is normal, and the label says what to expect.
           name: [
             harness?.name ?? 'roxd',
-            harness?.shared_team_ids.length ? 'Team machine' : undefined,
-            harness && !harness.connected ? 'Offline' : undefined,
+            harness?.shared_team_ids.length ? 'Компьютер команды' : undefined,
+            harness && !harness.connected ? 'Не в сети' : undefined,
           ]
             .filter(Boolean)
             .join(' · '),
@@ -318,7 +342,10 @@ export function Agents(props: {
     )
   );
   const teamAgents = createMemo(() => [
-    MACRO_AGENT,
+    {
+      ...MACRO_AGENT,
+      whereItRuns: t('agentControls.inRox', { name: displayName }),
+    },
     ...agents().filter((agent) => agent.share === 'Team'),
   ]);
   const privateAgents = createMemo(() =>
@@ -354,10 +381,10 @@ export function Agents(props: {
   const createAgent = async (agent: CreateAgentParams) => {
     try {
       const created = await createAgentMutation.mutateAsync(agent);
-      toast.success('Agent created');
+      toast.success('Агент создан');
       return created.bot.id;
     } catch {
-      toast.failure('Failed to create agent');
+      toast.failure('Не удалось создать агента');
       return undefined;
     }
   };
@@ -374,10 +401,10 @@ export function Agents(props: {
           ? { description: current.bot.description }
           : {}),
       });
-      toast.success('Agent updated');
+      toast.success('Агент обновлён');
       return current.bot.id;
     } catch {
-      toast.failure('Failed to update agent');
+      toast.failure('Не удалось обновить агента');
       return undefined;
     }
   };
@@ -393,9 +420,9 @@ export function Agents(props: {
       });
       setDeletingAgent(undefined);
       if (editingAgent()?.bot.id === current.bot.id) setEditingAgent(undefined);
-      toast.success('Agent deleted');
+      toast.success('Агент удалён');
     } catch {
-      toast.failure('Failed to delete agent');
+      toast.failure('Не удалось удалить агента');
     }
   };
 
@@ -410,21 +437,21 @@ export function Agents(props: {
         }
       >
         <SettingsPage
-          title="Agents"
-          description="Custom assistants with their own name, instructions, model, and place to run."
+          title="Агенты"
+          description="Свои помощники со своим именем, инструкциями, моделью и местом работы."
         >
           <AgentSetupStrips
             onCursor={props.onCursor}
             onSetUpRuntime={props.onSetUpRuntime}
             onManageRuntimes={props.onManageRuntimes}
           />
-          <section ref={agentList} aria-label="Your agents">
+          <section ref={agentList} aria-label="Ваши агенты">
             <SettingsSurface class="flex flex-col gap-2 p-5 touch:p-4">
               <div class="flex flex-wrap items-start justify-between gap-3">
                 <div class="flex min-w-0 flex-col gap-0.5">
-                  <h2 class="text-base font-medium text-ink">Your agents</h2>
+                  <h2 class="text-base font-medium text-ink">Ваши агенты</h2>
                   <p class="text-sm leading-relaxed text-ink/60">
-                    Shared with your team or private to you.
+                    Общие для команды или только для вас.
                   </p>
                 </div>
                 <Button
@@ -433,7 +460,7 @@ export function Agents(props: {
                   onClick={() => setCreating(true)}
                 >
                   <PlusIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-                  Add agent
+                  Добавить агента
                 </Button>
               </div>
               <SettingsCard>
@@ -468,12 +495,12 @@ export function Agents(props: {
                 <RunOnComputerRow />
                 <Show when={agentsQuery.isPending}>
                   <p class="px-6 py-4 text-sm text-ink-muted">
-                    Loading agents…
+                    Загрузка агентов…
                   </p>
                 </Show>
                 <Show when={agentsQuery.isError}>
                   <p class="px-6 py-4 text-xs text-negative">
-                    Could not load your agents. Try refreshing this page.
+                    Не удалось загрузить агентов. Обновите страницу.
                   </p>
                 </Show>
               </SettingsCard>
@@ -542,10 +569,10 @@ function summarizeAgent(
     .map((channel) => `#${channel.name}`);
   const channelSummary =
     agent.channel_scope === 'all'
-      ? 'All channels'
+      ? 'Все каналы'
       : selectedChannelNames.length > 0
         ? selectedChannelNames.join(', ')
-        : `${agent.channel_ids.length} selected ${agent.channel_ids.length === 1 ? 'channel' : 'channels'}`;
+        : ruSelectedChannels(agent.channel_ids.length);
 
   return {
     id: agent.bot.id,
@@ -567,13 +594,15 @@ function summarizeAgent(
 }
 
 function whereItRunsLabel(id: string, harness?: ConnectedHarness): string {
-  if (id === 'in-memory') return `In ${displayName}`;
-  if (id === 'cursor') return 'In Cursor';
+  if (id === 'in-memory') return t('agentControls.inRox', { name: displayName });
+  if (id === 'cursor') return t('agentControls.inCursor');
   // Any other id is a registered roxd harness uuid; if it is not in the
   // connected list any more, the harness has been removed.
   if (harness?.computer)
     return `${t('computers.onComputer')} · ${harness.name}`;
-  return harness ? `On your machine · ${harness.name}` : 'Disconnected machine';
+  return harness
+    ? `${t('agentControls.onYourMachine')} · ${harness.name}`
+    : 'Отключённый компьютер';
 }
 
 function AgentRow(props: {
@@ -595,7 +624,7 @@ function AgentRow(props: {
             @{props.agent.tag}
           </span>
           <span class="shrink-0 rounded-full border border-edge-muted px-2 py-0.5 text-xxs font-medium uppercase text-ink-extra-muted">
-            {props.agent.share}
+            {props.agent.share === 'Team' ? 'Команда' : 'Личный'}
           </span>
         </div>
         <p class="mt-0.5 text-xs text-ink-extra-muted">
@@ -611,11 +640,11 @@ function AgentRow(props: {
               variant="ghost"
               size="sm"
               disabled={props.messagePending}
-              aria-label={`Message ${props.agent.name}`}
+              aria-label={`Написать ${props.agent.name}`}
               onClick={onMessage()}
             >
               <ChatIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-              Message
+              Написать
             </Button>
           )}
         </Show>
@@ -625,7 +654,7 @@ function AgentRow(props: {
               type="button"
               variant="ghost"
               size="icon-sm"
-              aria-label={`Edit ${props.agent.name}`}
+              aria-label={`Изменить ${props.agent.name}`}
               onClick={onEdit()}
             >
               <PencilIcon class="size-3.5 touch:size-6 shrink-0 pointer-events-none" />
@@ -639,7 +668,7 @@ function AgentRow(props: {
               variant="ghost"
               size="icon-sm"
               class="text-negative"
-              aria-label={`Delete ${props.agent.name}`}
+              aria-label={`Удалить ${props.agent.name}`}
               onClick={onDelete()}
             >
               <TrashIcon class="size-3.5 touch:size-6 shrink-0 pointer-events-none" />
@@ -662,13 +691,13 @@ function AgentAvatar(props: { agent: AgentSummary }) {
               when={props.agent.id === MACRO_AGENT_BOT_ID}
               fallback={<AgentIcon class="size-5" />}
             >
-              <RoxMark class="size-5" />
+              <RoxMark class="absolute inset-0 size-full" cover />
             </Show>
           </Avatar.Fallback>
         }
       >
         {(avatarUrl) => (
-          <Avatar.Image src={avatarUrl()} alt={`${props.agent.name} avatar`} />
+          <Avatar.Image src={avatarUrl()} alt={`Аватар: ${props.agent.name}`} />
         )}
       </Show>
     </Avatar>
@@ -692,13 +721,13 @@ function AgentDeleteDialog(props: {
       <Panel depth={2} class="rounded-xl text-ink">
         <Panel.Header class="px-5 py-3">
           <Dialog.Title class="text-sm font-semibold">
-            Delete {props.agentName}?
+            Удалить {props.agentName}?
           </Dialog.Title>
         </Panel.Header>
         <Panel.Body class="p-5">
           <Dialog.Description class="text-sm leading-5 text-ink-muted">
-            This removes the agent from every channel and permanently deletes
-            its configuration. This action cannot be undone.
+            Агент будет убран из всех каналов, а его настройки удалены навсегда.
+            Это нельзя отменить.
           </Dialog.Description>
         </Panel.Body>
         <Panel.Footer class="justify-end gap-2 px-5 py-3">
@@ -709,7 +738,7 @@ function AgentDeleteDialog(props: {
             disabled={props.pending}
             onClick={props.onClose}
           >
-            Cancel
+            Отмена
           </Button>
           <Button
             type="button"
@@ -719,7 +748,7 @@ function AgentDeleteDialog(props: {
             onClick={props.onConfirm}
           >
             <TrashIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-            {props.pending ? 'Deleting…' : 'Delete agent'}
+            {props.pending ? 'Удаление…' : 'Удалить агента'}
           </Button>
         </Panel.Footer>
       </Panel>
@@ -777,9 +806,27 @@ function AgentEditorPage(props: {
     );
     return index >= 0 ? modelQueries[index] : undefined;
   };
+  // A missing in-Rox catalog is not an auth failure, so the known house
+  // model stays selectable instead of an empty error and Retry.
+  const inMemoryHouseCatalog = (id: string) => {
+    if (id !== IN_MEMORY_HARNESS.id) return;
+    const query = modelQueryForHarness(id);
+    if (!query || query.isPending) return;
+    if (query.isError) {
+      return catalogRequestIsAuthError(query.error)
+        ? undefined
+        : ROX_HOUSE_CATALOG;
+    }
+    if (!query.isSuccess) return;
+    const data = query.data;
+    if (data.status === 'available' && data.models.length > 0) return;
+    return ROX_HOUSE_CATALOG;
+  };
   const modelDataForHarness = (id: string) => {
     const query = modelQueryForHarness(id);
-    return query?.isSuccess ? query.data : undefined;
+    return (
+      inMemoryHouseCatalog(id) ?? (query?.isSuccess ? query.data : undefined)
+    );
   };
   const preferredModelId = (id: string) => {
     const data = modelDataForHarness(id);
@@ -820,7 +867,7 @@ function AgentEditorPage(props: {
       ...data.models,
       {
         id: selected,
-        name: `${selected} (${savedModel ? 'saved, ' : ''}unavailable)`,
+        name: `${selected} (${savedModel ? 'сохранён, ' : ''}недоступен)`,
         description: undefined,
         group: undefined,
       },
@@ -917,22 +964,29 @@ function AgentEditorPage(props: {
   };
   const advancedSummary = () =>
     [
-      isCoding() ? 'Coding agent' : 'Chat agent',
+      isCoding() ? 'Агент для кода' : 'Чат-агент',
       channelMode() === 'all'
-        ? 'All channels'
-        : `${selectedChannelIds().length} ${selectedChannelIds().length === 1 ? 'channel' : 'channels'}`,
+        ? 'Все каналы'
+        : ruCount(
+            selectedChannelIds().length,
+            'канал',
+            'канала',
+            'каналов'
+          ),
       mcp().scope === 'owner_connections'
-        ? 'Your connected apps'
-        : `${selectedMcpServers().length} selected apps`,
+        ? 'Ваши подключённые приложения'
+        : `Выбрано ${ruCount(selectedMcpServers().length, 'приложение', 'приложения', 'приложений')}`,
     ].join(' · ');
   const modelPicker = () => (
     <div class="flex min-w-0 flex-col gap-1.5">
-      <span class="text-xs font-medium text-ink-muted">Model</span>
+      <span class="text-xs font-medium text-ink-muted">
+        {t('agentControls.model')}
+      </span>
       <Show
         when={selectedModelQuery()}
         fallback={
           <p class="settings-input text-ink-muted">
-            Model discovery unavailable
+            Список моделей недоступен
           </p>
         }
         keyed
@@ -944,16 +998,19 @@ function AgentEditorPage(props: {
               <ModelCatalogPicker
                 value={null}
                 options={[]}
-                placeholder="Loading models…"
+                placeholder="Загрузка моделей…"
                 onSelect={setDefaultModelId}
-                ariaLabel="Default model"
+                ariaLabel="Модель по умолчанию"
                 triggerClass="w-full justify-between"
                 pending
               />
             }
           >
             <Show
-              when={!query.isError}
+              when={
+                !query.isError ||
+                inMemoryHouseCatalog(harnessId()) !== undefined
+              }
               fallback={
                 <Show
                   when={
@@ -971,19 +1028,19 @@ function AgentEditorPage(props: {
                 >
                   <div class="flex items-center gap-2">
                     <p class="min-w-0 flex-1 text-xs text-negative">
-                      Could not load models for{' '}
-                      {selectedHarness()?.name ?? 'this machine'}.
+                      Не удалось загрузить модели для{' '}
+                      {selectedHarness()?.name ?? 'этого компьютера'}.
                     </p>
                     <Button
                       type="button"
                       variant="secondary"
                       size="sm"
-                      aria-label={`Retry models for ${selectedHarness()?.name ?? 'this machine'}`}
+                      aria-label={`Повторить загрузку моделей для ${selectedHarness()?.name ?? 'этого компьютера'}`}
                       onClick={() =>
                         fireAndForget(query.refetch(), 'agent-settings')
                       }
                     >
-                      Retry
+                      {t('common.retry')}
                     </Button>
                   </div>
                 </Show>
@@ -993,7 +1050,7 @@ function AgentEditorPage(props: {
                 when={selectedModelData()?.status === 'available'}
                 fallback={
                   <p class="settings-input text-ink-muted">
-                    Model selection is unsupported by this machine.
+                    Этот компьютер не поддерживает выбор модели.
                   </p>
                 }
               >
@@ -1001,7 +1058,7 @@ function AgentEditorPage(props: {
                   when={selectedModelOptions().length > 0}
                   fallback={
                     <p class="settings-input text-ink-muted">
-                      This machine did not return any models.
+                      Этот компьютер не вернул ни одной модели.
                     </p>
                   }
                 >
@@ -1009,7 +1066,7 @@ function AgentEditorPage(props: {
                     value={selectedDefaultModelId()}
                     options={selectedCatalogOptions()}
                     onSelect={setDefaultModelId}
-                    ariaLabel="Default model"
+                    ariaLabel="Модель по умолчанию"
                     triggerClass="w-full justify-between"
                     contentClass="overflow-hidden"
                     placement="bottom-start"
@@ -1044,11 +1101,11 @@ function AgentEditorPage(props: {
     const saved = savedApiKey();
     if (apiKeyLocked())
       return saved
-        ? 'Agent API keys are part of the Premium and Max plans. This agent runs on Rox usage until you upgrade.'
-        : 'Agent API keys are part of the Premium and Max plans.';
+        ? 'Ключи API агента входят в тарифы Premium и Max. Пока вы не перейдёте на них, агент работает за счёт использования Rox.'
+        : 'Ключи API агента входят в тарифы Premium и Max.';
     if (saved && saved.provider !== provider.id)
-      return `The saved ${apiKeyProviderName(saved.provider)} key isn’t used with this model.`;
-    return `Bills this agent’s usage to your ${provider.name} account instead of Rox. Leave it empty to run on Rox.`;
+      return `Сохранённый ключ ${apiKeyProviderName(saved.provider)} не используется с этой моделью.`;
+    return `Списывает использование этого агента с вашего счёта ${provider.name}, а не с Rox. Оставьте пустым, чтобы работать на Rox.`;
   };
   // Optional, so it stays a one-line offer until asked for or already set.
   const [apiKeyOpen, setApiKeyOpen] = createSignal(false);
@@ -1063,15 +1120,15 @@ function AgentEditorPage(props: {
             <div class="flex max-w-[420px] items-center justify-between gap-3">
               <div class="min-w-0">
                 <div class="text-xs font-medium text-ink-muted">
-                  {provider().name} API key{' '}
+                  Ключ API {provider().name}{' '}
                   <span class="whitespace-nowrap font-normal text-ink-extra-muted">
-                    · Optional
+                    · Необязательно
                   </span>
                 </div>
                 <p class="mt-0.5 text-xs text-ink-extra-muted">
                   {apiKeyLocked()
                     ? apiKeyHelp(provider())
-                    : `Runs on ${displayName} usage unless you add one.`}
+                    : `Работает за счёт использования ${displayName}, пока вы не добавите свой.`}
                 </p>
               </div>
               <Show when={!apiKeyLocked()}>
@@ -1083,7 +1140,7 @@ function AgentEditorPage(props: {
                   disabled={busy()}
                   onClick={() => setApiKeyOpen(true)}
                 >
-                  Add key
+                  Добавить ключ
                 </Button>
               </Show>
             </div>
@@ -1091,14 +1148,14 @@ function AgentEditorPage(props: {
         >
           <div class="flex max-w-[420px] flex-col gap-1.5">
             <span class="text-xs font-medium text-ink-muted">
-              {provider().name} API key{' '}
+              Ключ API {provider().name}{' '}
               <span class="whitespace-nowrap font-normal text-ink-extra-muted">
-                · Optional
+                · Необязательно
               </span>
             </span>
             <div class="flex min-w-0 items-center gap-2">
               <ApiKeyInput
-                aria-label={`${provider().name} API key`}
+                aria-label={`Ключ API ${provider().name}`}
                 class="flex-1"
                 prefix={provider().prefix}
                 saved={savedApiKey()?.provider === provider().id}
@@ -1113,14 +1170,14 @@ function AgentEditorPage(props: {
                     type="button"
                     variant="ghost"
                     size="sm"
-                    aria-label="Cancel API key"
+                    aria-label="Отменить ключ API"
                     disabled={busy()}
                     onClick={() => {
                       setApiKeyDraft('');
                       setApiKeyOpen(false);
                     }}
                   >
-                    Cancel
+                    Отмена
                   </Button>
                 }
               >
@@ -1135,7 +1192,7 @@ function AgentEditorPage(props: {
                     setRemovingApiKey(true);
                   }}
                 >
-                  Remove
+                  Убрать
                 </Button>
               </Show>
             </div>
@@ -1156,10 +1213,10 @@ function AgentEditorPage(props: {
       }
     } catch (error) {
       toast.failure(
-        `The agent was saved, but not its API key: ${
+        `Агент сохранён, но ключ API — нет: ${
           error instanceof Error && error.message
             ? error.message
-            : 'something went wrong'
+            : 'что-то пошло не так'
         }`
       );
     }
@@ -1188,7 +1245,7 @@ function AgentEditorPage(props: {
       setAvatarUrl(await uploadAvatar.mutateAsync(file));
     } catch (error) {
       toast.failure(
-        error instanceof Error ? error.message : 'Failed to upload avatar'
+        error instanceof Error ? error.message : 'Не удалось загрузить аватар'
       );
     } finally {
       setUploadingAvatar(false);
@@ -1252,18 +1309,18 @@ function AgentEditorPage(props: {
       </Match>
       <Match when={!setup()}>
         <SettingsPage
-          title={props.agent ? 'Edit agent' : 'New agent'}
+          title={props.agent ? 'Изменить агента' : t('agentControls.newAgent')}
           showTitleInSheet
-          description="Name it, tell it what to do, and pick where it runs."
+          description={t('agentControls.nameIt')}
           actions={
             <Button variant="ghost" size="sm" onClick={close} disabled={busy()}>
               <ArrowLeftIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />{' '}
-              Back
+              {t('common.back')}
             </Button>
           }
         >
           <section
-            aria-label={props.agent ? 'Edit agent' : 'New agent'}
+            aria-label={props.agent ? 'Изменить агента' : t('agentControls.newAgent')}
             class="@container"
             ref={pageContentRef}
           >
@@ -1276,13 +1333,13 @@ function AgentEditorPage(props: {
               }}
             >
               <AgentFormSection
-                title="Profile"
-                description="How this agent appears in channels and mentions."
+                title={t('settingsNav.profile')}
+                description="Как этот агент выглядит в каналах и упоминаниях."
               >
                 <div class="flex items-center gap-3 border-b border-edge-muted pb-4">
                   <button
                     type="button"
-                    aria-label="Upload avatar"
+                    aria-label="Загрузить аватар"
                     disabled={busy()}
                     class="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-accent"
                     onClick={() => avatarInputRef?.click()}
@@ -1290,7 +1347,7 @@ function AgentEditorPage(props: {
                     <AgentAvatar
                       agent={{
                         id: 'draft',
-                        name: name() || 'Agent',
+                        name: name() || 'Агент',
                         tag: tag(),
                         avatarUrl: avatarUrl(),
                         instructions: '',
@@ -1302,9 +1359,9 @@ function AgentEditorPage(props: {
                     />
                   </button>
                   <div class="min-w-0 flex-1">
-                    <div class="text-sm font-medium text-ink">Avatar</div>
+                    <div class="text-sm font-medium text-ink">Аватар</div>
                     <div class="mt-0.5 text-xs text-ink-muted">
-                      Optional · square images work best
+                      Необязательно · лучше квадратные изображения
                     </div>
                   </div>
                   <input
@@ -1328,17 +1385,17 @@ function AgentEditorPage(props: {
                     onClick={() => avatarInputRef?.click()}
                   >
                     <UploadIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-                    {uploadingAvatar() ? 'Uploading…' : 'Upload'}
+                    {uploadingAvatar() ? 'Загрузка…' : t('teamAgents.upload')}
                   </Button>
                 </div>
 
                 <div class="mt-4 grid grid-cols-1 gap-3 @min-[440px]:grid-cols-2">
                   <label class="flex flex-col gap-1.5">
-                    <span class="text-xs font-medium text-ink">Name</span>
+                    <span class="text-xs font-medium text-ink">Имя</span>
                     <input
                       autofocus
                       class="settings-input w-full"
-                      placeholder="Bug fixer"
+                      placeholder="Исправитель ошибок"
                       value={name()}
                       onInput={(event) =>
                         handleNameInput(event.currentTarget.value)
@@ -1346,12 +1403,12 @@ function AgentEditorPage(props: {
                     />
                   </label>
                   <label for="agent-tag" class="flex flex-col gap-1.5">
-                    <span class="text-xs font-medium text-ink">@tag</span>
+                    <span class="text-xs font-medium text-ink">Тег</span>
                     <div class="flex items-center rounded-lg border border-edge-muted px-2 focus-within:border-accent">
                       <span class="text-sm text-ink-extra-muted">@</span>
                       <input
                         id="agent-tag"
-                        aria-label="@tag"
+                        aria-label="Тег"
                         class="min-w-0 flex-1 bg-transparent px-1.5 py-2 text-sm text-ink outline-none"
                         placeholder="bug-fixer"
                         value={tag()}
@@ -1366,29 +1423,29 @@ function AgentEditorPage(props: {
               </AgentFormSection>
 
               <AgentFormSection
-                title="Instructions"
-                description="Instructions the agent receives at the start of every conversation."
+                title={t('agentControls.instructions')}
+                description="Инструкции, которые агент получает в начале каждого разговора."
               >
                 <AgentInstructionsEditor
                   markdown={instructions()}
                   onChange={setInstructions}
                   disabled={props.pending}
                   class="rounded-lg border border-edge-muted bg-input px-3 py-2.5 focus-within:border-accent"
-                  placeholder="Describe your agent’s role, how it should work, and what a good result looks like…"
+                  placeholder="Опишите роль агента, как ему работать и каким должен быть хороший результат…"
                 />
               </AgentFormSection>
 
               <AgentFormSection
-                title="Where it runs"
-                description="Pick where this agent does its work."
+                title={t('agentControls.whereItRuns')}
+                description="Выберите, где этот агент выполняет работу."
               >
                 {/* A fieldset is min-content wide by default; a long option would widen the phone form. */}
                 <fieldset class="flex min-w-0 flex-col gap-2">
-                  <legend class="sr-only">Where it runs</legend>
+                  <legend class="sr-only">{t('agentControls.whereItRuns')}</legend>
                   <WhereItRunsOption
                     value="in-memory"
-                    title={`In ${displayName}`}
-                    description={`Fast and built in. Uses ${displayName} tools and your connected apps.`}
+                    title={t('agentControls.inRox', { name: displayName })}
+                    description={`Быстро и встроено. Использует инструменты ${displayName} и ваши подключённые приложения.`}
                     icon={<RoxMark />}
                     checked={harnessId() === IN_MEMORY_HARNESS.id}
                     onSelect={() => handleHarnessChange(IN_MEMORY_HARNESS.id)}
@@ -1400,11 +1457,11 @@ function AgentEditorPage(props: {
                   </WhereItRunsOption>
                   <WhereItRunsOption
                     value="cursor"
-                    title="In Cursor"
+                    title={t('agentControls.inCursor')}
                     description={
                       cursorHarness()
-                        ? 'Runs as a Cursor Cloud agent on your Cursor plan.'
-                        : 'Connect Cursor first. Runs as a Cursor Cloud agent on your Cursor plan.'
+                        ? 'Работает как облачный агент Cursor по вашему тарифу Cursor.'
+                        : 'Сначала подключите Cursor. Работает как облачный агент Cursor по вашему тарифу Cursor.'
                     }
                     icon={<CursorIcon />}
                     checked={harnessId() === 'cursor'}
@@ -1416,11 +1473,11 @@ function AgentEditorPage(props: {
                           variant="ghost"
                           size="sm"
                           class="text-ink"
-                          aria-label="Connect Cursor"
+                          aria-label="Подключить Cursor"
                           disabled={busy()}
                           onClick={() => setSetup('cursor')}
                         >
-                          Connect
+                          Подключить
                         </Button>
                       </Show>
                     }
@@ -1430,8 +1487,8 @@ function AgentEditorPage(props: {
                   </WhereItRunsOption>
                   <WhereItRunsOption
                     value="harness"
-                    title="On your machine"
-                    description="Your own agent on your own machine. Local Claude Code, Codex, or other harness, via Roxd."
+                    title={t('agentControls.onYourMachine')}
+                    description="Ваш агент на вашем компьютере. Локальные Claude Code, Codex или другая среда через roxd."
                     icon={<TerminalIcon />}
                     checked={roxdHarnesses().some(
                       (harness) => harness.id === harnessId()
@@ -1444,11 +1501,11 @@ function AgentEditorPage(props: {
                           variant="ghost"
                           size="sm"
                           class="text-ink"
-                          aria-label="Set up your own machine"
+                          aria-label="Настроить свой компьютер"
                           disabled={busy()}
                           onClick={() => setSetup('pairing')}
                         >
-                          Set up
+                          Настроить
                         </Button>
                       </Show>
                     }
@@ -1460,10 +1517,10 @@ function AgentEditorPage(props: {
                     <div class="grid grid-cols-1 gap-3 @min-[440px]:grid-cols-[repeat(2,minmax(0,280px))]">
                       <div class="flex min-w-0 flex-col gap-1.5">
                         <span class="text-xs font-medium text-ink-muted">
-                          Machine
+                          Компьютер
                         </span>
                         <SettingsSelect
-                          label="Machine"
+                          label="Компьютер"
                           options={roxdHarnesses()}
                           value={harnessId()}
                           onChange={handleHarnessChange}
@@ -1487,9 +1544,9 @@ function AgentEditorPage(props: {
                   {(saved) => (
                     <div class="mt-3 flex items-center justify-between gap-3 text-xs text-ink-muted">
                       <span>
-                        This agent has a saved{' '}
-                        {apiKeyProviderName(saved().provider)} API key it
-                        doesn’t use here.
+                        У этого агента сохранён ключ API{' '}
+                        {apiKeyProviderName(saved().provider)}, который здесь не
+                        используется.
                       </span>
                       <Button
                         type="button"
@@ -1498,7 +1555,7 @@ function AgentEditorPage(props: {
                         disabled={busy()}
                         onClick={() => setRemovingApiKey(true)}
                       >
-                        Remove key
+                        Убрать ключ
                       </Button>
                     </div>
                   )}
@@ -1506,20 +1563,20 @@ function AgentEditorPage(props: {
               </AgentFormSection>
 
               <AgentFormSection
-                title="Who can use it"
-                description="Private agents are yours. Team agents work in shared channels."
+                title="Кто может пользоваться"
+                description="Личные агенты — ваши. Командные работают в общих каналах."
               >
                 <fieldset class="grid grid-cols-1 gap-2 @min-[440px]:grid-cols-2">
-                  <legend class="sr-only">Share</legend>
+                  <legend class="sr-only">Доступ</legend>
                   <ChoiceRow
                     name="agent-share"
                     value="private"
                     checked={share() === 'Private'}
-                    title="Private"
+                    title="Личный"
                     description={
                       props.canMakePrivate
-                        ? 'Only you can use and manage this agent.'
-                        : 'Only the agent creator can make it private.'
+                        ? 'Только вы можете пользоваться этим агентом и управлять им.'
+                        : 'Сделать его личным может только создатель агента.'
                     }
                     disabled={!props.canMakePrivate}
                     onChange={() => setShare('Private')}
@@ -1528,11 +1585,11 @@ function AgentEditorPage(props: {
                     name="agent-share"
                     value="team"
                     checked={share() === 'Team'}
-                    title="Team"
+                    title="Команда"
                     description={
                       props.canShareWithTeam
-                        ? 'Your team can use this agent in shared channels.'
-                        : 'Create or join a team before sharing agents.'
+                        ? 'Команда может пользоваться этим агентом в общих каналах.'
+                        : 'Создайте команду или вступите в неё, прежде чем делиться агентами.'
                     }
                     disabled={!props.canShareWithTeam}
                     onChange={() => setShare('Team')}
@@ -1540,14 +1597,14 @@ function AgentEditorPage(props: {
                 </fieldset>
                 <Show when={!props.canShareWithTeam}>
                   <p class="mt-3 border-t border-edge-muted pt-3 text-xs text-ink-extra-muted">
-                    Team agents need a team owner. Create or join a team in Team
-                    settings to enable this option.
+                    Для командных агентов нужен владелец команды. Создайте команду
+                    или вступите в неё в настройках команды, чтобы включить этот вариант.
                   </p>
                 </Show>
               </AgentFormSection>
 
               <AgentFormSection
-                title="Advanced"
+                title="Дополнительно"
                 description={advancedSummary()}
                 expanded={advancedOpen()}
                 actions={
@@ -1559,7 +1616,7 @@ function AgentEditorPage(props: {
                     aria-controls="agent-advanced"
                     onClick={() => setAdvancedOpen((open) => !open)}
                   >
-                    {advancedOpen() ? 'Hide' : 'Show'}
+                    {advancedOpen() ? 'Скрыть' : 'Показать'}
                   </Button>
                 }
               >
@@ -1567,21 +1624,21 @@ function AgentEditorPage(props: {
                   <div id="agent-advanced" class="flex flex-col">
                     <fieldset class="grid gap-2">
                       <legend class="text-xs font-medium text-ink">
-                        Answering a mention
+                        Ответ на упоминание
                       </legend>
                       <ChoiceRow
                         name="agent-coding"
                         value="coding"
-                        title="Coding agent"
-                        description="Posts a magic chip you can open into the live session and watch it work in a repository."
+                        title="Агент для кода"
+                        description="Публикует карточку, которую можно открыть в живую сессию и смотреть, как агент работает в репозитории."
                         checked={isCoding()}
                         onChange={() => setCodingChoice(true)}
                       />
                       <ChoiceRow
                         name="agent-coding"
                         value="chat"
-                        title="Chat agent"
-                        description="Replies in the thread the way a person would, like @macro."
+                        title="Чат-агент"
+                        description="Отвечает в ветке, как человек, например @rox."
                         checked={!isCoding()}
                         onChange={() => setCodingChoice(false)}
                       />
@@ -1589,13 +1646,13 @@ function AgentEditorPage(props: {
                     <Show when={selectedHarness()?.kind === 'roxd'}>
                       <fieldset class="mt-4 grid gap-2 border-t border-ink/[0.06] pt-4">
                         <legend class="text-xs font-medium text-ink">
-                          Permission requests
+                          Запросы разрешений
                         </legend>
                         <ChoiceRow
                           name="agent-permission-policy"
                           value="prompt"
-                          title="Always prompt"
-                          description="Session editors approve or reject each permission request."
+                          title="Всегда спрашивать"
+                          description="Редакторы сессии одобряют или отклоняют каждый запрос разрешения."
                           checked={!autoAcceptPermissions()}
                           onChange={() => setAutoAcceptChoice(false)}
                         />
@@ -1603,18 +1660,18 @@ function AgentEditorPage(props: {
                           when={allowPermissionBypass()}
                           fallback={
                             <p class="text-xs text-ink-muted">
-                              This machine requires permission prompts. Turn on
-                              Don't ask before acting in its Options in Machines
-                              settings.
+                              Этот компьютер требует запросы разрешений. Включите
+                              «Не спрашивать перед действием» в его параметрах
+                              в настройках компьютеров.
                             </p>
                           }
                         >
                           <ChoiceRow
                             name="agent-permission-policy"
                             value="bypass"
-                            title="Always bypass"
+                            title="Всегда пропускать"
                             suggested
-                            description="Approve tool calls without asking."
+                            description="Одобрять вызовы инструментов без вопроса."
                             checked={autoAcceptPermissions()}
                             onChange={() => setAutoAcceptChoice(true)}
                           />
@@ -1623,25 +1680,25 @@ function AgentEditorPage(props: {
                     </Show>
 
                     <AdvancedGroup
-                      title="Connections"
-                      description="Which connected apps (MCP tools) this agent can use."
+                      title="Подключения"
+                      description="Какие подключённые приложения (инструменты MCP) может использовать этот агент."
                     >
                       <fieldset class="flex flex-col gap-2">
-                        <legend class="sr-only">Connections</legend>
+                        <legend class="sr-only">Подключения</legend>
                         <ChoiceRow
                           name="agent-mcp-mode"
                           value="owner_connections"
                           checked={mcp().scope === 'owner_connections'}
-                          title="Use my connected apps"
-                          description="The agent uses whatever apps the person running it has connected."
+                          title="Использовать мои подключённые приложения"
+                          description="Агент использует приложения, которые подключил запустивший его человек."
                           onChange={() => setMcpScope('owner_connections')}
                         />
                         <ChoiceRow
                           name="agent-mcp-mode"
                           value="selected"
                           checked={mcp().scope === 'selected'}
-                          title="Specific apps"
-                          description="Pick apps from the catalog. Each person connects their own account."
+                          title="Конкретные приложения"
+                          description="Выберите приложения из каталога. Каждый подключает свой аккаунт."
                           onChange={() => setMcpScope('selected')}
                         />
                       </fieldset>
@@ -1660,33 +1717,33 @@ function AgentEditorPage(props: {
 
                       <Show when={share() === 'Team'}>
                         <p class="mt-3 border-t border-edge-muted pt-3 text-xs text-ink-extra-muted">
-                          Connections are personal. Teammates who use this agent
-                          connect these apps under Agents → Connections; the
-                          indicators here show only your own.
+                          Подключения личные. Участники, которые пользуются этим
+                          агентом, подключают приложения в разделе «Агенты →
+                          Подключения»; здесь показаны только ваши.
                         </p>
                       </Show>
                     </AdvancedGroup>
 
                     <AdvancedGroup
-                      title="Channels"
-                      description="Choose whether this agent is global or channel-specific."
+                      title="Каналы"
+                      description="Выберите, доступен агент везде или только в отдельных каналах."
                     >
                       <fieldset class="flex flex-col gap-2">
-                        <legend class="sr-only">Channels</legend>
+                        <legend class="sr-only">Каналы</legend>
                         <ChoiceRow
                           name="agent-channel-mode"
                           value="all"
                           checked={channelMode() === 'all'}
-                          title="All channels"
-                          description="The agent can be mentioned in every channel, like @macro."
+                          title="Все каналы"
+                          description="Агента можно упомянуть в любом канале, как @rox."
                           onChange={() => setChannelMode('all')}
                         />
                         <ChoiceRow
                           name="agent-channel-mode"
                           value="selected"
                           checked={channelMode() === 'selected'}
-                          title="Specific channels"
-                          description="Only members of selected channels can use this agent."
+                          title="Конкретные каналы"
+                          description="Этим агентом могут пользоваться только участники выбранных каналов."
                           onChange={() => setChannelMode('selected')}
                         />
                       </fieldset>
@@ -1716,7 +1773,7 @@ function AgentEditorPage(props: {
                     onClick={onDelete()}
                   >
                     <TrashIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />{' '}
-                    Delete agent
+                    Удалить агента
                   </Button>
                 )}
               </Show>
@@ -1728,7 +1785,7 @@ function AgentEditorPage(props: {
                   onClick={close}
                   disabled={busy()}
                 >
-                  Cancel
+                  Отмена
                 </Button>
                 <Button
                   type="submit"
@@ -1739,11 +1796,11 @@ function AgentEditorPage(props: {
                 >
                   {props.pending
                     ? props.agent
-                      ? 'Saving…'
-                      : 'Creating…'
+                      ? 'Сохранение…'
+                      : 'Создание…'
                     : props.agent
-                      ? 'Save changes'
-                      : 'Create agent'}
+                      ? 'Сохранить изменения'
+                      : 'Создать агента'}
                 </Button>
               </div>
             </div>
@@ -1786,6 +1843,31 @@ function AdvancedGroup(props: {
       <div class="mt-2">{props.children}</div>
     </section>
   );
+}
+
+function ruCount(
+  count: number,
+  one: string,
+  few: string,
+  many: string
+): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  const word =
+    mod10 === 1 && mod100 !== 11
+      ? one
+      : mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)
+        ? few
+        : many;
+  return `${count} ${word}`;
+}
+
+function ruSelectedChannels(count: number): string {
+  const counted = ruCount(count, 'канал', 'канала', 'каналов');
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return `Выбран ${counted}`;
+  return `Выбрано ${counted}`;
 }
 
 function slugAgentTag(value: string): string {

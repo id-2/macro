@@ -98,7 +98,7 @@ export function ConnectorImportPromotion(props: {
             },
           }}
           secondaryAction={props.secondaryAction}
-          dismissLabel={`Dismiss ${config().action.toLowerCase()}`}
+          dismissLabel={`Скрыть импорт: ${config().items}`}
         />
       </div>
       {/* Beside the card, so the dialog outlives the card's own gates. */}

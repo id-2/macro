@@ -196,8 +196,8 @@ pub struct Snapshot {
     samples: Vec<MemorySample>,
     dropped_samples: u64,
     web_content: WebContentDiagnostics,
-    bundle_reloads: Option<macro_bundle_updater_plugin::inbound::plugin::BundleReloadDiagnostics>,
-    bundle_startup: Option<macro_bundle_updater_plugin::domain::startup::BundleStartup>,
+    bundle_reloads: Option<rox_bundle_updater_plugin::inbound::plugin::BundleReloadDiagnostics>,
+    bundle_startup: Option<rox_bundle_updater_plugin::domain::startup::BundleStartup>,
     recent_events: events::EventSnapshot,
 }
 
@@ -214,10 +214,10 @@ pub fn read_desktop_diagnostics<R: tauri::Runtime>(
         samples,
         dropped_samples,
         web_content: state.web_content.lock().map_err(|e| e.to_string())?.clone(),
-        bundle_reloads: macro_bundle_updater_plugin::inbound::plugin::bundle_reload_diagnostics(
+        bundle_reloads: rox_bundle_updater_plugin::inbound::plugin::bundle_reload_diagnostics(
             &app_handle,
         ),
-        bundle_startup: macro_bundle_updater_plugin::inbound::plugin::bundle_startup(&app_handle),
+        bundle_startup: rox_bundle_updater_plugin::inbound::plugin::bundle_startup(&app_handle),
         recent_events: state.events.lock().map_err(|e| e.to_string())?.snapshot(),
     })
 }

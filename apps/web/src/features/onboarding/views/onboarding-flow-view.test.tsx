@@ -544,7 +544,7 @@ describe('onboarding flow', () => {
   it('resumes the saved step, and Back returns to the previous one', async () => {
     setup({ resume: 'team' });
     await heading('Built for teams.');
-    click('Back to previous step');
+    click('Вернуться на предыдущий шаг');
     await heading('Connect your tools.');
     expect(readSavedStep(FAKE_VIEWER_ID)).toBe('tools');
   });
@@ -633,7 +633,7 @@ describe('onboarding flow', () => {
       event: 'onboarding_v4_team',
       data: { action: 'already_on_team' },
     });
-    click('Back to previous step');
+    click('Вернуться на предыдущий шаг');
     await heading('Connect your tools.');
   });
 

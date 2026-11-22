@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use async_graphql::ID;
 use graphql_common::parse_macro_user_id;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Most accounts one request may name.
 const MAX_ACCOUNT_IDS: usize = 50;
@@ -10,7 +10,7 @@ const MAX_ACCOUNT_IDS: usize = 50;
 /// Validate requested account ids, each once, in the order given.
 pub(crate) fn parse_account_ids(
     account_ids: Vec<ID>,
-) -> async_graphql::Result<Vec<MacroUserIdStr<'static>>> {
+) -> async_graphql::Result<Vec<RoxUserIdStr<'static>>> {
     if account_ids.len() > MAX_ACCOUNT_IDS {
         return Err(async_graphql::Error::new(format!(
             "accountIds is limited to {MAX_ACCOUNT_IDS} accounts"

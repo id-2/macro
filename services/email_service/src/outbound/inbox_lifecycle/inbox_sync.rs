@@ -16,7 +16,7 @@ use crate::outbound::persistence_error::InboxPersistenceError;
 use email::domain::mailbox::inbox_sync::*;
 use email_api_client::domain::models::EmailApiError;
 use futures::future::BoxFuture;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 use models_email::api::refresh::RefreshEmailEvent;
 use models_email::gmail::inbox_sync::InboxSyncPubsubMessage;
 use models_email::service::link::Link;
@@ -96,8 +96,8 @@ impl InboxSyncQueue for InboxSyncSqs {
     }
 }
 
-impl MacroEventBroker for InboxSyncEffects {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for InboxSyncEffects {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

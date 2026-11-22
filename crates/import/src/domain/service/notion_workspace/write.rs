@@ -15,7 +15,7 @@ use import_notion::domain::inventory::{all_rows, full_markdown};
 use import_notion::domain::macro_cells::{PeopleMap, capped_name, derived_id};
 use import_notion::domain::model::NotionId;
 use import_notion::domain::ports::NotionApi;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{
@@ -241,7 +241,7 @@ pub(in crate::domain::service) fn document_id(import_id: Uuid) -> Uuid {
 /// this one creates.
 pub(super) struct Progress<'a, Store> {
     store: &'a Store,
-    user: &'a MacroUserIdStr<'static>,
+    user: &'a RoxUserIdStr<'static>,
     import_id: Uuid,
     known: Mutex<HashMap<(WrittenKind, String), Uuid>>,
 }
@@ -250,7 +250,7 @@ impl<'a, Store: WrittenObjects> Progress<'a, Store> {
     /// Progress for ledger row `import_id`, from everything recorded so far.
     pub fn new(
         store: &'a Store,
-        user: &'a MacroUserIdStr<'static>,
+        user: &'a RoxUserIdStr<'static>,
         import_id: Uuid,
         written: &[WrittenObject],
     ) -> Self {
@@ -336,7 +336,7 @@ impl<'a, Store: WrittenObjects> Progress<'a, Store> {
 /// otherwise created and recorded.
 pub(super) async fn folder_once<Writer: WorkspaceWriter, Store: WrittenObjects>(
     writer: &Writer,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     progress: &Progress<'_, Store>,
     kind: WrittenKind,
     name: &str,
@@ -360,7 +360,7 @@ pub(super) async fn folder_once<Writer: WorkspaceWriter, Store: WrittenObjects>(
 pub(super) async fn write_tasks<Api: NotionApi, Writer: WorkspaceWriter, Store: WrittenObjects>(
     api: &Api,
     writer: &Writer,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     item: &WriteItem,
     folder: Uuid,
     share: bool,

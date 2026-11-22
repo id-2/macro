@@ -35,7 +35,7 @@ impl MailboxCredentialHealthRepository for PgMailboxSync {
                         message: "could not serialize mailbox capabilities".into(),
                     }
                 })?;
-                sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),mailbox.link_id,current.sync_generation,event)
+                sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),mailbox.link_id,current.sync_generation,event)
                     .execute(&mut *tx).await.map_err(failed)?;
             }
         }
@@ -47,7 +47,7 @@ impl MailboxCredentialHealthRepository for PgMailboxSync {
                     .map_err(|_| TokenError::Transient {
                         message: "could not serialize mailbox health".into(),
                     })?;
-                sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),mailbox.link_id,current.sync_generation,event)
+                sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),mailbox.link_id,current.sync_generation,event)
                     .execute(&mut *tx).await.map_err(failed)?;
             }
         }

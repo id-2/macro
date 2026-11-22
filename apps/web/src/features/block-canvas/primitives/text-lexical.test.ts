@@ -1,4 +1,4 @@
-import { createGraphicsEditor } from '@macro-inc/graphics';
+import { createGraphicsEditor } from '@rox-one/graphics';
 import { afterEach, expect, it } from 'vitest';
 import { plainRichText, richTextPlainText } from '../core/text-codec';
 import { createTextState } from './create-text-state';

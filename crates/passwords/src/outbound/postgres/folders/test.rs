@@ -1,6 +1,6 @@
 use super::*;
 use crate::outbound::postgres::test::{another_team, folder_fixture};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn subtree_delete_unfiles_items_and_rejects_stale_folder_and_revision(pool: PgPool) {

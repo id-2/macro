@@ -1,10 +1,10 @@
 //! Marked content the engine writes so a saved file reads back as it was
-//! edited: groups (`/MacroGroup`), edited text (`/MacroText`, written as
+//! edited: groups (`/RoxGroup`), edited text (`/RoxText`, written as
 //! outlines that other applications draw), paths whose gradients have
-//! transparent stops (`/MacroPath`, drawn under soft masks), objects' names
-//! (`/MacroName`), and hidden objects (inside an optional content group
-//! that is off and marked `/MacroHidden`). Artboard names are a page
-//! dictionary key (`/MacroArtboard`).
+//! transparent stops (`/RoxPath`, drawn under soft masks), objects' names
+//! (`/RoxName`), and hidden objects (inside an optional content group
+//! that is off and marked `/RoxHidden`). Artboard names are a page
+//! dictionary key (`/RoxArtboard`).
 
 use crate::geom::Affine;
 use crate::model::{PathNode, TextNode};
@@ -18,7 +18,7 @@ pub const GROUP: &str = "MacroGroup";
 pub const TEXT: &str = "MacroText";
 /// The tag of a path drawn under soft masks.
 pub const PATH: &str = "MacroPath";
-/// The tag around a named object (groups keep theirs in `/MacroGroup`).
+/// The tag around a named object (groups keep theirs in `/RoxGroup`).
 pub const NAME: &str = "MacroName";
 /// The page dictionary key holding the name of the artboard it is.
 pub const ARTBOARD: &str = "MacroArtboard";

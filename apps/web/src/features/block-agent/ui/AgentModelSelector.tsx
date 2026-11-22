@@ -10,6 +10,7 @@
  * models. The list itself is the shared `ModelCatalogPicker`.
  */
 
+import { t } from '@app/lib/i18n';
 import {
   ModelCatalogPicker,
   type ModelRowProps,
@@ -73,8 +74,8 @@ export function AgentModelSelector(props: AgentModelSelectorProps) {
         triggerLabel={label()}
         disabled={props.disabled}
         pending={isTouchDevice() && props.changingTo !== undefined}
-        ariaLabel="Agent model"
-        emptyMessage="Waiting for the agent to report its models."
+        ariaLabel={t('agentChat.agentModel')}
+        emptyMessage={t('agentChat.modelsNotReported')}
         triggerClass="w-auto max-w-[9rem] min-w-0 justify-start gap-1 rounded-full border-transparent bg-ink/5 px-2 text-left text-sm text-ink-subtle hover:bg-ink/10 touch:max-w-[60vw] touch:gap-1.5 touch:rounded-lg touch:bg-transparent touch:px-1.5 touch:hover:bg-hover"
         triggerSize="md"
         contentClass="overflow-hidden"

@@ -11,7 +11,7 @@ async fn transient_create_retries_keep_identity_and_trigger_controls_keep_source
         token: "test".into(),
     };
     let session = AgentSessionId::new();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     let server = tokio::spawn(async move {
         let mut received = Vec::new();
         let responses = [
@@ -45,7 +45,7 @@ async fn transient_create_retries_keep_identity_and_trigger_controls_keep_source
         }
         received
     });
-    let sender = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let sender = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     let request = CreateAgentSessionRequest {
         origin: trigger_context::TriggerOrigin::Unknown,
         id: Some(session.as_uuid()),
@@ -64,7 +64,7 @@ async fn transient_create_retries_keep_identity_and_trigger_controls_keep_source
             reuse_origin_message: false,
             channel_id: None,
             parent: Some(messages::domain::models::MessageParent::Channel(
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
             )),
             thread_id: Some(source),
             message_id: source,

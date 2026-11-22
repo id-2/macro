@@ -131,7 +131,7 @@ async fn an_external_mention_resolves_and_a_followup_can_finish_before_its_annou
     let mut service =
         harness_sharing_repo(InMemoryAgentSessionRepo::new()).with_external_replies(store.clone());
     Arc::get_mut(&mut service.inner).unwrap().coding_agents = Box::new(ChosenCodingAgents(false));
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     let mut request = open_external_request("/workspace");
     request.thread = Some(agent_session::domain::ports::SessionThread {
         reuse_origin_message: false,
@@ -164,7 +164,7 @@ async fn an_external_mention_resolves_and_a_followup_can_finish_before_its_annou
         ReplyOutcome::Answered("I am Eric Hayes.".into())
     );
 
-    let followup = macro_uuid::generate_uuid_v7();
+    let followup = rox_uuid::generate_uuid_v7();
     service
         .execute_here(
             session.id,
@@ -220,7 +220,7 @@ async fn failed_channel_updates_retry_after_restart_without_reprompting() {
         .open_external_session(open_external_request("/workspace"))
         .await
         .unwrap();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     service
         .announce_external_prompt(
             session.id,
@@ -290,7 +290,7 @@ async fn recovery_rebuilds_a_missed_completion_from_the_durable_protocol_log() {
         .open_external_session(open_external_request("/workspace"))
         .await
         .unwrap();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     service
         .announce_external_prompt(
             session.id,
@@ -360,7 +360,7 @@ async fn successful_announcements_are_not_repeated_after_restart() {
         .open_external_session(open_external_request("/workspace"))
         .await
         .unwrap();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     let action = AgentActionId::from_uuid(source);
     service
         .announce_external_prompt(
@@ -436,7 +436,7 @@ async fn an_unauthorized_destination_never_reserves_or_posts_a_reply() {
         .open_external_session(open_external_request("/workspace"))
         .await
         .unwrap();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     let result = service
         .announce_external_prompt(
             session.id,
@@ -459,11 +459,11 @@ async fn an_unauthorized_destination_never_reserves_or_posts_a_reply() {
     assert!(service.inner.announcer.announced().is_empty());
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn creation_retries_repair_reservation_for_both_primary_key_and_thread_conflicts(
     pool: sqlx::PgPool,
 ) {
-    let macro_user = macro_uuid::generate_uuid_v7();
+    let macro_user = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'asker@example.com', 'asker@example.com', 'external-reply-test')", macro_user).execute(&pool).await.unwrap();
     sqlx::query!(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|asker@example.com', 'asker@example.com', $1)"#, macro_user).execute(&pool).await.unwrap();
     use bots::domain::models::{BotOwner, CreateBotRequest};
@@ -477,7 +477,7 @@ async fn creation_retries_repair_reservation_for_both_primary_key_and_thread_con
             CreateBotRequest {
                 team_id: None,
                 name: "External chat agent".into(),
-                handle: format!("external-{}", macro_uuid::generate_uuid_v7()),
+                handle: format!("external-{}", rox_uuid::generate_uuid_v7()),
                 description: None,
                 avatar_url: None,
                 has_agent: None,
@@ -522,7 +522,7 @@ async fn creation_retries_repair_reservation_for_both_primary_key_and_thread_con
     )
     .with_external_replies(store.clone());
     let id = AgentSessionId::new();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     use channels::domain::agent_dm::AgentDmRepo;
     let channel = channels::outbound::pg_channels_repo::PgChannelsRepo::new(pool.clone())
         .ensure(sender(), bot)
@@ -656,7 +656,7 @@ async fn recovery_finishes_a_turn_interrupted_before_an_acp_response() {
         .open_external_session(open_external_request("/workspace"))
         .await
         .unwrap();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     service
         .announce_external_prompt(
             session.id,

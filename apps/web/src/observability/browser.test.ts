@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { initializeBrowserObservability } from './browser';
 import { readDesktopDiagnostics } from './desktop';
@@ -19,7 +19,7 @@ vi.mock('@core/util/platform', () => ({
 vi.mock('@graphql-cache/rollout-observability', () => ({
   recordBrowserTursoCacheNavigation: vi.fn(),
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     init: vi.fn(),
     info: vi.fn(),
@@ -28,7 +28,7 @@ vi.mock('@macro-inc/observability', () => ({
     span: vi.fn(() => startupSpan),
   },
 }));
-vi.mock('@macro-inc/observability/web', () => ({
+vi.mock('@rox-one/observability/web', () => ({
   createWebTracingProvider: vi.fn(),
   StackContextManager: class {},
 }));

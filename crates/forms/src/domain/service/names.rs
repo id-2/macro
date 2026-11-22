@@ -13,7 +13,7 @@ use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, Entity, EntityAccessReceipt, EntityPermission, EntityType,
     ViewAccessLevel,
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 
 use super::{FormsServiceImpl, database_error, internal_receipt, repository_error};
 use crate::domain::models::{DatabaseId, Form, FormError, FormId};
@@ -49,7 +49,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {

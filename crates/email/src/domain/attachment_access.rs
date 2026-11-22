@@ -2,7 +2,7 @@
 use super::{draft_attachments::AttachmentError, mailbox::MailboxKey, ports::EmailUserRepo};
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
 use futures::future::BoxFuture;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_email::service::{attachment::Attachment, link::Link};
 use std::future::Future;
@@ -86,7 +86,7 @@ impl<R: AttachmentReadRepository, P: AttachmentBytes, S: AttachmentFiles, A: Ent
 {
     pub async fn authorize(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<AttachmentReadRecord, AttachmentError> {
         let record = self
@@ -114,7 +114,7 @@ impl<R: AttachmentReadRepository, P: AttachmentBytes, S: AttachmentFiles, A: Ent
     }
     pub async fn download(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<Attachment, AttachmentError> {
         let mut record = self.authorize(actor, id).await?;
@@ -133,7 +133,7 @@ impl<R: AttachmentReadRepository, P: AttachmentBytes, S: AttachmentFiles, A: Ent
     }
     pub async fn document(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<String, AttachmentError> {
         let record = self.authorize(actor, id).await?;

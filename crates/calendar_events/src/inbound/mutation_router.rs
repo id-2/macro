@@ -16,9 +16,9 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, patch, post, put},
 };
-use macro_authorization::{
-    CredentialAttribution, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState, UserOrInternal, is_agent_run, is_program_run,
+use rox_authorization::{
+    CredentialAttribution, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState, UserOrInternal, is_agent_run, is_program_run,
 };
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -27,7 +27,7 @@ use crate::domain::{
     copies::{CopyChange, CopyRefusal},
     join_requests::CalendarJoinRequest,
     meeting_links::{
-        MacroCallEventError, MeetingLinkError, create_event_with_macro_call,
+        RoxCallEventError, MeetingLinkError, create_event_with_macro_call,
         update_event_with_macro_call,
     },
     models::{
@@ -46,7 +46,7 @@ use crate::domain::{
 pub struct CalendarMutationRouterState<S, L, Auth> {
     service: Arc<S>,
     meeting_links: Arc<L>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, L, Auth> Clone for CalendarMutationRouterState<S, L, Auth> {
@@ -65,7 +65,7 @@ impl<S, L, Auth> CalendarMutationRouterState<S, L, Auth> {
     pub fn new(
         service: Arc<S>,
         meeting_links: Arc<L>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -76,7 +76,7 @@ impl<S, L, Auth> CalendarMutationRouterState<S, L, Auth> {
 }
 
 impl<S, L, Auth> FromRef<CalendarMutationRouterState<S, L, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &CalendarMutationRouterState<S, L, Auth>) -> Self {
         state.authorization_state.clone()
@@ -91,11 +91,14 @@ pub fn calendar_mutation_router<S, L, Auth, T>(
 where
     S: CalendarMutationService + CalendarCopyConfirmation + CalendarEventDetailsReader,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
-        .route("/calendars", get(list_calendars::<S, L, Auth>))
+        .route(
+            "/calendars",
+            get(list_calendars::<S, L, Auth>).post(create_owned_calendar::<S, L, Auth>),
+        )
         .route("/events", post(create_calendar_event::<S, L, Auth>))
         .route(
             "/events/{event_id}",
@@ -428,7 +431,8 @@ pub enum CalendarMutationErrorCode {
     PersistFailed,
     /// The Rox call for a new event could not be created; nothing was
     /// written to the calendar.
-    MacroCallFailed,
+    #[serde(rename = "macro_call_failed")]
+    RoxCallFailed,
     /// The meeting is on several of the requester's inboxes and the agent
     /// run did not name the inbox of the copy it changes, or named another
     /// copy's; the message lists each copy's inbox, role and id.
@@ -630,19 +634,19 @@ impl From<CalendarMutationError> for CalendarMutationApiError {
     }
 }
 
-impl From<MacroCallEventError> for CalendarMutationApiError {
-    fn from(error: MacroCallEventError) -> Self {
+impl From<RoxCallEventError> for CalendarMutationApiError {
+    fn from(error: RoxCallEventError) -> Self {
         match error {
-            MacroCallEventError::Calendar(error) => error.into(),
-            MacroCallEventError::MeetingLink(MeetingLinkError::InvalidInput(message)) => Self {
+            RoxCallEventError::Calendar(error) => error.into(),
+            RoxCallEventError::MeetingLink(MeetingLinkError::InvalidInput(message)) => Self {
                 code: CalendarMutationErrorCode::InvalidInput,
                 message,
                 status: StatusCode::BAD_REQUEST,
             },
-            MacroCallEventError::MeetingLink(error) => {
+            RoxCallEventError::MeetingLink(error) => {
                 tracing::error!(error = ?error, "calendar event macro call creation failed");
                 Self {
-                    code: CalendarMutationErrorCode::MacroCallFailed,
+                    code: CalendarMutationErrorCode::RoxCallFailed,
                     message: "the Rox call for the event could not be created; the event was \
                               not saved"
                         .to_string(),
@@ -671,14 +675,14 @@ impl From<MacroCallEventError> for CalendarMutationApiError {
 )]
 pub async fn create_calendar_event<S, L, Auth>(
     State(state): State<CalendarMutationRouterState<S, L, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
     Json(request): Json<CreateCalendarEventRequest>,
 ) -> Result<(StatusCode, Json<CalendarEvent>), CalendarMutationApiError>
 where
     S: CalendarMutationService,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     refuse_program_create(user.authorization.user.attribution(), &headers)?;
     let draft = CalendarEventDraft {
@@ -730,6 +734,14 @@ pub struct ListCalendarsResponse {
     pub calendars: Vec<VisibleCalendar>,
 }
 
+/// Name of a personal calendar stored inside Rox.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateOwnedCalendarRequest {
+    /// Display name chosen by the signed-in user.
+    pub name: String,
+}
+
 /// List the requester's visible calendars for pickers and filters.
 #[tracing::instrument(skip_all, err)]
 #[utoipa::path(
@@ -744,18 +756,41 @@ pub struct ListCalendarsResponse {
 )]
 pub async fn list_calendars<S, L, Auth>(
     State(state): State<CalendarMutationRouterState<S, L, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<ListCalendarsResponse>, CalendarMutationApiError>
 where
     S: CalendarMutationService,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let calendars = state
         .service
         .list_visible_calendars(user.authorization.user.macro_user_id.as_ref())
         .await?;
     Ok(Json(ListCalendarsResponse { calendars }))
+}
+
+/// Create a personal calendar owned by the signed-in user. It is stored with
+/// the calendars [`list_calendars`] already returns and does not open Gmail.
+pub async fn create_owned_calendar<S, L, Auth>(
+    State(state): State<CalendarMutationRouterState<S, L, Auth>>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
+    Json(request): Json<CreateOwnedCalendarRequest>,
+) -> Result<(StatusCode, Json<VisibleCalendar>), CalendarMutationApiError>
+where
+    S: CalendarMutationService,
+    L: MeetingLinkProvider,
+    Auth: RoxAuthorizationService,
+{
+    let calendar = state
+        .service
+        .create_owned_calendar(
+            user.authorization.user.macro_user_id.as_ref(),
+            &user.authorization.user.user_context.fusion_user_id,
+            &request.name,
+        )
+        .await?;
+    Ok((StatusCode::CREATED, Json(calendar)))
 }
 
 /// Resolve an update's scope from its transport pair. An omitted scope
@@ -803,7 +838,7 @@ fn update_scope(
 )]
 pub async fn update_calendar_event<S, L, Auth>(
     State(state): State<CalendarMutationRouterState<S, L, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
     Path(event_id): Path<Uuid>,
     Json(request): Json<UpdateCalendarEventRequest>,
@@ -811,7 +846,7 @@ pub async fn update_calendar_event<S, L, Auth>(
 where
     S: CalendarMutationService + CalendarCopyConfirmation + CalendarEventDetailsReader,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let scope = update_scope(request.scope, request.recurrence_id)?;
     let patch = CalendarEventPatch {
@@ -887,7 +922,7 @@ where
 )]
 pub async fn delete_calendar_event<S, L, Auth>(
     State(state): State<CalendarMutationRouterState<S, L, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
     Path(event_id): Path<Uuid>,
     Query(query): Query<DeleteCalendarEventQuery>,
@@ -895,7 +930,7 @@ pub async fn delete_calendar_event<S, L, Auth>(
 where
     S: CalendarMutationService + CalendarCopyConfirmation,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let scoped_occurrence = |kind: &'static str| {
         query.recurrence_id.clone().ok_or(CalendarMutationApiError {
@@ -949,14 +984,14 @@ where
 )]
 pub async fn rsvp_calendar_event<S, L, Auth>(
     State(state): State<CalendarMutationRouterState<S, L, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(event_id): Path<Uuid>,
     Json(request): Json<RsvpCalendarEventRequest>,
 ) -> Result<Json<CalendarEvent>, CalendarMutationApiError>
 where
     S: CalendarMutationService,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let scope = match (request.scope, request.recurrence_id) {
         (Some(CalendarRsvpScopeParam::All), _) | (None, None) => CalendarRsvpScope::All,
@@ -1006,7 +1041,7 @@ where
 )]
 pub async fn invite_calendar_event_guests<S, L, Auth>(
     State(state): State<CalendarMutationRouterState<S, L, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
     Path(event_id): Path<Uuid>,
     Json(request): Json<InviteCalendarEventGuestsRequest>,
@@ -1014,7 +1049,7 @@ pub async fn invite_calendar_event_guests<S, L, Auth>(
 where
     S: CalendarMutationService + CalendarCopyConfirmation,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let scope = match (request.scope, request.recurrence_id) {
         (Some(CalendarUpdateScopeParam::All), _) | (None, None) => CalendarUpdateScope::All,
@@ -1086,14 +1121,14 @@ pub struct CopyCalendarEventRequest {
 )]
 pub async fn copy_calendar_event<S, L, Auth>(
     State(state): State<CalendarMutationRouterState<S, L, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(event_id): Path<Uuid>,
     Json(request): Json<CopyCalendarEventRequest>,
 ) -> Result<(StatusCode, Json<CalendarEvent>), CalendarMutationApiError>
 where
     S: CalendarMutationService,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let event = state
         .service
@@ -1145,14 +1180,14 @@ pub struct RespondToJoinRequestRequest {
 )]
 pub async fn respond_to_join_request<S, L, Auth>(
     State(state): State<CalendarMutationRouterState<S, L, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(request_id): Path<Uuid>,
     Json(request): Json<RespondToJoinRequestRequest>,
 ) -> Result<Json<CalendarJoinRequest>, CalendarMutationApiError>
 where
     S: CalendarMutationService,
     L: MeetingLinkProvider,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let answered = state
         .service

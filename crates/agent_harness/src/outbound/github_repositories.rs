@@ -7,7 +7,7 @@
 
 use github::domain::ports::{GithubRepositoryClient, GithubSyncRepo};
 use github::domain::service::ReachableRepositoriesService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::error::{HarnessError, Result};
 use crate::domain::model::ReachableRepository;
@@ -36,7 +36,7 @@ where
     Installations: GithubSyncRepo,
     Client: GithubRepositoryClient,
 {
-    async fn for_user(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<ReachableRepository>> {
+    async fn for_user(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<ReachableRepository>> {
         let repositories = self
             .repositories
             .for_user(user)

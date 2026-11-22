@@ -9,7 +9,7 @@ use std::str::FromStr;
 use chrono::{DateTime, Utc};
 #[cfg(feature = "ports")]
 use entity_access::domain::models::AccessError;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::team_share::AuthorizedTeamShareCommand;
 use models_permissions::share_permission::{SharePermissionV2, UpdateSharePermissionRequestV2};
@@ -72,7 +72,7 @@ pub struct InitiativeBasic {
     /// Display name.
     pub name: String,
     /// Owner of the initiative.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
 }
 
 /// List-row view of an initiative.
@@ -104,9 +104,9 @@ pub struct InitiativeDetail {
     /// Display name.
     pub name: String,
     /// Owner of the initiative.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// Member user ids. The owner is never stored here.
-    pub member_ids: Vec<MacroUserIdStr<'static>>,
+    pub member_ids: Vec<RoxUserIdStr<'static>>,
     /// Task ids currently assigned to the initiative.
     pub task_ids: Vec<String>,
     /// Current share permission.
@@ -186,26 +186,26 @@ pub struct CreateInitiativeRepoArgs {
     /// App-generated identifier.
     pub id: InitiativeId,
     /// Owner / creator.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// Validated name.
     pub name: String,
     /// Member ids with the owner removed and duplicates dropped.
-    pub member_ids: Vec<MacroUserIdStr<'static>>,
+    pub member_ids: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Arguments for updating an initiative row. No serde: repository-only.
 #[derive(Debug, Clone)]
 pub struct UpdateInitiativeRepoArgs {
     /// Authenticated actor, required when this update enables a share link.
-    pub actor_id: Option<MacroUserIdStr<'static>>,
+    pub actor_id: Option<RoxUserIdStr<'static>>,
     /// Initiative to update.
     pub id: InitiativeId,
     /// Replacement name when present.
     pub name: Option<String>,
     /// Members to add when `member_ids` was present on the request.
-    pub member_ids_added: Vec<MacroUserIdStr<'static>>,
+    pub member_ids_added: Vec<RoxUserIdStr<'static>>,
     /// Members to remove when `member_ids` was present on the request.
-    pub member_ids_removed: Vec<MacroUserIdStr<'static>>,
+    pub member_ids_removed: Vec<RoxUserIdStr<'static>>,
     /// Share permission patch when the owner sent one.
     pub share_permission: Option<UpdateSharePermissionRequestV2>,
     /// Authorized team-share write, if any.

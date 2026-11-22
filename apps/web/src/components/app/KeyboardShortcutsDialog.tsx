@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type {
   ShortcutSheet,
   ShortcutSheetEntry,
@@ -85,16 +86,21 @@ function KeyboardShortcutsDialog(
     >
       <ActionDialogShell>
         <div class="shrink-0 border-b border-edge-divider px-5 py-4">
-          <ActionDialogShell.Title>Keyboard shortcuts</ActionDialogShell.Title>
+          <ActionDialogShell.Title>
+            {t('nav.keyboardShortcuts')}
+          </ActionDialogShell.Title>
         </div>
         {/* Focusable so the keyboard can scroll a long sheet. */}
         <div
           tabIndex={0}
-          aria-label="Shortcuts"
+          aria-label={t('nav.shortcuts')}
           class="grid min-h-0 gap-x-8 gap-y-6 overflow-y-auto p-5 outline-none focus-visible:ring focus-visible:ring-inset focus-visible:ring-accent sm:grid-cols-2"
         >
-          <ShortcutSection title="This view" entries={props.sheet.view} />
-          <ShortcutSection title="Everywhere" entries={props.sheet.app} />
+          <ShortcutSection title={t('nav.thisView')} entries={props.sheet.view} />
+          <ShortcutSection
+            title={t('nav.everywhere')}
+            entries={props.sheet.app}
+          />
         </div>
       </ActionDialogShell>
     </Dialog>

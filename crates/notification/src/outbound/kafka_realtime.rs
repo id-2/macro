@@ -5,16 +5,16 @@ mod test;
 
 use std::collections::HashSet;
 
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::cowlike::CowLike as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::cowlike::CowLike as _;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use rootcause::prelude::ResultExt as _;
 use serde::Serialize;
 
 use crate::domain::models::UserNotificationRow;
 use crate::domain::models::queue_message::RealtimeNotif;
-use crate::domain::models::websocket_notification_event::NotificationMacroEvent;
+use crate::domain::models::websocket_notification_event::NotificationRoxEvent;
 use crate::domain::ports::RealtimeSender;
 
 /// Kafka-backed implementation of the realtime sender port.
@@ -31,7 +31,7 @@ impl<B> KafkaRealtimeSender<B> {
     }
 }
 
-impl<B: MacroEventBroker> RealtimeSender for KafkaRealtimeSender<B> {
+impl<B: RoxEventBroker> RealtimeSender for KafkaRealtimeSender<B> {
     #[tracing::instrument(
         err,
         skip_all,
@@ -39,9 +39,9 @@ impl<B: MacroEventBroker> RealtimeSender for KafkaRealtimeSender<B> {
     )]
     async fn send_notifications<'a, T: Serialize + Send + Sync>(
         &self,
-        recipients: &[MacroUserIdStr<'a>],
+        recipients: &[RoxUserIdStr<'a>],
         notification: &T,
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         let notifications = if recipients.is_empty() {
             Vec::new()
         } else {
@@ -58,7 +58,7 @@ impl<B: MacroEventBroker> RealtimeSender for KafkaRealtimeSender<B> {
                 })
                 .collect()
         };
-        let event = NotificationMacroEvent::new(notifications);
+        let event = NotificationRoxEvent::new(notifications);
 
         let publish = self
             .broker
@@ -75,7 +75,7 @@ impl<B: MacroEventBroker> RealtimeSender for KafkaRealtimeSender<B> {
 }
 
 fn user_notification_row(
-    owner_id: MacroUserIdStr<'static>,
+    owner_id: RoxUserIdStr<'static>,
     notification: &RealtimeNotif<serde_json::Value>,
 ) -> UserNotificationRow<serde_json::Value> {
     UserNotificationRow {

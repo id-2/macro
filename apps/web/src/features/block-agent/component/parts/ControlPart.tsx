@@ -9,6 +9,7 @@
  * in-progress state would only make the switch look slower than it is.
  */
 
+import { t } from '@app/lib/i18n';
 import { modelLabel } from '@core/component/AI/constant/model-label';
 import type { MessagePart } from '@service-agent-fold/generated/types';
 import { match, P } from 'ts-pattern';
@@ -55,13 +56,13 @@ function label(part: ControlPartData): string {
       )
       .with(
         [{ kind: 'compact' }, { kind: 'rejected' }],
-        () => "Couldn't compact the context"
+        () => t('agentChat.compactFailed')
       )
       // A stop is acknowledged the moment it is issued — nothing answers it, so
       // it has no pending state worth naming and cannot be refused.
       .with(
         [{ kind: 'stop' }, { kind: 'rejected' }],
-        () => "Couldn't stop the agent"
+        () => t('agentChat.stopFailed')
       )
       .with([{ kind: 'stop' }, { kind: 'pending' }], () => 'Stopped')
       .with([{ kind: 'stop' }, { kind: 'accepted' }], () => 'Stopped')

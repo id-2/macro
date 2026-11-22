@@ -1,7 +1,7 @@
 import CaretDownIcon from '@icon/system/regular/caret-down.svg?component-solid';
 import InfoIcon from '@icon/system/regular/info.svg';
 import XIcon from '@icon/system/regular/x.svg?component-solid';
-import { sanitizeEmailHtml } from '@macro-inc/email-renderer';
+import { sanitizeEmailHtml } from '@rox-one/email-renderer';
 import { Tooltip } from '@ui';
 import { createEffect, createSignal, on, Show } from 'solid-js';
 

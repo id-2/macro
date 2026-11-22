@@ -3519,12 +3519,12 @@ export type ChannelAccessRequest = {
     /**
      * Person asking to join.
      */
-    requester_id: MacroUserIdStr;
+    requester_id: RoxUserIdStr;
     /**
      * When the attempt stopped being pending.
      */
     resolved_at?: string | null;
-    resolved_by?: null | MacroUserIdStr;
+    resolved_by?: null | RoxUserIdStr;
     /**
      * Current outcome.
      */
@@ -3566,7 +3566,7 @@ export type ChannelAccessRequestedMetadata = {
     /**
      * Person asking to join.
      */
-    requester_id: MacroUserIdStr;
+    requester_id: RoxUserIdStr;
     /**
      * The requester's profile name when they asked, if they had one. Absent
      * on events from before it was added.
@@ -3594,11 +3594,11 @@ export type ChannelCreatedMetadata = {
      * Type of channel that was created.
      */
     channel_type: ChannelType;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * Active participants after creation (including the owner).
      */
-    participant_user_ids: Array<MacroUserIdStr>;
+    participant_user_ids: Array<RoxUserIdStr>;
 };
 
 /**
@@ -3832,7 +3832,7 @@ export type ChannelParticipantAddedMetadata = {
     /**
      * Users added by this mutation.
      */
-    added_user_ids: Array<MacroUserIdStr>;
+    added_user_ids: Array<RoxUserIdStr>;
     /**
      * Channel receiving new participants.
      */
@@ -3859,11 +3859,11 @@ export type ChannelParticipantRemovedMetadata = {
      * Actor who removed the participants; equals the sole removed user for a
      * self-service leave.
      */
-    removed_by: MacroUserIdStr;
+    removed_by: RoxUserIdStr;
     /**
      * Users removed by this mutation.
      */
-    removed_user_ids: Array<MacroUserIdStr>;
+    removed_user_ids: Array<RoxUserIdStr>;
 };
 
 /**
@@ -3873,7 +3873,7 @@ export type ChannelPictureChangedMetadata = {
     /**
      * User who changed the picture.
      */
-    actor: MacroUserIdStr;
+    actor: RoxUserIdStr;
     /**
      * Channel whose picture changed.
      */
@@ -4021,7 +4021,7 @@ export type ChannelUpdatedMetadata = {
     /**
      * The user who updated the channel.
      */
-    actor: MacroUserIdStr;
+    actor: RoxUserIdStr;
     /**
      * The id of the updated channel.
      */
@@ -4625,7 +4625,7 @@ export type CommandRejectedMetadata = {
      * The command that will not execute.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The command's thread announcement, when one was created.
      */
@@ -6987,7 +6987,7 @@ export type DocumentCopiedMetadata = {
      */
     document_name: string;
     file_type?: null | FileType;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * The principal who owns the new copy.
      */
@@ -7030,7 +7030,7 @@ export type DocumentCreatedMetadata = {
      */
     document_name: string;
     file_type?: null | FileType;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * The principal who owns the document.
      */
@@ -7052,12 +7052,12 @@ export type DocumentDeletedMetadata = {
      * [`Self::actor_user_id`]).
      */
     actor?: string | null;
-    actor_user_id?: null | MacroUserIdStr;
+    actor_user_id?: null | RoxUserIdStr;
     /**
      * The id of the deleted document.
      */
     document_id: string;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * Project the document belonged to, when any.
      */
@@ -7288,7 +7288,7 @@ export type DocumentPermissionsToken = {
      * The issuer of the token
      */
     iss: string;
-    user_id?: null | MacroUserIdStr;
+    user_id?: null | RoxUserIdStr;
 };
 
 export type DocumentPermissionsTokenRequest = {
@@ -7497,7 +7497,7 @@ export type DocumentSyncContentUpdatedMetadata = {
      * File type of the sync document, resolved by the document backend.
      */
     file_type: FileType;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
 };
 
 /**
@@ -7512,7 +7512,7 @@ export type DocumentSyncEditor = {
      * Invocation from the editor's signed document grant.
      */
     agent_correlation_id?: string | null;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
 };
 
 /**
@@ -7614,7 +7614,7 @@ export type DocumentUpdatedMetadata = {
      * [`Self::actor_user_id`]).
      */
     actor?: string | null;
-    actor_user_id?: null | MacroUserIdStr;
+    actor_user_id?: null | RoxUserIdStr;
     /**
      * Previous and new presentation overrides, in that order; no content edit occurred.
      */
@@ -7628,7 +7628,7 @@ export type DocumentUpdatedMetadata = {
      */
     document_name?: string | null;
     file_type?: null | FileTypeUpdate;
-    on_behalf_of?: null | MacroUserIdStr;
+    on_behalf_of?: null | RoxUserIdStr;
     /**
      * The owner of the document.
      */
@@ -13318,7 +13318,7 @@ export type Harness = {
      * Teams it is a team machine for: their every member is a user of it.
      */
     shared_team_ids?: Array<string>;
-    team_agent_user_id?: null | MacroUserIdStr;
+    team_agent_user_id?: null | RoxUserIdStr;
     /**
      * Update timestamp.
      */
@@ -13667,7 +13667,7 @@ export type InFlightTurnSummary = {
      * The action that opened the turn.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The magic-chip message posted for this turn, when one was.
      */
@@ -13802,7 +13802,7 @@ export type InitiativeDetail = {
     /**
      * Member user ids. The owner is never stored here.
      */
-    memberIds: Array<MacroUserIdStr>;
+    memberIds: Array<RoxUserIdStr>;
     /**
      * Display name.
      */
@@ -13810,7 +13810,7 @@ export type InitiativeDetail = {
     /**
      * Owner of the initiative.
      */
-    ownerId: MacroUserIdStr;
+    ownerId: RoxUserIdStr;
     /**
      * Current share permission.
      */
@@ -14460,7 +14460,7 @@ export type LocationResponseV3 = {
     type: 'syncServiceContent';
 };
 
-export type MacroUserIdStr = string;
+export type RoxUserIdStr = string;
 
 /**
  * Why a domain exclusion would hide an affected mailbox's entire history.
@@ -19123,7 +19123,7 @@ export type SessionIdentity = {
      * who has prompted or answered this session. Resolved by the emitter so
      * a consumer fanning out never has to read the session's log.
      */
-    audience?: Array<MacroUserIdStr>;
+    audience?: Array<RoxUserIdStr>;
     /**
      * Bot the session runs for.
      */
@@ -19136,7 +19136,7 @@ export type SessionIdentity = {
     /**
      * User who owns the session.
      */
-    owner_id: MacroUserIdStr;
+    owner_id: RoxUserIdStr;
     /**
      * The session.
      */
@@ -19170,8 +19170,8 @@ export type SessionMentionedMetadata = {
      * The users named, already narrowed to those who can open the session
      * and never including the author.
      */
-    mentioned: Array<MacroUserIdStr>;
-    mentioned_by?: null | MacroUserIdStr;
+    mentioned: Array<RoxUserIdStr>;
+    mentioned_by?: null | RoxUserIdStr;
     /**
      * The channel or document message the prompt was posted as, when it
      * arrived from a thread rather than the session view. That message
@@ -23317,7 +23317,7 @@ export type TurnEndedMetadata = {
      * The action that opened the turn.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The magic-chip message posted for this turn, when one was.
      */
@@ -23348,7 +23348,7 @@ export type TurnStartedMetadata = {
      * The action that opened the turn.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The magic-chip message posted for this turn, when one was.
      */
@@ -23371,7 +23371,7 @@ export type TurnSummary = {
      * The action that opened the turn.
      */
     action_id: AgentActionId;
-    actor?: null | MacroUserIdStr;
+    actor?: null | RoxUserIdStr;
     /**
      * The magic-chip message posted for this turn, when one was.
      */
@@ -24008,7 +24008,7 @@ export type UserPictureChangedMetadata = {
     /**
      * User whose profile picture changed.
      */
-    user_id: MacroUserIdStr;
+    user_id: RoxUserIdStr;
 };
 
 export type UserPinsResponse = {

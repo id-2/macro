@@ -27,13 +27,13 @@ pub struct MacroInmem;
 /// `_meta.macro`, as far as the fold reads it.
 #[derive(Debug, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
-struct MacroMeta {
+struct RoxMeta {
     tool_name: Option<String>,
     #[serde(default)]
     subagent: bool,
 }
 
-fn meta_of(meta: Option<&Meta>) -> MacroMeta {
+fn meta_of(meta: Option<&Meta>) -> RoxMeta {
     namespaced(meta, NAMESPACE).unwrap_or_default()
 }
 

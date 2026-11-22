@@ -5,8 +5,8 @@ use std::net::SocketAddr;
 use std::path::PathBuf;
 
 use clap::Parser;
-use macro_entrypoint::MacroEntrypoint;
-use macro_env::Environment;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env::Environment;
 use outlook_emulator::{Options, OutlookEmulator, Seed, SeedError, StartError};
 
 /// A stateful fake of the Microsoft Graph mail and calendar APIs and the
@@ -50,7 +50,7 @@ enum RunError {
 
 #[tokio::main]
 async fn main() -> Result<(), RunError> {
-    let _telemetry = MacroEntrypoint::new(Environment::Local).init();
+    let _telemetry = RoxEntrypoint::new(Environment::Local).init();
     let args = Args::parse();
 
     let seed = match &args.seed {

@@ -15,8 +15,8 @@ use axum::{
     routing::get,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use uuid::Uuid;
@@ -27,7 +27,7 @@ use crate::domain::{models::ReminderError, ports::RemindersService};
 pub struct RemindersRouterState<S, Eas, Auth> {
     service: Arc<S>,
     entity_access_service: Arc<Eas>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Eas, Auth> Clone for RemindersRouterState<S, Eas, Auth> {
@@ -49,7 +49,7 @@ where
     pub fn new(
         service: Arc<S>,
         entity_access_service: Arc<Eas>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -65,7 +65,7 @@ impl<S, Eas, Auth> FromRef<RemindersRouterState<S, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<S, Eas, Auth> FromRef<RemindersRouterState<S, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Eas, Auth> FromRef<RemindersRouterState<S, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &RemindersRouterState<S, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -76,7 +76,7 @@ pub fn reminders_router<S, Eas, Auth, T>(state: RemindersRouterState<S, Eas, Aut
 where
     S: RemindersService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -126,13 +126,13 @@ impl IntoResponse for ReminderError {
               (status = 403, body = ErrorResponse), (status = 500, body = ErrorResponse)))]
 pub async fn get_email_followup_handler<S, Eas, Auth>(
     State(state): State<RemindersRouterState<S, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(thread_id): Path<Uuid>,
 ) -> Result<Json<crate::domain::email_followup::EmailFollowupResponse>, ReminderError>
 where
     S: RemindersService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(crate::domain::email_followup::EmailFollowupResponse {
         followup: state
@@ -151,14 +151,14 @@ where
               (status = 500, body = ErrorResponse)))]
 pub async fn set_email_followup_handler<S, Eas, Auth>(
     State(state): State<RemindersRouterState<S, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(thread_id): Path<Uuid>,
     Json(command): Json<crate::domain::email_followup::EmailFollowupCommand>,
 ) -> Result<Json<crate::domain::email_followup::EmailFollowup>, ReminderError>
 where
     S: RemindersService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state

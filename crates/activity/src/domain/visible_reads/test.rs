@@ -19,7 +19,7 @@ fn records() -> Vec<ActivityRecord> {
     .enumerate()
     .map(|(index, kind)| ActivityRecord {
         id: Uuid::from_u128(index as u128 + 1),
-        actor: Actor::new_from_user(MacroUserIdStr::parse_from_str(VIEWER).unwrap()),
+        actor: Actor::new_from_user(RoxUserIdStr::parse_from_str(VIEWER).unwrap()),
         subject_id: VIEWER.to_owned(),
         entity_type: kind,
         entity_id: format!("record-{index}"),
@@ -109,12 +109,12 @@ impl ActivityAudienceExpander for Access {
         &self,
         _: EntityType,
         _: &str,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         unreachable!("page reads use the batch port")
     }
     async fn visible_entities(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         keys: &[(EntityType, String)],
     ) -> Result<HashSet<(EntityType, String)>, Self::Err> {
         self.checked

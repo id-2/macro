@@ -345,7 +345,7 @@ async fn records_provider_counts_before_image_decoding_or_refusal() {
             .mount(&server)
             .await;
         let recorder = RecordingUsage::default();
-        let user = macro_user_id::user_id::MacroUserIdStr::try_from(
+        let user = rox_user_id::user_id::RoxUserIdStr::try_from(
             "macro|artist@example.com".to_string(),
         )
         .unwrap();

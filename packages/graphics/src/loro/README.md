@@ -85,7 +85,7 @@ document clock and an optional pending action. Transform previews flatten select
 descendants into world-space shape outlines; drawing and marquee previews have
 their own payloads. Neither sending nor receiving presence issues editor commands.
 
-`@macro-inc/graphics/loro/solid` exports `CollaborativeGraphicsSurface`, composing
+`@rox-one/graphics/loro/solid` exports `CollaborativeGraphicsSurface`, composing
 the unchanged `GraphicsSurface` with a sibling overlay and cursor listener.
 Remote selections and ghosts use the receiving camera, have no editing handles
 and ignore pointer events. Committed shape components retain their identity.

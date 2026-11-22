@@ -264,7 +264,7 @@ where
 
     async fn find_thread_session(
         &self,
-        thread_id: macro_uuid::Uuid,
+        thread_id: rox_uuid::Uuid,
         bot_id: BotId,
     ) -> agent_session::domain::error::Result<Option<AgentSessionId>> {
         match self
@@ -324,7 +324,7 @@ where
     /// gets the workflows, so the warm claim's instructions match still holds.
     pub(super) async fn with_owner_coding_preferences(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         bot_id: BotId,
         kind: AgentKind,
         instructions: Option<String>,

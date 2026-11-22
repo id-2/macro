@@ -11,8 +11,8 @@ fn computer() -> ComputerId {
     ComputerId::new_from_uuid(uuid::Uuid::from_u128(1))
 }
 
-fn signer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()
+fn signer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()
 }
 
 /// A plausible expiry, the same for every call on a day.
@@ -33,7 +33,7 @@ fn signed_in() -> Response {
     }
 }
 
-fn claude_sign_in(signed_in_by: Option<MacroUserIdStr<'static>>) -> AccountLoginChange {
+fn claude_sign_in(signed_in_by: Option<RoxUserIdStr<'static>>) -> AccountLoginChange {
     AccountLoginChange::SignedIn {
         provider: AgentProvider::Claude,
         account: ProviderAccountIdentity {

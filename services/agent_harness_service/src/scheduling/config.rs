@@ -6,9 +6,9 @@
 //! and prod environments, surfacing any missing or mistyped values at CI time.
 
 use anyhow::Context;
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::env_vars;
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::env_vars;
 use secretsmanager_client::LocalOrRemoteSecret;
 
 #[cfg(test)]
@@ -23,7 +23,7 @@ env_vars! {
 }
 
 /// The configuration parameters for the agent schedule service.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Default-off quota admission and prospective usage counting.
@@ -83,7 +83,7 @@ impl Config {
     pub fn settlement_route(&self) -> anyhow::Result<ai_billing::composition::SettlementRoute> {
         let client = std::sync::Arc::new(authentication_service_client::AuthServiceClient::new(
             self.authentication_service_secret_key.as_ref().to_owned(),
-            macro_service_urls::AuthServiceUrl::new()?.to_string(),
+            rox_service_urls::AuthServiceUrl::new()?.to_string(),
         ));
         Ok(ai_billing::composition::SettlementRoute::from_policy(
             self.enable_ai_usage_billing,
@@ -96,7 +96,7 @@ impl Config {
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let billing = ai_billing::config::load_ai_usage_billing()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
-        let mut config = macro_config::ConfigLoader::load::<Config>()
+        let mut config = rox_config::ConfigLoader::load::<Config>()
             .context("failed to load agent schedule service config")?;
         config.enable_ai_usage_enforcement = enforcement;
         config.enable_ai_usage_billing = billing;

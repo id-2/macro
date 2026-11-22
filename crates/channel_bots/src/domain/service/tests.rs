@@ -51,7 +51,7 @@ fn handler(
     api: MockMessageServiceApi,
     access: Arc<Access>,
     responder: Arc<Responder>,
-) -> MacroAiHandler<Responder, FixedTimeZones> {
+) -> RoxAiHandler<Responder, FixedTimeZones> {
     handler_with_marks(api, access, responder, Marks::none())
 }
 
@@ -60,8 +60,8 @@ fn handler_with_marks(
     access: Arc<Access>,
     responder: Arc<Responder>,
     marks: Arc<Marks>,
-) -> MacroAiHandler<Responder, FixedTimeZones> {
-    MacroAiHandler::new(
+) -> RoxAiHandler<Responder, FixedTimeZones> {
+    RoxAiHandler::new(
         Arc::new(api),
         access,
         responder,
@@ -627,7 +627,7 @@ async fn prompt_says_the_time_zone_is_unknown_without_a_calendar() {
     let trigger = message(1, None, "@macro help");
     let mut api = MockMessageServiceApi::new();
     configure_reads(&mut api, &trigger, thread(trigger.clone(), vec![]));
-    let prompt = MacroAiHandler::new(
+    let prompt = RoxAiHandler::new(
         Arc::new(api),
         Arc::new(Access::default()),
         responder("reply"),

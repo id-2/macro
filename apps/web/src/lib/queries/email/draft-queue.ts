@@ -4,7 +4,7 @@ import {
   readRecordsByKeys,
   selectRecords,
 } from '@graphql-cache/exchange/record-selection';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   EmailDraftThreadFieldsFragmentDoc,
   EmailThreadMessageFieldsFragmentDoc,

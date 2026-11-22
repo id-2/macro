@@ -1,7 +1,7 @@
 //! An agent's conversation in a channel, and the sessions it runs on.
 
 use bot_id::BotId;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use super::{error::Result, model::AgentSessionId};
 

@@ -8,15 +8,15 @@
 use anyhow::Context;
 use database_env_vars::{DatabaseUrl, RedisUri};
 use entity_registry::NonUserOwners;
-pub use macro_env::Environment;
-use macro_uuid::Uuid;
+pub use rox_env::Environment;
+use rox_uuid::Uuid;
 
 use secretsmanager_client::LocalOrRemoteSecret;
 
 #[cfg(test)]
 mod test;
 
-macro_env_var::env_vars!(
+rox_env_var::env_vars!(
     /// Local static file bucket, read only when using local AWS.
     pub struct StaticStorageBucket;
     /// Comma-separated Kafka bootstrap servers.
@@ -57,7 +57,7 @@ macro_env_var::env_vars!(
     pub struct LivekitApiSecret;
 );
 
-macro_env_var::maybe_env_vars!(
+rox_env_var::maybe_env_vars!(
     /// PostHog project token for feature flags and public MCP analytics. When
     /// unset, both are off.
     pub struct PosthogApiKey;
@@ -86,7 +86,7 @@ fn default_pipedream_environment() -> String {
 }
 
 /// The configuration parameters for the agent harness service.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Optional TypeSafe key for Command K classification and for routing
@@ -380,7 +380,7 @@ impl Config {
     ) -> anyhow::Result<authentication_service_client::AuthServiceClient> {
         Ok(authentication_service_client::AuthServiceClient::new(
             self.authentication_service_secret_key.as_ref().to_owned(),
-            macro_service_urls::AuthServiceUrl::new()?.to_string(),
+            rox_service_urls::AuthServiceUrl::new()?.to_string(),
         ))
     }
 
@@ -402,7 +402,7 @@ impl Config {
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let billing = ai_billing::config::load_ai_usage_billing()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
-        let mut config = macro_config::ConfigLoader::load::<Config>()
+        let mut config = rox_config::ConfigLoader::load::<Config>()
             .context("failed to load agent harness service config")?;
         config.enable_ai_usage_enforcement = enforcement;
         config.enable_ai_usage_billing = billing;
@@ -410,7 +410,7 @@ impl Config {
     }
 }
 
-macro_env_var::env_vars! {
+rox_env_var::env_vars! {
     /// Public MCP OAuth configuration.
     pub struct FusionauthBaseUrl;
     /// Public MCP OAuth configuration.
@@ -427,7 +427,7 @@ macro_env_var::env_vars! {
     /// served at `/.well-known/openai-apps-challenge`.
     pub struct OpenaiDomainVerificationToken;
 }
-macro_env_var::maybe_env_vars! {
+rox_env_var::maybe_env_vars! {
     /// Optional public MCP OAuth configuration.
     pub struct FusionauthPublicUrl;
     /// Optional public MCP OAuth configuration.
@@ -450,11 +450,11 @@ pub enum ComputerFleetConfig {
 
 impl Config {
     /// Docker fleets are local infrastructure, never a deployed fallback.
-    pub fn validate_fleet_selection(&self) -> macro_config::MacroConfigResult<()> {
+    pub fn validate_fleet_selection(&self) -> rox_config::RoxConfigResult<()> {
         if matches!(self.computers_fleet, Some(ComputerFleetKind::Docker))
             && !matches!(self.environment, Environment::Local)
         {
-            return Err(macro_config::MacroConfigError::Deserialize(
+            return Err(rox_config::RoxConfigError::Deserialize(
                 "COMPUTERS_FLEET=docker is only available in local environments".to_owned(),
             ));
         }
@@ -464,25 +464,25 @@ impl Config {
     /// Rox computers' retention and past-due grace.
     pub fn computer_billing_policy(
         &self,
-    ) -> macro_config::MacroConfigResult<hosted_runtimes::domain::lifecycle::BillingPolicy> {
+    ) -> rox_config::RoxConfigResult<hosted_runtimes::domain::lifecycle::BillingPolicy> {
         hosted_runtimes::domain::lifecycle::BillingPolicy::from_days(
             self.computer_retention_days,
             self.computer_past_due_grace_days,
         )
-        .map_err(|error| macro_config::MacroConfigError::Deserialize(error.to_string()))
+        .map_err(|error| rox_config::RoxConfigError::Deserialize(error.to_string()))
     }
 
     /// Load only the required settings for the explicitly selected fleet.
-    pub fn computer_fleet(&self) -> macro_config::MacroConfigResult<Option<ComputerFleetConfig>> {
+    pub fn computer_fleet(&self) -> rox_config::RoxConfigResult<Option<ComputerFleetConfig>> {
         self.validate_fleet_selection()?;
         match self.computers_fleet {
             Some(ComputerFleetKind::Incus) => {
-                let settings: IncusFleetSettings = macro_config::load()?;
+                let settings: IncusFleetSettings = rox_config::load()?;
                 settings.validate()?;
                 Ok(Some(ComputerFleetConfig::Incus(settings)))
             }
             Some(ComputerFleetKind::Docker) => {
-                let settings: DockerFleetSettings = macro_config::load()?;
+                let settings: DockerFleetSettings = rox_config::load()?;
                 settings.validate()?;
                 Ok(Some(ComputerFleetConfig::Docker(settings)))
             }
@@ -492,7 +492,7 @@ impl Config {
 }
 
 /// Required Incus fleet configuration.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct IncusFleetSettings {
     pub computers_control_plane_id: String,
@@ -516,7 +516,7 @@ pub struct IncusFleetSettings {
 }
 
 /// Required Docker fleet configuration.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct DockerFleetSettings {
     pub computers_control_plane_id: String,
@@ -531,7 +531,7 @@ pub struct DockerFleetSettings {
 }
 
 impl IncusFleetSettings {
-    pub fn validate(&self) -> macro_config::MacroConfigResult<()> {
+    pub fn validate(&self) -> rox_config::RoxConfigResult<()> {
         for (name, value) in [
             (
                 "COMPUTERS_CONTROL_PLANE_ID",
@@ -563,11 +563,11 @@ impl IncusFleetSettings {
             ),
         ] {
             if value.trim().is_empty() {
-                return Err(macro_config::MacroConfigError::MissingRequiredValue(name));
+                return Err(rox_config::RoxConfigError::MissingRequiredValue(name));
             }
         }
         if self.computers_oversell_factor == 0 {
-            return Err(macro_config::MacroConfigError::Deserialize(
+            return Err(rox_config::RoxConfigError::Deserialize(
                 "COMPUTERS_OVERSELL_FACTOR must be positive".into(),
             ));
         }
@@ -576,7 +576,7 @@ impl IncusFleetSettings {
 }
 
 impl DockerFleetSettings {
-    pub fn validate(&self) -> macro_config::MacroConfigResult<()> {
+    pub fn validate(&self) -> rox_config::RoxConfigResult<()> {
         for (name, value) in [
             (
                 "COMPUTERS_CONTROL_PLANE_ID",
@@ -595,11 +595,11 @@ impl DockerFleetSettings {
             ),
         ] {
             if value.trim().is_empty() {
-                return Err(macro_config::MacroConfigError::MissingRequiredValue(name));
+                return Err(rox_config::RoxConfigError::MissingRequiredValue(name));
             }
         }
         if self.computers_oversell_factor == 0 {
-            return Err(macro_config::MacroConfigError::Deserialize(
+            return Err(rox_config::RoxConfigError::Deserialize(
                 "COMPUTERS_OVERSELL_FACTOR must be positive".into(),
             ));
         }

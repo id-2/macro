@@ -19,20 +19,20 @@ export function PasskeyForm(props: {
       }}
     >
       <h2 class="text-base font-medium text-ink">
-        {enroll() ? 'Add a passkey' : 'Use your passkey'}
+        {enroll() ? 'Добавить ключ доступа' : 'Использовать ваш ключ доступа'}
       </h2>
       <Show when={enroll()}>
         <p class="text-xs text-ink-muted leading-snug">
-          This key stays on this device and confirms it is you.
+          Этот ключ остаётся на этом устройстве и подтверждает, что это вы.
         </p>
       </Show>
       <FormError message={props.error} />
       <AuthButton type="submit" disabled={props.busy}>
-        {enroll() ? 'Add a passkey' : 'Use your passkey'}
+        {enroll() ? 'Добавить ключ доступа' : 'Использовать ваш ключ доступа'}
       </AuthButton>
       <AuthButton variant="secondary" onClick={props.onBack}>
         <ArrowLeft class="size-5 shrink-0" />
-        Back
+        Назад
       </AuthButton>
     </form>
   );

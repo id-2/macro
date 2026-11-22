@@ -6,7 +6,7 @@ use ai_toolset::{AsyncTool, RequestContext, ServiceContext, ToolCallError, ToolR
 use ai_toolset::{ToolAnnotated, ToolAnnotations};
 use async_trait::async_trait;
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -114,7 +114,7 @@ where
             Some(thread_id) => service_context
                 .service
                 .get_owned_link_for_thread(
-                    MacroUserIdStr((*request_context.user_id).clone()),
+                    RoxUserIdStr((*request_context.user_id).clone()),
                     thread_id,
                 )
                 .await
@@ -129,7 +129,7 @@ where
             None => {
                 let inboxes = service_context
                     .service
-                    .get_inboxes_for_macro_id(MacroUserIdStr((*request_context.user_id).clone()))
+                    .get_inboxes_for_macro_id(RoxUserIdStr((*request_context.user_id).clone()))
                     .await
                     .map_err(|e| ToolCallError {
                         description: format!("Failed to resolve inboxes: {e}"),
@@ -150,7 +150,7 @@ where
         service_context
             .service
             .set_sender_policy(
-                &MacroUserIdStr((*request_context.user_id).clone()),
+                &RoxUserIdStr((*request_context.user_id).clone()),
                 &link,
                 &self.sender_email,
                 policy,

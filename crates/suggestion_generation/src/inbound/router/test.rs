@@ -3,12 +3,12 @@ use std::sync::Mutex;
 use axum::body::Body;
 use axum::http::{Request, StatusCode, header};
 use http_body_util::BodyExt;
-use macro_authorization::{
-    CredentialOrigin, InternalAuthConfig, JwtValidator, MacroAuthorizationError,
-    MacroAuthorizationServiceImpl, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
+use rox_authorization::{
+    CredentialOrigin, InternalAuthConfig, JwtValidator, RoxAuthorizationError,
+    RoxAuthorizationServiceImpl, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
     ValidatedIdentity,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use scheduled_action::domain::suggestions::model::GenerationStatus;
 use tower::ServiceExt;
@@ -24,7 +24,7 @@ impl JwtValidator for Jwt {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         match jwt {
             "valid" => Ok(ValidatedCredential {
                 origin: CredentialOrigin::Session,
@@ -38,7 +38,7 @@ impl JwtValidator for Jwt {
                     permissions: None,
                 },
             }),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 }
@@ -71,7 +71,7 @@ impl Starts {
 impl StartGeneration for Starts {
     async fn start_onboarding(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> Result<bool, GenerationError> {
         self.calls
@@ -83,7 +83,7 @@ impl StartGeneration for Starts {
 
     async fn regenerate(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> Result<(), GenerationError> {
         self.calls
@@ -100,14 +100,14 @@ impl StartGeneration for Starts {
 
     async fn overview(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
     ) -> Result<GenerationOverview, GenerationError> {
         self.overview.ok_or(GenerationError::NotFound)
     }
 
     async fn seen(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
     ) -> Result<(), GenerationError> {
         self.calls
@@ -119,7 +119,7 @@ impl StartGeneration for Starts {
 
     async fn routine_suggestions(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
     ) -> Result<RoutineSuggestions, GenerationError> {
         Ok(RoutineSuggestions {
             status: GenerationStatus::Generating,
@@ -129,7 +129,7 @@ impl StartGeneration for Starts {
 }
 
 fn app(starts: &Arc<Starts>) -> Router {
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         Jwt,
         InternalAuthConfig {
             api_key: "internal-key".to_owned(),
@@ -140,7 +140,7 @@ fn app(starts: &Arc<Starts>) -> Router {
     );
     generation_router(GenerationRouterState {
         service: Arc::clone(starts),
-        authorization_state: MacroAuthorizationState::new(Arc::new(auth)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(auth)),
     })
 }
 

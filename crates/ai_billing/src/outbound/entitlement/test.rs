@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::BillingPeriod;
 use crate::domain::period::{PeriodEvidence, SubscriptionActivity};
 use chrono::{DateTime, Duration};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use roles_and_permissions::domain::service::UserRolesAndPermissionsServiceImpl;
 use roles_and_permissions::outbound::pgpool::RoxDB;
 use sqlx::PgPool;
@@ -44,7 +44,7 @@ async fn only_a_paying_team_bills_its_members_seats(pool: PgPool) {
     );
 
     let paid_member =
-        MacroUserIdStr::try_from("macro|paid-member@example.com".to_string()).unwrap();
+        RoxUserIdStr::try_from("macro|paid-member@example.com".to_string()).unwrap();
     let paid = entitlements.entitlement(&paid_member).await.unwrap();
     assert_eq!(paid.tier, PlanTier::Premium);
     assert_eq!(
@@ -55,7 +55,7 @@ async fn only_a_paying_team_bills_its_members_seats(pool: PgPool) {
     );
 
     let canceled_member =
-        MacroUserIdStr::try_from("macro|canceled-member@example.com".to_string()).unwrap();
+        RoxUserIdStr::try_from("macro|canceled-member@example.com".to_string()).unwrap();
     assert_eq!(
         entitlements.entitlement(&canceled_member).await.unwrap(),
         Entitlement::personal(canceled_member, PlanTier::Free)
@@ -74,7 +74,7 @@ async fn enterprise_team_still_bills_member_seats(pool: PgPool) {
     );
 
     let member =
-        MacroUserIdStr::try_from("macro|enterprise-member@example.com".to_string()).unwrap();
+        RoxUserIdStr::try_from("macro|enterprise-member@example.com".to_string()).unwrap();
     let entitlement = entitlements.entitlement(&member).await.unwrap();
 
     assert!(entitlement.unlimited);
@@ -122,7 +122,7 @@ async fn a_canceled_team_does_not_block_a_members_personal_subscription(pool: Pg
         evidence: PeriodEvidence::Snapshot,
     };
 
-    let member = MacroUserIdStr::try_from("macro|canceled-member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|canceled-member@example.com".to_string()).unwrap();
     assert_eq!(
         entitlements.seats(&member, &personal).await.unwrap(),
         Some(vec![member])

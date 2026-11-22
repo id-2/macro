@@ -1,26 +1,26 @@
 //! The Rox API tokens the OAuth broker issues to MCP servers that hand their
 //! bearer straight to Rox's APIs.
 
-use agent_egress::outbound::macro_mcp::{MINTED_TOKEN_LIFETIME_SECONDS, MacroApiTokenSigner};
+use agent_egress::outbound::macro_mcp::{MINTED_TOKEN_LIFETIME_SECONDS, RoxApiTokenSigner};
 use ai_toolset::ToolCaller;
 use anyhow::Context;
-use macro_auth::middleware::decode_jwt::{JwtToken, JwtValidationArgs, handler};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_auth::middleware::decode_jwt::{JwtToken, JwtValidationArgs, handler};
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_auth_proxy::domain::{
     models::AccessToken,
-    ports::{MacroApiTokenMinter, MintedAccessToken, MintedAccessTokenFuture},
+    ports::{RoxApiTokenMinter, MintedAccessToken, MintedAccessTokenFuture},
 };
 use std::time::Duration;
 
 /// Signs, for the user a FusionAuth access token names, the attribution the
 /// public MCP gives an OAuth client: the Rox bot, labelled with the client's
 /// name, as public `ExecuteCode` signs into its SDK token.
-pub struct SignedMacroApiTokens {
-    pub signer: MacroApiTokenSigner,
+pub struct SignedRoxApiTokens {
+    pub signer: RoxApiTokenSigner,
     pub jwt_args: JwtValidationArgs,
 }
 
-impl MacroApiTokenMinter for SignedMacroApiTokens {
+impl RoxApiTokenMinter for SignedRoxApiTokens {
     fn mint<'a>(
         &'a self,
         upstream: &'a AccessToken,
@@ -28,12 +28,12 @@ impl MacroApiTokenMinter for SignedMacroApiTokens {
         lifetime: Duration,
     ) -> MintedAccessTokenFuture<'a> {
         Box::pin(async move {
-            let JwtToken::MacroAccessToken(access) = handler(&self.jwt_args, upstream.as_str())
+            let JwtToken::RoxAccessToken(access) = handler(&self.jwt_args, upstream.as_str())
                 .context("upstream access token failed validation")?
             else {
                 anyhow::bail!("upstream access token is not a FusionAuth access token");
             };
-            let user = MacroUserIdStr::try_from(access.macro_user_id)
+            let user = RoxUserIdStr::try_from(access.macro_user_id)
                 .context("upstream access token names an invalid user")?;
             // The signer refuses lifetimes past its cap, so a long FusionAuth
             // token gets a shorter Rox API token; the client refreshes.

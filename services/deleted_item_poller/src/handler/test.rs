@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 use serde_json::{Value, json};
 use sqlx::{Pool, Postgres};
 use tokio::sync::Semaphore;
@@ -73,8 +73,8 @@ impl FakeEventBroker {
     }
 }
 
-impl MacroEventBroker for FakeEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for FakeEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

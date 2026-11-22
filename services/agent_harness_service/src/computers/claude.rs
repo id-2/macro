@@ -18,10 +18,10 @@ use harnesses::domain::models::{ClaudeMode, HarnessPermission};
 use harnesses::domain::ports::{HarnessError, HarnessService};
 use hosted_runtimes::domain::ids::ComputerId;
 use hosted_runtimes::domain::models::{FleetAttachment, FleetUnavailable};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio_util::task::TaskTracker;
 use tracing::Instrument as _;
 
@@ -37,7 +37,7 @@ pub struct ClaudeAccessState<Harnesses, Auth> {
     rollout: hosted_runtimes::domain::rollout::ComputerRollout,
     fleet_attachment: FleetAttachment,
     cleanup: TaskTracker,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<Harnesses, Auth> Clone for ClaudeAccessState<Harnesses, Auth> {
@@ -54,7 +54,7 @@ impl<Harnesses, Auth> Clone for ClaudeAccessState<Harnesses, Auth> {
 }
 
 impl<Harnesses, Auth> FromRef<ClaudeAccessState<Harnesses, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &ClaudeAccessState<Harnesses, Auth>) -> Self {
         state.authorization_state.clone()
@@ -65,14 +65,14 @@ impl<Harnesses, Auth> FromRef<ClaudeAccessState<Harnesses, Auth>>
 pub fn router<Harnesses, Auth>(
     harnessd: Harnessd<Harnesses>,
     harnesses: Arc<Harnesses>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
     rollout: hosted_runtimes::domain::rollout::ComputerRollout,
     fleet_attachment: FleetAttachment,
     tasks: &TaskTracker,
 ) -> Router
 where
     Harnesses: HarnessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let state = ClaudeAccessState {
         harnesses,
@@ -158,7 +158,7 @@ pub struct ClaudeAccountStatus {
     /// Who signed it in through Rox; absent once that user is deleted or
     /// when it was signed in on the computer itself.
     #[schema(value_type = Option<String>)]
-    pub signed_in_by: Option<MacroUserIdStr<'static>>,
+    pub signed_in_by: Option<RoxUserIdStr<'static>>,
     /// When it was signed in.
     pub signed_in_at: chrono::DateTime<chrono::Utc>,
     /// When the credential stops working, as the computer last reported it.
@@ -169,7 +169,7 @@ impl ClaudeModeResponse {
     fn of(login: Option<HarnessAccountLogin>) -> Self {
         match login {
             None => Self {
-                mode: ClaudeMode::MacroCredits,
+                mode: ClaudeMode::RoxCredits,
                 account: None,
             },
             Some(login) => Self {
@@ -198,12 +198,12 @@ impl ClaudeModeResponse {
 )]
 pub async fn claude_sign_in_handler<Harnesses, Auth>(
     State(state): State<ClaudeAccessState<Harnesses, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    caller: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<HarnessPath>,
 ) -> Result<Json<ClaudeSignInStarted>, ComputerRouteError>
 where
     Harnesses: HarnessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let computer_id = state
         .authorize_computer(caller, path.harness_id, HarnessPermission::Manage)
@@ -241,13 +241,13 @@ where
 )]
 pub async fn claude_sign_in_complete_handler<Harnesses, Auth>(
     State(state): State<ClaudeAccessState<Harnesses, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    caller: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<HarnessPath>,
     Json(body): Json<ClaudeSignInComplete>,
 ) -> Result<Json<ClaudeSignedIn>, ComputerRouteError>
 where
     Harnesses: HarnessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let signed_in_by = caller.authorization.user.macro_user_id.clone();
     let computer_id = state
@@ -286,12 +286,12 @@ where
 )]
 pub async fn claude_sign_out_handler<Harnesses, Auth>(
     State(state): State<ClaudeAccessState<Harnesses, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    caller: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<HarnessPath>,
 ) -> Result<Json<ClaudeModeResponse>, ComputerRouteError>
 where
     Harnesses: HarnessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let computer_id = state
         .authorize_computer(caller, path.harness_id, HarnessPermission::Manage)
@@ -323,12 +323,12 @@ where
 )]
 pub async fn claude_mode_handler<Harnesses, Auth>(
     State(state): State<ClaudeAccessState<Harnesses, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    caller: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(path): Path<HarnessPath>,
 ) -> Result<Json<ClaudeModeResponse>, ComputerRouteError>
 where
     Harnesses: HarnessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .authorize_computer(caller, path.harness_id, HarnessPermission::Manage)
@@ -379,7 +379,7 @@ where
         harness_id: HarnessId,
         computer_id: ComputerId,
         request: Request,
-        signed_in_by: Option<MacroUserIdStr<'static>>,
+        signed_in_by: Option<RoxUserIdStr<'static>>,
     ) -> Result<harnessd_protocol::Response, ComputerRouteError> {
         let harnessd = self.harnessd.clone();
         let (reply, received) = tokio::sync::oneshot::channel();
@@ -402,7 +402,7 @@ where
     /// is a Rox computer.
     async fn authorize_computer(
         &self,
-        caller: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+        caller: RoxAuthorizationExtractor<Auth, UserOrInternal>,
         harness_id: HarnessId,
         access: HarnessPermission,
     ) -> Result<ComputerId, ComputerRouteError> {

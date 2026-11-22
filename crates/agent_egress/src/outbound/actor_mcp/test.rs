@@ -50,8 +50,8 @@ async fn state_is_preserved_within_one_actor_and_isolated_across_actors() {
     });
     let transport = HttpActorMcpTransport::new(AddressPolicy::AnyAddress).unwrap();
     let session = AgentSessionId::new();
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
-    let requester = MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
+    let requester = RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     for (actor, expected) in [
         (requester.clone(), "1"),
         (requester.clone(), "2"),
@@ -135,7 +135,7 @@ async fn an_upstream_429_is_a_typed_rate_limit_carrying_retry_after() {
     let result = transport
         .exchange(
             AgentSessionId::new(),
-            MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
             UpstreamCall::bearer_over_local_cleartext(
                 url::Url::parse(&format!("http://{address}/mcp")).unwrap(),
                 crate::domain::model::BearerToken::new("test-credential"),

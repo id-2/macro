@@ -7,7 +7,7 @@ use crate::domain::models::ReferralError;
 use crate::domain::ports::ReferralService;
 use axum::{Json, Router, extract::FromRef, http::StatusCode, response::IntoResponse};
 pub use get_referral_code::{__path_get_referral_code_handler, get_referral_code_handler};
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use rate_limit::inbound::rate_limit_middleware;
 use rate_limit::{
@@ -61,7 +61,7 @@ pub struct ReferralRouterState<T, R, Auth> {
     /// The rate limiter service implementation.
     pub rate_limiter: R,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, R: Clone, Auth> Clone for ReferralRouterState<T, R, Auth> {
@@ -74,7 +74,7 @@ impl<T, R: Clone, Auth> Clone for ReferralRouterState<T, R, Auth> {
     }
 }
 
-impl<T, R, Auth> FromRef<ReferralRouterState<T, R, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, R, Auth> FromRef<ReferralRouterState<T, R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ReferralRouterState<T, R, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -82,7 +82,7 @@ impl<T, R, Auth> FromRef<ReferralRouterState<T, R, Auth>> for MacroAuthorization
 
 struct ReferralRateLimitState<R, Auth> {
     rate_limiter: R,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<R: Clone, Auth> Clone for ReferralRateLimitState<R, Auth> {
@@ -94,7 +94,7 @@ impl<R: Clone, Auth> Clone for ReferralRateLimitState<R, Auth> {
     }
 }
 
-impl<R, Auth> FromRef<ReferralRateLimitState<R, Auth>> for MacroAuthorizationState<Auth> {
+impl<R, Auth> FromRef<ReferralRateLimitState<R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ReferralRateLimitState<R, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -103,7 +103,7 @@ impl<R, Auth> FromRef<ReferralRateLimitState<R, Auth>> for MacroAuthorizationSta
 impl<R, Auth> RateLimitService for ReferralRateLimitState<R, Auth>
 where
     R: RateLimitService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     async fn check_rate_limit(
         &self,
@@ -123,7 +123,7 @@ pub fn referral_router<T, S, R, Auth>(state: ReferralRouterState<T, R, Auth>) ->
 where
     T: ReferralService,
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     let user_rate_limit_state = ReferralRateLimitState {

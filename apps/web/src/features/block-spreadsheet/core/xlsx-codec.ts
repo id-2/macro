@@ -1,4 +1,4 @@
-import { parseWorkbookMetadata } from '@macro-inc/spreadsheet/workbook-metadata';
+import { parseWorkbookMetadata } from '@rox-one/spreadsheet/workbook-metadata';
 import { CALCULATED_FUNCTIONS } from './formula-function-names';
 import { storedImage } from './image-data';
 import { metafilePreview } from './metafile';

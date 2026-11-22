@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(
@@ -26,8 +26,8 @@ async fn test_bulk_delete_user_notification(pool: Pool<Postgres>) -> anyhow::Res
         &pool,
         "macro|user@user.com",
         &vec![
-            macro_uuid::string_to_uuid("0193b1ea-a542-7589-893b-2b4a509c1e76")?,
-            macro_uuid::string_to_uuid("0193b1ea-a542-7589-893b-2b4a509c1e75")?,
+            rox_uuid::string_to_uuid("0193b1ea-a542-7589-893b-2b4a509c1e76")?,
+            rox_uuid::string_to_uuid("0193b1ea-a542-7589-893b-2b4a509c1e75")?,
         ],
     )
     .await?;

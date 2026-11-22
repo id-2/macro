@@ -1,11 +1,11 @@
 use super::*;
 use bots::domain::models::BotId;
 
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use serde_json::json;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|owner@rox.one")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|owner@rox.one")
         .expect("valid user id")
         .into_owned()
 }
@@ -93,7 +93,7 @@ fn one_of_each() -> Vec<AgentSessionLifecycleEvent> {
             action_id: action_id(),
             mentioned_by: Some(owner()),
             mentioned: vec![
-                MacroUserIdStr::parse_from_str("macro|reviewer@rox.one")
+                RoxUserIdStr::parse_from_str("macro|reviewer@rox.one")
                     .expect("valid user id")
                     .into_owned(),
             ],
@@ -201,7 +201,7 @@ fn identity_without_audience_still_decodes() {
 
 #[test]
 fn macro_event_is_keyed_by_session_id() {
-    let event = AgentSessionLifecycleMacroEvent::new(AgentSessionLifecycleEvent::Renamed(
+    let event = AgentSessionLifecycleRoxEvent::new(AgentSessionLifecycleEvent::Renamed(
         SessionRenamedMetadata {
             identity: identity(),
         },

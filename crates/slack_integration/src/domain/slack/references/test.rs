@@ -82,7 +82,7 @@ fn context() -> ReferenceContext {
     ReferenceContext {
         team: Uuid::now_v7().try_into().unwrap(),
         job: Uuid::now_v7().try_into().unwrap(),
-        requester: MacroUserIdStr::parse_from_str("macro|admin@example.com").unwrap(),
+        requester: RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap(),
         source: SourceIdentity::Known {
             source_id: "T1".parse().unwrap(),
         },

@@ -13,9 +13,9 @@ use crm::inbound::{
     pipeline_workflows::{self, PipelineWorkflowRouterState},
     pipelines::{self, PipelineRouterState},
 };
-use macro_authorization::{
-    CredentialOrigin, InternalAuthConfig, JwtValidator, MacroAuthorizationError,
-    MacroAuthorizationServiceImpl, MacroAuthorizationState, NoBotAuthorizer,
+use rox_authorization::{
+    CredentialOrigin, InternalAuthConfig, JwtValidator, RoxAuthorizationError,
+    RoxAuthorizationServiceImpl, RoxAuthorizationState, NoBotAuthorizer,
     NoUserApiKeyAuthorizer, ValidatedCredential, ValidatedIdentity,
 };
 use serde_json::{Value, json};
@@ -28,10 +28,10 @@ impl JwtValidator for OwnerToken {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, rootcause::Report<RoxAuthorizationError>> {
         if jwt != "owner" {
             return Err(rootcause::Report::new(
-                MacroAuthorizationError::InvalidCredentials,
+                RoxAuthorizationError::InvalidCredentials,
             ));
         }
         Ok(ValidatedCredential {
@@ -106,7 +106,7 @@ async fn http_routes_add_find_update_remove_edit_and_move_csv_by_name(pool: PgPo
     let id = sales.pipeline.pipeline.id;
     let workflows = Arc::new(workflows);
     let files = SavedFiles::default();
-    let authorization = MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
+    let authorization = RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
         OwnerToken,
         InternalAuthConfig {
             api_key: "test-only".into(),

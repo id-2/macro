@@ -1,4 +1,4 @@
-import type { Files } from '@macro-inc/muppet/core/state';
+import type { Files } from '@rox-one/muppet/core/state';
 import type { z } from 'zod';
 
 /** The filesystem, injected. A superset of lib's `Files`. */

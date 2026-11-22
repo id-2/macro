@@ -11,7 +11,7 @@ use axum::{
 use documents_hex::domain::permission_token::encode_permission_token;
 use entity_access::domain::models::EntityPermission;
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{AnyPrincipal, MacroAuthorization, OptionalMacroAuthorizationExtractor};
+use rox_authorization::{AnyPrincipal, RoxAuthorization, OptionalRoxAuthorizationExtractor};
 use model::response::ErrorResponse;
 use models_permissions::share_permission::access_level::{AccessLevel, ViewAccessLevel};
 use serde::Deserialize;
@@ -31,22 +31,22 @@ pub struct DocumentPermissionsTokenResponse {
 }
 
 fn token_identity(
-    authorization: Option<&MacroAuthorization>,
+    authorization: Option<&RoxAuthorization>,
 ) -> Result<(Option<String>, Option<String>), ()> {
     match authorization {
         None => Ok((None, None)),
-        Some(MacroAuthorization::User(user)) => Ok((Some(user.macro_user_id.to_string()), None)),
-        Some(MacroAuthorization::Bot(bot)) => Ok((
+        Some(RoxAuthorization::User(user)) => Ok((Some(user.macro_user_id.to_string()), None)),
+        Some(RoxAuthorization::Bot(bot)) => Ok((
             bot.acting_user
                 .as_ref()
                 .map(|user| user.macro_user_id.to_string()),
             Some(bot.bot_id.into_storage_id().to_string()),
         )),
-        Some(MacroAuthorization::Internal(user)) => Ok((
+        Some(RoxAuthorization::Internal(user)) => Ok((
             user.as_ref().map(|user| user.macro_user_id.to_string()),
             None,
         )),
-        Some(MacroAuthorization::Harness(_)) => Err(()),
+        Some(RoxAuthorization::Harness(_)) => Err(()),
     }
 }
 
@@ -72,7 +72,7 @@ fn token_identity(
 )]
 pub async fn handler(
     State(state): State<ApiContext>,
-    user: OptionalMacroAuthorizationExtractor<AuthorizationService, AnyPrincipal>,
+    user: OptionalRoxAuthorizationExtractor<AuthorizationService, AnyPrincipal>,
     users_access_level: DocumentAccessExtractor<
         ViewAccessLevel,
         EntityAccessService,

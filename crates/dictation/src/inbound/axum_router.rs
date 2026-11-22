@@ -14,8 +14,8 @@ use axum::{
     routing::post,
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
 use model_error_response::ErrorResponse;
 use rate_limit::{
@@ -34,7 +34,7 @@ const PER_USER_TRANSCRIPTIONS_PER_HOUR: u64 = 60;
 pub struct DictationRouterState<S, R, Auth> {
     service: Arc<S>,
     rate_limiter: R,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, R: Clone, Auth> Clone for DictationRouterState<S, R, Auth> {
@@ -52,7 +52,7 @@ impl<S: DictationService, R: RateLimitService + Clone, Auth> DictationRouterStat
     pub fn new(
         service: S,
         rate_limiter: R,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service: Arc::new(service),
@@ -68,7 +68,7 @@ impl<S, R, Auth> FromRef<DictationRouterState<S, R, Auth>> for Arc<S> {
     }
 }
 
-impl<S, R, Auth> FromRef<DictationRouterState<S, R, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, R, Auth> FromRef<DictationRouterState<S, R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &DictationRouterState<S, R, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -78,7 +78,7 @@ impl<S, R, Auth> RateLimitService for DictationRouterState<S, R, Auth>
 where
     S: Send + Sync + 'static,
     R: RateLimitService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     async fn check_rate_limit(
         &self,
@@ -101,13 +101,13 @@ where
 
 /// Per-user transcription rate limit. Only signed-in users may dictate; bots,
 /// harnesses, and internal callers are rejected by the `UserOnly` policy.
-pub struct PerUserDictationRateLimit<Auth>(MacroAuthorizationExtractor<Auth, UserOnly>);
+pub struct PerUserDictationRateLimit<Auth>(RoxAuthorizationExtractor<Auth, UserOnly>);
 
 impl<S, Auth> RateLimitExtractable<S> for PerUserDictationRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     fn config() -> RateLimitConfig {
         RateLimitConfig {
@@ -126,8 +126,8 @@ where
 impl<S, Auth> FromRequestParts<S> for PerUserDictationRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     type Rejection = Response;
 
@@ -135,7 +135,7 @@ where
         parts: &mut axum::http::request::Parts,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOnly>> = parts
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOnly>> = parts
             .extract_with_state(state)
             .await
             .map_err(IntoResponse::into_response)?;
@@ -153,7 +153,7 @@ pub fn dictation_router<S, R, Auth, T>(state: DictationRouterState<S, R, Auth>) 
 where
     S: DictationService,
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -228,7 +228,7 @@ pub struct EncodedAudioBody(
     )
 )]
 pub async fn transcribe_handler<S, R, Auth>(
-    Cached(user): Cached<MacroAuthorizationExtractor<Auth, UserOnly>>,
+    Cached(user): Cached<RoxAuthorizationExtractor<Auth, UserOnly>>,
     _limit: RateLimitExtractor<PerUserDictationRateLimit<Auth>, DictationRouterState<S, R, Auth>>,
     State(service): State<Arc<S>>,
     Query(query): Query<TranscribeQuery>,
@@ -237,7 +237,7 @@ pub async fn transcribe_handler<S, R, Auth>(
 where
     S: DictationService,
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let language = query
         .language

@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 use feature_flags::outbound::fake::FakeFeatureFlags;
 use feature_flags::{FlagSnapshot, FlagValue};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use model_entity::EntityType;
 use sqlx::PgPool;
 
@@ -20,8 +20,8 @@ pub(crate) mod runs;
 pub(crate) const OWNER: &str = "macro|suggestions-owner@rox.one";
 const OTHER: &str = "macro|suggestions-other@rox.one";
 
-pub(crate) fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+pub(crate) fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 /// Items the person can open: all but those named in `denied`; those in
@@ -41,7 +41,7 @@ pub(crate) struct AccessDown;
 impl SuggestionAccess for FakeAccess {
     type Err = AccessDown;
 
-    async fn can_view(&self, _: &MacroUserIdStr<'_>, target: &Target) -> Result<bool, Self::Err> {
+    async fn can_view(&self, _: &RoxUserIdStr<'_>, target: &Target) -> Result<bool, Self::Err> {
         if self.failing.lock().unwrap().contains(&target.entity_id) {
             return Err(AccessDown);
         }
@@ -71,7 +71,7 @@ impl SuggestionDrafts for FakeDrafts {
 
     async fn email_draft(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         draft: Uuid,
     ) -> Result<Option<FoundDraft>, Self::Err> {
         Ok(self
@@ -102,7 +102,7 @@ pub(crate) struct FakeWaits {
 impl ReplyWaits for FakeWaits {
     async fn waiting(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> Result<Option<Waiting>, rootcause::Report> {
         if self.failing.lock().unwrap().contains(&target.entity_id) {
@@ -143,7 +143,7 @@ impl GenerationSessions for RowSessions {
         Ok(row.map(|row| GenerationSession {
             session: row.session_id,
             generation: row.generation_id,
-            user: MacroUserIdStr::try_from(row.user_id).unwrap(),
+            user: RoxUserIdStr::try_from(row.user_id).unwrap(),
             kind: row.kind.parse().unwrap(),
             surfaces: Vec::new(),
             trace_id: None,
@@ -171,7 +171,7 @@ struct FakeAudience(Mutex<Vec<(String, String)>>);
 impl SuggestionAudience for FakeAudience {
     async fn seen(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: &str,
         _: chrono::DateTime<Utc>,
     ) -> Result<(), rootcause::Report> {
@@ -198,7 +198,7 @@ struct FakeRoutineSuggestions {
 impl RoutineSuggestions for FakeRoutineSuggestions {
     async fn dismiss_suggestion(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         suggestion: Uuid,
     ) -> Result<bool, rootcause::Report> {
         self.dismissed.lock().unwrap().push(suggestion);
@@ -207,7 +207,7 @@ impl RoutineSuggestions for FakeRoutineSuggestions {
 
     async fn texts(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         suggestions: &[Uuid],
         timezone: chrono_tz::Tz,
     ) -> Result<Vec<(Uuid, RoutineText)>, rootcause::Report> {
@@ -353,7 +353,7 @@ impl Harness {
     /// The person accepts suggestion `id` in the app, as it is now.
     pub(crate) async fn accept(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<(), SuggestionError> {
         let shown = PgSuggestionRepo::new(self.pool.clone())

@@ -24,22 +24,22 @@ export function GranolaCard() {
           />
         }
         title="Granola"
-        description="Import Granola meetings into Calls to make transcripts available to agents and team-level memory."
+        description="Импортирует встречи Granola в звонки, чтобы расшифровки были доступны агентам и памяти команды."
         status={
           <Switch>
             <Match when={granola.status() === 'connected'}>
-              <StatusDot state="connected" label="Connected" />
+              <StatusDot state="connected" label="Подключено" />
             </Match>
             <Match when={granola.status() === 'disabled'}>
-              <StatusDot state="attention" label="Paused" />
+              <StatusDot state="attention" label="На паузе" />
             </Match>
           </Switch>
         }
       >
-        <Switch fallback={<span class="text-xs text-ink-muted">Loading…</span>}>
+        <Switch fallback={<span class="text-xs text-ink-muted">Загрузка…</span>}>
           <Match when={granola.status() === 'connected'}>
             <ConnectAction
-              label="Disconnect"
+              label="Отключить"
               variant="danger"
               onClick={() =>
                 fireAndForget(granola.disconnect(), 'granola-settings')
@@ -49,7 +49,7 @@ export function GranolaCard() {
           </Match>
           <Match when={granola.status() === 'disabled'}>
             <ConnectAction
-              label="Resume"
+              label="Возобновить"
               onClick={() =>
                 fireAndForget(granola.connect(), 'granola-settings')
               }
@@ -58,7 +58,7 @@ export function GranolaCard() {
           </Match>
           <Match when={granola.status() === 'available'}>
             <ConnectAction
-              label="Connect"
+              label="Подключить"
               onClick={() =>
                 fireAndForget(granola.connect(), 'granola-settings')
               }

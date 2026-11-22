@@ -1,6 +1,6 @@
 import { createSignal, For } from 'solid-js';
 import { keepLastWords } from '../../utils/utilTypography';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 
 type GlyphKind =
   | 'mail'
@@ -46,7 +46,7 @@ export function AgentGlyph(props: { kind: GlyphKind }) {
 function AgentIdentity() {
   return (
     <span class="agents-identity">
-      <MacroMarkIcon /> <span>Rox</span>
+      <RoxMarkIcon /> <span>Rox</span>
     </span>
   );
 }

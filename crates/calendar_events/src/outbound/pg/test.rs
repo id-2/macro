@@ -16,7 +16,7 @@ use crate::domain::service::{CalendarService, GoogleCalendarBackfillFailureServi
 use crate::domain::team::{CalendarTeamRepository, TeamCalendarSharing};
 use crate::outbound::pg_team::PgCalendarTeamRepository;
 use chrono::{Duration, SubsecRound, TimeZone};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 fn complete_grant() -> GoogleScopeSet {
     GoogleScopeSet::parse(&GOOGLE_CALENDAR_SCOPES.join(" "))

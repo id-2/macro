@@ -33,8 +33,8 @@ fn rolled_out(on: bool) -> ConnectorBackends<Fake, Fake> {
     backends(Some(connect(true))).with_rollout(Arc::new(move |_| Box::pin(async move { on })))
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("caller@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("caller@example.com").unwrap()
 }
 
 fn record(provider: ConnectionProvider) -> PipedreamConnection {
@@ -61,7 +61,7 @@ impl McpUpstream for Fake {
 impl ConnectorCapabilities for Fake {
     async fn tools(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Vec<ConnectorTool>> {
         if self.name == "connect" && !self.connected {
@@ -77,7 +77,7 @@ impl ConnectorCapabilities for Fake {
 impl ConnectorDirectory for Fake {
     async fn search(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _search: Option<&str>,
         _cursor: Option<&str>,
         _limit: u32,
@@ -96,7 +96,7 @@ impl ConnectorDirectory for Fake {
 
     async fn retrieve(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Option<CatalogEntry>> {
         Ok(self.apps.contains(&app_slug).then(|| CatalogEntry {
@@ -109,8 +109,8 @@ impl ConnectorDirectory for Fake {
     }
 }
 
-impl MacroConnect for Fake {
-    async fn connect_only(&self, _user_id: &MacroUserIdStr<'static>) -> bool {
+impl RoxConnect for Fake {
+    async fn connect_only(&self, _user_id: &RoxUserIdStr<'static>) -> bool {
         self.name == "connect"
     }
 
@@ -124,7 +124,7 @@ impl MacroConnect for Fake {
 
     async fn create_connect_session(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _app: &ConnectApp,
     ) -> anyhow::Result<String> {
         Ok(format!("https://{}.test/session", self.name))
@@ -132,7 +132,7 @@ impl MacroConnect for Fake {
 
     async fn is_connected(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _app_id: &str,
     ) -> anyhow::Result<bool> {
         Ok(self.connected)
@@ -140,7 +140,7 @@ impl MacroConnect for Fake {
 
     async fn delete_connection(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _app_id: &str,
     ) -> anyhow::Result<()> {
         Ok(())

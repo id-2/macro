@@ -7,30 +7,40 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { useVisibleCalendarsQuery } from '@queries/calendar/calendars';
 import { useEmailLinksQuery } from '@queries/email/link';
 import type { Link as EmailLink } from '@service-email/generated/schemas';
-import { Button } from '@ui';
+import { Button, useImperativeDialog } from '@ui';
 import { createMemo, For, Show } from 'solid-js';
+import { CreateRoxCalendarDialog } from './CreateRoxCalendarDialog';
 
 const SETUP_MESSAGES = {
   connect: {
-    title: 'Connect your calendar',
+    title: 'Подключите календарь',
     description:
-      'Connect a Google or Microsoft account to show your calendar events.',
-    action: 'Connect calendar',
+      'Подключите аккаунт Google или Microsoft, чтобы видеть события календаря.',
+    action: 'Подключить календарь',
+  },
+  // A workspace with no calendar at all needs its own calendar first: Rox
+  // keeps that one itself, so it is the shortest way to a working grid.
+  create: {
+    title: 'Создайте календарь Rox',
+    description:
+      'Календарь Rox хранит события внутри Rox — подключать почту не нужно.',
+    action: 'Создать календарь Rox',
   },
   permission: {
-    title: 'Enable calendar',
-    description: 'Grant calendar access to show your events in Rox.',
-    action: 'Grant access',
+    title: 'Включите календарь',
+    description: 'Дайте доступ к календарю, чтобы видеть события в Rox.',
+    action: 'Разрешить доступ',
   },
   disabled: {
-    title: 'Calendar is off',
-    description: 'Grant calendar access again to show your events in Rox.',
-    action: 'Turn on',
+    title: 'Календарь выключен',
+    description: 'Снова дайте доступ к календарю, чтобы видеть события в Rox.',
+    action: 'Включить',
   },
   reauth: {
-    title: 'Reconnect calendar',
-    description: 'Reconnect your account to resume calendar sync.',
-    action: 'Reconnect',
+    title: 'Подключите календарь снова',
+    description:
+      'Подключите аккаунт заново, чтобы синхронизация календаря продолжилась.',
+    action: 'Подключить снова',
   },
 } as const;
 
@@ -62,6 +72,18 @@ export function SetupStatus() {
           .filter(isExternalEmailLink)
           .filter((link) => link.macro_id === userId())
       : [];
+
+  // A calendar Rox keeps itself needs no Google or Microsoft grant, so its
+  // presence means the grid has somewhere to put events.
+  const ownCalendars = createMemo(() =>
+    calendarsQuery.isSuccess
+      ? (calendarsQuery.data ?? []).filter(
+          (calendar) => calendar.provider === 'rox' && calendar.isWritable
+        )
+      : []
+  );
+
+  const createCalendar = useImperativeDialog(CreateRoxCalendarDialog);
 
   const hasEvents = () =>
     (calendarPager.activeData()?.events().length ?? 0) > 0 ||
@@ -110,14 +132,29 @@ export function SetupStatus() {
     return 'connect';
   });
 
-  const setupMessage = createMemo(
-    () => SETUP_MESSAGES[setupState() ?? 'connect']
+  // Nothing to put an event on: a Rox calendar is the shortest setup, and
+  // connecting a mailbox is a second way once that one exists.
+  const needsOwnCalendar = createMemo(
+    () =>
+      setupState() === 'connect' &&
+      calendarsQuery.isSuccess &&
+      (calendarsQuery.data?.length ?? 0) === 0
+  );
+
+  const setupMessage = createMemo(() =>
+    needsOwnCalendar()
+      ? SETUP_MESSAGES.create
+      : SETUP_MESSAGES[setupState() ?? 'connect']
   );
 
   // The permission and disabled states both sit on a working mailbox —
   // turning calendar off leaves Gmail untouched — so they ask for calendar
   // alone. Connecting and reconnecting need the mailbox scopes alongside it.
   const startSetup = () => {
+    if (needsOwnCalendar()) {
+      createCalendar.open({});
+      return;
+    }
     const state = setupState();
     const links = ownLinks();
     const link =
@@ -156,7 +193,7 @@ export function SetupStatus() {
       </Show>
       <Show when={setupState() !== undefined}>
         <Show
-          when={!hasEvents() && !seesWorkingCalendar()}
+          when={!hasEvents() && !seesWorkingCalendar() && ownCalendars().length === 0}
           fallback={
             <div class="absolute right-2 bottom-2 z-20 flex items-center gap-2 rounded-full border border-edge-muted bg-surface py-1 pr-1 pl-2.5 text-xs text-ink-muted shadow-menu">
               <span>{setupMessage().title}</span>

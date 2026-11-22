@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 
 use crate::api::context::{ApiContext, AuthorizationService};
@@ -23,15 +23,11 @@ use crate::api::context::{ApiContext, AuthorizationService};
 #[tracing::instrument(skip(ctx, user))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, Response> {
-    let email = user
-        .authorization
-        .user
-        .user_context
-        .user_id
-        .replace("macro|", "");
-    notification_db_client::unsubscribe::email::upsert_email_unsubscribe(&ctx.db, &email)
+    let user_context = &user.authorization.user.user_context;
+    let email = rox_user_id::user_id::strip_user_id_prefix(&user_context.user_id);
+    notification_db_client::unsubscribe::email::upsert_email_unsubscribe(&ctx.db, email)
         .await
         .map_err(|e| {
             tracing::error!(error=?e, email=?email, "unable to unsubscribe email");

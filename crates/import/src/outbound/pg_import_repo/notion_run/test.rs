@@ -1,16 +1,16 @@
 use std::time::Duration;
 
 use import_notion::domain::model::{ImportScope, NotionId};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use sqlx::PgPool;
 
 use super::*;
 use crate::domain::models::{ImportKind, ImportSource, ImportStatus};
 use crate::domain::ports::{ImportRepo, NotionPlanRepo, PlanRow};
 
-fn user(label: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|{label}@example.com"))
+fn user(label: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|{label}@example.com"))
         .unwrap()
         .into_owned()
 }
@@ -149,7 +149,7 @@ async fn an_expired_lease_is_adopted_once_and_a_finished_run_never(pool: PgPool)
 async fn concurrent_adopters_split_stalled_runs_without_overlap(pool: PgPool) {
     let repo = PgImportRepo::new(pool);
     let dead = Uuid::now_v7();
-    let users: Vec<MacroUserIdStr<'static>> = (0..6)
+    let users: Vec<RoxUserIdStr<'static>> = (0..6)
         .map(|index| user(&format!("lease-many-{index}")))
         .collect();
     for owner in &users {
@@ -361,7 +361,7 @@ async fn the_root_folder_outlives_the_run_that_made_it(pool: PgPool) {
     assert_eq!(repo.root_folder(&alice).await.unwrap(), Some(folder));
 }
 
-async fn review(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> Uuid {
+async fn review(pool: &PgPool, owner: &RoxUserIdStr<'static>) -> Uuid {
     let session = Uuid::now_v7();
     sqlx::query!(
         r#"INSERT INTO agent_session (id, owner_id, bot_id, harness, model, workspace, for_warming) VALUES ($1, $2, '00000000-0000-0000-0000-00000000a2a2', 'macro-inmem', 'test-model', '/workspace', false)"#,

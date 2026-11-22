@@ -16,8 +16,8 @@ use axum::{
 };
 use crm::domain::auth::CrmTeamReceipt;
 use entity_access::domain::models::MemberTeamRole;
-use macro_authorization::{MacroAuthorizationExtractor, MacroUserAuthentication, UserOrInternal};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_authorization::{RoxAuthorizationExtractor, RoxUserAuthentication, UserOrInternal};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use model::{response::ErrorResponse, user::UserContext};
 use models_opensearch::SearchEntityType;
 use models_search::unified::SearchEntityFilters;
@@ -249,7 +249,7 @@ struct ContentHits {
 /// thread meets `states` (see [`read_until_page_kept`]).
 async fn search_content(
     ctx: &SearchHandlerState,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
     args: UnifiedSearchArgs,
     states: &ThreadStates,
 ) -> Result<ContentHits, SearchError> {
@@ -358,7 +358,7 @@ where
 /// by: who called, the mode, and sizes. The request itself stays off it, since
 /// the query and the filter values are whatever the user typed or picked.
 fn unified_search_span(
-    user: &MacroUserAuthentication,
+    user: &RoxUserAuthentication,
     query_params: &SearchPaginationParams,
     req: &UnifiedSearchRequest,
 ) -> tracing::Span {
@@ -410,7 +410,7 @@ fn searched_entity_types(
 /// by calling individual simple search endpoints for each entity type
 pub(in crate::api::search) async fn perform_unified_search(
     ctx: &SearchHandlerState,
-    user: &MacroUserAuthentication,
+    user: &RoxUserAuthentication,
     crm_access: Option<&CrmTeamReceipt<MemberTeamRole>>,
     query_params: SearchPaginationParams,
     req: UnifiedSearchRequest,
@@ -449,7 +449,7 @@ async fn search_unified_sources(
     if user_id.is_empty() {
         return Err(SearchError::NoUserId);
     }
-    let user_id = MacroUserId::parse_from_str(&user_id)
+    let user_id = RoxUserId::parse_from_str(&user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?
         .lowercase();
 
@@ -1076,7 +1076,7 @@ async fn search_unified_sources(
 )]
 pub async fn handler(
     State(ctx): State<SearchHandlerState>,
-    authorization: MacroAuthorizationExtractor<SearchAuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<SearchAuthorizationService, UserOrInternal>,
     extract::Query(query_params): extract::Query<SearchPaginationParams>,
     extract::Json(req): extract::Json<UnifiedSearchRequest>,
 ) -> Result<Json<SimpleSearchResponse>, SearchError> {

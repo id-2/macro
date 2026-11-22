@@ -18,9 +18,9 @@ included static docs Worker.
 To get started, make a Rox client
 
 ```ts
-import { Rox } from '@macro-inc/sdk';
+import { Rox } from '@rox-one/sdk';
 
-const macro = new Rox({ }); // uses MACRO_API_KEY env var
+const macro = new Rox({ }); // uses ROX_API_KEY env var
 ```
 
 ### Authenticating
@@ -35,10 +35,10 @@ Every request the SDK sends carries exactly one Rox credential. There are three 
 
 #### API key
 
-The default for scripts and integrations. Put the key in `MACRO_API_KEY` and construct with no options.
+The default for scripts and integrations. Put the key in `ROX_API_KEY` and construct with no options.
 
 ```ts
-import { Rox } from '@macro-inc/sdk';
+import { Rox } from '@rox-one/sdk';
 
 const macro = new Rox({});
 const me = await macro.users.me();
@@ -47,14 +47,14 @@ const me = await macro.users.me();
 Or pass it in code. `token` accepts an API key or a bearer token. The SDK picks the header from the prefix.
 
 ```ts
-const macro = new Rox({ token: process.env.MACRO_API_KEY });
+const macro = new Rox({ token: process.env.ROX_API_KEY });
 ```
 
 The explicit form names the credential kind. Use it when the key is not from an env var, or when it predates the `mak_` prefix.
 
 ```ts
 const macro = new Rox({
-  auth: { type: 'user', apiKey: process.env.MACRO_API_KEY },
+  auth: { type: 'user', apiKey: process.env.ROX_API_KEY },
 });
 ```
 
@@ -102,7 +102,7 @@ in Settings → Account Managers.
 #### Bot token
 
 ```ts
-const asBot = new Rox({ auth: { type: 'bot', token: process.env.MACRO_BOT_TOKEN } });
+const asBot = new Rox({ auth: { type: 'bot', token: process.env.ROX_BOT_TOKEN } });
 const asWolf = asBot.requestedAs('macro|wolf@rox.one');
 ```
 
@@ -123,9 +123,9 @@ The backend rejects a request carrying two credentials with `400 ambiguous crede
 | You passed | Header sent |
 | --- | --- |
 | `apiKey: '…'` | `x-macro-user-api-key: …` |
-| `token: 'mak_…'` or `MACRO_API_KEY=mak_…` | `x-macro-user-api-key: mak_…` |
-| `token: '<jwt>'` or `MACRO_API_KEY=<jwt>` | `Authorization: Bearer <jwt>` |
-| `token: 'mbot_…'` | throws. Use `auth: { type: 'bot', token }` or `MACRO_BOT_TOKEN`. |
+| `token: 'mak_…'` or `ROX_API_KEY=mak_…` | `x-macro-user-api-key: mak_…` |
+| `token: '<jwt>'` or `ROX_API_KEY=<jwt>` | `Authorization: Bearer <jwt>` |
+| `token: 'mbot_…'` | throws. Use `auth: { type: 'bot', token }` or `ROX_BOT_TOKEN`. |
 | `type: 'bot'` | `x-macro-bot-token` plus `x-macro-bot-scope` |
 
 ### Accessing our API
@@ -390,18 +390,18 @@ const results = await database.applyOps(
 // results[1] is { kind: 'rows', table, tableVersion, change: { kind: 'inserted', rows: [rowId] } }
 ```
 
-A refusal throws `MacroOpRefusedError`, naming the op at fault (`op`, and
+A refusal throws `RoxOpRefusedError`, naming the op at fault (`op`, and
 `row` / `column` when one is) and, when the batch minted an id that already
 names something, that id as `taken` (`{ kind: 'table' | 'column' | 'option' |
 'view', id }`). A retried batch whose first attempt committed refuses this way.
 
 ```ts
-import { MacroOpRefusedError } from '@macro-inc/sdk';
+import { RoxOpRefusedError } from '@rox-one/sdk';
 
 try {
   await database.createTable({ name: 'Guests' });
 } catch (error) {
-  if (error instanceof MacroOpRefusedError) console.log(error.op, error.taken);
+  if (error instanceof RoxOpRefusedError) console.log(error.op, error.taken);
 }
 ```
 
@@ -420,7 +420,7 @@ Use the `msg` tagged template to build rich message bodies for channel messages
 or documents.
 
 ```ts
-import { msg, here } from '@macro-inc/sdk';
+import { msg, here } from '@rox-one/sdk';
 
 const channel = macro.channels.byId('chan_1');
 const user = macro.users.byId('user_1');
@@ -926,7 +926,7 @@ stream — no public URL, persisted webhook, or signing secret required.
 
 ```ts
 const macro = new Rox({
-  token: process.env.MACRO_API_KEY,
+  token: process.env.ROX_API_KEY,
 });
 
 const me = await macro.users.me();
@@ -982,14 +982,14 @@ macro.events.on('agent_session.settled', async ({ metadata, session, thread }) =
 ### Persisted webhooks
 
 To receive the same events as HTTPS POSTs instead of (or in addition to) SSE,
-register a webhook and pass a `webhookSecret` (or set `MACRO_WEBHOOK_SECRET`).
+register a webhook and pass a `webhookSecret` (or set `ROX_WEBHOOK_SECRET`).
 Use a framework like Hono or Express to handle the request; the SDK verifies
 the signature and dispatches.
 
 ```ts
 const macro = new Rox({
-  token: process.env.MACRO_API_KEY,
-  webhookSecret: process.env.MACRO_WEBHOOK_SECRET,
+  token: process.env.ROX_API_KEY,
+  webhookSecret: process.env.ROX_WEBHOOK_SECRET,
 });
 
 macro.events.on('message.posted', async ({ metadata, target }) => {
@@ -1254,7 +1254,7 @@ messages, mentions, mutations, and delivery references must belong to the same c
 
 ## Live call media
 
-Use `@macro-inc/sdk/calls/node` or `@macro-inc/sdk/calls/browser` for room
+Use `@rox-one/sdk/calls/node` or `@rox-one/sdk/calls/browser` for room
 connections and screen sharing. Install the optional LiveKit runtime only when
 using those helpers. The core import does not load or bundle call media code.
 See [Call rooms](CALLS.md) for installation and examples.

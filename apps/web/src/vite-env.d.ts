@@ -18,6 +18,11 @@ interface ImportMetaEnv {
    * Unset for `run_dev`, whose proxy shares cookies with the dev gateway.
    */
   readonly VITE_LOCAL_STACK?: string;
+  /**
+   * `true` only in a local build that signs in with the code the auth service
+   * returns (`PASSWORDLESS_RETURN_CODE=true`) without opening Mailpit.
+   */
+  readonly VITE_PASSWORDLESS_AUTO_CODE?: string;
   readonly VITE_OTEL_EXPORTER_URL?: string;
   readonly VITE_OTEL_ENV?: string;
   readonly VITE_ENABLE_BROWSER_OTEL?: string;

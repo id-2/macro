@@ -10,7 +10,7 @@ calendar_events = { path = "../calendar_events" }
 chrono = { workspace = true }
 futures = { workspace = true }
 graphql_common = { path = "../graphql_common" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 models_pagination = { path = "../models_pagination" }
 rootcause = { workspace = true }
 tracing = { workspace = true }

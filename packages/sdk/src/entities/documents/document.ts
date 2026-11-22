@@ -21,13 +21,13 @@ import {
 } from '../../mentions';
 import {
   iterate,
-  MacroApiError,
-  MacroError,
+  RoxApiError,
+  RoxError,
   mapConcurrently,
   paginate,
   unwrap,
 } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { rejectUnknownOptions } from '../../utils/options';
 import { Canvas } from '../canvases/canvas';
 import type { Channel } from '../channels/channel';
@@ -266,13 +266,13 @@ export class Document
   }
 
   /** A handle to a document by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Document {
+  static byId(client: RoxClient, id: string): Document {
     return new Document(client, id);
   }
 
   /** Create a markdown document. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: { name: string; markdown?: string; project?: Project },
   ): Promise<Document> {
     rejectUnknownOptions('documents.create', opts, {
@@ -298,7 +298,7 @@ export class Document
    * any markdown area.
    */
   static async createSnippet(
-    client: MacroClient,
+    client: RoxClient,
     opts: { name: string; markdown?: string; project?: Project },
   ): Promise<Document> {
     rejectUnknownOptions('documents.createSnippet', opts, {
@@ -325,7 +325,7 @@ export class Document
    * matches its `description`.
    */
   static async createSkill(
-    client: MacroClient,
+    client: RoxClient,
     opts: {
       name: string;
       description: string;
@@ -355,7 +355,7 @@ export class Document
 
   /** The user's recent documents, most recent first, auto-paginated; `maxItems` caps the total. */
   static recent(
-    client: MacroClient,
+    client: RoxClient,
     opts?: { pageSize?: number; fileType?: string; maxItems?: number },
   ): AsyncGenerator<Document> {
     const limit = opts?.pageSize ?? 50;
@@ -394,7 +394,7 @@ export class Document
    * filtered out here. Page through the whole trash with
    * {@link Document.trashed}.
    */
-  static async recentlyDeleted(client: MacroClient): Promise<Document[]> {
+  static async recentlyDeleted(client: RoxClient): Promise<Document[]> {
     const { data } = unwrap(await client.storage.recentlyDeleted({}));
     return data.items
       .filter((i) => i.type === 'document')
@@ -407,7 +407,7 @@ export class Document
    * are filtered out, so a page can yield fewer documents.
    */
   static trashed(
-    client: MacroClient,
+    client: RoxClient,
     opts?: { pageSize?: number; maxItems?: number },
   ): AsyncGenerator<Document> {
     return iterate('documents.trashed', opts, { pageSize: true }, () =>
@@ -579,7 +579,7 @@ export class Document
    * ```js
    * const file = await attachment.toDocument();
    * const bytes = await file.bytes();
-   * const copy = await macro.documents.upload({
+   * const copy = await rox.documents.upload({
    *   name: await attachment.filename(),
    *   content: bytes,
    *   project,
@@ -592,7 +592,7 @@ export class Document
   async bytes(): Promise<Uint8Array<ArrayBuffer>> {
     const fileType = await this.fileType();
     if (fileType && NATIVE_FILE_TYPES.has(fileType))
-      throw new MacroError(
+      throw new RoxError(
         `a native ${fileType} document has no stored file; read it with content()`,
       );
     return new Uint8Array(await (await this.download()).arrayBuffer());
@@ -607,7 +607,7 @@ export class Document
     );
     const res = await fetch(presigned_url);
     if (!res.ok)
-      throw new MacroApiError(res.status, {
+      throw new RoxApiError(res.status, {
         message: 'failed to download document content',
       });
     return res;

@@ -22,7 +22,7 @@ fn harness(connected: bool) -> Harness {
         last_connected_at: None,
         computer_id: None,
         team_agent_user_id: None,
-        claude_mode: ClaudeMode::MacroCredits,
+        claude_mode: ClaudeMode::RoxCredits,
     }
 }
 
@@ -44,9 +44,9 @@ mod approve_pairing_route {
     use crate::domain::ports::MockHarnessService;
     use axum::body::Body;
     use axum::http::Request;
-    use macro_authorization::{
-        CredentialOrigin, InternalAuthConfig, JwtValidator, MacroAuthorizationError,
-        MacroAuthorizationServiceImpl, MacroAuthorizationState, NoBotAuthorizer,
+    use rox_authorization::{
+        CredentialOrigin, InternalAuthConfig, JwtValidator, RoxAuthorizationError,
+        RoxAuthorizationServiceImpl, RoxAuthorizationState, NoBotAuthorizer,
         NoUserApiKeyAuthorizer, ValidatedCredential, ValidatedIdentity,
     };
     use rootcause::Report;
@@ -63,7 +63,7 @@ mod approve_pairing_route {
         fn validate_credential(
             &self,
             jwt: &str,
-        ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+        ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
             let agent = jwt.strip_prefix("agent:");
             let routine = jwt.strip_prefix("routine:");
             let user_id = agent.or(routine).unwrap_or(jwt);
@@ -71,7 +71,7 @@ mod approve_pairing_route {
                 origin: if user_id == jwt {
                     CredentialOrigin::Session
                 } else {
-                    CredentialOrigin::MacroApiJwt
+                    CredentialOrigin::RoxApiJwt
                 },
                 identity: ValidatedIdentity {
                     agent_id: agent.map(|_| bot_id::MACRO_AI_BOT_ID),
@@ -88,7 +88,7 @@ mod approve_pairing_route {
 
     fn router(service: MockHarnessService) -> axum::Router {
         let authorization =
-            MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
+            RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
                 Validator,
                 InternalAuthConfig {
                     api_key: "test-internal-key".to_owned(),
@@ -115,7 +115,7 @@ mod approve_pairing_route {
     async fn a_program_cannot_approve_a_pairing() {
         let mut header_only = approve(PERSON);
         header_only.headers_mut().insert(
-            macro_authorization::CODE_EXECUTION_HEADER,
+            rox_authorization::CODE_EXECUTION_HEADER,
             HeaderValue::from_static("1"),
         );
         for (program, request) in [

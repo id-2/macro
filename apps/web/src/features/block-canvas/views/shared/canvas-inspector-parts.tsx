@@ -9,7 +9,7 @@ import {
   setArtifactCommand,
   setPresentationOrderCommand,
   styleCommand,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { Button } from '@ui';
 import { createMemo, Show } from 'solid-js';
 import { ArtifactInspector } from '../../components/artifact-inspector';

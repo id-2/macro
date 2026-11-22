@@ -1,6 +1,5 @@
 import {
   clearSignupDraft,
-  Onboarding,
   OnboardingPending,
 } from '@app/features/onboarding/onboarding';
 import { LoadingBlock } from '@core/component/LoadingBlock';
@@ -12,7 +11,6 @@ import { getNativeMobilePlatform } from '@core/util/platform';
 import { getWebOrigin } from '@core/util/webOrigin';
 import { useNavigate, useSearchParams } from '@solidjs/router';
 import { createMemo, onMount } from 'solid-js';
-import { match } from 'ts-pattern';
 import { AuthProvider, type AuthUser } from './context/auth-context';
 import { sessionTokenParam } from './core/email-code';
 import {
@@ -26,8 +24,8 @@ import { AuthView } from './views/auth-view';
 import { MobileWebSignupView } from './views/mobile-web-signup-view';
 
 /**
- * /login and /signup. Once authenticated, first-time desktop users continue
- * into onboarding in place; everyone else proceeds into the app.
+ * /login and /signup. Every account leaves this page the same way: for the page
+ * it asked for, or for the app. Onboarding is a page of its own.
  */
 export function Login(props: { signupMode?: boolean }) {
   const [params] = useSearchParams();
@@ -39,6 +37,7 @@ export function Login(props: { signupMode?: boolean }) {
     <AuthProvider value={createAppAuthContext()}>
       <AuthView
         intent={props.signupMode ? 'signup' : 'login'}
+        emailOnly
         showApple={getNativeMobilePlatform() === 'ios'}
         compact={virtualKeyboardVisible()}
         initialEmail={email}
@@ -111,26 +110,18 @@ function needsAgentSetup(user: AuthUser) {
  * onboarding so the invitee joins first.
  */
 function PostAuthGate(props: { user: AuthUser; redirect: unknown }) {
-  // Compared by value so a refreshed user object never remounts onboarding.
+  // Compared by value so a refreshed user object never remounts the redirect.
   const target = createMemo(
     () =>
       postAuthTarget({
         tutorialComplete: props.user.tutorialComplete,
         isAgent: props.user.isAgent,
-        onboardsOnThisDevice: !isMobile() && !isNativeMobilePlatform(),
         redirect: props.redirect,
       }),
     undefined,
     { equals: deepEqual }
   );
-  return (
-    <>
-      {match(target())
-        .with({ t: 'onboarding' }, ({ next }) => <Onboarding next={next} />)
-        .with({ t: 'navigate' }, ({ to }) => <PostLoginRedirect target={to} />)
-        .exhaustive()}
-    </>
-  );
+  return <PostLoginRedirect target={target().to} />;
 }
 
 /** Login init runs in the per-method handlers; this only navigates. */

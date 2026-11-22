@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   EntityPropertiesSection,
   EntityTagsSection,
@@ -76,7 +77,7 @@ export function FilePropertiesSection(props: { order?: number }) {
   return (
     <SidePanel.Section
       id="properties"
-      title="Properties"
+      title={t('nav.properties')}
       defaultOpen
       order={props.order}
       render={(renderSection) => (
@@ -168,7 +169,7 @@ function DetailsSectionContent(props: { documentId: string }) {
         })()}
       >
         {(folder) => (
-          <EntityMetadataRow label="Folder">
+          <EntityMetadataRow label={t('nav.folder')}>
             <FolderLink projectId={folder().id} projectName={folder().name} />
           </EntityMetadataRow>
         )}

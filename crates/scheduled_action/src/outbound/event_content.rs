@@ -22,8 +22,8 @@ use email::domain::{
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel, ViewOnly};
 use github::domain::models::GithubWebhookReceived;
 use lexical_client::{LexicalClient, parse_markdown::MarkdownTarget};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use mention_utils::parse::{ParsedXmlText, PlainTextFormatter, XmlFormatter};
 use messages::domain::{
     api::MessageReader,
@@ -104,7 +104,7 @@ where
 {
     async fn read(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
     ) -> Result<Value, Report> {
         let event = &run.pending.event;
@@ -124,7 +124,7 @@ where
 {
     async fn read_event(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
     ) -> Result<RoutineEvent, Report> {
         let content = self.content(owner, run).await?;
@@ -174,7 +174,7 @@ where
 {
     async fn content(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
     ) -> Result<EventContent, Report> {
         let event = &run.pending.event;
@@ -228,7 +228,7 @@ where
 
     async fn channel(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         receipt: EntityAccessReceipt<ViewOnly>,
         event: &EventReference,
     ) -> Result<EventContent, Report> {
@@ -399,7 +399,7 @@ fn github_json(delivery: &GithubWebhookReceived) -> Value {
 }
 
 /// What every condition can rely on: what happened, when, and to whom.
-fn envelope(owner: &MacroUserIdStr<'static>, event: &EventReference, content: Value) -> Value {
+fn envelope(owner: &RoxUserIdStr<'static>, event: &EventReference, content: Value) -> Value {
     let mut value = json!({
         "event": event.event_name().as_str(),
         "occurred_at": event.published_at(),

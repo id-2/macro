@@ -5,8 +5,8 @@ use std::sync::Arc;
 
 use ai_billing::AiAdmissionService;
 use ai_usage::{AiFeature, UsageContext, UsageRecorder};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::models::{
     Billed, DEFAULT_FETCH_CHARS, DEFAULT_RESULTS, MAX_DOMAINS, MAX_EXCLUDED_DOMAINS,
@@ -22,14 +22,14 @@ mod test;
 #[derive(Debug, Clone)]
 pub struct WebCaller {
     /// The user whose allowance pays for the request.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// The entity the request relates to (a chat or agent session), if any.
     pub entity: Option<Uuid>,
 }
 
 impl WebCaller {
     /// A request attributed only to `user`.
-    pub fn user(user: MacroUserIdStr<'static>) -> Self {
+    pub fn user(user: RoxUserIdStr<'static>) -> Self {
         Self { user, entity: None }
     }
 }

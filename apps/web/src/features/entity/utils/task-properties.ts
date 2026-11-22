@@ -14,18 +14,18 @@ export function getTaskDueDate(
 }
 
 export const TASK_STATUS_OPTIONS = [
-  { value: PROPERTY_OPTION_IDS.STATUS.NOT_STARTED, label: 'Not Started' },
-  { value: PROPERTY_OPTION_IDS.STATUS.IN_PROGRESS, label: 'In Progress' },
-  { value: PROPERTY_OPTION_IDS.STATUS.IN_REVIEW, label: 'In Review' },
-  { value: PROPERTY_OPTION_IDS.STATUS.COMPLETED, label: 'Completed' },
-  { value: PROPERTY_OPTION_IDS.STATUS.CANCELED, label: 'Canceled' },
-] as const;
+  { value: PROPERTY_OPTION_IDS.STATUS.NOT_STARTED, label: 'Не начато' },
+  { value: PROPERTY_OPTION_IDS.STATUS.IN_PROGRESS, label: 'В работе' },
+  { value: PROPERTY_OPTION_IDS.STATUS.IN_REVIEW, label: 'На проверке' },
+  { value: PROPERTY_OPTION_IDS.STATUS.COMPLETED, label: 'Завершено' },
+  { value: PROPERTY_OPTION_IDS.STATUS.CANCELED, label: 'Отменено' },
+];
 
 export const TASK_PRIORITY_OPTIONS = [
-  { value: PROPERTY_OPTION_IDS.PRIORITY.URGENT, label: 'Urgent' },
-  { value: PROPERTY_OPTION_IDS.PRIORITY.HIGH, label: 'High' },
-  { value: PROPERTY_OPTION_IDS.PRIORITY.MEDIUM, label: 'Medium' },
-  { value: PROPERTY_OPTION_IDS.PRIORITY.LOW, label: 'Low' },
+  { value: PROPERTY_OPTION_IDS.PRIORITY.URGENT, label: 'Срочно' },
+  { value: PROPERTY_OPTION_IDS.PRIORITY.HIGH, label: 'Высокий' },
+  { value: PROPERTY_OPTION_IDS.PRIORITY.MEDIUM, label: 'Средний' },
+  { value: PROPERTY_OPTION_IDS.PRIORITY.LOW, label: 'Низкий' },
 ] as const;
 
 // Retired from the default stage set, but companies may still carry these

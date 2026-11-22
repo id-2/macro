@@ -2,7 +2,7 @@
 use super::{AgentIdentity, Preview, PreviewError};
 use agent_fold::domain::log::AgentSessionId;
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::io::{AsyncRead, AsyncWrite};
 
 /// Duplex byte stream; independent of its SSH transport.
@@ -29,7 +29,7 @@ pub trait Authority: Send + Sync {
     async fn viewer(
         &self,
         session: AgentSessionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<(), PreviewError>;
     /// Whether the originating agent session remains open.
     async fn active(&self, session: AgentSessionId) -> Result<(), PreviewError>;
@@ -42,7 +42,7 @@ pub trait Events: Send + Sync {
     async fn changed(
         &self,
         preview: &Preview,
-        viewers: &[MacroUserIdStr<'static>],
+        viewers: &[RoxUserIdStr<'static>],
     ) -> Result<(), PreviewError>;
 }
 

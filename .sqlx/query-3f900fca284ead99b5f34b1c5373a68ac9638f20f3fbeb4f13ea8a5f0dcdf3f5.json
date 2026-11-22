@@ -1,0 +1,29 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO crm_email_thread_exclusions (team_id, user_id, link_id, thread_id) SELECT $1, l.macro_id, l.id, t.id FROM email_threads t JOIN email_links l ON l.id = t.link_id WHERE t.id = $2 RETURNING link_id, user_id",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "link_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "user_id",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false
+    ]
+  },
+  "hash": "3f900fca284ead99b5f34b1c5373a68ac9638f20f3fbeb4f13ea8a5f0dcdf3f5"
+}

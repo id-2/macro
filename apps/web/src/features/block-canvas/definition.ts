@@ -52,7 +52,7 @@ export const definition = defineBlock({
           owner: documentMetadata.owner,
           documentId: documentMetadata.documentId,
           documentVersionId: documentMetadata.documentVersionId.toString(),
-          // @ts-ignore: TODO: fix / replace @macro-inc/document-processing-job-types
+          // @ts-ignore: TODO: fix / replace @rox-one/document-processing-job-types
           fileType: documentMetadata.fileType,
         },
         fileName: documentMetadata.documentName,
@@ -62,7 +62,7 @@ export const definition = defineBlock({
           blockAcceptedFileExtensionToMimeType[
             documentMetadata.fileType ?? 'canvas'
           ],
-        // @ts-ignore: TODO: fix / replace @macro-inc/document-processing-job-types
+        // @ts-ignore: TODO: fix / replace @rox-one/document-processing-job-types
         metadata: documentMetadata,
       });
 

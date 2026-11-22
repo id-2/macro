@@ -2,7 +2,7 @@
 //! Access matches attachment reads; the owner mailbox supplies provider credentials.
 use super::{draft_attachments::AttachmentError, mailbox::MailboxKey, ports::EmailUserRepo};
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_email::service::link::Link;
 use std::future::Future;
@@ -47,7 +47,7 @@ impl<R: MessageSourceRepository, P: MessageSourceBytes, A: EntityAccessService>
 {
     pub async fn download(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<MessageSource, AttachmentError> {
         let record = self

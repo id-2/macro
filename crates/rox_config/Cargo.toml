@@ -1,0 +1,23 @@
+[package]
+edition = "2024"
+name = "rox_config"
+publish = false
+version = "0.1.0"
+
+[dependencies]
+rox_config_derive = { path = "../rox_config_derive" }
+rox_env = { path = "../rox_env" }
+remote_env_var = { path = "../remote_env_var" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+thiserror = { workspace = true }
+workspace-hack = { version = "0.1", path = "../workspace-hack" }
+
+[dev-dependencies]
+rox_env_var = { path = "../rox_env_var" }
+tokio = { workspace = true, features = ["macros", "rt"] }
+
+[package.metadata.cargo-shear]
+# `rox_env_var` macros expand to `#[tracing::instrument]`.
+ignored = ["tracing"]

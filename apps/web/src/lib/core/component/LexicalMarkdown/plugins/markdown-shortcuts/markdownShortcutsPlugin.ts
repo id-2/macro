@@ -1,6 +1,6 @@
 import { registerMarkdownShortcuts, type Transformer } from '@lexical/markdown';
 import { mergeRegister } from '@lexical/utils';
-import { isConversionOnlyTransformer } from '@macro-inc/lexical-core';
+import { isConversionOnlyTransformer } from '@rox-one/lexical-core';
 import {
   $getSelection,
   $isParagraphNode,

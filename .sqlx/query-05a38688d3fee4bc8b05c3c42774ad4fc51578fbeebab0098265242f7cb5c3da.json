@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_contacts SET email_address = $1 WHERE id = '00000000-0000-4000-8000-000000000032'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Varchar"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "05a38688d3fee4bc8b05c3c42774ad4fc51578fbeebab0098265242f7cb5c3da"
+}

@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id,position,initial_complete,reader_revision,next_run_at,attachments_rechecked)\n        VALUES ($1,$5,1,'mail_folder','inbox-id','inbox-delta',true,NULL,now(),true),\n            ($2,$5,1,'mail_folder','sent-id','sent-delta',true,1,now() + interval '1 hour',true),\n            ($3,$5,1,'mail_folder','archive-id','archive-delta',true,NULL,now() + interval '1 hour',true),\n            ($4,$5,1,'mail_folder','projects-id','projects-delta',true,NULL,now() + interval '1 hour',true)\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e319eb8d1a5be9554388c13f155bc177a7b8f8dfa49a780f70fa6a4eed560656"
+}

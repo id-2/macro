@@ -5,6 +5,7 @@
  * pasted public URL, or an inline data URL.
  */
 
+import { t } from '@app/lib/i18n';
 import { getAttachmentKindFromFile } from '@channel/Input/utils/file-helpers';
 import { MediaImage } from '@channel/Media/MediaImage';
 import { MediaVideo } from '@channel/Media/MediaVideo';
@@ -105,7 +106,7 @@ export function AttachmentPart(props: { part: AttachmentPartData }) {
         <Match when={medium() === 'image'}>
           <button
             type="button"
-            aria-label="Open image viewer"
+            aria-label={t('agentChat.openImageViewer')}
             onClick={openViewer}
           >
             <MediaImage.Root>
@@ -121,7 +122,7 @@ export function AttachmentPart(props: { part: AttachmentPartData }) {
         <Match when={medium() === 'video'}>
           <button
             type="button"
-            aria-label="Open video viewer"
+            aria-label={t('agentChat.openVideoViewer')}
             onClick={openViewer}
           >
             <MediaVideo.Root class="group max-h-64 overflow-hidden border border-edge bg-surface">

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT DISTINCT t.link_id AS \"link_id!\" FROM email_threads t\n            WHERE crm_email_thread_allowed($1, t.id)\n            ORDER BY 1\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "link_id!",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "e2b7b3a3a7fd05351df0650516251ca0d67e3bce8906ecd3e7f8b9625c8d1543"
+}

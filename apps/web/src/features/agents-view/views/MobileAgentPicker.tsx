@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { MobileDrawer } from '@components/app/mobile/MobileDrawer';
 import {
   buildModelCatalog,
@@ -48,7 +49,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
     return (
       showAll() || search || frontier.length === 0
         ? providers
-        : [{ label: 'Suggested', options: frontier }]
+        : [{ label: t('agentControls.suggested'), options: frontier }]
     )
       .map((section) => ({
         label: section.label,
@@ -66,7 +67,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
     );
   const searchLabel = () =>
     browsing() || showAll()
-      ? 'Search models'
+      ? t('agentControls.searchModels')
       : macro()
         ? 'Search agents and models'
         : 'Search agents';
@@ -130,8 +131,8 @@ export function MobileAgentPicker(props: AgentPickerProps) {
           <div class="flex items-center gap-2 px-4 pb-3">
             <Show when={browsing() || showAll()}>
               <Button
-                aria-label={showAll() ? 'Back to Suggested' : 'Back to agents'}
-                tooltip={showAll() ? 'Back to Suggested' : 'Back to agents'}
+                aria-label={showAll() ? t('agentControls.backToSuggested') : t('agentControls.backToAgents')}
+                tooltip={showAll() ? t('agentControls.backToSuggested') : t('agentControls.backToAgents')}
                 variant="ghost"
                 size="icon-md"
                 onClick={() => {
@@ -227,7 +228,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
                   !showAll() &&
                   !query() &&
                   modelSections().some(
-                    (section) => section.label === 'Suggested'
+                    (section) => section.label === t('agentControls.suggested')
                   )
                 }
               >
@@ -239,7 +240,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
                     }}
                   >
                     <SquaresFour class="size-4 shrink-0 text-ink-muted" />
-                    <span class="flex-1">More models</span>
+                    <span class="flex-1">{t('agentControls.moreModels')}</span>
                     <CaretRight class="size-4" />
                   </MobileDrawer.Item>
                 </MobileDrawer.Section>
@@ -328,7 +329,7 @@ export function MobileAgentPicker(props: AgentPickerProps) {
                 }}
               >
                 <Plus class="size-4" />
-                Create agent
+                {t('agentControls.createAgent')}
               </Button>
             </div>
           </MobileDrawer.ScrollBody>

@@ -1,8 +1,8 @@
 use crate::api::context::AuthorizationService;
 use axum::extract::{Query, State};
 use axum::{http::StatusCode, response::IntoResponse};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::recents::deleted::{MAX_TRASH_PAGE_SIZE, TrashPosition};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::recents::deleted::{MAX_TRASH_PAGE_SIZE, TrashPosition};
 use model::item::Item;
 use model::response::{GenericErrorResponse, GenericResponse, TypedSuccessResponse};
 use models_pagination::{Base64Str, Cursor, CursorVal, CursorWithValAndFilter, DeletedAt};
@@ -49,7 +49,7 @@ pub type RecentlyDeletedResponse = TypedSuccessResponse<RecentlyDeletedResponseD
 #[tracing::instrument(skip_all)]
 pub async fn handler(
     State(db): State<PgPool>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Query(params): Query<RecentlyDeletedParams>,
     cursor: Option<CursorWithValAndFilter<String, DeletedAt, ()>>,
 ) -> impl IntoResponse {
@@ -62,7 +62,7 @@ pub async fn handler(
         id: cursor.id,
     });
 
-    let page = match macro_db_client::recents::deleted::get_recently_deleted(
+    let page = match rox_db_client::recents::deleted::get_recently_deleted(
         &db,
         user.authorization.user.macro_user_id.as_ref(),
         after.as_ref(),

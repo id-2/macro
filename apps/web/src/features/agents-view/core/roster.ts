@@ -155,10 +155,10 @@ function availability(
 ): Pick<RosterAgent, 'connectLabel' | 'unavailableReason'> {
   if (agent.harness === 'cursor' && input.cursorNeedsConnection)
     return {
-      connectLabel: 'Connect Cursor',
+      connectLabel: 'Подключить Cursor',
       unavailableReason: state.connected
         ? undefined
-        : 'Connect Cursor to start it',
+        : 'Подключите Cursor, чтобы запустить',
     };
   if (state.needsRuntimeAccess)
     return {
@@ -175,7 +175,7 @@ function availability(
       unavailableReason: 'Its machine is disconnected',
     };
   if (agent.harness === 'cursor' && !state.connected)
-    return { unavailableReason: 'Connect Cursor to start it' };
+    return { unavailableReason: 'Подключите Cursor, чтобы запустить' };
   return {};
 }
 
@@ -259,8 +259,8 @@ export function buildAgentRoster(input: RosterInput): RosterAgent[] {
       runtime: { label: 'Cursor', connected: input.cursorConnected },
       unavailableReason: input.cursorConnected
         ? undefined
-        : 'Connect Cursor to start it',
-      connectLabel: input.cursorNeedsConnection ? 'Connect Cursor' : undefined,
+        : 'Подключите Cursor, чтобы запустить',
+      connectLabel: input.cursorNeedsConnection ? 'Подключить Cursor' : undefined,
     },
     ...input.agents.map((agent) => persistedAgent(agent, input)),
   ];

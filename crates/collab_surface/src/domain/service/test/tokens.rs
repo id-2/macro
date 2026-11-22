@@ -31,7 +31,7 @@ async fn mint_token_maps_channel_role_to_edit() {
         .unwrap();
 
     let claims: model::document::DocumentPermissionsToken =
-        macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+        rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
     assert_eq!(claims.document_id, surface.id.to_string());
     assert_eq!(claims.access_level, AccessLevel::Edit);
 }
@@ -203,7 +203,7 @@ async fn parent_comment_access_mints_a_read_only_token() {
             .await
             .unwrap();
         let claims: model::document::DocumentPermissionsToken =
-            macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+            rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
         assert_eq!(claims.document_id, id.to_string());
         assert_eq!(claims.access_level, minted, "{parent:?}");
     }

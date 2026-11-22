@@ -1,4 +1,5 @@
 import { WorkspaceTexture } from '@app/components/WorkspaceTexture';
+import { RoxMark } from '@core/component/RoxMark';
 import CheckIcon from '@icon/system/regular/check.svg';
 import {
   createEffect,
@@ -14,7 +15,6 @@ import {
   type WorkspaceAccent,
 } from '../core/workspace-accent';
 import { ContinueButton } from './controls';
-import { MacroMarkIcon } from './macro-mark-icon';
 import './workspace-intro.css';
 
 /** An onboarding-only introduction; the public homepage keeps its own hero. */
@@ -72,11 +72,10 @@ export function WorkspaceIntro(props: {
         tabindex="-1"
         class="font-[Roboto_Slab_Variable] text-[30px] font-[315] leading-[1.2] tracking-[-.025em] outline-none [text-wrap:balance] sm:text-[36px]"
       >
-        Create your workspace
+        Какой цвет рабочего пространства
       </h1>
       <p class="mt-6 max-w-[460px] font-[Inter_Variable] text-sm leading-6 text-ink-muted sm:text-[15px] [text-wrap:balance]">
-        Choose your workspace color. You’ll connect accounts and invite
-        teammates next.
+        Выберите цвет. Его можно сменить позже.
       </p>
       <div
         class="relative mt-8 flex h-40 w-full max-w-[400px] items-center justify-center sm:h-44"
@@ -124,9 +123,9 @@ export function WorkspaceIntro(props: {
         </div>
         <button
           type="button"
-          aria-label="Play accent burst"
+          aria-label="Показать цвет"
           onClick={celebrateAccent}
-          class="workspace-intro-icon base-header-logo relative flex size-20 items-center justify-center rounded-[22px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
+          class="workspace-intro-icon base-header-logo relative size-20 overflow-hidden p-0 rounded-[22px] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ink"
           style={{
             color: 'var(--intro-accent)',
             background:
@@ -135,12 +134,16 @@ export function WorkspaceIntro(props: {
               'var(--onboarding-intro-shadow, inset .5px .5px 1px #ffffff1c, inset -.5px -.5px 1px #0008, 0 1px 1px #131313, 0 4px 10px #0005)',
           }}
         >
-          <MacroMarkIcon class="size-12 overflow-visible" />
+          <RoxMark
+            cover
+            class="absolute inset-0 size-full"
+            style={{ width: '100%', height: '100%' }}
+          />
         </button>
       </div>
       <fieldset class="mt-6 w-full max-w-[270px]">
         <legend class="mb-3 w-full text-xs text-ink-muted">
-          Your accent{' '}
+          Цвет{' '}
           <span class="text-ink-extra-muted">· {accent().name}</span>
         </legend>
         <div class="flex justify-center gap-2">
@@ -185,7 +188,7 @@ export function WorkspaceIntro(props: {
       <div class="mt-5">
         {props.action ?? (
           <ContinueButton
-            label="Get started"
+            label="Начать"
             onClick={() => props.onContinue(accent().color)}
           />
         )}

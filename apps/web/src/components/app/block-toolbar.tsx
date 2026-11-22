@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { Permissions } from '@core/component/SharePermissions';
 import type { EntityData } from '@entity';
 import type { ItemType } from '@service-storage/client';
@@ -47,7 +48,7 @@ export function BlockToolbar(props: {
       <SplitHeaderRight>
         <div class="order-[1000] flex items-center gap-2">
           <Show when={activeTools().length > 0}>
-            <HeaderActionGroup label="Document actions">
+            <HeaderActionGroup label={t('nav.documentActions')}>
               <For each={activeTools()}>
                 {(tool) =>
                   tool.buttonComponent ? (

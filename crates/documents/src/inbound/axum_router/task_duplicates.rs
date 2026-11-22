@@ -9,10 +9,10 @@ use axum::{
 use entity_access::domain::models::MemberTeamRole;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::{
-    DocumentAccessExtractor, OptionalMacroUserTeamExtractorV2,
+    DocumentAccessExtractor, OptionalRoxUserTeamExtractorV2,
 };
 use lexical_client::LexicalClient;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model::document::DocumentBasic;
 use model::response::GenericSuccessResponse;
 use models_permissions::share_permission::access_level::{OwnerAccessLevel, ViewAccessLevel};
@@ -74,7 +74,7 @@ pub struct TaskSimilaritySearchResponse {
 pub async fn get_task_duplicates_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -108,11 +108,11 @@ pub async fn get_task_duplicates_handler<
 pub async fn task_similarity_search_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
-    optional_team: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Svc, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
+    optional_team: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Svc, Auth>,
     Json(request): Json<TaskSimilaritySearchRequest>,
 ) -> Result<Json<TaskSimilaritySearchResponse>, DocumentError> {
     // Search the user's whole team, not just their own tasks: a duplicate is a
@@ -120,7 +120,7 @@ pub async fn task_similarity_search_handler<
     // back to owner-only scope.
     let team_id = optional_team
         .entity_access_receipt
-        .map(|team| macro_uuid::string_to_uuid(&team.entity().entity_id).unwrap());
+        .map(|team| rox_uuid::string_to_uuid(&team.entity().entity_id).unwrap());
     // The composer renders the draft body with lexical-core's
     // `markdownToEmbeddingText`, so we trust it as embedding-format here rather
     // than round-tripping through lexical-service on this latency-sensitive path.
@@ -145,11 +145,11 @@ pub async fn task_similarity_search_handler<
 pub async fn dismiss_task_duplicates_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     _access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(Params { document_id }): Path<Params>,
     Json(request): Json<DismissTaskDuplicatesRequest>,
 ) -> Result<Json<GenericSuccessResponse>, DocumentError> {
@@ -171,7 +171,7 @@ pub async fn dismiss_task_duplicates_handler<
 pub async fn delete_this_duplicate_task_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<OwnerAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

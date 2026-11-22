@@ -7,7 +7,7 @@ use std::sync::Mutex;
 use ai_toolset::schema::generate_validated_input_schema;
 use ai_toolset::{AsyncTool, RequestContext, ServiceContext, ToolSet};
 use chrono::{NaiveDate, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -166,7 +166,7 @@ struct MockMutations {
     create_error: Mutex<Option<CalendarMutationError>>,
     updated: Mutex<Vec<(Uuid, CalendarEventPatch, CalendarUpdateScope)>>,
     switched_to_macro_call: Mutex<Vec<(Uuid, CalendarEventPatch, CalendarUpdateScope)>>,
-    macro_call_error: Mutex<Option<MacroCallEventError>>,
+    macro_call_error: Mutex<Option<RoxCallEventError>>,
     deleted: Mutex<Vec<(Uuid, CalendarDeletionScope)>>,
     answered: Mutex<Vec<(Uuid, AttendeeResponseStatus, CalendarRsvpScope)>>,
     calendars: Mutex<Vec<VisibleCalendar>>,
@@ -174,14 +174,14 @@ struct MockMutations {
     copy_error: Mutex<Option<CalendarMutationError>>,
 }
 
-impl CalendarMacroCallService for MockMutations {
+impl CalendarRoxCallService for MockMutations {
     async fn create_event_with_macro_call(
         &self,
         _requester_id: &str,
         _email_link_id: Option<Uuid>,
         _calendar_id: Option<Uuid>,
         _draft: CalendarEventDraft,
-    ) -> Result<crate::domain::models::CalendarEvent, MacroCallEventError> {
+    ) -> Result<crate::domain::models::CalendarEvent, RoxCallEventError> {
         unreachable!("the create tool mints its call through the meeting link port")
     }
 
@@ -192,7 +192,7 @@ impl CalendarMacroCallService for MockMutations {
         _calendar_id: Option<Uuid>,
         patch: CalendarEventPatch,
         scope: CalendarUpdateScope,
-    ) -> Result<crate::domain::models::CalendarEvent, MacroCallEventError> {
+    ) -> Result<crate::domain::models::CalendarEvent, RoxCallEventError> {
         if let Some(error) = self.macro_call_error.lock().unwrap().take() {
             return Err(error);
         }
@@ -474,7 +474,7 @@ fn context_with_meeting_links(
 }
 
 fn request_context() -> RequestContext {
-    RequestContext::new(MacroUserIdStr::try_from("macro|test@example.com".to_string()).unwrap())
+    RequestContext::new(RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap())
 }
 
 fn empty_occurrences() -> MockOccurrences {

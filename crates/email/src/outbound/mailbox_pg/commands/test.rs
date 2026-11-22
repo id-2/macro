@@ -1,8 +1,8 @@
 use super::*;
 use crate::domain::{models::mailbox_action::MailboxAction, ports::EmailRepo};
 use crate::outbound::mailbox_pg::test::{fixture, page, snapshot};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 async fn setup(
     db: &PgPool,
@@ -14,13 +14,13 @@ async fn setup(
 ) {
     let (sync, link) = fixture(db).await;
     let stream = sync
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     sync.commit_page(&stream, &page()).await.unwrap();
     let work = sync
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -45,8 +45,8 @@ async fn setup(
         thread,
     )
 }
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("outlook-test@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("outlook-test@example.com").unwrap()
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
@@ -67,7 +67,7 @@ async fn newer_intent_survives_sync_and_ack_of_an_older_command(db: PgPool) {
         .await
         .unwrap();
     let lease = sync
-        .claim_command(macro_uuid::generate_uuid_v7())
+        .claim_command(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -128,7 +128,7 @@ async fn newer_intent_survives_sync_and_ack_of_an_older_command(db: PgPool) {
         .await
         .unwrap();
     assert_eq!(
-        sync.claim_command(macro_uuid::generate_uuid_v7())
+        sync.claim_command(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .unwrap()
@@ -148,7 +148,7 @@ async fn acceptance_rechecks_access_and_expired_worker_cannot_confirm(db: PgPool
     assert!(
         repo.enqueue_mailbox_action(
             work.mailbox.link_id,
-            MacroUserIdStr::try_from_email("stranger@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("stranger@example.com").unwrap(),
             &MailboxAction::Flagged(true),
             &targets
         )
@@ -171,7 +171,7 @@ async fn acceptance_rechecks_access_and_expired_worker_cannot_confirm(db: PgPool
     .await
     .unwrap();
     let old = sync
-        .claim_command(macro_uuid::generate_uuid_v7())
+        .claim_command(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -184,7 +184,7 @@ async fn acceptance_rechecks_access_and_expired_worker_cannot_confirm(db: PgPool
     .await
     .unwrap();
     let new = sync
-        .claim_command(macro_uuid::generate_uuid_v7())
+        .claim_command(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();

@@ -21,7 +21,7 @@ use ai_toolset::{AsyncToolCollection, ToolCallError};
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 pub use get_thread::{GetThread, GetThreadResponse};
@@ -158,7 +158,7 @@ impl<T: EmailService, G: GmailTokenProvider, E: EntityAccessService> EmailToolCo
     /// connected addresses, which is exactly the correction it needs.
     pub async fn resolve_sending_inbox(
         &self,
-        macro_id: MacroUserIdStr<'_>,
+        macro_id: RoxUserIdStr<'_>,
         request: SendingInboxRequest<'_>,
     ) -> Result<ResolvedSendingInbox, ToolCallError> {
         self.service

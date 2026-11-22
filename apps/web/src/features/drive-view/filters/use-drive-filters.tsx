@@ -1,4 +1,5 @@
 import type { ListFilterGroup } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import { EntityIcon } from '@core/component/EntityIcon';
 import { useContactFilterOptions } from '@core/user/use-contact-filter-options';
 import { useTagFilterGroup } from '@property/tags/use-tag-filter-group';
@@ -8,19 +9,23 @@ import { useDriveView } from '../context/drive-context';
 export type DriveFilterGroupId = 'type' | 'created-by' | 'tags' | 'scope';
 
 const typeOptions = [
-  { id: 'database', label: 'Database', type: 'database' },
-  { id: 'form', label: 'Form', type: 'form' },
-  { id: 'doc-markdown', label: 'Markdown', type: 'md' },
-  { id: 'doc-canvas', label: 'Canvas', type: 'canvas' },
-  { id: 'doc-spreadsheet', label: 'Spreadsheet', type: 'spreadsheet' },
-  { id: 'file-code', label: 'Code', type: 'code' },
-  { id: 'file-image', label: 'Images', type: 'image' },
-  { id: 'file-pdf', label: 'PDFs', type: 'pdf' },
-  { id: 'file-docx', label: 'DOCX', type: 'write' },
-  { id: 'file-video', label: 'Videos', type: 'video' },
-  { id: 'doc-snippet', label: 'Snippets', type: 'snippet' },
-  { id: 'doc-skill', label: 'Skills', type: 'skill' },
-  { id: 'file-other', label: 'Other', type: 'files' },
+  { id: 'database', get label() { return t('drive.filterDatabase'); }, type: 'database' },
+  { id: 'form', get label() { return t('drive.filterForm'); }, type: 'form' },
+  { id: 'doc-markdown', get label() { return t('drive.filterMarkdown'); }, type: 'md' },
+  { id: 'doc-canvas', get label() { return t('viewMenus.canvas'); }, type: 'canvas' },
+  {
+    id: 'doc-spreadsheet',
+    get label() { return t('viewMenus.spreadsheet'); },
+    type: 'spreadsheet',
+  },
+  { id: 'file-code', get label() { return t('viewMenus.code'); }, type: 'code' },
+  { id: 'file-image', get label() { return t('viewMenus.images'); }, type: 'image' },
+  { id: 'file-pdf', get label() { return t('viewMenus.pdfs'); }, type: 'pdf' },
+  { id: 'file-docx', get label() { return t('drive.filterDocx'); }, type: 'write' },
+  { id: 'file-video', get label() { return t('viewMenus.videos'); }, type: 'video' },
+  { id: 'doc-snippet', get label() { return t('viewMenus.snippets'); }, type: 'snippet' },
+  { id: 'doc-skill', get label() { return t('viewMenus.skills'); }, type: 'skill' },
+  { id: 'file-other', get label() { return t('viewMenus.other'); }, type: 'files' },
 ] as const;
 
 /** Filter model shared by the desktop filter dropdown and the mobile drawer. */
@@ -53,7 +58,9 @@ export function useDriveFilters() {
 
       groups.push({
         id: 'type',
-        label: 'Type',
+        get label() {
+          return t('viewMenus.type');
+        },
         options: typeOptions.map((option) => ({
           id: option.id,
           label: option.label,
@@ -65,8 +72,10 @@ export function useDriveFilters() {
       if (showCreators()) {
         groups.push({
           id: 'created-by',
-          label: 'Created by',
-          searchPlaceholder: 'Search creators...',
+          get label() {
+            return t('viewMenus.createdBy');
+          },
+          searchPlaceholder: t('viewMenus.searchCreators'),
           options: [],
           createSource: useContactFilterOptions,
         });
@@ -75,13 +84,18 @@ export function useDriveFilters() {
 
     groups.push({
       id: 'scope',
-      label: 'Files',
+      get label() {
+        return t('drive.filterFilesGroup');
+      },
       selectionMode: 'single',
       defaultOptionId: 'default',
       options: [
-        { id: 'default', label: 'Default' },
-        { id: 'all', label: 'All files' },
-        { id: 'attachments', label: 'Email attachments' },
+        { id: 'default', get label() { return t('drive.scopeDefault'); } },
+        { id: 'all', get label() { return t('drive.scopeAllFiles'); } },
+        {
+          id: 'attachments',
+          get label() { return t('drive.scopeAttachments'); },
+        },
       ],
     });
 

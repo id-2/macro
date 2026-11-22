@@ -162,7 +162,7 @@ export type ApiDraftInput = {
     /**
      * Rox body format.
      */
-    body_macro?: string | null;
+    body_rox?: string | null;
     /**
      * Plain text body.
      */
@@ -233,7 +233,7 @@ export type ApiDraftOutput = {
     /**
      * Rox body.
      */
-    body_macro?: string | null;
+    body_rox?: string | null;
     /**
      * Plain text body.
      */
@@ -320,7 +320,7 @@ export type ApiMessage = {
     attachments_forwarded: Array<ApiAttachmentForwarded>;
     bcc: Array<ApiContactInfo>;
     body_html_sanitized?: string | null;
-    body_macro?: string | null;
+    body_rox?: string | null;
     body_replyless?: string | null;
     body_text?: string | null;
     calendar_invitations?: Array<CalendarInvitation>;
@@ -1622,7 +1622,7 @@ export type Message = {
     attachments_forwarded: Array<AttachmentForwarded>;
     bcc: Array<ContactInfo>;
     body_html_sanitized?: string | null;
-    body_macro?: string | null;
+    body_rox?: string | null;
     body_text?: string | null;
     cc: Array<ContactInfo>;
     created_at: string;

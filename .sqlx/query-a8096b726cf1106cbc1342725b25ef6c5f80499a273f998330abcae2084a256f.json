@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_message_reconciliation (link_id,generation,provider_id,is_import,available_at,lease_id,lease_until) VALUES\n            ($1,1,'due',true,now() - interval '90 seconds',NULL,NULL),\n            ($1,1,'parked',true,now() + interval '600 seconds',NULL,NULL),\n            ($1,1,'leased',true,now() - interval '10 seconds',$2,now() + interval '60 seconds'),\n            ($1,0,'old generation',true,now() - interval '1 hour',NULL,NULL)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a8096b726cf1106cbc1342725b25ef6c5f80499a273f998330abcae2084a256f"
+}

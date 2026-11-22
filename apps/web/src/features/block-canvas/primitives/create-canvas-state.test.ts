@@ -2,7 +2,7 @@ import {
   type Appearance,
   createGraphicsEditor,
   IDENTITY,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { createRoot } from 'solid-js';
 import { expect, it } from 'vitest';
 import { initialAppearance } from '../core/seed-scene';

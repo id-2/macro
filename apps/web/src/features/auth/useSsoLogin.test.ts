@@ -37,7 +37,7 @@ vi.mock('@core/mobile/isNativeMobilePlatform', () => ({
 vi.mock('@core/auth/native-auth', () => ({
   createNativeAuthSession: mocks.createNativeAuthSession,
   openDesktopAuthSession: mocks.openDesktopAuthSession,
-  DESKTOP_AUTH_CALLBACK_URL: 'macro:///login',
+  DESKTOP_AUTH_CALLBACK_URL: 'rox:///login',
 }));
 vi.mock('@core/util/platform', () => ({
   isPlatform: (target: string) => mocks.platform === target,
@@ -90,7 +90,7 @@ beforeEach(() => {
   mocks.location.state = undefined;
   mocks.reloadHolds = 0;
   mocks.createNativeAuthSession.mockReturnValue({
-    callbackUrl: 'macro://android-auth/test-attempt',
+    callbackUrl: 'rox://android-auth/test-attempt',
     authenticate: mocks.authenticate,
   });
   mocks.authenticate.mockResolvedValue({
@@ -188,7 +188,7 @@ describe('useSsoLogin', () => {
 
       const authUrl = new URL(mocks.openDesktopAuthSession.mock.calls[0][0]);
       expect(`${authUrl.origin}${authUrl.pathname}`).toBe(`${host}/login/sso`);
-      expect(authUrl.searchParams.get('original_url')).toBe('macro:///login');
+      expect(authUrl.searchParams.get('original_url')).toBe('rox:///login');
       expect(authUrl.searchParams.get('is_mobile')).toBe('true');
       expect(authUrl.searchParams.get('idp_name')).toBe('google');
       expect(authUrl.searchParams.get('referral_code')).toBe('invite');
@@ -224,7 +224,7 @@ describe('useSsoLogin', () => {
       '/doc/document-id?referral_code=original-invite#comment'
     );
     const authUrl = new URL(mocks.openDesktopAuthSession.mock.calls[0][0]);
-    expect(authUrl.searchParams.get('original_url')).toBe('macro:///login');
+    expect(authUrl.searchParams.get('original_url')).toBe('rox:///login');
   });
 
   it('reports a desktop browser that will not open', async () => {
@@ -256,7 +256,7 @@ describe('useSsoLogin', () => {
       const authUrl = new URL(mocks.authenticate.mock.calls[0][0]);
       expect(authUrl.searchParams.get('is_mobile')).toBe('true');
       expect(authUrl.searchParams.get('original_url')).toBe(
-        'macro://android-auth/test-attempt'
+        'rox://android-auth/test-attempt'
       );
       expect(mocks.sessionLogin).toHaveBeenCalledOnce();
       expect(mocks.sessionLogin).toHaveBeenCalledWith({

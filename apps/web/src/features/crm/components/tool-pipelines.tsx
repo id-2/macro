@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { Tool } from '@core/component/AI/component/tool/Tool';
 import Buildings from '@icon/system/regular/buildings.svg';
 import Kanban from '@icon/system/regular/kanban.svg';
@@ -53,7 +54,7 @@ export function formatFieldValue(
 }
 
 export function recordName(record: TrackedRecord | null | undefined) {
-  if (!record) return 'Entry';
+  if (!record) return t('crm.entry');
   return record.name ?? record.detail ?? record.id;
 }
 
@@ -106,7 +107,7 @@ export function PipelinesToolResponse(props: { pipelines: Pipeline[] }) {
     <Tool.List>
       <Show
         when={props.pipelines.length > 0}
-        fallback={<Tool.ListItem>No pipelines.</Tool.ListItem>}
+        fallback={<Tool.ListItem>{t('crm.noPipelines')}</Tool.ListItem>}
       >
         <For each={props.pipelines}>
           {(pipeline) => (
@@ -118,8 +119,8 @@ export function PipelinesToolResponse(props: { pipelines: Pipeline[] }) {
                     .find((field) => field.name === 'Stage')
                     ?.options?.join(' → ') ??
                   (pipeline.tracks
-                    ? `Tracks ${pipeline.tracks}s`
-                    : 'Generic pipeline')
+                    ? t('crm.tracks', { type: pipeline.tracks })
+                    : t('crm.genericPipeline'))
                 }
               />
             </Tool.ListItem>

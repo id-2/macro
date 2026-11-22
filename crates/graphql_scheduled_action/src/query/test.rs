@@ -2,8 +2,8 @@ use std::sync::{Arc, Mutex};
 
 use async_graphql::{Context, EmptyMutation, EmptySubscription, Object, Schema};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::Owner;
 use rootcause::Report;
 use scheduled_action::domain::{
@@ -47,7 +47,7 @@ const QUERY: &str = r#"
 "#;
 
 struct FakeReader {
-    calls: Mutex<Vec<MacroUserIdStr<'static>>>,
+    calls: Mutex<Vec<RoxUserIdStr<'static>>>,
     actions: Vec<ScheduledAction>,
     error: Option<String>,
 }
@@ -55,7 +55,7 @@ struct FakeReader {
 impl ScheduledActionReadService for FakeReader {
     async fn list_accessible(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<ScheduledAction>, Report> {
         self.calls.lock().unwrap().push(user_id);
         if let Some(message) = &self.error {
@@ -66,10 +66,10 @@ impl ScheduledActionReadService for FakeReader {
 }
 
 struct QueryRoot {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 }
 
-struct Viewer(MacroUserIdStr<'static>);
+struct Viewer(RoxUserIdStr<'static>);
 
 #[Object]
 impl QueryRoot {
@@ -92,8 +92,8 @@ impl Viewer {
     }
 }
 
-fn viewer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(VIEWER.to_owned()).unwrap()
+fn viewer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(VIEWER.to_owned()).unwrap()
 }
 
 fn utc(value: &str) -> DateTime<Utc> {

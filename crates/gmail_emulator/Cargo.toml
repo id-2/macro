@@ -13,8 +13,8 @@ chrono = { workspace = true }
 chrono-tz = { workspace = true }
 clap = { workspace = true }
 jsonwebtoken = { workspace = true }
-macro_entrypoint = { path = "../macro_entrypoint" }
-macro_env = { path = "../macro_env" }
+rox_entrypoint = { path = "../rox_entrypoint" }
+rox_env = { path = "../rox_env" }
 mail-builder = { workspace = true }
 mailparse = { workspace = true }
 nom = { workspace = true }

@@ -1,4 +1,4 @@
-import type { MagicChipData } from '@macro-inc/lexical-core';
+import type { MagicChipData } from '@rox-one/lexical-core';
 import type { NamedTool } from '@service-cognition/generated/tools/tool';
 import { cleanup, fireEvent, render } from '@solidjs/testing-library';
 import { createSignal } from 'solid-js';

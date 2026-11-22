@@ -10,6 +10,8 @@ import {
 const detected = (id: string) => ({
   id,
   name: id,
+  command: id,
+  config_path: null,
   note: null,
   needs_install: false,
 });
@@ -21,12 +23,14 @@ describe('offeredAgents', () => {
       detected('herdr-claude'),
       detected('codex'),
       detected('custom'),
+      detected('omp'),
       detected('claude-code'),
     ]);
     expect(offered.map((agent) => agent.id)).toEqual([
       'claude-code',
       'codex',
       'opencode',
+      'omp',
     ]);
   });
 });

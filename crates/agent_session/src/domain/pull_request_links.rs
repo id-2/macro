@@ -9,8 +9,8 @@ use entity_access::domain::models::{
     EditAccessLevel, EntityAccessAuth, EntityAccessReceipt, EntityType, RequiredPermission,
     ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::models::MessageParent;
 
 use super::error::{AgentSessionError, Result};
@@ -111,7 +111,7 @@ pub trait SessionPullRequestLinkRepo: Send + Sync + 'static {
         &self,
         session: AgentSessionId,
         github_key: &str,
-        linked_by: &MacroUserIdStr<'static>,
+        linked_by: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Remove a link a person made; the pull request the session's agent opened stays. Returns
@@ -168,7 +168,7 @@ pub trait SessionPullRequestLinks: Send + Sync + 'static {
     /// The sessions associated with the pull request at `url` that `viewer` may view.
     fn sessions_for_pull_request(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         url: &str,
     ) -> impl Future<Output = Result<Vec<AgentSessionId>>> + Send;
 
@@ -176,7 +176,7 @@ pub trait SessionPullRequestLinks: Send + Sync + 'static {
     /// order. At most [`MAX_PULL_REQUESTS_PER_LOOKUP`] URLs.
     fn sessions_for_pull_requests(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         urls: &[String],
     ) -> impl Future<Output = Result<Vec<PullRequestSessions>>> + Send;
 }
@@ -234,7 +234,7 @@ impl<R: SessionPullRequestLinkRepo> SessionPullRequestLinks for SessionPullReque
     #[tracing::instrument(err, skip(self))]
     async fn sessions_for_pull_request(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         url: &str,
     ) -> Result<Vec<AgentSessionId>> {
         let github_key = pull_request_key(url)?;
@@ -250,7 +250,7 @@ impl<R: SessionPullRequestLinkRepo> SessionPullRequestLinks for SessionPullReque
     #[tracing::instrument(err, skip(self, urls), fields(urls = urls.len()))]
     async fn sessions_for_pull_requests(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         urls: &[String],
     ) -> Result<Vec<PullRequestSessions>> {
         if urls.len() > MAX_PULL_REQUESTS_PER_LOOKUP {

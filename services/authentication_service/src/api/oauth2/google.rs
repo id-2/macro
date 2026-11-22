@@ -98,7 +98,7 @@ async fn link_user(
     link_id: &Uuid,
 ) -> Result<GoogleLinkOutcome, (StatusCode, String)> {
     let in_progress =
-        macro_db_client::in_progress_user_link::get_in_progress_user_link(&ctx.db, link_id)
+        rox_db_client::in_progress_user_link::get_in_progress_user_link(&ctx.db, link_id)
             .await
             .map_err(|e| (StatusCode::INTERNAL_SERVER_ERROR, e.to_string()))?;
     let macro_user_id = in_progress.macro_user_id;
@@ -187,7 +187,7 @@ async fn link_user(
     // account — attaching it to the requester would capture the owner's sign-in. Only
     // mailboxes with no macro user of their own link under the requester.
     let idp_link_owner =
-        match macro_db_client::user::get::get_macro_user_id_by_email(&ctx.db, &user_info_email)
+        match rox_db_client::user::get::get_macro_user_id_by_email(&ctx.db, &user_info_email)
             .await
         {
             Ok(Some(mailbox_owner_fa)) => mailbox_owner_fa.to_string(),
@@ -243,7 +243,7 @@ async fn link_user(
     // Stash the linked identity and Google's actual grant (which may be a
     // subset of what was requested). /email/init applies these capabilities
     // atomically to the durable link and schedules any newly unlocked work.
-    macro_db_client::in_progress_user_link::set_linked_google_grant(
+    rox_db_client::in_progress_user_link::set_linked_google_grant(
         &ctx.db,
         link_id,
         &user_info_email,

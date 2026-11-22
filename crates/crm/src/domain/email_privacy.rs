@@ -18,7 +18,7 @@ use super::{
 #[async_trait::async_trait]
 pub trait ThreadExclusionGate: std::fmt::Debug + Send + Sync {
     /// Missing or unavailable flag evaluation must return false.
-    async fn enabled_for(&self, caller: macro_user_id::user_id::MacroUserIdStr<'_>) -> bool;
+    async fn enabled_for(&self, caller: rox_user_id::user_id::RoxUserIdStr<'_>) -> bool;
 }
 
 /// The audience affected by a domain exclusion.

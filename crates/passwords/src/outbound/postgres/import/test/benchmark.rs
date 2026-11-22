@@ -180,11 +180,11 @@ async fn import_performance() {
         }))
         .init();
     let (repository, actor, team) = if let Ok(team) = std::env::var("PWCONC_TEAM") {
-        use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+        use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
         (
             PgRepository::new(pool.clone()).expect("repository"),
             Actor {
-                user_id: MacroUserIdStr::parse_from_str("macro|folder@example.test")
+                user_id: RoxUserIdStr::parse_from_str("macro|folder@example.test")
                     .expect("synthetic actor")
                     .into_owned(),
             },

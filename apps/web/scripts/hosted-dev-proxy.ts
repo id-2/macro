@@ -188,10 +188,10 @@ export function hostedDevProxy(
       command === 'serve' &&
       (env.MODE ?? mode) === 'development' &&
       !isPreview &&
-      !env.MACRO_LOCAL_BACKEND_PROXY &&
+      !env.ROX_LOCAL_BACKEND_PROXY &&
       !env.TAURI_ENV_PLATFORM &&
       !env.TAURI_DEV_HOST &&
-      env.MACRO_DEV_PROXY !== 'false',
+      env.ROX_DEV_PROXY !== 'false',
     config() {
       // A middleware rather than `server.proxy`: Vite falls back to HTTP/1.1
       // whenever `server.proxy` is set, and remote browsers then fetch

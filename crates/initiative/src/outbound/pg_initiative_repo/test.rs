@@ -8,9 +8,9 @@ mod initial_properties;
 mod task_access;
 #[cfg(feature = "toolset")]
 mod toolset;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_permissions::share_permission::channel_share_permission::{
     ChannelSharePermission, UpdateChannelSharePermission, UpdateOperation,
@@ -64,8 +64,8 @@ const OTHER_OWNER: &str = "macro|initiative-repo-other-owner@corp.test";
 
 const INITIATIVE: &str = "initiative";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id)
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id)
         .expect("valid user id")
         .into_owned()
 }

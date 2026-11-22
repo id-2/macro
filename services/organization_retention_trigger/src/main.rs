@@ -8,8 +8,8 @@ use lambda_runtime::{
     Error, LambdaEvent, run, service_fn,
     tracing::{self},
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_env_var::env_vars;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env_var::env_vars;
 use sqlx::postgres::PgPoolOptions;
 
 env_vars! {
@@ -35,7 +35,7 @@ async fn handler(
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     tracing::info!("initiating lambda");
 
@@ -51,9 +51,9 @@ async fn main() -> Result<(), Error> {
 
     tracing::trace!("initialized db client");
 
-    let organization_retention_queue = macro_queues::OrganizationRetentionQueue::new();
+    let organization_retention_queue = rox_queues::OrganizationRetentionQueue::new();
     let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(
-        &macro_aws_config::get_macro_aws_config().await,
+        &rox_aws_config::get_macro_aws_config().await,
     ))
     .organization_retention_queue(organization_retention_queue.as_ref());
 

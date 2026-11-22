@@ -18,7 +18,7 @@ fn macrod_section_gives_the_current_setup_steps() {
         "**Settings → Agents**",
         "**Add agent**",
         "**On your machine** under **Where it runs**",
-        "dials out to Macro",
+        "dials out to Rox",
         "On a cloud server",
         "https://macro.com/docs/AI/bring-your-own",
     ] {

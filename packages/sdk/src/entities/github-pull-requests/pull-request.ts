@@ -3,13 +3,13 @@ import type {
   StoredGithubPullRequest,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 
 /** A stored GitHub pull request addressed by its Rox foreign entity. */
-export class GithubPullRequest extends MacroEntity<StoredGithubPullRequest> {
+export class GithubPullRequest extends RoxEntity<StoredGithubPullRequest> {
   /** Construct a lazy pull request handle. */
-  static byId(client: MacroClient, id: string): GithubPullRequest {
+  static byId(client: RoxClient, id: string): GithubPullRequest {
     return new GithubPullRequest(client, id);
   }
 
@@ -58,7 +58,7 @@ export class GithubPullRequest extends MacroEntity<StoredGithubPullRequest> {
  */
 export class PullRequestChangeset {
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Parent pull request. */
     readonly pullRequest: GithubPullRequest,
     /** Captured metadata. */

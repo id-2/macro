@@ -7,7 +7,7 @@ import type {
 import { ChannelNamespace } from '../src/entities/channels/namespace';
 import { DocumentNamespace } from '../src/entities/documents/namespace';
 import { EmailNamespace } from '../src/entities/email/namespace';
-import type { MacroClient } from '../src/utils/client';
+import type { RoxClient } from '../src/utils/client';
 
 function channelRecord(
   id: string,
@@ -47,7 +47,7 @@ function channelsClient(records: ApiChannelWithLatest[]) {
       },
       patchChannel: async () => ({ data: 'ok' }),
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, detailRequests };
 }
 
@@ -140,7 +140,7 @@ test('channel name search hits carry their type', async () => {
         return { data: {} };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
 
   const [channel] = await Array.fromAsync(
     new ChannelNamespace(client).search('design'),
@@ -178,7 +178,7 @@ test('documents.recent() handles read listed metadata without a detail request',
         };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
 
   const [document] = await Array.fromAsync(
     new DocumentNamespace(client).recent(),
@@ -226,7 +226,7 @@ test('email.inbox() handles read preview fields without a thread request', async
         };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
 
   const [thread] = await Array.fromAsync(new EmailNamespace(client).inbox());
 

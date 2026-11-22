@@ -3,7 +3,7 @@ import type {
   ApiActivity,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { User } from '../users/user';
 import type { Channel } from './channel';
 
@@ -14,7 +14,7 @@ import type { Channel } from './channel';
  */
 export class ChannelActivity {
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Related channel. */
     readonly channel: Channel,
     private readonly record: ApiActivity,

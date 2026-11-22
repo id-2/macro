@@ -8,7 +8,7 @@ use entity_mutation::{
     MoveEntity, RenameEntity, RestoreEntity, TrashEntity, UpdateEntitySharePolicy,
     capability::MoveEntityRequest, project_refs,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use models_permissions::share_permission::UpdateSharePermissionRequestV2;
 
@@ -237,7 +237,7 @@ where
         &self,
         _entity: Entity<'static>,
         receipt: EntityAccessReceipt<Self::Receipt>,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         display_name: Option<String>,
     ) -> Result<Vec<EntityMutationEffect>, EntityMutationErrorCode> {
         if display_name.is_some() {

@@ -261,8 +261,8 @@ async function main() {
     };
     console.log(JSON.stringify(result, null, 2));
   } else if (output === "env") {
-    console.log(`export MACRO_ACCESS_TOKEN='${accessToken}'`);
-    console.log(`export MACRO_API_TOKEN='${macroApiToken}'`);
+    console.log(`export ROX_ACCESS_TOKEN='${accessToken}'`);
+    console.log(`export ROX_API_TOKEN='${macroApiToken}'`);
   } else {
     // Default: simple output with browser command and curl
     const serviceSuffix = env === "prod" ? "" : "-dev";

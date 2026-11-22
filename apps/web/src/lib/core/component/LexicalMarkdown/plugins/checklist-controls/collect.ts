@@ -15,7 +15,7 @@ import {
   $isDateMentionNode,
   $isDocumentMentionNode,
   $isUserMentionNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $getRoot,
   $isElementNode,

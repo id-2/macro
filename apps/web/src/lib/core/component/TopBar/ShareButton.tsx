@@ -18,6 +18,7 @@ import {
   updatePipelineTeamShare,
 } from '@app/features/crm/sharing-adapter';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
+import { t } from '@app/lib/i18n';
 import { useChannelParticipants } from '@channel/use-channel-participants';
 import { HeaderActionButton } from '@components/app/HeaderActionButton';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
@@ -706,7 +707,7 @@ function MobileShareDrawer(props: MobileShareDrawerProps) {
       <MobileDrawer.Portal>
         <MobileDrawer.Overlay />
         <MobileDrawer.Content
-          aria-label="Share"
+          aria-label={t('agentChat.share')}
           class="h-[80vh] overflow-y-auto"
         >
           <div class="flex justify-center pt-3 pb-1 shrink-0">
@@ -1993,7 +1994,7 @@ export function ShareTrigger(props: {
     isTouchDevice() || props.size === 'md' ? 'icon-md' : 'icon-sm';
 
   return (
-    <HeaderActionGroup label="Sharing" size={props.size}>
+    <HeaderActionGroup label={t('agentChat.sharing')} size={props.size}>
       <div
         ref={requests.ref}
         class="flex items-stretch touch:items-center touch:gap-1"
@@ -2003,16 +2004,16 @@ export function ShareTrigger(props: {
         <HeaderActionButton
           grouped
           size={isTouchDevice() ? undefined : props.size}
-          label="Share"
+          label={t('agentChat.share')}
           tooltip={
             shareStatus()?.tooltip ??
             (blockType() === 'agent'
-              ? 'Share agent session'
+              ? t('agentChat.shareAgentSession')
               : blockType() === 'initiative'
-                ? 'Share project'
+                ? t('agentChat.shareProject')
                 : inBlock
-                  ? 'This item has been shared with you.'
-                  : `Share ${blockType()}`)
+                  ? t('agentChat.sharedWithYou')
+                  : t('agentChat.shareItem', { type: blockType() }))
           }
           icon={
             <ShareRequestIcon count={requests.count()}>
@@ -2032,8 +2033,8 @@ export function ShareTrigger(props: {
         <CopyButton
           as={ButtonGroup.Button}
           variant="ghost"
-          aria-label="Copy Share Link"
-          tooltip="Copy Share Link"
+          aria-label={t('agentChat.copyShareLink')}
+          tooltip={t('agentChat.copyShareLink')}
           size={iconSize()}
           onClick={ShareLinkAction().action}
           icon={<Dynamic component={ShareLinkAction().icon} class="size-3.5" />}

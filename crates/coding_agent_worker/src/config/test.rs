@@ -152,7 +152,7 @@ fn harness_env_is_optional() {
 
 #[test]
 fn the_gateway_url_is_the_api_base_with_a_websocket_scheme() {
-    let local = MacroApi {
+    let local = RoxApi {
         egress_url: None,
         api_url: "http://localhost:50009/agent-harness".to_owned(),
         storage_url: "http://localhost:50009/dss".to_owned(),
@@ -163,7 +163,7 @@ fn the_gateway_url_is_the_api_base_with_a_websocket_scheme() {
         "ws://localhost:50009/agent-harness/runtime/ws",
     );
 
-    let secure = MacroApi {
+    let secure = RoxApi {
         egress_url: None,
         api_url: "https://gateway.rox.one/agent-harness/".to_owned(),
         storage_url: "https://gateway.rox.one/dss".to_owned(),

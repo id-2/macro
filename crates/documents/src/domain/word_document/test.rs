@@ -7,8 +7,8 @@ use std::sync::Mutex;
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813c";
 const SECRET: &str = "local-word-document-test-secret";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|words@rox.one".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|words@rox.one".to_owned()).unwrap()
 }
 
 fn receipt<T: RequiredPermission>(access_level: AccessLevel) -> EntityAccessReceipt<T> {
@@ -201,8 +201,8 @@ fn response(content: &str) -> WordDocumentResponse {
     }
 }
 
-fn claims(token: &macro_sync_service_jwt::DocumentPermissionToken) -> serde_json::Value {
-    macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap()
+fn claims(token: &rox_sync_service_jwt::DocumentPermissionToken) -> serde_json::Value {
+    rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap()
 }
 
 fn rename(paragraph: &str) -> WordDocumentOperation {

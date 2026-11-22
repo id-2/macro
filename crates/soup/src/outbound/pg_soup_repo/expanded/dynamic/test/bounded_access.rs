@@ -103,14 +103,14 @@ fn continuation(
     })
 }
 
-async fn user_id(pool: &PgPool) -> anyhow::Result<MacroUserIdStr<'static>> {
+async fn user_id(pool: &PgPool) -> anyhow::Result<RoxUserIdStr<'static>> {
     let owner = sqlx::query_scalar!(
         r#"SELECT owner FROM "Document" WHERE id = $1"#,
         A.to_string()
     )
     .fetch_one(pool)
     .await?;
-    Ok(MacroUserIdStr::parse_from_str(&owner)?.into_owned())
+    Ok(RoxUserIdStr::parse_from_str(&owner)?.into_owned())
 }
 
 async fn flat(pool: &PgPool, filter: EntityFilterAst) -> anyhow::Result<Vec<Uuid>> {

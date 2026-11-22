@@ -3,8 +3,8 @@ import type {
   EmailInclusionRule,
   EmailRuleSet,
 } from '../../../generated/storage/types.gen';
-import { MacroError } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { rejectUnknownOptions } from '../../utils/options';
 import { Company } from '../crm/company';
 import { Contact } from '../crm/contact';
@@ -85,7 +85,7 @@ export function emailRulesBody(rules: CrmEmailRuleSet): EmailRuleSet {
             return { kind: rule.kind, domain: rule.domain };
           })
           .exhaustive(() => {
-            throw new MacroError('Unknown email inclusion rule kind.');
+            throw new RoxError('Unknown email inclusion rule kind.');
           }),
     ),
   };
@@ -93,7 +93,7 @@ export function emailRulesBody(rules: CrmEmailRuleSet): EmailRuleSet {
 
 /** @internal Rebuild handles without fetching target details or email content. */
 export function emailRules(
-  client: MacroClient,
+  client: RoxClient,
   rules: EmailRuleSet,
 ): CrmEmailRuleSet {
   return {
@@ -115,7 +115,7 @@ export function emailRules(
           }))
           .with({ kind: 'address' }, { kind: 'domain' }, (rule) => rule)
           .exhaustive(() => {
-            throw new MacroError('Unknown email inclusion rule kind.');
+            throw new RoxError('Unknown email inclusion rule kind.');
           }),
     ),
   };

@@ -1,6 +1,6 @@
 import { ENABLE_SCRIPTING } from '@core/constant/featureFlags';
 import { showMessageBoxSync } from '@core/util/dialog';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import debounce from 'lodash/debounce';
 import { AnnotationMode, type PageViewport } from 'pdfjs-dist';
 import scriptingSandbox from 'pdfjs-dist/build/pdf.sandbox.js?url';

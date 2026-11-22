@@ -15,7 +15,7 @@ fn policy() -> BudgetPolicy {
 
 fn lane(account: &str) -> BudgetLane {
     BudgetLane::of(
-        MacroUserIdStr::try_from_email(account).unwrap(),
+        RoxUserIdStr::try_from_email(account).unwrap(),
         &UpstreamCall::bearer(
             url::Url::parse("https://api.githubcopilot.com/mcp/").unwrap(),
             crate::domain::model::BearerToken::new("test-credential"),
@@ -195,7 +195,7 @@ impl ActorMcpTransport for Upstream {
     async fn exchange(
         &self,
         _: AgentSessionId,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: UpstreamCall,
         _: Value,
     ) -> Result<Value, EgressError> {
@@ -217,7 +217,7 @@ async fn the_transport_retries_an_exchange_the_upstream_refused() {
     let result = transport
         .exchange(
             AgentSessionId::new(),
-            MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
             UpstreamCall::bearer(
                 url::Url::parse("https://api.githubcopilot.com/mcp/").unwrap(),
                 crate::domain::model::BearerToken::new("test-credential"),
@@ -244,7 +244,7 @@ async fn a_listing_is_not_budgeted() {
     let result = transport
         .exchange(
             AgentSessionId::new(),
-            MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
             UpstreamCall::bearer(
                 url::Url::parse("https://api.githubcopilot.com/mcp/").unwrap(),
                 crate::domain::model::BearerToken::new("test-credential"),

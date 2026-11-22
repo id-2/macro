@@ -1,6 +1,6 @@
 import type { DiscoverConnectorsResponse } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { CodeExecution } from '../agent-sessions/code-execution';
 
 /** One action a connectable app advertises; not callable until connected. */
@@ -33,7 +33,7 @@ export type ConnectorInspection = {
  */
 export class Connector {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The running execution the catalog is read through. */
     readonly execution: CodeExecution,
     /** The app's catalog slug, e.g. `linear`. */
@@ -46,7 +46,7 @@ export class Connector {
 
   /** Search the connector catalog by app name. */
   static async search(
-    client: MacroClient,
+    client: RoxClient,
     execution: CodeExecution,
     appName: string,
   ): Promise<{ connectors: Connector[]; moreResults: boolean }> {
@@ -106,7 +106,7 @@ export class Connector {
 }
 
 async function discover(
-  client: MacroClient,
+  client: RoxClient,
   execution: CodeExecution,
   request:
     | { operation: 'search'; query: string }

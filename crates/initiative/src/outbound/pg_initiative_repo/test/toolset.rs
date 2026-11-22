@@ -1,7 +1,7 @@
 use super::*;
 mod reads;
 use crate::domain::{
-    events::{InitiativeEventPublisher, InitiativeMacroEvent, InitiativeTopicEvent},
+    events::{InitiativeEventPublisher, InitiativeRoxEvent, InitiativeTopicEvent},
     history::InitiativeHistory,
     ports::MockInitiativeDescriptionSurfaces,
     reads::InitiativePropertySnapshot,
@@ -18,7 +18,7 @@ use entity_access::{
     },
     outbound::PgAccessRepository,
 };
-use macro_event_broker::MacroEvent;
+use rox_event_broker::RoxEvent;
 use std::{
     collections::HashMap,
     sync::{Arc, Mutex},
@@ -33,7 +33,7 @@ impl InitiativeResources for UnusedProperties {
     }
     fn set_initial_properties(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: InitiativeId,
         _: Vec<crate::domain::models::InitialPropertyValue>,
     ) -> ResourceFuture<'_, ()> {
@@ -64,7 +64,7 @@ impl InitiativeResources for UnusedProperties {
 struct Events(Mutex<Vec<InitiativeTopicEvent>>);
 
 impl InitiativeEventPublisher for Events {
-    fn publish(&self, event: InitiativeMacroEvent) -> ResourceFuture<'_, ()> {
+    fn publish(&self, event: InitiativeRoxEvent) -> ResourceFuture<'_, ()> {
         Box::pin(async move {
             self.0.lock().unwrap().push(event.event().event.clone());
             Ok(())

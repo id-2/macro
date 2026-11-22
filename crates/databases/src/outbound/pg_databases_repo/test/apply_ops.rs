@@ -9,9 +9,9 @@ use entity_access::domain::models::{
 };
 use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::{
     CellValue, CellWrite, ColumnChange, ColumnKind, ColumnResult, DatabaseOp, NewColumn, NewOption,
     OpResult, OptionRef, RowChange, RowChanges, RowsChange, RowsResult, TableChange,
@@ -38,14 +38,14 @@ const USER: &str = "macro|apply-ops@rox.one";
 
 pub(super) fn viewer() -> Viewer {
     Viewer {
-        user_id: MacroUserIdStr::parse_from_str(USER).unwrap().into_owned(),
+        user_id: RoxUserIdStr::parse_from_str(USER).unwrap().into_owned(),
         acting_bot: None,
     }
 }
 
 pub(super) fn edit(database_id: DatabaseId) -> EntityAccessReceipt<EditAccessLevel> {
     EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::parse_from_str(USER).unwrap().into_owned(),
+        RoxUserIdStr::parse_from_str(USER).unwrap().into_owned(),
         Entity {
             entity_id: database_id.to_string(),
             entity_type: EntityType::Database,
@@ -62,7 +62,7 @@ pub(super) async fn insert_user(pool: &PgPool) {
 }
 
 pub(super) async fn insert_named_user(pool: &PgPool, user: &str) {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#, id, user)
         .execute(pool).await.unwrap();
     sqlx::query!(
@@ -149,7 +149,7 @@ pub(super) fn service(
     pool: &PgPool,
 ) -> PgDatabasesService<
     NoOpTableEventPublisher,
-    NoopMacroEventBroker,
+    NoopRoxEventBroker,
     EntityAccessServiceImpl<PgAccessRepository>,
 > {
     build_service(
@@ -158,7 +158,7 @@ pub(super) fn service(
             pool.clone(),
         ))),
         NoOpTableEventPublisher,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     )
 }
 
@@ -396,7 +396,7 @@ async fn a_refused_op_leaves_nothing_of_its_batch_behind(pool: PgPool) {
     let guests = guests(&pool).await;
     let service = service(&pool);
     let before = version(&pool, guests.table_id).await;
-    let ghost = macro_uuid::generate_uuid_v7();
+    let ghost = rox_uuid::generate_uuid_v7();
 
     let error = service
         .apply_ops(
@@ -936,8 +936,8 @@ async fn a_shared_property_is_editable_by_its_owner_alone(pool: PgPool) {
     insert_user(&pool).await;
     insert_named_user(&pool, "macro|someone-else@rox.one").await;
     let properties = PropertiesPgRepo::new(pool.clone());
-    let owner = MacroUserIdStr::parse_from_str(USER).unwrap();
-    let someone_else = MacroUserIdStr::parse_from_str("macro|someone-else@rox.one").unwrap();
+    let owner = RoxUserIdStr::parse_from_str(USER).unwrap();
+    let someone_else = RoxUserIdStr::parse_from_str("macro|someone-else@rox.one").unwrap();
     let mine = properties
         .create_property_definition(
             PropertyDefinitionOwner::User(&owner),
@@ -1123,7 +1123,7 @@ async fn a_text_column_converts_into_a_new_number_column_and_keeps_its_rows(pool
     let conversion = service
         .column_conversion(
             EntityAccessReceipt::<ViewAccessLevel>::try_new_authenticated_user(
-                MacroUserIdStr::parse_from_str(USER).unwrap().into_owned(),
+                RoxUserIdStr::parse_from_str(USER).unwrap().into_owned(),
                 Entity {
                     entity_id: guests.database_id.to_string(),
                     entity_type: EntityType::Database,

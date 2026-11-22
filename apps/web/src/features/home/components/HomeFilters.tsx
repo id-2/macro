@@ -4,6 +4,7 @@ import {
   MobileFilterDrawer,
   useViewControlHotkeys,
 } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import { useSplitPanelOrThrow } from '@components/app/split-layout/layoutUtils';
 import { EntityIcon } from '@core/component/EntityIcon';
 import FilterIcon from '@icon/system/regular/funnel-simple.svg';
@@ -193,19 +194,19 @@ function FilterCountBadge(props: { count: number }) {
   );
 }
 
-const HOME_FILTER_GROUPS: ListFilterGroup<string, string>[] = [
+const homeFilterGroups = (): ListFilterGroup<string, string>[] => [
   {
     id: 'read',
-    label: 'Status',
+    label: t('home.status'),
     selectionMode: 'single',
     defaultOptionId: 'all',
     options: [
-      { id: 'unread', label: 'Unread' },
-      { id: 'read', label: 'Read' },
-      { id: 'all', label: 'All' },
+      { id: 'unread', label: t('common.unread') },
+      { id: 'read', label: t('home.read') },
+      { id: 'all', label: t('home.all') },
     ],
   },
-  ...FILTER_GROUPS.map((group) => ({ ...group, label: 'Type' })),
+  ...FILTER_GROUPS.map((group) => ({ ...group, label: t('home.type') })),
 ];
 
 export function HomeFilterDropdown() {
@@ -216,7 +217,7 @@ export function HomeFilterDropdown() {
     scopeId: panel.splitHotkeyScope,
     enabled: panel.isPanelActive,
     filter: {
-      description: 'Filter Home',
+      description: t('home.filterHome'),
       run: () => {
         setOpen(true);
       },
@@ -226,11 +227,11 @@ export function HomeFilterDropdown() {
   return (
     <div class="relative shrink-0">
       <ListFilterDropdown
-        label="Filter Home"
+        label={t('home.filterHome')}
         customTrigger={
           <Dropdown.Trigger
-            aria-label="Filter Home"
-            tooltip="Filter Home"
+            aria-label={t('home.filterHome')}
+            tooltip={t('home.filterHome')}
             ref={tourTarget(HOME_TOUR.filter)}
             variant="ghost"
             size="icon-xs"
@@ -238,7 +239,7 @@ export function HomeFilterDropdown() {
             <FilterIcon class="size-4 touch:size-6 shrink-0 pointer-events-none" />
           </Dropdown.Trigger>
         }
-        groups={HOME_FILTER_GROUPS}
+        groups={homeFilterGroups()}
         open={open()}
         onOpenChange={setOpen}
         isSelected={filters.isSelected}
@@ -246,7 +247,7 @@ export function HomeFilterDropdown() {
         isGroupActive={filters.isGroupActive}
         onSelectionChange={filters.setSelected}
         onClear={filters.clear}
-        clearLabel="Reset filters"
+        clearLabel={t('drive.resetFilters')}
       />
       <FilterCountBadge count={filters.activeCount()} />
     </div>
@@ -258,14 +259,14 @@ export function HomeFilterDrawer() {
 
   return (
     <MobileFilterDrawer
-      triggerLabel="Filter Home"
-      label="Home filters"
+      triggerLabel={t('home.filterHome')}
+      label={t('home.homeFilters')}
       activeCount={filters.activeCount()}
       onClear={filters.clear}
     >
       <Accordion multiple collapsible defaultValue={['read', 'type']}>
         <div class="flex flex-col">
-          <For each={HOME_FILTER_GROUPS}>
+          <For each={homeFilterGroups()}>
             {(group) => {
               const activeCount = createMemo(
                 () =>

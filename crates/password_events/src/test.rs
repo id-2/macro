@@ -1,13 +1,13 @@
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 #[test]
 fn resolution_is_keyed_by_recipient_and_keeps_its_outbox_id() {
-    let recipient = MacroUserIdStr::parse_from_str("macro|agent@example.com")
+    let recipient = RoxUserIdStr::parse_from_str("macro|agent@example.com")
         .unwrap()
         .into_owned();
     let outbox_id = Uuid::from_u128(7);
-    let event = PasswordMacroEvent::access_request_resolved(
+    let event = PasswordRoxEvent::access_request_resolved(
         outbox_id,
         AccessRequestResolvedMetadata {
             recipient_user_id: recipient,

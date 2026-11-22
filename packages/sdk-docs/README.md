@@ -38,5 +38,5 @@ also restricted to `main`. The hostname becomes live with the first successful
 deployment. The Worker also retains its account's `workers.dev` address.
 
 Other build packages can import `renderSdkDocs` from
-`@macro-inc/sdk-docs/render` and consume the canonical Markdown. This package
+`@rox-one/sdk-docs/render` and consume the canonical Markdown. This package
 does not create Deno bundles or backend artifacts.

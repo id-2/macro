@@ -1,8 +1,8 @@
 use super::*;
 use chrono::{TimeZone, Utc};
 use entity_access::domain::models::{AccessLevel, Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use models_properties::service::{
     property_option::PropertyOptionValue, property_value::PropertyValue,
 };
@@ -17,7 +17,7 @@ use system_properties::SystemPropertyKey;
 
 fn access() -> EntityAccessReceipt<MessageWrite> {
     EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::try_from_email("assigner@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("assigner@example.com").unwrap(),
         Entity {
             entity_type: EntityType::Document,
             entity_id: "task-1".to_owned(),

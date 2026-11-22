@@ -1,5 +1,5 @@
 import { throwOnErr } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { refreshActiveGraphqlSoupQueries } from '@queries/soup/graphql/active-queries';
 import { prepareCrmContactEdit } from '@service-storage/crm-contact-edit';
 import type { CrmCompanyResponse } from '@service-storage/generated/schemas/crmCompanyResponse';

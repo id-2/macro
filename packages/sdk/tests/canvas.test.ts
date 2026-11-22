@@ -7,7 +7,7 @@ import {
   EditOutcomeUnknownError,
   Macro,
   StaticImage,
-} from '../src/macro';
+} from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {

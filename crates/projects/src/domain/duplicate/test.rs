@@ -7,8 +7,8 @@ use entity_access_management::domain::models::EntityAccessManagementError;
 use entity_access_management::domain::ports::EntityAccessManagementService;
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
 use sqlx::PgPool;
 
 use super::*;
@@ -94,7 +94,7 @@ type TestProjects = ProjectServiceImpl<
     AcceptAll,
     AcceptAll,
     crate::domain::ports::UnavailableFiledItemsUnfiler,
-    NoopMacroEventBroker,
+    NoopRoxEventBroker,
 >;
 
 fn projects(pool: PgPool) -> Arc<TestProjects> {
@@ -110,7 +110,7 @@ fn projects(pool: PgPool) -> Arc<TestProjects> {
         AcceptAll,
         crate::domain::ports::UnavailableFiledItemsUnfiler,
         None,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     ))
 }
 
@@ -160,7 +160,7 @@ impl ProjectContentCopier for FakeContents {
         }
         Ok(Some(
             EntityAccessReceipt::dangerously_assert_authenticated_user(
-                MacroUserIdStr::try_from(OWNER.to_string()).unwrap(),
+                RoxUserIdStr::try_from(OWNER.to_string()).unwrap(),
                 &entity.entity_id,
                 entity.entity_type,
             ),
@@ -243,7 +243,7 @@ async fn duplicate(
     project_id: &str,
     display_name: Option<&str>,
 ) -> Result<Vec<EntityMutationEffect>, EntityMutationErrorCode> {
-    let owner = MacroUserIdStr::try_from(OWNER.to_string()).unwrap();
+    let owner = RoxUserIdStr::try_from(OWNER.to_string()).unwrap();
     duplicator
         .duplicate_entity(
             EntityType::Project.with_entity_string(project_id.to_string()),

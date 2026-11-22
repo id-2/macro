@@ -2,8 +2,8 @@
  * Identity: who the agent is, as its owner told it. One markdown file in its
  * memory, which the agent writes whole and is shown on every wake.
  */
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { module } from '@macro-inc/muppet/core/capability';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { module } from '@rox-one/muppet/core/capability';
 import type { Base } from '../../context/index.ts';
 
 /** The state directory the identity lives in. */

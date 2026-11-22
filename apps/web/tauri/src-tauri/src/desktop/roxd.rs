@@ -140,6 +140,9 @@ struct Inner {
     wanted: bool,
     /// Consecutive restarts without reaching `running`, for backoff.
     restarts: u32,
+    /// The signed-in user's session token last given by the webview; the
+    /// daemon confirms its pairing codes with it. Kept only in memory.
+    approval_token: Option<String>,
 }
 
 fn emit_status(app: &AppHandle, status: &RoxdStatus) {
@@ -288,7 +291,14 @@ fn roxd_path_env() -> String {
         push(&path);
     }
     if let Ok(home) = std::env::var("HOME") {
-        for suffix in [".local/bin", ".bun/bin", ".volta/bin", ".cargo/bin"] {
+        // OpenCode's installer puts its binary in `~/.opencode/bin`.
+        for suffix in [
+            ".local/bin",
+            ".opencode/bin",
+            ".bun/bin",
+            ".volta/bin",
+            ".cargo/bin",
+        ] {
             push(&format!("{home}/{suffix}"));
         }
     }
@@ -345,8 +355,8 @@ fn roxd_command(app: &AppHandle) -> Result<tokio::process::Command, String> {
     );
     command.env("PATH", roxd_path_env());
     if crate::AppEnvironment::current() == crate::AppEnvironment::Development {
-        // A config created by this daemon must target the dev deployment,
-        // like the webview it pairs with.
+        // A config created by this daemon defaults to the development
+        // deployment; explicit URLs from the webview override it.
         command.env("DEV_MODE", "1");
     }
     #[cfg(windows)]
@@ -426,6 +436,15 @@ pub(crate) async fn roxd_inspect(app: AppHandle) -> Result<serde_json::Value, St
 pub(crate) struct RoxdStartOptions {
     agent: Option<String>,
     workspace: Option<String>,
+    /// Base URLs of the deployment this webview is signed in to. The daemon
+    /// must pair and serve against the same services, or the approval the
+    /// app sends lands in a different environment than the daemon's.
+    api_url: Option<String>,
+    storage_url: Option<String>,
+    web_url: Option<String>,
+    /// The signed-in user's Rox API token: the daemon approves its own
+    /// pairing code with it.
+    approval_token: Option<String>,
 }
 
 /// Start (or restart) the supervised daemon and remember to auto-start it on
@@ -466,6 +485,15 @@ fn launch(
     if let Some(workspace) = &options.workspace {
         command.args(["--workspace", workspace]);
     }
+    if let Some(api_url) = &options.api_url {
+        command.args(["--api-url", api_url]);
+    }
+    if let Some(storage_url) = &options.storage_url {
+        command.args(["--storage-url", storage_url]);
+    }
+    if let Some(web_url) = &options.web_url {
+        command.args(["--web-url", web_url]);
+    }
     command
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
@@ -477,6 +505,16 @@ fn launch(
     let mut inner = state.lock().expect("roxd state lock");
     if resume.is_some_and(|generation| inner.generation != generation || !inner.wanted) {
         return Ok(None);
+    }
+    // A supervisor restart keeps the session token the webview last gave, so
+    // an expired credential re-pairs and confirms itself without a code step.
+    if let Some(token) = options
+        .approval_token
+        .clone()
+        .or_else(|| inner.approval_token.clone())
+    {
+        command.env("ROXD_APPROVAL_TOKEN", &token);
+        inner.approval_token = Some(token);
     }
     let mut child = command
         .spawn()
@@ -560,6 +598,32 @@ async fn read_events(
             tracing::warn!(target: "roxd", "unparseable service event: {line}");
             continue;
         };
+        // The one lifecycle a user watches is pairing, and its events are the
+        // only place the daemon's own confirmation shows up in this log.
+        match event.get("event").and_then(serde_json::Value::as_str) {
+            Some("pairing") => tracing::info!(
+                target: "roxd",
+                code = event.get("code").and_then(serde_json::Value::as_str).unwrap_or(""),
+                "roxd opened a pairing code"
+            ),
+            Some("approving") => tracing::info!(
+                target: "roxd",
+                code = event.get("code").and_then(serde_json::Value::as_str).unwrap_or(""),
+                "roxd is confirming its pairing code itself"
+            ),
+            Some("approval_failed") => tracing::warn!(
+                target: "roxd",
+                code = event.get("code").and_then(serde_json::Value::as_str).unwrap_or(""),
+                message = event.get("message").and_then(serde_json::Value::as_str).unwrap_or(""),
+                "roxd could not confirm its pairing code"
+            ),
+            Some("paired") => tracing::info!(
+                target: "roxd",
+                harness = event.get("harness_id").and_then(serde_json::Value::as_str).unwrap_or(""),
+                "roxd pairing approved"
+            ),
+            _ => {}
+        }
         let status = {
             let mut inner = inner.lock().expect("roxd state lock");
             if inner.generation != generation {
@@ -607,6 +671,7 @@ pub(crate) async fn roxd_stop(
     stop_child(&state.inner).await;
     let status = {
         let mut inner = state.inner.lock().expect("roxd state lock");
+        inner.approval_token = None;
         inner.status = RoxdStatus::default();
         inner.status.clone()
     };

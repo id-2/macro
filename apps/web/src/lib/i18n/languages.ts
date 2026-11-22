@@ -58,8 +58,22 @@ export function browserLanguage(
 }
 
 /**
+ * English is what the server stores when nobody has chosen a language: a new
+ * team's language, and the language the sign-in service saves on the person.
+ * That default must not override Russian. Any other language is a choice made
+ * in this app's settings and still wins.
+ */
+function explicitChoice(
+  language: Language | null | undefined
+): Language | undefined {
+  if (language == null || language === Language.en) return undefined;
+  return language;
+}
+
+/**
  * The language the interface shows: the person's own choice, else their
- * team's, else an explicit browser language passed in, else Russian. A missing
+ * team's, else an explicit browser language passed in, else Russian. English
+ * from the person or the team is the server default, not a choice. A missing
  * choice is not filled from the browser.
  */
 export function resolveInterfaceLanguage(
@@ -67,5 +81,10 @@ export function resolveInterfaceLanguage(
   teamLanguage: Language | null | undefined,
   browser: Language | undefined
 ): Language {
-  return userLanguage ?? teamLanguage ?? browser ?? DEFAULT_LANGUAGE;
+  return (
+    explicitChoice(userLanguage) ??
+    explicitChoice(teamLanguage) ??
+    explicitChoice(browser) ??
+    DEFAULT_LANGUAGE
+  );
 }

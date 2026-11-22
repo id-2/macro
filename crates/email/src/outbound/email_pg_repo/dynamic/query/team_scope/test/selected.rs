@@ -81,7 +81,7 @@ async fn parity(pool: &sqlx::PgPool, expected: bool) -> anyhow::Result<()> {
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn all_five_selectors_share_the_whole_thread(pool: sqlx::PgPool) -> anyhow::Result<()> {
@@ -124,7 +124,7 @@ async fn all_five_selectors_share_the_whole_thread(pool: sqlx::PgPool) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn contacts_resolve_live_with_record_visibility(pool: sqlx::PgPool) -> anyhow::Result<()> {
@@ -193,7 +193,7 @@ async fn contacts_resolve_live_with_record_visibility(pool: sqlx::PgPool) -> any
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn companies_resolve_live_and_domain_matches_have_dot_boundaries(
@@ -238,7 +238,7 @@ async fn companies_resolve_live_and_domain_matches_have_dot_boundaries(
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn exceptions_and_domain_denials_override_all_contribution_modes(
@@ -308,7 +308,7 @@ async fn exceptions_and_domain_denials_override_all_contribution_modes(
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn sender_to_cc_bcc_match_but_drafts_do_not(pool: sqlx::PgPool) -> anyhow::Result<()> {
@@ -336,7 +336,7 @@ async fn sender_to_cc_bcc_match_but_drafts_do_not(pool: sqlx::PgPool) -> anyhow:
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn revisions_mailbox_copies_and_lifecycle_stay_scoped(
@@ -517,7 +517,7 @@ async fn mode_transition_snapshot(pool: &sqlx::PgPool, selected: bool) -> anyhow
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn selected_to_all_keeps_resolution_probe_and_page_in_one_snapshot(
@@ -527,7 +527,7 @@ async fn selected_to_all_keeps_resolution_probe_and_page_in_one_snapshot(
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn all_to_selected_keeps_resolution_probe_and_page_in_one_snapshot(

@@ -498,7 +498,7 @@ pub(crate) async fn delete_draft_message(
         sqlx::query!("UPDATE email_messages SET mailbox_state = COALESCE(mailbox_state,'{}'::jsonb) || '{\"provider_missing\":true}'::jsonb WHERE id = $1",message_id).execute(&mut *tx).await?;
         super::thread::update_thread_metadata(&mut tx, thread_db_id, link.id).await?;
         let payload = serde_json::json!({"kind":"organization","thread_id":thread_db_id});
-        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),link.id,link.sync_generation,payload).execute(&mut *tx).await?;
+        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),link.id,link.sync_generation,payload).execute(&mut *tx).await?;
         tx.commit().await?;
         return Ok(Some(DraftDeletion {
             thread_deleted: false,

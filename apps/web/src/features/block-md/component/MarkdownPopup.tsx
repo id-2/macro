@@ -64,9 +64,9 @@ import {
   $createDocumentMentionNode,
   buildMentionMarkdownString,
   type NodeIdMappings,
-} from '@macro-inc/lexical-core';
-import { $getId } from '@macro-inc/lexical-core/plugins/nodeIdPlugin';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { $getId } from '@rox-one/lexical-core/plugins/nodeIdPlugin';
+import { Telemetry } from '@rox-one/observability';
 import { makeResizeObserver } from '@solid-primitives/resize-observer';
 import { Button, SendButton, Toolbar } from '@ui';
 import {

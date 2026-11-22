@@ -10,7 +10,7 @@ import type { AttachmentForwarded } from './attachmentForwarded';
 import type { ContactInfo } from './contactInfo';
 import type { Label } from './label';
 import type { MessageBodyHtmlSanitized } from './messageBodyHtmlSanitized';
-import type { MessageBodyMacro } from './messageBodyMacro';
+import type { MessageBodyRox } from './messageBodyRox';
 import type { MessageBodyText } from './messageBodyText';
 import type { MessageFrom } from './messageFrom';
 import type { MessageGlobalId } from './messageGlobalId';
@@ -34,7 +34,7 @@ export interface Message {
   attachments_forwarded: AttachmentForwarded[];
   bcc: ContactInfo[];
   body_html_sanitized?: MessageBodyHtmlSanitized;
-  body_macro?: MessageBodyMacro;
+  body_rox?: MessageBodyRox;
   body_text?: MessageBodyText;
   cc: ContactInfo[];
   created_at: string;

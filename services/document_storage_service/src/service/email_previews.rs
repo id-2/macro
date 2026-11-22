@@ -45,7 +45,7 @@ impl<P: EmailPreviewServiceReadOnly, R: EmailPreviewServiceReadOnly> EmailPrevie
 mod test {
     use super::*;
     use email::domain::models::{PreviewView, PreviewViewStandardLabel};
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_user_id::user_id::RoxUserIdStr;
     use models_pagination::{Cursor, CursorVal, Query};
     use std::sync::Mutex;
 
@@ -87,7 +87,7 @@ mod test {
         GetEmailsRequest {
             view: PreviewView::StandardLabel(PreviewViewStandardLabel::All),
             link_ids: vec![Uuid::from_u128(46)],
-            macro_id: MacroUserIdStr::parse_from_str("macro|member@example.com").unwrap(),
+            macro_id: RoxUserIdStr::parse_from_str("macro|member@example.com").unwrap(),
             limit: Some(25),
             query,
             include_frecency: true,

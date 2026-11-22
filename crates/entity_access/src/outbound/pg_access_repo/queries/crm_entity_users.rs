@@ -1,6 +1,6 @@
 //! Query for the users who can see a CRM company or contact.
 
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -16,7 +16,7 @@ pub async fn get_crm_entity_users(
     pool: &PgPool,
     entity_id: &Uuid,
     entity_type: EntityType,
-) -> Result<Vec<MacroUserIdStr<'static>>, sqlx::Error> {
+) -> Result<Vec<RoxUserIdStr<'static>>, sqlx::Error> {
     let users = match entity_type {
         EntityType::CrmCompany => {
             sqlx::query_scalar!(
@@ -54,7 +54,7 @@ pub async fn get_crm_entity_users(
     Ok(users
         .into_iter()
         .filter_map(|u| {
-            MacroUserIdStr::parse_from_str(u.as_str())
+            RoxUserIdStr::parse_from_str(u.as_str())
                 .ok()
                 .map(|u| u.into_owned())
         })

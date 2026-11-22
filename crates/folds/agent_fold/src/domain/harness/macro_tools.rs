@@ -68,7 +68,7 @@ pub const SUBAGENT_TOOL: &str = "Subagent";
 
 /// What the fold does with a Rox tool, by its name.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MacroTool<'name> {
+pub enum RoxTool<'name> {
     /// A user tool: folds to a draft the user finishes.
     User(&'name str),
     /// The `Subagent` tool: folds to a delegation, like a harness's own.
@@ -79,7 +79,7 @@ pub enum MacroTool<'name> {
     Other(&'name str),
 }
 
-impl<'name> MacroTool<'name> {
+impl<'name> RoxTool<'name> {
     /// Classify a Rox tool by name.
     #[must_use]
     pub fn of(tool: &'name str) -> Self {

@@ -9,6 +9,7 @@
  * validates the payload. External servers never select Rox UI by name alone.
  */
 
+import { t } from '@app/lib/i18n';
 import { hasToolRenderer } from '@core/component/AI/component/tool/handler';
 import { type JSX, Match, Show, Switch } from 'solid-js';
 import { isCodeModeSupportCall } from '../../state/code-mode-support';
@@ -58,7 +59,11 @@ export function ToolCallPart(props: {
     status: status(),
     muted: failed(),
     stopped: stopped(),
-    trailing: failed() ? 'Failed' : stopped() ? 'Stopped' : undefined,
+    trailing: failed()
+      ? t('agentChat.failed')
+      : stopped()
+        ? t('agentChat.stopped')
+        : undefined,
   });
 
   // Non-keyed matches preserve the disclosure when a streamed update replaces

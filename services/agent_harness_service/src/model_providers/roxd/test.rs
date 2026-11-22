@@ -32,7 +32,7 @@ impl Drop for Peer {
 }
 
 async fn peer() -> Peer {
-    let url = macro_env_var::optional_read_env_var("REDIS_URI")
+    let url = rox_env_var::optional_read_env_var("REDIS_URI")
         .ok()
         .flatten()
         .unwrap_or_else(|| "redis://127.0.0.1:6379".to_owned());
@@ -63,7 +63,7 @@ async fn peer() -> Peer {
 }
 
 fn harness_id() -> HarnessId {
-    HarnessId::new_from_uuid(macro_uuid::generate_uuid_v7())
+    HarnessId::new_from_uuid(rox_uuid::generate_uuid_v7())
 }
 
 fn options() -> Vec<SessionConfigOption> {

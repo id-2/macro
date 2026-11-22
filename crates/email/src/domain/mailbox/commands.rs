@@ -121,7 +121,7 @@ impl<R: MailboxCommandRepository, G: MailboxCommandGateway> MailboxCommandServic
     pub async fn execute_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repo
-            .claim_command(macro_uuid::generate_uuid_v7())
+            .claim_command(rox_uuid::generate_uuid_v7())
             .await
             .map_err(|error| super::telemetry::claim_failed("commands", error))?
         else {

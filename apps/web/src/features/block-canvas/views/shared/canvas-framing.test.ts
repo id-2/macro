@@ -1,4 +1,4 @@
-import { createGraphicsEditor, screenToWorld } from '@macro-inc/graphics';
+import { createGraphicsEditor, screenToWorld } from '@rox-one/graphics';
 import { createRoot } from 'solid-js';
 import { afterEach, expect, it, vi } from 'vitest';
 import { createCanvasFraming } from './canvas-framing';

@@ -20,15 +20,15 @@ import type {
   Widget,
   FormSection as WireFormSection,
 } from '../../../generated/storage/types.gen';
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import type { Channel } from '../channels/channel';
 import { shareWithChannel } from '../channels/share';
 import type { DatabaseColumn } from '../databases/column';
 import { Database } from '../databases/database';
 import { DatabaseRow } from '../databases/row';
 import { DatabaseTable } from '../databases/table';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 import { FormOption, FormQuestion } from './question';
 import { FormResponse } from './response';
@@ -179,19 +179,19 @@ export type FormQuestionTally = {
  * A form over a database table. Viewers can read its questions and submit;
  * editors can build it and read responses; owners control its audience.
  */
-export class Form extends MacroEntity<FormDetail> {
+export class Form extends RoxEntity<FormDetail> {
   protected async fetch(): Promise<FormDetail> {
     return unwrap(await this.client.storage.getForm({ path: { id: this.id } }));
   }
 
   /** A form handle with details loaded on demand. */
-  static byId(client: MacroClient, id: string): Form {
+  static byId(client: RoxClient, id: string): Form {
     return new Form(client, id);
   }
 
   /** Create a form, optionally over a table of a database the caller owns. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     options: { name: string; table?: DatabaseTable },
   ): Promise<Form> {
     const detail = unwrap(
@@ -212,7 +212,7 @@ export class Form extends MacroEntity<FormDetail> {
   }
 
   /** Forms shared with the caller, or live forms over a specified database. */
-  static async list(client: MacroClient, database?: Database): Promise<Form[]> {
+  static async list(client: RoxClient, database?: Database): Promise<Form[]> {
     if (!database) {
       const listed = unwrap(await client.storage.listAccessibleForms());
       return listed.map(({ form }) => new Form(client, form.id));
@@ -334,7 +334,7 @@ export class Form extends MacroEntity<FormDetail> {
 
   private assertOwns(part: { form: Form }): void {
     if (part.form.id !== this.id)
-      throw new MacroError(
+      throw new RoxError(
         `question or section does not belong to form ${this.id}`,
       );
   }
@@ -357,7 +357,7 @@ export class Form extends MacroEntity<FormDetail> {
         column.table.id !== table.id ||
         column.table.database.id !== table.database.id
       ) {
-        throw new MacroError(
+        throw new RoxError(
           `column does not belong to form ${this.id}'s table`,
         );
       }
@@ -462,7 +462,7 @@ export class Form extends MacroEntity<FormDetail> {
               option.question.id !== question.id ||
               option.question.form.id !== this.id
             ) {
-              throw new MacroError(
+              throw new RoxError(
                 'option does not belong to the answered question',
               );
             }
@@ -586,7 +586,7 @@ export class Form extends MacroEntity<FormDetail> {
             type: 'options' as const,
             value: cell.value.map((option) => {
               if (!('id' in option))
-                throw new MacroError(
+                throw new RoxError(
                   'stored form answers must reference options by id',
                 );
               return FormOption.byId(question, option.id);
@@ -602,7 +602,7 @@ export class Form extends MacroEntity<FormDetail> {
           .with({ type: 'rows' }, async (cell) => {
             const detail = await question.detail();
             if (detail.kind.type !== 'relation')
-              throw new MacroError('row answer requires a relation question');
+              throw new RoxError('row answer requires a relation question');
             const related = DatabaseTable.byId(
               Database.byId(this.client, detail.kind.database),
               detail.kind.table,
@@ -627,7 +627,7 @@ export class Form extends MacroEntity<FormDetail> {
             (cell) => cell,
           )
           .exhaustive(() => {
-            throw new MacroError(
+            throw new RoxError(
               `answer to question ${question.id} has a type this SDK doesn't know`,
             );
           });

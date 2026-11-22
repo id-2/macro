@@ -13,7 +13,7 @@ use crate::domain::models::{
     ViewAccessLevel, ViewOnly,
 };
 use crate::domain::ports::{AccessibleForms, ScheduledActionGrants};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::OwnerAccessLevel;
 use std::sync::{
     Arc,
@@ -46,7 +46,7 @@ struct MockRepo {
     database_row_access_calls: Arc<AtomicUsize>,
     form_access: Arc<Mutex<Option<AccessLevel>>>,
     form_access_callers: Arc<Mutex<Vec<Option<String>>>>,
-    form_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    form_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
     form_access_list: Arc<Mutex<Vec<(Uuid, AccessLevel)>>>,
     external_chat_access: Arc<Mutex<Option<AccessLevel>>>,
     external_chat_access_callers: Arc<Mutex<Vec<Option<String>>>>,
@@ -67,16 +67,16 @@ struct MockRepo {
     channel_membership: Arc<Mutex<Vec<Uuid>>>,
     channel_role: Arc<Mutex<ChannelRoleResult>>,
     last_channel_role_request: Arc<Mutex<Option<(String, Option<i64>)>>>,
-    document_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
-    chat_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
-    project_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
-    thread_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
-    agent_session_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
-    database_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    document_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
+    chat_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
+    project_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
+    thread_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
+    agent_session_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
+    database_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
     database_row_database: Arc<Mutex<Option<Uuid>>>,
-    channel_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    channel_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
     call_channel: Arc<Mutex<Option<CallChannelInfo>>>,
-    call_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    call_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
     user_team: Arc<Mutex<Option<UserTeamInfo>>>,
     grant_audience_lookups: Arc<AtomicUsize>,
 }
@@ -216,7 +216,7 @@ impl MockRepo {
         self
     }
 
-    fn with_form_users(mut self, users: Vec<MacroUserIdStr<'static>>) -> Self {
+    fn with_form_users(mut self, users: Vec<RoxUserIdStr<'static>>) -> Self {
         self.form_users = Arc::new(Mutex::new(users));
         self
     }
@@ -293,12 +293,12 @@ impl MockRepo {
         self
     }
 
-    fn with_document_users(mut self, users: Vec<MacroUserIdStr<'static>>) -> Self {
+    fn with_document_users(mut self, users: Vec<RoxUserIdStr<'static>>) -> Self {
         self.document_users = Arc::new(Mutex::new(users));
         self
     }
 
-    fn with_database_users(mut self, users: Vec<MacroUserIdStr<'static>>) -> Self {
+    fn with_database_users(mut self, users: Vec<RoxUserIdStr<'static>>) -> Self {
         self.database_users = Arc::new(Mutex::new(users));
         self
     }
@@ -308,22 +308,22 @@ impl MockRepo {
         self
     }
 
-    fn with_chat_users(mut self, users: Vec<MacroUserIdStr<'static>>) -> Self {
+    fn with_chat_users(mut self, users: Vec<RoxUserIdStr<'static>>) -> Self {
         self.chat_users = Arc::new(Mutex::new(users));
         self
     }
 
-    fn with_project_users(mut self, users: Vec<MacroUserIdStr<'static>>) -> Self {
+    fn with_project_users(mut self, users: Vec<RoxUserIdStr<'static>>) -> Self {
         self.project_users = Arc::new(Mutex::new(users));
         self
     }
 
-    fn with_thread_users(mut self, users: Vec<MacroUserIdStr<'static>>) -> Self {
+    fn with_thread_users(mut self, users: Vec<RoxUserIdStr<'static>>) -> Self {
         self.thread_users = Arc::new(Mutex::new(users));
         self
     }
 
-    fn with_agent_session_users(mut self, users: Vec<MacroUserIdStr<'static>>) -> Self {
+    fn with_agent_session_users(mut self, users: Vec<RoxUserIdStr<'static>>) -> Self {
         self.agent_session_users = Arc::new(Mutex::new(users));
         self
     }
@@ -349,7 +349,7 @@ impl AccessRepository for MockRepo {
     async fn get_document_access(
         &self,
         _document_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.document_access.lock().await)
     }
@@ -357,7 +357,7 @@ impl AccessRepository for MockRepo {
     async fn get_documents_access(
         &self,
         document_ids: &[String],
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<HashMap<String, AccessLevel>, AccessError> {
         let level = *self.document_access.lock().await;
         Ok(document_ids
@@ -369,7 +369,7 @@ impl AccessRepository for MockRepo {
     async fn get_chat_access(
         &self,
         _chat_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.chat_access.lock().await)
     }
@@ -377,7 +377,7 @@ impl AccessRepository for MockRepo {
     async fn get_project_access(
         &self,
         _project_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.project_access.lock().await)
     }
@@ -385,7 +385,7 @@ impl AccessRepository for MockRepo {
     async fn get_thread_access(
         &self,
         _thread_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         self.thread_access_calls.fetch_add(1, Ordering::SeqCst);
         Ok(*self.thread_access.lock().await)
@@ -394,7 +394,7 @@ impl AccessRepository for MockRepo {
     async fn get_calendar_event_access(
         &self,
         _event_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.calendar_event_access.lock().await)
     }
@@ -402,7 +402,7 @@ impl AccessRepository for MockRepo {
     async fn get_owned_email_thread_ids(
         &self,
         thread_ids: &[Uuid],
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<Uuid>, AccessError> {
         let owned = self.owned_email_thread_ids.lock().await;
         Ok(thread_ids
@@ -414,7 +414,7 @@ impl AccessRepository for MockRepo {
 
     async fn check_user_channel_membership(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _channel_ids: &[Uuid],
     ) -> Result<Vec<Uuid>, AccessError> {
         Ok(self.channel_membership.lock().await.clone())
@@ -423,7 +423,7 @@ impl AccessRepository for MockRepo {
     async fn get_channel_role(
         &self,
         _channel_id: &Uuid,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         user_org_id: Option<i64>,
     ) -> Result<ChannelRoleResult, AccessError> {
         *self.last_channel_role_request.lock().await = Some((
@@ -436,7 +436,7 @@ impl AccessRepository for MockRepo {
     async fn get_call_access(
         &self,
         _call_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.call_access.lock().await)
     }
@@ -444,7 +444,7 @@ impl AccessRepository for MockRepo {
     async fn get_agent_session_access(
         &self,
         _agent_session_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.agent_session_access.lock().await)
     }
@@ -452,7 +452,7 @@ impl AccessRepository for MockRepo {
     async fn get_initiative_access(
         &self,
         _initiative_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.initiative_access.lock().await)
     }
@@ -460,20 +460,20 @@ impl AccessRepository for MockRepo {
     async fn get_pipeline_access(
         &self,
         _id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.pipeline_access.lock().await)
     }
     async fn list_pipeline_access(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         Ok(self.pipeline_access_list.lock().await.clone())
     }
     async fn get_pipelines_access(
         &self,
         ids: &[Uuid],
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<HashMap<Uuid, AccessLevel>, AccessError> {
         Ok(self
             .pipeline_access_list
@@ -488,14 +488,14 @@ impl AccessRepository for MockRepo {
     async fn get_database_access(
         &self,
         _database_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.database_access.lock().await)
     }
 
     async fn list_database_access(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         Ok(self.database_access_list.lock().await.clone())
     }
@@ -503,7 +503,7 @@ impl AccessRepository for MockRepo {
     async fn get_form_access(
         &self,
         _form_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         self.form_access_callers
             .lock()
@@ -515,7 +515,7 @@ impl AccessRepository for MockRepo {
     async fn get_harness_access(
         &self,
         _harness_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.harness_access.lock().await)
     }
@@ -523,7 +523,7 @@ impl AccessRepository for MockRepo {
     async fn get_external_chat_access(
         &self,
         _group_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         self.external_chat_access_callers
             .lock()
@@ -534,7 +534,7 @@ impl AccessRepository for MockRepo {
 
     async fn list_form_access(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         Ok(self.form_access_list.lock().await.clone())
     }
@@ -542,7 +542,7 @@ impl AccessRepository for MockRepo {
     async fn get_database_row_access(
         &self,
         _row_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         self.database_row_access_calls
             .fetch_add(1, Ordering::SeqCst);
@@ -552,7 +552,7 @@ impl AccessRepository for MockRepo {
     async fn get_database_rows_access(
         &self,
         row_ids: &[Uuid],
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<HashMap<Uuid, AccessLevel>, AccessError> {
         self.database_row_access_calls
             .fetch_add(1, Ordering::SeqCst);
@@ -566,14 +566,14 @@ impl AccessRepository for MockRepo {
     async fn get_scheduled_action_access(
         &self,
         _scheduled_action_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.scheduled_action_access.lock().await)
     }
 
     async fn accessible_scheduled_action_ids(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<Uuid>, AccessError> {
         Ok(self.accessible_scheduled_action_ids.lock().await.clone())
     }
@@ -581,7 +581,7 @@ impl AccessRepository for MockRepo {
     async fn get_reminder_access(
         &self,
         _reminder_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         Ok(*self.reminder_access.lock().await)
     }
@@ -642,7 +642,7 @@ impl AccessRepository for MockRepo {
     async fn has_foreign_entity_access(
         &self,
         _foreign_entity_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<bool, AccessError> {
         Ok(*self.foreign_entity_access.lock().await)
     }
@@ -650,7 +650,7 @@ impl AccessRepository for MockRepo {
     async fn get_crm_company_access(
         &self,
         _company_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<CrmEntityAccess>, AccessError> {
         // Owning team / role are irrelevant to these access-level tests.
         Ok(
@@ -665,7 +665,7 @@ impl AccessRepository for MockRepo {
     async fn get_crm_contact_access(
         &self,
         _contact_id: &str,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<CrmEntityAccess>, AccessError> {
         // Owning team / role are irrelevant to these access-level tests.
         Ok(
@@ -681,7 +681,7 @@ impl AccessRepository for MockRepo {
         &self,
         _entity_id: &uuid::Uuid,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         match entity_type {
             EntityType::Document => Ok(self.document_users.lock().await.clone()),
             EntityType::Chat => Ok(self.chat_users.lock().await.clone()),
@@ -715,7 +715,7 @@ impl AccessRepository for MockRepo {
         &self,
         _entity_id: &Uuid,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         assert_eq!(entity_type, EntityType::Call);
         Ok(self.call_users.lock().await.clone())
     }
@@ -723,7 +723,7 @@ impl AccessRepository for MockRepo {
     async fn get_channel_users(
         &self,
         _channel_id: &Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Ok(self.channel_users.lock().await.clone())
     }
 
@@ -747,14 +747,14 @@ impl AccessRepository for MockRepo {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(*self.user_team.lock().await)
     }
 }
 
-fn test_user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|test@test.com".to_string()).unwrap()
+fn test_user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|test@test.com".to_string()).unwrap()
 }
 
 fn test_bot_id() -> BotId {
@@ -778,8 +778,8 @@ fn test_user_bot_scope(user_org_id: Option<i64>) -> BotAccessScope {
     }
 }
 
-fn user_id(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).unwrap()
+fn user_id(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).unwrap()
 }
 
 const FOREIGN_ENTITY_ID: &str = "22222222-2222-2222-2222-222222222222";
@@ -2712,7 +2712,7 @@ async fn test_get_users_by_entity_database_row_reaches_its_databases_users() {
         )
         .await
         .unwrap(),
-        Vec::<MacroUserIdStr<'static>>::new()
+        Vec::<RoxUserIdStr<'static>>::new()
     );
 }
 
@@ -2814,7 +2814,7 @@ async fn test_get_users_by_entity_document_with_single_user() {
 
 #[tokio::test]
 async fn test_get_users_by_entity_project_with_many_users() {
-    let users: Vec<MacroUserIdStr<'static>> = (0..50)
+    let users: Vec<RoxUserIdStr<'static>> = (0..50)
         .map(|i| user_id(&format!("macro|user{}@test.com", i)))
         .collect();
     let repo = MockRepo::new().with_project_users(users.clone());
@@ -2864,7 +2864,7 @@ async fn document_session_access_tracks_current_document_permission() {
 #[tokio::test]
 async fn standalone_call_recipients_use_explicit_entity_grants() {
     let repo = MockRepo::new();
-    let granted = MacroUserIdStr::parse_from_str("macro|participant@example.com")
+    let granted = RoxUserIdStr::parse_from_str("macro|participant@example.com")
         .unwrap()
         .into_owned();
     *repo.call_channel.lock().await = Some(CallChannelInfo {
@@ -2873,7 +2873,7 @@ async fn standalone_call_recipients_use_explicit_entity_grants() {
     });
     *repo.call_users.lock().await = vec![granted.clone()];
     *repo.channel_users.lock().await = vec![
-        MacroUserIdStr::parse_from_str("macro|unrelated@example.com")
+        RoxUserIdStr::parse_from_str("macro|unrelated@example.com")
             .unwrap()
             .into_owned(),
     ];
@@ -2888,7 +2888,7 @@ async fn standalone_call_recipients_use_explicit_entity_grants() {
 #[tokio::test]
 async fn channel_call_recipients_still_use_channel_membership() {
     let repo = MockRepo::new();
-    let member = MacroUserIdStr::parse_from_str("macro|member@example.com")
+    let member = RoxUserIdStr::parse_from_str("macro|member@example.com")
         .unwrap()
         .into_owned();
     *repo.call_channel.lock().await = Some(CallChannelInfo {
@@ -3027,7 +3027,7 @@ async fn a_members_form_has_no_public_access() {
 
 #[tokio::test]
 async fn a_form_audience_is_its_entity_access_users() {
-    let respondent = MacroUserIdStr::try_from_email("respondent@example.com")
+    let respondent = RoxUserIdStr::try_from_email("respondent@example.com")
         .unwrap()
         .into_owned();
     let service =
@@ -3092,7 +3092,7 @@ async fn accessible_forms_are_the_repository_listing() {
 async fn pipeline_receipts_use_their_own_grants() {
     let repo = MockRepo::new().with_database_access(AccessLevel::Owner);
     let service = EntityAccessServiceImpl::new(repo.clone());
-    let user = MacroUserIdStr::try_from_email("pipeline@rox.one").unwrap();
+    let user = RoxUserIdStr::try_from_email("pipeline@rox.one").unwrap();
     let id = Uuid::now_v7().to_string();
     assert!(
         service

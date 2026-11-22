@@ -6,8 +6,8 @@ use crate::domain::{
     },
     ports::AccessRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -25,8 +25,8 @@ mod documents_access;
 mod pipelines_access;
 mod telemetry;
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).unwrap()
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).unwrap()
 }
 
 async fn insert_foreign_entity(

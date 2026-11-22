@@ -5,8 +5,8 @@ use agent_session::domain::routines::{
     ValidatedRoutineSession,
 };
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::generate_uuid_v7;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::generate_uuid_v7;
 use model_owner::Owner;
 use serde_json::json;
 use std::{collections::VecDeque, sync::Mutex};
@@ -27,7 +27,7 @@ use crate::domain::{
     program_runner::{ProgramRunner, test as program},
 };
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use routine_program::RoutineProgram;
 use tokio_util::{sync::CancellationToken, task::TaskTracker};
@@ -39,7 +39,7 @@ struct NoModelAdmission;
 impl ai_billing::AiAdmissionService for NoModelAdmission {
     fn admit<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
         _: ai_usage::AiFeature,
     ) -> ai_billing::AdmissionFuture<'a> {
         panic!("agent funding must be decided by the session/harness service")
@@ -205,7 +205,7 @@ impl RoutineSessions for Sessions {
 fn action() -> ScheduledAction {
     ScheduledAction {
         id: Some(generate_uuid_v7()),
-        owner: Owner::User(MacroUserIdStr::parse_from_str(USER).unwrap()),
+        owner: Owner::User(RoxUserIdStr::parse_from_str(USER).unwrap()),
         name: "routine".into(),
         trigger: serde_json::from_value(
             json!({"type":"cron", "schedule":"0 0 * * * *", "timezone":"UTC"}),
@@ -246,8 +246,8 @@ fn program_runner(sessions: Sessions) -> (Arc<Sessions>, Arc<Program>) {
     (sessions, Arc::new(runner))
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER).unwrap()
 }
 
 /// The routine's only step: its agent.
@@ -664,7 +664,7 @@ impl ScheduledActionRepo for UnusedRepo {
     async fn create_action(&self, _: ScheduledAction) -> Result<ScheduledAction> {
         unimplemented!()
     }
-    async fn get_owned_actions(&self, _: &MacroUserIdStr<'static>) -> Result<Vec<ScheduledAction>> {
+    async fn get_owned_actions(&self, _: &RoxUserIdStr<'static>) -> Result<Vec<ScheduledAction>> {
         unimplemented!()
     }
     async fn get_actions_by_ids(&self, _: &[Uuid]) -> Result<Vec<ScheduledAction>> {
@@ -736,7 +736,7 @@ fn event_run() -> ClaimedEventRun {
         run: AuthorizedEventRun {
             access: EventAccessCapability::Document(
                 EntityAccessReceipt::<ViewAccessLevel>::dangerously_assert_authenticated_user(
-                    MacroUserIdStr::parse_from_str(USER).unwrap(),
+                    RoxUserIdStr::parse_from_str(USER).unwrap(),
                     &event.entity_id().unwrap().to_string(),
                     EntityType::Document,
                 ),
@@ -890,7 +890,7 @@ async fn invalid_targets_and_non_user_owners_never_reach_sessions() {
             .await
             .is_err()
     );
-    action.owner = Owner::User(MacroUserIdStr::parse_from_str(USER).unwrap());
+    action.owner = Owner::User(RoxUserIdStr::parse_from_str(USER).unwrap());
     for value in [
         json!({}),
         json!({"model":" ", "prompt":"", "user_prompt":""}),

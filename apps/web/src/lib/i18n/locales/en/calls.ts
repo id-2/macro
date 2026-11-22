@@ -214,4 +214,18 @@ export default {
   microphoneAccessBrowser:
     'Rox needs the microphone for calls. Allow it in your browser’s site settings.',
   openSettings: 'Open Settings',
+  title: 'Calls',
+  navigation: 'Call navigation',
+  viewsLabel: 'Call views',
+  filtersLabel: 'Call filters',
+  viewOptionsLabel: 'Call view options',
+  sortCalls: 'Sort calls',
+  searchCalls: 'Search calls',
+  typeSection: 'Type',
+  channelsSection: 'Channels',
+  audienceInternal: 'Internal',
+  audienceExternal: 'External',
+  untitledChannel: 'Untitled channel',
+  callLocation: 'Call location',
+  recordingFallback: 'Call Recording',
 };

@@ -1,3 +1,4 @@
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import {
   cleanup,
   fireEvent,
@@ -6,7 +7,7 @@ import {
   waitFor,
 } from '@solidjs/testing-library';
 import { createSignal, Show } from 'solid-js';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, expect, it, vi } from 'vitest';
 import type { FolderSubmission } from '../core/folder-composer';
 import { CreateFolder } from './create-folder';
 
@@ -42,6 +43,8 @@ afterEach(() => {
   vi.resetAllMocks();
 });
 
+beforeAll(() => setInterfaceLanguage('en'));
+
 it('stages files and nested folders with tags, removes items, and submits to the created folder', async () => {
   const file = new File(['brief'], 'brief.txt');
   const nested = { file: new File(['zip'], 'Assets.zip'), isFolder: true };
@@ -67,7 +70,7 @@ it('stages files and nested folders with tags, removes items, and submits to the
 
   expect(
     screen
-      .getByRole('button', { name: /Create Folder/ })
+      .getByRole('button', { name: /Create folder/ })
       .hasAttribute('disabled')
   ).toBe(true);
   fireEvent.input(screen.getByLabelText('Folder name'), {
@@ -83,7 +86,7 @@ it('stages files and nested folders with tags, removes items, and submits to the
   await waitFor(() =>
     expect(
       screen
-        .getByRole('button', { name: /Create Folder/ })
+        .getByRole('button', { name: /Create folder/ })
         .hasAttribute('disabled')
     ).toBe(false)
   );
@@ -132,7 +135,7 @@ it('dismisses immediately on confirmation before folder creation or uploads fini
       />
     </Show>
   ));
-  fireEvent.click(screen.getByRole('button', { name: /Create Folder/ }));
+  fireEvent.click(screen.getByRole('button', { name: /Create folder/ }));
   expect(screen.queryByRole('form', { name: 'New folder' })).toBeNull();
   expect(commands.upload).not.toHaveBeenCalled();
   creation.resolve('folder-id');
@@ -169,7 +172,7 @@ it('allows name and tag creation with uploads hidden in the mobile composer', as
     target: { value: 'Mobile folder' },
   });
   fireEvent.click(screen.getByRole('button', { name: 'Add tags' }));
-  fireEvent.click(screen.getByRole('button', { name: /Create Folder/ }));
+  fireEvent.click(screen.getByRole('button', { name: /Create folder/ }));
   expect(onSubmit).toHaveBeenCalledOnce();
   const submission: FolderSubmission = onSubmit.mock.calls[0][0];
   expect(await submission.result).toEqual({

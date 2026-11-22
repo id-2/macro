@@ -16,8 +16,8 @@ use axum::{
     response::{IntoResponse, Response},
     routing::post,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use serde::Serialize;
 use uuid::Uuid;
@@ -30,7 +30,7 @@ use crate::domain::{
 /// Router state for authenticated join requests.
 pub struct CalendarJoinRequestRouterState<S, Auth> {
     service: Arc<S>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for CalendarJoinRequestRouterState<S, Auth> {
@@ -45,7 +45,7 @@ impl<S, Auth> Clone for CalendarJoinRequestRouterState<S, Auth> {
 impl<S, Auth> CalendarJoinRequestRouterState<S, Auth> {
     /// Create router state from a shared join-request service and
     /// authorization state.
-    pub fn new(service: Arc<S>, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<S>, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization_state,
@@ -53,7 +53,7 @@ impl<S, Auth> CalendarJoinRequestRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<CalendarJoinRequestRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<CalendarJoinRequestRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &CalendarJoinRequestRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -65,7 +65,7 @@ pub fn calendar_join_request_router<S, Auth, T>(
 ) -> Router<T>
 where
     S: CalendarJoinRequestService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -184,12 +184,12 @@ pub struct CalendarJoinRequestsResponse {
 )]
 pub async fn request_to_join<S, Auth>(
     State(state): State<CalendarJoinRequestRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(event_id): Path<Uuid>,
 ) -> Result<Json<CalendarJoinRequest>, CalendarJoinRequestApiError>
 where
     S: CalendarJoinRequestService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let request = state
         .service
@@ -214,12 +214,12 @@ where
 )]
 pub async fn list_join_requests<S, Auth>(
     State(state): State<CalendarJoinRequestRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(event_id): Path<Uuid>,
 ) -> Result<Json<CalendarJoinRequestsResponse>, CalendarJoinRequestApiError>
 where
     S: CalendarJoinRequestService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let requests = state
         .service

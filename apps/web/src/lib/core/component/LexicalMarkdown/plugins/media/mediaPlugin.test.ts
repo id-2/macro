@@ -10,7 +10,7 @@ import {
   $isImageNode,
   RegisteredNodesByType,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $createNodeSelection,
   $createParagraphNode,

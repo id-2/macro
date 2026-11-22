@@ -904,11 +904,11 @@ impl MessageGroupRecipients for GroupMembers {
     async fn channel_members(
         &self,
         channel: Uuid,
-    ) -> Result<Vec<macro_user_id::user_id::MacroUserIdStr<'static>>, MessageError> {
+    ) -> Result<Vec<rox_user_id::user_id::RoxUserIdStr<'static>>, MessageError> {
         assert_eq!(channel, Uuid::from_u128(20));
         Ok((0..300)
             .map(|i| {
-                macro_user_id::user_id::MacroUserIdStr::try_from_email(&format!(
+                rox_user_id::user_id::RoxUserIdStr::try_from_email(&format!(
                     "participant-{i}@example.com"
                 ))
                 .unwrap()

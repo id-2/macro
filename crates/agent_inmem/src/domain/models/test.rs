@@ -1,4 +1,5 @@
 use super::{AUTO_MODEL, ROUTED_MODELS, advertised_models, display_name, resolve};
+use agent::provider_keys::model_is_callable;
 use chat::domain::models::CHAT_MODELS;
 
 #[test]
@@ -9,28 +10,39 @@ fn advertised_models_lead_with_auto_then_chat_then_routed() {
             .iter()
             .filter(|model| **model == "google/gemini-3.8-flash")
             .count(),
-        1
+        usize::from(model_is_callable("google/gemini-3.8-flash"))
     );
     assert_eq!(models[0], AUTO_MODEL);
-    assert_eq!(&models[1..=CHAT_MODELS.len()], CHAT_MODELS);
-    assert_eq!(
-        &models[CHAT_MODELS.len() + 1..],
-        ROUTED_MODELS
-            .iter()
-            .map(|(model, _)| *model)
-            .filter(|model| *model != AUTO_MODEL && !CHAT_MODELS.contains(model))
-            .collect::<Vec<_>>()
-            .as_slice()
-    );
+    let expected = CHAT_MODELS
+        .iter()
+        .chain(ROUTED_MODELS.iter().map(|(model, _)| model))
+        .copied()
+        .filter(|model| *model != AUTO_MODEL && model_is_callable(model))
+        .fold(Vec::new(), |mut unique, model| {
+            if !unique.contains(&model) {
+                unique.push(model);
+            }
+            unique
+        });
+    assert_eq!(&models[1..], expected.as_slice());
 }
 
+/// Auto runs on a model whose provider key this deployment really has, so a
+/// placeholder key never becomes the prompt a new session sends first.
 #[test]
-fn auto_defaults_to_gemini() {
-    assert_eq!(resolve(AUTO_MODEL), "google/gemini-3.8-flash");
+fn auto_runs_on_a_model_this_deployment_can_call() {
+    let target = resolve(AUTO_MODEL);
+    assert!(model_is_callable(target), "{target} is not callable");
     assert_eq!(resolve("fireworks/glm-5p3"), "fireworks/glm-5p3");
     assert_eq!(display_name(AUTO_MODEL), "Auto");
-    assert_eq!(super::supports_images(AUTO_MODEL), Some(true));
-    assert_eq!(super::context_window(AUTO_MODEL), Some(1_048_576));
+    assert_eq!(
+        super::supports_images(AUTO_MODEL),
+        super::supports_images(target)
+    );
+    assert_eq!(
+        super::context_window(AUTO_MODEL),
+        super::context_window(target)
+    );
 }
 
 #[test]

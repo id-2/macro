@@ -16,7 +16,7 @@ use crate::{get_nested_project_entities, walk_up_project_tree};
 #[derive(Clone, Debug)]
 pub struct ProjectGrantSource {
     /// The folder the grant was made on.
-    pub project_id: macro_uuid::Uuid,
+    pub project_id: rox_uuid::Uuid,
     /// The user, channel or team granted access.
     pub source_id: String,
     /// What kind of grantee `source_id` is.
@@ -29,7 +29,7 @@ pub struct ProjectGrantSource {
 #[tracing::instrument(skip(transaction), err)]
 pub async fn project_grant_sources(
     transaction: &mut Transaction<'_, Postgres>,
-    project_ids: &[macro_uuid::Uuid],
+    project_ids: &[rox_uuid::Uuid],
 ) -> Result<Vec<ProjectGrantSource>, sqlx::Error> {
     sqlx::query!(
         r#"
@@ -58,7 +58,7 @@ pub async fn project_grant_sources(
 /// access (see [`crate::scoped_grants`]).
 pub async fn refuse_inherited_access(
     connection: &mut PgConnection,
-    entities: &[(macro_uuid::Uuid, &str)],
+    entities: &[(rox_uuid::Uuid, &str)],
     sources: &[ProjectGrantSource],
 ) -> Result<(), sqlx::Error> {
     if agent_correlation::context::may_share() {
@@ -90,9 +90,9 @@ pub async fn refuse_inherited_access(
 #[tracing::instrument(skip(transaction), err)]
 pub async fn refuse_filing(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
-    project_id: &macro_uuid::Uuid,
+    project_id: &rox_uuid::Uuid,
 ) -> Result<(), sqlx::Error> {
     if agent_correlation::context::may_share() {
         return Ok(());
@@ -108,10 +108,10 @@ pub async fn refuse_filing(
         Vec::new()
     };
     // Legacy contents without a UUID inherit through their folder at read time.
-    let mut filed: Vec<(macro_uuid::Uuid, &str)> = nested
+    let mut filed: Vec<(rox_uuid::Uuid, &str)> = nested
         .iter()
         .filter_map(|entity| {
-            let id = macro_uuid::string_to_uuid(&entity.entity_id).ok()?;
+            let id = rox_uuid::string_to_uuid(&entity.entity_id).ok()?;
             Some((id, entity.entity_type.as_str()))
         })
         .collect();
@@ -125,11 +125,11 @@ pub async fn refuse_filing(
 /// empty id (filed nowhere) or one that isn't a UUID has nothing to refuse.
 pub async fn refuse_filing_in(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
     project_id: Option<&str>,
 ) -> Result<(), sqlx::Error> {
-    match project_id.and_then(|id| macro_uuid::string_to_uuid(id).ok()) {
+    match project_id.and_then(|id| rox_uuid::string_to_uuid(id).ok()) {
         Some(project_id) => refuse_filing(transaction, entity_id, entity_type, &project_id).await,
         None => Ok(()),
     }
@@ -197,9 +197,9 @@ async fn unregistered_reach(
     )
     .fetch_all(transaction.as_mut())
     .await?;
-    let project_ids: Vec<macro_uuid::Uuid> = chain
+    let project_ids: Vec<rox_uuid::Uuid> = chain
         .iter()
-        .filter_map(|folder| macro_uuid::string_to_uuid(&folder.id).ok())
+        .filter_map(|folder| rox_uuid::string_to_uuid(&folder.id).ok())
         .collect();
     let grants = sqlx::query!(
         r#"
@@ -241,9 +241,9 @@ async fn unregistered_reach(
 #[tracing::instrument(skip(transaction), err)]
 pub async fn inherit_project_grants(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
-    project_id: &macro_uuid::Uuid,
+    project_id: &rox_uuid::Uuid,
 ) -> Result<(), sqlx::Error> {
     let project_ids = walk_up_project_tree(transaction, project_id).await?;
     let sources = project_grant_sources(transaction, &project_ids).await?;
@@ -272,9 +272,9 @@ pub async fn inherit_project_grants(
 #[tracing::instrument(skip(transaction), err)]
 pub async fn drop_project_grants(
     transaction: &mut Transaction<'_, Postgres>,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
-    old_project_id: &macro_uuid::Uuid,
+    old_project_id: &rox_uuid::Uuid,
 ) -> Result<(), sqlx::Error> {
     let project_ids = walk_up_project_tree(transaction, old_project_id)
         .await?

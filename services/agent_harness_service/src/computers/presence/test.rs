@@ -3,13 +3,13 @@ use std::sync::Arc;
 
 use agent_harness::domain::ports::{HarnessPresence, RuntimeConnectionId};
 use agent_session::domain::model::ReplicaId;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use crate::harness_bindings::PgHarnessPresence;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn stale_close_preserves_replacement_on_another_replica(pool: PgPool) {
-    let harness = HarnessId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let harness = HarnessId::new_from_uuid(rox_uuid::generate_uuid_v7());
     sqlx::query!(
         r#"
         INSERT INTO harnesses (id, kind, name, owner_user_id, created_by)
@@ -39,7 +39,7 @@ async fn stale_close_preserves_replacement_on_another_replica(pool: PgPool) {
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn lifecycle_guard_blocks_other_replicas_until_observation_finishes(pool: PgPool) {
-    let harness = HarnessId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let harness = HarnessId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let guard = PresenceGuard::lock(&pool, harness).await.unwrap();
     let acquired = sqlx::query_scalar!(
         r#"
@@ -59,7 +59,7 @@ async fn lifecycle_guard_blocks_other_replicas_until_observation_finishes(pool: 
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn observation_checks_lease_time_after_guard_started(pool: PgPool) {
-    let harness = HarnessId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let harness = HarnessId::new_from_uuid(rox_uuid::generate_uuid_v7());
     sqlx::query!(
         r#"
         INSERT INTO harnesses (id, kind, name, owner_user_id, created_by)

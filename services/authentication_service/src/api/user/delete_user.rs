@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
 use tower_cookies::Cookies;
 
 use crate::api::{
@@ -29,7 +29,7 @@ use model::response::{ErrorResponse, GenericSuccessResponse};
 #[tracing::instrument(skip(ctx, authorization, jwt_session, cookies), fields(user_id=%authorization.authorization.user.user_context.user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
     JwtSessionContext(jwt_session): JwtSessionContext,
     cookies: Cookies,
 ) -> Result<Response, Response> {
@@ -38,7 +38,9 @@ pub async fn handler(
     // This may seem dumb, but if you delete this account it will delete my fusionauth account and
     // we will then be locked out of fusionauth. So this is a way to prevent any accidental fuck
     // ups from occurring.
-    if user_context.user_id == "macro|hutch@rox.one" {
+    if rox_user_id::user_id::strip_user_id_prefix(&user_context.user_id)
+        .eq_ignore_ascii_case("hutch@rox.one")
+    {
         return Err((StatusCode::FORBIDDEN, "you cannot delete hutch").into_response());
     }
     // Perform a logout for the user
@@ -59,7 +61,7 @@ pub async fn handler(
         tracing::warn!(error=?e, "error logging out");
     }
 
-    let email = user_id.replace("macro|", "");
+    let email = rox_user_id::user_id::strip_user_id_prefix(user_id);
 
     // Delete the user from fusionauth
     // This will trigger the delete user webhook to clear out the user's items from the db async

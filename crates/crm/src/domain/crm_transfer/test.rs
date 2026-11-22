@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use chrono::{TimeZone, Utc};
 use databases::domain::models::{ColumnId, DatabaseId, OptionId, RowId, TableId, TableVersion};
 use entity_access::domain::models::AccessLevel;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::DateRange;
 
 use super::*;
@@ -18,7 +18,7 @@ use crate::domain::{
 
 fn viewer() -> Viewer {
     Viewer {
-        user_id: MacroUserIdStr::parse_from_str("macro|me@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|me@example.com")
             .unwrap()
             .into_owned(),
         acting_bot: None,

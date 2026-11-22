@@ -19,15 +19,15 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_authorization::{
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims, BotAuthentication, BotAuthorizer,
-    BotScope, InternalAuthConfig, JwtValidator, MacroAuthorizationError,
-    MacroAuthorizationServiceImpl, MacroAuthorizationState, NoBotAuthorizer,
+    BotScope, InternalAuthConfig, JwtValidator, RoxAuthorizationError,
+    RoxAuthorizationServiceImpl, RoxAuthorizationState, NoBotAuthorizer,
     NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use rootcause::Report;
 use sqlx::{PgPool, Row};
 use std::sync::{
@@ -115,7 +115,7 @@ impl TestBotService {
 impl BotService for TestBotService {
     async fn create_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _req: CreateAgentRequest,
     ) -> Result<Agent, BotError> {
         unimplemented!()
@@ -123,7 +123,7 @@ impl BotService for TestBotService {
 
     async fn update_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: UpdateAgentRequest,
     ) -> Result<Agent, BotError> {
@@ -132,7 +132,7 @@ impl BotService for TestBotService {
 
     async fn manageable_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<Agent, BotError> {
         unimplemented!()
@@ -140,20 +140,20 @@ impl BotService for TestBotService {
 
     async fn patch_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: PatchAgentRequest,
     ) -> Result<Agent, BotError> {
         unimplemented!()
     }
 
-    async fn list_agents(&self, _caller: MacroUserIdStr<'static>) -> Result<Vec<Agent>, BotError> {
+    async fn list_agents(&self, _caller: RoxUserIdStr<'static>) -> Result<Vec<Agent>, BotError> {
         unimplemented!()
     }
 
     async fn create_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _req: CreateBotRequest,
     ) -> Result<Bot, BotError> {
         unimplemented!()
@@ -161,20 +161,20 @@ impl BotService for TestBotService {
 
     async fn create_channel_scoped_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _channel_id: Uuid,
         _req: CreateChannelScopedBotRequest,
     ) -> Result<CreateChannelScopedBotResponse, BotError> {
         unimplemented!()
     }
 
-    async fn list_bots(&self, _caller: MacroUserIdStr<'static>) -> Result<Vec<Bot>, BotError> {
+    async fn list_bots(&self, _caller: RoxUserIdStr<'static>) -> Result<Vec<Bot>, BotError> {
         unimplemented!()
     }
 
     async fn get_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<Bot, BotError> {
         unimplemented!()
@@ -202,7 +202,7 @@ impl BotService for TestBotService {
 
     async fn patch_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: PatchBotRequest,
     ) -> Result<Bot, BotError> {
@@ -211,7 +211,7 @@ impl BotService for TestBotService {
 
     async fn delete_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<(), BotError> {
         unimplemented!()
@@ -228,7 +228,7 @@ impl BotService for TestBotService {
 
     async fn remove_bot_from_channel(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _channel_id: Uuid,
         _bot_id: BotId,
     ) -> Result<(), BotError> {
@@ -254,7 +254,7 @@ impl BotService for TestBotService {
 
     async fn create_token(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: CreateBotTokenRequest,
     ) -> Result<CreateBotTokenResponse, BotError> {
@@ -276,7 +276,7 @@ impl BotService for TestBotService {
 
     async fn list_tokens(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<Vec<BotToken>, BotError> {
         unimplemented!()
@@ -284,7 +284,7 @@ impl BotService for TestBotService {
 
     async fn revoke_token(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _token_id: Uuid,
     ) -> Result<(), BotError> {
@@ -337,7 +337,7 @@ impl TestAccessService {
 impl EntityAccessService for TestAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -357,7 +357,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -366,7 +366,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -385,7 +385,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -395,7 +395,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, uuid::Uuid, TeamRole), AccessError> {
@@ -406,7 +406,7 @@ impl EntityAccessService for TestAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unimplemented!()
     }
 
@@ -426,7 +426,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!()
     }
@@ -439,9 +439,9 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         if jwt == INVALID_BEARER_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         // A prefix stands for a Macro API JWT signed for an agent or a
@@ -449,11 +449,11 @@ impl JwtValidator for FakeJwtValidator {
         let agent = jwt.strip_prefix(AGENT_BEARER_PREFIX);
         let routine = jwt.strip_prefix(ROUTINE_BEARER_PREFIX);
         let user_id = agent.or(routine).unwrap_or(jwt);
-        Ok(macro_authorization::ValidatedCredential {
+        Ok(rox_authorization::ValidatedCredential {
             origin: if user_id == jwt {
-                macro_authorization::CredentialOrigin::Session
+                rox_authorization::CredentialOrigin::Session
             } else {
-                macro_authorization::CredentialOrigin::MacroApiJwt
+                rox_authorization::CredentialOrigin::RoxApiJwt
             },
             identity: ValidatedIdentity {
                 agent_id: agent.map(|_| bot_id::MACRO_AI_BOT_ID),
@@ -468,10 +468,10 @@ impl JwtValidator for FakeJwtValidator {
     }
 }
 
-type TestAuthorizationService = MacroAuthorizationServiceImpl<FakeJwtValidator>;
+type TestAuthorizationService = RoxAuthorizationServiceImpl<FakeJwtValidator>;
 
-fn authorization_state() -> MacroAuthorizationState<TestAuthorizationService> {
-    let service = MacroAuthorizationServiceImpl::new(
+fn authorization_state() -> RoxAuthorizationState<TestAuthorizationService> {
+    let service = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".to_string(),
@@ -480,7 +480,7 @@ fn authorization_state() -> MacroAuthorizationState<TestAuthorizationService> {
         NoBotAuthorizer,
         NoUserApiKeyAuthorizer,
     );
-    MacroAuthorizationState::new(Arc::new(service))
+    RoxAuthorizationState::new(Arc::new(service))
 }
 
 const SELF_BOT_TOKEN: &str = "mbot_self_test";
@@ -497,9 +497,9 @@ impl BotAuthorizer for SelfBotAuthorizer {
         bot_token: &str,
         bot_scope: BotScope,
         _acting_user: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, rootcause::Report<RoxAuthorizationError>> {
         if bot_token != SELF_BOT_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(BotAuthentication {
             bot_id: self.bot_id,
@@ -513,8 +513,8 @@ impl BotAuthorizer for SelfBotAuthorizer {
 
 fn authorization_state_with_bot(
     bot_id: BotId,
-) -> MacroAuthorizationState<TestAuthorizationService> {
-    let service = MacroAuthorizationServiceImpl::new(
+) -> RoxAuthorizationState<TestAuthorizationService> {
+    let service = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".to_string(),
@@ -523,7 +523,7 @@ fn authorization_state_with_bot(
         SelfBotAuthorizer { bot_id },
         NoUserApiKeyAuthorizer,
     );
-    MacroAuthorizationState::new(Arc::new(service))
+    RoxAuthorizationState::new(Arc::new(service))
 }
 
 async fn attach_default_bearer(mut request: Request<Body>) -> Request<Body> {
@@ -550,7 +550,7 @@ fn router(service: TestBotService, role: EntityParticipantRole) -> Router {
 fn real_router(pool: PgPool, user_id: &str) -> Router {
     let bot_service = BotServiceImpl::new(
         PgBotsRepo::new(pool.clone()),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         crate::domain::service::test::TeamAgentHarnesses::default(),
     );
     let access_service = EntityAccessServiceImpl::new(PgAccessRepository::new(pool));
@@ -640,8 +640,8 @@ async fn insert_private_channel_with_admin(
     Ok(())
 }
 
-fn macro_user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid macro user id")
+fn macro_user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid macro user id")
 }
 
 fn bot_channel(channel_id: Uuid) -> BotChannel {
@@ -998,7 +998,7 @@ async fn bot_owner_can_list_and_remove_bot_channels_via_bot_routes(
 
     let bot_service = BotServiceImpl::new(
         PgBotsRepo::new(pool.clone()),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         crate::domain::service::test::TeamAgentHarnesses::default(),
     );
     let bot = bot_service
@@ -1102,7 +1102,7 @@ async fn channel_admin_can_add_and_remove_owned_bot_via_http(pool: PgPool) -> an
 
     let bot_service = BotServiceImpl::new(
         PgBotsRepo::new(pool.clone()),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         crate::domain::service::test::TeamAgentHarnesses::default(),
     );
     let bot = bot_service
@@ -1390,7 +1390,7 @@ async fn an_agents_program_cannot_mint_a_bot_token() {
     let agent_bearer = format!("{AGENT_BEARER_PREFIX}{DEFAULT_BEARER_TOKEN}");
     let mut code_mode = mint_request(bot_id, DEFAULT_BEARER_TOKEN);
     code_mode.headers_mut().insert(
-        macro_authorization::CODE_EXECUTION_HEADER,
+        rox_authorization::CODE_EXECUTION_HEADER,
         "1".parse().unwrap(),
     );
     let routine_bearer = format!("{ROUTINE_BEARER_PREFIX}{DEFAULT_BEARER_TOKEN}");

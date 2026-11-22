@@ -18,8 +18,8 @@ use axum::{
     routing::{get, post},
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 use model_error_response::ErrorResponse;
 use rate_limit::domain::models::RateLimitOk;
@@ -33,7 +33,7 @@ use std::time::Duration;
 pub struct WebhookRouterState<S, R, Auth> {
     service: Arc<S>,
     rate_limiter: R,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, R: Clone, Auth> Clone for WebhookRouterState<S, R, Auth> {
@@ -51,7 +51,7 @@ impl<S: WebhookService, R: RateLimitService + Clone, Auth> WebhookRouterState<S,
     pub fn new(
         service: S,
         rate_limiter: R,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service: Arc::new(service),
@@ -67,7 +67,7 @@ impl<S, R, Auth> FromRef<WebhookRouterState<S, R, Auth>> for Arc<S> {
     }
 }
 
-impl<S, R, Auth> FromRef<WebhookRouterState<S, R, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, R, Auth> FromRef<WebhookRouterState<S, R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &WebhookRouterState<S, R, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -82,15 +82,15 @@ pub struct WebhookPath {
 
 /// Per-user validation attempt rate limit.
 pub struct PerUserValidateWebhookRateLimit<Auth> {
-    authorization: MacroAuthorizationExtractor<Auth, ActingUser>,
+    authorization: RoxAuthorizationExtractor<Auth, ActingUser>,
     webhook_id: WebhookId,
 }
 
 impl<S, Auth> RateLimitExtractable<S> for PerUserValidateWebhookRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     fn config() -> RateLimitConfig {
         RateLimitConfig {
@@ -110,8 +110,8 @@ where
 impl<S, Auth> FromRequestParts<S> for PerUserValidateWebhookRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     type Rejection = Response;
 
@@ -119,7 +119,7 @@ where
         parts: &mut axum::http::request::Parts,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, ActingUser>> = parts
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, ActingUser>> = parts
             .extract_with_state(state)
             .await
             .map_err(IntoResponse::into_response)?;
@@ -137,7 +137,7 @@ where
 
 struct ValidateWebhookRateLimitState<R, Auth> {
     rate_limiter: R,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<R: Clone, Auth> Clone for ValidateWebhookRateLimitState<R, Auth> {
@@ -149,7 +149,7 @@ impl<R: Clone, Auth> Clone for ValidateWebhookRateLimitState<R, Auth> {
     }
 }
 
-impl<R, Auth> FromRef<ValidateWebhookRateLimitState<R, Auth>> for MacroAuthorizationState<Auth> {
+impl<R, Auth> FromRef<ValidateWebhookRateLimitState<R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ValidateWebhookRateLimitState<R, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -158,7 +158,7 @@ impl<R, Auth> FromRef<ValidateWebhookRateLimitState<R, Auth>> for MacroAuthoriza
 impl<R, Auth> RateLimitService for ValidateWebhookRateLimitState<R, Auth>
 where
     R: RateLimitService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     async fn check_rate_limit(
         &self,
@@ -178,7 +178,7 @@ pub fn webhook_router<S, R, Auth, T>(state: WebhookRouterState<S, R, Auth>) -> R
 where
     S: WebhookService,
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     let rate_limit_state = ValidateWebhookRateLimitState {
@@ -228,9 +228,9 @@ where
     ),
     tag = "webhook"
 )]
-pub async fn create_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
+pub async fn create_webhook<S: WebhookService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<S>>,
-    authorization: MacroAuthorizationExtractor<Auth, ActingUser>,
+    authorization: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(request): Json<CreateWebhookRequest>,
 ) -> Result<(StatusCode, Json<CreateWebhookResponse>), WebhookHandlerError> {
     let webhook = service
@@ -252,9 +252,9 @@ pub async fn create_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
     ),
     tag = "webhook"
 )]
-pub async fn get_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
+pub async fn get_webhook<S: WebhookService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<S>>,
-    authorization: MacroAuthorizationExtractor<Auth, ActingUser>,
+    authorization: RoxAuthorizationExtractor<Auth, ActingUser>,
     Path(path): Path<WebhookPath>,
 ) -> Result<Json<Webhook>, WebhookHandlerError> {
     Ok(Json(
@@ -278,9 +278,9 @@ pub async fn get_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
     ),
     tag = "webhook"
 )]
-pub async fn list_webhooks<S: WebhookService, Auth: MacroAuthorizationService>(
+pub async fn list_webhooks<S: WebhookService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<S>>,
-    authorization: MacroAuthorizationExtractor<Auth, ActingUser>,
+    authorization: RoxAuthorizationExtractor<Auth, ActingUser>,
 ) -> Result<Json<ListWebhooksResponse>, WebhookHandlerError> {
     Ok(Json(
         service
@@ -304,9 +304,9 @@ pub async fn list_webhooks<S: WebhookService, Auth: MacroAuthorizationService>(
     ),
     tag = "webhook"
 )]
-pub async fn patch_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
+pub async fn patch_webhook<S: WebhookService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<S>>,
-    authorization: MacroAuthorizationExtractor<Auth, ActingUser>,
+    authorization: RoxAuthorizationExtractor<Auth, ActingUser>,
     Path(path): Path<WebhookPath>,
     Json(request): Json<PatchWebhookRequest>,
 ) -> Result<Json<Webhook>, WebhookHandlerError> {
@@ -334,9 +334,9 @@ pub async fn patch_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
     ),
     tag = "webhook"
 )]
-pub async fn delete_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
+pub async fn delete_webhook<S: WebhookService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<S>>,
-    authorization: MacroAuthorizationExtractor<Auth, ActingUser>,
+    authorization: RoxAuthorizationExtractor<Auth, ActingUser>,
     Path(path): Path<WebhookPath>,
 ) -> Result<StatusCode, WebhookHandlerError> {
     service
@@ -362,9 +362,9 @@ pub async fn delete_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
     ),
     tag = "webhook"
 )]
-pub async fn validate_webhook<S: WebhookService, Auth: MacroAuthorizationService>(
+pub async fn validate_webhook<S: WebhookService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<S>>,
-    Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, ActingUser>>,
+    Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, ActingUser>>,
     Path(path): Path<WebhookPath>,
 ) -> Result<Json<ValidateWebhookResponse>, WebhookHandlerError> {
     Ok(Json(

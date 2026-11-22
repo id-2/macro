@@ -16,7 +16,7 @@ use import::domain::ports::{
     ImportedDocumentProperties, ImportedTaskProperties, NewDatabase, NotionLinks, SharedEntity,
     SourceDates, TeamMember,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::project::request::{CreateProjectRequest, PatchProjectRequestV2};
 use models_permissions::share_permission::UpdateSharePermissionRequestV2;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -27,7 +27,7 @@ use uuid::Uuid;
 mod test;
 
 /// The import acts as Rox AI on the user's behalf, like the agent's tools.
-fn viewer(user: &MacroUserIdStr<'static>) -> Viewer {
+fn viewer(user: &RoxUserIdStr<'static>) -> Viewer {
     Viewer {
         user_id: user.clone(),
         acting_bot: Some(bot_id::MACRO_AI_BOT_ID),
@@ -111,7 +111,7 @@ fn new_database(detail: &DatabaseDetail) -> anyhow::Result<NewDatabase> {
 impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     async fn create_tracker_project(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         markdown: &str,
@@ -122,7 +122,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     }
     async fn create_tracker_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         markdown: &str,
@@ -134,7 +134,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     }
     async fn link_tracker_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         relations: &import::domain::ports::TrackerTaskRelations,
     ) -> anyhow::Result<()> {
@@ -144,7 +144,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     #[tracing::instrument(skip(self, user, name), err)]
     async fn create_folder(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         parent: Option<Uuid>,
     ) -> anyhow::Result<Uuid> {
@@ -170,7 +170,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     #[tracing::instrument(skip(self, user, name, notion_markdown, links, properties), err)]
     async fn create_document(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         notion_markdown: &str,
@@ -196,7 +196,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     #[tracing::instrument(skip(self, user, name, notion_markdown, links, properties), err)]
     async fn create_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         notion_markdown: &str,
@@ -224,7 +224,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     #[tracing::instrument(skip(self, user), err)]
     async fn folder_exists(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         folder: Uuid,
     ) -> anyhow::Result<bool> {
         let Ok(receipt) = self
@@ -251,7 +251,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     #[tracing::instrument(skip(self, user, name), err)]
     async fn create_database(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
     ) -> anyhow::Result<NewDatabase> {
         let viewer = viewer(user);
@@ -280,7 +280,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     #[tracing::instrument(skip(self, user, ops), fields(op_count = ops.len()), err)]
     async fn apply_database_ops(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         database_id: Uuid,
         ops: Vec<models_databases::DatabaseOp>,
     ) -> anyhow::Result<Vec<models_databases::OpResult>> {
@@ -301,7 +301,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     #[tracing::instrument(skip(self, user), err)]
     async fn share_with_team(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         entity: SharedEntity,
     ) -> anyhow::Result<()> {
         match entity {
@@ -388,7 +388,7 @@ impl import::domain::ports::WorkspaceWriter for ToolEntityCreator {
     #[tracing::instrument(skip(self, user), err)]
     async fn team_members(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> anyhow::Result<Vec<TeamMember>> {
         let (_, roster) = self.team_roster(user).await;
         Ok(roster

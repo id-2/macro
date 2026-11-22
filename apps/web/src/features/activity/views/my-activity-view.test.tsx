@@ -1,6 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { createSignal, type JSX } from 'solid-js';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { ActivityContextProvider } from '../context/activity-context';
 import type { ActivityScope } from '../core/event';
 import { placeholderOverview } from '../core/placeholder-overview';
@@ -95,6 +96,7 @@ vi.mock('@core/component/EntityIcon', () => ({
   getIconConfig: () => ({ icon: () => null }),
 }));
 
+beforeAll(() => setInterfaceLanguage('en'));
 afterEach(cleanup);
 
 const settle = () => new Promise<void>((resolve) => setTimeout(resolve, 0));

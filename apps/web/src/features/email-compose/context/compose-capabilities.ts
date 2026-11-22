@@ -98,7 +98,7 @@ export interface SendEmailDraft {
   forwardedAttachmentIds?: string[];
   restoreBodyHtml?: string | null;
   restoreBodyText?: string | null;
-  restoreBodyMacro?: string | null;
+  restoreBodyRox?: string | null;
   inboxId?: string;
   completingThread?: boolean;
 }
@@ -231,7 +231,7 @@ export interface OutgoingEmail {
     | 'bcc'
     | 'subject'
     | 'body_text'
-    | 'body_macro'
+    | 'body_rox'
     | 'body_html_sanitized'
     | 'replying_to_id'
   >;

@@ -1,6 +1,6 @@
 use chrono::{DateTime, TimeZone, Utc};
 use email::outbound::EmailPgRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 use crate::outbound::pg_suggestion_repo::test::insert_user;
@@ -8,8 +8,8 @@ use crate::outbound::pg_suggestion_repo::test::insert_user;
 const OWNER: &str = "macro|waits-owner@example.com";
 const SENDER: &str = "macro|waits-sender@example.com";
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap()
 }
 
 fn at(hour: u32) -> DateTime<Utc> {

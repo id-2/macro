@@ -3,7 +3,7 @@
 use ai_billing::domain::{EntitlementSource, PlanTier, SubscriptionScope};
 use chrono::{DateTime, Utc};
 use hosted_runtimes::domain::rollout::ComputerRollout;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use teams::domain::model::ScheduledSeatPlan;
 
 use super::subscription_plan::PlanChangeError;
@@ -35,7 +35,7 @@ pub trait SubscriptionStatusGateway: Send + Sync {
     fn billing_access(
         &self,
         scope: SubscriptionScope,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<billing_facts::BillingAccess, PlanChangeError>> + Send;
 
     /// Find the live subscription in the trusted scope and its caller-specific change.
@@ -43,7 +43,7 @@ pub trait SubscriptionStatusGateway: Send + Sync {
         &self,
         customer: &str,
         scope: SubscriptionScope,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         read_billing: bool,
     ) -> impl Future<Output = Result<Option<SubscriptionPlanFacts>, PlanChangeError>> + Send;
 }
@@ -82,7 +82,7 @@ impl<E: EntitlementSource, G: SubscriptionStatusGateway> SubscriptionStatusServi
     #[tracing::instrument(name = "billing.subscription.status", skip_all, fields(team_id = tracing::field::Empty, billing_allowed = tracing::field::Empty), err)]
     pub async fn status(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<SubscriptionStatus, PlanChangeError> {
         let entitlement = self
             .entitlements

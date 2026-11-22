@@ -213,7 +213,7 @@ function InboxAccountGroup(props: {
     (selection.isAll() ? selection.soleInbox() : undefined);
   const label = () =>
     selectedOption()?.label ??
-    (selection.options().length ? selection.label() : 'No inboxes connected');
+    (selection.options().length ? selection.label() : 'Нет подключённых ящиков');
 
   return (
     <section
@@ -224,7 +224,7 @@ function InboxAccountGroup(props: {
       )}
     >
       <h2 class="px-2 pt-1 pb-1.5 text-xs font-medium text-ink-muted">
-        Accounts
+        Аккаунты
       </h2>
       <Dropdown placement="bottom-start">
         <Dropdown.Trigger
@@ -288,7 +288,7 @@ function InboxAccountGroup(props: {
           onClick={selection.addInbox}
         >
           <PlusIcon class="size-4" />
-          Connect another account
+          Подключить другой аккаунт
         </Button>
       </div>
     </section>
@@ -353,7 +353,7 @@ function InboxAccountList(props: {
         <ViewSidebar.Icon>
           <PlusIcon class="size-4" />
         </ViewSidebar.Icon>
-        <span class="truncate">Connect another account</span>
+        <span class="truncate">Подключить другой аккаунт</span>
       </ViewSidebar.Item>
     </div>
   );
@@ -501,7 +501,7 @@ export function EmailInboxMenu(props: { class?: string; grouped?: boolean }) {
               >
                 <PlusIcon class="size-4" />
               </span>
-              <span class="flex-1">Connect another account</span>
+              <span class="flex-1">Подключить другой аккаунт</span>
             </Dropdown.Item>
           </Dropdown.Group>
         </Dropdown.Content>

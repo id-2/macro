@@ -4,7 +4,7 @@ use crate::{
     people::{CONTEXT_FIELD, StoredFacts},
     value::{CacheValue, Record},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use predicate_index::{ExactFact, ExactValue, Token, ValidationError};
 use std::collections::BTreeSet;
 use subsequence_match::{names::words, normalize_text};
@@ -43,7 +43,7 @@ fn fact(attribute: &str, bytes: impl Into<Vec<u8>>) -> Result<ExactFact, Validat
 /// Call only after the parent projection validates membership, viewer key and
 /// name/email fields. These facts never create membership by themselves.
 pub(crate) fn derive(
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     name: &str,
     record: &Record,
 ) -> Result<Vec<ExactFact>, ValidationError> {

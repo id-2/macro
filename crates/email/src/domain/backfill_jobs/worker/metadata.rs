@@ -1,7 +1,7 @@
 use super::*;
-use crate::domain::events::{EmailMacroEvent, ThreadBackfilledMetadata};
+use crate::domain::events::{EmailRoxEvent, ThreadBackfilledMetadata};
 use crate::domain::mailbox::connection::ConnectionSourceError;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_email::service::{
     backfill::*,
     link,
@@ -52,7 +52,7 @@ where
     // backfill is not retried after its completed-thread counters have advanced.
     publish_email_event(
         &ctx.effects,
-        &EmailMacroEvent::thread_backfilled(ThreadBackfilledMetadata {
+        &EmailRoxEvent::thread_backfilled(ThreadBackfilledMetadata {
             link_id: link.id,
             owner: link.macro_id.clone(),
             thread_id: p.thread_db_id,
@@ -62,7 +62,7 @@ where
     Ok(())
 }
 
-fn publish_email_event<B: MacroEventBroker>(broker: &B, event: &EmailMacroEvent) {
+fn publish_email_event<B: RoxEventBroker>(broker: &B, event: &EmailRoxEvent) {
     let _ = broker
         .send_event(event)
         .inspect_err(|e| tracing::error!(error=?e, "failed to publish email macro event"));

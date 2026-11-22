@@ -20,9 +20,9 @@ use axum::{
     body::Body,
     http::{Request, StatusCode},
 };
-use macro_authorization::{
-    INTERNAL_API_KEY_HEADER, InternalAuthConfig, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, NoopMacroAuthJwtValidator,
+use rox_authorization::{
+    INTERNAL_API_KEY_HEADER, InternalAuthConfig, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, NoopRoxAuthJwtValidator,
 };
 use std::{
     pin::Pin,
@@ -77,8 +77,8 @@ impl RoutineSessions for RoutineSessionsSpy {
 #[tokio::test]
 async fn routine_sessions_preserve_internal_auth_and_owner_at_both_mounts() {
     let service = Arc::new(RoutineSessionsSpy::default());
-    let auth = MacroAuthorizationServiceImpl::new(
-        NoopMacroAuthJwtValidator,
+    let auth = RoxAuthorizationServiceImpl::new(
+        NoopRoxAuthJwtValidator,
         InternalAuthConfig {
             api_key: "internal-test-key".into(),
             default_user_id: None,
@@ -89,7 +89,7 @@ async fn routine_sessions_preserve_internal_auth_and_owner_at_both_mounts() {
     let app = mount_at_root_and_prefix(
         routine_sessions_router(RoutineSessionsState::new(
             service.clone(),
-            MacroAuthorizationState::new(Arc::new(auth)),
+            RoxAuthorizationState::new(Arc::new(auth)),
         )),
         GATEWAY_PATH_PREFIX,
     );
@@ -332,7 +332,7 @@ async fn gateway_egress_keeps_authentication_and_git_basic_challenge() {
 impl CodingAgentService for RoutineSessionsSpy {
     fn list_updates(
         &self,
-        user_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        user_id: rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> Pin<
         Box<
             dyn Future<
@@ -356,7 +356,7 @@ impl CodingAgentService for RoutineSessionsSpy {
 
     fn list(
         &self,
-        user_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        user_id: rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<CodingAgent>, CodingAgentError>> + Send + '_>> {
         Box::pin(async move {
             self.0.lock().unwrap().push(user_id.to_string());
@@ -381,8 +381,8 @@ async fn coding_agent_commands_keep_internal_auth_and_user_at_both_mounts() {
     use agent_session::inbound::coding_agents::{CodingAgentsState, coding_agents_router};
 
     let service = Arc::new(RoutineSessionsSpy::default());
-    let auth = MacroAuthorizationServiceImpl::new(
-        NoopMacroAuthJwtValidator,
+    let auth = RoxAuthorizationServiceImpl::new(
+        NoopRoxAuthJwtValidator,
         InternalAuthConfig {
             api_key: "internal-test-key".into(),
             default_user_id: None,
@@ -393,7 +393,7 @@ async fn coding_agent_commands_keep_internal_auth_and_user_at_both_mounts() {
     let app = mount_at_root_and_prefix(
         coding_agents_router(CodingAgentsState::new(
             service.clone(),
-            MacroAuthorizationState::new(Arc::new(auth)),
+            RoxAuthorizationState::new(Arc::new(auth)),
         )),
         GATEWAY_PATH_PREFIX,
     );

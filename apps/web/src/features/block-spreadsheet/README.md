@@ -58,7 +58,7 @@ ID/name and selection snapshot. Local demos save through the existing acknowledg
 draft path first. Selection remains local presence, not persisted workbook data.
 
 The editor and AI editing worker import the same pure model and pinned IronCalc
-adapter from `@macro-inc/spreadsheet`; the feature's core files re-export that
+adapter from `@rox-one/spreadsheet`; the feature's core files re-export that
 implementation. Three document tools expose bounded reads, scratch calculations,
 and revision-guarded edit batches. Source inputs, formulas, typed results, errors,
 and optional styles are explicit in reads. Scratch what-if overrides never write.
@@ -118,7 +118,7 @@ keeps their changes and explains the conflict without consuming the history step
 Read-only permissions and initial hydration gate every write and history action.
 
 The session reuses `LoroManager`, `createSyncEngine`, `BrowserWALStore`,
-`WALSyncer`, and `IDBSnapshotStore` from `@macro-inc/collaboration`, as markdown
+`WALSyncer`, and `IDBSnapshotStore` from `@rox-one/collaboration`, as markdown
 does, including BroadcastChannel synchronization between local tabs. Cached
 snapshots and unsent updates restore local state; remote snapshots
 merge into an already-initialized document. Selection presence is ephemeral

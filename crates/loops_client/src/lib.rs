@@ -20,7 +20,7 @@ const IDEMPOTENCY_KEY_HEADER: &str = "Idempotency-Key";
 /// Hashes an idempotency key to a fixed 64 characters.
 ///
 /// Loops caps the header at 100 characters, and callers build keys from
-/// unbounded input — an email, or a `MacroUserId`, which embeds one. Hashing
+/// unbounded input — an email, or a `RoxUserId`, which embeds one. Hashing
 /// keeps every key in range while staying deterministic across retries, which
 /// is the whole point of the header.
 fn idempotency_digest(key: &str) -> String {

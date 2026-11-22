@@ -19,7 +19,7 @@ fn mapping_an_attachment_preserves_activation_and_handshake() {
     use crate::domain::model::{ManagerFence, ReplicaId};
     let claim = SessionClaim {
         session: OTHER,
-        replica: ReplicaId::from_uuid(macro_uuid::Uuid::from_u128(2)),
+        replica: ReplicaId::from_uuid(rox_uuid::Uuid::from_u128(2)),
         fence: ManagerFence(7),
     };
     let called = Arc::new(AtomicBool::new(false));

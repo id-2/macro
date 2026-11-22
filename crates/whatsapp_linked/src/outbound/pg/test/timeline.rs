@@ -24,7 +24,7 @@ async fn shared_viewer_without_whatsapp_reads_history_and_unread_but_cannot_send
     use entity_access::domain::ports::EntityAccessService;
     let receipt = access_service
         .generate_entity_access_receipt::<MessageView>(
-            &macro_user_id::user_id::MacroUserIdStr::try_from(CAROL.to_owned())
+            &rox_user_id::user_id::RoxUserIdStr::try_from(CAROL.to_owned())
                 .unwrap()
                 .0,
             None,
@@ -141,7 +141,7 @@ async fn shared_viewer_without_whatsapp_reads_history_and_unread_but_cannot_send
     assert!(
         access_service
             .generate_entity_access_receipt::<MessageView>(
-                &macro_user_id::user_id::MacroUserIdStr::try_from(CAROL.to_owned())
+                &rox_user_id::user_id::RoxUserIdStr::try_from(CAROL.to_owned())
                     .unwrap()
                     .0,
                 None,
@@ -350,7 +350,7 @@ async fn canonical_team_sharing_is_owner_only_and_reversible(pool: PgPool) {
     let access = entity_access::domain::service::EntityAccessServiceImpl::new(
         entity_access::outbound::PgAccessRepository::new(pool.clone()),
     );
-    let carol = macro_user_id::user_id::MacroUserIdStr::try_from(CAROL.to_owned()).unwrap();
+    let carol = rox_user_id::user_id::RoxUserIdStr::try_from(CAROL.to_owned()).unwrap();
     assert_eq!(
         access
             .get_access_level(

@@ -1,9 +1,10 @@
+import { t } from '@app/lib/i18n';
 import type { EntityData } from '@entity';
 
 /** Client predicate ids that narrow the Calls list by who attended. */
 export const CALL_AUDIENCES = [
-  { id: 'call-internal', label: 'Internal' },
-  { id: 'call-external', label: 'External' },
+  { id: 'call-internal' },
+  { id: 'call-external' },
 ] as const;
 
 export type CallAudienceId = (typeof CALL_AUDIENCES)[number]['id'];
@@ -41,7 +42,7 @@ export function collectCallChannels(
     if (current && (!name || current.name === name)) continue;
     byId.set(entity.channelId, {
       id: entity.channelId,
-      name: name || 'Untitled channel',
+      name: name || t('calls.untitledChannel'),
     });
     changed = true;
   }

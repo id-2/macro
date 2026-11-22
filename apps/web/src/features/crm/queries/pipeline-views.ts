@@ -1,6 +1,6 @@
 import type { DatabaseOp } from '@core/database-sql/generated/types';
 import { throwOnErr } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { CardPosition } from '@service-storage/generated/schemas/cardPosition';
 import type { DatabaseView } from '@service-storage/generated/schemas/databaseView';
 import type { OpResult } from '@service-storage/generated/schemas/opResult';

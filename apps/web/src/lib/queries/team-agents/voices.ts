@@ -1,5 +1,5 @@
 import { throwOnErr } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { agentHarnessServiceClient } from '@service-agent-harness/client';
 import { type AgentVoice, teamAgentsClient } from '@service-auth/team-agents';
 import { queryOptions, useMutation, useQuery } from '@tanstack/solid-query';

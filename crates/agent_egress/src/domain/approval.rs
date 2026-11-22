@@ -27,7 +27,7 @@ use std::time::Duration;
 
 use agent_runtime_protocol::domain::tool_approval::ToolApprovalStatus;
 use bytes::Bytes;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::sync::mpsc;
 
 use crate::domain::error::EgressError;
@@ -113,7 +113,7 @@ pub struct HeldCall {
     /// The session whose agent made it.
     pub session: AgentSessionId,
     /// The owner whose approval it waits on.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Who prompted the turn it was made in.
     pub prompter: TurnPrompter,
     /// `macro`, or the connected app's slug.
@@ -292,7 +292,7 @@ pub struct InProcessCall {
     /// The session whose agent made it.
     pub session: AgentSessionId,
     /// The owner whose approval it waits on.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Who prompted the turn it was made in.
     pub prompter: TurnPrompter,
     /// `macro`, or the connected app's slug.
@@ -358,7 +358,7 @@ pub trait ToolApprovalAnswers: Send + Sync + 'static {
         session: AgentSessionId,
         id: ToolApprovalId,
         answer: ApprovalAnswer,
-        by: &MacroUserIdStr<'static>,
+        by: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<ToolApproval, ToolApprovalError>> + Send;
 
     /// Stop holding every call `session` is waiting on: its turn ended, it
@@ -375,7 +375,7 @@ impl<Answers: ToolApprovalAnswers> ToolApprovalAnswers for Arc<Answers> {
         session: AgentSessionId,
         id: ToolApprovalId,
         answer: ApprovalAnswer,
-        by: &MacroUserIdStr<'static>,
+        by: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<ToolApproval, ToolApprovalError>> + Send {
         (**self).answer(session, id, answer, by)
     }
@@ -400,7 +400,7 @@ where
         session: AgentSessionId,
         id: ToolApprovalId,
         answer: ApprovalAnswer,
-        by: &MacroUserIdStr<'static>,
+        by: &RoxUserIdStr<'static>,
     ) -> Result<ToolApproval, ToolApprovalError> {
         let approval = self
             .inner
@@ -446,7 +446,7 @@ where
         &self,
         id: ToolApprovalId,
         status: ToolApprovalStatus,
-        by: Option<&MacroUserIdStr<'static>>,
+        by: Option<&RoxUserIdStr<'static>>,
     ) -> Result<Option<ToolApproval>, EgressError> {
         self.settle(id, status, by, false).await
     }
@@ -456,7 +456,7 @@ where
         &self,
         id: ToolApprovalId,
         status: ToolApprovalStatus,
-        by: Option<&MacroUserIdStr<'static>>,
+        by: Option<&RoxUserIdStr<'static>>,
         remembered: bool,
     ) -> Result<Option<ToolApproval>, EgressError> {
         let resolved = self.store.resolve(id, status, by, remembered).await?;
@@ -523,7 +523,7 @@ where
     async fn approve_for_good(
         &self,
         approval: &ToolApproval,
-        by: &MacroUserIdStr<'static>,
+        by: &RoxUserIdStr<'static>,
     ) -> Result<ToolApproval, ToolApprovalError> {
         let standing =
             StandingApproval::covering(approval, by).ok_or(ToolApprovalError::NobodyToRemember)?;
@@ -774,7 +774,7 @@ where
             session: call.session,
             turn_action_id: call.prompter.action_id,
             // No JSON-RPC request to name; unique so nothing withdraws it.
-            request_id: serde_json::Value::String(macro_uuid::generate_uuid_v7().to_string()),
+            request_id: serde_json::Value::String(rox_uuid::generate_uuid_v7().to_string()),
             owner: call.owner.clone(),
             requested_by: call.prompter.acting_user().cloned(),
             server_slug: call.server_slug,

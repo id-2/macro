@@ -5,7 +5,7 @@ import type {
   RingStatus,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
 import { shareWithChannel } from '../channels/share';
 import { Thread } from '../channels/thread';
@@ -36,7 +36,7 @@ export class CallRecord extends FavoritableEntity<CallRecordDetail> {
   readonly kind?: LiveCallSummary['kind'];
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     id: string,
     kind?: LiveCallSummary['kind'],
   ) {
@@ -45,7 +45,7 @@ export class CallRecord extends FavoritableEntity<CallRecordDetail> {
   }
 
   /** Build a live call handle without fetching its archived detail. */
-  static fromLive(client: MacroClient, summary: LiveCallSummary): CallRecord {
+  static fromLive(client: RoxClient, summary: LiveCallSummary): CallRecord {
     return new CallRecord(client, summary.callId, summary.kind);
   }
 
@@ -247,7 +247,7 @@ export class CallRecord extends FavoritableEntity<CallRecordDetail> {
   }
 
   /** A handle to a call record by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): CallRecord {
+  static byId(client: RoxClient, id: string): CallRecord {
     return new CallRecord(client, id);
   }
 

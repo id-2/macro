@@ -4,8 +4,8 @@ use crate::domain::{
     models::{AccessLevel, EntityAccessSourceType},
     ports::ExplainAccessService,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[sqlx::test(
     migrator = "MACRO_DB_MIGRATIONS",
@@ -14,8 +14,8 @@ use macro_user_id::user_id::MacroUserIdStr;
 async fn database_explanation_isolates_grants_and_tracks_team_membership(pool: PgPool) {
     let database_id = Uuid::now_v7();
     let other_database_id = Uuid::now_v7();
-    let member = MacroUserIdStr::try_from_email("member@team.com").unwrap();
-    let outsider = MacroUserIdStr::try_from_email("noteam@team.com").unwrap();
+    let member = RoxUserIdStr::try_from_email("member@team.com").unwrap();
+    let outsider = RoxUserIdStr::try_from_email("noteam@team.com").unwrap();
     let team_id = "00000000-0000-0000-0000-0000000ea001";
 
     sqlx::query!(
@@ -88,7 +88,7 @@ async fn database_explanation_rejects_invalid_ids_before_querying() {
         .connect_lazy("postgres://unused:unused@localhost/unused")
         .unwrap();
     let repository = PgExplainAccessRepository::new(pool);
-    let user = MacroUserIdStr::try_from_email("member@team.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("member@team.com").unwrap();
     let error = repository
         .list_access_grants(&user, "not-a-uuid", EntityType::Database)
         .await
@@ -107,7 +107,7 @@ async fn database_row_explanation_is_its_database_grants(pool: PgPool) {
     let database_id = Uuid::now_v7();
     let table_id = Uuid::now_v7();
     let row_id = Uuid::now_v7();
-    let member = MacroUserIdStr::try_from_email("member@team.com").unwrap();
+    let member = RoxUserIdStr::try_from_email("member@team.com").unwrap();
 
     sqlx::query!(
         r#"WITH storage AS (INSERT INTO databases (id) VALUES ($1) RETURNING id)
@@ -214,7 +214,7 @@ async fn insert_form(pool: &PgPool, database_id: Uuid, table_id: Uuid, audience:
 )]
 async fn database_explanation_names_the_form_a_form_editor_reaches_it_through(pool: PgPool) {
     let (database_id, edited_form) = insert_database_with_form(&pool, "members").await;
-    let member = MacroUserIdStr::try_from_email("member@team.com").unwrap();
+    let member = RoxUserIdStr::try_from_email("member@team.com").unwrap();
     // A form owns its table, so the view-only form needs another table in the same database.
     let table_id = Uuid::now_v7();
     sqlx::query!(
@@ -292,7 +292,7 @@ async fn database_explanation_names_the_form_a_form_editor_reaches_it_through(po
 async fn form_explanation_lists_grants_and_the_public_audience(pool: PgPool) {
     let (_, public_form) = insert_database_with_form(&pool, "public").await;
     let (_, members_form) = insert_database_with_form(&pool, "members").await;
-    let member = MacroUserIdStr::try_from_email("member@team.com").unwrap();
+    let member = RoxUserIdStr::try_from_email("member@team.com").unwrap();
     let team_id = "00000000-0000-0000-0000-0000000ea001";
     sqlx::query!(
         r#"
@@ -339,8 +339,8 @@ async fn form_explanation_lists_grants_and_the_public_audience(pool: PgPool) {
 )]
 async fn pipeline_explanation_uses_pipeline_grants_without_database_grants(pool: PgPool) {
     let pipeline_id = Uuid::now_v7();
-    let member = MacroUserIdStr::try_from_email("member@team.com").unwrap();
-    let outsider = MacroUserIdStr::try_from_email("noteam@team.com").unwrap();
+    let member = RoxUserIdStr::try_from_email("member@team.com").unwrap();
+    let outsider = RoxUserIdStr::try_from_email("noteam@team.com").unwrap();
     sqlx::query!(
         "INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level)
          VALUES ($1, 'crm_pipeline', $2, 'user', 'view'),

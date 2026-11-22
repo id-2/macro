@@ -5,21 +5,21 @@ mod test;
 
 use agent::types::ChatMessageContent;
 use attachment::{Attachable, AttachmentService, FormattedParts};
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{RoxEventBroker, NoopRoxEventBroker};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::chat::{AttachmentType, NewChatMessage};
 use model_entity::{Entity, EntityType};
 use non_empty::NonEmpty;
 
-use crate::domain::events::{ChatMacroEvent, ChatMessageDeletedMetadata, ChatMessageSentMetadata};
+use crate::domain::events::{ChatRoxEvent, ChatMessageDeletedMetadata, ChatMessageSentMetadata};
 use crate::domain::models::{ChatErr, ResolvedMessageContent, Result};
 use crate::domain::ports::{MessageRepo, MessageService};
 
 /// Concrete [`MessageService`] backed by a [`MessageRepo`] and [`AttachmentService`].
-pub struct MessageServiceImpl<R, A, B = NoopMacroEventBroker>
+pub struct MessageServiceImpl<R, A, B = NoopRoxEventBroker>
 where
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     repo: R,
     attachment_service: A,
@@ -32,14 +32,14 @@ impl<R: MessageRepo, A: AttachmentService> MessageServiceImpl<R, A> {
         Self {
             repo,
             attachment_service,
-            event_broker: NoopMacroEventBroker,
+            event_broker: NoopRoxEventBroker,
         }
     }
 }
 
-impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageServiceImpl<R, A, B> {
+impl<R: MessageRepo, A: AttachmentService, B: RoxEventBroker> MessageServiceImpl<R, A, B> {
     /// Replaces the event broker while preserving the other dependencies.
-    pub fn with_event_broker<B2: MacroEventBroker>(
+    pub fn with_event_broker<B2: RoxEventBroker>(
         self,
         event_broker: B2,
     ) -> MessageServiceImpl<R, A, B2> {
@@ -50,7 +50,7 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageServiceIm
         }
     }
 
-    fn publish_chat_event(&self, event: &ChatMacroEvent) {
+    fn publish_chat_event(&self, event: &ChatRoxEvent) {
         drop(self.event_broker.send_event(event).inspect_err(|error| {
             tracing::error!(error = ?error, "failed to schedule chat event");
         }));
@@ -58,7 +58,7 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageServiceIm
 
     async fn resolve_attachments(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         attachments: &[Entity<'_>],
     ) -> Result<Option<FormattedParts>> {
         if attachments.is_empty() {
@@ -77,13 +77,13 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageServiceIm
     }
 }
 
-impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageService
+impl<R: MessageRepo, A: AttachmentService, B: RoxEventBroker> MessageService
     for MessageServiceImpl<R, A, B>
 {
     #[tracing::instrument(err, skip(self, message))]
     async fn create(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         chat_id: &str,
         message: NewChatMessage,
     ) -> Result<ResolvedMessageContent> {
@@ -112,7 +112,7 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageService
                 .await?;
         }
 
-        self.publish_chat_event(&ChatMacroEvent::message_sent(ChatMessageSentMetadata {
+        self.publish_chat_event(&ChatRoxEvent::message_sent(ChatMessageSentMetadata {
             chat_id: chat_id.to_owned(),
             message_id: message_id.clone(),
             role: role.into(),
@@ -135,7 +135,7 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageService
 
         let message_id = self.repo.create(chat_id, message).await?;
 
-        self.publish_chat_event(&ChatMacroEvent::message_sent(ChatMessageSentMetadata {
+        self.publish_chat_event(&ChatRoxEvent::message_sent(ChatMessageSentMetadata {
             chat_id: chat_id.to_owned(),
             message_id: message_id.clone(),
             role: role.into(),
@@ -150,7 +150,7 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageService
     #[tracing::instrument(err, skip(self, content))]
     async fn update(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         chat_id: &str,
         message_id: &str,
         content: &ChatMessageContent,
@@ -178,7 +178,7 @@ impl<R: MessageRepo, A: AttachmentService, B: MacroEventBroker> MessageService
     async fn delete(&self, message_id: &str) -> Result<()> {
         let chat_id = self.repo.delete(message_id).await?;
 
-        self.publish_chat_event(&ChatMacroEvent::message_deleted(
+        self.publish_chat_event(&ChatRoxEvent::message_deleted(
             ChatMessageDeletedMetadata {
                 chat_id,
                 message_id: message_id.to_owned(),

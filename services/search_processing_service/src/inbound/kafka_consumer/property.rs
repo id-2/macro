@@ -1,9 +1,9 @@
 //! Maps property lifecycle events to search-index actions and processes them.
 
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 use models_properties::EntityType;
 use opensearch_client::OpensearchClient;
-use properties::domain::events::{PropertyMacroEvent, PropertyTopicEvent};
+use properties::domain::events::{PropertyRoxEvent, PropertyTopicEvent};
 use sqlx::PgPool;
 
 use super::{EventOutcome, MAX_PROCESSING_ATTEMPTS, PROCESSING_RETRY_BASE_DELAY, retry_processing};
@@ -73,7 +73,7 @@ pub(super) fn describe_property_event(event: &PropertyTopicEvent) -> PropertyEve
 pub(super) async fn process_property_event(
     db: &PgPool,
     opensearch_client: &OpensearchClient,
-    event: &PropertyMacroEvent,
+    event: &PropertyRoxEvent,
     partition: i32,
     offset: i64,
 ) -> EventOutcome {

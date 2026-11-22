@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE email_contacts SET email_address = CASE email_address\n            WHEN 'p0@other1.test' THEN 'p0@notblocked.test'\n            WHEN 'p1@other1.test' THEN 'p1@Sub.BLOCKED.test'\n            WHEN 'p2@other1.test' THEN 'p2@blocked.test.example'\n            WHEN 'p0@other2.test' THEN 'no-at-sign'\n            WHEN 'p1@other2.test' THEN 'p1@x..hidden.test'\n            WHEN 'p2@other2.test' THEN 'p2@personal.test.'\n        END\n        WHERE email_address IN ('p0@other1.test', 'p1@other1.test', 'p2@other1.test',\n                                'p0@other2.test', 'p1@other2.test', 'p2@other2.test')\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "5caad3570c55155203e435a7ae75a0848fb24335ceae5e706f1ed5dc22a3bc8a"
+}

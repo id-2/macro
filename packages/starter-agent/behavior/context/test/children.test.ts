@@ -14,7 +14,7 @@ const parent = {
   PULSE_SERVER: 'unix:/run/pulse',
   XDG_RUNTIME_DIR: '/run/user/1000',
   MUPPET_BROWSER_CDP_URL: 'http://127.0.0.1:9223',
-  MACRO_API_KEY: 'mak_secret',
+  ROX_API_KEY: 'mak_secret',
   CREDENTIALS_DIRECTORY: '/run/credentials/macro-agent.service',
   MUPPET_CREDENTIALS_FILE: '/run/credentials/macro-agent.service/agent.env',
   AWS_SECRET_ACCESS_KEY: 'other',
@@ -50,7 +50,7 @@ describe('claudeAccess', () => {
   test('in Rox-credits mode, Claude reaches the gateway through the relay, never with the real token', () => {
     const access = claudeAccess(
       {
-        MACRO_API_KEY: 'mak_secret',
+        ROX_API_KEY: 'mak_secret',
         ANTHROPIC_BASE_URL: 'https://egress/brain/anthropic',
         ANTHROPIC_AUTH_TOKEN: 'mak_secret',
         CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: '1',
@@ -67,7 +67,7 @@ describe('claudeAccess', () => {
   });
 
   test('without them, nothing: the claude wrapper signs in itself', () => {
-    expect(claudeAccess({ MACRO_API_KEY: 'mak_secret' }, relay)).toEqual({});
+    expect(claudeAccess({ ROX_API_KEY: 'mak_secret' }, relay)).toEqual({});
   });
 });
 
@@ -79,6 +79,6 @@ describe('anthropicUpstream', () => {
         ANTHROPIC_AUTH_TOKEN: 'mak_secret',
       })
     ).toEqual({ url: 'https://egress/brain/anthropic', token: 'mak_secret' });
-    expect(anthropicUpstream({ MACRO_API_KEY: 'mak_secret' })).toBeUndefined();
+    expect(anthropicUpstream({ ROX_API_KEY: 'mak_secret' })).toBeUndefined();
   });
 });

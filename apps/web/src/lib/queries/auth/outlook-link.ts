@@ -29,16 +29,31 @@ const adminConsentReturnUrl = () => `${getWebOrigin()}/app/inbox-link-callback`;
 const emailConnectionProvidersQuery = () =>
   queryOptions({
     queryKey: authKeys.emailConnectionProviders.queryKey,
+    // Availability only: no `original_url`, because the answer is booleans.
+    // That hint exists for the admin-consent URL below, and sending it on
+    // every read made the read depend on the browser's origin being an
+    // allowed return URL — a 400 on a deployment served from any other host.
     queryFn: () =>
-      throwOnErr(() =>
-        authServiceClient.emailConnectionProviders(adminConsentReturnUrl())
-      ),
+      throwOnErr(() => authServiceClient.emailConnectionProviders()),
     staleTime: 0,
   });
 
 /** Fetch on opening the chooser, without suspending unrelated application UI. */
 export function fetchEmailConnectionProviders() {
   return queryClient.fetchQuery(emailConnectionProvidersQuery());
+}
+
+/**
+ * Where a Microsoft 365 administrator approves Rox for the whole directory,
+ * read only when that flow actually needs the link.
+ */
+export async function fetchOutlookAdminConsentUrl(): Promise<
+  string | undefined
+> {
+  const providers = await throwOnErr(() =>
+    authServiceClient.emailConnectionProviders(adminConsentReturnUrl())
+  );
+  return providers.outlook_admin_consent_url ?? undefined;
 }
 
 /**
@@ -55,4 +70,20 @@ export function useOutlookAvailable(
   }));
   // Gate the read: a pending query's data suspends the caller's boundary.
   return () => queryReadyGate(query) && query.data.outlook;
+}
+
+/**
+ * Whether this deployment can start a GitHub link at all: its sign-in service
+ * has the `github` identity provider. A local stack started without a real
+ * GitHub OAuth app has none, and the link-status read there could only ever
+ * answer "not linked", so callers skip it. False until the server says yes.
+ */
+export function useGithubLinkAvailable(
+  enabled: Accessor<boolean> = () => true
+): Accessor<boolean> {
+  const query = useQuery(() => ({
+    ...emailConnectionProvidersQuery(),
+    enabled: enabled(),
+  }));
+  return () => queryReadyGate(query) && query.data.github;
 }

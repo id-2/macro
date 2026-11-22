@@ -6,7 +6,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use model_entity::EntityType;
 use notification::domain::item_preferences::ItemNotificationPreferenceError;
@@ -72,7 +72,7 @@ fn error_response(error: ItemNotificationPreferenceError) -> Response {
 #[tracing::instrument(skip(ctx, user, request))]
 pub async fn unsubscribe_items(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(request): Json<BulkSetItemsRequest>,
 ) -> Result<Response, Response> {
     let entities = request
@@ -108,7 +108,7 @@ pub async fn unsubscribe_items(
 #[tracing::instrument(skip(ctx, user, request))]
 pub async fn remove_unsubscribe_items(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(request): Json<BulkRemoveItemsRequest>,
 ) -> Result<Response, Response> {
     let entities = request

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { Button, Dialog, Panel } from '@ui';
 import { Show } from 'solid-js';
@@ -102,8 +103,8 @@ export function PipelineImport(props: {
             <PipelineImportFailures
               addLabel={
                 props.pipeline.recordType === 'company'
-                  ? 'Add deal'
-                  : 'Add contact'
+                  ? t('crm.addDeal')
+                  : t('crm.addContact')
               }
               failures={result()?.invalid}
             />
@@ -128,8 +129,8 @@ export function PipelineImport(props: {
                 {pending()
                   ? `Importing… ${resolved().toLocaleString()} ${records()} matched`
                   : reading()
-                    ? 'Reading…'
-                    : 'Import'}
+                    ? t('crm.reading')
+                    : t('crm.import')}
               </Button>
             </div>
           </div>

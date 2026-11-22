@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 use crate::domain::model::{ChangeAction, RunMode};
@@ -64,7 +64,7 @@ async fn concurrent_creates_stay_within_the_limits(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let generation = generation(&pool).await;
     let repo = std::sync::Arc::new(PgSuggestionRepo::new(pool));
-    let user = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let user = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let limits = Limits {
         open: 30,
         new_per_generation: 3,
@@ -182,7 +182,7 @@ async fn a_broken_suggestion_row_is_skipped_and_the_rest_read(pool: PgPool) {
     .await
     .unwrap();
     let repo = PgSuggestionRepo::new(pool);
-    let user = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let user = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let suggestions = repo.for_review(&user, 60).await.unwrap();
     assert_eq!(
         suggestions
@@ -201,7 +201,7 @@ async fn reads_load_only_the_suggestions_they_show(pool: PgPool) {
     insert_user(&pool, OWNER).await;
     let generation = generation(&pool).await;
     let repo = PgSuggestionRepo::new(pool);
-    let user = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let user = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let limits = Limits {
         open: 30,
         new_per_generation: 12,
@@ -340,7 +340,7 @@ const NO_LIMITS: Limits = Limits {
 struct Fixture {
     pool: PgPool,
     repo: PgSuggestionRepo,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     generation: Uuid,
 }
 
@@ -350,7 +350,7 @@ async fn fixture(pool: PgPool) -> Fixture {
     Fixture {
         repo: PgSuggestionRepo::new(pool.clone()),
         pool,
-        user: MacroUserIdStr::parse_from_str(OWNER).unwrap(),
+        user: RoxUserIdStr::parse_from_str(OWNER).unwrap(),
         generation,
     }
 }

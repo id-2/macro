@@ -7,7 +7,7 @@ where
     R: CalendarRepository + CalendarReplacementRepository,
     G: CalendarMutationProvider + CalendarReplacementProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     async fn replacement_target(
@@ -83,7 +83,7 @@ where
     R: CalendarRepository + CalendarReplacementRepository,
     G: CalendarMutationProvider + CalendarReplacementProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     async fn recover_replacements(&self) -> Result<usize, rootcause::Report> {

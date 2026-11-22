@@ -1,4 +1,4 @@
-use macro_db_client::document::get_document_history::DocumentHistoryInfo;
+use rox_db_client::document::get_document_history::DocumentHistoryInfo;
 use models_properties::service::property_definition::PropertyDefinition;
 use models_properties::service::property_value::PropertyValue;
 use models_properties::{DataType, shared::PropertyOwner};
@@ -428,7 +428,7 @@ fn test_document_history_deleted() {
     let mut document_histories = HashMap::new();
     document_histories.insert(
         "11111111-1111-1111-1111-111111111111".to_string(),
-        macro_db_client::document::get_document_history::DocumentHistoryInfo {
+        rox_db_client::document::get_document_history::DocumentHistoryInfo {
             item_id: "11111111-1111-1111-1111-111111111111".to_string(),
             created_at: now,
             updated_at: now,

@@ -2,7 +2,7 @@ use crate::api::context::SearchHandlerState;
 use crate::api::search::simple::SearchError;
 use email_db_client::contacts::get::ThreadContactsMap;
 use indexmap::IndexMap;
-use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
 use models_email::service::message::{MessageSenderInfo, ThreadHistoryInfo};
 use models_properties::{EntityReference, EntityType};
 use models_search::email::{
@@ -49,7 +49,7 @@ pub(in crate::api::search) async fn enrich_emails(
 
     // A shared thread lives in someone else's inbox: read it through that
     // inbox once a grant to the caller confirms it is shared with them.
-    let viewer = MacroUserId::parse_from_str(user_id)
+    let viewer = RoxUserId::parse_from_str(user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?
         .lowercase();
     let unresolved_ids: Vec<Uuid> = thread_ids
@@ -115,7 +115,7 @@ pub(in crate::api::search) async fn enrich_emails(
         .collect();
     // Scope tags to the viewer so another user's personal tags never leak into
     // the response. System properties still ride along via the key list.
-    let viewer_user_id = MacroUserIdStr::parse_from_str(user_id)
+    let viewer_user_id = RoxUserIdStr::parse_from_str(user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?;
     let properties_map: HashMap<String, Vec<SoupProperty>> =
         properties::outbound::entity_properties_get_query::get_bulk_entity_properties_values_filtered(

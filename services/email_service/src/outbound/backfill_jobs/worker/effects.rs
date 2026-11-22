@@ -16,8 +16,8 @@ use crm::domain::{
     model::{CrmError, DepopulateContactOutcome},
     service::CrmService,
 };
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::api::refresh::{BackfillStatus, RefreshEmailEvent};
 use models_email::service::{backfill::*, link::Link};
 use std::collections::HashSet;
@@ -62,7 +62,7 @@ impl BackfillEffects for BackfillWorkerEffects {
     }
     async fn connect(
         &self,
-        users: HashSet<MacroUserIdStr<'static>>,
+        users: HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), rootcause::Report> {
         self.contacts_ingress.enqueue_contacts(users).await
     }
@@ -94,8 +94,8 @@ impl BackfillWritePermit for crate::util::redis::backfill_write_slots::BackfillW
     }
 }
 
-impl MacroEventBroker for BackfillWorkerEffects {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for BackfillWorkerEffects {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -292,7 +292,7 @@ impl BackfillLifecycleEffects for BackfillWorkerEffects {
     }
     async fn refresh_progress(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         link_id: Uuid,
         progress: BackfillProgress,
     ) {
@@ -314,8 +314,8 @@ impl BackfillLifecycleEffects for BackfillWorkerEffects {
     }
     async fn connect_contacts(
         &self,
-        owner: &MacroUserIdStr<'static>,
-        contacts: Vec<MacroUserIdStr<'static>>,
+        owner: &RoxUserIdStr<'static>,
+        contacts: Vec<RoxUserIdStr<'static>>,
     ) -> Result<(), rootcause::Report> {
         self.contacts_ingress
             .enqueue_contact_connections(

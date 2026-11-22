@@ -32,7 +32,7 @@ vi.mock('@service-connection/websocket', async () => ({
     .parseWebsocketPayload,
   ws: {},
 }));
-vi.mock('@macro-inc/collaboration/websocket', () => ({
+vi.mock('@rox-one/collaboration/websocket', () => ({
   createReconnectEffect: () => {},
 }));
 vi.mock('@queries/client', async () => {

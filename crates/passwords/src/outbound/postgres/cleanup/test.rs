@@ -1,6 +1,6 @@
 use super::*;
 use crate::outbound::postgres::test::{another_team, folder_fixture};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn empty_active_pages_advance_and_full_batches_retain_orphan_candidates(pool: PgPool) {

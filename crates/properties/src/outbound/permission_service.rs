@@ -7,8 +7,8 @@ use entity_access::domain::models::{
     EntityType as AccessEntityType,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_properties::EntityType as StorageEntityType;
@@ -38,7 +38,7 @@ impl<Svc: EntityAccessService> PermissionServiceImpl<Svc> {
     /// never created.
     async fn get_access_level(
         &self,
-        user_id: Option<&MacroUserIdStr<'_>>,
+        user_id: Option<&RoxUserIdStr<'_>>,
         entity_id: &str,
         entity_type: AccessEntityType,
     ) -> anyhow::Result<Option<AccessLevel>> {
@@ -88,7 +88,7 @@ impl<Svc: EntityAccessService> PermissionServiceImpl<Svc> {
 }
 
 /// The auth an authenticated or anonymous caller mints receipts under.
-fn caller_auth(user_id: Option<&MacroUserIdStr<'_>>) -> EntityAccessAuth {
+fn caller_auth(user_id: Option<&RoxUserIdStr<'_>>) -> EntityAccessAuth {
     match user_id {
         Some(user_id) => EntityAccessAuth::Authenticated(user_id.copied().into_owned()),
         None => EntityAccessAuth::Unauthenticated,
@@ -122,7 +122,7 @@ impl<Svc: EntityAccessService> PermissionService for PermissionServiceImpl<Svc> 
     #[tracing::instrument(skip(self), fields(user_id = ?user_id, entity_id = %entity_id, entity_type = ?entity_type), err)]
     async fn mint_view_receipt<'a>(
         &self,
-        user_id: Option<&'a MacroUserIdStr<'a>>,
+        user_id: Option<&'a RoxUserIdStr<'a>>,
         entity_id: &str,
         entity_type: AccessEntityType,
     ) -> Result<ViewReceipt, Self::Err> {
@@ -179,7 +179,7 @@ impl<Svc: EntityAccessService> PermissionService for PermissionServiceImpl<Svc> 
     #[tracing::instrument(skip(self), fields(user_id = %user_id, entity_id = %entity_id, entity_type = ?entity_type), err)]
     async fn mint_edit_receipt<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         entity_id: &str,
         entity_type: AccessEntityType,
     ) -> Result<EditReceipt, Self::Err> {
@@ -200,7 +200,7 @@ impl<Svc: EntityAccessService> PermissionService for PermissionServiceImpl<Svc> 
     #[tracing::instrument(skip(self), fields(task_id = %task_id, user_count = user_ids.len()), err)]
     async fn grant_permissions_to_task(
         &self,
-        user_ids: &[MacroUserIdStr<'_>],
+        user_ids: &[RoxUserIdStr<'_>],
         task_id: &str,
     ) -> Result<(), Self::Err> {
         if user_ids.is_empty() {
@@ -211,7 +211,7 @@ impl<Svc: EntityAccessService> PermissionService for PermissionServiceImpl<Svc> 
         entity_access_db_utils::upsert_user_entity_access_bulk(
             &mut *self.db.acquire().await?,
             user_ids,
-            &macro_uuid::string_to_uuid(task_id).unwrap(),
+            &rox_uuid::string_to_uuid(task_id).unwrap(),
             model_entity::EntityType::Document,
             AccessLevel::Edit,
         )

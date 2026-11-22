@@ -29,7 +29,7 @@ export function TaskDetail(props: TaskDetailProps) {
     <MarkdownDetail
       documentId={props.task.id}
       kind="task"
-      fallbackName={props.task.fallbackName ?? 'New Task'}
+      fallbackName={props.task.fallbackName ?? 'Новая задача'}
       onDuplicate={props.onDuplicate}
       onDelete={props.onDelete}
       children={props.children}

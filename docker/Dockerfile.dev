@@ -25,7 +25,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=shared \
     jobs="${CARGO_BUILD_JOBS:-0}" \
     && if [ -z "${jobs}" ] || [ "${jobs}" = "0" ]; then jobs="$(nproc)"; fi \
     && cargo build -j "${jobs}" \
-        --features authentication_service/return_passwordless_code,authentication_service/no_rate_limit,search_processing_service/no_pdf \
+        --features authentication_service/no_rate_limit,search_processing_service/no_pdf \
         --bin authentication_service \
         --bin connection_gateway_service \
         --bin contacts_service \

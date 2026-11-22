@@ -81,7 +81,9 @@ pub use graphql_properties::{
 };
 pub use graphql_registered_work::{RegisteredWorkGraphqlContext, RegisteredWorkGraphqlService};
 pub use graphql_work_feed::{WorkFeedGraphqlContext, WorkFeedGraphqlService};
-pub use mail_cache_profile::{MAIL_CACHE_PROFILE_HEADER, MailCacheProfile};
+pub use mail_cache_profile::{
+    LEGACY_MAIL_CACHE_PROFILE_HEADER, MAIL_CACHE_PROFILE_HEADER, MailCacheProfile,
+};
 pub use realtime::{
     AgentSessionActivitySubscriptions, AgentSessionLogSubscriptions,
     agent_session_activity_subscriptions, agent_session_log_subscriptions,

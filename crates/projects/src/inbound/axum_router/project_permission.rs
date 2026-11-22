@@ -8,7 +8,7 @@ use entity_access::{
     },
     inbound::axum_extractors::ProjectAccessLevelExtractor,
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use models_permissions::share_permission::{SharePermissionV2, access_level::AccessLevel};
 
 use super::ProjectRouterState;
@@ -34,13 +34,13 @@ use crate::domain::{models::ProjectError, ports::ProjectService};
 )]
 pub async fn get_project_permissions_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     access: ProjectAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
 ) -> Result<Json<SharePermissionV2>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let permissions = state
         .service
@@ -70,13 +70,13 @@ where
 )]
 pub async fn get_project_access_level_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     access: ProjectAccessLevelExtractor<ViewAccessLevel, Svc, Auth>,
 ) -> Result<Json<AccessLevel>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let access_level = state
         .service

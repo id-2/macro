@@ -74,7 +74,7 @@ export async function sendEmailQueued(args: {
   signatureHtml?: string;
   restoreBodyHtml?: string | null;
   restoreBodyText?: string | null;
-  restoreBodyMacro?: string | null;
+  restoreBodyRox?: string | null;
 }) {
   args = structuredClone(args);
   const previous = (await readEmailSendIntents()).find(
@@ -114,7 +114,7 @@ export async function sendEmailQueued(args: {
       bcc: draft.bcc,
       bodyHtml: draft.bodyHtml,
       bodyText: draft.bodyText,
-      bodyMacro: draft.bodyMacro,
+      bodyRox: draft.bodyRox,
     },
     attachmentIds: args.attachmentIds,
     forwardedAttachmentIds: args.forwardedAttachmentIds,
@@ -122,7 +122,7 @@ export async function sendEmailQueued(args: {
     signatureHtml: args.signatureHtml,
     restoreBodyHtml: args.restoreBodyHtml ?? draft.bodyHtml,
     restoreBodyText: args.restoreBodyText ?? draft.bodyText,
-    restoreBodyMacro: args.restoreBodyMacro ?? draft.bodyMacro,
+    restoreBodyRox: args.restoreBodyRox ?? draft.bodyRox,
   };
   const intent: EmailSendIntent = {
     uuid: attemptId,

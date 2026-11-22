@@ -6,7 +6,7 @@ pub mod wire;
 
 use std::{fmt, time::Duration};
 
-use macro_tower_layers::inject_trace_headers;
+use rox_tower_layers::inject_trace_headers;
 use reqwest::{Method, StatusCode, header::HeaderMap};
 use tracing::Span;
 use url::Url;

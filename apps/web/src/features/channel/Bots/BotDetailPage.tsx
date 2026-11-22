@@ -215,7 +215,7 @@ export function BotDetail(props: { botId: string; onBack: () => void }) {
             onClick={leave}
           >
             <CaretLeftIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-            Back to bots
+            Назад к ботам
           </Button>
           <Show
             when={initialized() && botQuery.data}

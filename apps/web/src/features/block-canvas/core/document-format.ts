@@ -1,4 +1,4 @@
-import { freezeDocument, type GraphicsDocument } from '@macro-inc/graphics';
+import { freezeDocument, type GraphicsDocument } from '@rox-one/graphics';
 import type { CanvasReferenceTracking } from './references';
 import { validCanvasTextDocument } from './text-codec';
 

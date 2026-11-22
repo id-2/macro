@@ -1,4 +1,4 @@
-import type { WorkbookSheetMetadata } from '@macro-inc/spreadsheet/workbook-metadata';
+import type { WorkbookSheetMetadata } from '@rox-one/spreadsheet/workbook-metadata';
 import type { SpreadsheetCalculation } from './calculation';
 import type { SpreadsheetCells } from './spreadsheet-document';
 

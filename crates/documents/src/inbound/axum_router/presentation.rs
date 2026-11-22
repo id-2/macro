@@ -22,7 +22,7 @@ use entity_access::{
     inbound::axum_extractors::{DocumentAccessExtractor, principal_entity_access_receipt},
 };
 use entity_registry::CreationPrincipalExtractor;
-use macro_authorization::{AnyPrincipal, MacroAuthorizationExtractor, MacroAuthorizationService};
+use rox_authorization::{AnyPrincipal, RoxAuthorizationExtractor, RoxAuthorizationService};
 use model::document::{DocumentBasic, FileType};
 use pptx_engine::EditOp;
 
@@ -110,7 +110,7 @@ fn presentation_error(error: anyhow::Error) -> DocumentError {
 pub async fn read_presentation_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -157,7 +157,7 @@ pub async fn read_presentation_handler<
 pub async fn edit_presentation_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
@@ -206,11 +206,11 @@ pub async fn edit_presentation_handler<
 pub async fn copy_presentation_handler<
     T: DocumentService + DocumentCreationService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,
     CreationPrincipalExtractor { principal, .. }: CreationPrincipalExtractor<Auth>,
-    caller: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    caller: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
     // Request-local metadata from validate_document_exists_middleware, not a shared service.
     // ast-grep-ignore: rust-no-axum-extension-param
@@ -267,7 +267,7 @@ pub async fn copy_presentation_handler<
 /// The original's project, when the caller may add documents to it.
 async fn original_project<T, Svc: EntityAccessService, Auth>(
     state: &DocumentRouterState<T, Svc, Auth>,
-    caller: &MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    caller: &RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     document: &DocumentBasic,
 ) -> Option<uuid::Uuid> {
     let project_id = document.project_id.as_deref()?;

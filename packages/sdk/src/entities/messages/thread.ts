@@ -5,7 +5,7 @@ import type {
   ThreadState,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { CallRecord } from '../calls/call-record';
 import type { CallMessage } from '../calls/message';
 import type { Channel } from '../channels/channel';
@@ -14,7 +14,7 @@ import type { Company } from '../crm/company';
 import type { Contact } from '../crm/contact';
 import type { Comment } from '../documents/comment';
 import type { Document } from '../documents/document';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import type { Initiative } from '../initiatives/initiative';
 import { User } from '../users/user';
 import type { DiscussionComment } from './discussion';
@@ -60,7 +60,7 @@ export type MessageParent =
   | { type: 'call'; entity: CallRecord };
 
 /** A shared message thread with resolution and deletion operations. */
-export class MessageThread extends MacroEntity<ThreadState> {
+export class MessageThread extends RoxEntity<ThreadState> {
   /** Serialize identity with its owning resource. */
   override toJSON() {
     return {
@@ -71,7 +71,7 @@ export class MessageThread extends MacroEntity<ThreadState> {
   }
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** The entity containing this thread. */
     readonly parent: MessageParent,
     id: string,
@@ -81,7 +81,7 @@ export class MessageThread extends MacroEntity<ThreadState> {
 
   /** Construct a scoped thread handle. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     parent: MessageParent,
     id: string,
   ): MessageThread {
@@ -144,7 +144,7 @@ export class MessageThread extends MacroEntity<ThreadState> {
 
 /** A bounded mixed message/activity page with typed message handles. */
 export async function timeline<TMessage extends TimelineMessage>(
-  client: MacroClient,
+  client: RoxClient,
   parent: MessageParent,
   map: (record: MessageListItem) => TMessage,
   selection?: TimelineOptions<TMessage>,

@@ -40,6 +40,10 @@ export type RoxdDetectedAgent = {
   /** Stable preset id accepted by {@link roxdStart}, e.g. `claude-code`. */
   id: string;
   name: string;
+  /** The command that starts this agent, resolved on this machine. */
+  command: string;
+  /** Where the agent keeps its own settings and credentials. */
+  config_path: string | null;
   note: string | null;
   /** Whether selecting this agent downloads an ACP adapter first. */
   needs_install: boolean;
@@ -61,6 +65,12 @@ export type RoxdInspection = {
 export type RoxdStartOptions = {
   agent?: string;
   workspace?: string;
+  /** The deployment this webview is signed in to, for the daemon. */
+  apiUrl?: string;
+  storageUrl?: string;
+  webUrl?: string;
+  /** This user's Rox API token, so the daemon confirms its own pairing code. */
+  approvalToken?: string;
 };
 
 export function roxdSupport(): Promise<RoxdSupport> {

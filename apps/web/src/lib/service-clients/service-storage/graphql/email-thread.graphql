@@ -87,7 +87,7 @@ fragment EmailThreadMessageFields on GraphqlSoupEmailMessage {
 	}
 	bodyText
 	bodyHtmlSanitized
-	bodyMacro
+	bodyRox
 	calendarInvitations
 	bodyReplyless
 	attachments {

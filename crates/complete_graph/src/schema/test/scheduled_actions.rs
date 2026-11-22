@@ -7,13 +7,13 @@ use super::*;
 
 #[derive(Default)]
 struct RecordingScheduledActionReader {
-    calls: Mutex<Vec<MacroUserIdStr<'static>>>,
+    calls: Mutex<Vec<RoxUserIdStr<'static>>>,
 }
 
 impl ScheduledActionReadService for RecordingScheduledActionReader {
     async fn list_accessible(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<ScheduledAction>, Report> {
         self.calls.lock().expect("call lock").push(user_id);
         Ok(Vec::new())

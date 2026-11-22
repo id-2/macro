@@ -68,7 +68,7 @@ export function packageEntityDocs(
     [...sourcePages].filter(([path]) => !path.endsWith('/README.md'))
   );
   const core = [
-    'src/macro/',
+    'src/rox/',
     'src/config/',
     'src/mentions/',
     'src/entities/entity/',
@@ -209,15 +209,15 @@ export function packageEntityDocs(
       symbols[`${symbol}.${method.name}`] = method.markdown;
   }
 
-  // Where each namespace class is reached from: `macro.tasks`.
+  // Where each namespace class is reached from: `rox.tasks`.
   const accessors = new Map<string, string>();
   for (const match of relink(
-    'src/macro/classes/Macro.md',
-    pages.get('src/macro/classes/Macro.md') ?? ''
+    'src/rox/classes/Rox.md',
+    pages.get('src/rox/classes/Rox.md') ?? ''
   ).matchAll(
     /^\| <a id="property-[^"]+"><\/a> `([^`]+)` \| `readonly` \| `([^`]+)`/gm
   ))
-    accessors.set(match[2] ?? '', `macro.${match[1]}`);
+    accessors.set(match[2] ?? '', `rox.${match[1]}`);
 
   return {
     entities: sections.map(({ name, description, guide }, index) => ({

@@ -1,7 +1,7 @@
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rdkafka::message::{OwnedMessage, Timestamp};
 use serde_json::{Value, json};
 
@@ -41,8 +41,8 @@ fn envelope(event_type: &str, metadata: Value) -> Value {
     })
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap()
 }
 
 fn posted(sender: &str, thread_id: Option<&str>) -> Value {

@@ -1,10 +1,10 @@
 use super::*;
 use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 #[tokio::test]
 async fn writes_require_an_explicit_enabled_flag_and_fail_closed() {
-    let user = MacroUserIdStr::parse_from_str("macro|user@example.com")
+    let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
         .unwrap()
         .into_owned();
     for (result, expected) in [

@@ -26,7 +26,7 @@ async fn committed_reply_recovery(pool: sqlx::PgPool, extra_passage: bool) {
     let record = journal.get(source, command.bot_id).await.unwrap().unwrap();
     let mut stale = record.in_flight.unwrap();
     if extra_passage {
-        stale.presented.push(macro_uuid::generate_uuid_v7());
+        stale.presented.push(rox_uuid::generate_uuid_v7());
         stale.announcement_message_id = stale.presented.last().copied();
         journal
             .record_flight(record.action_id, &stale)

@@ -14,7 +14,7 @@ use agent_session::domain::error::AgentSessionError;
 use agent_session::domain::model::AgentSessionId;
 use agent_session::domain::notifications::{NotificationService, ProduceNotification};
 use agent_session::domain::ports::AgentSessionRepo;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -23,7 +23,7 @@ mod test;
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SessionStanding {
     /// The owning user; `None` for a session a bot or team owns.
-    pub owner: Option<MacroUserIdStr<'static>>,
+    pub owner: Option<RoxUserIdStr<'static>>,
     /// Archived sessions take no new turns.
     pub archived: bool,
 }
@@ -77,7 +77,7 @@ pub trait ConnectedApps: Send + Sync + 'static {
     /// enabled for tool use.
     fn connected_app_name(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> impl Future<Output = Result<Option<String>, Self::Err>> + Send;
 }
@@ -138,7 +138,7 @@ where
     pub async fn continue_session(
         &self,
         session_id: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         app_slug: &str,
         report_id: Option<AgentActionId>,
     ) -> Result<(), AppConnectedError> {

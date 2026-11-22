@@ -38,28 +38,28 @@ export function ChatTipsSection() {
   return (
     <section>
       <div class="mb-2 flex items-center px-1">
-        <span class="text-sm text-ink-muted">Tips</span>
+        <span class="text-sm text-ink-muted">Советы</span>
       </div>
       <div class="flex flex-col gap-2">
         <SetupRow
           icon={<AtIcon class="size-4" />}
-          title="@mention anything"
-          desc="Attach files, documents, emails & more as context for the AI"
+          title="Упомяните что угодно через @"
+          desc="Прикрепляйте файлы, документы, письма и другое как контекст для ИИ"
         />
         <SetupRow
           icon={<PaperPlaneTiltIcon class="size-4" />}
-          title="Send in the background"
+          title="Отправка в фоне"
           desc={
             <>
-              Press <Hotkey shortcut="meta+enter" theme="subtle" /> to send and
-              get notified when the AI responds
+              Нажмите <Hotkey shortcut="meta+enter" theme="subtle" />, чтобы
+              отправить и получить уведомление, когда ИИ ответит
             </>
           }
         />
         <SetupRow
           icon={<PlugsConnectedIcon class="size-4" />}
-          title="Connect your tools"
-          desc="Give the agent access to Linear, Notion, PostHog & more"
+          title="Подключите инструменты"
+          desc="Дайте агенту доступ к Linear, Notion, PostHog и другим сервисам"
           trailing={
             /* The arrow MUST stay BLACK. See comment at top of file. */
             <ChevronRightIcon class={SETUP_ROW_ARROW_CLASSES} />
@@ -68,8 +68,8 @@ export function ChatTipsSection() {
         />
         <SetupRow
           icon={<PuzzlePieceIcon class="size-4" />}
-          title="Connect your own agents"
-          desc="Use Rox as a tool from Claude Code, Cursor, or any MCP client"
+          title="Подключите своих агентов"
+          desc="Используйте Rox как инструмент из Claude Code, Cursor или любого клиента MCP"
           trailing={
             /* The arrow MUST stay BLACK. See comment at top of file. */
             <ChevronRightIcon class={SETUP_ROW_ARROW_CLASSES} />
@@ -78,8 +78,8 @@ export function ChatTipsSection() {
         />
         <SetupRow
           icon={<BookOpenIcon class="size-4" />}
-          title="Learn about the agent"
-          desc="What it can do and how to get the most out of it"
+          title="Узнайте об агенте"
+          desc="Что он умеет и как получить от него максимум"
           trailing={
             /* The arrow MUST stay BLACK. See comment at top of file. */
             <ArrowUpRightIcon class={SETUP_ROW_ARROW_CLASSES} />

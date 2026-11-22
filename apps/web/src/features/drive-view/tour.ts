@@ -1,31 +1,31 @@
 import { VIEW_SHELL_TOUR } from '@app/components/view-shell/tour';
 import { defineViewTour } from '@app/features/tours/core/view-tour';
+import { t } from '@app/lib/i18n';
 
-export const documentsTour = defineViewTour({
-  id: 'documents',
-  title: 'Documents',
-  connector: { kind: 'mcp', label: 'Notion', tools: ['Notion'] },
-  video: { youtubeId: 'V8wE8Hq5_qw', title: 'Rox Docs', duration: '1:09' },
-  steps: [
-    {
-      target: VIEW_SHELL_TOUR.aside,
-      entry: VIEW_SHELL_TOUR.sidebarToggle,
-      entryLabel: 'Show the Documents sidebar to continue',
-      title: 'A place for your ideas',
-      description:
-        'Create a document or bring your existing files into Rox. Search and filter to find them again.',
-    },
-    {
-      target: VIEW_SHELL_TOUR.main,
-      title: 'Connect the context',
-      description:
-        'In a document, type @ to mention people or link related work.',
-    },
-    {
-      target: VIEW_SHELL_TOUR.topBar,
-      title: 'Think together',
-      description:
-        'Share a document and use comments to keep feedback close to the work.',
-    },
-  ],
-});
+/** The Drive tour in the current interface language. */
+export const documentsTour = () =>
+  defineViewTour({
+    id: 'documents',
+    title: t('nav.documents'),
+    connector: { kind: 'mcp', label: 'Notion', tools: ['Notion'] },
+    video: { youtubeId: 'V8wE8Hq5_qw', title: 'Rox Docs', duration: '1:09' },
+    steps: [
+      {
+        target: VIEW_SHELL_TOUR.aside,
+        entry: VIEW_SHELL_TOUR.sidebarToggle,
+        entryLabel: t('drive.tourEntryLabel'),
+        title: t('drive.tourIdeasTitle'),
+        description: t('drive.tourIdeasDescription'),
+      },
+      {
+        target: VIEW_SHELL_TOUR.main,
+        title: t('drive.tourContextTitle'),
+        description: t('drive.tourContextDescription'),
+      },
+      {
+        target: VIEW_SHELL_TOUR.topBar,
+        title: t('drive.tourTogetherTitle'),
+        description: t('drive.tourTogetherDescription'),
+      },
+    ],
+  });

@@ -20,7 +20,7 @@ impl ConnectionStore for FixedConnections {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _app_slug: &str,
     ) -> Result<Option<pipedream_mcp::domain::models::PipedreamConnection>, Self::Err> {
         unreachable!("provisioning lists, never loads one")
@@ -28,7 +28,7 @@ impl ConnectionStore for FixedConnections {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _app_slug: &str,
     ) -> Result<(), Self::Err> {
         unreachable!("provisioning never deletes")
@@ -36,7 +36,7 @@ impl ConnectionStore for FixedConnections {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<pipedream_mcp::domain::models::PipedreamConnection>, Self::Err> {
         Ok(self.0.clone())
     }
@@ -72,7 +72,7 @@ impl McpServerStore for FixedServers {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         unreachable!("provisioning lists, never loads one")
@@ -80,7 +80,7 @@ impl McpServerStore for FixedServers {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<(), Self::Err> {
         unreachable!("provisioning never deletes")
@@ -88,7 +88,7 @@ impl McpServerStore for FixedServers {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         Ok(self.0.clone())
     }
@@ -96,7 +96,7 @@ impl McpServerStore for FixedServers {
 
 fn custom_server(url: &str, name: &str, enabled: bool) -> McpServerRecord {
     McpServerRecord {
-        user_id: MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+        user_id: RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
         url: url.to_owned(),
         server_name: name.to_owned(),
         credentials: None,
@@ -106,7 +106,7 @@ fn custom_server(url: &str, name: &str, enabled: bool) -> McpServerRecord {
 
 fn connection(app_slug: &str, enabled: bool) -> pipedream_mcp::domain::models::PipedreamConnection {
     pipedream_mcp::domain::models::PipedreamConnection {
-        user_id: MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+        user_id: RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
         app_slug: app_slug.to_owned(),
         server_name: app_slug.to_owned(),
         account_id: format!("apn_{app_slug}"),
@@ -134,7 +134,7 @@ async fn lists_enabled_app_slugs_verbatim() {
     let provisioned = provisioner
         .provision(
             AgentSessionId::new(),
-            &MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+            &RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             &AgentMcpServers::OwnerConnections,
         )
         .await
@@ -161,7 +161,7 @@ async fn restore_wraps_an_existing_token_in_a_fresh_listing() {
 
     let restored = provisioner
         .restore(
-            &MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+            &RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             "already-minted-token".to_owned(),
             &AgentMcpServers::OwnerConnections,
         )
@@ -207,7 +207,7 @@ async fn a_selected_list_is_advertised_regardless_of_connections() {
     let provisioned = provisioner
         .provision(
             AgentSessionId::new(),
-            &MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+            &RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             &selected(&["notion", "linear", "Not A Slug!"]),
         )
         .await
@@ -223,7 +223,7 @@ async fn a_selected_list_is_advertised_regardless_of_connections() {
 
     let restored = provisioner
         .restore(
-            &MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+            &RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             "already-minted-token".to_owned(),
             &selected(&["notion"]),
         )
@@ -250,7 +250,7 @@ async fn an_empty_selection_offers_nothing_of_the_owners() {
     let provisioned = provisioner
         .provision(
             AgentSessionId::new(),
-            &MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+            &RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             &selected(&[]),
         )
         .await
@@ -292,7 +292,7 @@ async fn lists_the_owners_enabled_custom_servers_by_key() {
     let provisioned = provisioner
         .provision(
             AgentSessionId::new(),
-            &MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+            &RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             &AgentMcpServers::OwnerConnections,
         )
         .await
@@ -307,7 +307,7 @@ async fn lists_the_owners_enabled_custom_servers_by_key() {
 
     let restored = provisioner
         .restore(
-            &MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+            &RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             "already-minted-token".to_owned(),
             &AgentMcpServers::OwnerConnections,
         )
@@ -336,7 +336,7 @@ async fn a_selected_list_carries_none_of_the_owners_custom_servers() {
     let provisioned = provisioner
         .provision(
             AgentSessionId::new(),
-            &MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+            &RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             &selected(&["notion"]),
         )
         .await
@@ -559,7 +559,7 @@ async fn native_provider_wins_without_hiding_other_hosted_apps() {
     let provisioned = provisioner
         .provision(
             AgentSessionId::new(),
-            &MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+            &RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
             &AgentMcpServers::OwnerConnections,
         )
         .await
@@ -587,7 +587,7 @@ async fn a_selected_overlaid_app_is_advertised_as_its_native_server_once_connect
         serde_json::from_value(serde_json::json!({"client_id":"test", "token_response":null}))
             .expect("credentials"),
     );
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id");
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id");
 
     for (servers, expected_slugs, expected_custom) in [
         (vec![authorized.clone()], vec!["notion"], vec!["Sentry"]),

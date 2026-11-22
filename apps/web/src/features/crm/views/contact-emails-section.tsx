@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import EmptyStateEmailGraphic from '@design/empty-state-email.svg';
 import { Tabs } from '@ui';
 import { createMemo, createSignal } from 'solid-js';
@@ -34,11 +35,11 @@ export function ContactEmailsSection(props: { contact?: CrmContactResponse }) {
 
   return (
     <RecordSection
-      title="Emails"
+      title={t('crm.emails')}
       search={search()}
       onSearchChange={setSearch}
       createAction={{
-        label: 'New email',
+        label: t('crm.newEmail'),
         onClick: () => crm.openEmailComposer(email()),
       }}
       actions={
@@ -52,23 +53,23 @@ export function ContactEmailsSection(props: { contact?: CrmContactResponse }) {
           }}
         >
           <Tabs
-            aria-label="Email importance"
+            aria-label={t('crm.emailImportance')}
             size="sm"
             touch="inset"
             options={[
-              { value: 'signal', label: 'Signal' },
-              { value: 'all', label: 'All' },
+              { value: 'signal', label: t('crm.signal') },
+              { value: 'all', label: t('crm.all') },
             ]}
             value={signalView()}
             onChange={setSignalView}
           />
           <Tabs
-            aria-label="Email inboxes"
+            aria-label={t('crm.emailInboxes')}
             size="sm"
             touch="inset"
             options={[
-              { value: 'team', label: 'Team' },
-              { value: 'me', label: 'Me' },
+              { value: 'team', label: t('crm.team') },
+              { value: 'me', label: t('crm.me') },
             ]}
             value={view()}
             onChange={setView}
@@ -84,10 +85,18 @@ export function ContactEmailsSection(props: { contact?: CrmContactResponse }) {
         emptyContent={
           <CrmListEmpty
             graphic={EmptyStateEmailGraphic}
-            title={`No ${signalView() === 'signal' ? 'signal emails' : 'emails'} with this contact ${view() === 'me' ? 'in your inbox' : 'yet'}.`}
-            description="Email this contact to start a conversation."
+            title={
+                signalView() === 'signal'
+                  ? view() === 'me'
+                    ? t('crm.noContactSignalEmailsInbox')
+                    : t('crm.noContactSignalEmails')
+                  : view() === 'me'
+                    ? t('crm.noContactEmailsInbox')
+                    : t('crm.noContactEmails')
+              }
+            description={t('crm.contactEmailsEmpty')}
             action={{
-              label: 'New email',
+              label: t('crm.newEmail'),
               onClick: () => crm.openEmailComposer(email()),
             }}
           />

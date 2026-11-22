@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { ThemeV3 } from '@theme/types/themeTypes';
 import { themeCssVars } from '@theme/utils/themeCssVars';
 import { createUniqueId, For, Show } from 'solid-js';
@@ -47,12 +48,12 @@ export function AppearanceModePicker(props: {
 }) {
   const name = createUniqueId();
   const modes = [
-    { value: 'system', label: 'System' },
-    { value: 'light', label: 'Light' },
-    { value: 'dark', label: 'Dark' },
+    { value: 'system', label: t('settingsNav.themeSystem') },
+    { value: 'light', label: t('settingsNav.themeLight') },
+    { value: 'dark', label: t('settingsNav.themeDark') },
   ] as const;
   return (
-    <fieldset class="min-w-0" aria-label="Appearance mode">
+    <fieldset class="min-w-0" aria-label={t('settingsNav.tabAppearance')}>
       <div class="grid grid-cols-3 gap-3">
         <For each={modes}>
           {(mode) => (

@@ -10,8 +10,8 @@ use bots::domain::models::{AgentChannelScope, AgentMcpServers, CreateAgentReques
 use bots::domain::ports::{BotError, BotService, HarnessAgentDeletion, HarnessAssignments};
 use harness_id::HarnessId;
 use hosted_runtimes::domain::ports::DefaultAgent;
-use macro_db_client::user::get_user_name::get_user_names;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_client::user::get_user_name::get_user_names;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -27,7 +27,7 @@ const FALLBACK_NAME: &str = "Agent";
 #[derive(Debug, Clone)]
 pub struct DefaultAgentRequest {
     pub team_id: Uuid,
-    pub buyer: MacroUserIdStr<'static>,
+    pub buyer: RoxUserIdStr<'static>,
     pub harness_id: HarnessId,
 }
 
@@ -52,7 +52,7 @@ pub trait DefaultAgents: Send + Sync + 'static {
     /// behalf of `buyer`.
     fn delete_bound(
         &self,
-        buyer: MacroUserIdStr<'static>,
+        buyer: RoxUserIdStr<'static>,
         harness_id: HarnessId,
     ) -> Pin<Box<dyn Future<Output = Result<usize, DefaultAgentError>> + Send + '_>>;
 }
@@ -163,7 +163,7 @@ where
 
     fn delete_bound(
         &self,
-        buyer: MacroUserIdStr<'static>,
+        buyer: RoxUserIdStr<'static>,
         harness_id: HarnessId,
     ) -> Pin<Box<dyn Future<Output = Result<usize, DefaultAgentError>> + Send + '_>> {
         Box::pin(async move { Ok(self.bots.delete_harness_agents(buyer, harness_id).await?) })

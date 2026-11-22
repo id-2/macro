@@ -53,8 +53,8 @@ function Actions(props: { sidebar?: boolean; compact?: boolean }) {
   return (
     <Dropdown placement={props.sidebar ? 'bottom-start' : 'bottom-end'}>
       <Dropdown.Trigger
-        aria-label="Booking links"
-        tooltip="Booking links"
+        aria-label="Ссылки для записи"
+        tooltip="Ссылки для записи"
         variant={props.compact ? 'secondary' : 'ghost'}
         size={props.sidebar || props.compact ? 'md' : 'lg'}
         class={
@@ -76,7 +76,7 @@ function Actions(props: { sidebar?: boolean; compact?: boolean }) {
         <span
           class={props.sidebar ? 'min-w-0 flex-1 truncate' : 'hidden lg:inline'}
         >
-          Booking links
+          Ссылки для записи
         </span>
         <CaretDownIcon class="size-4 shrink-0" />
       </Dropdown.Trigger>

@@ -81,7 +81,7 @@ use axum::{
     routing::{get, post, put},
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 
 use crate::domain::{model::CrmError, service::CrmService, stages::CrmStageService};
@@ -96,7 +96,7 @@ pub struct CrmRouterState<C, St, Eas, Auth> {
     /// Entity access service used by the team-scoped extractors.
     pub entity_access_service: Arc<Eas>,
     /// State used to authorize direct users and internal service callers.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<C, St, Eas, Auth> FromRef<CrmRouterState<C, St, Eas, Auth>> for Arc<Eas> {
@@ -105,7 +105,7 @@ impl<C, St, Eas, Auth> FromRef<CrmRouterState<C, St, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<C, St, Eas, Auth> FromRef<CrmRouterState<C, St, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<C, St, Eas, Auth> FromRef<CrmRouterState<C, St, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &CrmRouterState<C, St, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -152,7 +152,7 @@ where
         + crate::domain::email_policy_preview::EmailPreviewService,
     St: CrmStageService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()

@@ -29,8 +29,8 @@ impl SupportChannelMessageGateway for RecordingGateway {
     }
 }
 
-fn user_id(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user_id(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 const NEW_USER_MENTION: &str = "<m-user-mention>{\"userId\":\"macro|new.user@example.com\",\"email\":\"new.user@example.com\"}</m-user-mention>";

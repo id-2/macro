@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { initSync } from '@ironcalc/wasm';
-import { createInitializedSpreadsheetCalculator } from '@macro-inc/spreadsheet/calculation';
+import { createInitializedSpreadsheetCalculator } from '@rox-one/spreadsheet/calculation';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import type { SpreadsheetCalculator, WorkbookCalculation } from './calculation';
 import type { WorkbookFileData } from './workbook-file-types';

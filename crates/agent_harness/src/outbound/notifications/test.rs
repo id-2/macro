@@ -6,8 +6,8 @@ use agent_session::domain::events::{
 };
 use agent_session::domain::model::{AgentSessionId, TurnId};
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use notification::domain::models::{Notification, NotificationResult, SendNotificationRequest};
 use notification::domain::service::{NotificationIngress, SendNotificationError};
 use rootcause::Report;
@@ -44,8 +44,8 @@ impl NotificationIngress for RecordingIngress {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").unwrap()
 }
 
 fn settled() -> AgentSessionLifecycleEvent {

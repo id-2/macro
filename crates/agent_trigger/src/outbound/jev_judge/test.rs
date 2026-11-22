@@ -2,7 +2,7 @@ use std::sync::Mutex;
 
 use chrono::Utc;
 use jev::domain::{JevError, Probability};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use messages::domain::{events::MessageEventAttachment, models::MessageParent};
 
 use super::*;
@@ -65,7 +65,7 @@ fn posted(sender: channel_sender::ChannelSender<'static>) -> MessagePostedMetada
 
 fn user_sender() -> channel_sender::ChannelSender<'static> {
     channel_sender::ChannelSender::new_from_user(
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("jev-judge-test@rox.one")
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("jev-judge-test@rox.one")
             .expect("valid user id"),
     )
 }

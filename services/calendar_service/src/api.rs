@@ -7,7 +7,7 @@ use calendar_events::inbound::replacement_router::{
     CalendarReplacementRouterState, calendar_replacement_router,
 };
 use context::ApiContext;
-use macro_tower_layers::MacroRequestIdAndTracingLayer;
+use rox_tower_layers::RoxRequestIdAndTracingLayer;
 use std::time::Duration;
 use tower::ServiceBuilder;
 use tower_http::compression::CompressionLayer;
@@ -45,7 +45,7 @@ pub async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
         port
     );
     axum::serve(listener, app.into_make_service())
-        .with_graceful_shutdown(macro_entrypoint::shutdown_signal())
+        .with_graceful_shutdown(rox_entrypoint::shutdown_signal())
         .await
         .context("error starting service")
 }
@@ -57,8 +57,8 @@ pub async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
 fn traced(api: Router) -> Router {
     api.layer(
         ServiceBuilder::new()
-            .layer(MacroRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
-            .layer(macro_cors::cors_layer())
+            .layer(RoxRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
+            .layer(rox_cors::cors_layer())
             .layer(CompressionLayer::new().gzip(true)),
     )
 }

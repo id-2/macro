@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::{LoginAttempt, LoginStatus};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::collections::HashMap;
 use tokio::sync::Mutex;
 use uuid::Uuid;

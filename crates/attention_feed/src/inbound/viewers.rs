@@ -10,7 +10,7 @@ use entity_access::{
     inbound::axum_extractors::user_team_receipt,
 };
 use futures::future::BoxFuture;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::FeedViewer;
 
@@ -21,7 +21,7 @@ pub trait FeedViewerResolver: Send + Sync + 'static {
     /// The user's qualifying team receipt, if any.
     fn team(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> BoxFuture<'_, Result<Option<EntityAccessReceipt<MemberTeamRole>>, rootcause::Report>>;
 }
 
@@ -34,7 +34,7 @@ where
 {
     fn team(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> BoxFuture<'_, Result<Option<EntityAccessReceipt<MemberTeamRole>>, rootcause::Report>> {
         Box::pin(async move {
             user_team_receipt::<MemberTeamRole, S>(self.0.as_ref(), user)
@@ -47,7 +47,7 @@ where
 /// The viewer `user` is evaluated as, with their team receipt.
 pub async fn resolve_viewer(
     viewers: &dyn FeedViewerResolver,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
 ) -> Result<FeedViewer, rootcause::Report> {
     let team = viewers.team(user.clone()).await?;
     Ok(FeedViewer { user, team })

@@ -173,7 +173,7 @@ impl FavoritesMutationService for CapturingService {
 
     async fn reorder_favorites(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         ordered: Vec<Entity<'static>>,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         *self
@@ -203,8 +203,8 @@ impl FavoritesMutationService for CapturingService {
     }
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|graphql-favorite@example.com").expect("valid user id")
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|graphql-favorite@example.com").expect("valid user id")
 }
 
 fn schema(

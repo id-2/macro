@@ -2,13 +2,13 @@
 
 use contacts::domain::{models::messages::ContactConnection, ports::ContactsIngress};
 use email::domain::{
-    events::EmailMacroEvent,
+    events::EmailRoxEvent,
     invitation_extraction::InvitationExtractionRepository,
     mailbox::{DatabaseFailure, EffectFailure, MailboxError, MailboxKey, projection::*},
     models::calendar_invitation::CalendarInvitation,
 };
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::NewEmailMetadata;
 use models_email::{
@@ -59,7 +59,7 @@ impl<A, I, B, N, C> MailboxProjectionEffects for MailboxEffects<A, I, B, N, C>
 where
     A: MailboxAttachmentAccess,
     I: InvitationExtractionRepository + 'static,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: NotificationIngress + 'static,
     C: ContactsIngress + 'static,
 {
@@ -89,7 +89,7 @@ where
     async fn photo_refresh(
         &self,
         link_id: Uuid,
-        viewers: &HashSet<MacroUserIdStr<'static>>,
+        viewers: &HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), MailboxError> {
         for viewer in viewers {
             crate::pubsub::util::cg_refresh_email(
@@ -101,7 +101,7 @@ where
         }
         Ok(())
     }
-    async fn publish(&self, event: EmailMacroEvent) -> Result<(), MailboxError> {
+    async fn publish(&self, event: EmailRoxEvent) -> Result<(), MailboxError> {
         // Await the broker acknowledgement before deleting durable work.
         self.broker
             .send_event(&event)
@@ -113,7 +113,7 @@ where
     async fn refresh(
         &self,
         link_id: Uuid,
-        viewers: &HashSet<MacroUserIdStr<'static>>,
+        viewers: &HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), MailboxError> {
         for viewer in viewers {
             crate::pubsub::util::cg_refresh_email(

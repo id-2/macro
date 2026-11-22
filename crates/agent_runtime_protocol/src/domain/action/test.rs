@@ -148,7 +148,7 @@ fn non_uuid_request_ids_are_not_action_ids() {
     // production, so uuid-shaped is treated as ours.)
     let handshake = RequestId::Str(format!(
         "agent_session:{}:0",
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     ));
     assert_eq!(AgentActionId::from_request_id(&handshake), None);
     assert_eq!(
@@ -552,7 +552,7 @@ fn a_compact_command_with_attachments_is_still_a_plain_prompt() {
 fn notification_prompt_survives_queue_persistence_and_is_identified_on_the_wire() {
     use crate::domain::notification::*;
     let notification = Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "connection<&".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {

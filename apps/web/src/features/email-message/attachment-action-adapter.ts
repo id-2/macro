@@ -2,7 +2,7 @@ import { useSplitLayout } from '@components/app/split-layout/layout';
 import { toast } from '@core/component/Toast/Toast';
 import { fileTypeToBlockName } from '@core/constant/allBlocks';
 import { downloadFile } from '@filesystem/download';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { getEmailAttachmentDownloadUrl } from '@queries/email/attachment';
 import {
   getEmailAttachmentDocument,

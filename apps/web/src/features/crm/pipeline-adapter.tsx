@@ -94,7 +94,7 @@ export function PipelineDatabaseEditor(props: {
       class="@container/database flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-canvas-base text-ink"
       style={{ '--database-title-column-width': '18rem' }}
     >
-      <Suspense fallback={<CrmListSkeleton label="Loading pipeline" />}>
+      <Suspense fallback={<CrmListSkeleton label={t('crm.loadingPipeline')} />}>
         <Show when={props.pipeline.id} keyed>
           {(_id) => (
             <PipelineRecords
@@ -353,8 +353,8 @@ function PipelineToolbar(props: {
             <Button variant="secondary" onClick={() => props.onCompose({})}>
               <PlusIcon class="size-4" />
               {props.pipeline.recordType === 'company'
-                ? 'Add deal'
-                : 'Add contact'}
+                ? t('crm.addDeal')
+                : t('crm.addContact')}
             </Button>
           </Show>
           <Show when={tracked()}>

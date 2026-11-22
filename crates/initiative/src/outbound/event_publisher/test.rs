@@ -2,11 +2,11 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use chrono::Utc;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 
 use super::BrokerInitiativeEventPublisher;
 use crate::domain::events::{
-    InitiativeChange, InitiativeEventPublisher, InitiativeMacroEvent, InitiativeTopicEvent,
+    InitiativeChange, InitiativeEventPublisher, InitiativeRoxEvent, InitiativeTopicEvent,
 };
 use crate::domain::models::InitiativeId;
 
@@ -15,8 +15,8 @@ use crate::domain::models::InitiativeId;
 #[derive(Clone, Default)]
 struct StalledBroker(Arc<Mutex<Vec<String>>>);
 
-impl MacroEventBroker for StalledBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for StalledBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -30,7 +30,7 @@ async fn publish_returns_once_the_broker_has_the_event() {
     let broker = StalledBroker::default();
     let publisher = BrokerInitiativeEventPublisher::new(broker.clone());
     let id = InitiativeId::generate();
-    let event = InitiativeMacroEvent::new(
+    let event = InitiativeRoxEvent::new(
         id,
         InitiativeTopicEvent::Created(InitiativeChange {
             initiative_id: id,

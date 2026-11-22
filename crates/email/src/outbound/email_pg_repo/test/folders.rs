@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 type ExpectedWrite = (&'static [&'static str], &'static [&'static str]);
 
@@ -23,7 +23,7 @@ async fn gmail_folder_restore_refreshes_all_mail_before_provider_sync(
 
     let enqueuer = RecordingEnqueuer::default();
     let service = service_with_enqueuer(pool.clone(), enqueuer.clone());
-    let owner = MacroUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
+    let owner = RoxUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
     let link = uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
 
     // Restoring from Trash takes TRASH off and nothing else. Not spam is a
@@ -161,7 +161,7 @@ async fn gmail_report_spam_moves_the_thread_out_of_the_inbox(
 
     let enqueuer = RecordingEnqueuer::default();
     let service = service_with_enqueuer(pool.clone(), enqueuer.clone());
-    let owner = MacroUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
+    let owner = RoxUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
     let link = uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
     let thread = uuid::uuid!("0b000000-0000-0000-0000-000000000101");
     let message = uuid::uuid!("0c000000-0000-0000-0000-000000000101");
@@ -303,7 +303,7 @@ async fn provider_folders_match_messages_before_pagination(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = MacroUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
     for (link, prefix) in [
         (uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), 100u128),
         (uuid::uuid!("0a000000-0000-0000-0000-000000000001"), 200u128),
@@ -319,7 +319,7 @@ async fn provider_folders_match_messages_before_pagination(
                 None,
                 Some(Arc::new(Expr::val(EmailLiteral::CalendarOnly(false)))),
                 Some(Arc::new(Expr::val(EmailLiteral::Sender(Email::Complete(
-                    macro_user_id::email::EmailStr::parse_from_str("sender@example.com")?
+                    rox_user_id::email::EmailStr::parse_from_str("sender@example.com")?
                         .into_owned(),
                 ))))),
             ] {
@@ -398,7 +398,7 @@ async fn folder_candidates_respect_pending_moves_and_provider_absence(
         sqlx::query!("INSERT INTO email_pending_mailbox_state (message_id,attribute,command_id,desired) VALUES ($1,'in_trash',$2,$3)", message, command, serde_json::json!(desired)).execute(&pool).await?;
     }
     let repo = EmailPgRepo::new(pool.clone());
-    let viewer = MacroUserIdStr::parse_from_str("macro|mail@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|mail@example.com")?;
     let query = || PreviewCursorQuery {
         view: PreviewView::StandardLabel(PreviewViewStandardLabel::Trash),
         link_ids: vec![link],
@@ -438,7 +438,7 @@ async fn folder_dates_and_shared_scope_use_the_selected_folder(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let thread = uuid::uuid!("0b000000-0000-0000-0000-000000000202");
-    let viewer = MacroUserIdStr::parse_from_str("macro|user1@example.com")?;
+    let viewer = RoxUserIdStr::parse_from_str("macro|user1@example.com")?;
     let repo = EmailPgRepo::new(pool.clone());
     let filter = Arc::new(Expr::and(
         Expr::val(EmailLiteral::Shared(item_filters::SharedEmailFilter::Only)),
@@ -500,7 +500,7 @@ async fn outlook_mailbox_states_report_the_messages_they_change(
 
     let service = service_with_enqueuer(pool.clone(), RecordingEnqueuer::default());
     // `email_all_mail` gives the Outlook inbox this owner.
-    let owner = MacroUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
+    let owner = RoxUserIdStr::parse_from_str("macro|mail@example.com")?.into_owned();
     let thread = uuid::uuid!("0a000000-0000-0000-0000-0000000000a1");
     // A second received message in the same conversation, also read and in
     // the Inbox.

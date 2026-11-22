@@ -6,7 +6,7 @@ use super::{
 use ai_billing::{AiAdmissionError, AiAdmissionService};
 use ai_usage::{AiFeature, UsageContext};
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{sync::Arc, time::Duration};
 use tokio::{sync::Semaphore, time::Instant};
 use tracing::Instrument;
@@ -51,7 +51,7 @@ pub trait DecisionService: Send + Sync + 'static {
     /// authenticate this identity; it must not come from the request body.
     async fn decide(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, DecisionError>;
 }
@@ -80,7 +80,7 @@ impl<C: YesNoClassifier> DecisionService for DecisionServiceImpl<C> {
     #[tracing::instrument(name = "jev.decide", skip_all, fields(question_count = request.questions.len()), err)]
     async fn decide(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, DecisionError> {
         let deadline = Instant::now() + DECISION_TIMEOUT;

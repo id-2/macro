@@ -7,7 +7,7 @@ use std::sync::Arc;
 use collab_surface::domain::ports::OwnedSurfaceService;
 use databases::domain::ports::{DatabaseMetadataReads, DatabaseRowReads, DatabasesService};
 use entity_access::domain::ports::AccessibleForms;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use sqlx::PgPool;
 use static_file_service_client::StaticFileServiceClient;
 
@@ -49,7 +49,7 @@ where
     Databases: DatabasesService + DatabaseRowReads + DatabaseMetadataReads,
     EntityAccess: AccessibleForms,
     Events: FormEventPublisher,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Surfaces: OwnedSurfaceService,
 {
     FormsServiceImpl::new(

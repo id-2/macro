@@ -5,14 +5,14 @@ use crate::{
 };
 use serde_json::json;
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn review_revision_claim_is_atomic_and_session_deletion_removes_reviews(pool: PgPool) {
     sqlx::raw_sql(include_str!("../postgres/test/sessions.sql"))
         .execute(&pool)
         .await
         .unwrap();
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(1));
-    let other = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(2));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(1));
+    let other = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(2));
     let execution = ExecutionId::mint();
     PgExecutionStore::new(pool.clone())
         .create(
@@ -39,7 +39,7 @@ async fn review_revision_claim_is_atomic_and_session_deletion_removes_reviews(po
         )),
     );
     let mut record: ReviewRecord = serde_json::from_value(json!({
-        "id": macro_uuid::generate_uuid_v7(),
+        "id": rox_uuid::generate_uuid_v7(),
         "sessionId": session.as_uuid(),
         "actingUser": "macro|owner@example.com",
         "executionId": execution,
@@ -50,7 +50,7 @@ async fn review_revision_claim_is_atomic_and_session_deletion_removes_reviews(po
         "decision": null,
         "kind": "email",
         "items": [{
-            "id": macro_uuid::generate_uuid_v7(),
+            "id": rox_uuid::generate_uuid_v7(),
             "draft": {"subject":"Which?", "body":"Hello", "to":[{"email":"ada@example.com"}]},
             "edited": false,
             "status": "pending",
@@ -61,9 +61,9 @@ async fn review_revision_claim_is_atomic_and_session_deletion_removes_reviews(po
     .unwrap();
     store.create(&record, 100).await.unwrap();
     let mut second = record.clone();
-    second.id = ReviewId(macro_uuid::generate_uuid_v7());
+    second.id = ReviewId(rox_uuid::generate_uuid_v7());
     let mut third = record.clone();
-    third.id = ReviewId(macro_uuid::generate_uuid_v7());
+    third.id = ReviewId(rox_uuid::generate_uuid_v7());
     let (second_result, third_result) =
         tokio::join!(store.create(&second, 2), store.create(&third, 2));
     assert_eq!(
@@ -81,7 +81,7 @@ async fn review_revision_claim_is_atomic_and_session_deletion_removes_reviews(po
     ));
     assert!(store.list(other, execution).await.unwrap().is_empty());
     let mut standalone = record.clone();
-    standalone.id = ReviewId(macro_uuid::generate_uuid_v7());
+    standalone.id = ReviewId(rox_uuid::generate_uuid_v7());
     standalone.execution_id = None;
     assert!(matches!(
         store.create(&standalone, 2).await,

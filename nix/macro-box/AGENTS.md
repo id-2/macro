@@ -33,9 +33,10 @@ PID 1 (for the dev-only DockerFleet).
 - `_agent.nix` (imported by `_guest.nix`, options `macro.box.agent.*`) runs
   the agent teammate: `packages/starter-agent` on `packages/muppet`.
   `_agent-runtime.nix` builds its `node_modules` from the starter agent's own
-  `bun.lock` (one fixed-output fetch), with `@macro-inc/muppet` and
-  `@macro-inc/observability` (TypeScript source) and `@macro-inc/sdk` (built
-  against those packages) beside them.
+  `bun.lock` (one fixed-output fetch), with `@rox-one/muppet` and
+  `@rox-one/observability` (TypeScript source) and `@rox-one/sdk` (built
+  against those packages) beside them; the old `@macro-inc/*` names are
+  symlinks to those directories for older agent repositories.
   `_computer-use-linux.nix` builds computer-use-linux (MIT) from source at a
   pinned release.
 - `files/` holds the enrollment probe script, the agent's `start-agent`,

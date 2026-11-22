@@ -119,6 +119,10 @@ const SettingsRouteView = lazyNamed(
   () => import('@app/features/settings/route-views'),
   'SettingsRouteView'
 );
+const AccountPortalRouteView = lazyNamed(
+  () => import('@app/features/settings/route-views'),
+  'AccountPortalRouteView'
+);
 const TasksRouteView = lazyNamed(
   () => import('@app/features/tasks-view/route-views'),
   'TasksRouteView'
@@ -434,6 +438,11 @@ registerComponent(
 registerComponent(
   'settings',
   () => <SettingsRouteView />,
+  () => composableLayout(true)
+);
+registerComponent(
+  'account',
+  () => <AccountPortalRouteView />,
   () => composableLayout(true)
 );
 registerComponent(

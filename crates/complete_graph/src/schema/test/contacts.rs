@@ -14,7 +14,7 @@ struct Directory(Mutex<Vec<String>>);
 impl ContactDirectory for Directory {
     async fn search_contacts(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         _search: &ContactSearch,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
@@ -23,7 +23,7 @@ impl ContactDirectory for Directory {
     }
     async fn lookup_contacts(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         _lookup: &ContactLookup,
     ) -> Result<Vec<Contact>, Report> {
         Ok(self
@@ -33,12 +33,12 @@ impl ContactDirectory for Directory {
     }
     async fn contact_page(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         _after: Option<&ContactCursor>,
         _limit: ContactPageSize,
     ) -> Result<ContactPage, Report> {
         self.0.lock().unwrap().push(viewer.to_string());
-        let user_id = MacroUserIdStr::try_from_email("person@example.com").unwrap();
+        let user_id = RoxUserIdStr::try_from_email("person@example.com").unwrap();
         Ok(ContactPage {
             contacts: vec![Contact {
                 id: ContactId::for_viewer(&viewer, &user_id),

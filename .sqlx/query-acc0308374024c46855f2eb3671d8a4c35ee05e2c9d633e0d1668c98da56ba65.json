@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT m.body_text,m.body_rox,m.provider_version,d.base_version,d.remote_snapshot FROM email_messages m JOIN email_mailbox_drafts d ON d.message_id = m.id WHERE m.id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "body_text",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "body_rox",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "provider_version",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "base_version",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "remote_snapshot",
+        "type_info": "Jsonb"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "acc0308374024c46855f2eb3671d8a4c35ee05e2c9d633e0d1668c98da56ba65"
+}

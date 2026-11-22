@@ -217,7 +217,7 @@ function SplitDriveReturnButton() {
     if (typeof label === 'string') return label;
 
     const driveState = state?.['drive.view.v2'] as DriveState | undefined;
-    return driveState ? driveLocationLabel(driveState.location) : 'My Files';
+    return driveState ? driveLocationLabel(driveState.location) : 'Мои файлы';
   };
   const returnToDrive = () => {
     if (panel.handle.goBackTo(isDrive)) return;

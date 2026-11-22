@@ -1,4 +1,4 @@
-import { behavior } from '@macro-inc/muppet/core/behavior';
+import { behavior } from '@rox-one/muppet/core/behavior';
 import type { CallsContext } from '../../capabilities/calls/context.ts';
 import { tick } from '../../capabilities/calls/watch.ts';
 import type { callsSources } from '../sources/calls.ts';

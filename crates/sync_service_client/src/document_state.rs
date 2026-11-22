@@ -12,7 +12,7 @@
 //! routes. The token and the payloads are never logged.
 
 use base64::{Engine, engine::general_purpose::STANDARD};
-use macro_sync_service_jwt::DocumentPermissionToken;
+use rox_sync_service_jwt::DocumentPermissionToken;
 use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 

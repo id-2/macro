@@ -20,8 +20,8 @@ use entity_access::{
     domain::{models::MemberTeamRole, ports::EntityAccessService},
     inbound::axum_extractors::user_team_receipt,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
 use std::{marker::PhantomData, sync::Arc};
 use uuid::Uuid;
@@ -38,13 +38,13 @@ impl<S, Eas, Auth> FromRequestParts<S> for OwnEmailPolicyAccess<Eas, Auth>
 where
     S: Send + Sync + 'static,
     Arc<Eas>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     type Rejection = Response;
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let authentication: MacroAuthorizationExtractor<Auth, UserOnly> = parts
+        let authentication: RoxAuthorizationExtractor<Auth, UserOnly> = parts
             .extract_with_state(state)
             .await
             .map_err(IntoResponse::into_response)?;
@@ -89,7 +89,7 @@ pub async fn get_handler<
     C: CrmService + EmailPolicyService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: OwnEmailPolicyAccess<Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
@@ -103,7 +103,7 @@ pub async fn update_handler<
     C: CrmService + EmailPolicyService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: OwnEmailPolicyAccess<Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
@@ -125,7 +125,7 @@ pub async fn validate_handler<
     C: CrmService + EmailPolicyService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: OwnEmailPolicyAccess<Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
@@ -145,7 +145,7 @@ pub async fn history_handler<
     C: CrmService + EmailPolicyService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: OwnEmailPolicyAccess<Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
@@ -164,7 +164,7 @@ where
     C: CrmService + EmailPolicyService + EmailPreviewService,
     St: Send + Sync + 'static,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         .route(
@@ -203,7 +203,7 @@ pub async fn start_preview_handler<
     C: CrmService + EmailPreviewService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: OwnEmailPolicyAccess<Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
@@ -222,7 +222,7 @@ pub async fn preview_handler<
     C: CrmService + EmailPreviewService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: OwnEmailPolicyAccess<Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
@@ -237,7 +237,7 @@ pub async fn cancel_preview_handler<
     C: CrmService + EmailPreviewService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: OwnEmailPolicyAccess<Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
@@ -256,7 +256,7 @@ pub async fn revision_handler<
     C: CrmService + EmailPolicyService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: OwnEmailPolicyAccess<Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,

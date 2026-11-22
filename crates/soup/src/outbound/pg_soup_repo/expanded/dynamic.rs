@@ -35,7 +35,7 @@ use item_filters::ast::{
     project::ProjectLiteral,
     properties::{PropertiesLiteral, PropertyEntityType, PropertyMatchValue},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use models_pagination::{Query, SimpleSortMethod};
 use models_soup::{
@@ -2986,7 +2986,7 @@ impl SoupRow {
 #[derive(Debug, Clone)]
 pub(crate) struct ExpandedDynamicCursorArgs<'a> {
     /// the user for which we are performing the query
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// the limit of items we can return
     pub limit: u16,
     /// the Query that we are attempting to perform
@@ -3190,7 +3190,7 @@ pub(crate) async fn expanded_dynamic_cursor_soup(
 #[derive(Debug)]
 pub struct GroupedDynamicCursorArgs<'a> {
     /// The user for which we are performing the query
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// The limit of items we can return
     pub limit: u16,
     /// The Query that we are attempting to perform

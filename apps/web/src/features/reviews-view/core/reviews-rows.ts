@@ -1,4 +1,5 @@
 import { dateBucket } from '@app/features/soup/collection/date-buckets';
+import { t } from '@app/lib/i18n';
 import type { GithubPullRequestEntity } from '@entity';
 import { match } from 'ts-pattern';
 import type { ReviewsSortId } from '../reviews-types';
@@ -13,6 +14,17 @@ export type ReviewsRow =
       /** Position among the pull requests, which focus and selection use. */
       index: number;
     };
+
+/** The heading a date bucket shows in the interface language. */
+const bucketLabel = (key: string, fallback: string): string => {
+  if (key === 'today') return t('reviews.bucketToday');
+  if (key === 'yesterday') return t('reviews.bucketYesterday');
+  if (key === 'last-7-days') return t('reviews.bucketLast7Days');
+  if (key === 'earlier-this-month') return t('reviews.bucketEarlierThisMonth');
+  if (key === 'last-month') return t('reviews.bucketLastMonth');
+  if (key === 'older') return t('reviews.bucketOlder');
+  return fallback;
+};
 
 /** The timestamp a sort orders by, or `undefined` when it is not by date. */
 const sortTimestamp = (sort: ReviewsSortId) =>
@@ -50,7 +62,7 @@ export function buildReviewsRows(
         rows.push({
           kind: 'header',
           id: `header:${next.key}:${index}`,
-          label: next.label,
+          label: bucketLabel(next.key, next.label),
         });
       }
     }

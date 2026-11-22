@@ -1,5 +1,5 @@
 use crate::config::SenderBaseAddress;
-use macro_env::Environment;
+use rox_env::Environment;
 use std::sync::LazyLock;
 
 pub static SENDER_ADDRESS: LazyLock<String> = LazyLock::new(|| {

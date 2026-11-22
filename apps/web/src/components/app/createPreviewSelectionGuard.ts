@@ -2,7 +2,7 @@ import type { NavigationStackChangeReason } from '@app/components/navigation-sta
 import { goToChannelMessage } from '@block-channel/utils/link';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createSignal, onCleanup, untrack, useContext } from 'solid-js';
 import {
   type PreviewBlockTarget,

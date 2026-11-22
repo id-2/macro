@@ -1,9 +1,9 @@
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use models_properties::{EntityType, shared::entity_reference::EntityReference};
 
-fn viewer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|me@example.com")
+fn viewer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|me@example.com")
         .unwrap()
         .into_owned()
 }

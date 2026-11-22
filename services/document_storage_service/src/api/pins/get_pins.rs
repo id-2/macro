@@ -5,7 +5,7 @@ use crate::{
 };
 use axum::extract::State;
 use axum::{http::StatusCode, response::IntoResponse};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{GenericErrorResponse, GenericResponse};
 
 /// Gets the users pinned items
@@ -21,9 +21,9 @@ use model::response::{GenericErrorResponse, GenericResponse};
 #[tracing::instrument(skip(ctx, user), fields(user_id=?user.authorization.user.macro_user_id))]
 pub async fn get_pins_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> impl IntoResponse {
-    let pins = match macro_db_client::pins::get_pins(
+    let pins = match rox_db_client::pins::get_pins(
         ctx.db.clone(),
         user.authorization.user.macro_user_id.as_ref(),
     )

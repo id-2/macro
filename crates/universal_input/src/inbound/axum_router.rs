@@ -14,8 +14,8 @@ use axum::{
     routing::post,
 };
 use jev::domain::YesNoClassifier;
-use macro_authorization::{
-    InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
     UserOrInternal,
 };
 use std::sync::Arc;
@@ -23,7 +23,7 @@ use std::sync::Arc;
 /// Authenticated inference state; concrete providers are composed by the host.
 pub struct UniversalInputRouterState<C, E, A> {
     service: Arc<UniversalInputService<C, E>>,
-    authorization: MacroAuthorizationState<A>,
+    authorization: RoxAuthorizationState<A>,
 }
 
 impl<C, E, A> Clone for UniversalInputRouterState<C, E, A> {
@@ -39,7 +39,7 @@ impl<C, E, A> UniversalInputRouterState<C, E, A> {
     /// Attach domain inference and the host's existing authorization service.
     pub fn new(
         service: Arc<UniversalInputService<C, E>>,
-        authorization: MacroAuthorizationState<A>,
+        authorization: RoxAuthorizationState<A>,
     ) -> Self {
         Self {
             service,
@@ -48,7 +48,7 @@ impl<C, E, A> UniversalInputRouterState<C, E, A> {
     }
 }
 
-impl<C, E, A> FromRef<UniversalInputRouterState<C, E, A>> for MacroAuthorizationState<A> {
+impl<C, E, A> FromRef<UniversalInputRouterState<C, E, A>> for RoxAuthorizationState<A> {
     fn from_ref(state: &UniversalInputRouterState<C, E, A>) -> Self {
         state.authorization.clone()
     }
@@ -59,7 +59,7 @@ pub fn axum_router<C, E, A>(state: UniversalInputRouterState<C, E, A>) -> Router
 where
     C: YesNoClassifier + 'static,
     E: FieldExtractor + 'static,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 {
     Router::new()
         .route("/classify", post(classify::<C, E, A>))
@@ -98,13 +98,13 @@ impl IntoResponse for InputApiError {
 /// Classify a draft for the authenticated user.
 pub async fn classify<C, E, A>(
     State(state): State<UniversalInputRouterState<C, E, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Json(input): Json<ClassifyInputRequest>,
 ) -> Result<Json<ClassifyInputResponse>, InputApiError>
 where
     C: YesNoClassifier,
     E: FieldExtractor,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -119,13 +119,13 @@ where
 /// Extract editable fields for the authenticated user.
 pub async fn extract<C, E, A>(
     State(state): State<UniversalInputRouterState<C, E, A>>,
-    user: MacroAuthorizationExtractor<A, UserOrInternal>,
+    user: RoxAuthorizationExtractor<A, UserOrInternal>,
     Json(input): Json<ExtractInputRequest>,
 ) -> Result<Json<ExtractInputResponse>, InputApiError>
 where
     C: YesNoClassifier,
     E: FieldExtractor,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -138,7 +138,7 @@ where
 /// Internal due date state; concrete extraction is composed by the host.
 pub struct ThreadDueDateRouterState<E, A> {
     service: Arc<ThreadDueDateService<E>>,
-    authorization: MacroAuthorizationState<A>,
+    authorization: RoxAuthorizationState<A>,
 }
 
 impl<E, A> Clone for ThreadDueDateRouterState<E, A> {
@@ -154,7 +154,7 @@ impl<E, A> ThreadDueDateRouterState<E, A> {
     /// Attach the domain use case and the host's existing authorization service.
     pub fn new(
         service: Arc<ThreadDueDateService<E>>,
-        authorization: MacroAuthorizationState<A>,
+        authorization: RoxAuthorizationState<A>,
     ) -> Self {
         Self {
             service,
@@ -163,7 +163,7 @@ impl<E, A> ThreadDueDateRouterState<E, A> {
     }
 }
 
-impl<E, A> FromRef<ThreadDueDateRouterState<E, A>> for MacroAuthorizationState<A> {
+impl<E, A> FromRef<ThreadDueDateRouterState<E, A>> for RoxAuthorizationState<A> {
     fn from_ref(state: &ThreadDueDateRouterState<E, A>) -> Self {
         state.authorization.clone()
     }
@@ -174,7 +174,7 @@ impl<E, A> FromRef<ThreadDueDateRouterState<E, A>> for MacroAuthorizationState<A
 pub fn thread_due_date_router<E, A>(state: ThreadDueDateRouterState<E, A>) -> Router
 where
     E: ThreadFactExtractor + 'static,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 {
     Router::new()
         .route("/thread-due-date", post(thread_due_date::<E, A>))
@@ -184,12 +184,12 @@ where
 /// Read a thread's due date for the acting user who owns it.
 async fn thread_due_date<E, A>(
     State(state): State<ThreadDueDateRouterState<E, A>>,
-    internal: MacroAuthorizationExtractor<A, InternalOnly>,
+    internal: RoxAuthorizationExtractor<A, InternalOnly>,
     Json(input): Json<ThreadDueDateRequest>,
 ) -> Result<Json<ThreadDueDateResponse>, Response>
 where
     E: ThreadFactExtractor,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 {
     let Some(owner) = internal.authorization.acting_user else {
         // Usage is the owner's: never guess whom to meter it against.

@@ -43,7 +43,7 @@ fn enrollment_round_trips_through_json() {
         "mak_secret_value".to_owned(),
     );
     let enrollment = AgentEnrollment {
-        agent_user_id: MacroUserIdStr::try_from("macro|ada-agent@rox.one".to_owned()).unwrap(),
+        agent_user_id: RoxUserIdStr::try_from("macro|ada-agent@rox.one".to_owned()).unwrap(),
         env: AgentEnv::new(values).unwrap(),
     };
     let json = serde_json::to_value(&enrollment).unwrap();

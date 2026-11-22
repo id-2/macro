@@ -138,7 +138,7 @@ fn outcomes_become_outputs_or_bounded_reasons() {
 fn rewrites_read_the_declarations_the_errors_name() {
     let names = quoted_names(&[
         "TS2339 [ERROR]: Property 'create' does not exist on type 'TaskNamespace'.".into(),
-        "TS2345 [ERROR]: Argument of type 'string' is not assignable to parameter of type 'Macro<MacroOpts>'.".into(),
+        "TS2345 [ERROR]: Argument of type 'string' is not assignable to parameter of type 'Macro<RoxOpts>'.".into(),
         "TS2339 [ERROR]: Property 'create' does not exist on type 'TaskNamespace'.".into(),
     ]);
     assert_eq!(names, ["create", "TaskNamespace", "string", "Rox"]);
@@ -202,7 +202,7 @@ struct RecordedTokens(std::sync::Mutex<Vec<(CodeIdentity, Uuid)>>);
 impl RoutineCredentials for RecordedTokens {
     async fn mint(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         acts_as: CodeIdentity,
         routine_id: Uuid,
         _: bool,
@@ -227,7 +227,7 @@ async fn a_step_waits_for_a_free_slot_before_its_credential_and_gives_up_after_f
         )
         .with_slots(1),
     );
-    let owner = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     let step = routine_program::CodeStep {
         id: None,
         title: "Label invoices".into(),
@@ -301,14 +301,14 @@ struct SignedTokens;
 impl RoutineCredentials for SignedTokens {
     async fn mint(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         acts_as: CodeIdentity,
         routine_id: Uuid,
         dry_run: bool,
     ) -> anyhow::Result<String> {
         let (agent_id, scope) = routine_claims(acts_as, dry_run);
-        macro_auth::macro_api_token::encode_macro_api_token(
-            macro_auth::macro_api_token::EncodeMacroApiTokenArgs {
+        rox_auth::macro_api_token::encode_macro_api_token(
+            rox_auth::macro_api_token::EncodeRoxApiTokenArgs {
                 fusionauth_id: "fixture".into(),
                 macro_user_id: "macro|owner@example.com".into(),
                 organization_id: None,
@@ -360,7 +360,7 @@ async fn a_dry_run_token_is_refused_every_write() {
         None,
         Arc::new(NoTimeZones),
     );
-    let owner = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     let step = routine_program::CodeStep {
         id: None,
         title: "Label invoices".into(),
@@ -404,7 +404,7 @@ async fn a_dry_run_token_is_refused_every_write() {
             axum::routing::post(|| async { axum::http::StatusCode::OK }),
         )
         .layer(axum::middleware::from_fn_with_state(
-            macro_auth::middleware::decode_jwt::JwtValidationArgs::testing_macro_token(
+            rox_auth::middleware::decode_jwt::JwtValidationArgs::testing_macro_token(
                 "fixture", PUBLIC,
             ),
             agent_correlation::inbound::enforce_signed_scope,
@@ -454,7 +454,7 @@ struct NoTimeZones;
 
 #[async_trait::async_trait]
 impl OwnerTimeZones for NoTimeZones {
-    async fn time_zone(&self, _: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn time_zone(&self, _: &RoxUserIdStr<'static>) -> Option<String> {
         None
     }
 }
@@ -479,7 +479,7 @@ mod real_deno {
     impl RoutineCredentials for FixedToken {
         async fn mint(
             &self,
-            _: &MacroUserIdStr<'static>,
+            _: &RoxUserIdStr<'static>,
             _: CodeIdentity,
             _: Uuid,
             _: bool,
@@ -583,8 +583,8 @@ export async function main({ macro, trigger, steps, run }: StepContext) {
         program.code_steps()[0].clone()
     }
 
-    fn owner() -> MacroUserIdStr<'static> {
-        MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+    fn owner() -> RoxUserIdStr<'static> {
+        RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
     }
 
     fn program(steps: serde_json::Value) -> RoutineProgram {
@@ -944,7 +944,7 @@ fn an_area_reads_its_index_guidance_and_declarations_without_imports() {
     assert!(reference.starts_with("## tasks\n"));
     let files: Vec<&str> = reference
         .lines()
-        .filter_map(|line| line.strip_prefix("// @macro-inc/sdk/"))
+        .filter_map(|line| line.strip_prefix("// @rox-one/sdk/"))
         .collect();
     assert_eq!(
         files,
@@ -974,9 +974,9 @@ fn areas_are_found_by_directory_once_each_and_unknown_ones_skipped() {
     // `agentSessions` lives in `agent-sessions`, `foreignEntities` in
     // `foreign`.
     let sessions = area_reference(&["agentSessions".to_owned()]);
-    assert!(sessions.contains("// @macro-inc/sdk/src/entities/agent-sessions/namespace.d.ts\n"));
+    assert!(sessions.contains("// @rox-one/sdk/src/entities/agent-sessions/namespace.d.ts\n"));
     let foreign = area_reference(&["foreignEntities".to_owned()]);
-    assert!(foreign.contains("// @macro-inc/sdk/src/entities/foreign/namespace.d.ts\n"));
+    assert!(foreign.contains("// @rox-one/sdk/src/entities/foreign/namespace.d.ts\n"));
 
     let twice = area_reference(&[
         "tasks".to_owned(),

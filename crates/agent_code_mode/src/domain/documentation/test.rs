@@ -16,14 +16,14 @@ struct Classifier {
 impl Cognition for Classifier {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         panic!("selection must not generate text")
     }
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         let probabilities = request
@@ -44,8 +44,8 @@ impl Cognition for Classifier {
         Ok(DecisionResponse { probabilities })
     }
 }
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
 }
 #[tokio::test]
 async fn one_bounded_request_expands_only_selected_entities() {
@@ -557,7 +557,7 @@ struct BookingLinkClassifier;
 impl Cognition for BookingLinkClassifier {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         panic!("selection must not generate text")
@@ -565,7 +565,7 @@ impl Cognition for BookingLinkClassifier {
 
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         let mentions_booking_link = request.input.to_string().contains("booking link");

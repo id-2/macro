@@ -1,14 +1,14 @@
-import { pivotLayout } from '@macro-inc/spreadsheet/pivot-layout';
+import { pivotLayout } from '@rox-one/spreadsheet/pivot-layout';
 import {
   MAX_NOTE_LENGTH,
   MAX_SHEET_NOTES,
-} from '@macro-inc/spreadsheet/sheet-rules';
+} from '@rox-one/spreadsheet/sheet-rules';
 import {
   displayStructuredReferences,
   resolveStructuredReferences,
   type WorkbookTable,
-} from '@macro-inc/spreadsheet/structured-references';
-import type { WorkbookSheetMetadata } from '@macro-inc/spreadsheet/workbook-metadata';
+} from '@rox-one/spreadsheet/structured-references';
+import type { WorkbookSheetMetadata } from '@rox-one/spreadsheet/workbook-metadata';
 import {
   DEFAULT_COLUMN_WIDTH,
   formatCellAddress,

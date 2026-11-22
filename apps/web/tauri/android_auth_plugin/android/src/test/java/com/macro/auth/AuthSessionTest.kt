@@ -5,7 +5,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class AuthSessionTest {
-    private val expected = "macro://android-auth/123e4567-e89b-42d3-a456-426614174000"
+    private val expected = "rox://android-auth/123e4567-e89b-42d3-a456-426614174000"
     private val session = AuthSession.Pending("https://example.com/login", expected, 42)
 
     @After fun cleanup() {
@@ -26,6 +26,13 @@ class AuthSessionTest {
         assertEquals(callback, AuthSession.pending?.receivedCallback)
         assertNull(AuthSession.receive("$expected?token=duplicate"))
         assertEquals(callback, AuthSession.pending?.receivedCallback)
+    }
+
+    @Test fun acceptsACallbackPinnedToTheLegacyScheme() {
+        val legacy = session.copy(callbackUrl = expected.replace("rox://", "macro://"))
+        assertTrue(AuthSession.begin(legacy))
+        val callback = "${legacy.callbackUrl}?token=current"
+        assertEquals(callback, AuthSession.receive(callback)?.receivedCallback)
     }
 
     @Test fun absentOrFinishedSessionsCannotBeResurrectedByCallbacks() {

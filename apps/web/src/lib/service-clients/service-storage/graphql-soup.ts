@@ -45,8 +45,8 @@ import {
 import { getBrowserTursoCacheRolloutDecision } from '@graphql-cache/rollout';
 import { getOrCreateCacheScope } from '@graphql-cache/scope';
 import { classifyCacheError } from '@graphql-cache/telemetry';
-import { TauriWebSocketWrapper } from '@macro-inc/collaboration/websocket/platform/tauri-websocket';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { TauriWebSocketWrapper } from '@rox-one/collaboration/websocket/platform/tauri-websocket';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { notificationStateFromGraphql } from '@notifications/notification-state';
 import { localDraftQueueLifecycle } from '@queries/email/local-drafts';
 import { getMacroApiToken } from '@service-auth/fetch';
@@ -416,7 +416,7 @@ async function sendGraphqlTransportRequest(
     const transportInit: RequestInit = {
       ...requestInit,
       headers: mergeHeaders(requestInit?.headers, traceHeaders, {
-        'x-macro-mail-cache-profile': mail.profile,
+        'x-rox-mail-cache-profile': mail.profile,
       }),
     };
     span.event('request_dispatch');

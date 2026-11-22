@@ -1,10 +1,10 @@
 use super::*;
-use macro_sync_service_jwt::session::{SurfaceClaims, SurfaceSessionKind};
+use rox_sync_service_jwt::session::{SurfaceClaims, SurfaceSessionKind};
 
 const ID: &str = "01952cbd-76ad-7a65-9c21-020304050607";
 
 fn surface_token() -> String {
-    macro_sync_service_jwt::session::encode_surface(
+    rox_sync_service_jwt::session::encode_surface(
         &SurfaceClaims {
             session_kind: SurfaceSessionKind::Surface,
             surface_id: ID.parse().unwrap(),
@@ -12,7 +12,7 @@ fn surface_token() -> String {
             access_level: SurfaceAccessLevel::Edit,
             actor: None,
             exp: usize::MAX / 2,
-            iss: macro_sync_service_jwt::ISSUER.into(),
+            iss: rox_sync_service_jwt::ISSUER.into(),
         },
         "secret",
     )
@@ -22,7 +22,7 @@ fn surface_token() -> String {
 
 #[test]
 fn same_uuid_does_not_authorize_another_session_kind() {
-    let document = macro_sync_service_jwt::encode(
+    let document = rox_sync_service_jwt::encode(
         &serde_json::json!({"document_id": ID, "access_level": "edit", "exp": usize::MAX / 2}),
         "secret",
     )
@@ -56,7 +56,7 @@ fn dual_kind_document_claims_are_rejected() {
             .as_object_mut()
             .unwrap()
             .extend(extra.as_object().unwrap().clone());
-        let token = macro_sync_service_jwt::encode(&claims, "secret").unwrap();
+        let token = rox_sync_service_jwt::encode(&claims, "secret").unwrap();
         assert!(decode_document_token(token.as_str(), "secret").is_err());
     }
 }

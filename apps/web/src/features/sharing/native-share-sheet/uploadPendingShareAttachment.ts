@@ -12,7 +12,7 @@ import { chatRuleset, uploadFile } from '@core/util/upload';
 import type {
   PendingShareFile,
   UploadPendingShareFileArgs,
-} from '@macro/tauri';
+} from '@rox/tauri';
 
 export type PendingShareUploadResult = 'uploaded' | 'skipped' | 'failed';
 

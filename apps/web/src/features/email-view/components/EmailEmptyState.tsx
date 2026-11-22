@@ -18,64 +18,64 @@ const EMAIL_DOCS_URL = `${DOCS_BASE}/product/email`;
 function tabCopy(tab: EmailTab): { title: string; description: string } {
   return match(tab)
     .with('important', () => ({
-      title: 'Inbox zero',
+      title: 'Входящие разобраны',
       description:
-        "You're all caught up. New email will appear here as it arrives.",
+        'Новых писем нет. Письма появятся здесь, как только придут.',
     }))
     .with('noise', () => ({
-      title: 'No noise',
+      title: 'Шума нет',
       description:
-        'Low-priority email like newsletters and notifications collects here. Nothing to clear right now.',
+        'Сюда собирается почта без приоритета: рассылки и уведомления. Сейчас разбирать нечего.',
     }))
     .with('favorites', () => ({
-      title: 'No favorite emails',
-      description: 'Star an email to keep it here for easy access.',
+      title: 'Избранных писем нет',
+      description: 'Отметьте письмо звёздочкой, чтобы оно всегда было под рукой.',
     }))
     .with('sent', () => ({
-      title: 'No sent email',
-      description: 'Email you send will appear here.',
+      title: 'Отправленных писем нет',
+      description: 'Здесь появятся письма, которые вы отправите.',
     }))
     .with('scheduled', () => ({
-      title: 'No scheduled email',
-      description: 'Email you schedule to send later will appear here.',
+      title: 'Отложенных писем нет',
+      description: 'Здесь появятся письма, отправку которых вы отложите.',
     }))
     .with('reminders', () => ({
-      title: 'No email reminders',
-      description: 'Use Remind me on an email to return to it later.',
+      title: 'Напоминаний о письмах нет',
+      description: 'Нажмите «Напомнить» в письме, чтобы вернуться к нему позже.',
     }))
     .with('calendar', () => ({
-      title: 'No calendar email',
-      description: 'Invitations and event updates will appear here.',
+      title: 'Писем календаря нет',
+      description: 'Здесь появятся приглашения и изменения событий.',
     }))
     .with('drafts', () => ({
-      title: 'No drafts',
-      description: "Email you start but haven't sent will appear here.",
+      title: 'Черновиков нет',
+      description: 'Здесь появятся письма, которые вы начали, но ещё не отправили.',
     }))
     .with('shared', () => ({
-      title: 'No shared email',
-      description: 'Threads teammates share with you will appear here.',
+      title: 'Писем, которыми поделились, нет',
+      description: 'Здесь появятся переписки, которыми с вами поделятся коллеги.',
     }))
     .with('archived', () => ({
-      title: 'No archived email',
-      description: 'Email you archive will appear here.',
+      title: 'Архив пуст',
+      description: 'Здесь появятся письма, которые вы отправите в архив.',
     }))
     .with('focus', () => ({
-      title: "You're caught up",
-      description: `Email worth your attention from the last ${FOCUS_WINDOW_DAYS} days appears here.`,
+      title: 'Всё разобрано',
+      description: `Здесь показывается почта, достойная внимания, за последние ${FOCUS_WINDOW_DAYS} дней.`,
     }))
     .with('spam', () => ({
-      title: 'No spam',
+      title: 'Спама нет',
       description:
-        'Email marked as spam or junk in your connected inboxes appears here.',
+        'Здесь появляются письма, помеченные как спам или нежелательные во входящих, которые вы подключили.',
     }))
     .with('trash', () => ({
-      title: 'Trash is empty',
+      title: 'Корзина пуста',
       description:
-        'Deleted email from your connected inboxes appears here until it is permanently removed.',
+        'Здесь лежат удалённые письма из подключённых входящих, пока их не удалят окончательно.',
     }))
     .with('all', () => ({
-      title: 'No email yet',
-      description: 'Everything in your inbox will appear here as it arrives.',
+      title: 'Писем пока нет',
+      description: 'Всё, что придёт во входящие, появится здесь.',
     }))
     .exhaustive();
 }
@@ -98,13 +98,13 @@ export function EmailEmptyState() {
         <EmptyStatePanel
           centered
           graphic={EmptyStateEmailGraphic}
-          title="Connect your email"
-          description="Bring your inbox into Rox to triage signal from noise, reply faster, and let agents work alongside your mail."
+          title="Подключите почту"
+          description="Перенесите входящие в Rox, чтобы отделять важное от остального, отвечать быстрее и работать с письмами вместе с агентами."
           primaryAction={{
-            label: 'Connect email',
+            label: 'Подключить почту',
             onClick: () => fireAndForget(startAddInbox(), 'add-inbox'),
           }}
-          documentationUrl={EMAIL_DOCS_URL}
+          documentationLabel="Документация"
         />
       </Match>
 
@@ -112,10 +112,10 @@ export function EmailEmptyState() {
         <EmptyStatePanel
           centered
           graphic={EmptyStateInboxTrayGraphic}
-          title="No inboxes selected"
-          description="Pick at least one inbox to see its email."
+          title="Ящики не выбраны"
+          description="Выберите хотя бы один ящик, чтобы увидеть его письма."
           primaryAction={{
-            label: 'Show all inboxes',
+            label: 'Показать все ящики',
             onClick: () => setInboxIds(undefined),
           }}
         />
@@ -126,11 +126,11 @@ export function EmailEmptyState() {
           <EmptyStatePanel
             centered
             graphic={EmptyStateNoSearchMatchGraphic}
-            title={`No results for "${search()}"`}
+            title={`По запросу «${search()}» ничего не нашлось`}
             description={
               state.tab === 'focus'
-                ? 'Focus search covers subjects, senders, and previews. Try a different query.'
-                : 'Search across subjects, senders, and message content. Try a different query.'
+                ? 'Поиск по важному ищет в темах, отправителях и превью. Попробуйте другой запрос.'
+                : 'Поиск идёт по темам, отправителям и тексту писем. Попробуйте другой запрос.'
             }
             documentationUrl={`${DOCS_BASE}/product/search`}
           />
@@ -141,8 +141,8 @@ export function EmailEmptyState() {
         <EmptyStatePanel
           centered
           graphic={EmptyStateNoFilterMatchGraphic}
-          title="No email matching the filters"
-          description="Try adjusting or clearing your filters to see more results."
+          title="Под фильтры ничего не подходит"
+          description="Измените или сбросьте фильтры, чтобы увидеть больше."
         >
           <FilteredHiddenBanner
             hasHiddenItems={false}
@@ -161,7 +161,7 @@ export function EmailEmptyState() {
             primaryAction={
               state.tab === 'focus'
                 ? {
-                    label: 'See the rest of your inbox',
+                    label: 'Показать остальные входящие',
                     onClick: () => setTab('important'),
                   }
                 : undefined

@@ -329,7 +329,7 @@ impl ScenarioArgs {
         }
 
         println!("--force: running migrations");
-        macro_db_migrator::MACRO_DB_MIGRATIONS
+        rox_db_migrator::MACRO_DB_MIGRATIONS
             .run(&pool)
             .await
             .context("running migrations")?;

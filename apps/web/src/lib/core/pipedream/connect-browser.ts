@@ -23,7 +23,7 @@ export function mountPipedreamBrowserConnect(
       // Pipedream displays recoverable errors inside its own UI.
       if (event.type === 'error') return;
       ui.close();
-      const callback = new URL(`macro://${PIPEDREAM_CALLBACK_PATH}`);
+      const callback = new URL(`rox://${PIPEDREAM_CALLBACK_PATH}`);
       callback.searchParams.set('state', state);
       callback.searchParams.set(
         'outcome',

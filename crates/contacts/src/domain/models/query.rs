@@ -1,7 +1,7 @@
 //! Validated search and lookup requests for the personal directory.
 
 use super::{contact::Contact, page::MAX_CONTACT_PAGE_SIZE};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashSet;
 use subsequence_match::{MAX_QUERY_BYTES, normalize_text, subsequence_score};
 
@@ -106,12 +106,12 @@ impl ContactSearch {
 
 /// A bounded, deduplicated set of requested user IDs, in first-requested order.
 #[derive(Clone)]
-pub struct ContactLookup(Vec<MacroUserIdStr<'static>>);
+pub struct ContactLookup(Vec<RoxUserIdStr<'static>>);
 
 impl ContactLookup {
     /// Bound the raw request before deduplication. Empty input means no results,
     /// never an unrestricted directory listing.
-    pub fn new(mut ids: Vec<MacroUserIdStr<'static>>) -> Option<Self> {
+    pub fn new(mut ids: Vec<RoxUserIdStr<'static>>) -> Option<Self> {
         if ids.len() > usize::from(MAX_CONTACT_PAGE_SIZE) {
             return None;
         }
@@ -121,7 +121,7 @@ impl ContactLookup {
     }
 
     /// Requested IDs; repository implementations must check membership before enrichment.
-    pub fn ids(&self) -> &[MacroUserIdStr<'static>] {
+    pub fn ids(&self) -> &[RoxUserIdStr<'static>] {
         &self.0
     }
 }

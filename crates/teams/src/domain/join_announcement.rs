@@ -9,9 +9,9 @@ mod test;
 
 use std::collections::HashSet;
 
-use macro_user_id::{cowlike::CowLike, email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, email::EmailStr, user_id::RoxUserIdStr};
 use model_entity::EntityType;
-use model_notifications::ColleagueJoinedMacro;
+use model_notifications::ColleagueJoinedRox;
 use notification::domain::{models::SendNotificationRequestBuilder, service::NotificationIngress};
 use rootcause::Report;
 use uuid::Uuid;
@@ -30,11 +30,11 @@ pub struct AnnounceJoin {
     /// The team the user joined.
     pub team_id: Uuid,
     /// The user who joined.
-    pub joined: MacroUserIdStr<'static>,
+    pub joined: RoxUserIdStr<'static>,
     /// The joined user's display name from an untrusted source.
     pub joined_name: Option<String>,
     /// Possible recipients. They may include `joined` and duplicates.
-    pub candidates: Vec<MacroUserIdStr<'static>>,
+    pub candidates: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Counts from one announcement. It never carries addresses.
@@ -60,7 +60,7 @@ pub enum JoinAnnouncementError {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ClaimedJoinEmail {
     /// The colleague to email.
-    pub recipient: MacroUserIdStr<'static>,
+    pub recipient: RoxUserIdStr<'static>,
     /// The name of the team.
     pub team_name: String,
 }
@@ -74,7 +74,7 @@ pub trait JoinAnnouncementRepository: Send + Sync + 'static {
     fn claim(
         &self,
         team_id: Uuid,
-        candidates: &[MacroUserIdStr<'static>],
+        candidates: &[RoxUserIdStr<'static>],
         team_limit: u32,
     ) -> impl Future<Output = Result<Vec<ClaimedJoinEmail>, Report<JoinAnnouncementError>>> + Send;
 
@@ -82,7 +82,7 @@ pub trait JoinAnnouncementRepository: Send + Sync + 'static {
     fn release(
         &self,
         team_id: Uuid,
-        recipient: &MacroUserIdStr<'_>,
+        recipient: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), Report<JoinAnnouncementError>>> + Send;
 }
 
@@ -114,7 +114,7 @@ impl<R, N> JoinAnnouncementServiceImpl<R, N> {
     }
 }
 
-fn idempotent_notification_id(team_id: Uuid, recipient: &MacroUserIdStr<'_>) -> Uuid {
+fn idempotent_notification_id(team_id: Uuid, recipient: &RoxUserIdStr<'_>) -> Uuid {
     Uuid::new_v5(
         &NOTIFICATION_ID_NAMESPACE,
         format!("{team_id}:{}", recipient.email_str()).as_bytes(),
@@ -157,7 +157,7 @@ where
                     secondary_notification_entity: None,
                     sender_id: Some(joined.clone()),
                     recipient_ids: HashSet::from([recipient.clone()]),
-                    notification: ColleagueJoinedMacro {
+                    notification: ColleagueJoinedRox {
                         team_name,
                         joined_by: joined.clone(),
                         joined_name: joined_name.clone(),

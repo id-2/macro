@@ -1,16 +1,16 @@
 use super::*;
 use crate::domain::{
-    events::{WebhookDeletedMetadata, WebhookMacroEvent, WebhookTopicEvent},
+    events::{WebhookDeletedMetadata, WebhookRoxEvent, WebhookTopicEvent},
     ingestion::WebhookEventIngestionError,
 };
 use call::domain::notification_events::{CallNotificationEvent, CallNotificationMetadata};
 use channel_sender::ChannelSender;
 use channels::domain::broker_events::{ChannelDeletedMetadata, ChannelTopicEvent};
 use documents::domain::events::{DocumentDeletedMetadata, DocumentTopicEvent};
-use macro_event_broker::{
-    Event, EventBrokerError, MacroEvent as _, MacroEventCollection as _, MessageParts,
+use rox_event_broker::{
+    Event, EventBrokerError, RoxEvent as _, RoxEventCollection as _, MessageParts,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use std::sync::atomic::{AtomicU32, Ordering};
 use uuid::Uuid;
@@ -34,8 +34,8 @@ impl MessageParts for TestMessage<'_> {
     }
 }
 
-fn decode_message(topic: &str, payload: &[u8]) -> Result<DeclaredMacroEvent, EventBrokerError> {
-    DeclaredMacroEvent::decode(&TestMessage { topic, payload })
+fn decode_message(topic: &str, payload: &[u8]) -> Result<DeclaredRoxEvent, EventBrokerError> {
+    DeclaredRoxEvent::decode(&TestMessage { topic, payload })
 }
 
 fn document_event() -> Event<DocumentTopicEvent> {
@@ -53,19 +53,19 @@ fn webhook_event() -> Event<WebhookTopicEvent> {
     Event::new(WebhookTopicEvent::Deleted(WebhookDeletedMetadata {
         webhook_id: "wh_1".to_string(),
         workspace_id: "macro|owner@example.com".to_string(),
-        actor_user_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string())
+        actor_user_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string())
             .expect("valid user id"),
     }))
 }
 
-fn declared_webhook_event() -> DeclaredMacroEvent {
-    DeclaredMacroEvent::WebhookMacroEvent(WebhookMacroEvent::with_event("wh_1", webhook_event()))
+fn declared_webhook_event() -> DeclaredRoxEvent {
+    DeclaredRoxEvent::WebhookRoxEvent(WebhookRoxEvent::with_event("wh_1", webhook_event()))
 }
 
 #[test]
 fn subscribes_to_all_ingestion_topics() {
     assert_eq!(
-        DeclaredMacroEvent::topics(),
+        DeclaredRoxEvent::topics(),
         [
             "macro.documents",
             "macro.channels",
@@ -90,7 +90,7 @@ fn decodes_call_notifications() {
 
     let decoded = decode_message("macro.call_notifications", &payload).expect("decodable");
     match decoded {
-        DeclaredMacroEvent::CallNotificationMacroEvent(decoded) => {
+        DeclaredRoxEvent::CallNotificationRoxEvent(decoded) => {
             assert_eq!(decoded.event(), &event);
         }
         _ => panic!("decoded into the wrong topic variant"),
@@ -105,7 +105,7 @@ fn decodes_document_events() {
     let decoded = decode_message("macro.documents", &payload).expect("decodable");
 
     match decoded {
-        DeclaredMacroEvent::DocumentMacroEvent(decoded) => assert_eq!(decoded.event(), &event),
+        DeclaredRoxEvent::DocumentRoxEvent(decoded) => assert_eq!(decoded.event(), &event),
         _ => panic!("decoded into the wrong topic variant"),
     }
 }
@@ -122,7 +122,7 @@ fn decodes_channel_events() {
     let decoded = decode_message("macro.channels", &payload).expect("decodable");
 
     match decoded {
-        DeclaredMacroEvent::ChannelMacroEvent(decoded) => assert_eq!(decoded.event(), &event),
+        DeclaredRoxEvent::ChannelRoxEvent(decoded) => assert_eq!(decoded.event(), &event),
         _ => panic!("decoded into the wrong topic variant"),
     }
 }
@@ -135,7 +135,7 @@ fn decodes_webhook_events() {
     let decoded = decode_message("macro.webhooks", &payload).expect("decodable");
 
     match decoded {
-        DeclaredMacroEvent::WebhookMacroEvent(decoded) => assert_eq!(decoded.event(), &event),
+        DeclaredRoxEvent::WebhookRoxEvent(decoded) => assert_eq!(decoded.event(), &event),
         _ => panic!("decoded into the wrong topic variant"),
     }
 }
@@ -189,7 +189,7 @@ impl FlakyIngestionService {
 impl WebhookEventIngestionService for FlakyIngestionService {
     async fn ingest_call_notification_event(
         &self,
-        _event: macro_event_broker::Event<call::domain::notification_events::CallNotificationEvent>,
+        _event: rox_event_broker::Event<call::domain::notification_events::CallNotificationEvent>,
     ) -> Result<(), WebhookEventIngestionError> {
         self.ingest()
     }

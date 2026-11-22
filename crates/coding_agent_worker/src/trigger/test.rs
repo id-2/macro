@@ -31,8 +31,8 @@ fn test_session() -> AgentSessionId {
     AgentSessionId::new_from_uuid(Uuid::from_u128(0xA))
 }
 
-fn sender() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("asker@example.com").unwrap()
+fn sender() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("asker@example.com").unwrap()
 }
 
 /// A channel post in the channel-only shape channel triggers travel in.

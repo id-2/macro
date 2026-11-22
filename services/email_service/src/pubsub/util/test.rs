@@ -1,8 +1,8 @@
 use email::domain::mailbox::inbox_sync::build_notification_recipients;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
-fn id(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).expect("valid macro user id")
+fn id(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).expect("valid macro user id")
 }
 
 #[test]

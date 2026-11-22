@@ -1,3 +1,5 @@
+import { t } from '@app/lib/i18n';
+
 export type UsageSummary = {
   monthlyPercent: number;
   periodEnd: string;
@@ -70,21 +72,27 @@ export function validateAutoReload(
   settings: AutoReloadSettings
 ): string | undefined {
   if (settings.minimumBalanceCents <= 0)
-    return 'Enter a minimum balance greater than $0.';
+    return t('settingsUsage.minimumInvalid');
   if (
     settings.targetBalanceCents <
     settings.minimumBalanceCents + MIN_RELOAD_CENTS
   ) {
-    return `Target balance must be greater than minimum balance by at least ${formatCreditBalance(MIN_RELOAD_CENTS)}.`;
+    return t('settingsUsage.targetTooSmall', {
+      amount: formatCreditBalance(MIN_RELOAD_CENTS),
+    });
   }
   if (settings.targetBalanceCents > MAX_TARGET_BALANCE_CENTS) {
-    return `Target balance can be at most ${formatCreditBalance(MAX_TARGET_BALANCE_CENTS)}.`;
+    return t('settingsUsage.targetTooLarge', {
+      amount: formatCreditBalance(MAX_TARGET_BALANCE_CENTS),
+    });
   }
   if (
     settings.monthlySpendLimitCents !== null &&
     settings.monthlySpendLimitCents < MIN_MONTHLY_SPEND_LIMIT_CENTS
   ) {
-    return `Monthly spend limit must be at least ${formatCreditBalance(MIN_MONTHLY_SPEND_LIMIT_CENTS)}, or leave it blank.`;
+    return t('settingsUsage.spendLimitTooSmall', {
+      amount: formatCreditBalance(MIN_MONTHLY_SPEND_LIMIT_CENTS),
+    });
   }
 }
 

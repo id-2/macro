@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 fn link() -> Uuid {
     Uuid::parse_str("00000000-0000-0000-0000-000000000f01").unwrap()

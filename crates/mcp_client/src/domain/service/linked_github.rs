@@ -20,7 +20,7 @@ use oauth2::{AccessToken, StandardTokenResponse};
 use rmcp::transport::auth::VendorExtraTokenFields;
 
 use crate::domain::models::{
-    GITHUB_MCP_SERVER_URL, MacroUserIdStr, McpServerRecord, StoredCredentials,
+    GITHUB_MCP_SERVER_URL, RoxUserIdStr, McpServerRecord, StoredCredentials,
 };
 use crate::domain::ports::{LinkedGithubTokens, McpServerStore};
 
@@ -71,7 +71,7 @@ impl<S> WithLinkedGithub<S> {
 
     /// The link's token, or `None` when unlinked. A failed lookup reads as
     /// unlinked: GitHub goes missing rather than every server failing.
-    async fn linked_token(&self, user_id: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn linked_token(&self, user_id: &RoxUserIdStr<'static>) -> Option<String> {
         let tokens = self.tokens.as_ref()?;
         tokens
             .access_token(user_id)
@@ -97,7 +97,7 @@ impl<S: McpServerStore> McpServerStore for WithLinkedGithub<S> {
 
     async fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         let stored = self.inner.load(user_id, server_url).await?;
@@ -112,7 +112,7 @@ impl<S: McpServerStore> McpServerStore for WithLinkedGithub<S> {
 
     async fn delete(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<(), Self::Err> {
         self.inner.delete(user_id, server_url).await
@@ -120,7 +120,7 @@ impl<S: McpServerStore> McpServerStore for WithLinkedGithub<S> {
 
     async fn list(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         let mut records = self.inner.list(user_id).await?;
         let Some(token) = self.linked_token(user_id).await else {
@@ -139,7 +139,7 @@ impl<S: McpServerStore> McpServerStore for WithLinkedGithub<S> {
 /// and enabled toggle.
 fn with_link(
     stored: Option<McpServerRecord>,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     token: String,
 ) -> McpServerRecord {
     let mut record = stored.unwrap_or_else(|| McpServerRecord {

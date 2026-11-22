@@ -7,7 +7,7 @@ use entity_access::{
     domain::{models::OwnerAccessLevel, ports::EntityAccessService},
     inbound::axum_extractors::ProjectAccessLevelExtractor,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model::{
     project::BasicProject,
     response::{GenericSuccessResponse, SuccessResponse},
@@ -39,7 +39,7 @@ pub async fn revert_delete_project_handler<T, Svc, Auth>(
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let service = Arc::clone(&state.service);
     let receipt = access.entity_access_receipt;

@@ -334,22 +334,9 @@ test('a personal address refers friends instead of creating a team', async ({
   );
 });
 
-test('staff can bypass onboarding from any step', async ({ page }) => {
-  await openFixture(page, '/?view=flow', {
-    viewer: {
-      id: 'macro|wolf@rox.one',
-      email: 'wolf@rox.one',
-      tutorialComplete: false,
-      licensed: false,
-    },
-  });
-  await expect(heading(page, 'Create your workspace')).toBeVisible();
-  await page.getByRole('button', { name: 'Bypass' }).click();
-  await expectLanded(page, 'Entered Rox at /home');
-  expect((await fakeWorld(page)).record.status).toBe('completed');
-});
-
-test('a finished user is sent straight into the app', async ({ page }) => {
+test('a finished account walks the flow again when it opens the page', async ({
+  page,
+}) => {
   await openFixture(page, '/?view=flow&next=/md/doc', {
     viewer: {
       id: 'macro|ada@acme.com',
@@ -358,7 +345,9 @@ test('a finished user is sent straight into the app', async ({ page }) => {
       licensed: false,
     },
   });
-  await expectLanded(page, 'Entered Rox at /md/doc');
+  // Onboarding is no longer an automatic gate, so opening it is the only way
+  // in — and a finished account gets the same first screen a new one does.
+  await expect(heading(page, 'Выберите своё имя в Rox.')).toBeVisible();
 });
 
 test.describe('with motion', () => {

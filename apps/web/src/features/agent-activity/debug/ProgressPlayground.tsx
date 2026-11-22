@@ -20,7 +20,7 @@ import {
   type AgentChatReplyBody,
   type AgentReplySegment,
   composeAgentChatReply,
-} from '@macro-inc/lexical-core/utils/agent-chat-reply';
+} from '@rox-one/lexical-core/utils/agent-chat-reply';
 import type {
   ActivityRow,
   FoldedMessage,
@@ -68,7 +68,7 @@ const DOC_NOTES = '4a4886d8-9f4b-4f7e-a5a3-3f5c8b6c0e48';
 
 // The harness's closing lines (agent_harness `channel_announcer`).
 const CANCELLED_FALLBACK = 'I stopped before finishing that.';
-const ERROR_FALLBACK = 'Sorry — I ran into an error while responding.';
+const ERROR_FALLBACK = 'Не получилось ответить — произошла ошибка.';
 
 function tool(
   id: string,

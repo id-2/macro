@@ -15,15 +15,15 @@ import { formatEmailDate } from '@core/util/date';
 import { $generateHtmlFromNodes, $generateNodesFromDOM } from '@lexical/html';
 import { $createQuoteNode, $isQuoteNode } from '@lexical/rich-text';
 import { $dfsIterator } from '@lexical/utils';
-import { type ImagePolicy, sanitizeEmailHtml } from '@macro-inc/email-renderer';
-import type { DocumentMentionInfo } from '@macro-inc/lexical-core';
+import { type ImagePolicy, sanitizeEmailHtml } from '@rox-one/email-renderer';
+import type { DocumentMentionInfo } from '@rox-one/lexical-core';
 import {
   $createClassedBlockNode,
   $createDocumentMentionNode,
   $createHtmlRenderNode,
   $isClassedBlockNode,
   type ClassedBlockNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $addUpdateTag,
   $createLineBreakNode,
@@ -575,11 +575,11 @@ export function hasDraftContent(
   );
 }
 
-export function prepareMacroBody(bodyMacro: string): string {
+export function prepareRoxBody(bodyRox: string): string {
   // Remove appended-quote blocks from the markdown string
-  // We want these in the HTML, but not in body_macro
+  // We want these in the HTML, but not in body_rox
   // TODO (seamus + peter) Add logic for binding a markdown signal that skips certain transforms
-  return bodyMacro
+  return bodyRox
     .replace(/<m-email-thread-embed>.*?<\/m-email-thread-embed>/gs, '')
     .trim();
 }

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { Tool } from '@core/component/AI/component/tool/Tool';
 import Buildings from '@icon/system/regular/buildings.svg';
 import { For, Show } from 'solid-js';
@@ -54,7 +55,7 @@ export function ListCompaniesToolResponse(props: ListCompaniesResponse) {
     <Tool.List>
       <Show
         when={props.companies.length > 0}
-        fallback={<Tool.ListItem>No matching CRM companies.</Tool.ListItem>}
+        fallback={<Tool.ListItem>{t('crm.noMatchingCrmCompanies')}</Tool.ListItem>}
       >
         <For each={props.companies}>
           {(company) => <CompanyRow company={company} />}
@@ -68,18 +69,18 @@ export function GetCompanyToolResponse(props: GetCompanyResponse) {
   const details = () => {
     const rows: { label: string; value: string }[] = [];
     if (props.domains.length > 0) {
-      rows.push({ label: 'Domains', value: props.domains.join(', ') });
+      rows.push({ label: t('crm.domains'), value: props.domains.join(', ') });
     }
-    if (props.stage) rows.push({ label: 'Stage', value: props.stage.label });
+    if (props.stage) rows.push({ label: t('crm.stage'), value: props.stage.label });
     if (props.ownerUserId) {
-      rows.push({ label: 'Owner', value: props.ownerUserId });
+      rows.push({ label: t('crm.owner'), value: props.ownerUserId });
     }
     if (props.revenue !== undefined && props.revenue !== null) {
-      rows.push({ label: 'Revenue', value: `$${props.revenue}` });
+      rows.push({ label: t('crm.revenue'), value: `$${props.revenue}` });
     }
     rows.push({
-      label: 'Contacts',
-      value: pluralize(props.contacts.length, 'contact'),
+      label: t('crm.contacts'),
+      value: t('crm.contactCount', { count: props.contacts.length }),
     });
     return rows;
   };

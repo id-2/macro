@@ -24,7 +24,7 @@ import avatarGabriel from '../../../assets/people/gabriel.webp';
 import avatarJacob from '../../../assets/people/jacob-work.webp';
 import avatarJulia from '../../../assets/people/julia.webp';
 import avatarTeo from '../../../assets/people/teo.webp';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 
 // ---------------------------------------------------------------------------
 // The two hero panels, as DOM rather than as exported SVG.
@@ -1088,7 +1088,7 @@ function ChannelPanel(props: {
                       when={row.face}
                       fallback={
                         <span class="chh-agentface">
-                          <MacroMarkIcon
+                          <RoxMarkIcon
                             style={{
                               color: '#ff8f00',
                               height: '14px',

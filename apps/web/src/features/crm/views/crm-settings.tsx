@@ -174,10 +174,10 @@ function StageEditorRow(props: {
       )}
     >
       <Show when={sortable}>
-        <Tooltip label="Drag to reorder, or use the arrow keys">
+        <Tooltip label="Перетащите, чтобы изменить порядок, или используйте стрелки">
           <Button
             {...(sortable?.dragActivators ?? {})}
-            aria-label={`Reorder ${props.label}. Press the up or down arrow keys to move it.`}
+            aria-label={`Изменить порядок «${props.label}». Стрелки вверх и вниз перемещают этап.`}
             variant="ghost"
             size="icon-sm"
             class="-mx-1.5 cursor-grab touch-none text-ink-extra-muted active:cursor-grabbing"
@@ -190,8 +190,8 @@ function StageEditorRow(props: {
       <StageIcon id={props.id} index={props.index} />
       <InlineStageInput
         value={value()}
-        label={`Rename ${props.label}`}
-        placeholder="Stage name"
+        label={`Переименовать «${props.label}»`}
+        placeholder="Название этапа"
         onInput={(next) => props.onDraft(next)}
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
@@ -204,9 +204,9 @@ function StageEditorRow(props: {
       />
       <div class="flex shrink-0 items-center gap-0.5">
         <Show when={isEditing()}>
-          <Tooltip label="Save">
+          <Tooltip label="Сохранить">
             <Button
-              aria-label="Save stage name"
+              aria-label="Сохранить название этапа"
               variant="primary"
               size="icon-sm"
               disabled={props.pending || !hasChanged()}
@@ -220,9 +220,9 @@ function StageEditorRow(props: {
               </Show>
             </Button>
           </Tooltip>
-          <Tooltip label="Cancel">
+          <Tooltip label="Отмена">
             <Button
-              aria-label="Cancel rename"
+              aria-label="Отменить переименование"
               variant="ghost"
               size="icon-sm"
               disabled={props.pending}
@@ -233,9 +233,9 @@ function StageEditorRow(props: {
           </Tooltip>
         </Show>
         <Show when={reorderMode === 'buttons'}>
-          <Tooltip label="Move up">
+          <Tooltip label="Выше">
             <Button
-              aria-label={`Move ${props.label} up`}
+              aria-label={`Переместить «${props.label}» выше`}
               variant="ghost"
               size="icon-sm"
               disabled={props.pending || isFirst()}
@@ -244,9 +244,9 @@ function StageEditorRow(props: {
               <CaretUpIcon class="size-4" />
             </Button>
           </Tooltip>
-          <Tooltip label="Move down">
+          <Tooltip label="Ниже">
             <Button
-              aria-label={`Move ${props.label} down`}
+              aria-label={`Переместить «${props.label}» ниже`}
               variant="ghost"
               size="icon-sm"
               disabled={props.pending || isLast()}
@@ -258,11 +258,11 @@ function StageEditorRow(props: {
         </Show>
         <Tooltip
           label={
-            isLastStage() ? 'At least one stage is required' : 'Delete stage'
+            isLastStage() ? 'Нужен хотя бы один этап' : 'Удалить этап'
           }
         >
           <Button
-            aria-label={`Delete ${props.label}`}
+            aria-label={`Удалить «${props.label}»`}
             variant="ghost"
             size="icon-sm"
             class="text-ink-extra-muted not-touch:hover:text-failure"
@@ -334,16 +334,16 @@ function StagesSection() {
   const editing = () => dealStages.isCustomized() && canEdit();
   const description = () => {
     const scope =
-      'The Stage options on companies. New pipelines start with these stages.';
+      'Варианты этапа у компаний. Новые воронки начинаются с этих этапов.';
     if (loading() || canEdit()) return scope;
     return crmPermissions.permissions().editStages === 'owner'
-      ? `${scope} Only the team owner can change them.`
-      : `${scope} Only team admins can change them.`;
+      ? `${scope} Менять их может только владелец команды.`
+      : `${scope} Менять их могут только администраторы команды.`;
   };
 
   return (
     <SettingsSection
-      title="Stages"
+      title="Этапы"
       description={description()}
       actions={
         <Show when={canEdit() && !loading() && !failed()}>
@@ -356,7 +356,7 @@ function StagesSection() {
                 disabled={pending()}
                 onClick={handleCustomize}
               >
-                <Show when={pending()} fallback="Customize">
+                <Show when={pending()} fallback="Настроить">
                   <SpinnerIcon class="size-4 animate-spin" />
                 </Show>
               </Button>
@@ -368,7 +368,7 @@ function StagesSection() {
               disabled={blocked()}
               onClick={() => setShowResetModal(true)}
             >
-              Reset to defaults
+              Вернуть по умолчанию
             </Button>
           </Show>
         </Show>
@@ -378,7 +378,7 @@ function StagesSection() {
         <Switch>
           <Match when={failed()}>
             <div class="px-4 py-4 text-sm text-ink-muted">
-              Stages could not be loaded. Reload to try again.
+              Не удалось загрузить этапы. Обновите страницу и попробуйте снова.
             </div>
           </Match>
           <Match when={loading()}>
@@ -409,8 +409,8 @@ function StagesSection() {
               <PlusIcon class="size-3.5 shrink-0 text-ink-muted" />
               <InlineStageInput
                 value={newStageName()}
-                label="New stage name"
-                placeholder="Add stage"
+                label="Название нового этапа"
+                placeholder="Добавить этап"
                 onInput={setNewStageName}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter') handleAddStage();
@@ -423,7 +423,7 @@ function StagesSection() {
                 disabled={newStageName().trim() === '' || pending()}
                 onClick={handleAddStage}
               >
-                Add
+                Добавить
               </Button>
             </div>
           </Match>
@@ -443,19 +443,19 @@ function StagesSection() {
       <ConfirmDialog
         open={!!stageToDelete()}
         onOpenChange={(open) => !open && setStageToDelete(null)}
-        title="Delete stage"
+        title="Удалить этап"
         tone="danger"
-        confirmLabel="Delete"
+        confirmLabel="Удалить"
         pending={replaceMutation.isPending}
         onConfirm={handleDeleteStage}
         body={
           <>
-            Companies at{' '}
+            Компании на этапе{' '}
             <span class="font-medium text-ink">
               {stageToDelete()?.label ?? ''}
             </span>{' '}
-            lose their stage and show under No stage. Pipelines keep their own
-            stages.
+            теряют этап и показываются в «Без этапа». У воронок остаются свои
+            этапы.
           </>
         }
       />
@@ -463,16 +463,16 @@ function StagesSection() {
       <ConfirmDialog
         open={showResetModal()}
         onOpenChange={setShowResetModal}
-        title="Reset stages"
+        title="Сбросить этапы"
         tone="danger"
-        confirmLabel="Reset to defaults"
+        confirmLabel="Вернуть по умолчанию"
         pending={resetMutation.isPending}
         onConfirm={handleReset}
         body={
           <>
-            Your team returns to Rox's default stages. Companies keep their
-            stored stage values, and stages whose names match a default display
-            as before.
+            Команда возвращается к этапам Rox по умолчанию. У компаний
+            сохраняются записанные значения этапов, а этапы с теми же
+            названиями отображаются как раньше.
           </>
         }
       />
@@ -490,7 +490,7 @@ function NoTeamState() {
       <SettingsSection>
         <SettingsCard>
           <div class="px-6 py-8 text-center text-sm text-ink-muted">
-            Join or create a team to set up the CRM.
+            Создайте команду или вступите в неё, чтобы настроить CRM.
           </div>
         </SettingsCard>
       </SettingsSection>
@@ -505,7 +505,7 @@ function CrmContent(props: { onOpenThread?: () => void }) {
     <Show when={teamQuery.data} fallback={<NoTeamState />}>
       <SettingsPage
         title="CRM"
-        description="Manage email sharing and shape your team’s deal pipeline."
+        description="Управляйте передачей почты и настройте воронку сделок команды."
       >
         <CrmEmailPrivacySettings onOpenThread={props.onOpenThread} />
         <StagesSection />

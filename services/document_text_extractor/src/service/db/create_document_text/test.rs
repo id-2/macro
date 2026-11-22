@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 async fn check(pool: &Pool<Postgres>, document_id: &str, expected: DocumentTextOutcome) {
     let outcome = create_document_text(pool.clone(), document_id, "extracted text", 2)

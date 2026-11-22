@@ -1,9 +1,9 @@
 //! Implementation of GW port using the ConnectionGatewayClient
 
 use connection_gateway_client::ConnectionGatewayClient;
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 
 use crate::domain::{
@@ -31,7 +31,7 @@ impl ConnectionGateway for ConnectionGatewayImpl {
     #[tracing::instrument(skip(self), err)]
     async fn bulk_send_invalidation_event<'a, T: std::fmt::Debug + serde::Serialize + Send>(
         &self,
-        users: &[MacroUserId<Lowercase<'a>>],
+        users: &[RoxUserId<Lowercase<'a>>],
         invalidation_event: InvalidationEvent<'a, T>,
     ) -> Result<(), Self::Err> {
         let message = serde_json::to_value(&invalidation_event)?;
@@ -54,7 +54,7 @@ impl ConnectionGateway for ConnectionGatewayImpl {
     #[tracing::instrument(skip(self, message), err)]
     async fn batch_send_message<'a>(
         &self,
-        users: &[MacroUserIdStr<'a>],
+        users: &[RoxUserIdStr<'a>],
         message_type: &str,
         message: serde_json::Value,
     ) -> Result<(), Self::Err> {

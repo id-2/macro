@@ -24,7 +24,7 @@ mod test;
 const GATEWAY_PATH_PREFIX: &str = "/convert";
 
 pub async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
-    let cors = macro_cors::cors_layer();
+    let cors = rox_cors::cors_layer();
 
     let port = state.config.port;
     let env = state.config.environment;
@@ -67,7 +67,7 @@ fn api_router() -> Router<ApiContext> {
             .nest("/convert", convert::router())
             .nest("/backfill", backfill::router())
             .layer(ServiceBuilder::new().layer(axum::middleware::from_fn(
-                macro_middleware::connection_drop_prevention_handler,
+                rox_middleware::connection_drop_prevention_handler,
             ))),
     )
 }

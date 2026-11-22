@@ -2,7 +2,7 @@ use super::*;
 use std::sync::Mutex;
 
 use ai_toolset::{ToolSet, schema::generate_validated_input_schema};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use uuid::Uuid;
 
@@ -78,7 +78,7 @@ impl CalendarTeamService for FakeService {
 
 fn request() -> RequestContext {
     RequestContext::new(
-        MacroUserIdStr::try_from("macro|requester@example.com".to_string()).unwrap(),
+        RoxUserIdStr::try_from("macro|requester@example.com".to_string()).unwrap(),
     )
 }
 

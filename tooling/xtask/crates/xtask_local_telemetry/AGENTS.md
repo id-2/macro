@@ -3,7 +3,7 @@
 ## What it is
 
 Local build timings for `just run_local`, `just stack` and `cargo x build-services`.
-Off unless `MACRO_LOCAL_TELEMETRY` is explicitly on. Unset means off, and this
+Off unless `ROX_LOCAL_TELEMETRY` is explicitly on. Unset means off, and this
 runner does not create a settings file and does not write `services = true`.
 The foreign Grafana copy stays off. When a caller has already opted in, each
 run, step, build and service health wait can become one Loki line
@@ -14,7 +14,7 @@ and sends it only when the switch and the settings file both allow it.
 ## Start here
 
 - `src/lib.rs`: `Recorder` (start, record, finish) and the buffer line format.
-- `src/config.rs`: the settings file, the `MACRO_LOCAL_TELEMETRY`/`CI` switch,
+- `src/config.rs`: the settings file, the `ROX_LOCAL_TELEMETRY`/`CI` switch,
   and the Doppler provisioning command.
 - `src/provision.rs`: writing the settings file from Doppler, backoff, the hint.
 - `src/sender.rs`: the background thread, retries, and left-behind files.
@@ -37,7 +37,7 @@ and sends it only when the switch and the settings file both allow it.
 
 ## Gotchas
 
-- Unset `MACRO_LOCAL_TELEMETRY` is off for this runner. Off also means an
+- Unset `ROX_LOCAL_TELEMETRY` is off for this runner. Off also means an
   explicit opt-out, `CI`, or provisioning failed within the hour.
   `Recorder::start` returns `None` before creating anything; keep every new path
   behind it, so an off run makes no file, no request and no Doppler call.

@@ -42,8 +42,8 @@ pub(crate) struct LoginQueryParams {
 }
 
 pub(crate) fn is_allowed_original_url(url: &Url) -> bool {
-    let local_origin = match macro_env::Environment::new_or_prod() {
-        macro_env::Environment::Local => Some(crate::api::utils::default_redirect_url()),
+    let local_origin = match rox_env::Environment::new_or_prod() {
+        rox_env::Environment::Local => Some(crate::api::utils::default_redirect_url()),
         _ => None,
     };
     is_allowed_original_url_with_local_origin(url, local_origin.as_ref())
@@ -65,9 +65,24 @@ fn is_allowed_original_url_with_local_origin(url: &Url, local_origin: Option<&Ur
         "macro" => true,
         "tauri" => url.host_str() == Some("localhost"),
         "http" => matches!(url.host_str(), Some("localhost" | "tauri.localhost")),
+        // The web app's own hosts, in every deployment (see the shared CORS
+        // origins): the Outlook admin-consent return URL is built from
+        // `location.origin`, so whatever host the app is served from has to be
+        // allowed here or the provider read fails with 400. Enumerated rather
+        // than a `*.rox.one` wildcard: a preview subdomain is not the app.
         "https" => matches!(
             url.host_str(),
-            Some("localhost" | "tauri.localhost" | "dev.rox.one" | "rox.one" | "www.rox.one")
+            Some(
+                "localhost"
+                    | "tauri.localhost"
+                    | "dev.rox.one"
+                    | "rox.one"
+                    | "www.rox.one"
+                    | "app.rox.one"
+                    | "app-dev.rox.one"
+                    | "app-staging.rox.one"
+                    | "app-prod.rox.one"
+            )
         ),
         _ => false,
     }

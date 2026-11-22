@@ -9,7 +9,7 @@ axum = [
   "dep:axum",
   "dep:axum-extra",
   "dep:ip_extractor",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:model_user",
   "dep:tower",
@@ -32,11 +32,11 @@ uuid = { workspace = true }
 
 # Domain models
 invite_email = { path = "../invite_email" }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = [
   "axum",
 ] }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid" }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid" }
 model-entity = { path = "../model-entity" }
 notification = { path = "../notification" }
 rate_limit = { path = "../rate_limit", features = ["axum"] }
@@ -58,7 +58,7 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 http-body-util = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 mockall = { workspace = true }
 rate_limit = { path = "../rate_limit", features = ["axum", "testing"] }
 serde_json = { workspace = true }

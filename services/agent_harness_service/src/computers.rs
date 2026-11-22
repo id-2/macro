@@ -21,7 +21,7 @@ use harnesses::domain::service::HarnessServiceImpl;
 use hosted_runtimes::domain::enrollment::{Deployment, DeploymentSource, DeploymentUnavailable};
 use hosted_runtimes::domain::models::{Computer, ControlPlaneId};
 use hosted_runtimes::domain::operator::ComputerOperator;
-use hosted_runtimes::domain::operator::MacrodConnected;
+use hosted_runtimes::domain::operator::RoxdConnected;
 use hosted_runtimes::domain::ports::{DefaultAgent, Harnesses, HostedPairing};
 use hosted_runtimes::domain::service::SystemClock;
 use hosted_runtimes::outbound::configured_fleet::ConfiguredFleet;
@@ -223,7 +223,7 @@ impl DeploymentSource for ServiceDeployment {
 }
 
 fn resolve_deployment() -> anyhow::Result<Deployment> {
-    use macro_service_urls::{
+    use rox_service_urls::{
         AgentHarnessEgressUrl, AgentHarnessServiceUrl, AppServiceUrl, DocumentStorageServiceUrl,
     };
     Ok(Deployment {
@@ -595,7 +595,7 @@ impl<Inner: HarnessPresence> HarnessPresence for ComputerPresence<Inner> {
                 }
             }
             if let Some(operator) = &self.operator
-                && let Ok(MacrodConnected::AgentBound) = operator
+                && let Ok(RoxdConnected::AgentBound) = operator
                     .macrod_connected(harness)
                     .await
                     .inspect_err(|error| tracing::error!(%harness, error = ?error, "computer connect event failed"))

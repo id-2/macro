@@ -25,7 +25,7 @@ vi.mock('@app/features/dynamic-ui/widget', () => ({
 }));
 
 const telemetryError = vi.hoisted(() => vi.fn());
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: telemetryError },
 }));
 

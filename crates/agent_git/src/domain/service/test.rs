@@ -1,4 +1,4 @@
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 use std::collections::{HashMap, HashSet};
 use std::convert::Infallible;
@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 use bytes::Bytes;
 use chrono::Utc;
 use futures::StreamExt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -21,7 +21,7 @@ struct Rollout(bool);
 impl feature_flags::FeatureFlags for Rollout {
     async fn load(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<feature_flags::FlagSnapshot, rootcause::Report> {
         Ok(feature_flags::FlagSnapshot::new([(
             agent_credentials::AGENT_TEAMMATES_FLAG.to_owned(),
@@ -34,8 +34,8 @@ impl feature_flags::FeatureFlags for Rollout {
 fn invited_by_admin() -> agent_credentials::FakeAgentCreators {
     let mut creators = agent_credentials::FakeAgentCreators::default();
     creators.set(
-        MacroUserIdStr::try_from(AGENT.to_owned()).unwrap(),
-        MacroUserIdStr::try_from(ADMIN.to_owned()).unwrap(),
+        RoxUserIdStr::try_from(AGENT.to_owned()).unwrap(),
+        RoxUserIdStr::try_from(ADMIN.to_owned()).unwrap(),
     );
     creators
 }
@@ -72,7 +72,7 @@ impl RepoRepository for FakeRepos {
     type Err = Infallible;
     type Lock = FakeLock;
 
-    async fn lock_repo(&self, agent_user_id: &MacroUserIdStr<'_>) -> Result<FakeLock, Infallible> {
+    async fn lock_repo(&self, agent_user_id: &RoxUserIdStr<'_>) -> Result<FakeLock, Infallible> {
         let agent_user_id = agent_user_id.as_ref().to_owned();
         let lock = self
             .locks
@@ -93,7 +93,7 @@ impl RepoRepository for FakeRepos {
 
     async fn try_lock_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<FakeLock>, Infallible> {
         let agent_user_id = agent_user_id.as_ref().to_owned();
         let lock = self
@@ -117,7 +117,7 @@ impl RepoRepository for FakeRepos {
 
     async fn find_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<AgentRepo>, Infallible> {
         Ok(self
             .rows
@@ -129,7 +129,7 @@ impl RepoRepository for FakeRepos {
 
     async fn upsert_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
         token_hash: &RepoTokenHash,
     ) -> Result<bool, Infallible> {
@@ -146,7 +146,7 @@ impl RepoRepository for FakeRepos {
         rows.insert(
             agent_user_id.as_ref().to_owned(),
             AgentRepo {
-                agent_user_id: MacroUserIdStr::try_from(agent_user_id.as_ref().to_owned()).unwrap(),
+                agent_user_id: RoxUserIdStr::try_from(agent_user_id.as_ref().to_owned()).unwrap(),
                 team_id,
                 token_hash: token_hash.clone(),
                 size_bytes: None,
@@ -159,7 +159,7 @@ impl RepoRepository for FakeRepos {
 
     async fn insert_repo_if_missing(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
         token_hash: &RepoTokenHash,
     ) -> Result<(), Infallible> {
@@ -168,7 +168,7 @@ impl RepoRepository for FakeRepos {
             .unwrap()
             .entry(agent_user_id.as_ref().to_owned())
             .or_insert_with(|| AgentRepo {
-                agent_user_id: MacroUserIdStr::try_from(agent_user_id.as_ref().to_owned()).unwrap(),
+                agent_user_id: RoxUserIdStr::try_from(agent_user_id.as_ref().to_owned()).unwrap(),
                 team_id,
                 token_hash: token_hash.clone(),
                 size_bytes: None,
@@ -180,7 +180,7 @@ impl RepoRepository for FakeRepos {
 
     async fn record_push(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         size_bytes: u64,
     ) -> Result<(), Infallible> {
         self.pushes
@@ -190,7 +190,7 @@ impl RepoRepository for FakeRepos {
         Ok(())
     }
 
-    async fn delete_repo(&self, agent_user_id: &MacroUserIdStr<'_>) -> Result<(), Infallible> {
+    async fn delete_repo(&self, agent_user_id: &RoxUserIdStr<'_>) -> Result<(), Infallible> {
         self.rows.lock().unwrap().remove(agent_user_id.as_ref());
         Ok(())
     }
@@ -208,7 +208,7 @@ impl RepoStore for FakeStore {
     type Err = Infallible;
     async fn create_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         _files: &[RenderedFile],
     ) -> Result<(), Infallible> {
         self.repos
@@ -218,21 +218,21 @@ impl RepoStore for FakeStore {
         Ok(())
     }
 
-    async fn delete_repo(&self, agent_user_id: &MacroUserIdStr<'_>) -> Result<(), Infallible> {
+    async fn delete_repo(&self, agent_user_id: &RoxUserIdStr<'_>) -> Result<(), Infallible> {
         self.repos.lock().unwrap().remove(agent_user_id.as_ref());
         Ok(())
     }
 
     async fn repo_size_bytes(
         &self,
-        _agent_user_id: &MacroUserIdStr<'_>,
+        _agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<u64, Infallible> {
         Ok(self.size_bytes)
     }
 
     async fn read_file(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         path: &str,
     ) -> Result<Option<Vec<u8>>, Infallible> {
         Ok(self
@@ -245,7 +245,7 @@ impl RepoStore for FakeStore {
 
     async fn commit_file(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         path: &str,
         contents: &[u8],
         message: &str,
@@ -269,7 +269,7 @@ impl TeamAdmins for FakeAdmins {
     async fn is_team_admin(
         &self,
         team_id: Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, Infallible> {
         Ok(self
             .admins
@@ -287,7 +287,7 @@ impl PushRateLimiter for FakeLimiter {
 
     async fn try_acquire_push(
         &self,
-        _agent_user_id: &MacroUserIdStr<'_>,
+        _agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, Infallible> {
         let mut remaining = self.remaining.lock().unwrap();
         if *remaining == 0 {
@@ -378,7 +378,7 @@ async fn the_agent_token_pushes_and_an_admin_session_only_reads() {
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
 
     let created = service
         .create_repo(agent.clone(), TEAM, &seed())
@@ -407,7 +407,7 @@ async fn the_agent_token_pushes_and_an_admin_session_only_reads() {
 
     service
         .serve_git(
-            GitCredential::User(MacroUserIdStr::try_from(ADMIN.to_owned()).unwrap()),
+            GitCredential::User(RoxUserIdStr::try_from(ADMIN.to_owned()).unwrap()),
             &agent,
             request(GitEndpoint::InfoRefs(GitService::UploadPack), b""),
         )
@@ -416,7 +416,7 @@ async fn the_agent_token_pushes_and_an_admin_session_only_reads() {
 
     let admin_push = service
         .serve_git(
-            GitCredential::User(MacroUserIdStr::try_from(ADMIN.to_owned()).unwrap()),
+            GitCredential::User(RoxUserIdStr::try_from(ADMIN.to_owned()).unwrap()),
             &agent,
             request(GitEndpoint::InfoRefs(GitService::ReceivePack), b""),
         )
@@ -428,7 +428,7 @@ async fn the_agent_token_pushes_and_an_admin_session_only_reads() {
 
     let member_read = service
         .serve_git(
-            GitCredential::User(MacroUserIdStr::try_from(MEMBER.to_owned()).unwrap()),
+            GitCredential::User(RoxUserIdStr::try_from(MEMBER.to_owned()).unwrap()),
             &agent,
             request(GitEndpoint::InfoRefs(GitService::UploadPack), b""),
         )
@@ -466,7 +466,7 @@ async fn creating_again_replaces_the_token_and_another_team_is_refused() {
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
 
     let first = service
         .create_repo(agent.clone(), TEAM, &seed())
@@ -529,7 +529,7 @@ async fn pushes_stop_at_the_size_cap_and_the_rate_limit() {
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     let created = service
         .create_repo(agent.clone(), TEAM, &seed())
         .await
@@ -588,7 +588,7 @@ async fn a_full_repo_refuses_the_push_advertisement() {
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     let created = service
         .create_repo(agent.clone(), TEAM, &seed())
         .await
@@ -631,7 +631,7 @@ async fn deleting_removes_the_repo_and_the_row() {
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     service
         .create_repo(agent.clone(), TEAM, &seed())
         .await
@@ -644,7 +644,7 @@ async fn deleting_removes_the_repo_and_the_row() {
     assert!(store.repos.lock().unwrap().is_empty());
     let missing = service
         .serve_git(
-            GitCredential::User(MacroUserIdStr::try_from(ADMIN.to_owned()).unwrap()),
+            GitCredential::User(RoxUserIdStr::try_from(ADMIN.to_owned()).unwrap()),
             &agent,
             request(GitEndpoint::InfoRefs(GitService::UploadPack), b""),
         )
@@ -672,7 +672,7 @@ async fn voices_are_read_and_committed_only_for_the_repos_team() {
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     let other_team = Uuid::from_u128(2);
     let voice = VoiceConfig {
         model: crate::domain::voice::VoiceModel::parse("aura-2-thalia-en").unwrap(),
@@ -744,15 +744,15 @@ fn seed() -> PersonaSeed {
         personality: "Warm and direct.".to_owned(),
         voice: None,
         creator_id: Some(
-            MacroUserIdStr::parse_from_str("macro|admin@example.com")
+            RoxUserIdStr::parse_from_str("macro|admin@example.com")
                 .expect("creator id")
                 .into_owned(),
         ),
     }
 }
 
-fn agent() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|sam@agents.example.com")
+fn agent() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|sam@agents.example.com")
         .expect("agent id")
         .into_owned()
 }
@@ -842,7 +842,7 @@ async fn creating_a_repo_without_a_creator_is_refused() {
 
     let created = service
         .create_repo(
-            MacroUserIdStr::try_from(AGENT.to_owned()).unwrap(),
+            RoxUserIdStr::try_from(AGENT.to_owned()).unwrap(),
             TEAM,
             &persona,
         )
@@ -870,7 +870,7 @@ async fn recovery_preserves_live_tokens_and_recreates_missing_resources() {
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     let original = service
         .create_repo(agent.clone(), TEAM, &seed())
         .await
@@ -937,7 +937,7 @@ impl RepoStore for PausedStore {
     type Err = Infallible;
     async fn create_repo(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         files: &[RenderedFile],
     ) -> Result<(), Self::Err> {
         self.creating.notify_one();
@@ -945,17 +945,17 @@ impl RepoStore for PausedStore {
         self.store.create_repo(agent, files).await
     }
 
-    async fn delete_repo(&self, agent: &MacroUserIdStr<'_>) -> Result<(), Self::Err> {
+    async fn delete_repo(&self, agent: &RoxUserIdStr<'_>) -> Result<(), Self::Err> {
         self.store.delete_repo(agent).await
     }
 
-    async fn repo_size_bytes(&self, agent: &MacroUserIdStr<'_>) -> Result<u64, Self::Err> {
+    async fn repo_size_bytes(&self, agent: &RoxUserIdStr<'_>) -> Result<u64, Self::Err> {
         self.store.repo_size_bytes(agent).await
     }
 
     async fn read_file(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         path: &str,
     ) -> Result<Option<Vec<u8>>, Self::Err> {
         self.store.read_file(agent, path).await
@@ -963,7 +963,7 @@ impl RepoStore for PausedStore {
 
     async fn commit_file(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         path: &str,
         contents: &[u8],
         message: &str,
@@ -999,7 +999,7 @@ async fn deletion_waits_for_recovery_and_removes_its_published_storage() {
         },
         WORKSPACE_TEMPLATE,
     ));
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     let recovery_service = service.clone();
     let recovery_agent = agent.clone();
     let recovery = tokio::spawn(async move {
@@ -1038,7 +1038,7 @@ async fn a_push_holds_the_repo_lock_until_its_response_ends_and_management_takes
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     let created = service
         .create_repo(agent.clone(), TEAM, &seed())
         .await
@@ -1098,7 +1098,7 @@ async fn a_second_push_while_one_holds_the_repo_is_busy_and_a_rate_limited_one_n
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     let created = service
         .create_repo(agent.clone(), TEAM, &seed())
         .await
@@ -1139,7 +1139,7 @@ async fn with_the_rollout_off_for_its_creator_the_agents_repo_is_closed_to_every
         },
         WORKSPACE_TEMPLATE,
     );
-    let agent = MacroUserIdStr::try_from(AGENT.to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from(AGENT.to_owned()).unwrap();
     let created = service
         .create_repo(agent.clone(), TEAM, &seed())
         .await

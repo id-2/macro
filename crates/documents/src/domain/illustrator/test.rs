@@ -2,14 +2,14 @@ use super::*;
 use ai_engine::edit::{History, NewNode, Op, Position};
 use ai_engine::geom::Point;
 use entity_access::domain::models::{Entity, EntityPermission, EntityType, RequiredPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f01218141";
 
 fn receipt<T: RequiredPermission>(access_level: AccessLevel) -> EntityAccessReceipt<T> {
     EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::try_from("macro|illustrator@rox.one".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|illustrator@rox.one".to_owned()).unwrap(),
         Entity {
             entity_id: DOCUMENT.to_owned(),
             entity_type: EntityType::Document,

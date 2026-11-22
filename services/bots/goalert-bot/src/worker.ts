@@ -1,7 +1,7 @@
 import {
   createWorkerTraceConfig,
   instrument,
-} from '@macro-inc/observability/worker';
+} from '@rox-one/observability/worker';
 import { createAlertChannel } from './channel';
 import { createApp } from './index';
 import { createKvAlertStore, type KeyValueNamespace } from './store';

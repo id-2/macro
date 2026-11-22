@@ -160,7 +160,7 @@ const toGroupOptions = (options: EmailFacetOption[]) =>
 /** The Focus tab's flag menu; shown only there, first. */
 export const EMAIL_FOCUS_FILTER_GROUP: EmailFilterGroup = {
   id: 'focus',
-  label: 'Focus',
+  label: 'Фокус',
   selectionMode: 'single',
   defaultOptionId: 'all',
   options: [

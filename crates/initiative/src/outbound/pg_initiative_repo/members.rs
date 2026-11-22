@@ -1,7 +1,7 @@
 use entity_access_db_utils::{
     AccessLevel, delete_user_entity_access_rows, upsert_user_entity_access_bulk,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{PgPool, Postgres, Transaction};
 use uuid::Uuid;
 
@@ -11,7 +11,7 @@ use crate::domain::models::{InitiativeError, InitiativeId};
 pub(super) async fn grant_assignees(
     pool: &PgPool,
     id: InitiativeId,
-    user_ids: &[MacroUserIdStr<'static>],
+    user_ids: &[RoxUserIdStr<'static>],
 ) -> Result<(), InitiativeError> {
     if user_ids.is_empty() {
         return Ok(());
@@ -48,7 +48,7 @@ pub(super) async fn grant_assignees(
 pub(super) async fn insert_members(
     tx: &mut Transaction<'_, Postgres>,
     id: Uuid,
-    member_ids: &[MacroUserIdStr<'static>],
+    member_ids: &[RoxUserIdStr<'static>],
 ) -> Result<(), InitiativeError> {
     if member_ids.is_empty() {
         return Ok(());
@@ -72,7 +72,7 @@ pub(super) async fn insert_members(
 pub(super) async fn grant_members_edit(
     tx: &mut Transaction<'_, Postgres>,
     targets: &GrantTargets,
-    member_ids: &[MacroUserIdStr<'static>],
+    member_ids: &[RoxUserIdStr<'static>],
 ) -> Result<(), InitiativeError> {
     for (entity_id, entity_type) in targets.each() {
         upsert_user_entity_access_bulk(
@@ -91,8 +91,8 @@ pub(super) async fn grant_members_edit(
 pub(super) async fn apply_member_diff(
     tx: &mut Transaction<'_, Postgres>,
     targets: &GrantTargets,
-    added: &[MacroUserIdStr<'static>],
-    removed: &[MacroUserIdStr<'static>],
+    added: &[RoxUserIdStr<'static>],
+    removed: &[RoxUserIdStr<'static>],
 ) -> Result<(), InitiativeError> {
     let initiative_id = targets.initiative_id();
     if !removed.is_empty() {

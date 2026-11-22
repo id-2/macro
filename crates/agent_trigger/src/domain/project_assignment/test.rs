@@ -5,12 +5,12 @@ use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessReceipt, EntityPermission, RequiredPermission,
 };
 use initiative::domain::events::InitiativeEventActor;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use models_properties::shared::EntityReference;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("assigner@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("assigner@example.com").unwrap()
 }
 
 fn project_value(project: Option<InitiativeId>) -> Option<PropertyValue> {

@@ -15,7 +15,7 @@ import {
 import { BlockLiveIndicators } from '@core/component/LiveIndicators';
 import { ShareTrigger } from '@core/component/TopBar/ShareButton';
 import { ENABLE_MARKDOWN_SIDE_PANEL } from '@core/constant/featureFlags';
-import type { SyncSourceStatus } from '@macro-inc/collaboration/collab/source';
+import type { SyncSourceStatus } from '@rox-one/collaboration/collab/source';
 import { type Accessor, Show } from 'solid-js';
 import { useMarkdownName } from '../component/MarkdownNameProvider';
 import {

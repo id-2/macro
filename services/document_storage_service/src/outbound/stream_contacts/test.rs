@@ -3,8 +3,8 @@ use contacts::domain::models::page::{ContactCursor, ContactIdPage, ContactPageSi
 use rootcause::Report;
 use std::sync::Mutex;
 
-fn id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 /// Graph with one edge per `(viewer, contact)`; records each lookup.
@@ -17,9 +17,9 @@ struct FakeRepository {
 impl ContactsPageRepository for FakeRepository {
     async fn lookup_contact_ids(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         let requested: Vec<String> = lookup.ids().iter().map(ToString::to_string).collect();
         self.lookups
             .lock()
@@ -39,7 +39,7 @@ impl ContactsPageRepository for FakeRepository {
 
     async fn contact_id_page(
         &self,
-        _viewer: MacroUserIdStr<'_>,
+        _viewer: RoxUserIdStr<'_>,
         _after: Option<&ContactCursor>,
         _limit: ContactPageSize,
     ) -> Result<ContactIdPage, Report> {

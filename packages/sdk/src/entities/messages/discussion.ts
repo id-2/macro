@@ -6,8 +6,8 @@ import type {
 } from '../../../generated/storage/types.gen';
 import { type RichMessage, toBody } from '../../mentions';
 import { mapConcurrently, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 
 /** The CRM record or initiative a discussion hangs off. */
@@ -32,9 +32,9 @@ const THREAD_FETCH_CONCURRENCY = 8;
  * parent is that record, addressed by the record and the message UUID. Its
  * record and mutations are the ones document comments and channel messages use.
  */
-export class DiscussionComment extends MacroEntity<MessageRecord> {
+export class DiscussionComment extends RoxEntity<MessageRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** The company, contact or initiative this comment belongs to. */
     readonly parent: DiscussionParent,
     id: string,
@@ -59,7 +59,7 @@ export class DiscussionComment extends MacroEntity<MessageRecord> {
 
   /** A handle to a comment by id. Fields load on first access. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     parent: DiscussionParent,
     id: string,
   ): DiscussionComment {
@@ -68,7 +68,7 @@ export class DiscussionComment extends MacroEntity<MessageRecord> {
 
   /** Build a comment from a message record (pre-seeded, no fetch). */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     parent: DiscussionParent,
     record: MessageRecord,
   ): DiscussionComment {
@@ -150,7 +150,7 @@ export class DiscussionComment extends MacroEntity<MessageRecord> {
 
 /** A discussion's live comment threads, each with its comments, newest thread first. */
 export async function listDiscussionThreads(
-  client: MacroClient,
+  client: RoxClient,
   parent: DiscussionParent,
 ): Promise<DiscussionThread[]> {
   const path = { parent_type: parent.type, parent_id: parent.id };
@@ -185,7 +185,7 @@ export async function listDiscussionThreads(
  * (the thread's root comment id) is given.
  */
 export async function postDiscussionComment(
-  client: MacroClient,
+  client: RoxClient,
   parent: DiscussionParent,
   body: string | RichMessage,
   opts?: { threadId?: string },

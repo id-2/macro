@@ -8,8 +8,8 @@
 
 import { StaticImage } from '../src/entities/images/image';
 import { resolveLocalPortmap } from '../src/local-portmap';
-import { Rox } from '../src/macro';
-import { MacroError } from '../src/utils';
+import { Rox } from '../src/rox';
+import { RoxError } from '../src/utils';
 
 const portmap = resolveLocalPortmap();
 if (!portmap) throw new Error('no local stack portmap; run `just run_local`');
@@ -137,7 +137,7 @@ let throttled = false;
 try {
   await alice.me.update({ profilePicture: second });
 } catch (error) {
-  throttled = error instanceof MacroError || error instanceof Error;
+  throttled = error instanceof RoxError || error instanceof Error;
   console.log('  throttle error:', (error as Error).message);
 }
 check('second change within 1s is throttled', throttled);

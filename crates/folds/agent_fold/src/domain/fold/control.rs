@@ -3,7 +3,7 @@
 use crate::domain::model::{Author, Control, ControlOutcome, FoldedMessage, MessagePart, TurnId};
 use agent_client_protocol::schema::v1::RequestId;
 use agent_runtime_protocol::domain::action::AgentActionId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use non_empty::NonEmpty;
 
 use super::state::{Changed, FoldState};
@@ -72,7 +72,7 @@ impl FoldState {
         &mut self,
         control: Control,
         request_id: Option<&RequestId>,
-        user_id: Option<MacroUserIdStr<'static>>,
+        user_id: Option<RoxUserIdStr<'static>>,
     ) -> Option<Changed> {
         if matches!(control, Control::SetModel { .. }) && user_id.is_none() {
             return None;

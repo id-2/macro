@@ -16,7 +16,7 @@ where
     R: InboxSyncRepository,
     G: InboxSyncGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher,
+    E: RoxEventBroker + InboxSyncRefresher,
 {
     let mut tx = ctx.repository.begin_delete().await.map_err(|e| {
         ProcessingError::Retryable(DetailedError {
@@ -122,7 +122,7 @@ where
 
     publish_email_event(
         &ctx.effects,
-        &EmailMacroEvent::message_deleted(MessageDeletedMetadata {
+        &EmailRoxEvent::message_deleted(MessageDeletedMetadata {
             link_id: link.id,
             owner: link.macro_id.clone(),
             message_id: message.db_id,

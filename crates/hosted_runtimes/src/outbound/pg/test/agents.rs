@@ -3,7 +3,7 @@ use crate::domain::agent::ComputerAgents;
 use crate::outbound::pg::PgComputerAgents;
 use harnesses::domain::ports::ComputerTeamAgents;
 
-async fn insert_agent(pool: &PgPool) -> MacroUserIdStr<'static> {
+async fn insert_agent(pool: &PgPool) -> RoxUserIdStr<'static> {
     let macro_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0022);
     sqlx::query!(
         r#"
@@ -22,7 +22,7 @@ async fn insert_agent(pool: &PgPool) -> MacroUserIdStr<'static> {
     .execute(pool)
     .await
     .unwrap();
-    MacroUserIdStr::try_from("macro|ada-1@agents.macro.invalid".to_owned()).unwrap()
+    RoxUserIdStr::try_from("macro|ada-1@agents.macro.invalid".to_owned()).unwrap()
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]

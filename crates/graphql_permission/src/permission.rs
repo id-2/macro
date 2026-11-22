@@ -6,7 +6,7 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use futures::{StreamExt, stream};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, OwnedEntity};
 use rootcause::markers::{Cloneable, Dynamic};
 use tracing::Instrument;
@@ -164,7 +164,7 @@ pub trait EntityPermissionEdgeReader: Send + Sync + 'static {
     /// entities map to `None` instead of leaking their existence.
     fn get_entity_permissions<'a>(
         &'a self,
-        user_id: &'a MacroUserIdStr<'static>,
+        user_id: &'a RoxUserIdStr<'static>,
         organization_id: Option<i64>,
         entities: Vec<Entity<'static>>,
     ) -> impl Future<
@@ -179,7 +179,7 @@ where
 {
     async fn get_entity_permissions(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         organization_id: Option<i64>,
         entities: Vec<Entity<'static>>,
     ) -> Result<HashMap<Entity<'static>, Option<EntityPermission>>, rootcause::Report> {
@@ -232,7 +232,7 @@ pub struct NoOpEntityPermissionEdgeReader;
 impl EntityPermissionEdgeReader for NoOpEntityPermissionEdgeReader {
     async fn get_entity_permissions(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _organization_id: Option<i64>,
         entities: Vec<Entity<'static>>,
     ) -> Result<HashMap<Entity<'static>, Option<EntityPermission>>, rootcause::Report> {
@@ -243,7 +243,7 @@ impl EntityPermissionEdgeReader for NoOpEntityPermissionEdgeReader {
 /// Request-scoped DataLoader for current-viewer entity permissions.
 pub struct EntityPermissionLoader<R> {
     /// Authenticated viewer whose permissions are requested.
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     /// Organization context used when resolving permissions.
     organization_id: Option<i64>,
     /// Domain-facing reader that resolves effective access.
@@ -252,7 +252,7 @@ pub struct EntityPermissionLoader<R> {
 
 impl<R> EntityPermissionLoader<R> {
     /// Construct a permission loader for one authenticated viewer.
-    pub fn new(user_id: MacroUserIdStr<'static>, organization_id: Option<i64>, reader: R) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>, organization_id: Option<i64>, reader: R) -> Self {
         Self {
             user_id,
             organization_id,
@@ -288,7 +288,7 @@ where
 
 /// Build a permission DataLoader scoped to the authenticated viewer.
 pub fn entity_permission_loader<R>(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     organization_id: Option<i64>,
     reader: R,
 ) -> DataLoader<EntityPermissionLoader<R>>

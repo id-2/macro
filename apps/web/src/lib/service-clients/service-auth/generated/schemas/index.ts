@@ -187,7 +187,7 @@ export * from './language';
 export * from './linkShare';
 export * from './listGtmInviteLinksParams';
 export * from './macroApiTokenParams';
-export * from './macroApiTokenResponse';
+export * from './roxApiTokenResponse';
 export * from './mergeGithubPullRequestRequest';
 export * from './mergeGithubPullRequestRequestMergeMethod';
 export * from './mergeGithubPullRequestResponse';

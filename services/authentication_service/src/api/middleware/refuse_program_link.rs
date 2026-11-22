@@ -8,9 +8,9 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{
-    AnyPrincipal, CredentialOrigin, MacroAuthorization, MacroAuthorizationState,
-    OptionalMacroAuthorizationExtractor, is_program_run,
+use rox_authorization::{
+    AnyPrincipal, CredentialOrigin, RoxAuthorization, RoxAuthorizationState,
+    OptionalRoxAuthorizationExtractor, is_program_run,
 };
 use model::response::ErrorResponse;
 
@@ -29,12 +29,12 @@ const PROGRAM_LINK_REFUSAL: &str = "An agent's program cannot link an account: t
 /// account manager's key and a scoped session are refused too. A credential that does not verify is rejected here, so a check that
 /// fails cannot let the request through.
 pub(in crate::api) async fn handler(
-    State(authorization): State<MacroAuthorizationState<AuthorizationService>>,
+    State(authorization): State<RoxAuthorizationState<AuthorizationService>>,
     request: Request,
     next: Next,
 ) -> Response {
     let (mut parts, body) = request.into_parts();
-    let principal = match OptionalMacroAuthorizationExtractor::<AuthorizationService, AnyPrincipal>::from_request_parts(
+    let principal = match OptionalRoxAuthorizationExtractor::<AuthorizationService, AnyPrincipal>::from_request_parts(
         &mut parts,
         &authorization,
     )
@@ -46,16 +46,14 @@ pub(in crate::api) async fn handler(
     let program = match &principal {
         // An account manager's key and a scoped session act for this
         // account but are not its holder; neither may add a sign-in to it.
-        Some(MacroAuthorization::User(user)) => {
+        Some(RoxAuthorization::User(user)) => {
             matches!(
                 user.origin,
-                CredentialOrigin::AccountManager(_) | CredentialOrigin::ScopedMacroApiJwt
+                CredentialOrigin::AccountManager(_) | CredentialOrigin::ScopedRoxApiJwt
             ) || is_program_run(user.attribution(), &parts.headers)
         }
-        Some(MacroAuthorization::Bot(_)) => true,
-        _ => parts
-            .headers
-            .contains_key(macro_authorization::CODE_EXECUTION_HEADER),
+        Some(RoxAuthorization::Bot(_)) => true,
+        _ => rox_authorization::marks_code_execution(&parts.headers),
     };
     if program {
         tracing::warn!(

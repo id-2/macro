@@ -4,7 +4,7 @@
  * own logic; these are the nouns they share.
  */
 import type { Room } from '@livekit/rtc-node';
-import type { ScreenFrame, ScreenShare } from '@macro-inc/sdk/calls/node';
+import type { ScreenFrame, ScreenShare } from '@rox-one/sdk/calls/node';
 import { z } from 'zod';
 
 /** One line of a call's flight recorder: `t` is milliseconds since the join started. */

@@ -1,5 +1,5 @@
 {
-	"name": "@macro-inc/macro",
+	"name": "@rox-one/macro",
 	"overrides": {
 		"@lexical/clipboard": "0.45.0",
 		"@lexical/code": "0.45.0",

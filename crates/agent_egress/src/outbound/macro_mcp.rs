@@ -18,8 +18,8 @@
 use bot_id::BotId;
 use chrono::{DateTime, Duration as ChronoDuration, TimeZone, Utc};
 use lru::LruCache;
-use macro_auth::macro_api_token::{EncodeMacroApiTokenArgs, encode_macro_api_token};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_auth::macro_api_token::{EncodeRoxApiTokenArgs, encode_macro_api_token};
+use rox_user_id::user_id::RoxUserIdStr;
 use std::num::NonZeroUsize;
 use std::sync::Mutex;
 use url::Url;
@@ -39,11 +39,11 @@ const EXPIRY_MARGIN_MINUTES: i64 = 5;
 ///
 /// Implementations own the whole exchange - including finding whatever else
 /// the minting side needs to know about the owner beyond their id.
-pub trait MacroApiTokens: Send + Sync {
+pub trait RoxApiTokens: Send + Sync {
     /// A token that acts as `owner`, and nobody else, attributed to `agent`.
     fn mint(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: BotId,
         session: uuid::Uuid,
     ) -> impl Future<Output = Result<String, EgressError>> + Send;
@@ -54,7 +54,7 @@ pub trait MacroApiTokens: Send + Sync {
 /// [`McpDestination::Macro`] is answered here; everything else passes
 /// straight through to `Inner`. The two destinations arrive from different
 /// routes, so there is no name for a connected app to collide with.
-pub struct WithMacroMcp<Inner, Tokens> {
+pub struct WithRoxMcp<Inner, Tokens> {
     inner: Inner,
     tokens: Tokens,
     url: Url,
@@ -65,7 +65,7 @@ pub struct WithMacroMcp<Inner, Tokens> {
     /// another session's code-mode invocation to this one. Bounded, so
     /// the map cannot grow with every owner ever seen; freshness still comes
     /// from each token's own expiry, never from cache residency.
-    cached: Mutex<LruCache<(MacroUserIdStr<'static>, BotId, uuid::Uuid), CachedToken>>,
+    cached: Mutex<LruCache<(RoxUserIdStr<'static>, BotId, uuid::Uuid), CachedToken>>,
 }
 
 /// How many owners' tokens are kept at once. Far past any real concurrency;
@@ -79,10 +79,10 @@ struct CachedToken {
     expires_at: DateTime<Utc>,
 }
 
-impl<Inner, Tokens> WithMacroMcp<Inner, Tokens>
+impl<Inner, Tokens> WithRoxMcp<Inner, Tokens>
 where
     Inner: McpCredentials,
-    Tokens: MacroApiTokens,
+    Tokens: RoxApiTokens,
 {
     /// Wrap `inner`, answering [`McpDestination::Macro`] at `url` with tokens
     /// from `tokens`.
@@ -116,7 +116,7 @@ where
 
     async fn token(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: BotId,
         session: uuid::Uuid,
     ) -> Result<String, EgressError> {
@@ -151,15 +151,15 @@ where
     }
 }
 
-impl<Inner, Tokens> McpCredentials for WithMacroMcp<Inner, Tokens>
+impl<Inner, Tokens> McpCredentials for WithRoxMcp<Inner, Tokens>
 where
     Inner: McpCredentials,
-    Tokens: MacroApiTokens,
+    Tokens: RoxApiTokens,
 {
     #[tracing::instrument(skip_all, err, fields(%owner, %agent, ?destination))]
     async fn resolve(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: BotId,
         session: uuid::Uuid,
         destination: &McpDestination,
@@ -232,7 +232,7 @@ fn token_expiry(token: &str) -> Result<DateTime<Utc>, EgressError> {
 /// Pipedream project token on the same terms. The key can act as any user
 /// wherever Rox API tokens are accepted, which is why everything minted
 /// here is short-lived and names only the one owner the grant did.
-pub struct MacroApiTokenSigner {
+pub struct RoxApiTokenSigner {
     pool: sqlx::PgPool,
     issuer: String,
     private_key: String,
@@ -243,7 +243,7 @@ pub struct MacroApiTokenSigner {
 /// anyone can do much with it.
 pub const MINTED_TOKEN_LIFETIME_SECONDS: usize = 900;
 
-impl MacroApiTokenSigner {
+impl RoxApiTokenSigner {
     /// Build the signer over the database holding user rows, the token
     /// issuer, and the RSA signing key.
     pub fn new(
@@ -259,12 +259,12 @@ impl MacroApiTokenSigner {
     }
 }
 
-impl MacroApiTokenSigner {
+impl RoxApiTokenSigner {
     /// Mint a fresh owner token with a bounded lifetime for a short execution.
     #[tracing::instrument(skip_all, err, fields(%owner))]
     pub async fn mint_for(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         lifetime_seconds: usize,
     ) -> Result<String, EgressError> {
         self.mint_for_agent(owner, lifetime_seconds, None, None, None, None)
@@ -277,9 +277,9 @@ impl MacroApiTokenSigner {
     #[tracing::instrument(skip_all, err, fields(?agent_id, ?agent_via))]
     pub async fn mint_for_agent(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         lifetime_seconds: usize,
-        agent_id: Option<macro_uuid::Uuid>,
+        agent_id: Option<rox_uuid::Uuid>,
         agent_via: Option<String>,
         agent_session_id: Option<uuid::Uuid>,
         correlation: Option<SignedCorrelation>,
@@ -303,10 +303,10 @@ impl MacroApiTokenSigner {
     #[tracing::instrument(skip_all, err, fields(?agent_id, %routine_id, ?scope))]
     pub async fn mint_for_routine(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         lifetime_seconds: usize,
-        agent_id: Option<macro_uuid::Uuid>,
-        routine_id: macro_uuid::Uuid,
+        agent_id: Option<rox_uuid::Uuid>,
+        routine_id: rox_uuid::Uuid,
         scope: Option<agent_correlation::scope::SessionScope>,
     ) -> Result<String, EgressError> {
         let claims = SignedClaims::routine(agent_id, routine_id, scope);
@@ -315,7 +315,7 @@ impl MacroApiTokenSigner {
 
     async fn sign(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         lifetime_seconds: usize,
         claims: SignedClaims,
     ) -> Result<String, EgressError> {
@@ -338,7 +338,7 @@ impl MacroApiTokenSigner {
         // owner with no row is a session created wrong, which is ours to fix,
         // not something the sandbox can retry its way out of.
         let (fusion_root_id, macro_user_id) =
-            macro_db_client::user::get::get_user_macro_user_id_and_id_by_email(
+            rox_db_client::user::get::get_user_macro_user_id_and_id_by_email(
                 &self.pool,
                 owner.email_str(),
             )
@@ -348,7 +348,7 @@ impl MacroApiTokenSigner {
                     "session owner has no user row to mint a token for: {error}"
                 ))
             })?;
-        let organization_id = macro_db_client::user::get_user_organization::get_user_organization(
+        let organization_id = rox_db_client::user::get_user_organization::get_user_organization(
             self.pool.clone(),
             &macro_user_id,
         )
@@ -359,7 +359,7 @@ impl MacroApiTokenSigner {
             ))
         })?;
 
-        encode_macro_api_token(EncodeMacroApiTokenArgs {
+        encode_macro_api_token(EncodeRoxApiTokenArgs {
             agent_correlation_id,
             agent_session_id,
             fusionauth_id: fusion_root_id.to_string(),
@@ -394,20 +394,20 @@ pub struct SignedCorrelation {
 /// The optional claims a minted token signs besides the owner.
 #[derive(Debug, PartialEq)]
 struct SignedClaims {
-    agent_id: Option<macro_uuid::Uuid>,
+    agent_id: Option<rox_uuid::Uuid>,
     agent_via: Option<String>,
     agent_session_id: Option<uuid::Uuid>,
     agent_correlation_id: Option<uuid::Uuid>,
     agent_scope: Option<agent_correlation::scope::SessionScope>,
-    routine_id: Option<macro_uuid::Uuid>,
+    routine_id: Option<rox_uuid::Uuid>,
 }
 
 impl SignedClaims {
     /// What a routine run's token signs: its routine, its agent if any, and
     /// its scope if narrower.
     fn routine(
-        agent_id: Option<macro_uuid::Uuid>,
-        routine_id: macro_uuid::Uuid,
+        agent_id: Option<rox_uuid::Uuid>,
+        routine_id: rox_uuid::Uuid,
         scope: Option<agent_correlation::scope::SessionScope>,
     ) -> Self {
         Self {
@@ -421,10 +421,10 @@ impl SignedClaims {
     }
 }
 
-impl MacroApiTokens for MacroApiTokenSigner {
+impl RoxApiTokens for RoxApiTokenSigner {
     async fn mint(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: BotId,
         session: uuid::Uuid,
     ) -> Result<String, EgressError> {

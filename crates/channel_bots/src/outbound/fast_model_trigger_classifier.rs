@@ -6,7 +6,7 @@ use std::sync::Arc;
 use agent::structured_output::{DynamicSchema, dynamic_structured_completion};
 use agent::{Message, PredefinedModel};
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 use serde_json::json;
 
@@ -76,7 +76,7 @@ impl InferredTriggerClassifier for FastModelTriggerClassifier {
     )]
     async fn expects_response(
         &self,
-        requesting_user: &MacroUserIdStr<'static>,
+        requesting_user: &RoxUserIdStr<'static>,
         thread: &[TranscriptMessage],
     ) -> anyhow::Result<bool> {
         let prompt = format!(

@@ -1,5 +1,5 @@
 use crate::domain::models::{
-    CatalogEntry, CatalogPage, ConnectToken, MacroUserIdStr, McpServer, PipedreamAccount,
+    CatalogEntry, CatalogPage, ConnectToken, RoxUserIdStr, McpServer, PipedreamAccount,
     PipedreamConnection, client_info,
 };
 use crate::domain::ports::{
@@ -304,7 +304,7 @@ impl PipedreamClient {
 impl ConnectorDirectory for PipedreamClient {
     async fn retrieve(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Option<CatalogEntry>> {
         self.retrieve_app(app_slug).await
@@ -313,7 +313,7 @@ impl ConnectorDirectory for PipedreamClient {
     #[tracing::instrument(skip(self), err)]
     async fn search(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         search: Option<&str>,
         cursor: Option<&str>,
         limit: u32,

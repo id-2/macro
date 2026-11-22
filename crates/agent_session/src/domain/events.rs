@@ -1,5 +1,5 @@
 //! Agent session lifecycle facts, published to
-//! [`MacroAgentSessionLifecycleTopic`] and keyed by session id.
+//! [`RoxAgentSessionLifecycleTopic`] and keyed by session id.
 //!
 //! These are facts about a session after the fact - opened, a turn started or
 //! ended, nothing left to do, asking its owner something, gone - for anyone
@@ -15,10 +15,10 @@ mod test;
 
 use agent_runtime_protocol::domain::action::AgentActionId;
 use bots::domain::models::BotId;
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroAgentSessionLifecycleTopic;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxAgentSessionLifecycleTopic;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::models::MessageParent;
 use serde::{Deserialize, Serialize};
 
@@ -106,14 +106,14 @@ pub struct SessionIdentity {
     /// The bot's display name at the time of the event.
     pub bot_name: String,
     /// User who owns the session.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// Thread the session was opened from, when it was.
     pub origin: Option<ThreadOrigin>,
     /// Everyone with a stake in what happens next: the owner plus every user
     /// who has prompted or answered this session. Resolved by the emitter so
     /// a consumer fanning out never has to read the session's log.
     #[serde(default)]
-    pub audience: Vec<MacroUserIdStr<'static>>,
+    pub audience: Vec<RoxUserIdStr<'static>>,
     /// Who started the session. Events from before it was recorded say
     /// nothing and read as a person.
     #[serde(default)]
@@ -130,7 +130,7 @@ pub struct TurnSummary {
     /// The action that opened the turn.
     pub action_id: AgentActionId,
     /// User who prompted it, absent when a bot acted on nobody's behalf.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// The magic-chip message posted for this turn, when one was.
     pub announcement_message_id: Option<Uuid>,
     /// The ACP stop reason, or `"error"` when the runtime refused the prompt.
@@ -150,7 +150,7 @@ pub struct InFlightTurnSummary {
     /// The action that opened the turn.
     pub action_id: AgentActionId,
     /// User who prompted it, absent when a bot acted on nobody's behalf.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// The magic-chip message posted for this turn, when one was.
     pub announcement_message_id: Option<Uuid>,
 }
@@ -179,7 +179,7 @@ pub struct TurnStartedMetadata {
     /// The action that opened the turn.
     pub action_id: AgentActionId,
     /// User who prompted it, absent when a bot acted on nobody's behalf.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// The magic-chip message posted for this turn, when one was.
     pub announcement_message_id: Option<Uuid>,
 }
@@ -197,7 +197,7 @@ pub struct TurnEndedMetadata {
     /// The action that opened the turn.
     pub action_id: AgentActionId,
     /// User who prompted it, absent when a bot acted on nobody's behalf.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// The magic-chip message posted for this turn, when one was.
     pub announcement_message_id: Option<Uuid>,
     /// The ACP stop reason, or `"error"` when the runtime refused the prompt.
@@ -238,7 +238,7 @@ pub struct CommandRejectedMetadata {
     /// The command that will not execute.
     pub action_id: AgentActionId,
     /// Who submitted the command, if acting on a user's behalf.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// The command's thread announcement, when one was created.
     pub announcement_message_id: Option<Uuid>,
     /// Safe details for clients and downstream consumers.
@@ -296,10 +296,10 @@ pub struct SessionMentionedMetadata {
     /// The action carrying the prompt.
     pub action_id: AgentActionId,
     /// Who wrote the prompt, absent when a bot acted on nobody's behalf.
-    pub mentioned_by: Option<MacroUserIdStr<'static>>,
+    pub mentioned_by: Option<RoxUserIdStr<'static>>,
     /// The users named, already narrowed to those who can open the session
     /// and never including the author.
-    pub mentioned: Vec<MacroUserIdStr<'static>>,
+    pub mentioned: Vec<RoxUserIdStr<'static>>,
     /// The channel or document message the prompt was posted as, when it
     /// arrived from a thread rather than the session view. That message
     /// already notified the users it named when it was posted.
@@ -335,7 +335,7 @@ pub struct SessionDeletedMetadata {
     pub identity: SessionIdentity,
 }
 
-/// Events publishable to [`MacroAgentSessionLifecycleTopic`].
+/// Events publishable to [`RoxAgentSessionLifecycleTopic`].
 ///
 /// The serde tag and [`AgentSessionLifecycleEventName`] spell the same wire
 /// names: subscribers filter on them, so they are API. The
@@ -429,22 +429,22 @@ impl AgentSessionLifecycleEvent {
 }
 
 impl TopicEvent for AgentSessionLifecycleEvent {
-    type Topic = MacroAgentSessionLifecycleTopic;
+    type Topic = RoxAgentSessionLifecycleTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroAgentSessionLifecycleTopic`].
+/// Publishable event for [`RoxAgentSessionLifecycleTopic`].
 ///
 /// Keyed by session id: one session's facts land on one partition, in order,
 /// so a consumer sees `turn_started` before `turn_ended` before `settled`.
 #[derive(Debug, Clone)]
-pub struct AgentSessionLifecycleMacroEvent {
+pub struct AgentSessionLifecycleRoxEvent {
     key: String,
     event: Event<AgentSessionLifecycleEvent>,
 }
 
-impl AgentSessionLifecycleMacroEvent {
+impl AgentSessionLifecycleRoxEvent {
     /// Wrap a lifecycle fact for publication.
     #[must_use]
     pub fn new(event: AgentSessionLifecycleEvent) -> Self {
@@ -455,7 +455,7 @@ impl AgentSessionLifecycleMacroEvent {
     }
 }
 
-impl MacroEvent for AgentSessionLifecycleMacroEvent {
+impl RoxEvent for AgentSessionLifecycleRoxEvent {
     type EventPayload = AgentSessionLifecycleEvent;
 
     fn key(&self) -> &str {
@@ -491,7 +491,7 @@ pub struct LogAppendedEntry {
     /// When the log recorded the frame.
     pub created_at: chrono::DateTime<chrono::Utc>,
     /// The user whose action produced the frame, absent when no user did.
-    pub user_id: Option<MacroUserIdStr<'static>>,
+    pub user_id: Option<RoxUserIdStr<'static>>,
     /// The frame, with its direction.
     pub content: Message,
 }

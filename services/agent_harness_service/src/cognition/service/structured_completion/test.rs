@@ -6,8 +6,8 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
 };
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|one-shot@example.com".to_owned()).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|one-shot@example.com".to_owned()).unwrap()
 }
 
 #[derive(Default)]

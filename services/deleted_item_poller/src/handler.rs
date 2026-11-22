@@ -6,18 +6,18 @@ use std::time::{Duration, SystemTime};
 use crate::context::{self};
 use anyhow::Context;
 use aws_lambda_events::eventbridge::EventBridgeEvent;
-use chat::domain::events::{ChatMacroEvent, ChatPermanentlyDeletedMetadata};
-use documents::domain::events::{DocumentMacroEvent, DocumentPurgedMetadata};
+use chat::domain::events::{ChatRoxEvent, ChatPermanentlyDeletedMetadata};
+use documents::domain::events::{DocumentRoxEvent, DocumentPurgedMetadata};
 use futures::{StreamExt, future::join_all};
 use lambda_runtime::{
     Error, LambdaEvent,
     tracing::{self},
 };
-use macro_db_client::document::get_all_documents::{ExpiredDocument, get_documents_to_delete};
-use macro_db_client::projects::ProjectToDelete;
-use macro_event_broker::MacroEventBroker;
+use rox_db_client::document::get_all_documents::{ExpiredDocument, get_documents_to_delete};
+use rox_db_client::projects::ProjectToDelete;
+use rox_event_broker::RoxEventBroker;
 use model_owner::Owner;
-use projects::domain::events::{ProjectMacroEvent, ProjectPermanentlyDeletedMetadata};
+use projects::domain::events::{ProjectRoxEvent, ProjectPermanentlyDeletedMetadata};
 
 /// How many expired documents one run purges, and in what steps.
 #[derive(Clone, Copy, Debug)]
@@ -132,13 +132,13 @@ pub async fn handler(
 /// Publish a purge event for each document and wait for every delivery.
 /// Returns the documents whose event was delivered.
 #[tracing::instrument(skip_all, fields(document.count = document_ids.len() as i64))]
-async fn publish_document_purge_events<B: MacroEventBroker>(
+async fn publish_document_purge_events<B: RoxEventBroker>(
     event_broker: &B,
     document_ids: Vec<String>,
     run: &mut DocumentPurgeRun,
 ) -> Vec<String> {
     let publications = join_all(document_ids.into_iter().map(|document_id| async move {
-        let event = DocumentMacroEvent::purged(
+        let event = DocumentRoxEvent::purged(
             document_id.clone(),
             DocumentPurgedMetadata {
                 document_id: document_id.clone(),
@@ -211,7 +211,7 @@ async fn enqueue_document_deletes<Q: DocumentDeleteQueue>(
 /// deletion, and a document whose event failed is not queued. Whatever fails
 /// stays in trash, so the next run finds it and tries again: a repeated purge
 /// event only removes the document from search again, which is harmless.
-async fn purge_expired_document_pages<B: MacroEventBroker, Q: DocumentDeleteQueue>(
+async fn purge_expired_document_pages<B: RoxEventBroker, Q: DocumentDeleteQueue>(
     db: &sqlx::PgPool,
     event_broker: &B,
     delete_queue: &Q,
@@ -271,7 +271,7 @@ async fn purge_expired_document_pages<B: MacroEventBroker, Q: DocumentDeleteQueu
     ),
     err
 )]
-async fn purge_expired_documents<B: MacroEventBroker, Q: DocumentDeleteQueue>(
+async fn purge_expired_documents<B: RoxEventBroker, Q: DocumentDeleteQueue>(
     db: &sqlx::PgPool,
     event_broker: &B,
     delete_queue: &Q,
@@ -306,7 +306,7 @@ async fn purge_expired_documents<B: MacroEventBroker, Q: DocumentDeleteQueue>(
 }
 
 #[tracing::instrument(skip(event_broker, projects_to_delete), err)]
-async fn publish_project_purge_events<B: MacroEventBroker>(
+async fn publish_project_purge_events<B: RoxEventBroker>(
     event_broker: &B,
     projects_to_delete: &[ProjectToDelete],
 ) -> anyhow::Result<()> {
@@ -317,7 +317,7 @@ async fn publish_project_purge_events<B: MacroEventBroker>(
             let owner = Owner::from_principal_str(&project.user_id)
                 .with_context(|| format!("invalid owner for project {}", project.project_id))?;
 
-            Ok(ProjectMacroEvent::permanently_deleted(
+            Ok(ProjectRoxEvent::permanently_deleted(
                 project_id.clone(),
                 ProjectPermanentlyDeletedMetadata {
                     project_id: project_id.clone(),
@@ -353,14 +353,14 @@ async fn publish_project_purge_events<B: MacroEventBroker>(
 }
 
 #[tracing::instrument(skip(event_broker, chat_ids), err)]
-async fn publish_chat_purge_events<B: MacroEventBroker>(
+async fn publish_chat_purge_events<B: RoxEventBroker>(
     event_broker: &B,
     chat_ids: &[String],
 ) -> anyhow::Result<()> {
     let events = chat_ids
         .iter()
         .map(|chat_id| {
-            ChatMacroEvent::permanently_deleted(ChatPermanentlyDeletedMetadata {
+            ChatRoxEvent::permanently_deleted(ChatPermanentlyDeletedMetadata {
                 chat_id: chat_id.clone(),
                 actor_user_id: None,
                 project_id: None,
@@ -393,7 +393,7 @@ async fn handle_projects(ctx: &context::Context) -> anyhow::Result<()> {
     let date = chrono::Utc::now().naive_utc() - chrono::Duration::days(30);
 
     let projects_to_delete =
-        macro_db_client::projects::get_projects_to_delete(&ctx.db, &date).await?;
+        rox_db_client::projects::get_projects_to_delete(&ctx.db, &date).await?;
 
     if projects_to_delete.is_empty() {
         tracing::info!("no projects to delete");
@@ -413,7 +413,7 @@ async fn handle_projects(ctx: &context::Context) -> anyhow::Result<()> {
 
     // We can actually perform the project deletion here as we will automatically be queuing all
     // the items in the project for deletion as well
-    macro_db_client::projects::delete::delete_projects_bulk(&ctx.db, &project_ids)
+    rox_db_client::projects::delete::delete_projects_bulk(&ctx.db, &project_ids)
         .await
         .context("unable to delete projects")?;
 
@@ -424,7 +424,7 @@ async fn handle_projects(ctx: &context::Context) -> anyhow::Result<()> {
 async fn handle_chats(ctx: &context::Context) -> anyhow::Result<()> {
     let date = chrono::Utc::now().naive_utc() - chrono::Duration::days(30);
 
-    let chats_to_delete = macro_db_client::chat::get_chats_to_delete(&ctx.db, &date).await?;
+    let chats_to_delete = rox_db_client::chat::get_chats_to_delete(&ctx.db, &date).await?;
 
     if chats_to_delete.is_empty() {
         tracing::info!("no chats to delete");

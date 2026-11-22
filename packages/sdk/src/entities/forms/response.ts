@@ -1,5 +1,5 @@
 import type { ResponseStatus } from '../../../generated/storage/types.gen';
-import { Lazy, MacroNotFoundError } from '../../utils';
+import { Lazy, RoxNotFoundError } from '../../utils';
 import type { DatabaseRow } from '../databases/row';
 import type { Form, FormAnswer, FormBookingStep } from './form';
 
@@ -27,7 +27,7 @@ export class FormResponse {
   private async load(): Promise<ResponseSnapshot> {
     const current = await this.form.myResponse();
     if (current.kind === 'anonymous' || current.response.id !== this.id)
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `response ${this.id} is not your current response`,
       );
     return current;

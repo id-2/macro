@@ -394,8 +394,8 @@ No hosted configuration change or collection activation is authorized by this
 procedure. Operators must approve and record each release gate.
 
 1. **Compatible schema first.** Apply
-   [the default-false column migration](../../crates/macro_db_client/migrations/20260930145625_add_ai_usage_count_usage.sql)
-   and [the concurrent partial-index migration](../../crates/macro_db_client/migrations/20260930145626_ai_usage_counted_user_created_at_idx.sql).
+   [the default-false column migration](../../crates/rox_db_client/migrations/20260930145625_add_ai_usage_count_usage.sql)
+   and [the concurrent partial-index migration](../../crates/rox_db_client/migrations/20260930145626_ai_usage_counted_user_created_at_idx.sql).
    Keep the full analytics/old-service index. Verify historical rows and old
    inserts remain false. Verify `pg_index.indisvalid` and `pg_get_indexdef` for
    `ai_usage_counted_user_created_at_idx`: `(user_id, created_at DESC) WHERE

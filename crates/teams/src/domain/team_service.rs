@@ -19,12 +19,12 @@ use channels::domain::{
 use entity_access::domain::models::{
     AdminTeamRole, EntityAccessReceipt, MemberTeamRole, OwnerTeamRole,
 };
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::{
+use rox_event_broker::{RoxEventBroker, NoopRoxEventBroker};
+use rox_user_id::{
     cowlike::CowLike,
     email::{Email, ReadEmailParts},
     lowercased::Lowercase,
-    user_id::MacroUserIdStr,
+    user_id::RoxUserIdStr,
 };
 use roles_and_permissions::domain::{model::RoleId, port::UserRolesAndPermissionsService};
 
@@ -43,7 +43,7 @@ use crate::domain::{
     events::{
         OwnedEntityMetadata, TeamAutoJoinDomainToggledMetadata, TeamCreatedMetadata,
         TeamDeletedMetadata, TeamInviteCreatedMetadata, TeamInviteRejectedMetadata,
-        TeamInviteRevokedMetadata, TeamJoinMethod, TeamMacroEvent, TeamMemberJoinedMetadata,
+        TeamInviteRevokedMetadata, TeamJoinMethod, TeamRoxEvent, TeamMemberJoinedMetadata,
         TeamMemberRemovedMetadata, TeamMemberRoleChangedMetadata, TeamUpdatedMetadata,
     },
     invite_rewards::{InviteRewardEvent, InviteRewarder, NoOpInviteRewarder},
@@ -118,7 +118,7 @@ pub struct TeamServiceImpl<
     TCRMS,
     TA = NoOpTeamAnalytics,
     CNE = NoOpContactsEnqueuer,
-    EB = NoopMacroEventBroker,
+    EB = NoopRoxEventBroker,
     OSR = NoOpOpenSeatRelease,
     OEC = UnwiredOwnedEntityCleanup,
 > where
@@ -131,7 +131,7 @@ pub struct TeamServiceImpl<
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker,
+    EB: RoxEventBroker,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -185,7 +185,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker + Clone,
+    EB: RoxEventBroker + Clone,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -220,7 +220,7 @@ impl<TR, CR, CS, URPS, NI, CE, TCRMS>
         TCRMS,
         NoOpTeamAnalytics,
         NoOpContactsEnqueuer,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         NoOpOpenSeatRelease,
         UnwiredOwnedEntityCleanup,
     >
@@ -267,7 +267,7 @@ impl<TR, CR, CS, URPS, NI, CE, TCRMS, TA>
         TCRMS,
         TA,
         NoOpContactsEnqueuer,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         NoOpOpenSeatRelease,
         UnwiredOwnedEntityCleanup,
     >
@@ -306,7 +306,7 @@ where
             team_crm_settings_repository,
             team_analytics,
             contacts_enqueuer: NoOpContactsEnqueuer,
-            event_broker: NoopMacroEventBroker,
+            event_broker: NoopRoxEventBroker,
             open_seat_release: NoOpOpenSeatRelease,
             owned_entity_cleanup: UnwiredOwnedEntityCleanup,
             invite_rewarder: Arc::new(NoOpInviteRewarder),
@@ -327,7 +327,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker,
+    EB: RoxEventBroker,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -339,7 +339,7 @@ where
     async fn join_team_directly(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         join_method: TeamJoinMethod,
         seat_billing: SeatBilling,
     ) -> Result<Option<TeamMember<'static>>, JoinTeamDirectlyError> {
@@ -558,7 +558,7 @@ where
 
         // NOTE: no TeamJoined analytics event here - that event is tied to
         // the team invite that was accepted, and a direct join has none.
-        self.publish_team_event(&TeamMacroEvent::member_joined(TeamMemberJoinedMetadata {
+        self.publish_team_event(&TeamRoxEvent::member_joined(TeamMemberJoinedMetadata {
             team_id,
             member_id: team_member.user_id.clone().into_owned(),
             teammate_ids,
@@ -708,7 +708,7 @@ where
         event_broker: EB2,
     ) -> TeamServiceImpl<TR, CR, CS, URPS, NI, CE, TCRMS, TA, CNE, EB2, OSR, OEC>
     where
-        EB2: MacroEventBroker,
+        EB2: RoxEventBroker,
     {
         TeamServiceImpl {
             team_repository: self.team_repository,
@@ -769,8 +769,8 @@ where
     /// Rewards `inviter` for `joined`, best-effort: the join already happened.
     pub(crate) async fn reward_inviter(
         &self,
-        inviter: &MacroUserIdStr<'_>,
-        joined: &MacroUserIdStr<'_>,
+        inviter: &RoxUserIdStr<'_>,
+        joined: &RoxUserIdStr<'_>,
         event_key: String,
     ) {
         if inviter == joined {
@@ -822,7 +822,7 @@ where
         removed_member: &RemovedTeamMember<'_>,
         seat_included: bool,
         subscription_id: Option<&stripe::SubscriptionId>,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         left_channel_ids: &[uuid::Uuid],
         failed_step: &'static str,
     ) {
@@ -867,7 +867,7 @@ where
     async fn restore_pending_seat_change(
         &self,
         subscription_id: Option<&stripe::SubscriptionId>,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         pending_plan: Option<SeatPlan>,
     ) {
         if let (Some(subscription), Some(plan)) = (subscription_id, pending_plan) {
@@ -895,7 +895,7 @@ where
     async fn delete_team_as(
         &self,
         team_id: uuid::Uuid,
-        actor_user_id: MacroUserIdStr<'static>,
+        actor_user_id: RoxUserIdStr<'static>,
     ) -> Result<(), DeleteTeamError> {
         let members = self.team_repository.get_all_team_members(&team_id).await?;
         let member_user_ids = members
@@ -933,7 +933,7 @@ where
             .delete_team(&cleared)
             .await
             .map_err(DeleteTeamError::TeamError)?;
-        self.publish_team_event(&TeamMacroEvent::deleted(TeamDeletedMetadata {
+        self.publish_team_event(&TeamRoxEvent::deleted(TeamDeletedMetadata {
             team_id,
             actor_user_id,
             member_user_ids,
@@ -971,8 +971,8 @@ where
     async fn remove_member(
         &self,
         team_id: uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
-        removed_by_id: MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'_>,
+        removed_by_id: RoxUserIdStr<'static>,
     ) -> Result<(), RemoveUserFromTeamError> {
         let enterprise = self
             .team_repository
@@ -1185,7 +1185,7 @@ where
             role: removed_member.member.role,
         })
         .await;
-        self.publish_team_event(&TeamMacroEvent::member_removed(TeamMemberRemovedMetadata {
+        self.publish_team_event(&TeamRoxEvent::member_removed(TeamMemberRemovedMetadata {
             team_id,
             member_id: removed_member.member.user_id.into_owned(),
             removed_by: removed_by_id,
@@ -1199,7 +1199,7 @@ where
         dead_code,
         reason = "team mutations publish events in follow-up changes"
     )]
-    fn publish_team_event(&self, event: &TeamMacroEvent) {
+    fn publish_team_event(&self, event: &TeamRoxEvent) {
         drop(self.event_broker.send_event(event).inspect_err(|error| {
             tracing::error!(error = ?error, "failed to schedule team event");
         }));
@@ -1221,8 +1221,8 @@ where
     async fn teammate_ids_except(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
-    ) -> Vec<MacroUserIdStr<'static>> {
+        user_id: &RoxUserIdStr<'_>,
+    ) -> Vec<RoxUserIdStr<'static>> {
         let Some(team_with_members) = self
             .team_repository
             .get_team_by_id(team_id)
@@ -1258,8 +1258,8 @@ where
 
     async fn enqueue_joining_user_contacts(
         &self,
-        user_id: &MacroUserIdStr<'_>,
-        teammate_ids: &[MacroUserIdStr<'static>],
+        user_id: &RoxUserIdStr<'_>,
+        teammate_ids: &[RoxUserIdStr<'static>],
     ) {
         if teammate_ids.is_empty() {
             return;
@@ -1344,7 +1344,7 @@ where
 
     /// Whether the user's Stripe customer still has an active or trialing
     /// subscription.
-    async fn has_live_subscription(&self, user_id: &MacroUserIdStr<'_>) -> Result<bool, TeamError> {
+    async fn has_live_subscription(&self, user_id: &RoxUserIdStr<'_>) -> Result<bool, TeamError> {
         let Some(customer_id) = self.team_repository.get_stripe_customer_id(user_id).await? else {
             return Ok(false);
         };
@@ -1363,7 +1363,7 @@ where
     async fn rollback_add_user_to_team(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         failed_step: &str,
     ) {
         self.team_repository
@@ -1382,7 +1382,7 @@ where
 
     /// The inviter's display name for invite emails. The email falls back to the
     /// inviter's address, so a failed lookup is logged rather than failing the invite.
-    async fn inviter_name(&self, inviter: &MacroUserIdStr<'_>) -> Option<String> {
+    async fn inviter_name(&self, inviter: &RoxUserIdStr<'_>) -> Option<String> {
         self.team_repository
             .get_user_display_name(inviter)
             .await
@@ -1395,7 +1395,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn send_invite_notification(
         &self,
-        recipient_id: MacroUserIdStr<'_>,
+        recipient_id: RoxUserIdStr<'_>,
         team_invite_id: uuid::Uuid,
         notification: InviteToTeamMetadata,
     ) -> anyhow::Result<()> {
@@ -1459,7 +1459,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker + Clone,
+    EB: RoxEventBroker + Clone,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -1469,7 +1469,7 @@ where
         entity_access_receipt: EntityAccessReceipt<MemberTeamRole>,
     ) -> Result<TeamMembers, TeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
 
         let members = self.team_repository.get_team_by_id(&team_id).await?.members;
         let invited = self.team_repository.get_team_invites(&team_id).await?;
@@ -1490,14 +1490,14 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker + Clone,
+    EB: RoxEventBroker + Clone,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
     #[tracing::instrument(skip(self), err)]
     async fn create_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_name: &str,
         subscription_id: Option<&stripe::SubscriptionId>,
         allow_domain_join: bool,
@@ -1564,7 +1564,7 @@ where
             team_name: team.name().to_owned(),
         })
         .await;
-        self.publish_team_event(&TeamMacroEvent::created(TeamCreatedMetadata {
+        self.publish_team_event(&TeamRoxEvent::created(TeamCreatedMetadata {
             team_id: *team.id(),
             name: team.name().to_owned(),
             slug: team.slug().to_owned(),
@@ -1580,7 +1580,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn is_user_premium(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<stripe::SubscriptionId>, TeamError> {
         let Some(customer_id) = self.team_repository.get_stripe_customer_id(user_id).await? else {
             return Ok(None);
@@ -1600,7 +1600,7 @@ where
         is_agent: bool,
     ) -> Result<Vec<TeamInvite<'_>>, InviteUsersToTeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
 
         let enterprise = self
             .team_repository
@@ -1712,7 +1712,7 @@ where
             for invite in &invited {
                 if self
                     .send_invite_notification(
-                        MacroUserIdStr::try_from_email(invite.email.as_ref())
+                        RoxUserIdStr::try_from_email(invite.email.as_ref())
                             .expect("this cannot fail"),
                         invite.team_invite_id,
                         InviteToTeamMetadata {
@@ -1758,7 +1758,7 @@ where
                 team_name: team_name.clone(),
             })
             .await;
-            self.publish_team_event(&TeamMacroEvent::invite_created(TeamInviteCreatedMetadata {
+            self.publish_team_event(&TeamRoxEvent::invite_created(TeamInviteCreatedMetadata {
                 team_id,
                 invite_id: invite.team_invite_id,
                 email: invite.email.as_ref().to_owned(),
@@ -1774,10 +1774,10 @@ where
     async fn remove_user_from_team(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), RemoveUserFromTeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
         let removed_by_id = entity_access_receipt
             .get_authenticated_user()
             .map_err(|e| RemoveUserFromTeamError::TeamError(TeamError::AccessError(e)))?
@@ -1800,10 +1800,10 @@ where
     async fn remove_team_agent(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), RemoveUserFromTeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
         let removed_by_id = entity_access_receipt
             .get_authenticated_user()
             .map_err(|e| RemoveUserFromTeamError::TeamError(TeamError::AccessError(e)))?
@@ -1817,7 +1817,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn reject_invitation(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_invite_id: &uuid::Uuid,
     ) -> Result<(), RemoveTeamInviteError> {
         let team_invite = self
@@ -1833,7 +1833,7 @@ where
             .delete_team_invite(&team_invite.team_id, team_invite_id)
             .await?;
 
-        self.publish_team_event(&TeamMacroEvent::invite_rejected(
+        self.publish_team_event(&TeamRoxEvent::invite_rejected(
             TeamInviteRejectedMetadata {
                 team_id: team_invite.team_id,
                 invite_id: team_invite.team_invite_id,
@@ -1852,7 +1852,7 @@ where
         team_invite_id: &uuid::Uuid,
     ) -> Result<(), RemoveTeamInviteError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
         let actor_user_id = entity_access_receipt
             .get_authenticated_user()
             .map_err(|error| RemoveTeamInviteError::TeamError(TeamError::AccessError(error)))?
@@ -1867,7 +1867,7 @@ where
             .delete_team_invite(&team_id, team_invite_id)
             .await?;
 
-        self.publish_team_event(&TeamMacroEvent::invite_revoked(TeamInviteRevokedMetadata {
+        self.publish_team_event(&TeamRoxEvent::invite_revoked(TeamInviteRevokedMetadata {
             team_id,
             invite_id: team_invite.team_invite_id,
             email: team_invite.email.as_ref().to_owned(),
@@ -1883,7 +1883,7 @@ where
         entity_access_receipt: EntityAccessReceipt<OwnerTeamRole>,
     ) -> Result<(), DeleteTeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
         let actor_user_id = entity_access_receipt
             .get_authenticated_user()
             .map_err(|error| DeleteTeamError::TeamError(TeamError::AccessError(error)))?
@@ -1896,7 +1896,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn remove_user_from_all_teams(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), RemoveUserFromAllTeamsError> {
         let teams = self.team_repository.get_user_teams(user_id).await?;
         for team in teams {
@@ -1924,7 +1924,7 @@ where
     async fn join_team(
         &self,
         team_invite_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<TeamMember<'_>, JoinTeamError> {
         // This will fail if the user is already in another team
         let accepted_invite = self
@@ -2203,7 +2203,7 @@ where
             role: team_member.role,
         })
         .await;
-        self.publish_team_event(&TeamMacroEvent::member_joined(TeamMemberJoinedMetadata {
+        self.publish_team_event(&TeamRoxEvent::member_joined(TeamMemberJoinedMetadata {
             team_id: team_member.team_id,
             member_id: team_member.user_id.clone().into_owned(),
             teammate_ids,
@@ -2309,11 +2309,11 @@ where
     async fn set_team_member_plan(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         plan: SeatPlan,
     ) -> Result<TeamMember<'static>, SetTeamMemberPlanError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
         // Serialize the whole use case with renewal reconciliation across replicas.
         let _billing = self.customer_repository.lock_team_billing(&team_id).await?;
         let changed_by = entity_access_receipt
@@ -2566,7 +2566,7 @@ where
         entity_access_receipt: EntityAccessReceipt<MemberTeamRole>,
     ) -> Result<TeamWithMembers, TeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
         let mut team = self.team_repository.get_team_by_id(&team_id).await?;
         team.scheduled_seat_plans = Some(HashMap::new());
         if !entity_access_receipt
@@ -2616,14 +2616,14 @@ where
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn get_user_teams(&self, user_id: &MacroUserIdStr<'_>) -> Result<Vec<Team>, TeamError> {
+    async fn get_user_teams(&self, user_id: &RoxUserIdStr<'_>) -> Result<Vec<Team>, TeamError> {
         self.team_repository.get_user_teams(user_id).await
     }
 
     #[tracing::instrument(skip(self), err)]
     async fn get_user_invites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<TeamInviteDetails>, TeamError> {
         self.team_repository.get_user_team_invites(user_id).await
     }
@@ -2634,7 +2634,7 @@ where
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
     ) -> Result<Vec<TeamInviteDetails>, TeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
         self.team_repository.get_team_invites(&team_id).await
     }
 
@@ -2650,7 +2650,7 @@ where
             .clone()
             .into_owned();
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
 
         if let Some(change) = &req.member_crm_access {
             self.crm_access_rollout.require_enabled().await?;
@@ -2696,7 +2696,7 @@ where
                     self.team_repository
                         .patch_team_user_role(&team_id, &update.team_user_id, update.role)
                         .await?;
-                    self.publish_team_event(&TeamMacroEvent::member_role_changed(
+                    self.publish_team_event(&TeamRoxEvent::member_role_changed(
                         TeamMemberRoleChangedMetadata {
                             team_id,
                             actor_user_id: actor_user_id.clone(),
@@ -2711,7 +2711,7 @@ where
 
         self.team_repository.patch_team(&team_id, req).await?;
         if req.name.is_some() || req.slug.is_some() {
-            self.publish_team_event(&TeamMacroEvent::updated(TeamUpdatedMetadata {
+            self.publish_team_event(&TeamRoxEvent::updated(TeamUpdatedMetadata {
                 team_id,
                 actor_user_id,
                 name: req.name.clone(),
@@ -2725,7 +2725,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn get_team_user_permissions(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<HashSet<roles_and_permissions::domain::model::PermissionId>, TeamError> {
         self.user_roles_and_permissions_service
             .get_user_permissions(user_id)
@@ -2765,13 +2765,13 @@ where
             .clone()
             .into_owned();
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
 
         let auto_join_domain = self
             .team_repository
             .toggle_auto_join_domain(&team_id)
             .await?;
-        self.publish_team_event(&TeamMacroEvent::auto_join_domain_toggled(
+        self.publish_team_event(&TeamRoxEvent::auto_join_domain_toggled(
             TeamAutoJoinDomainToggledMetadata {
                 team_id,
                 actor_user_id,
@@ -2788,7 +2788,7 @@ where
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
     ) -> Result<bool, TeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
 
         self.team_repository
             .toggle_allow_non_admin_invites(&team_id)
@@ -2798,7 +2798,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn try_join_team_by_domain(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<TeamMember<'static>>, JoinTeamDirectlyError> {
         let Some(team_id) = self.team_repository.get_team_id_by_domain(user_id).await? else {
             return Ok(None);
@@ -2817,9 +2817,9 @@ where
     async fn add_team_agent(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<TeamMember<'static>, JoinTeamDirectlyError> {
-        let team_id = macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id)
+        let team_id = rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id)
             .map_err(|_| TeamError::TeamDoesNotExist)?;
         let added_by = entity_access_receipt
             .get_authenticated_user()
@@ -2841,9 +2841,9 @@ where
     async fn undo_team_agent_join(
         &self,
         entity_access_receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), RemoveUserFromTeamError> {
-        let team_id = macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id)
+        let team_id = rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id)
             .map_err(|_| RemoveUserFromTeamError::TeamDoesNotExist)?;
 
         // A billed seat leaves through `remove_user_from_team`, which takes it

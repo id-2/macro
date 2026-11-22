@@ -1,0 +1,46 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT request, prepared_content, restore_body_html, restore_body_text, restore_body_rox FROM email_send_attempts WHERE attempt_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "request",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 1,
+        "name": "prepared_content",
+        "type_info": "Jsonb"
+      },
+      {
+        "ordinal": 2,
+        "name": "restore_body_html",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "restore_body_text",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 4,
+        "name": "restore_body_rox",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true,
+      true,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "99255fadc7d8db54f26482862827ba1ff35f645d89aa94c5f2ecf73b7c430c47"
+}

@@ -2,7 +2,7 @@ import { For, Show } from 'solid-js';
 
 /** Rejected entries remain identifiable without discarding successful imports. */
 export function PipelineImportFailures(props: {
-  addLabel: 'Add deal' | 'Add contact';
+  addLabel: string;
   failures?: { entry: number; key: string; reason: string }[];
 }) {
   return (

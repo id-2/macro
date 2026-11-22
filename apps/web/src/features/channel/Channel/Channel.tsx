@@ -62,8 +62,8 @@ import {
 import {
   buildMentionMarkdownString,
   markdownToPlainText,
-} from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import { MessageNotificationIndexContext } from '@notifications/components/MarkMessageNotifications';
 import { recordChannelViewWhenIdle } from '@queries/channel/activity';
 import { queryClient } from '@queries/client';
@@ -513,7 +513,7 @@ export function Channel(props: ChannelProps) {
   const inputPlaceholder = () => {
     const name = inputPlaceholderName();
     if (channel()?.agent_dm) return `Message ${name ?? 'agent'}`;
-    return name ? `Type @ to share with ${name}` : 'Type @ to share';
+    return name ? t('nav.shareWith', { name }) : t('nav.share');
   };
 
   const buildChannelMessageMention = (message: {

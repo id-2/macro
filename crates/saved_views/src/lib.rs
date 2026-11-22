@@ -2,7 +2,7 @@ pub mod domain;
 mod pgsql;
 mod storage;
 use chrono::{DateTime, Utc};
-use macro_uuid::generate_uuid_v7;
+use rox_uuid::generate_uuid_v7;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;

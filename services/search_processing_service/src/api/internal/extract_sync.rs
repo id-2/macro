@@ -4,9 +4,9 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use documents::domain::events::{DocumentMacroEvent, DocumentSyncContentUpdatedMetadata};
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
-use macro_event_broker::MacroEventBroker as _;
+use documents::domain::events::{DocumentRoxEvent, DocumentSyncContentUpdatedMetadata};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
+use rox_event_broker::RoxEventBroker as _;
 use model::document::FileType;
 
 #[cfg(test)]
@@ -30,12 +30,12 @@ pub struct ExtractSyncRequest {
     pub documents: Vec<SyncDocument>,
 }
 
-fn documents_to_events(documents: Vec<SyncDocument>) -> Vec<DocumentMacroEvent> {
+fn documents_to_events(documents: Vec<SyncDocument>) -> Vec<DocumentRoxEvent> {
     documents
         .into_iter()
         .map(|document| {
             let document_id = document.document_id;
-            DocumentMacroEvent::sync_content_updated(
+            DocumentRoxEvent::sync_content_updated(
                 document_id.clone(),
                 DocumentSyncContentUpdatedMetadata::from_extract(
                     document_id,
@@ -53,7 +53,7 @@ fn documents_to_events(documents: Vec<SyncDocument>) -> Vec<DocumentMacroEvent> 
 #[tracing::instrument(skip(ctx, _internal_authorization, req))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<ExtractSyncRequest>,
 ) -> Result<Response, Response> {
     let document_ids: Vec<&str> = req

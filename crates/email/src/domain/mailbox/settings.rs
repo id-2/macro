@@ -3,7 +3,7 @@
 
 use super::*;
 use email_api_client::domain::models::{CategoryMessage, OwnedSenderRule};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{label::Label, link::UserProvider};
 
 #[derive(Clone, Copy)]
@@ -49,19 +49,19 @@ pub enum MailboxSettingsChange {
 pub trait MailboxSettingsRepository: Send + Sync + 'static {
     fn accessible(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
     ) -> impl Future<Output = Result<SettingsMailbox, MailboxError>> + Send;
     fn store_label(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         mailbox: SettingsMailbox,
         label: Label,
     ) -> impl Future<Output = Result<Label, MailboxError>> + Send;
     /// Atomically records an optimistic category and durable provider creation.
     fn queue_label_creation(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         mailbox: SettingsMailbox,
         name: &str,
     ) -> impl Future<Output = Result<Label, MailboxError>> + Send;
@@ -73,13 +73,13 @@ pub trait MailboxSettingsRepository: Send + Sync + 'static {
     ) -> impl Future<Output = Result<(), MailboxError>> + Send;
     fn delete_label(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         label: Uuid,
     ) -> impl Future<Output = Result<(), MailboxError>> + Send;
     fn sender_block(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         sender: &str,
         blocked: bool,
@@ -197,7 +197,7 @@ impl<R, G> MailboxSettingsService<R, G> {
 impl<R: MailboxSettingsRepository, G: MailboxSettingsGateway> MailboxSettingsService<R, G> {
     pub async fn create_label(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         name: &str,
     ) -> Result<Label, MailboxError> {
@@ -228,7 +228,7 @@ impl<R: MailboxSettingsRepository, G: MailboxSettingsGateway> MailboxSettingsSer
     }
     pub async fn delete_label(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         label: Uuid,
     ) -> Result<(), MailboxError> {
@@ -237,7 +237,7 @@ impl<R: MailboxSettingsRepository, G: MailboxSettingsGateway> MailboxSettingsSer
     }
     pub async fn sender_block(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         sender: &str,
         blocked: bool,
@@ -246,7 +246,7 @@ impl<R: MailboxSettingsRepository, G: MailboxSettingsGateway> MailboxSettingsSer
         if sender.len() > 254
             || sender.chars().any(char::is_whitespace)
             || sender.chars().any(char::is_control)
-            || macro_user_id::email::EmailStr::try_from(sender.clone()).is_err()
+            || rox_user_id::email::EmailStr::try_from(sender.clone()).is_err()
         {
             return Err(MailboxError::InvalidInput("invalid sender address"));
         }
@@ -257,7 +257,7 @@ impl<R: MailboxSettingsRepository, G: MailboxSettingsGateway> MailboxSettingsSer
     }
     pub async fn blocked_senders(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
     ) -> Result<Vec<String>, MailboxError> {
         let mailbox = self.repository.accessible(actor, link).await?;
@@ -285,7 +285,7 @@ impl<R: MailboxSettingsRepository, G: MailboxSettingsGateway> MailboxSettingsSer
     }
     pub async fn pending_operations(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
     ) -> Result<Vec<MailboxSettingsOperation>, MailboxError> {
         let mailbox = self.repository.accessible(actor, link).await?;
@@ -295,7 +295,7 @@ impl<R: MailboxSettingsRepository, G: MailboxSettingsGateway> MailboxSettingsSer
         let Some(lease) = self
             .repository
             .claim_settings(
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 self.outlook_sync,
                 self.outlook_writes,
             )

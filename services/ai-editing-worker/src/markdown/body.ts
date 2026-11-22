@@ -1,12 +1,12 @@
 import { $convertToMarkdownString } from '@lexical/markdown';
 import type { InferType } from '@loro-mirror/core';
-import { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import { LoroManager } from '@rox-one/collaboration/collab/manager';
 import {
   MARKDOWN_LORO_SCHEMA,
   type MarkdownLoroSchemaType,
-} from '@macro-inc/lexical-core/markdown-loro-schema';
-import { $updateAllNodeIds } from '@macro-inc/lexical-core/plugins/nodeIdPlugin';
-import { INTERNAL_TRANSFORMERS } from '@macro-inc/lexical-core/transformers';
+} from '@rox-one/lexical-core/markdown-loro-schema';
+import { $updateAllNodeIds } from '@rox-one/lexical-core/plugins/nodeIdPlugin';
+import { INTERNAL_TRANSFORMERS } from '@rox-one/lexical-core/transformers';
 import {
   $createParagraphNode,
   $getRoot,

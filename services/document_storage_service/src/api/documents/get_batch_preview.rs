@@ -9,8 +9,8 @@ use anyhow::Result;
 use axum::extract::Json;
 use axum::extract::State;
 use axum::response::{IntoResponse, Response};
-use macro_authorization::{
-    OptionalMacroAuthorizationExtractor, UserOrInternalService, UserOrInternalServiceAuthorization,
+use rox_authorization::{
+    OptionalRoxAuthorizationExtractor, UserOrInternalService, UserOrInternalServiceAuthorization,
 };
 use model::document::{DocumentPreview, DocumentPreviewV2, WithDocumentId};
 use model::response::{GenericErrorResponse, GenericResponse};
@@ -33,7 +33,7 @@ use reqwest::StatusCode;
 )]
 pub async fn get_batch_preview_handler(
     State(ctx): State<ApiContext>,
-    user: OptionalMacroAuthorizationExtractor<AuthorizationService, UserOrInternalService>,
+    user: OptionalRoxAuthorizationExtractor<AuthorizationService, UserOrInternalService>,
     Json(req): Json<GetBatchPreviewRequest>,
 ) -> Result<(StatusCode, Json<GetBatchPreviewResponse>), Response> {
     if let Some(actor) = user.acting_entity() {
@@ -51,7 +51,7 @@ pub async fn get_batch_preview_handler(
         .map(|user| &user.macro_user_id);
 
     let document_preview_results =
-        macro_db_client::document::preview::batch_get_document_preview_v2(
+        rox_db_client::document::preview::batch_get_document_preview_v2(
             &ctx.db,
             &document_ids,
             viewer_id,

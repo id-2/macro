@@ -1,6 +1,6 @@
 //! A table's changes since a version, over Postgres, on the guest list.
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::apply_ops::service;

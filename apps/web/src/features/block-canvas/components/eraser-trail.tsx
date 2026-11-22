@@ -2,8 +2,8 @@ import {
   IDENTITY,
   type PencilPoint,
   type ShapeItem,
-} from '@macro-inc/graphics';
-import { defaultRenderers } from '@macro-inc/graphics/solid';
+} from '@rox-one/graphics';
+import { defaultRenderers } from '@rox-one/graphics/solid';
 import { createMemo, Show } from 'solid-js';
 
 const Pencil = defaultRenderers.pencil;

@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => ({
   activeSpan: undefined as string | undefined,
 }));
 
-vi.mock('@macro-inc/observability', () => {
+vi.mock('@rox-one/observability', () => {
   type Operation = (span: ReturnType<typeof named>) => Promise<unknown>;
   const named = (name: string) => ({
     span: (child: string, operation: Operation) => operation(named(child)),

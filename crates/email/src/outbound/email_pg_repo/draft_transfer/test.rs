@@ -1,8 +1,8 @@
 use super::*;
 use crate::domain::{models::mailbox_operation::*, ports::EmailRepo};
 use email_api_client::domain::models::EmailApiError;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::collections::BTreeSet;
 
@@ -225,7 +225,7 @@ async fn disconnect_keeps_destination_blocked_until_explicit_duplicate_acknowled
     let decision = plan_resolution(facts, resolution).unwrap();
     super::super::draft_resolution::commit(
         &db,
-        &MacroUserIdStr::parse_from_str(ACTOR).unwrap(),
+        &RoxUserIdStr::parse_from_str(ACTOR).unwrap(),
         decision,
     )
     .await
@@ -339,7 +339,7 @@ async fn paused_outlook_writes_still_finish_gmail_moves_and_keep_outlook_origina
     let decision = plan_resolution(reviewed, keep_original).unwrap();
     super::super::draft_resolution::commit(
         &db,
-        &MacroUserIdStr::parse_from_str(ACTOR).unwrap(),
+        &RoxUserIdStr::parse_from_str(ACTOR).unwrap(),
         decision,
     )
     .await

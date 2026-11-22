@@ -30,8 +30,8 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::routing::get;
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::MacroAuthorizationService;
-use macro_tower_layers::MacroRequestIdAndTracingLayer;
+use rox_authorization::RoxAuthorizationService;
+use rox_tower_layers::RoxRequestIdAndTracingLayer;
 use tower_http::{CompressionLevel, compression::CompressionLayer};
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
@@ -360,7 +360,7 @@ where
     Bots: BotDirectory,
     Requests: ExternalSessionRequester,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Models: AgentModelsService,
     Changes: AgentChanges,
 {
@@ -378,9 +378,9 @@ where
     let preview = states.preview.clone();
     let agent_git = states.agent_git.clone();
     let inner = api_router(states)
-        .layer(MacroRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
+        .layer(RoxRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
         .merge(health_router(runtime_commands_ready))
-        .layer(macro_cors::cors_layer())
+        .layer(rox_cors::cors_layer())
         // A session log is megabytes of repetitive JSON; gzip cuts the transfer
         // more than tenfold, and the fetch is what a session open waits on.
         // Fastest: the default level spent ~1 s of CPU on a 13 MB log for a
@@ -432,7 +432,7 @@ where
     Bots: BotDirectory,
     Requests: ExternalSessionRequester,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     Models: AgentModelsService,
     Changes: AgentChanges,
 {

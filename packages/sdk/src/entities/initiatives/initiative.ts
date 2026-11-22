@@ -6,8 +6,8 @@ import type {
 } from '../../../generated/storage/types.gen';
 import type { RichMessage } from '../../mentions';
 import { iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import {
   DiscussionComment,
   type DiscussionParent,
@@ -59,7 +59,7 @@ export interface InitiativeActivityEntry {
 }
 
 /** A group of tasks and members working toward an outcome. */
-export class Initiative extends MacroEntity<InitiativeDetail> {
+export class Initiative extends RoxEntity<InitiativeDetail> {
   /** How entity-addressed APIs identify this entity's type. */
   readonly entityType = 'initiative';
 
@@ -81,12 +81,12 @@ export class Initiative extends MacroEntity<InitiativeDetail> {
   }
 
   /** Construct a lazy initiative handle. */
-  static byId(client: MacroClient, id: string): Initiative {
+  static byId(client: RoxClient, id: string): Initiative {
     return new Initiative(client, id);
   }
 
   /** Seed from an initiative detail response. */
-  static from(client: MacroClient, record: InitiativeDetail): Initiative {
+  static from(client: RoxClient, record: InitiativeDetail): Initiative {
     return new Initiative(client, record.id, record);
   }
 
@@ -131,7 +131,7 @@ export class Initiative extends MacroEntity<InitiativeDetail> {
 
   /**
    * Tasks in this initiative. For their names, pass them to
-   * `macro.tasks.summaries` (one request) instead of calling `name()` on each.
+   * `rox.tasks.summaries` (one request) instead of calling `name()` on each.
    */
   readonly tasks = this.mappedField('taskIds', (ids) =>
     ids.map((id) => Task.byId(this.client, id)),

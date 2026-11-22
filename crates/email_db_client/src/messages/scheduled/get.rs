@@ -157,7 +157,7 @@ pub async fn get_scheduled_db_messages_by_link_id(
             m.is_draft,
             m.body_text,
             m.body_html_sanitized,
-            m.body_macro,
+            m.body_rox,
             m.headers_jsonb,
             m.created_at,
             m.updated_at

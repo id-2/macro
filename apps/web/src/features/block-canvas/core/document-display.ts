@@ -1,4 +1,4 @@
-import type { GraphicsCommand } from '@macro-inc/graphics';
+import type { GraphicsCommand } from '@rox-one/graphics';
 
 export const canEmbedDocument = (fileType: string) =>
   fileType === 'md' || fileType === 'canvas';

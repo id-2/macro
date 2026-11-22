@@ -32,22 +32,21 @@ export function EmailProviderDialog(
       <Panel depth={2} class="rounded-xl">
         <Panel.Header class="px-6">
           <Dialog.Title class="text-ink text-sm font-semibold">
-            Connect email
+            Подключить почту
           </Dialog.Title>
         </Panel.Header>
         <Panel.Body class="p-6 font-sans flex flex-col gap-3">
           <Dialog.Description class="text-ink-muted text-sm/tight">
             <Show
               when={props.outlookAvailable}
-              fallback="Connect a Gmail or Google Workspace account."
+              fallback="Подключите аккаунт Gmail или Google Workspace."
             >
-              Connect Gmail, Outlook.com, or an individual Microsoft 365
-              account.
+              Подключите Gmail, Outlook.com или личный аккаунт Microsoft 365.
             </Show>
           </Dialog.Description>
           <p class="text-ink-muted text-sm/tight">
-            Rox connects an account's email and calendar together, so keep the
-            email permissions checked on the provider's screen.
+            Rox подключает почту и календарь одного аккаунта вместе, поэтому на
+            экране провайдера не снимайте разрешения почты.
           </p>
           <Button
             variant="secondary"
@@ -71,7 +70,7 @@ export function EmailProviderDialog(
             disabled={props.disabled}
             onClick={() => props.onOpenChange(false)}
           >
-            Cancel
+            Отмена
           </Button>
         </Panel.Body>
       </Panel>

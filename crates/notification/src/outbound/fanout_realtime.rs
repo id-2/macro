@@ -5,7 +5,7 @@ mod test;
 
 use std::collections::HashSet;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde::Serialize;
 
@@ -31,9 +31,9 @@ impl<A: RealtimeSender, B: RealtimeSender> RealtimeSender for FanoutRealtimeSend
     #[tracing::instrument(err, skip_all, fields(recipient_count = recipients.len()))]
     async fn send_notifications<'a, T: Serialize + Send + Sync>(
         &self,
-        recipients: &[MacroUserIdStr<'a>],
+        recipients: &[RoxUserIdStr<'a>],
         notification: &T,
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         let (first, second) = futures::future::join(
             self.first.send_notifications(recipients, notification),
             self.second.send_notifications(recipients, notification),

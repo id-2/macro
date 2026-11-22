@@ -4,7 +4,7 @@ import type {
   CodingPreferencesBody,
   SandboxSize,
 } from '../../../generated/agent-harness/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import {
   AgentSession,
   type AgentSessionUpdates,
@@ -23,14 +23,14 @@ import {
  *
  * Do repository and coding work yourself when you can. Start another agent session only when the user asks for one, or the work needs a repository runtime you do not have.
  *
- * Start sessions from ExecuteCode. For coding work, macro.agents.coding() lists the coding personas the user can start right now, built-in ones such as Cursor included; for a chat agent, macro.agents.list() lists the user's configurable agents. Choose by name, description and instructions, preferring an agent the user named, and pass its `agent` handle to macro.agentSessions.createManaged. Never invent an agent or construct one by id. To use Macro's default persona instead, omit `agent`. Read AgentSessionNamespace.createManaged with ReadCodeDocs before the first call.
+ * Start sessions from ExecuteCode. For coding work, rox.agents.coding() lists the coding personas the user can start right now, built-in ones such as Cursor included; for a chat agent, rox.agents.list() lists the user's configurable agents. Choose by name, description and instructions, preferring an agent the user named, and pass its `agent` handle to rox.agentSessions.createManaged. Never invent an agent or construct one by id. To use Macro's default persona instead, omit `agent`. Read AgentSessionNamespace.createManaged with ReadCodeDocs before the first call.
  *
  * ```javascript
  * export async function main({macro}) {
- *   const coding = await macro.agents.coding();
+ *   const coding = await rox.agents.coding();
  *   const chosen = coding.find((option) => option.name === 'Cursor');
  *   if (!chosen) return {data: {error: 'Cursor is not connected', available: coding.map((option) => option.name)}};
- *   const session = await macro.agentSessions.createManaged({
+ *   const session = await rox.agentSessions.createManaged({
  *     agent: chosen.agent,
  *     repoUrl: 'https://github.com/acme/web',
  *     prompt: 'Fix the login redirect loop in acme/web. ...',
@@ -43,10 +43,10 @@ import {
  *
  * ## Sessions waiting for the user
  *
- * macro.agentSessions.updates() lists the user's sessions waiting on them (permission requests, questions, held tool approvals) or stalled. The user answers them only on cards: in ExecuteCode, whenever it returns items, present them with execution.views.present({widgets: [{type: "agentUpdates", items: updates.items}]}). A session's held tool calls come from session.pendingApprovals(); approve or deny one only when the user said so for that call. session.linkTask(task) links a session the user owns to its Macro task, and the session's pull request with it.
+ * rox.agentSessions.updates() lists the user's sessions waiting on them (permission requests, questions, held tool approvals) or stalled. The user answers them only on cards: in ExecuteCode, whenever it returns items, present them with execution.views.present({widgets: [{type: "agentUpdates", items: updates.items}]}). A session's held tool calls come from session.pendingApprovals(); approve or deny one only when the user said so for that call. session.linkTask(task) links a session the user owns to its Macro task, and the session's pull request with it.
  */
 export class AgentSessionNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to an agent session by id. Details load on first access. */
   byId(id: string): AgentSession {

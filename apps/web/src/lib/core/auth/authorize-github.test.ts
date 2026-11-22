@@ -47,7 +47,7 @@ describe('desktop GitHub authorization', () => {
     ).resolves.toBe(false);
 
     expect(getAuthorizationUrl).toHaveBeenCalledWith(
-      'macro:///github-link-callback'
+      'rox:///github-link-callback'
     );
     expect(mocks.invoke).toHaveBeenCalledWith('plugin:opener|open_url', {
       url: AUTHORIZATION_URL,

@@ -1,6 +1,6 @@
 import '@fontsource-variable/inter';
 import '../../../index.css';
-import type { RoxdStatus } from '@macro/tauri/roxd';
+import type { RoxdStatus } from '@rox/tauri/roxd';
 import { Button } from '@ui';
 import { createSignal, Show } from 'solid-js';
 import { render } from 'solid-js/web';
@@ -50,12 +50,16 @@ const capabilities: SetupCapabilities = {
           {
             id: 'codex',
             name: 'Codex',
+            command: 'codex',
+            config_path: '~/.codex',
             note: null,
             needs_install: true,
           },
           {
             id: 'claude-code',
             name: 'Claude Code',
+            command: 'claude',
+            config_path: '~/.claude',
             note: null,
             needs_install: false,
           },

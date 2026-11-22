@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ViewShell } from '@app/components/view-shell/ViewShell';
 import { ViewSidebar } from '@app/components/view-shell/ViewSidebar';
 import ArrowLeft from '@icon/system/regular/arrow-left.svg';
@@ -16,8 +17,8 @@ export function Topbar(props: {
       <Show when={props.onBack}>
         <ViewShell.TopBarIsland>
           <Button
-            aria-label="Back to conversations"
-            tooltip="Back to conversations"
+            aria-label={t('agentChat.backToConversations')}
+            tooltip={t('agentChat.backToConversations')}
             variant="ghost"
             size="icon-md"
             onClick={props.onBack}

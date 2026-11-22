@@ -6,19 +6,19 @@ use calendar_events::domain::{
         CalendarChangeQueryService, CalendarChangesPage, CalendarEventChange, CalendarWatermark,
         EventOccurrence,
     },
-    meeting_links::{MacroCallEventError, MeetingLinkError},
+    meeting_links::{RoxCallEventError, MeetingLinkError},
     models::{
         AttendeeResponseStatus, CalendarAttendeeInput, CalendarEvent, CalendarEventDraft,
         CalendarEventPatch, ConferenceChange, EventTime, EventVisibility,
         OutOfOfficeAutoDeclineMode, VisibleCalendar,
     },
     ports::{
-        CalendarDeletionScope, CalendarMacroCallService, CalendarMutationError,
+        CalendarDeletionScope, CalendarRoxCallService, CalendarMutationError,
         CalendarMutationService, CalendarRsvpScope, CalendarUpdateScope,
     },
 };
 use chrono::{NaiveDate, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::Value;
 use uuid::Uuid;
@@ -176,14 +176,14 @@ impl CalendarMutationService for FakeMutations {
     }
 }
 
-impl CalendarMacroCallService for FakeMutations {
+impl CalendarRoxCallService for FakeMutations {
     async fn create_event_with_macro_call(
         &self,
         requester_id: &str,
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> Result<CalendarEvent, MacroCallEventError> {
+    ) -> Result<CalendarEvent, RoxCallEventError> {
         if let Some(error) = self.meeting_failure.lock().unwrap().take() {
             return Err(error.into());
         }
@@ -201,7 +201,7 @@ impl CalendarMacroCallService for FakeMutations {
         _calendar_id: Option<Uuid>,
         _patch: CalendarEventPatch,
         _scope: CalendarUpdateScope,
-    ) -> Result<CalendarEvent, MacroCallEventError> {
+    ) -> Result<CalendarEvent, RoxCallEventError> {
         unreachable!("GraphQL updates carry no Rox call")
     }
 }
@@ -272,7 +272,7 @@ async fn execute(
     authenticated: bool,
 ) -> async_graphql::Response {
     let schema = Schema::build(
-        GraphqlCalendarQuery::new(MacroUserIdStr::parse_from_str(VIEWER).unwrap()),
+        GraphqlCalendarQuery::new(RoxUserIdStr::parse_from_str(VIEWER).unwrap()),
         CalendarMutationRoot,
         EmptySubscription,
     )
@@ -280,7 +280,7 @@ async fn execute(
     .finish();
     let request = async_graphql::Request::new(query);
     let request = if authenticated {
-        request.data(MacroUserIdStr::parse_from_str(VIEWER).unwrap())
+        request.data(RoxUserIdStr::parse_from_str(VIEWER).unwrap())
     } else {
         request
     };

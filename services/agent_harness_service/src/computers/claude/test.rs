@@ -3,13 +3,13 @@ use hosted_runtimes::domain::models::FleetAttachment;
 #[derive(Clone)]
 struct TestIdentity;
 
-impl macro_authorization::JwtValidator for TestIdentity {
+impl rox_authorization::JwtValidator for TestIdentity {
     fn validate_credential(
         &self,
         jwt: &str,
     ) -> Result<
-        macro_authorization::ValidatedCredential,
-        rootcause::Report<macro_authorization::MacroAuthorizationError>,
+        rox_authorization::ValidatedCredential,
+        rootcause::Report<rox_authorization::RoxAuthorizationError>,
     > {
         let user_id = match jwt {
             "owner" => "macro|owner@example.com",
@@ -19,13 +19,13 @@ impl macro_authorization::JwtValidator for TestIdentity {
             "resident" => "macro|resident@example.com",
             _ => {
                 return Err(rootcause::Report::new(
-                    macro_authorization::MacroAuthorizationError::InvalidCredentials,
+                    rox_authorization::RoxAuthorizationError::InvalidCredentials,
                 ));
             }
         };
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
-            identity: macro_authorization::ValidatedIdentity {
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
+            identity: rox_authorization::ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
                 routine_id: None,
@@ -88,8 +88,8 @@ async fn computer_route_access(
         ports::{MockComputerTeamAgents, MockHarnessRepo},
         service::HarnessServiceImpl,
     };
-    use macro_authorization::{
-        InternalAuthConfig, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+    use rox_authorization::{
+        InternalAuthConfig, RoxAuthorizationServiceImpl, RoxAuthorizationState,
         NoBotAuthorizer, NoUserApiKeyAuthorizer,
     };
     use std::sync::Arc;
@@ -137,7 +137,7 @@ async fn computer_route_access(
                             },
                         },
                         signed_in_by: Some(
-                            macro_user_id::user_id::MacroUserIdStr::try_from(
+                            rox_user_id::user_id::RoxUserIdStr::try_from(
                                 "macro|owner@example.com".to_owned(),
                             )
                             .unwrap(),
@@ -157,7 +157,7 @@ async fn computer_route_access(
             })
         })
     });
-    let authorization = MacroAuthorizationServiceImpl::new(
+    let authorization = RoxAuthorizationServiceImpl::new(
         TestIdentity,
         InternalAuthConfig {
             api_key: "test-internal-key".to_owned(),
@@ -171,7 +171,7 @@ async fn computer_route_access(
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
     for user in ["macro|owner@example.com", "macro|other@example.com"] {
         flags.set(
-            macro_user_id::user_id::MacroUserIdStr::try_from(user.to_owned()).unwrap(),
+            rox_user_id::user_id::RoxUserIdStr::try_from(user.to_owned()).unwrap(),
             Ok(feature_flags::FlagSnapshot::new([(
                 "enable-macro-computers".into(),
                 feature_flags::FlagValue::Boolean(enabled),
@@ -193,7 +193,7 @@ async fn computer_route_access(
     let app = super::router(
         harnessd,
         harnesses,
-        MacroAuthorizationState::new(Arc::new(authorization)),
+        RoxAuthorizationState::new(Arc::new(authorization)),
         hosted_runtimes::domain::rollout::ComputerRollout::new(flags),
         fleet_attachment,
         &tasks,
@@ -461,10 +461,10 @@ async fn a_completion_whose_caller_left_still_records_its_signer() {
         ),
         fleet_attachment: FleetAttachment::Attached,
         cleanup: cleanup.clone(),
-        authorization_state: macro_authorization::MacroAuthorizationState::new(Arc::new(())),
+        authorization_state: rox_authorization::RoxAuthorizationState::new(Arc::new(())),
     };
     let signer =
-        macro_user_id::user_id::MacroUserIdStr::try_from("macro|owner@example.com".to_owned())
+        rox_user_id::user_id::RoxUserIdStr::try_from("macro|owner@example.com".to_owned())
             .unwrap();
     let computer = computer_id::ComputerId::new_from_uuid(uuid::Uuid::from_u128(1));
 
@@ -547,8 +547,8 @@ async fn claude_sign_in_follows_the_computer_teams_admins_not_its_buyer() {
         ports::{MockComputerTeamAgents, MockHarnessRepo},
         service::HarnessServiceImpl,
     };
-    use macro_authorization::{
-        InternalAuthConfig, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+    use rox_authorization::{
+        InternalAuthConfig, RoxAuthorizationServiceImpl, RoxAuthorizationState,
         NoBotAuthorizer, NoUserApiKeyAuthorizer,
     };
     use std::sync::Arc;
@@ -577,7 +577,7 @@ async fn claude_sign_in_follows_the_computer_teams_admins_not_its_buyer() {
                     uuid::Uuid::from_u128(1),
                 )),
                 team_agent_user_id: None,
-                claude_mode: ClaudeMode::MacroCredits,
+                claude_mode: ClaudeMode::RoxCredits,
             }))
         })
     });
@@ -592,7 +592,7 @@ async fn claude_sign_in_follows_the_computer_teams_admins_not_its_buyer() {
     });
     repo.expect_user_owns_team()
         .returning(|_, _| Box::pin(async { Ok(false) }));
-    let authorization = MacroAuthorizationServiceImpl::new(
+    let authorization = RoxAuthorizationServiceImpl::new(
         TestIdentity,
         InternalAuthConfig {
             api_key: "test-internal-key".to_owned(),
@@ -604,7 +604,7 @@ async fn claude_sign_in_follows_the_computer_teams_admins_not_its_buyer() {
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
     for user in ["macro|owner@example.com", "macro|other@example.com"] {
         flags.set(
-            macro_user_id::user_id::MacroUserIdStr::try_from(user.to_owned()).unwrap(),
+            rox_user_id::user_id::RoxUserIdStr::try_from(user.to_owned()).unwrap(),
             Ok(feature_flags::FlagSnapshot::new([(
                 "enable-macro-computers".into(),
                 feature_flags::FlagValue::Boolean(true),
@@ -627,7 +627,7 @@ async fn claude_sign_in_follows_the_computer_teams_admins_not_its_buyer() {
     let app = super::router(
         harnessd,
         harnesses,
-        MacroAuthorizationState::new(Arc::new(authorization)),
+        RoxAuthorizationState::new(Arc::new(authorization)),
         hosted_runtimes::domain::rollout::ComputerRollout::new(flags),
         FleetAttachment::Attached,
         &tasks,

@@ -13,9 +13,9 @@ use axum::{
     routing::get,
 };
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_authorization::{
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
+use rox_authorization::{
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
     ValidatedIdentity,
 };
 use serde_json::Value;
@@ -35,19 +35,19 @@ impl JwtValidator for FixtureCredential {
     fn validate_credential(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, rootcause::Report<RoxAuthorizationError>> {
         let user = match token {
             "owner" => OWNER,
             "member" => MEMBER,
             "outsider" => OUTSIDER,
             _ => {
                 return Err(rootcause::Report::new(
-                    MacroAuthorizationError::InvalidCredentials,
+                    RoxAuthorizationError::InvalidCredentials,
                 ));
             }
         };
         Ok(ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -71,8 +71,8 @@ fn app(pool: &PgPool) -> Router {
         entity_access_service: Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
             pool.clone(),
         ))),
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
                 FixtureCredential,
                 InternalAuthConfig {
                     api_key: "fixture-only".into(),

@@ -10,7 +10,7 @@ version = "0.1.0"
 default = ["redis"]
 redis = [
   "dep:chrono",
-  "dep:macro_uuid",
+  "dep:rox_uuid",
   "dep:redis",
   "dep:serde_json",
 ]
@@ -19,7 +19,7 @@ redis = [
 agent_session = { path = "../agent_session", default-features = false }
 broadcast = { path = "../broadcast" }
 chrono = { workspace = true, optional = true }
-macro_uuid = { path = "../macro_uuid", optional = true }
+rox_uuid = { path = "../rox_uuid", optional = true }
 redis = { workspace = true, optional = true, features = [
   "aio",
   "streams",
@@ -37,7 +37,7 @@ agent-client-protocol = { workspace = true }
 agent_runtime_protocol = { path = "../agent_runtime_protocol" }
 agent_session = { path = "../agent_session", default-features = false, features = ["test-utils"] }
 chrono = { workspace = true }
-macro_env_var = { path = "../macro_env_var" }
-macro_uuid = { path = "../macro_uuid" }
+rox_env_var = { path = "../rox_env_var" }
+rox_uuid = { path = "../rox_uuid" }
 serde_json = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "test-util", "time"] }

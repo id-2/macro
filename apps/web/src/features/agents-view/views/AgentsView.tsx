@@ -5,6 +5,7 @@ import { AgentSettings } from '@app/features/settings/AgentSettings';
 import { IntegrationsPage } from '@app/features/settings/IntegrationsPage';
 import { withEntityNotifications } from '@app/features/soup/entity-notifications';
 import { ViewTour } from '@app/features/tours/ViewTour';
+import { t } from '@app/lib/i18n';
 import { TutorialPill } from '@app/features/video-tutorials';
 import {
   useGlobalBlockOrchestrator,
@@ -392,9 +393,9 @@ function AgentsWorkspace(props: { route?: AgentsRoute }) {
     });
   };
   const pageTitle = () => {
-    if (page() === 'routines') return 'Routines';
-    if (page() === 'agents') return 'Agents';
-    if (page() === 'connections') return 'Integrations';
+    if (page() === 'routines') return 'Рутины';
+    if (page() === 'agents') return 'Агенты';
+    if (page() === 'connections') return 'Подключения';
     return undefined;
   };
 
@@ -569,7 +570,7 @@ function AgentsWorkspace(props: { route?: AgentsRoute }) {
                             value={() => (
                               <div class="px-4 py-16 text-center">
                                 <ComposerGreeting>
-                                  What should we work on?
+                                  {t('agentControls.workOn')}
                                 </ComposerGreeting>
                               </div>
                             )}

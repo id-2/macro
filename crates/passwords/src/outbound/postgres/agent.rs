@@ -8,13 +8,13 @@ use crate::domain::agent::{
         IntentAgent, NewRequest, PendingRequest, RequestOutcome,
     },
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgConnection;
 
 const UNDELIVERED_BATCH: i64 = 100;
 
-fn user(id: String) -> Result<MacroUserIdStr<'static>, Error> {
-    MacroUserIdStr::parse_from_str(&id)
+fn user(id: String) -> Result<RoxUserIdStr<'static>, Error> {
+    RoxUserIdStr::parse_from_str(&id)
         .map(CowLike::into_owned)
         .map_err(|_| Error::Unavailable)
 }
@@ -253,7 +253,7 @@ impl AgentRepository for PgRepository {
     async fn catalog(
         &self,
         team: TeamId,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         query: &str,
         after: Option<ItemId>,
         limit: u8,
@@ -288,7 +288,7 @@ impl AgentRepository for PgRepository {
         &self,
         team: TeamId,
         items: &[ItemId],
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Vec<(ItemId, AgentAccessRow)>, Error> {
         let ids: Vec<Uuid> = items.iter().map(|item| item.0).collect();
         let rows = sqlx::query!(
@@ -558,7 +558,7 @@ impl AgentRepository for PgRepository {
     async fn pending(
         &self,
         team: TeamId,
-        creator: Option<&MacroUserIdStr<'_>>,
+        creator: Option<&RoxUserIdStr<'_>>,
         after: Option<Uuid>,
         limit: u8,
     ) -> Result<Vec<PendingRequest>, Error> {
@@ -616,7 +616,7 @@ impl AgentRepository for PgRepository {
         team: TeamId,
         item: ItemId,
         request: Uuid,
-    ) -> Result<Option<(MacroUserIdStr<'static>, AgentAccessRow)>, Error> {
+    ) -> Result<Option<(RoxUserIdStr<'static>, AgentAccessRow)>, Error> {
         let stored = sqlx::query!(
             r#"SELECT agent_user_id,approved_by IS NOT NULL AS "approved!",permission_revision,request_id,request_permission,request_status,request_revision,request_updated_at
             FROM password_agent_access WHERE team_id=$1 AND item_id=$2 AND request_id=$3"#,
@@ -734,9 +734,9 @@ impl AgentRepository for PgRepository {
         &self,
         team: TeamId,
         item: ItemId,
-        after: Option<&MacroUserIdStr<'_>>,
+        after: Option<&RoxUserIdStr<'_>>,
         limit: u8,
-    ) -> Result<Vec<(MacroUserIdStr<'static>, AgentAccessRow)>, Error> {
+    ) -> Result<Vec<(RoxUserIdStr<'static>, AgentAccessRow)>, Error> {
         let rows = sqlx::query!(
             r#"SELECT agent_user_id,approved_by IS NOT NULL AS "approved!",permission_revision,request_id,request_permission,request_status,request_revision,request_updated_at
             FROM password_agent_access WHERE team_id=$1 AND item_id=$2 AND ($3::text IS NULL OR agent_user_id>$3) ORDER BY agent_user_id LIMIT $4"#,

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   DocumentAccessDenied,
   useSharedAccessUpdates,
@@ -21,7 +22,7 @@ import { useIsAuthenticated } from '@core/context/user';
 import { trackOpen } from '@core/internal/track-open';
 import { fireAndForget } from '@core/util/fireAndForget';
 import SpinnerIcon from '@icon/system/regular/spinner.svg';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type { AccessLevel } from '@service-storage/generated/schemas/accessLevel';
 import type { DocumentMetadata } from '@service-storage/generated/schemas/documentMetadata';
 import { Button } from '@ui';
@@ -81,7 +82,7 @@ function FileDetailBodyState(props: {
         fallback={
           <SpinnerIcon
             aria-hidden={false}
-            aria-label={`Loading ${props.label}`}
+            aria-label={t('drive.loadingEntity', { entity: props.label })}
             class="size-5 animate-spin"
           />
         }
@@ -91,12 +92,12 @@ function FileDetailBodyState(props: {
             class="flex max-w-xl flex-col items-center gap-3 px-6 text-center"
             role="alert"
           >
-            <span>This {props.label} couldn’t be displayed.</span>
+            <span>{t('drive.couldNotDisplay', { entity: props.label })}</span>
             <pre class="max-h-48 max-w-full overflow-auto whitespace-pre-wrap text-left text-failure text-xs">
               {String(props.error)}
             </pre>
             <Button variant="secondary" size="sm" onClick={props.onAction}>
-              {props.actionLabel ?? 'Reset'}
+              {props.actionLabel ?? t('drive.reset')}
             </Button>
           </div>
         </Match>
@@ -223,7 +224,7 @@ export function FileDetailLoadGate<
             <FileDetailBodyState
               label={props.label}
               error={error()}
-              actionLabel="Try again"
+              actionLabel={t('common.tryAgain')}
               onAction={() => fireAndForget(refetch(), 'drive-view')}
             />
           )}
@@ -238,7 +239,7 @@ export function FileDetailLoadGate<
                   <FileDetailBodyState
                     label={props.label}
                     error={error}
-                    actionLabel="Reset"
+                    actionLabel={t('drive.reset')}
                     onAction={reset}
                   />
                 )}

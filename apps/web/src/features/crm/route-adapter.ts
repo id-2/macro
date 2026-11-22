@@ -25,7 +25,7 @@ import {
   fileTypeToResolvedBlockName,
 } from '@core/constant/allBlocks';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type {
   CrmRecordNavigation,
   CrmRoute,

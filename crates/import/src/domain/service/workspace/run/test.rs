@@ -17,8 +17,8 @@ use import_notion::domain::model::{
     SearchObject,
 };
 use import_notion::domain::ports::{NotionApi, NotionError};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use sqlx::{PgConnection, PgPool};
 use tokio::sync::Notify;
 use tokio_util::task::TaskTracker;
@@ -126,7 +126,7 @@ impl NotionConnections for Connected {
 
     async fn for_user(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
     ) -> std::result::Result<Option<Pages>, NotionError> {
         Ok(Some(Pages))
     }
@@ -154,7 +154,7 @@ struct Writer {
 impl WorkspaceWriter for Writer {
     async fn create_tracker_project(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         id: Uuid,
         _: &str,
         _: &str,
@@ -174,7 +174,7 @@ impl WorkspaceWriter for Writer {
     }
     async fn create_tracker_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         id: Uuid,
         _: &str,
         _: &str,
@@ -190,7 +190,7 @@ impl WorkspaceWriter for Writer {
     }
     async fn link_tracker_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         id: Uuid,
         _: &crate::domain::ports::TrackerTaskRelations,
     ) -> anyhow::Result<()> {
@@ -206,7 +206,7 @@ impl WorkspaceWriter for Writer {
 
     async fn create_folder(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         name: &str,
         _: Option<Uuid>,
     ) -> anyhow::Result<Uuid> {
@@ -214,13 +214,13 @@ impl WorkspaceWriter for Writer {
         Ok(Uuid::now_v7())
     }
 
-    async fn folder_exists(&self, _: &MacroUserIdStr<'static>, _: Uuid) -> anyhow::Result<bool> {
+    async fn folder_exists(&self, _: &RoxUserIdStr<'static>, _: Uuid) -> anyhow::Result<bool> {
         Ok(true)
     }
 
     async fn share_with_team(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         entity: SharedEntity,
     ) -> anyhow::Result<()> {
         self.shares.lock().unwrap().push(entity);
@@ -229,7 +229,7 @@ impl WorkspaceWriter for Writer {
 
     async fn create_document(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         _: &str,
@@ -253,7 +253,7 @@ impl WorkspaceWriter for Writer {
 
     async fn create_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
         _: &str,
         _: &str,
@@ -267,7 +267,7 @@ impl WorkspaceWriter for Writer {
 
     async fn create_database(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
     ) -> anyhow::Result<NewDatabase> {
         unimplemented!("only pages here")
@@ -275,14 +275,14 @@ impl WorkspaceWriter for Writer {
 
     async fn apply_database_ops(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
         _: Vec<models_databases::DatabaseOp>,
     ) -> anyhow::Result<Vec<models_databases::OpResult>> {
         unimplemented!("only pages here")
     }
 
-    async fn team_members(&self, _: &MacroUserIdStr<'static>) -> anyhow::Result<Vec<TeamMember>> {
+    async fn team_members(&self, _: &RoxUserIdStr<'static>) -> anyhow::Result<Vec<TeamMember>> {
         Ok(Vec::new())
     }
 }
@@ -290,7 +290,7 @@ impl WorkspaceWriter for Writer {
 impl EntityCreator for Writer {
     async fn can_view(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: crate::domain::models::ImportSource,
         _: &str,
     ) -> anyhow::Result<bool> {
@@ -298,7 +298,7 @@ impl EntityCreator for Writer {
     }
     async fn create_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &str,
         _: &ImportedTaskProperties,
@@ -308,7 +308,7 @@ impl EntityCreator for Writer {
 
     async fn create_notion_document(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &str,
         _: &NotionLinks,
@@ -319,7 +319,7 @@ impl EntityCreator for Writer {
 
     async fn create_channel(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &ImportTargetReservation,
         _: &[String],
@@ -352,8 +352,8 @@ fn service(
     .with_job_shutdown(shutdown, tracker)
 }
 
-fn user(label: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|{label}@example.com"))
+fn user(label: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|{label}@example.com"))
         .unwrap()
         .into_owned()
 }
@@ -390,14 +390,14 @@ fn planned_page(hex: char, title: &str, shared: bool) -> PlanRow {
 }
 
 /// A user with an approved two-page plan.
-async fn approved_plan(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> (Uuid, Vec<Uuid>) {
+async fn approved_plan(pool: &PgPool, owner: &RoxUserIdStr<'static>) -> (Uuid, Vec<Uuid>) {
     approved(pool, owner, &[page('a', "Roadmap"), page('b', "Spec")]).await
 }
 
 /// A user with an approved plan of `rows`.
 async fn approved(
     pool: &PgPool,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     rows: &[PlanRow],
 ) -> (Uuid, Vec<Uuid>) {
     approved_source(pool, owner, rows, ImportSource::Notion).await
@@ -405,7 +405,7 @@ async fn approved(
 
 async fn approved_source(
     pool: &PgPool,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     rows: &[PlanRow],
     source: ImportSource,
 ) -> (Uuid, Vec<Uuid>) {
@@ -624,7 +624,7 @@ async fn a_run_that_keeps_stopping_is_given_up_with_its_rows_back_in_staged(pool
 }
 
 /// A Rox user on `team`, which is made on first use.
-async fn teammate(pool: &PgPool, label: &str, team: Uuid) -> MacroUserIdStr<'static> {
+async fn teammate(pool: &PgPool, label: &str, team: Uuid) -> RoxUserIdStr<'static> {
     let id = Uuid::now_v7();
     let email = format!("{label}@example.com");
     let user_id = format!("macro|{email}");
@@ -662,13 +662,13 @@ async fn teammate(pool: &PgPool, label: &str, team: Uuid) -> MacroUserIdStr<'sta
     .execute(pool)
     .await
     .unwrap();
-    MacroUserIdStr::parse_from_str(&user_id)
+    RoxUserIdStr::parse_from_str(&user_id)
         .unwrap()
         .into_owned()
 }
 
 /// Move `owner`'s run to `ready`, as planning leaves it.
-async fn planned(repo: &PgImportRepo, owner: &MacroUserIdStr<'static>) {
+async fn planned(repo: &PgImportRepo, owner: &RoxUserIdStr<'static>) {
     repo.start_run(owner, ImportSource::Notion, &[])
         .await
         .unwrap();

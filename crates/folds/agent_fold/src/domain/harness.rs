@@ -82,7 +82,7 @@ use agent_client_protocol::schema::v1::{
     Content, ContentBlock, Meta, ToolCall, ToolCallContent, ToolCallLocation, ToolCallUpdate,
     ToolKind,
 };
-use macro_tools::MacroTool;
+use macro_tools::RoxTool;
 use serde::Deserialize;
 use serde::de::DeserializeOwned;
 use serde_json::Value;
@@ -441,11 +441,11 @@ pub fn tool_shape<'name>(
     name: &'name ToolName,
     frame: &ToolFrame<'_>,
 ) -> ToolShape<'name> {
-    match reader.macro_tool(name).map(MacroTool::of) {
-        Some(MacroTool::User(tool)) => ToolShape::UserTool(tool),
-        Some(MacroTool::Subagent) => ToolShape::Subagent,
-        Some(MacroTool::View) => ToolShape::View,
-        Some(MacroTool::Other(tool)) => ToolShape::Macro(tool),
+    match reader.macro_tool(name).map(RoxTool::of) {
+        Some(RoxTool::User(tool)) => ToolShape::UserTool(tool),
+        Some(RoxTool::Subagent) => ToolShape::Subagent,
+        Some(RoxTool::View) => ToolShape::View,
+        Some(RoxTool::Other(tool)) => ToolShape::Macro(tool),
         None if reader.is_subagent(name, frame) => ToolShape::Subagent,
         None => ToolShape::Harness,
     }
@@ -462,7 +462,7 @@ pub fn subagent_result(
     name: &ToolName,
     frame: &ToolFrame<'_>,
 ) -> Option<SubagentResult> {
-    if reader.macro_tool(name).map(MacroTool::of) == Some(MacroTool::Subagent) {
+    if reader.macro_tool(name).map(RoxTool::of) == Some(RoxTool::Subagent) {
         let (value, error) = reader.unwrap_tool_output(frame.raw_output?);
         return macro_tools::subagent_result(&value, error);
     }

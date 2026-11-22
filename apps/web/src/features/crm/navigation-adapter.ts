@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import { useSplitPanel } from '@components/app/split-layout/layoutUtils';
 import { toast } from '@core/component/Toast/Toast';
@@ -36,10 +37,10 @@ export async function copyCrmPipelineLink(pipelineId: string) {
 async function copyCrmLink(url: string, options: { silent?: boolean } = {}) {
   try {
     await navigator.clipboard.writeText(url);
-    if (!options.silent) toast.success('Link copied to clipboard');
+    if (!options.silent) toast.success(t('crm.linkCopied'));
     return true;
   } catch {
-    toast.failure('Failed to copy link');
+    toast.failure(t('crm.linkCopyFailed'));
     return false;
   }
 }
@@ -49,10 +50,10 @@ export async function copyCrmRecordLink(target: {
 }) {
   try {
     await navigator.clipboard.writeText(buildSimpleEntityUrl(target));
-    toast.success('Link copied to clipboard');
+    toast.success(t('crm.linkCopied'));
     return true;
   } catch {
-    toast.failure('Could not copy link. Please try again.');
+    toast.failure(t('crm.linkCopyFailedTry'));
     return false;
   }
 }

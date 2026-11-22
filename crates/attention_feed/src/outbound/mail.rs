@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use email::domain::ports::EmailService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use uuid::Uuid;
 
@@ -27,7 +27,7 @@ where
 {
     async fn set_archived(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> Result<(), Report> {

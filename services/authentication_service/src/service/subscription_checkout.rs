@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, future::Future};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use teams::domain::model::SeatPlan;
 use thiserror::Error;
 
@@ -40,7 +40,7 @@ pub struct TrialEligibility {
 /// Authenticated purchase intent; the caller cannot choose a customer or price ID.
 pub struct CheckoutRequest<'a> {
     /// Identity established by the authentication boundary.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// Requested seat plan.
     pub plan: SeatPlan,
     /// Request the introductory Premium trial instead of immediate billing.
@@ -107,7 +107,7 @@ pub trait CheckoutGateway: Send + Sync {
     /// Resolve the authenticated account's billing customer.
     fn customer(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<Self::Customer>, Self::Error>> + Send;
     /// Include every page and every subscription status.
     fn history(
@@ -117,7 +117,7 @@ pub trait CheckoutGateway: Send + Sync {
     /// Read the offer already granted by the invite domain.
     fn invite_promotion(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<String>, Self::Error>> + Send;
     /// Resolve an active promotion code.
     fn promotion(
@@ -149,7 +149,7 @@ impl<G: CheckoutGateway> CheckoutService<G> {
     #[tracing::instrument(skip_all, err)]
     pub async fn trial_eligibility(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<TrialEligibility, CheckoutError<G::Error>> {
         let customer = self
             .gateway
@@ -225,7 +225,7 @@ impl<G: CheckoutGateway> CheckoutService<G> {
         })
     }
 
-    async fn invite_promotion(&self, user: &MacroUserIdStr<'_>) -> Option<G::Promotion> {
+    async fn invite_promotion(&self, user: &RoxUserIdStr<'_>) -> Option<G::Promotion> {
         let offer = async {
             match self.gateway.invite_promotion(user).await? {
                 Some(code) => self.gateway.promotion(&code).await,

@@ -7,7 +7,7 @@ use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, EntityType, RequiredPermission, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rand::RngCore;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -33,7 +33,7 @@ pub struct AgentIdentity {
     /// Agent-session entity ID.
     pub session: AgentSessionId,
     /// Account whose preview quota is charged.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
 }
 /// Public state of one preview; contains no credentials.
 #[derive(Clone, Debug, Serialize, Deserialize)]

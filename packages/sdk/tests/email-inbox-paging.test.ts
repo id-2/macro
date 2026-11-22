@@ -1,5 +1,5 @@
 import { afterEach, expect, mock, spyOn, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 afterEach(() => mock.restore());
 

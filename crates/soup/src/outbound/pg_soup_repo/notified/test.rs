@@ -5,8 +5,8 @@ use item_filters::ast::EntityFilterAst;
 use item_filters::ast::agent_session::AgentSessionLiteral;
 use item_filters::ast::chat::ChatLiteral;
 use item_filters::ast::document::DocumentLiteral;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -53,7 +53,7 @@ fn req<'a>(
     hydratable: NotifiedHydratableTypes,
 ) -> NotifiedSoupRequest<'a> {
     NotifiedSoupRequest {
-        user_id: MacroUserIdStr::parse_from_str(USER_1).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER_1).unwrap(),
         limit: 50,
         after: None,
         filter,

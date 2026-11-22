@@ -5,9 +5,9 @@ use crate::domain::mailbox::link_manager::purge::{
 use email_db_client::links::delete::mark_link_deleting;
 use email_db_client::links::insert::upsert_link;
 use email_db_client::links::update::update_link_sync_status;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::email::EmailStr;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::email::EmailStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::service::link::{Link, UserProvider};
 use sqlx::{Pool, Postgres};
 use std::collections::HashMap;
@@ -148,8 +148,8 @@ fn tiny_batches() -> PurgePacing {
 
 fn gmail_link(email: &str) -> anyhow::Result<Link> {
     Ok(Link {
-        id: macro_uuid::generate_uuid_v7(),
-        macro_id: MacroUserIdStr::try_from(format!("macro|{email}"))?,
+        id: rox_uuid::generate_uuid_v7(),
+        macro_id: RoxUserIdStr::try_from(format!("macro|{email}"))?,
         fusionauth_user_id: "33333333-3333-3333-3333-333333333333".to_string(),
         email_address: EmailStr::try_from(email.to_string())?,
         provider: UserProvider::Gmail,
@@ -468,7 +468,7 @@ async fn sync_does_not_resume_on_a_link_being_deleted(pool: Pool<Postgres>) -> a
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn purge_of_a_missing_link_is_a_no_op(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let missing = macro_uuid::generate_uuid_v7();
+    let missing = rox_uuid::generate_uuid_v7();
 
     mark_link_deleting(&pool, missing).await?;
     assert_eq!(
@@ -516,7 +516,7 @@ async fn purge_queues_its_attachment_documents_for_the_trash(
     .bind(PURGED)
     .fetch_one(&pool)
     .await?;
-    let document_id = macro_uuid::generate_uuid_v7().to_string();
+    let document_id = rox_uuid::generate_uuid_v7().to_string();
     sqlx::query(
         r#"INSERT INTO "Document" (id, name, owner, "fileType", uploaded)
            VALUES ($1, 'invoice', $2, 'pdf', true)"#,

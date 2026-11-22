@@ -18,7 +18,7 @@ import type { ValidHotkey } from '@core/hotkey/types';
 import { blockHotkeyScopeSignal } from '@core/signal/blockElement';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { type EntityData, isEmailEntity, isTaskEntity } from '@entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { SYSTEM_PROPERTY_IDS } from '@property/constants';
 import type { Property, PropertyDefinitionDomain } from '@property/types';
 import { useIsTeamAdmin } from '@queries/team/teams';

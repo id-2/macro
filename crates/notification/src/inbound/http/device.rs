@@ -5,7 +5,7 @@ use axum::{
     extract::State,
     routing::{delete, post},
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model_error_response::ErrorResponse;
 use reqwest::StatusCode;
 
@@ -17,7 +17,7 @@ use crate::inbound::http::NotificationRouterState;
 pub fn device_router<S, Auth>() -> Router<NotificationRouterState<S, Auth>>
 where
     S: NotificationReader,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         .route("/register", post(register_device::<S, Auth>))
@@ -26,9 +26,9 @@ where
 
 /// Register a device for push notifications.
 #[tracing::instrument(skip(state, user, req))]
-async fn register_device<S: NotificationReader, Auth: MacroAuthorizationService>(
+async fn register_device<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(state): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<DeviceRequest>,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
     state
@@ -55,9 +55,9 @@ async fn register_device<S: NotificationReader, Auth: MacroAuthorizationService>
 
 /// Unregister the calling user's device from push notifications.
 #[tracing::instrument(skip(state, user, req))]
-async fn unregister_device<S: NotificationReader, Auth: MacroAuthorizationService>(
+async fn unregister_device<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(state): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<DeviceRequest>,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
     state

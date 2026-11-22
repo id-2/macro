@@ -10,7 +10,7 @@ import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, rm } from 'node:fs/promises';
 import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { renderSdkDocs } from '@macro-inc/sdk-docs/render';
+import { renderSdkDocs } from '@rox-one/sdk-docs/render';
 import ts from 'typescript';
 import { entityDirectories } from './catalog';
 import { packageEntityDocs, readMarkdownPages } from './typedoc';

@@ -7,7 +7,7 @@ import {
   $createDocumentCardNode,
   $isDocumentCardNode,
   $isDocumentMentionNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   cleanup,
   fireEvent,

@@ -3,7 +3,7 @@ import {
   type ConnectorTarget,
   connectorAnchors,
   worldToScreen,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { For, Show } from 'solid-js';
 
 /** Only the hovered shape exposes ports; the active port gets a larger halo. */

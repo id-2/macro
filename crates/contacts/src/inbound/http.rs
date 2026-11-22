@@ -7,10 +7,10 @@ use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{RequestPartsExt, Router};
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rate_limit::domain::models::RateLimitOk;
 use rate_limit::inbound::{RateLimitExtractable, rate_limit_middleware};
 use rate_limit::{RateLimitConfig, RateLimitKey, RateLimitResult, RateLimitService};
@@ -27,7 +27,7 @@ use utoipa::{OpenApi, ToSchema};
 pub struct GetContactsResponse {
     /// The list of contact user IDs.
     #[schema(value_type = Vec<String>)]
-    pub contacts: Vec<MacroUserIdStr<'static>>,
+    pub contacts: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Request body for POST /contacts.
@@ -35,7 +35,7 @@ pub struct GetContactsResponse {
 pub struct AddContactRequest {
     /// The user ID to add as a contact.
     #[schema(value_type = String)]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
 }
 
 /// Query string for GET /contacts/search.
@@ -56,7 +56,7 @@ pub struct SearchPeopleParams {
 pub struct SearchedPerson {
     /// The person's user ID (`macro|<email>`).
     #[schema(value_type = String)]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Resolved name, as the contact directory shows it; null when unknown.
     pub name: Option<String>,
     /// Whether the person is on the viewer's current team.
@@ -99,9 +99,9 @@ pub struct SearchPeopleResponse {
     skip_all,
     fields(actor = %authorization.acting_entity())
 )]
-pub async fn search_people_handler<S: PeopleSearchService, Auth: MacroAuthorizationService>(
+pub async fn search_people_handler<S: PeopleSearchService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<S>>,
-    Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Query(params): Query<SearchPeopleParams>,
 ) -> Result<Json<SearchPeopleResponse>, (StatusCode, &'static str)> {
     let query = PeopleSearchQuery::new(&params.query)
@@ -139,9 +139,9 @@ pub async fn search_people_handler<S: PeopleSearchService, Auth: MacroAuthorizat
     skip(authorization, contacts),
     fields(actor = %authorization.acting_entity())
 )]
-pub async fn handler<S: ContactsService, Auth: MacroAuthorizationService>(
+pub async fn handler<S: ContactsService, Auth: RoxAuthorizationService>(
     State(contacts): State<Arc<S>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> impl IntoResponse {
     let user = authorization.authorization.user;
 
@@ -170,9 +170,9 @@ pub async fn handler<S: ContactsService, Auth: MacroAuthorizationService>(
     fields(actor = %authorization.acting_entity()),
     err
 )]
-pub async fn add_contact_handler<S: ContactsService, Auth: MacroAuthorizationService>(
+pub async fn add_contact_handler<S: ContactsService, Auth: RoxAuthorizationService>(
     State(service): State<Arc<S>>,
-    Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Json(body): Json<AddContactRequest>,
 ) -> Result<StatusCode, StatusCode> {
     let user = authorization.authorization.user;
@@ -190,13 +190,13 @@ pub async fn add_contact_handler<S: ContactsService, Auth: MacroAuthorizationSer
 }
 
 /// Rate limit for adding contacts: 50 requests per user per hour.
-pub struct PerUserAddContactRateLimit<Auth>(MacroAuthorizationExtractor<Auth, UserOrInternal>);
+pub struct PerUserAddContactRateLimit<Auth>(RoxAuthorizationExtractor<Auth, UserOrInternal>);
 
 impl<S, Auth> RateLimitExtractable<S> for PerUserAddContactRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     fn config() -> RateLimitConfig {
         RateLimitConfig {
@@ -215,16 +215,16 @@ where
 impl<S, Auth> FromRequestParts<S> for PerUserAddContactRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
-    type Rejection = macro_authorization::MacroAuthorizationRejection;
+    type Rejection = rox_authorization::RoxAuthorizationRejection;
 
     async fn from_request_parts(
         parts: &mut axum::http::request::Parts,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>> =
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>> =
             parts.extract_with_state(state).await?;
         Ok(Self(authorization))
     }
@@ -232,13 +232,13 @@ where
 
 /// Rate limit for people search: 600 requests per user per hour, the budget
 /// other interactive read routes use.
-pub struct PerUserPeopleSearchRateLimit<Auth>(MacroAuthorizationExtractor<Auth, UserOrInternal>);
+pub struct PerUserPeopleSearchRateLimit<Auth>(RoxAuthorizationExtractor<Auth, UserOrInternal>);
 
 impl<S, Auth> RateLimitExtractable<S> for PerUserPeopleSearchRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
     fn config() -> RateLimitConfig {
         RateLimitConfig {
@@ -257,16 +257,16 @@ where
 impl<S, Auth> FromRequestParts<S> for PerUserPeopleSearchRateLimit<Auth>
 where
     S: Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
 {
-    type Rejection = macro_authorization::MacroAuthorizationRejection;
+    type Rejection = rox_authorization::RoxAuthorizationRejection;
 
     async fn from_request_parts(
         parts: &mut axum::http::request::Parts,
         state: &S,
     ) -> Result<Self, Self::Rejection> {
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>> =
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>> =
             parts.extract_with_state(state).await?;
         Ok(Self(authorization))
     }
@@ -279,7 +279,7 @@ pub struct ContactsRouterState<S, R, Auth> {
     /// The rate-limit service implementation.
     pub rate_limit_service: R,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, R: Clone, Auth> Clone for ContactsRouterState<S, R, Auth> {
@@ -298,7 +298,7 @@ impl<S, R, Auth> FromRef<ContactsRouterState<S, R, Auth>> for Arc<S> {
     }
 }
 
-impl<S, R, Auth> FromRef<ContactsRouterState<S, R, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, R, Auth> FromRef<ContactsRouterState<S, R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ContactsRouterState<S, R, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -306,7 +306,7 @@ impl<S, R, Auth> FromRef<ContactsRouterState<S, R, Auth>> for MacroAuthorization
 
 struct AddContactRateLimitState<R, Auth> {
     rate_limit_service: R,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<R: Clone, Auth> Clone for AddContactRateLimitState<R, Auth> {
@@ -318,7 +318,7 @@ impl<R: Clone, Auth> Clone for AddContactRateLimitState<R, Auth> {
     }
 }
 
-impl<R, Auth> FromRef<AddContactRateLimitState<R, Auth>> for MacroAuthorizationState<Auth> {
+impl<R, Auth> FromRef<AddContactRateLimitState<R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AddContactRateLimitState<R, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -327,7 +327,7 @@ impl<R, Auth> FromRef<AddContactRateLimitState<R, Auth>> for MacroAuthorizationS
 impl<R, Auth> RateLimitService for AddContactRateLimitState<R, Auth>
 where
     R: RateLimitService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     async fn check_rate_limit(
         &self,
@@ -348,7 +348,7 @@ pub fn contacts_router<S, R, Auth, T>(state: ContactsRouterState<S, R, Auth>) ->
 where
     S: ContactsService + PeopleSearchService,
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     let rate_limit_state = AddContactRateLimitState {

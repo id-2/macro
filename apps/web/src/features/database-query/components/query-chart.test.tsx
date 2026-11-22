@@ -1,7 +1,7 @@
 import type {
   DatabaseQueryChart,
   DatabaseQueryChartMode,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import { render, waitFor } from '@solidjs/testing-library';
 import { describe, expect, it, vi } from 'vitest';
 import { unknownNames } from '../core/answer-cell';

@@ -10,7 +10,7 @@ use entity_access::outbound::{
     get_user_source_ids, project_email_threads, project_shared_email_threads, shared_email_threads,
 };
 use item_filters::ast::email::AttachmentKind;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use readonly_pool::ReadOnlyPool;
 use rootcause::Report;
 use uuid::Uuid;
@@ -43,7 +43,7 @@ fn attachment_kind(kind: AttachmentKind) -> ThreadAttachmentKind {
 impl EmailSearchSource for EmailSearchPgSource {
     async fn shared_threads(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         own_link_ids: &[Uuid],
         requested: &[Uuid],
         max: usize,
@@ -58,7 +58,7 @@ impl EmailSearchSource for EmailSearchPgSource {
 
     async fn project_threads(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         own_link_ids: &[Uuid],
         project_ids: &[String],
         requested: &[Uuid],
@@ -85,7 +85,7 @@ impl EmailSearchSource for EmailSearchPgSource {
 
     async fn project_shared_threads(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         own_link_ids: &[Uuid],
         thread_ids: &[Uuid],
     ) -> Result<Vec<SharedThread>, Report> {
@@ -113,7 +113,7 @@ impl EmailSearchSource for EmailSearchPgSource {
 
     async fn threads_in_states(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         thread_ids: &[Uuid],
         states: &ThreadStates,
     ) -> Result<HashSet<Uuid>, Report> {

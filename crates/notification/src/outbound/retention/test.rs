@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::models::NotificationState;
 use chrono::TimeDelta;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::postgres::PgListener;
 use std::collections::HashSet;
 use uuid::Uuid;

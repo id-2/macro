@@ -145,9 +145,9 @@ export function TaskListHeader(props: {
       style={taskGridTemplate(props.columns)}
     >
       <span role="columnheader" style={{ 'grid-area': 'indicator' }} />
-      <SortableHeader label="Task" area="content" sortId="title" />
+      <SortableHeader label="Задача" area="content" sortId="title" />
       <SortableHeader
-        label="Due date"
+        label="Срок"
         area="dueDate"
         sortId="due_date_earliest"
         reverseSortId="due_date_latest"
@@ -155,19 +155,19 @@ export function TaskListHeader(props: {
       />
       <Show when={showTaskProject()}>
         <SortableHeader
-          label="Project"
+          label="Проект"
           area="initiative"
           narrowIcon={<ProjectIcon class="size-4" />}
         />
       </Show>
       <SortableHeader
-        label="Assignees"
+        label="Исполнители"
         area="assignees"
         class="@max-[840px]/u-list:justify-start @max-[840px]/u-list:pl-1"
         narrowIcon={<UsersIcon class="size-4" />}
       />
       <SortableHeader
-        label="Updated"
+        label="Обновлено"
         area="timestamp"
         sortId="updated_at"
         class="task-updated-cell"
@@ -177,12 +177,12 @@ export function TaskListHeader(props: {
       />
       <span
         role="columnheader"
-        aria-label="Created by"
+        aria-label="Автор"
         class="task-creator-cell ms-2 flex items-center justify-end"
         style={{ 'grid-area': 'createdBy' }}
       >
-        <Tooltip label="Created by" as="span" tabIndex={0}>
-          <UserPlusIcon class="size-4" role="img" aria-label="Created by" />
+        <Tooltip label="Автор" as="span" tabIndex={0}>
+          <UserPlusIcon class="size-4" role="img" aria-label="Автор" />
         </Tooltip>
       </span>
     </div>

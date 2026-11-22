@@ -1,11 +1,11 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const CHANNEL: Uuid = Uuid::from_u128(0x11111111_1111_1111_1111_111111111111);
 const OTHER_CHANNEL: Uuid = Uuid::from_u128(0x33333333_3333_3333_3333_333333333333);
 
 async fn seed(pool: &Pool<Postgres>) -> Result<Vec<Uuid>> {
-    let mut ids: Vec<_> = (0..4).map(|_| macro_uuid::generate_uuid_v7()).collect();
+    let mut ids: Vec<_> = (0..4).map(|_| rox_uuid::generate_uuid_v7()).collect();
     ids.sort_unstable();
     sqlx::query!(
         r#"
@@ -29,8 +29,8 @@ async fn seed(pool: &Pool<Postgres>) -> Result<Vec<Uuid>> {
 )]
 async fn backfill_includes_replies_but_not_document_messages(pool: Pool<Postgres>) -> Result<()> {
     let messages = seed(&pool).await?;
-    let reply = macro_uuid::generate_uuid_v7();
-    let document_message = macro_uuid::generate_uuid_v7();
+    let reply = rox_uuid::generate_uuid_v7();
+    let document_message = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, thread_id, sender_id, content, created_at)

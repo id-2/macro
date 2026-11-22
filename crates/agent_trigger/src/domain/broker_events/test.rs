@@ -2,13 +2,13 @@ use super::*;
 
 use channel_sender::ChannelSender;
 use chrono::Utc;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 
 fn sender() -> ChannelSender<'static> {
     ChannelSender::new_from_user(
-        MacroUserIdStr::parse_from_str("macro|agent-trigger@rox.one")
+        RoxUserIdStr::parse_from_str("macro|agent-trigger@rox.one")
             .expect("valid user id")
             .into_owned(),
     )
@@ -160,7 +160,7 @@ fn task_assignment_round_trips_and_opens_on_its_discussion() {
         prompt: message.content.clone(),
         context: None,
     });
-    let published = AgentSessionMacroEvent::new_session(assigned.clone());
+    let published = AgentSessionRoxEvent::new_session(assigned.clone());
     assert_eq!(published.key(), BotId::TEST_A.to_string());
     assert_eq!(published.event().event.bot_id(), Some(BotId::TEST_A));
     assert!(assigned.requested().is_none());
@@ -227,7 +227,7 @@ fn accessors_present_both_shapes_as_parent_aware_messages() {
 #[test]
 fn decisions_take_the_wire_shape_their_parent_needs() {
     let channel = MessageParent::Channel(Uuid::from_u128(1));
-    let opened = AgentSessionMacroEvent::from_decision(
+    let opened = AgentSessionRoxEvent::from_decision(
         TriggerDecision::Open {
             bot_id: BotId::TEST_A,
             message: posted(channel.clone(), None),
@@ -246,7 +246,7 @@ fn decisions_take_the_wire_shape_their_parent_needs() {
     assert_eq!(mentioned.message.channel_type, ChannelType::Team);
     assert_eq!(mentioned.message.thread_id, None);
 
-    let followed = AgentSessionMacroEvent::from_decision(
+    let followed = AgentSessionRoxEvent::from_decision(
         TriggerDecision::Existing {
             bot_id: BotId::TEST_A,
             session_id: AgentSessionId::TEST_A,
@@ -266,7 +266,7 @@ fn decisions_take_the_wire_shape_their_parent_needs() {
     assert_eq!(metadata.kind, ThreadMessageKind::Inferred);
     assert_eq!(metadata.message.thread_id, Some(Uuid::from_u128(7)));
 
-    let document_opened = AgentSessionMacroEvent::from_decision(
+    let document_opened = AgentSessionRoxEvent::from_decision(
         TriggerDecision::Open {
             bot_id: BotId::TEST_B,
             message: posted(document(), None),
@@ -280,7 +280,7 @@ fn decisions_take_the_wire_shape_their_parent_needs() {
         AgentTriggerTopicEvent::New(NewAgentSessionEvent::Mentioned(mentioned))
             if mentioned.message.parent == document()
     ));
-    let document_followed = AgentSessionMacroEvent::from_decision(
+    let document_followed = AgentSessionRoxEvent::from_decision(
         TriggerDecision::Existing {
             bot_id: BotId::TEST_B,
             session_id: AgentSessionId::TEST_B,
@@ -299,7 +299,7 @@ fn decisions_take_the_wire_shape_their_parent_needs() {
     ));
 
     assert_eq!(
-        AgentSessionMacroEvent::from_decision(
+        AgentSessionRoxEvent::from_decision(
             TriggerDecision::Open {
                 bot_id: BotId::TEST_A,
                 message: posted(channel, None),
@@ -418,7 +418,7 @@ fn a_conversation_turn_carries_its_trigger_without_the_channel() {
         })
     );
 
-    let event = AgentSessionMacroEvent::from_decision(
+    let event = AgentSessionRoxEvent::from_decision(
         decision,
         Some(ChannelType::DirectMessage),
         Some(context.clone()),
@@ -450,7 +450,7 @@ fn a_mention_is_attributed_to_whoever_posted_it() {
     assert_eq!(message_id, message.message_id);
     assert!(matches!(by, Caller::Person { .. }));
 
-    let user = MacroUserIdStr::try_from_email("user@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("user@example.com").unwrap();
     let by_agent = NewAgentSessionEvent::Mentioned(AgentMentionedEvent {
         bot_id: BotId::TEST_A,
         message: MessagePostedMetadata {

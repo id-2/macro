@@ -19,7 +19,7 @@ import {
 } from '@app/routes/routes';
 import { previewCalendarTarget } from '@components/app/previewTarget';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import deepEqual from 'fast-deep-equal';
 import { createSignal } from 'solid-js';
 

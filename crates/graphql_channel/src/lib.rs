@@ -17,7 +17,7 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use graphql_common::{parse_id, require_authenticated_user};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Domain-facing capability required by the channel activity mutation.
@@ -48,7 +48,7 @@ pub trait ChannelActivityAuthorizer: Send + Sync + 'static {
     /// Mint a member receipt for the authenticated user and channel.
     fn authorize_channel_member(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         channel_id: Uuid,
     ) -> impl Future<Output = Result<EntityAccessReceipt<MemberParticipantRole>, AccessError>> + Send;
 }
@@ -59,7 +59,7 @@ where
 {
     async fn authorize_channel_member(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         channel_id: Uuid,
     ) -> Result<EntityAccessReceipt<MemberParticipantRole>, AccessError> {
         self.generate_entity_access_receipt::<MemberParticipantRole>(

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useCrmContactByEmailQuery } from '@app/features/crm/record-adapter';
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import type { UserCardAction } from '@core/component/userCardActions';
@@ -37,7 +38,7 @@ export function createCrmUserCardAction(
     return contact
       ? {
           id: 'open-contact',
-          label: 'Open contact',
+          label: t('crm.openContact'),
           icon: WideContact,
           onSelect: (event) => openContact(event, contact.id),
         }

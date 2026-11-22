@@ -5,7 +5,7 @@ import {
   type ThreadId,
 } from '@core/comments/commentType';
 import { COMMIT_COMMENT_MARK_COMMAND } from '@core/component/LexicalMarkdown/plugins/comments/commentPlugin';
-import { $getCommentMarkText } from '@macro-inc/lexical-core';
+import { $getCommentMarkText } from '@rox-one/lexical-core';
 import { createCallback } from '@solid-primitives/rootless';
 import { useMarkdownDocument } from '../context/markdown-document-context';
 import { useDeleteNewComments } from './commentOperations';

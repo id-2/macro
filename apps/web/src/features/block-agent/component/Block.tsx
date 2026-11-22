@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { AgentChangesProvider } from '@app/features/changes/agent-session-changes';
 import {
   ChangesHandoff,
@@ -166,15 +167,15 @@ function AgentBlockContent(props: {
               when={accessDenied()}
               fallback={
                 <LoadErrorPanel
-                  title="Unable to load this agent session"
+                  title={t('agentChat.sessionUnavailable')}
                   onRetry={loadRetryable() ? retryLoad : undefined}
                 />
               }
             >
               <EmptyStatePanel
                 centered
-                title="You don't have access to this agent session"
-                description="Ask a participant to share it with you."
+                title="У вас нет доступа к этой сессии агента"
+                description="Попросите участника поделиться ею с вами."
               />
             </Show>
           }
@@ -182,7 +183,7 @@ function AgentBlockContent(props: {
           {(error) => (
             <EmptyStatePanel
               centered
-              title="Unable to start this agent"
+              title="Не удалось запустить агента"
               description={error()}
             />
           )}

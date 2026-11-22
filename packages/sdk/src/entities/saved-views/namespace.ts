@@ -1,5 +1,5 @@
 import { iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Team } from '../teams/team';
 import { SavedView, type SavedViewConfig } from './saved-view';
 
@@ -13,7 +13,7 @@ const PAGE_SIZE = 50;
  * @routing Use when creating, editing, reordering or removing saved views, the named filters in the Email or Tasks sidebar; not favorites or pins.
  */
 export class SavedViewsNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to a saved view by id. Details load on first access. */
   byId(id: string): SavedView {

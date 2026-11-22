@@ -238,7 +238,7 @@ impl LegacyOfficeUpgradeStoragePort for S3LegacyOfficeUpgradeStorage {
         let message = upgrade_convert_message(
             request,
             &self.document_storage_bucket,
-            macro_uuid::generate_uuid_v7().to_string(),
+            rox_uuid::generate_uuid_v7().to_string(),
         )?;
         self.sqs_client
             .enqueue_convert_queue_message(message)

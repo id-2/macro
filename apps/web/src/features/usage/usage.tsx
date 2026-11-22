@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useAiUsageLimitState } from '@core/constant/AiUsageLimitState';
 import { DEV_MODE_ENV, LOCAL_ONLY } from '@core/constant/featureFlags';
 import { useSettingsState } from '@core/constant/SettingsState';
@@ -194,7 +195,9 @@ export function Usage() {
       : undefined,
   };
   return (
-    <Suspense fallback={<p role="status">Loading usage…</p>}>
+    <Suspense
+      fallback={<p role="status">{t('settingsUsage.loading')}</p>}
+    >
       <UsageSettingsView context={context} />
     </Suspense>
   );

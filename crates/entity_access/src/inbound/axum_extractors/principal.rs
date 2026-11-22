@@ -7,18 +7,18 @@ use crate::domain::{
     models::{AccessError, BotAccessScope, EntityAccessReceipt, EntityType, RequiredPermission},
     ports::EntityAccessService,
 };
-use macro_authorization::MacroAuthorization;
+use rox_authorization::RoxAuthorization;
 
 /// Mint a parent capability while preserving bot identity and its verified scope.
 /// Identity-less internal services and harness credentials cannot impersonate a message author.
 pub async fn principal_entity_access_receipt<T: RequiredPermission>(
     service: &impl EntityAccessService,
-    principal: &MacroAuthorization,
+    principal: &RoxAuthorization,
     entity_id: &str,
     entity_type: EntityType,
 ) -> Result<EntityAccessReceipt<T>, AccessError> {
     match principal {
-        MacroAuthorization::Bot(authentication) => {
+        RoxAuthorization::Bot(authentication) => {
             let scope = super::bot::map_bot_access_scope(authentication)
                 .map_err(|_| AccessError::Unauthorized)?;
             service
@@ -30,7 +30,7 @@ pub async fn principal_entity_access_receipt<T: RequiredPermission>(
                 )
                 .await
         }
-        MacroAuthorization::User(user) | MacroAuthorization::Internal(Some(user)) => {
+        RoxAuthorization::User(user) | RoxAuthorization::Internal(Some(user)) => {
             service
                 .generate_entity_access_receipt::<T>(
                     &user.macro_user_id,
@@ -40,7 +40,7 @@ pub async fn principal_entity_access_receipt<T: RequiredPermission>(
                 )
                 .await
         }
-        MacroAuthorization::Internal(None) | MacroAuthorization::Harness(_) => {
+        RoxAuthorization::Internal(None) | RoxAuthorization::Harness(_) => {
             Err(AccessError::Unauthorized)
         }
     }
@@ -50,11 +50,11 @@ pub async fn principal_entity_access_receipt<T: RequiredPermission>(
 /// Use the caller capability above for reads, edits, deletes, and reactions.
 pub async fn message_sender_entity_access_receipt<T: RequiredPermission>(
     service: &impl EntityAccessService,
-    principal: &MacroAuthorization,
+    principal: &RoxAuthorization,
     entity_id: &str,
     entity_type: EntityType,
 ) -> Result<EntityAccessReceipt<T>, AccessError> {
-    if let MacroAuthorization::User(user) = principal
+    if let RoxAuthorization::User(user) = principal
         && let Some(agent_id) = user.agent_id
     {
         return service

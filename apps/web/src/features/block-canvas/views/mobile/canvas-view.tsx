@@ -2,7 +2,7 @@ import { makePersistedState } from '@app/lib/persistence';
 import { hapticImpact } from '@core/mobile/haptics';
 import { isMobile } from '@core/mobile/isMobile';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { selectAllCommand } from '@macro-inc/graphics';
+import { selectAllCommand } from '@rox-one/graphics';
 import { createElementSize } from '@solid-primitives/resize-observer';
 import { createSignal, type JSX, onCleanup, Show } from 'solid-js';
 import { onKeyboardClosed } from '../../primitives/on-keyboard-closed';

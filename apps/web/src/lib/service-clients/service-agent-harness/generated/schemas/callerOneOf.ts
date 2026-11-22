@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { CallerOneOfType } from './callerOneOfType';
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 
 /**
  * A person.
@@ -13,5 +13,5 @@ import type { MacroUserIdStr } from './macroUserIdStr';
 export type CallerOneOf = {
   type: CallerOneOfType;
   /** Who. */
-  user: MacroUserIdStr;
+  user: RoxUserIdStr;
 };

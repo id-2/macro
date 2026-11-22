@@ -206,7 +206,7 @@ async fn send_request(
     send_user_agent: bool,
 ) -> Result<reqwest::Response, ProxyError> {
     let mut headers = reqwest::header::HeaderMap::new();
-    macro_tower_layers::inject_trace_headers(&mut headers);
+    rox_tower_layers::inject_trace_headers(&mut headers);
     let mut request = http_client.get(url.as_str()).headers(headers);
     if send_user_agent {
         request = request.header(reqwest::header::USER_AGENT, UPSTREAM_USER_AGENT);

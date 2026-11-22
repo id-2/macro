@@ -53,6 +53,7 @@ fn mutation_target(is_read_only: bool) -> CalendarEventMutationTarget {
         guest_policy: GuestPolicy::default(),
         is_snapshot: false,
         organizer_copy_calendar_id: None,
+        is_local: false,
     }
 }
 
@@ -79,6 +80,7 @@ fn creation_target(is_read_only: bool) -> CalendarCreationTarget {
         is_read_only,
         is_primary: true,
         token_identity: token_identity(),
+        is_local: false,
         actor: Some(ActorInboxes::sole("self@example.com")),
     }
 }
@@ -1044,16 +1046,16 @@ impl RecordingEventBroker {
     }
 }
 
-impl macro_event_broker::MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: macro_event_broker::MacroEvent + ?Sized>(
+impl rox_event_broker::RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: rox_event_broker::RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<
-        tokio::task::JoinHandle<Result<(), macro_event_broker::EventBrokerError>>,
-        macro_event_broker::EventBrokerError,
+        tokio::task::JoinHandle<Result<(), rox_event_broker::EventBrokerError>>,
+        rox_event_broker::EventBrokerError,
     > {
         if self.fail {
-            return Err(macro_event_broker::EventBrokerError::Publish(
+            return Err(rox_event_broker::EventBrokerError::Publish(
                 "test failure".to_string(),
             ));
         }

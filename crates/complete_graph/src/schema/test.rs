@@ -18,15 +18,15 @@ use entity_access::domain::models::{
     ViewAccessLevel,
 };
 use graphql_common::GraphqlRequestParts;
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{
     email::EmailStr,
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_entity::EntityType as ModelEntityType;
 use model_owner::Owner;
@@ -73,13 +73,13 @@ const VALID_INTERNAL_KEY: &str = "valid-internal-key";
 #[derive(Clone)]
 struct TestRealtimeSubscriptionService {
     receiver: Arc<Mutex<Option<tokio::sync::mpsc::Receiver<Patch<model_entity::Entity<'static>>>>>>,
-    subscribed_user: Arc<Mutex<Option<MacroUserIdStr<'static>>>>,
+    subscribed_user: Arc<Mutex<Option<RoxUserIdStr<'static>>>>,
 }
 
 impl SoupRealtimeSubscriptionService for TestRealtimeSubscriptionService {
     fn subscribe(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> tokio::sync::mpsc::Receiver<Patch<model_entity::Entity<'static>>> {
         *self.subscribed_user.lock().expect("subscribed user lock") = Some(user_id);
         self.receiver
@@ -350,7 +350,7 @@ impl SoupService for CountingSoupService {
 
     async fn group_labels<'a>(
         &'a self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
         _group_by: &'a soup::domain::models::grouping::GroupByField,
         _keys: &'a [String],
     ) -> Result<soup::domain::models::grouping::GroupLabels, soup::domain::models::SoupErr> {
@@ -359,7 +359,7 @@ impl SoupService for CountingSoupService {
 
     async fn caller_tag_sets<'a>(
         &self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
     ) -> Result<
         Vec<models_properties::service::property_definition_with_options::PropertyDefinitionWithOptions>,
         soup::domain::models::SoupErr,
@@ -376,21 +376,21 @@ struct CountingEmailService {
     thread_read_redirect: Arc<Mutex<Option<(Uuid, Uuid)>>>,
     thread_is_read: Arc<Mutex<bool>>,
     thread_archived: Arc<Mutex<bool>>,
-    archive_mutation_calls: Arc<Mutex<Vec<(MacroUserIdStr<'static>, Uuid, bool)>>>,
+    archive_mutation_calls: Arc<Mutex<Vec<(RoxUserIdStr<'static>, Uuid, bool)>>>,
     inbox_calls: Arc<AtomicUsize>,
     user_label_calls: Arc<AtomicUsize>,
     user_link_calls: Arc<AtomicUsize>,
-    user_catalog_identities: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
-    seen_mutation_calls: Arc<Mutex<Vec<(MacroUserIdStr<'static>, Uuid)>>>,
-    unread_mutation_calls: Arc<Mutex<Vec<(MacroUserIdStr<'static>, Uuid)>>>,
-    label_mutation_calls: Arc<Mutex<Vec<(MacroUserIdStr<'static>, Uuid, Uuid, bool)>>>,
+    user_catalog_identities: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
+    seen_mutation_calls: Arc<Mutex<Vec<(RoxUserIdStr<'static>, Uuid)>>>,
+    unread_mutation_calls: Arc<Mutex<Vec<(RoxUserIdStr<'static>, Uuid)>>>,
+    label_mutation_calls: Arc<Mutex<Vec<(RoxUserIdStr<'static>, Uuid, Uuid, bool)>>>,
     thread_preview_receipts: Arc<Mutex<Vec<Vec<Uuid>>>>,
 }
 
 impl email::domain::ports::EmailThreadPreviewService for CountingEmailService {
     async fn get_email_thread_previews_by_receipts(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
     ) -> Result<Vec<EnrichedEmailThreadPreview>, EmailErr> {
         assert_eq!(user_id.as_ref(), VALID_USER_ID);
@@ -410,7 +410,7 @@ impl email::domain::ports::EmailThreadPreviewService for CountingEmailService {
 
     async fn get_owned_email_thread_preview(
         &self,
-        _macro_id: MacroUserIdStr<'static>,
+        _macro_id: RoxUserIdStr<'static>,
         _thread_id: Uuid,
     ) -> Result<Option<EnrichedEmailThreadPreview>, EmailErr> {
         // Mutation replies read through `EmailMutationThreadReader` here.
@@ -421,7 +421,7 @@ impl email::domain::ports::EmailThreadPreviewService for CountingEmailService {
 impl graphql_soup::EmailMutationThreadReader for CountingEmailService {
     async fn read(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> async_graphql::Result<Option<SoupEnrichedEmailThreadPreview<()>>> {
         assert_eq!(user_id.as_ref(), VALID_USER_ID);
@@ -442,7 +442,7 @@ fn test_email_err() -> EmailErr {
 impl email::domain::send_attempt::EmailSendService for CountingEmailService {
     async fn pending_email_sends(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Option<email::domain::send_attempt::SendAttemptCursor>,
     ) -> Result<email::domain::send_attempt::SendAttemptPage, EmailErr> {
         Err(test_email_err())
@@ -450,7 +450,7 @@ impl email::domain::send_attempt::EmailSendService for CountingEmailService {
 
     async fn send_email(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
         _: email::domain::send_attempt::SendAttemptId,
         _: email::domain::send_attempt::SendSnapshot,
@@ -459,7 +459,7 @@ impl email::domain::send_attempt::EmailSendService for CountingEmailService {
     }
     async fn cancel_email_send(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
         _: email::domain::send_attempt::SendAttemptId,
     ) -> Result<email::domain::send_attempt::SendAttempt, EmailErr> {
@@ -467,7 +467,7 @@ impl email::domain::send_attempt::EmailSendService for CountingEmailService {
     }
     async fn email_send_status(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
         _: email::domain::send_attempt::SendAttemptId,
     ) -> Result<Option<email::domain::send_attempt::SendAttempt>, EmailErr> {
@@ -478,7 +478,7 @@ impl email::domain::send_attempt::EmailSendService for CountingEmailService {
 impl EmailUserService for CountingEmailService {
     async fn get_user_email_senders(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _link: Uuid,
     ) -> Result<Vec<email::domain::senders::SendAsAddress>, EmailErr> {
         Ok(vec![])
@@ -486,7 +486,7 @@ impl EmailUserService for CountingEmailService {
 
     async fn get_user_email_labels(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<LinkLabel>, EmailErr> {
         self.user_label_calls.fetch_add(1, Ordering::SeqCst);
         self.user_catalog_identities
@@ -507,7 +507,7 @@ impl EmailUserService for CountingEmailService {
 
     async fn get_user_email_links(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<UserEmailLink>, EmailErr> {
         self.user_link_calls.fetch_add(1, Ordering::SeqCst);
         self.user_catalog_identities
@@ -517,7 +517,7 @@ impl EmailUserService for CountingEmailService {
         Ok(vec![UserEmailLink {
             draft_is_signal: true,
             id: Uuid::from_u128(502),
-            macro_id: MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+            macro_id: RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
             email_address: EmailStr::try_from("inbox@example.com".to_owned()).unwrap(),
             photo_url: Some("https://example.com/inbox.png".to_owned()),
             provider: UserProvider::Gmail,
@@ -541,7 +541,7 @@ impl EmailUserService for CountingEmailService {
 impl EmailService for CountingEmailService {
     async fn resolve_thread_read_id(
         &self,
-        macro_id: MacroUserIdStr<'_>,
+        macro_id: RoxUserIdStr<'_>,
         thread_id: Uuid,
     ) -> Result<Uuid, EmailErr> {
         assert_eq!(macro_id.as_ref(), VALID_USER_ID);
@@ -559,7 +559,7 @@ impl EmailService for CountingEmailService {
 
     async fn resolve_message_operation(
         &self,
-        _actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        _actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         _request: email::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> Result<Uuid, EmailErr> {
         Err(EmailErr::RepoErr(anyhow::anyhow!("unused test capability")))
@@ -567,7 +567,7 @@ impl EmailService for CountingEmailService {
 
     async fn send_message_for_user(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _link: Option<Uuid>,
         _input: email::domain::models::CreateDraftInput,
     ) -> Result<email::domain::models::CreatedDraft, EmailErr> {
@@ -576,7 +576,7 @@ impl EmailService for CountingEmailService {
 
     async fn set_thread_archived(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> Result<(), EmailErr> {
@@ -590,7 +590,7 @@ impl EmailService for CountingEmailService {
 
     async fn set_threads_archived(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
         archived: bool,
     ) -> Result<SetThreadsArchivedResult, EmailErr> {
@@ -617,14 +617,14 @@ impl EmailService for CountingEmailService {
     async fn get_link_by_auth_id_and_macro_id(
         &self,
         _auth_id: &str,
-        _macro_id: MacroUserIdStr<'_>,
+        _macro_id: RoxUserIdStr<'_>,
     ) -> Result<Option<Link>, EmailErr> {
         Err(test_email_err())
     }
 
     async fn resolve_sending_inbox(
         &self,
-        _macro_id: MacroUserIdStr<'_>,
+        _macro_id: RoxUserIdStr<'_>,
         _request: SendingInboxRequest<'_>,
     ) -> Result<ResolvedSendingInbox, EmailErr> {
         Err(test_email_err())
@@ -632,7 +632,7 @@ impl EmailService for CountingEmailService {
 
     async fn get_inboxes_for_macro_id(
         &self,
-        _macro_id: MacroUserIdStr<'_>,
+        _macro_id: RoxUserIdStr<'_>,
     ) -> Result<Vec<Link>, EmailErr> {
         self.inbox_calls.fetch_add(1, Ordering::SeqCst);
         Ok(Vec::new())
@@ -640,7 +640,7 @@ impl EmailService for CountingEmailService {
 
     async fn get_owned_link_for_thread(
         &self,
-        _macro_id: MacroUserIdStr<'_>,
+        _macro_id: RoxUserIdStr<'_>,
         _thread_id: Uuid,
     ) -> Result<Option<Link>, EmailErr> {
         Err(test_email_err())
@@ -675,7 +675,7 @@ impl EmailService for CountingEmailService {
 
     async fn save_draft_for_user(
         &self,
-        _macro_id: MacroUserIdStr<'_>,
+        _macro_id: RoxUserIdStr<'_>,
         _link_id: Option<Uuid>,
         _input: CreateDraftInput,
     ) -> Result<email::domain::models::SavedUserDraft, EmailErr> {
@@ -684,7 +684,7 @@ impl EmailService for CountingEmailService {
 
     async fn delete_draft_for_user(
         &self,
-        _macro_id: MacroUserIdStr<'_>,
+        _macro_id: RoxUserIdStr<'_>,
         _draft_id: Uuid,
         _expected_generation: i32,
     ) -> Result<email::domain::models::DeletedUserDraft, EmailErr> {
@@ -716,7 +716,7 @@ impl EmailService for CountingEmailService {
 
     async fn mark_thread_seen(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<(), EmailErr> {
         *self.thread_is_read.lock().unwrap() = true;
@@ -729,7 +729,7 @@ impl EmailService for CountingEmailService {
 
     async fn mark_thread_unread(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<(), EmailErr> {
         *self.thread_is_read.lock().unwrap() = false;
@@ -742,7 +742,7 @@ impl EmailService for CountingEmailService {
 
     async fn update_thread_labels_for_user(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         label_id: Uuid,
         add: bool,
@@ -775,7 +775,7 @@ impl EmailService for CountingEmailService {
 
     async fn set_sender_policy(
         &self,
-        _actor: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _actor: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _link: &Link,
         _sender_email: &str,
         _policy: SenderPolicy,
@@ -836,7 +836,7 @@ struct RecordingEmailContentReader {
 impl graphql_email::SoupEmailThreadMetadataEdgeReader for RecordingEmailContentReader {
     async fn get_email_thread_metadata(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> HashMap<Uuid, graphql_email::EmailThreadMetadataLoad> {
         self.metadata_calls
@@ -868,7 +868,7 @@ impl graphql_email::SoupEmailThreadMetadataEdgeReader for RecordingEmailContentR
 impl graphql_email::SoupEmailThreadMailProjectionEdgeReader for RecordingEmailContentReader {
     async fn get_email_thread_mail_projections(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> HashMap<Uuid, graphql_email::EmailThreadMailProjectionLoad> {
         self.mail_projection_calls
@@ -906,7 +906,7 @@ impl graphql_email::SoupEmailThreadMailProjectionEdgeReader for RecordingEmailCo
 impl graphql_email::SoupEmailContentEdgeReader for RecordingEmailContentReader {
     async fn get_email_content(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         keys: Vec<graphql_email::EmailContentKey>,
     ) -> HashMap<graphql_email::EmailContentKey, graphql_email::EmailContentLoad> {
         self.calls
@@ -1075,7 +1075,7 @@ fn parsed_message(thread_id: Uuid) -> ParsedMessage {
         body_parsed: Some("Direct thread body".to_owned()),
         body_text: Some("Direct thread body".to_owned()),
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         body_replyless: Some("Direct thread body".to_owned()),
         internal_date_ts: Some(Default::default()),
         sent_at: Some(Default::default()),
@@ -1123,7 +1123,7 @@ fn full_message(thread_id: Uuid) -> Message {
         labels: Vec::new(),
         body_text: Some("Direct thread body".to_owned()),
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         body_replyless: Some("Direct thread body".to_owned()),
         attachments: vec![MessageAttachment {
             reference_url: Some("https://outlook.office.com/mail/message".into()),
@@ -1175,7 +1175,7 @@ struct CountingEntityAccessService {
 impl EntityAccessService for CountingEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -1190,7 +1190,7 @@ impl EntityAccessService for CountingEntityAccessService {
             (EntityType::Database | EntityType::Form, _) => None,
             (EntityType::Team, _) => {
                 return EntityAccessReceipt::try_new_authenticated_user(
-                    MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+                    RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
                     entity_access::domain::models::Entity {
                         entity_id: entity_id.to_owned(),
                         entity_type,
@@ -1219,7 +1219,7 @@ impl EntityAccessService for CountingEntityAccessService {
         };
         if let Some(access_level) = grant {
             return EntityAccessReceipt::try_new_authenticated_user(
-                MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+                RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
                 entity_access::domain::models::Entity {
                     entity_id: entity_id.to_owned(),
                     entity_type,
@@ -1253,7 +1253,7 @@ impl EntityAccessService for CountingEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -1262,7 +1262,7 @@ impl EntityAccessService for CountingEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -1281,7 +1281,7 @@ impl EntityAccessService for CountingEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -1291,7 +1291,7 @@ impl EntityAccessService for CountingEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -1302,7 +1302,7 @@ impl EntityAccessService for CountingEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
 
@@ -1322,7 +1322,7 @@ impl EntityAccessService for CountingEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         self.team_calls.fetch_add(1, Ordering::SeqCst);
         Ok(Some(UserTeamInfo {
@@ -1337,35 +1337,35 @@ struct FakeAuthorizationService {
     authorization_calls: Arc<AtomicUsize>,
 }
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         self.authorization_calls.fetch_add(1, Ordering::SeqCst);
 
         match jwt {
             "valid" => Ok(user_context(VALID_USER_ID)),
-            "expired" => Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            "expired" => Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         self.authorization_calls.fetch_add(1, Ordering::SeqCst);
 
         if provided_key != VALID_INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(claims.user_id.map(|user_id| user_context(&user_id)))
@@ -1383,12 +1383,12 @@ fn user_context(user_id: &str) -> UserContext {
 
 #[derive(Clone)]
 struct TestState {
-    authorization: MacroAuthorizationState<FakeAuthorizationService>,
+    authorization: RoxAuthorizationState<FakeAuthorizationService>,
     email: EmailRouterState<CountingEmailService>,
     entity_access: Arc<CountingEntityAccessService>,
 }
 
-impl FromRef<TestState> for MacroAuthorizationState<FakeAuthorizationService> {
+impl FromRef<TestState> for RoxAuthorizationState<FakeAuthorizationService> {
     fn from_ref(state: &TestState) -> Self {
         state.authorization.clone()
     }
@@ -1429,7 +1429,7 @@ impl RecordingThreadReader {
 impl graphql_soup::SoupEmailThreadReader for RecordingThreadReader {
     async fn read_threads(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> Result<Vec<SoupEnrichedEmailThreadPreview<()>>, graphql_soup::SoupItemLoaderError> {
         assert_eq!(user_id.as_ref(), VALID_USER_ID);
@@ -1487,7 +1487,7 @@ struct TestHarness {
     thread_reads: Arc<AtomicUsize>,
     user_label_calls: Arc<AtomicUsize>,
     user_link_calls: Arc<AtomicUsize>,
-    user_catalog_identities: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    user_catalog_identities: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
     team_calls: Arc<AtomicUsize>,
     raw_soup_calls: Arc<AtomicUsize>,
     raw_soup_team_receipts: Arc<AtomicUsize>,
@@ -1519,7 +1519,7 @@ fn harness() -> TestHarness {
     TestHarness {
         schema: build_schema_with_service(soup.clone()),
         state: TestState {
-            authorization: MacroAuthorizationState::new(Arc::new(authorization)),
+            authorization: RoxAuthorizationState::new(Arc::new(authorization)),
             email: EmailRouterState::new(email.clone()),
             entity_access: Arc::new(entity_access),
         },
@@ -1579,14 +1579,14 @@ impl TestHarness {
     }
 
     async fn execute_authenticated_mutation(&self, mutation: &str) -> async_graphql::Response {
-        let user_id = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+        let user_id = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
         self.schema
             .execute(self.request(mutation, authenticated_parts()).data(user_id))
             .await
     }
 
     fn request(&self, query: &str, parts: axum::http::request::Parts) -> async_graphql::Request {
-        let user_id = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+        let user_id = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
         async_graphql::Request::new(query)
             .data(GraphqlRequestParts::new(parts))
             .data(self.state.clone())
@@ -1641,7 +1641,7 @@ impl TestHarness {
 async fn soup_updates_subscribes_as_the_authenticated_user() {
     use async_graphql::futures_util::{StreamExt as _, pin_mut};
 
-    let user_id = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
     let subscribed_user = Arc::new(Mutex::new(None));
     let (sender, receiver) = tokio::sync::mpsc::channel(2);
     let realtime = TestRealtimeSubscriptionService {
@@ -1879,7 +1879,7 @@ async fn agent_session_log_appended_streams_runs_for_an_accessible_session() {
         }
     }
 
-    let user_id = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
     let session_id = Uuid::from_u128(7);
     let other_session_id = Uuid::from_u128(8);
     let (sender, receiver) = tokio::sync::mpsc::channel(2);
@@ -1981,7 +1981,7 @@ async fn agent_session_log_appended_streams_runs_for_an_accessible_session() {
 async fn agent_session_activity_appended_refuses_a_session_outside_the_viewers_scope() {
     use async_graphql::futures_util::StreamExt as _;
 
-    let user_id = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
     let hidden_session_id = Uuid::from_u128(8);
     let soup_service = CountingSoupService::default();
     soup_service.set_raw_response(vec![]);
@@ -2105,7 +2105,7 @@ async fn agent_session_activity_appended_routes_only_the_requested_session(pool:
         async_graphql::Request::new(format!(
             "subscription {{ agentSessionActivityAppended(sessionId: \"{session_id}\") {{ id agentCorrelationId }} }}"
         ))
-        .data(MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap())
+        .data(RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap())
         .data(loader)
         .data(SchemaOnlyState)
         .data(subscriptions),
@@ -2162,16 +2162,16 @@ async fn activity_updates_subscribes_as_the_authenticated_user() {
     };
     use async_graphql::futures_util::{StreamExt as _, pin_mut};
 
-    let user_id = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
-    let subscribed_user: Arc<Mutex<Option<MacroUserIdStr<'static>>>> = Arc::default();
+    let user_id = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+    let subscribed_user: Arc<Mutex<Option<RoxUserIdStr<'static>>>> = Arc::default();
 
     struct TestActivitySubscriptionService {
-        subscribed_user: Arc<Mutex<Option<MacroUserIdStr<'static>>>>,
+        subscribed_user: Arc<Mutex<Option<RoxUserIdStr<'static>>>>,
         subscription: Mutex<Option<ActivitySubscription>>,
     }
 
     impl ActivitySubscriptionService for TestActivitySubscriptionService {
-        fn subscribe(&self, user_id: MacroUserIdStr<'static>) -> ActivitySubscription {
+        fn subscribe(&self, user_id: RoxUserIdStr<'static>) -> ActivitySubscription {
             *self.subscribed_user.lock().expect("subscribed user lock") = Some(user_id);
             self.subscription
                 .lock()
@@ -2364,8 +2364,8 @@ async fn email_catalog_fields_use_the_authenticated_user_and_remain_direct_user_
             .lock()
             .expect("user catalog identities lock"),
         vec![
-            MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
-            MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+            RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+            RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
         ]
     );
 }
@@ -2655,7 +2655,7 @@ fn soup_email_thread_with_read_status(thread_id: Uuid, is_read: bool) -> SoupIte
         thread: SoupEmailThreadPreview {
             id: thread_id,
             provider_id: Some("provider-thread".to_owned()),
-            owner_id: MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+            owner_id: RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
             inbox_visible: true,
             is_read,
             is_draft: false,
@@ -2848,7 +2848,7 @@ fn activity_record(
         agent_verb: None,
         id: Uuid::from_u128(id),
         actor: activity::Actor::new_from_user(
-            MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+            RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
         ),
         subject_id: VALID_USER_ID.to_owned(),
         entity_type,
@@ -3212,7 +3212,7 @@ async fn email_mutations_return_primary_state_even_when_the_soup_replica_is_stal
     assert_eq!(unread_thread["isRead"], false);
     assert_eq!(harness.raw_soup_calls.load(Ordering::SeqCst), 0);
 
-    let expected_user = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+    let expected_user = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
     assert_eq!(
         *harness.email_service.unread_mutation_calls.lock().unwrap(),
         vec![(expected_user.clone(), thread_id)]

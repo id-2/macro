@@ -12,10 +12,10 @@ use axum::{
     routing::{delete, get, patch, put},
 };
 use hmac::Hmac;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 use models_pagination::{CreatedAt, CursorOptionExt, CursorWithValAndFilter};
 use reqwest::StatusCode;
@@ -59,10 +59,10 @@ pub struct NotificationRouterState<S, Auth> {
     /// The value which is used to verify the presigned url requests
     pub hmac_signing_key: Hmac<Sha256>,
     /// State used to authorize requests.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
-impl<S, Auth> FromRef<NotificationRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<NotificationRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(input: &NotificationRouterState<S, Auth>) -> Self {
         input.authorization_state.clone()
     }
@@ -86,7 +86,7 @@ impl<S: NotificationReader, Auth> NotificationRouterState<S, Auth> {
         val: S,
         blockable_notification_typenames: &'static HashSet<&'static str>,
         hmac_signing_key: Hmac<Sha256>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         NotificationRouterState {
             inner: Arc::new(val),
@@ -101,7 +101,7 @@ impl<S: NotificationReader, Auth> NotificationRouterState<S, Auth> {
 pub fn router<S, Auth, T>() -> Router<NotificationRouterState<S, Auth>>
 where
     S: NotificationReader,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Serialize + DeserializeOwned + Send + 'static,
 {
     Router::new()
@@ -155,11 +155,11 @@ pub struct GetAllUserNotificationsResponse<T> {
 /// List user notifications with generic metadata type `T`.
 pub async fn list_user_notifications<
     S: NotificationReader,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Serialize + DeserializeOwned + Send,
 >(
     service: &NotificationRouterState<S, Auth>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     Query(Params { limit, states }): Query<Params>,
     cursor: Option<CursorWithValAndFilter<Uuid, CreatedAt, ()>>,
 ) -> Result<Json<GetAllUserNotificationsResponse<T>>, (StatusCode, Json<ErrorResponse<'static>>)> {
@@ -222,11 +222,11 @@ pub struct BulkGetByEventItemIdsRequest {
 )]
 pub async fn bulk_get_by_event_item_ids<
     S: NotificationReader,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Serialize + DeserializeOwned + Send,
 >(
     State(service): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(Params { limit, states }): Query<Params>,
     cursor: Option<CursorWithValAndFilter<Uuid, CreatedAt, ()>>,
     Json(req): Json<BulkGetByEventItemIdsRequest>,
@@ -283,9 +283,9 @@ pub struct NotificationBulkRequest {
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn bulk_mark_seen<S: NotificationReader, Auth: MacroAuthorizationService>(
+pub async fn bulk_mark_seen<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(service): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<NotificationBulkRequest>,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
     bulk_update(
@@ -310,9 +310,9 @@ pub async fn bulk_mark_seen<S: NotificationReader, Auth: MacroAuthorizationServi
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn bulk_mark_done<S: NotificationReader, Auth: MacroAuthorizationService>(
+pub async fn bulk_mark_done<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(service): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<NotificationBulkRequest>,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
     bulk_update(
@@ -337,9 +337,9 @@ pub async fn bulk_mark_done<S: NotificationReader, Auth: MacroAuthorizationServi
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn bulk_mark_undone<S: NotificationReader, Auth: MacroAuthorizationService>(
+pub async fn bulk_mark_undone<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(service): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<NotificationBulkRequest>,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
     bulk_update(
@@ -351,9 +351,9 @@ pub async fn bulk_mark_undone<S: NotificationReader, Auth: MacroAuthorizationSer
     .await
 }
 
-async fn bulk_update<S: NotificationReader, Auth: MacroAuthorizationService>(
+async fn bulk_update<S: NotificationReader, Auth: RoxAuthorizationService>(
     service: &NotificationRouterState<S, Auth>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     req: &NotificationBulkRequest,
     status: NotificationStatus,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
@@ -398,11 +398,11 @@ async fn bulk_update<S: NotificationReader, Auth: MacroAuthorizationService>(
 )]
 pub async fn get_by_event_item_id<
     S: NotificationReader,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Serialize + DeserializeOwned + Send,
 >(
     State(service): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(EventItemIdPath { event_item_id }): Path<EventItemIdPath>,
     Query(Params { limit, states }): Query<Params>,
     cursor: Option<CursorWithValAndFilter<Uuid, CreatedAt, ()>>,
@@ -456,11 +456,11 @@ pub async fn get_by_event_item_id<
 )]
 pub async fn get_notification_by_id<
     S: NotificationReader,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Serialize + DeserializeOwned + Send,
 >(
     State(service): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(NotificationIdPath { notification_id }): Path<NotificationIdPath>,
 ) -> Result<Json<UserNotificationRow<T>>, (StatusCode, Json<ErrorResponse<'static>>)> {
     let result = service
@@ -504,9 +504,9 @@ pub async fn get_notification_by_id<
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn delete_notification<S: NotificationReader, Auth: MacroAuthorizationService>(
+pub async fn delete_notification<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(service): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(NotificationIdPath { notification_id }): Path<NotificationIdPath>,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
     service
@@ -539,9 +539,9 @@ pub async fn delete_notification<S: NotificationReader, Auth: MacroAuthorization
         (status = 500, body = ErrorResponse),
     )
 )]
-pub async fn bulk_delete_notifications<S: NotificationReader, Auth: MacroAuthorizationService>(
+pub async fn bulk_delete_notifications<S: NotificationReader, Auth: RoxAuthorizationService>(
     State(service): State<NotificationRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<NotificationBulkRequest>,
 ) -> Result<Json<()>, (StatusCode, Json<ErrorResponse<'static>>)> {
     service

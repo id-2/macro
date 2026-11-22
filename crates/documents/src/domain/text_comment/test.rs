@@ -4,7 +4,7 @@ use crate::domain::ports::editing::MockEditingWorkerService;
 use channel_sender::ChannelSender;
 use chrono::{TimeZone, Utc};
 use entity_access::domain::models::{Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{api::MockMessageCommands, models::MessageParent};
 use model_owner::Owner;
 
@@ -31,7 +31,7 @@ fn document(file_type: &str) -> DocumentBasic {
 /// that names no agent.
 fn user_receipt(document_id: &str) -> EntityAccessReceipt<MessageWrite> {
     EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::try_from(USER.to_owned()).unwrap(),
+        RoxUserIdStr::try_from(USER.to_owned()).unwrap(),
         Entity {
             entity_id: document_id.into(),
             entity_type: EntityType::Document,

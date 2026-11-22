@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::{ports::ContactsPageService, service::ContactsDomainService};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 mod case_lookup;
@@ -22,7 +22,7 @@ async fn pages_include_self_once_and_only_the_viewers_neighbors(pool: PgPool) {
         repository: DbContactsRepository::new(pool),
         notifier: None::<crate::outbound::gateway::ConnectionGatewayNotifier>,
     };
-    let viewer = MacroUserIdStr::try_from_email("m@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("m@example.com").unwrap();
     let limit = ContactPageSize::new(2).unwrap();
     let mut after = None;
     let mut found = Vec::new();
@@ -55,7 +55,7 @@ async fn pages_include_self_once_and_only_the_viewers_neighbors(pool: PgPool) {
     assert!(end.contacts.is_empty());
     assert!(end.next_cursor.is_none());
     // A cursor from another listing is just a position, never access to its rows.
-    let unrelated = MacroUserIdStr::try_from_email("nobody@example.com").unwrap();
+    let unrelated = RoxUserIdStr::try_from_email("nobody@example.com").unwrap();
     let foreign_cursor = ContactCursor::from_position("macro|a@example.com".into()).unwrap();
     let own = service
         .contact_id_page(unrelated.clone(), Some(&foreign_cursor), limit)
@@ -82,7 +82,7 @@ async fn full_final_page_has_no_cursor_and_bad_rows_do_not_strand_pagination(poo
     .await
     .unwrap();
     let repository = DbContactsRepository::new(pool);
-    let viewer = MacroUserIdStr::try_from_email("m@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("m@example.com").unwrap();
     let skipped = repository
         .contact_id_page(viewer.clone(), None, ContactPageSize::new(1).unwrap())
         .await
@@ -122,7 +122,7 @@ async fn exact_lookup_checks_membership_and_preserves_requested_order(pool: PgPo
     .await
     .unwrap();
     let repository = DbContactsRepository::new(pool);
-    let viewer = MacroUserIdStr::try_from_email("m@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("m@example.com").unwrap();
     let lookup = ContactLookup::new(
         [
             "Z@example.com",
@@ -131,7 +131,7 @@ async fn exact_lookup_checks_membership_and_preserves_requested_order(pool: PgPo
             "a@example.com",
             "z@example.com",
         ]
-        .map(|email| MacroUserIdStr::try_from_email(email).unwrap())
+        .map(|email| RoxUserIdStr::try_from_email(email).unwrap())
         .to_vec(),
     )
     .unwrap();
@@ -143,7 +143,7 @@ async fn exact_lookup_checks_membership_and_preserves_requested_order(pool: PgPo
         found.iter().map(|id| id.email_str()).collect::<Vec<_>>(),
         ["z@example.com", "m@example.com", "a@example.com"]
     );
-    let other = MacroUserIdStr::try_from_email("other@example.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@example.com").unwrap();
     assert!(
         repository
             .lookup_contact_ids(other.clone(), &lookup)

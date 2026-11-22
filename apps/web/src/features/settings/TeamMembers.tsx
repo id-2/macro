@@ -87,8 +87,8 @@ const roleOrder: Record<string, number> = {
 type RoleOption = { value: TeamRole; label: string };
 
 const roleOptions: RoleOption[] = [
-  { value: TeamRole.member, label: 'Member' },
-  { value: TeamRole.admin, label: 'Admin' },
+  { value: TeamRole.member, label: 'Участник' },
+  { value: TeamRole.admin, label: 'Администратор' },
 ];
 
 function RoleSelect(props: {
@@ -187,7 +187,7 @@ function MemberRow(props: {
             <div class="text-sm font-medium text-ink truncate">
               {displayName()}
               {props.isCurrentUser && (
-                <span class="text-ink-muted font-normal"> (you)</span>
+                <span class="text-ink-muted font-normal"> (вы)</span>
               )}
             </div>
             <Show when={isAgentAccount(tryMacroId(props.member.user_id))}>
@@ -205,7 +205,7 @@ function MemberRow(props: {
             when={props.canEditPlan}
             fallback={
               <span class="text-xs text-ink-muted capitalize">
-                {memberPlan(props.member)}
+                {memberPlan(props.member) === 'max' ? 'Макс' : 'Про'}
               </span>
             }
           >
@@ -222,7 +222,11 @@ function MemberRow(props: {
           when={props.isOwner && !isMemberOwner()}
           fallback={
             <span class="text-xs text-ink-muted capitalize">
-              {props.member.role}
+              {roleOptions.find((option) => option.value === props.member.role)
+                ?.label ??
+                (props.member.role === TeamRole.owner
+                  ? 'Владелец'
+                  : props.member.role)}
             </span>
           }
         >
@@ -235,8 +239,8 @@ function MemberRow(props: {
               <Tooltip
                 label={
                   isMemberOwner()
-                    ? 'Cannot remove team owner'
-                    : 'Cannot remove yourself'
+                    ? 'Нельзя удалить владельца команды'
+                    : 'Нельзя удалить себя'
                 }
               >
                 <Button
@@ -250,7 +254,7 @@ function MemberRow(props: {
               </Tooltip>
             }
           >
-            <Tooltip label="Remove member">
+            <Tooltip label="Удалить участника">
               <Button variant="ghost" size="sm" onClick={props.onRemove}>
                 <TrashIcon class="size-4" />
               </Button>
@@ -392,8 +396,8 @@ export function TeamMembers(props: { team: TeamSummary }) {
   const autoJoinDescription = () => {
     const domain = autoJoinDomain();
     return domain
-      ? `New sign-ups with an @${domain} email automatically join this team.`
-      : "Automatically add new sign-ups whose email matches the team owner's domain.";
+      ? `Новые регистрации с почтой @${domain} автоматически попадают в эту команду.`
+      : 'Новые пользователи с почтой на домене владельца команды добавляются автоматически.';
   };
 
   const handleToggleAutoJoin = () => {
@@ -468,8 +472,8 @@ export function TeamMembers(props: { team: TeamSummary }) {
   return (
     <>
       <SettingsPage
-        title="Members"
-        description={`Invite people to ${props.team.name} and manage their roles.`}
+        title="Участники"
+        description={`Приглашайте людей в ${props.team.name} и управляйте их ролями.`}
         actions={
           // Members can invite unless the team has restricted inviting
           // to admins; removals stay admin-only.
@@ -491,7 +495,7 @@ export function TeamMembers(props: { team: TeamSummary }) {
                 onClick={() => setShowInviteModal(true)}
               >
                 <PlusIcon class="size-4" />
-                Invite
+                Пригласить
               </Button>
             </div>
           </Show>
@@ -501,8 +505,8 @@ export function TeamMembers(props: { team: TeamSummary }) {
           <Show when={showMemberSearch()}>
             <SearchBar
               size="sm"
-              label="Filter members"
-              placeholder="Filter members"
+              label="Фильтр участников"
+              placeholder="Фильтр участников"
               value={memberQuery()}
               onValueChange={setMemberQuery}
               onEscape={() => setMemberQuery('')}
@@ -523,13 +527,13 @@ export function TeamMembers(props: { team: TeamSummary }) {
               class="flex items-center gap-2 text-xs text-ink-muted"
               role="status"
             >
-              <span>Couldn't load scheduled plan changes.</span>
+              <span>Не удалось загрузить запланированные изменения тарифа.</span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => teamQuery.refetch()}
               >
-                Try again
+                Повторить
               </Button>
             </div>
           </Show>
@@ -547,7 +551,7 @@ export function TeamMembers(props: { team: TeamSummary }) {
               fallback={
                 <SettingsCard>
                   <div class="px-6 py-8 text-center text-sm text-ink-muted">
-                    No members match “{memberQuery()}”
+                    Нет участников по запросу «{memberQuery()}»
                   </div>
                 </SettingsCard>
               }
@@ -645,7 +649,7 @@ export function TeamMembers(props: { team: TeamSummary }) {
             (invitesQuery.data?.invites?.length ?? 0) > 0
           }
         >
-          <SettingsSection title="Pending invites">
+          <SettingsSection title="Ожидающие приглашения">
             <SettingsCard>
               <For each={invitesQuery.data?.invites ?? []}>
                 {(invite) => (
@@ -671,10 +675,10 @@ export function TeamMembers(props: { team: TeamSummary }) {
         </Show>
 
         <Show when={isAdminOrOwner()}>
-          <SettingsSection title="Invite settings">
+          <SettingsSection title="Настройки приглашений">
             <SettingsCard>
               <SettingsRow
-                label="Auto-join on domain"
+                label="Автоматическое присоединение по домену"
                 description={autoJoinDescription()}
                 hideDescriptionOnMobile
               >
@@ -689,8 +693,8 @@ export function TeamMembers(props: { team: TeamSummary }) {
               </SettingsRow>
 
               <SettingsRow
-                label="Members can invite"
-                description="Let every team member invite people. When off, only admins and the owner can send invites."
+                label="Участники могут приглашать"
+                description="Каждый участник может приглашать людей. Если выключено, приглашения отправляют только администраторы и владелец."
                 hideDescriptionOnMobile
               >
                 <ToggleSwitch
@@ -711,18 +715,18 @@ export function TeamMembers(props: { team: TeamSummary }) {
       <ConfirmDialog
         open={!!showRemoveModal()}
         onOpenChange={(open) => !open && setShowRemoveModal(null)}
-        title="Remove Member"
+        title="Удалить участника"
         tone="danger"
-        confirmLabel="Remove"
+        confirmLabel="Удалить"
         pending={removeUserMutation.isPending}
         onConfirm={handleRemoveMember}
         body={
           <>
-            Are you sure you want to remove{' '}
+            Вы уверены, что хотите удалить{' '}
             <Show when={showRemoveModal()}>
               {(member) => <MemberName memberId={member().user_id} />}
             </Show>{' '}
-            from the team?
+            из команды?
           </>
         }
       />
@@ -741,15 +745,15 @@ export function TeamMembers(props: { team: TeamSummary }) {
       <ConfirmDialog
         open={!!showCancelInviteModal()}
         onOpenChange={(open) => !open && setShowCancelInviteModal(null)}
-        title="Cancel Invitation"
+        title="Отменить приглашение"
         tone="danger"
-        confirmLabel="Cancel Invite"
-        cancelLabel="Keep"
+        confirmLabel="Отменить приглашение"
+        cancelLabel="Оставить"
         pending={deleteInviteMutation.isPending}
         onConfirm={handleCancelInvite}
         body={
           <>
-            Are you sure you want to cancel the invitation for{' '}
+            Вы уверены, что хотите отменить приглашение для{' '}
             <span class="font-medium">{showCancelInviteModal()?.email}</span>?
           </>
         }

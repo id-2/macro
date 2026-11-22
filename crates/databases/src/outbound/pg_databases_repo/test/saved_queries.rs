@@ -54,7 +54,7 @@ async fn a_saved_query_round_trips_and_outlives_its_database(pool: PgPool) {
 async fn a_definition_without_its_version_and_query_is_rejected(pool: PgPool) {
     let rejected = sqlx::query!(
         "INSERT INTO database_queries (id, definition, created_by) VALUES ($1, $2, $3)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         serde_json::json!({"query": "SELECT 1"}),
         USER,
     )

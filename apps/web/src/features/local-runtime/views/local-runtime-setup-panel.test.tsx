@@ -1,4 +1,4 @@
-import type { RoxdStatus } from '@macro/tauri/roxd';
+import type { RoxdStatus } from '@rox/tauri/roxd';
 import { fireEvent, render, screen } from '@solidjs/testing-library';
 import { describe, expect, it, vi } from 'vitest';
 import type {
@@ -27,6 +27,8 @@ function capabilities(
       {
         id: 'claude-code',
         name: 'Claude Code',
+        command: 'claude',
+        config_path: '~/.claude',
         note: null,
         needs_install: false,
       },
@@ -63,14 +65,19 @@ describe('LocalRuntimeSetupPanel', () => {
     ));
 
     expect(
-      await screen.findByText('Found Claude Code on this computer.')
+      await screen.findByRole('radio', { name: /Claude Code/ })
     ).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Set up Claude Code' }));
+    expect(screen.getByText('claude')).toBeTruthy();
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Настроить Claude Code' })
+    );
 
-    expect(await screen.findByText('@claude-code is ready')).toBeTruthy();
-    expect(screen.getByText('Sessions run in /home/me/Rox.')).toBeTruthy();
+    expect(await screen.findByText('@claude-code готов')).toBeTruthy();
+    expect(
+      screen.getByText('Сеансы выполняются в /home/me/Rox.')
+    ).toBeTruthy();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Start a session' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Начать сеанс' }));
     expect(onOpenSession).toHaveBeenCalledWith({
       botId: 'bot-1',
       name: 'Claude Code',
@@ -97,8 +104,8 @@ describe('LocalRuntimeSetupPanel', () => {
     ));
 
     expect(await screen.findByText('the pairing code expired')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Try again' }));
-    expect(await screen.findByText('@claude-code is ready')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
+    expect(await screen.findByText('@claude-code готов')).toBeTruthy();
   });
 
   it('does not start setup when closed while it is still looking for agents', async () => {
@@ -139,8 +146,8 @@ describe('LocalRuntimeSetupPanel', () => {
     ));
 
     expect(
-      await screen.findByRole('button', { name: 'Scan again' })
+      await screen.findByRole('button', { name: 'Искать снова' })
     ).toBeTruthy();
-    expect(screen.queryByRole('button', { name: /^Set up/ })).toBeNull();
+    expect(screen.queryByRole('button', { name: /^Настроить/ })).toBeNull();
   });
 });

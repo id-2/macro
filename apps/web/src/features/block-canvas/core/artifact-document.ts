@@ -1,4 +1,4 @@
-import type { ArtifactLibrary } from '@macro-inc/graphics/loro';
+import type { ArtifactLibrary } from '@rox-one/graphics/loro';
 
 /**
  * The iframe's `sandbox` gives the document an opaque origin, so it cannot reach

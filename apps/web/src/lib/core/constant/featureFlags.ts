@@ -881,11 +881,11 @@ export const enableRoutineStarterTemplates = defineFlag({
 // Routines AI picks for the user from the catalog: sidebar cards, the
 // Routines page and onboarding's last step. The scheduler checks the same
 // PostHog flag before it reads mail or generates, so with it off there are
-// none to show.
+// none to show — and a dev default would ask for routes the server answers
+// 404, so follow PostHog everywhere, like enableRoutineSharing.
 export const enableRoutineSuggestions = defineFlag({
   key: 'enable-routine-suggestions',
   env: 'ENABLE_ROUTINE_SUGGESTIONS',
-  default: onInDev,
 });
 
 // New routine drafts in the background: the dialog shows the draft's progress,
@@ -899,11 +899,12 @@ export const enableRoutineBackgroundDrafts = defineFlag({
 });
 
 // Suggestions: the For you feed of proactive suggestions. The backend gates every
-// suggestions route on the same PostHog flag.
+// suggestions route on the same PostHog flag and answers 404 when it is off or
+// unreadable, so this follows PostHog even in development — a dev default would
+// put the UI in a state the server refuses.
 export const enableSuggestions = defineFlag({
   key: 'enable-suggestions',
   env: 'ENABLE_SUGGESTIONS',
-  default: onInDev,
 });
 
 // Templates are not ready for general use. Follow PostHog even in development

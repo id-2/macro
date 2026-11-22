@@ -1,4 +1,4 @@
-//! `Release SDK` — publishes `@macro-inc/sdk` when a merge to `main` raises the
+//! `Release SDK` — publishes `@rox-one/sdk` when a merge to `main` raises the
 //! version in `packages/sdk/package.json`. Generated into `release-sdk.yml`.
 //!
 //! The version bump rides in the PR that changes the SDK, so `main` and npm
@@ -25,7 +25,7 @@ use crate::workflows::steps;
 #[cfg(test)]
 mod test;
 
-const PACKAGE_NAME: &str = "@macro-inc/sdk";
+const PACKAGE_NAME: &str = "@rox-one/sdk";
 const REGISTRY: &str = "https://registry.npmjs.org";
 
 /// Build the workflow.
@@ -47,7 +47,7 @@ pub fn release_sdk() -> Workflow {
 
 fn release() -> Job {
     Job::default()
-        .name("Release @macro-inc/sdk")
+        .name("Release @rox-one/sdk")
         // npm trusted publishing only supports GitHub-hosted runners.
         .runs_on("ubuntu-latest")
         .permissions(

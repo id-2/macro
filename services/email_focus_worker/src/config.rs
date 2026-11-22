@@ -1,9 +1,9 @@
 //! Configuration for the email focus worker, loaded with `macro_config` from
 //! the email-service Doppler project it shares with the other email binaries.
 
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::{env_vars, maybe_env_vars};
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::{env_vars, maybe_env_vars};
 
 env_vars! {
     /// The connection URL for the Rox database.
@@ -24,7 +24,7 @@ maybe_env_vars! {
 }
 
 /// The email focus worker's configuration.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// The environment we are in.
@@ -56,6 +56,6 @@ pub struct Config {
 impl Config {
     /// Load and validate the configuration from the environment.
     pub fn from_env() -> Result<Self, rootcause::Report> {
-        Ok(macro_config::ConfigLoader::load::<Config>()?)
+        Ok(rox_config::ConfigLoader::load::<Config>()?)
     }
 }

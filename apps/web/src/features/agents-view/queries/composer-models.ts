@@ -1,3 +1,6 @@
+import { Model } from '@core/component/AI/constant/model';
+import { thrownResultErrorHasCode } from '@core/util/result';
+import { modelLabel } from '@core/component/AI/constant/model-label';
 import {
   type AgentModelTarget,
   useAgentModelsQuery,
@@ -35,6 +38,15 @@ export function composerModelTarget(
   return { harness };
 }
 
+/** A refused sign-in is not a missing catalog. */
+function catalogAuthError(error: unknown): boolean {
+  return (
+    thrownResultErrorHasCode(error, 'UNAUTHORIZED') ||
+    thrownResultErrorHasCode(error, 'FORBIDDEN') ||
+    providerCredentialRejectedMessage(error) !== undefined
+  );
+}
+
 /** Keep discovery scoped to the selected, connected runtime. */
 export function createComposerModels(agent: Accessor<RosterAgent | undefined>) {
   const target = (): AgentModelTarget | undefined => {
@@ -52,10 +64,39 @@ export function createComposerModels(agent: Accessor<RosterAgent | undefined>) {
     () => target() !== undefined
   );
   const data = () => (target() && query.isSuccess ? query.data : undefined);
+  const models = () => {
+    const listed = data()?.models ?? [];
+    const harness = agent()?.harness;
+    const inMemory = harness === 'macro-inmem' || harness === 'in-memory';
+    if (
+      !inMemory ||
+      catalogAuthError(query.error) ||
+      listed.some((option) => option.id === Model.roxR1Max)
+    ) {
+      return listed;
+    }
+    return [
+      {
+        id: Model.roxR1Max,
+        name: modelLabel(Model.roxR1Max),
+        supportsImages: false,
+      },
+      ...listed,
+    ];
+  };
+  const currentModel = () => {
+    const current = data()?.currentModel ?? undefined;
+    const harness = agent()?.harness;
+    const inMemory = harness === 'macro-inmem' || harness === 'in-memory';
+    if (!inMemory || catalogAuthError(query.error)) return current;
+    return !current || current === Model.gemini38Flash
+      ? Model.roxR1Max
+      : current;
+  };
   return {
-    models: () => data()?.models ?? [],
-    currentModel: () => data()?.currentModel ?? undefined,
-    /** Discovery is in flight, so {@link models} is empty for now, not for good. */
+    models,
+    currentModel,
+    /** Discovery is in flight. Other runtimes have no choices yet; Rox is already selectable. */
     pending: () => target() !== undefined && query.isPending,
     message: () => {
       if (!agent()?.runtime.connected)

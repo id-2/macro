@@ -22,8 +22,8 @@ use entity_access::domain::models::{
     AccessLevel, BotId, BotReceiptScope, Entity, EntityAccessAuth, EntityAccessReceipt,
     EntityPermission, EntityType as AccessEntityType, ViewAccessLevel,
 };
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_properties::service::property_change_source::{GithubAccount, PropertyChangeSource};
 use models_properties::{
     DataType, EntityType, PropertyOwner,
@@ -119,8 +119,8 @@ fn event_timestamp() -> chrono::DateTime<chrono::Utc> {
         .with_timezone(&chrono::Utc)
 }
 
-fn caller_user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn caller_user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -149,8 +149,8 @@ impl RecordingEventBroker {
     }
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -170,7 +170,7 @@ impl MacroEventBroker for RecordingEventBroker {
     }
 }
 
-fn service_with_event_broker<B: MacroEventBroker>(
+fn service_with_event_broker<B: RoxEventBroker>(
     repo: MockPropertiesRepo,
     event_broker: B,
 ) -> PropertiesServiceImpl<MockPropertiesRepo, MockPermissionService, MockNotificationService, B> {
@@ -1135,7 +1135,7 @@ fn edit_receipt(entity_id: &str, entity_type: EntityType) -> EditReceipt {
 
 fn edit_receipt_for_user(user_id: &str, entity_id: &str, entity_type: EntityType) -> EditReceipt {
     EditReceipt::dangerously_assert_authenticated_user(
-        MacroUserIdStr::parse_from_str(user_id)
+        RoxUserIdStr::parse_from_str(user_id)
             .unwrap()
             .into_owned(),
         entity_id,
@@ -2471,8 +2471,8 @@ async fn test_handle_task_assignee_permissions_grants_permissions() {
 
     let task_id = Uuid::from_u128(0x12345678_1234_1234_1234_123456789abc);
     let assignee_ids = vec![
-        MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap(),
-        MacroUserIdStr::parse_from_str("macro|user2@test.com").unwrap(),
+        RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap(),
+        RoxUserIdStr::parse_from_str("macro|user2@test.com").unwrap(),
     ];
 
     perm_service
@@ -2480,9 +2480,9 @@ async fn test_handle_task_assignee_permissions_grants_permissions() {
         .withf(move |user_ids, task_id_param| {
             user_ids.len() == 2
                 && user_ids
-                    .contains(&MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap())
+                    .contains(&RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap())
                 && user_ids
-                    .contains(&MacroUserIdStr::parse_from_str("macro|user2@test.com").unwrap())
+                    .contains(&RoxUserIdStr::parse_from_str("macro|user2@test.com").unwrap())
                 && task_id_param == task_id.to_string()
         })
         .returning(|_, _| Box::pin(async { Ok(()) }));
@@ -2517,7 +2517,7 @@ async fn test_handle_task_assignee_permissions_empty_assignees() {
 async fn test_handle_task_assignee_permissions_no_service() {
     let repo = MockPropertiesRepo::new();
     let task_id = Uuid::from_u128(0x12345678_1234_1234_1234_123456789abc);
-    let assignee_ids = vec![MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()];
+    let assignee_ids = vec![RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()];
 
     let service = PropertiesServiceImpl::new(
         repo,
@@ -2542,7 +2542,7 @@ async fn test_handle_task_assignee_permissions_error_propagates() {
     let mut perm_service = MockPermissionService::new();
 
     let task_id = Uuid::from_u128(0x12345678_1234_1234_1234_123456789abc);
-    let assignee_ids = vec![MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()];
+    let assignee_ids = vec![RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()];
 
     perm_service
         .expect_grant_permissions_to_task()
@@ -2566,7 +2566,7 @@ async fn test_handle_task_assignee_permissions_error_propagates() {
 struct NotificationTestCase {
     task_id: Uuid,
     assigned_by: String,
-    assignees: Vec<MacroUserIdStr<'static>>,
+    assignees: Vec<RoxUserIdStr<'static>>,
     existing_assignees: Vec<String>,
     expected_notification_count: usize,
     expected_recipient_ids: Option<Vec<String>>,
@@ -2642,7 +2642,7 @@ async fn check_notifications(test_case: NotificationTestCase) {
         )
     };
 
-    let assigned_by = MacroUserIdStr::parse_from_str(&assigned_by).unwrap();
+    let assigned_by = RoxUserIdStr::parse_from_str(&assigned_by).unwrap();
     service
         .handle_task_assignee_notifications(task_id, &assignees, Some(&assigned_by))
         .await
@@ -2655,9 +2655,9 @@ async fn test_handle_task_assignee_notifications_sends_to_new_assignees_only() {
         task_id: Uuid::from_u128(0x12345678_1234_1234_1234_123456789abc),
         assigned_by: "macro|assigner@rox.one".to_string(),
         assignees: vec![
-            MacroUserIdStr::parse_from_str("macro|user1@rox.one").unwrap(),
-            MacroUserIdStr::parse_from_str("macro|user2@rox.one").unwrap(),
-            MacroUserIdStr::parse_from_str("macro|user3@rox.one").unwrap(), // existing, should not get notification
+            RoxUserIdStr::parse_from_str("macro|user1@rox.one").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user2@rox.one").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user3@rox.one").unwrap(), // existing, should not get notification
         ],
         existing_assignees: vec!["macro|user3@rox.one".to_string()],
         expected_notification_count: 2, // user1 and user2, but not user3 (existing) or assigner
@@ -2673,8 +2673,8 @@ async fn test_handle_task_assignee_notifications_filters_out_assigner() {
         task_id: Uuid::from_u128(0x12345678_1234_1234_1234_123456789abc),
         assigned_by: "macro|assigner@rox.one".to_string(),
         assignees: vec![
-            MacroUserIdStr::parse_from_str("macro|user1@rox.one").unwrap(),
-            MacroUserIdStr::parse_from_str("macro|assigner@rox.one").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user1@rox.one").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|assigner@rox.one").unwrap(),
         ],
         existing_assignees: vec![],
         expected_notification_count: 1, // only user1, not assigner
@@ -2689,7 +2689,7 @@ async fn test_handle_task_assignee_notifications_no_new_assignees() {
     check_notifications(NotificationTestCase {
         task_id: Uuid::from_u128(0x12345678_1234_1234_1234_123456789abc),
         assigned_by: "macro|assigner@rox.one".to_string(),
-        assignees: vec![MacroUserIdStr::parse_from_str("macro|user1@rox.one").unwrap()],
+        assignees: vec![RoxUserIdStr::parse_from_str("macro|user1@rox.one").unwrap()],
         existing_assignees: vec!["macro|user1@rox.one".to_string()],
         expected_notification_count: 0, // no new assignees
         expected_recipient_ids: None,
@@ -2703,7 +2703,7 @@ async fn test_handle_task_assignee_notifications_no_service() {
     check_notifications(NotificationTestCase {
         task_id: Uuid::from_u128(0x12345678_1234_1234_1234_123456789abc),
         assigned_by: "macro|assigner@rox.one".to_string(),
-        assignees: vec![MacroUserIdStr::parse_from_str("macro|user1@rox.one").unwrap()],
+        assignees: vec![RoxUserIdStr::parse_from_str("macro|user1@rox.one").unwrap()],
         existing_assignees: vec![],
         expected_notification_count: 0,
         expected_recipient_ids: None,
@@ -2739,7 +2739,7 @@ async fn test_handle_task_assignee_notifications_internal_write_skips() {
     service
         .handle_task_assignee_notifications(
             Uuid::from_u128(0x12345678_1234_1234_1234_123456789abc),
-            &[MacroUserIdStr::parse_from_str("macro|user1@rox.one").unwrap()],
+            &[RoxUserIdStr::parse_from_str("macro|user1@rox.one").unwrap()],
             None,
         )
         .await
@@ -2760,8 +2760,8 @@ async fn test_handle_task_assignees_property_calls_both_handlers() {
     let entity_id = task_id.to_string();
     let assigned_by = "macro|assigner@rox.one".to_string();
     let assignees = [
-        MacroUserIdStr::parse_from_str("macro|user1@rox.one").unwrap(),
-        MacroUserIdStr::parse_from_str("macro|user2@rox.one").unwrap(),
+        RoxUserIdStr::parse_from_str("macro|user1@rox.one").unwrap(),
+        RoxUserIdStr::parse_from_str("macro|user2@rox.one").unwrap(),
     ];
 
     let value = Some(
@@ -2798,7 +2798,7 @@ async fn test_handle_task_assignees_property_calls_both_handlers() {
 
     let service = PropertiesServiceImpl::new(repo, Some(perm_service), Some(notif_service));
 
-    let assigned_by = MacroUserIdStr::parse_from_str(&assigned_by).unwrap();
+    let assigned_by = RoxUserIdStr::parse_from_str(&assigned_by).unwrap();
     service
         .handle_task_assignees_property(&entity_id, value, Some(&assigned_by))
         .await
@@ -2821,7 +2821,7 @@ async fn test_handle_task_assignees_property_clearing_assignees() {
         .handle_task_assignees_property(
             &entity_id,
             None,
-            Some(&MacroUserIdStr::parse_from_str("macro|assigner@rox.one").unwrap()),
+            Some(&RoxUserIdStr::parse_from_str("macro|assigner@rox.one").unwrap()),
         )
         .await
         .unwrap();
@@ -3132,7 +3132,7 @@ async fn canonical_document_task_write_uses_task_storage_type() {
 #[tokio::test]
 async fn canonical_document_task_assignee_write_grants_permissions() {
     let task_id = Uuid::from_u128(0xA5516E);
-    let assignee = MacroUserIdStr::parse_from_str("macro|assignee@test.com").unwrap();
+    let assignee = RoxUserIdStr::parse_from_str("macro|assignee@test.com").unwrap();
     let mut repo = MockPropertiesRepo::new();
 
     repo.expect_get_document_sub_types()
@@ -3212,7 +3212,7 @@ async fn canonical_document_task_assignee_write_grants_permissions() {
 #[tokio::test]
 async fn user_scoped_bot_assignee_write_notifies_as_the_acting_user() {
     let task_id = Uuid::from_u128(0xA5516F);
-    let assignee = MacroUserIdStr::parse_from_str("macro|assignee@test.com").unwrap();
+    let assignee = RoxUserIdStr::parse_from_str("macro|assignee@test.com").unwrap();
     let acting_user = caller_user_id();
     let bot_id = BotId::new_from_uuid(uuid::uuid!("00000000-0000-0000-0000-000000005759"));
     let bot_access = EditReceipt::dangerously_assert_bot(

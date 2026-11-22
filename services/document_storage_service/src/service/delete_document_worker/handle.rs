@@ -24,7 +24,7 @@ pub async fn handle(
     if owner.is_none() {
         tracing::info!(document_id=%document_id, "starting delete process for document");
 
-        let document = macro_db_client::document::get_deleted_document_info(&ctx.db, document_id)
+        let document = rox_db_client::document::get_deleted_document_info(&ctx.db, document_id)
             .await
             .inspect_err(
                 |e| tracing::error!(error=?e, document_id=%document_id, "unable to get document"),
@@ -39,7 +39,7 @@ pub async fn handle(
         {
             // Get the sha counts to decrement from the documents bom parts
             let bom_parts =
-                macro_db_client::document::get_bom_parts(&ctx.db, &document.document_id).await?;
+                rox_db_client::document::get_bom_parts(&ctx.db, &document.document_id).await?;
 
             // Transform bom parts into Vec<(sha, count)>
             let sha_counts = count_occurrences(
@@ -54,7 +54,7 @@ pub async fn handle(
         }
 
         tracing::trace!(document_id=%document.document_id, "deleting document");
-        macro_db_client::document::delete_document(&ctx.db, &document.document_id).await?;
+        rox_db_client::document::delete_document(&ctx.db, &document.document_id).await?;
         tracing::trace!(document_id=%document.document_id, "deleted document");
     }
 

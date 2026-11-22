@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import type { SavedViewDefinition } from '../generated/storage/types.gen';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 const VIEW = '0198a4cc-e138-7670-a308-a6b766602730';

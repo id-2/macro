@@ -37,8 +37,8 @@ use entity_access::domain::models::{
 use foreign_entity::domain::models::{ForeignEntity, SourceId};
 use foreign_entity::domain::ports::ForeignEntityService;
 use github_pull_requests::domain::models::GITHUB_PULL_REQUEST_FOREIGN_ENTITY_SOURCE;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::response::{DocumentResponseMetadata, LocationResponseData};
 use model::document::{
     ContentType, DocumentBasic, DocumentMetadata, FileAssociation, FileType, FileTypeExt,
@@ -62,7 +62,7 @@ use super::branch_name::{build_task_branch_name, user_branch_prefix};
 use super::content::{DocumentContent, DocumentContentLocation, DocumentContentState};
 use super::events::{
     DocumentCopiedMetadata, DocumentCreatedMetadata, DocumentDeletedMetadata,
-    DocumentInteractionMetadata, DocumentMacroEvent, DocumentUpdatedMetadata, InteractionReason,
+    DocumentInteractionMetadata, DocumentRoxEvent, DocumentUpdatedMetadata, InteractionReason,
 };
 use super::models::{
     CloudFrontConfig, CopyDocumentRepoArgs, CreateDocumentRepoArgs, CreateTaskRequest,
@@ -92,7 +92,7 @@ pub struct DocumentServiceImpl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > {
     /// Document repository
@@ -209,8 +209,8 @@ fn should_revoke_non_owner_user_access(
 #[derive(Default)]
 struct PublishedDocumentActors {
     actor: Option<Actor<'static>>,
-    on_behalf_of: Option<MacroUserIdStr<'static>>,
-    actor_user_id: Option<MacroUserIdStr<'static>>,
+    on_behalf_of: Option<RoxUserIdStr<'static>>,
+    actor_user_id: Option<RoxUserIdStr<'static>>,
 }
 
 fn published_document_actors(auth: &EntityAccessAuth) -> PublishedDocumentActors {
@@ -253,9 +253,9 @@ impl DocumentDates {
 }
 
 fn short_id_for_entity_id(entity_id: &str) -> Result<String, DocumentError> {
-    let uuid = macro_uuid::string_to_uuid(entity_id)
+    let uuid = rox_uuid::string_to_uuid(entity_id)
         .map_err(|e| DocumentError::BadRequest(format!("invalid entity_id: {e}")))?;
-    Ok(macro_uuid::ShortUuidConverter::default().from_uuid(&uuid))
+    Ok(rox_uuid::ShortUuidConverter::default().from_uuid(&uuid))
 }
 
 fn invalid_team_task_slug() -> DocumentError {
@@ -354,7 +354,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 {
@@ -441,7 +441,7 @@ impl<
         let constructed_url = self.cloudfront_url_for_key(key);
         let options = self.get_signed_options();
 
-        let signed_url = if !macro_aws_config::is_local_aws() {
+        let signed_url = if !rox_aws_config::is_local_aws() {
             get_signed_url(&constructed_url, &options)?
         } else {
             constructed_url
@@ -704,7 +704,7 @@ impl<
     }
 
     /// Publish a document lifecycle event; failures are logged and dropped.
-    fn publish_document_event(&self, event: &DocumentMacroEvent) {
+    fn publish_document_event(&self, event: &DocumentRoxEvent) {
         let _ = self.macro_event_broker.send_event(event).inspect_err(|e| {
             tracing::error!(error=?e, "failed to publish document event");
         });
@@ -973,7 +973,7 @@ impl<
 
         let team_task_metadata = self.team_task_metadata_for_document(&document_id).await?;
 
-        self.publish_document_event(&DocumentMacroEvent::created(
+        self.publish_document_event(&DocumentRoxEvent::created(
             document_metadata.document_id.clone(),
             DocumentCreatedMetadata {
                 document_id: document_metadata.document_id.clone(),
@@ -1011,7 +1011,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > DocumentCreationService for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 {
@@ -1095,7 +1095,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > DocumentService for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 {
@@ -1187,7 +1187,7 @@ impl<
             .await
             .map_err(|e| DocumentError::Internal(e.into()))?
         {
-            self.publish_document_event(&DocumentMacroEvent::updated(
+            self.publish_document_event(&DocumentRoxEvent::updated(
                 id.clone(),
                 DocumentUpdatedMetadata {
                     appearance_change: Some([previous, appearance.clone()]),
@@ -1394,7 +1394,7 @@ impl<
             on_behalf_of,
             actor_user_id,
         } = published_document_actors(entity_access_receipt.auth());
-        self.publish_document_event(&DocumentMacroEvent::deleted(
+        self.publish_document_event(&DocumentRoxEvent::deleted(
             entity_access_receipt.entity().entity_id.clone(),
             DocumentDeletedMetadata {
                 document_id: entity_access_receipt.entity().entity_id.clone(),
@@ -1644,7 +1644,7 @@ impl<
             return Ok(response);
         }
 
-        let converter = macro_uuid::ShortUuidConverter::default();
+        let converter = rox_uuid::ShortUuidConverter::default();
         let mut task_ids_by_key = std::collections::HashMap::<String, Vec<String>>::new();
         for (github_key, task_short_id) in links {
             match converter.to_uuid(&task_short_id) {
@@ -1963,7 +1963,7 @@ impl<
             on_behalf_of,
             actor_user_id,
         } = published_document_actors(entity_access_receipt.auth());
-        self.publish_document_event(&DocumentMacroEvent::updated(
+        self.publish_document_event(&DocumentRoxEvent::updated(
             entity_access_receipt.entity().entity_id.clone(),
             DocumentUpdatedMetadata {
                 appearance_change: None,
@@ -2313,7 +2313,7 @@ impl<
         };
         let attribution = Attribution::from(principal);
 
-        self.publish_document_event(&DocumentMacroEvent::copied(
+        self.publish_document_event(&DocumentRoxEvent::copied(
             new_document_id.clone(),
             DocumentCopiedMetadata {
                 document_id: new_document_id.clone(),
@@ -2351,7 +2351,7 @@ impl<
     async fn update_task_status(
         &self,
         entity_access_receipt: EntityAccessReceipt<entity_access::domain::models::EditAccessLevel>,
-        credited_user: Option<MacroUserIdStr<'static>>,
+        credited_user: Option<RoxUserIdStr<'static>>,
         source: Option<PropertyChangeSource>,
         status: &str,
     ) -> Result<(), DocumentError> {
@@ -2405,7 +2405,7 @@ impl<
                 .map_err(Into::into)?;
         }
 
-        self.publish_document_event(&DocumentMacroEvent::interaction(
+        self.publish_document_event(&DocumentRoxEvent::interaction(
             document_id,
             DocumentInteractionMetadata {
                 document_id: document_id.to_owned(),

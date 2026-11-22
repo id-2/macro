@@ -25,6 +25,7 @@ pub mod db;
 pub mod docker;
 pub mod doctor;
 pub mod e2e;
+mod env_compat;
 pub mod env_layer;
 pub mod frontend;
 pub mod fusionauth;
@@ -437,13 +438,13 @@ pub(crate) fn bring_up(
     // Both modes run at least Redis + LocalStack locally, and those reference the
     // instance's `external` volumes/networks — which must exist before compose
     // `up`. Unconditional + idempotent, mirroring the unconditional teardown (dev
-    // was tearing `macro_redis_data` down each run but never recreating it).
+    // was tearing `rox_redis_data` down each run but never recreating it).
     ensure_external_resources(stage, instance)?;
 
     // Bring the backend infra up and fully ready — DB created + migrated,
     // LocalStack provisioned, FusionAuth kickstarted — BEFORE the app services
     // start. The teardown means everything is freshly created each run, so
-    // otherwise the services race their backends on startup (no `macrodb`,
+    // otherwise the services race their backends on startup (no `roxdb`,
     // DynamoDB/OpenSearch connection refused).
     match &snapshot_plan {
         Some(plan) if plan.exists() => {
@@ -624,7 +625,7 @@ fn run_attached(mut stage: Stage, mode: Mode, run: &cli::RunLocalArgs) -> Result
         args.instance.port_base,
     )?;
     stage.section(&format!(
-        "macro {} stack — instance {}",
+        "rox {} stack — instance {}",
         mode.label(),
         instance.name()
     ));
@@ -1130,7 +1131,7 @@ enum InfraInit {
 /// Bring up the backend infra the app services connect to at startup, and get it
 /// fully ready before any of them start. The clean-slate teardown means
 /// everything is freshly created each run, so this ordering is what stops the
-/// services racing their backends (missing `macrodb`, DynamoDB/OpenSearch
+/// services racing their backends (missing `roxdb`, DynamoDB/OpenSearch
 /// refused). Dev points Postgres/OpenSearch/FusionAuth at shared dev resources,
 /// so it only runs Redis + LocalStack locally.
 fn bring_up_infra(
@@ -1287,14 +1288,14 @@ fn ensure_tracing_backend(stage: &Stage, backend: cli::TracesBackend) -> Result<
     // every payload at the vendor intake (403), which looks like "traces are
     // broken" rather than "key is missing" — so fail loud up front.
     if let Some(var) = backend.required_env()
-        && macro_env_var::maybe_read_env(var).is_none_or(|v| v.is_empty())
+        && rox_env_var::maybe_read_env(var).is_none_or(|v| v.is_empty())
     {
         anyhow::bail!(
             "--traces {profile} requires the {var} env var to be set (export it in \
              the shell you run this from)"
         );
     }
-    // Launch-timing export stays off unless `MACRO_LOCAL_TELEMETRY` is explicitly
+    // Launch-timing export stays off unless `ROX_LOCAL_TELEMETRY` is explicitly
     // on. Unset means off (`xtask_local_telemetry::config::Switch::from_env`).
     // The foreign Grafana copy is a separate switch and stays off: this runner
     // does not start the forwarder and does not set a copy endpoint. Nothing
@@ -1353,7 +1354,7 @@ fn ensure_tracing_backend(stage: &Stage, backend: cli::TracesBackend) -> Result<
 
 /// Compose project of the machine-global containers (`name:` in
 /// `docker/docker-compose.yml`).
-const GLOBAL_COMPOSE_PROJECT: &str = "macro";
+const GLOBAL_COMPOSE_PROJECT: &str = "rox";
 
 /// What [`ensure_tracing_backend`] does about the container holding the OTLP
 /// port.
@@ -1371,7 +1372,7 @@ enum CollectorAction {
 }
 
 /// Decide from the [`otlp_port_holder`] line (`<name> <project> <service>`).
-/// Ownership is by compose label, not name: the global `macro-lgtm-1` is
+/// Ownership is by compose label, not name: the global `rox-lgtm-1` is
 /// name-indistinguishable from an instance named `lgtm`'s containers.
 fn collector_action(holder: Option<&str>, wanted_service: &str) -> CollectorAction {
     let Some(mut fields) = holder.map(str::split_whitespace) else {
@@ -1446,7 +1447,7 @@ fn binds_host_otlp_port(ports: &str) -> bool {
 }
 
 /// Start a profile-gated service from the base compose file under the global
-/// `macro` project (one per machine, shared across instances, left running
+/// `rox` project (one per machine, shared across instances, left running
 /// across invocations) — the pattern the trace collectors and headless Chrome
 /// share. Keep other containers in the shared project: the base compose file
 /// does not include generated infrastructure services such as LocalStack.
@@ -1470,7 +1471,7 @@ fn start_global_compose_service(
     stage.run(&format!("Starting {profile} {label}"), &mut up)
 }
 
-/// `docker compose` over the base compose file in the global `macro` project,
+/// `docker compose` over the base compose file in the global `rox` project,
 /// with `profile` enabled.
 fn global_compose(profile: &str) -> Command {
     let mut compose = Command::new("docker");
@@ -1548,9 +1549,9 @@ fn disconnect_tracing_network(instance: &Instance) {
         return;
     };
     // Foreign means "not this compose project". Decide by the compose project
-    // label, not the container name: the global collector `macro-lgtm-1`
-    // (project `macro`, service `lgtm`) is name-indistinguishable from a
-    // container of an instance literally named `lgtm` (project `macro-lgtm`).
+    // label, not the container name: the global collector `rox-lgtm-1`
+    // (project `rox`, service `lgtm`) is name-indistinguishable from a
+    // container of an instance literally named `lgtm` (project `rox-lgtm`).
     // One `docker inspect` for all attached containers, not one per name.
     let names: Vec<&str> = attached
         .lines()

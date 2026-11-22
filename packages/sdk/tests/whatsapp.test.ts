@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { ExternalChat, Macro, WhatsAppChat } from '../src/macro';
+import { ExternalChat, Macro, WhatsAppChat } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {

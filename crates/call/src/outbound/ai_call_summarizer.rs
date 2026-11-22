@@ -8,7 +8,7 @@ use std::fmt::Write as _;
 
 use uuid::Uuid;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::{
     CallRecordTranscriptSegment, CallTranscriptCustomSpeakerResult, EnrichedCallTranscript,
@@ -203,7 +203,7 @@ impl CallSummarizer for AiCallSummarizer {
     async fn generate_custom_speakers(
         &self,
         transcript: Vec<EnrichedCallTranscript>,
-        candidate_speakers: Vec<MacroUserIdStr<'static>>,
+        candidate_speakers: Vec<RoxUserIdStr<'static>>,
     ) -> Result<Vec<CallTranscriptCustomSpeakerResult>, Self::Err> {
         if transcript.is_empty() || candidate_speakers.is_empty() {
             return Ok(Vec::new());
@@ -289,7 +289,7 @@ fn sanitize_call_name(raw: &str) -> Option<String> {
 /// attribution prompt.
 fn format_custom_speakers_prompt(
     transcript: &[EnrichedCallTranscript],
-    candidate_speakers: &[MacroUserIdStr<'static>],
+    candidate_speakers: &[RoxUserIdStr<'static>],
 ) -> String {
     let candidate_user_ids: Vec<&str> = candidate_speakers
         .iter()
@@ -321,7 +321,7 @@ fn parse_custom_speaker_results(
             continue;
         }
 
-        let Ok(normalized_user_id) = MacroUserIdStr::try_from(result.custom_speaker) else {
+        let Ok(normalized_user_id) = RoxUserIdStr::try_from(result.custom_speaker) else {
             continue;
         };
         let normalized_custom_speaker = normalized_user_id.as_ref().to_string();

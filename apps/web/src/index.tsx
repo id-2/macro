@@ -11,12 +11,13 @@ import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { getPlatform } from '@core/util/platform';
 import { installPlatformFetch } from '@core/util/platformFetch';
 import { recoverFromFailedLoad } from '@core/util/reloadForNewerBuild';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { initMonochromeIcons } from '@ui/utils/monochromeIcons';
 import { ErrorBoundary, render } from 'solid-js/web';
 import { FatalError } from './components/app/FatalError';
 import { interfaceLanguageReady } from './lib/i18n';
 import { prepareNotificationLaunch } from './lib/tauri/notification-launch';
+import { pruneDesktopSessionCookies } from './lib/tauri/session-cookies';
 import { perfMark } from './observability/perf-marks';
 import { Root } from './routes/Root';
 
@@ -92,6 +93,10 @@ async function languageReady() {
 
 async function main() {
   perfMark('boot.main');
+  // A session that changed cookie scope leaves the older twin in the shell's
+  // jar, and the services read the last cookie: prune before the first
+  // authenticated request so the signed-in session is the only one sent.
+  await pruneDesktopSessionCookies();
   // A translated interface waits for its messages (already loading, cached
   // after the first visit) so the first screen isn't English for a moment.
   await Promise.all([observabilityReady(), languageReady()]);

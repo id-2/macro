@@ -4358,7 +4358,7 @@
             "description": "Feature that performed the invocation."
           },
           "user": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "User the invocation was performed for."
           }
         }
@@ -5781,7 +5781,7 @@
         "description": "Defines who can access an item through its share link.",
         "enum": ["PUBLIC", "TEAM"]
       },
-      "MacroUserIdStr": {
+      "RoxUserIdStr": {
         "type": "string"
       },
       "MemoryEdit": {

@@ -3,7 +3,7 @@ import {
   type LiveSyncSource,
   type SyncError,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
+} from '@rox-one/collaboration/collab/source';
 import { errAsync, okAsync, type ResultAsync } from 'neverthrow';
 import type { DocumentSyncAuthorization } from './authorization';
 

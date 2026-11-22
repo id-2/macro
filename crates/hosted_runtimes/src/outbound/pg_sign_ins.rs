@@ -12,7 +12,7 @@ use harnesses::domain::account_logins::{
 };
 use harnesses::domain::ports::HarnessRepo;
 use harnesses::outbound::pg_harness_repo::PgHarnessRepo;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -115,7 +115,7 @@ impl ClaudeSignIns for PgClaudeSignIns {
 fn sign_in(login: ComputerAccountLogin, teams: &HashMap<Uuid, Uuid>) -> Option<ClaudeSignIn> {
     let computer_id = login.computer_id;
     let team_id = *teams.get(&computer_id.as_uuid())?;
-    let signed_in_by = match login.signed_in_by.map(MacroUserIdStr::try_from).transpose() {
+    let signed_in_by = match login.signed_in_by.map(RoxUserIdStr::try_from).transpose() {
         Ok(signed_in_by) => signed_in_by,
         Err(_) => {
             tracing::error!(%computer_id, "computer has an invalid Claude signer");

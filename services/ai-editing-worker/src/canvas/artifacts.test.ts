@@ -1,4 +1,4 @@
-import { createScene, presentationOrder } from '@macro-inc/graphics';
+import { createScene, presentationOrder } from '@rox-one/graphics';
 import { getQuickJS } from 'quickjs-emscripten';
 import { describe, expect, it } from 'vitest';
 import { artifactLibraryEdits, prepareCanvasEdit } from './operations';

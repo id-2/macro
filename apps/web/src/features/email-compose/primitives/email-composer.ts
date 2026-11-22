@@ -9,7 +9,7 @@ import { $generateHtmlFromNodes } from '@lexical/html';
 import {
   $appendWatermarkNodeToLast,
   $removeAllWatermarkNodes,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import * as EmailValidator from 'email-validator';
 import type { LexicalEditor } from 'lexical';
 import {
@@ -1090,7 +1090,7 @@ export function createEmailComposer(props: EmailComposerOptions) {
       // Append watermark after all validation passes so failed sends don't
       // leave orphaned watermark nodes in the editor tree.
       const restoration = prepareEmailBody(currentEditor);
-      const restoreMacro = content();
+      const restoreRox = content();
       const cleanupWatermark = $appendWatermarkNodeToLast(
         currentEditor,
         !hasPaidAccess() ? MACRO_EMAIL_SIGNATURE : undefined
@@ -1102,7 +1102,7 @@ export function createEmailComposer(props: EmailComposerOptions) {
         return;
       }
 
-      const bodyMacro = content();
+      const bodyRox = content();
 
       try {
         setSendPhase('sending');
@@ -1122,7 +1122,7 @@ export function createEmailComposer(props: EmailComposerOptions) {
             .flatMap((a) => (a.attachmentId ? [a.attachmentId] : [])),
           restoreBodyHtml: restoration?.bodyHtml,
           restoreBodyText: restoration?.bodyText,
-          restoreBodyMacro: restoreMacro,
+          restoreBodyRox: restoreRox,
           message: {
             sender_email: form.senderEmail() ?? link()?.email_address,
             to: convertToContactInfoArray(recipients.to),
@@ -1137,7 +1137,7 @@ export function createEmailComposer(props: EmailComposerOptions) {
             subject: form.subject(),
             body_text: prepared.bodyText,
             body_html: prepared.bodyHtml,
-            body_macro: bodyMacro,
+            body_rox: bodyRox,
             db_id: draftId,
             // Backend includes the signature by default for new emails; only signal
             // an explicit dismiss. Omitting it falls through to the backend default.

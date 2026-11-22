@@ -128,7 +128,11 @@ pub enum ModelProbeResult {
 /// The dial header a runtime lists the optional messages it accepts in,
 /// comma-separated. The service sends an optional message only to a runtime
 /// that listed it, so older runtimes never receive one they cannot read.
-pub const RUNTIME_ACCEPTS_HEADER: &str = "x-macro-runtime-accepts";
+pub const RUNTIME_ACCEPTS_HEADER: &str = "x-rox-runtime-accepts";
+
+/// The name [`RUNTIME_ACCEPTS_HEADER`] had before the rename. Runtimes that
+/// predate it still list their messages under it.
+pub const LEGACY_RUNTIME_ACCEPTS_HEADER: &str = "x-macro-runtime-accepts";
 
 /// The [`RUNTIME_ACCEPTS_HEADER`] entry for [`ToRuntimeMessage::AgentsChanged`].
 pub const ACCEPTS_AGENTS_CHANGED: &str = "agents-changed";

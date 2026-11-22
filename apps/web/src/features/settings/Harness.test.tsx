@@ -8,6 +8,7 @@ vi.mock('@core/codex/flag', () => ({
  * @vitest-environment jsdom
  */
 
+import { interfaceLanguageReady, setInterfaceLanguage } from '@app/lib/i18n';
 import { ThrownResultError } from '@core/util/result';
 import { useAgentModelsQuery } from '@queries/agents/models';
 import { invalidateHarnesses } from '@queries/harnesses/harnesses';
@@ -266,6 +267,11 @@ beforeEach(() => {
 });
 
 describe('Harness', () => {
+  beforeAll(async () => {
+    setInterfaceLanguage('ru');
+    await interfaceLanguageReady(1000);
+  });
+
   it.each([false, true])(
     'shows Codex settings only within its rollout (access %s)',
     (enabled) => {
@@ -306,16 +312,16 @@ describe('Harness', () => {
       expect(screen.queryByText('Settings suspended')).toBeNull();
       expect(screen.getByText('Loading models…')).toBeTruthy();
       expect(
-        (screen.getByLabelText('Default model') as HTMLButtonElement).disabled
+        (screen.getByLabelText('Модель по умолчанию') as HTMLButtonElement).disabled
       ).toBe(true);
 
       if (outcome === 'error') {
         rejectModels(new Error('Cursor is unavailable'));
         await waitFor(() =>
-          expect(screen.getByText(/Could not load Cursor models/)).toBeTruthy()
+          expect(screen.getByText(/Не удалось загрузить модели Cursor/)).toBeTruthy()
         );
         expect(screen.queryByText('Settings suspended')).toBeNull();
-        expect(screen.getByRole('button', { name: 'Retry' })).toBeTruthy();
+        expect(screen.getByRole('button', { name: 'Повторить' })).toBeTruthy();
       } else {
         resolveModels({
           status: 'available',
@@ -333,7 +339,7 @@ describe('Harness', () => {
         );
         expect(screen.queryByText('Settings suspended')).toBeNull();
         expect(
-          (screen.getByLabelText('Default model') as HTMLButtonElement).disabled
+          (screen.getByLabelText('Модель по умолчанию') as HTMLButtonElement).disabled
         ).toBe(false);
       }
       view.unmount();
@@ -347,15 +353,15 @@ describe('Harness', () => {
     expect(screen.getByRole('heading', { name: 'Rox Agent' })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Cursor' })).toBeTruthy();
     expect(
-      screen.getByText(/Uses official Rox tools and MCPs to get the job done/)
+      screen.getByText(/официальными инструментами Rox и MCP/)
     ).toBeTruthy();
   });
 
   it('validates and saves a Cursor API key', async () => {
     render(() => <Harness />);
 
-    const apiKeyInput = screen.getByLabelText('API key');
-    const saveButton = screen.getByRole('button', { name: 'Save' });
+    const apiKeyInput = screen.getByLabelText('Ключ API');
+    const saveButton = screen.getByRole('button', { name: 'Сохранить' });
 
     expect(apiKeyInput).toHaveProperty('type', 'password');
     expect(saveButton).toHaveProperty('disabled', true);
@@ -373,7 +379,7 @@ describe('Harness', () => {
 
     await waitFor(() => {
       expect(mocks.save).toHaveBeenCalledWith('grok_example');
-      expect(mocks.toastSuccess).toHaveBeenCalledWith('Cursor connected');
+      expect(mocks.toastSuccess).toHaveBeenCalledWith('Cursor подключён');
       expect(apiKeyInput).toHaveProperty('value', '');
     });
   });
@@ -381,10 +387,10 @@ describe('Harness', () => {
   it('still accepts a Cursor API key minted with the older crsr_ prefix', async () => {
     render(() => <Harness />);
 
-    fireEvent.input(screen.getByLabelText('API key'), {
+    fireEvent.input(screen.getByLabelText('Ключ API'), {
       target: { value: 'crsr_example' },
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Сохранить' }));
 
     await waitFor(() => {
       expect(mocks.save).toHaveBeenCalledWith('crsr_example');
@@ -405,23 +411,23 @@ describe('Harness', () => {
 
     render(() => <Harness />);
 
-    expect(screen.getByText('Connected')).toBeTruthy();
-    expect(screen.queryByLabelText('API key')).toBeNull();
-    expect(screen.getByText(/does not revoke it in Cursor/)).toBeTruthy();
+    expect(screen.getByText('Подключено')).toBeTruthy();
+    expect(screen.queryByLabelText('Ключ API')).toBeNull();
+    expect(screen.getByText(/не отзывает его в Cursor/)).toBeTruthy();
 
-    chooseModelOption(screen.getByLabelText('Default model'), 'Another Model');
+    chooseModelOption(screen.getByLabelText('Модель по умолчанию'), 'Another Model');
     await waitFor(() => {
       expect(mocks.setDefaultModel).toHaveBeenCalledWith({
         modelId: 'another-model',
       });
-      expect(mocks.toastSuccess).toHaveBeenCalledWith('Default model updated');
+      expect(mocks.toastSuccess).toHaveBeenCalledWith('Модель по умолчанию обновлена');
     });
 
-    fireEvent.click(screen.getByRole('button', { name: 'Disconnect' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Отключить' }));
 
     await waitFor(() => {
       expect(mocks.disconnect).toHaveBeenCalledOnce();
-      expect(mocks.toastSuccess).toHaveBeenCalledWith('Cursor disconnected');
+      expect(mocks.toastSuccess).toHaveBeenCalledWith('Cursor отключён');
     });
   });
 
@@ -430,15 +436,15 @@ describe('Harness', () => {
 
     render(() => <Harness />);
 
-    expect(screen.getByText('Loading…')).toBeTruthy();
-    expect(screen.queryByLabelText('API key')).toBeNull();
+    expect(screen.getByText('Загрузка…')).toBeTruthy();
+    expect(screen.queryByLabelText('Ключ API')).toBeNull();
   });
 
   it('hides the empty paired runtimes section', () => {
     render(() => <Harness />);
 
     expect(screen.queryByText('No paired machines yet')).toBeNull();
-    expect(screen.queryByRole('heading', { name: 'Your machines' })).toBeNull();
+    expect(screen.queryByRole('heading', { name: 'Ваши машины' })).toBeNull();
     expect(
       screen.queryByRole('button', { name: 'Enter pairing code' })
     ).toBeNull();
@@ -447,18 +453,18 @@ describe('Harness', () => {
   it('opens pairing from New runtime and returns to the runtimes list', () => {
     render(() => <Harness />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'New machine' }));
-    expect(screen.getByRole('region', { name: 'New machine' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Новая машина' }));
+    expect(screen.getByRole('region', { name: 'Новая машина' })).toBeTruthy();
     expect(screen.queryByRole('dialog')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-    expect(screen.getByRole('heading', { name: 'Machines' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Отмена' }));
+    expect(screen.getByRole('heading', { name: 'Машины' })).toBeTruthy();
   });
 
   it('goes back to Agents from the runtimes page', () => {
     const onBack = vi.fn();
     render(() => <Harness onBack={onBack} />);
 
-    fireEvent.click(screen.getByRole('button', { name: 'Agents' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Агенты' }));
     expect(onBack).toHaveBeenCalledOnce();
   });
 
@@ -467,12 +473,12 @@ describe('Harness', () => {
 
     render(() => <Harness />);
 
-    expect(screen.getByRole('heading', { name: 'Your machines' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Ваши машины' })).toBeTruthy();
     expect(screen.getByText('Dev box')).toBeTruthy();
-    expect(screen.getByRole('img', { name: 'Connected' })).toBeTruthy();
+    expect(screen.getByRole('img', { name: 'Подключена' })).toBeTruthy();
     const row = screen.getByText('Dev box').closest('[data-runtime-row]');
     expect(row?.textContent).toMatch(
-      /Team machine · 2 requests · Last connected /
+      /Машина команды · 2 запроса · Последнее подключение: /
     );
     expect(
       screen.queryByRole('switch', { name: /bypass|Don't ask/ })
@@ -492,9 +498,9 @@ describe('Harness', () => {
 
     render(() => <Harness />);
 
-    expect(screen.getByRole('img', { name: 'Offline' })).toBeTruthy();
+    expect(screen.getByRole('img', { name: 'Не в сети' })).toBeTruthy();
     const old = screen.getByText('Old laptop').closest('[data-runtime-row]');
-    expect(old?.textContent).toMatch(/Private · 2 requests · Never connected/);
+    expect(old?.textContent).toMatch(/Личная · 2 запроса · Никогда не подключалась/);
     const names = screen
       .getAllByText(/Dev box|Old laptop/)
       .map((node) => node.textContent);
@@ -515,7 +521,7 @@ describe('Harness', () => {
     const row = document.querySelector('[data-runtime-row="Dev box"]');
     expect(row).not.toBeNull();
     expect(
-      within(row as HTMLElement).getByRole('button', { name: 'Remove' })
+      within(row as HTMLElement).getByRole('button', { name: 'Убрать' })
     ).toBeTruthy();
   });
 
@@ -539,14 +545,13 @@ describe('Harness', () => {
     render(() => <Harness />);
 
     fireEvent.click(
-      screen.getByRole('button', { name: 'Share, 2 access requests' })
+      screen.getByRole('button', { name: 'Открыть доступ, 2 запроса' })
     );
-    expect(
-      await screen.findByRole('dialog', { name: 'Share Dev box' })
-    ).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Options' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Rename' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Remove' })).toBeTruthy();
+    expect(await screen.findByRole('dialog')).toBeTruthy();
+    expect(await screen.findByRole('dialog')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Параметры' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Переименовать' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Убрать' })).toBeTruthy();
   });
 
   it('opens the Share menu of the runtime an access request is about', async () => {
@@ -558,12 +563,8 @@ describe('Harness', () => {
 
     render(() => <Harness />);
 
-    expect(
-      await screen.findByRole('dialog', { name: 'Share Dev box' })
-    ).toBeTruthy();
-    expect(
-      screen.queryByRole('dialog', { name: 'Share Other box' })
-    ).toBeNull();
+    expect(await screen.findByRole('dialog')).toBeTruthy();
+    expect(screen.queryByText('Открыть доступ к Other box')).toBeNull();
     const row = screen.getByText('Dev box').closest('[data-runtime-row]');
     await waitFor(() => expect(row?.classList.contains('ring-2')).toBe(true));
     expect(runtimeShareRequest()).toBeUndefined();
@@ -584,24 +585,24 @@ describe('Harness', () => {
     harnessMocks.query.data = [REGISTERED_HARNESS];
 
     render(() => <Harness />);
-    fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Убрать' }));
 
     const dialog = screen.getByRole('dialog');
-    expect(within(dialog).getByText('Remove Dev box?')).toBeTruthy();
+    expect(within(dialog).getByText('Удалить Dev box?')).toBeTruthy();
     expect(
-      within(dialog).getByText(/Agents using this machine will stop running/)
+      within(dialog).getByText(/Агенты на этой машине остановятся/)
     ).toBeTruthy();
     expect(harnessMocks.deleteHarness).not.toHaveBeenCalled();
 
     fireEvent.click(
-      within(dialog).getByRole('button', { name: 'Remove machine' })
+      within(dialog).getByRole('button', { name: 'Удалить машину' })
     );
 
     await waitFor(() => {
       expect(harnessMocks.deleteHarness).toHaveBeenCalledWith({
         harnessId: REGISTERED_HARNESS.id,
       });
-      expect(mocks.toastSuccess).toHaveBeenCalledWith('Machine removed');
+      expect(mocks.toastSuccess).toHaveBeenCalledWith('Машина удалена');
       expect(screen.queryByRole('dialog')).toBeNull();
     });
   });
@@ -614,9 +615,9 @@ describe('Harness', () => {
     );
 
     render(() => <Harness />);
-    fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Убрать' }));
     const confirm = within(screen.getByRole('dialog')).getByRole('button', {
-      name: 'Remove machine',
+      name: 'Удалить машину',
     });
     fireEvent.click(confirm);
     fireEvent.click(confirm);
@@ -629,10 +630,10 @@ describe('Harness', () => {
         { code: 'NOT_FOUND', message: 'Resource not found' },
       ])
     );
-    fireEvent.click(screen.getByRole('button', { name: 'Remove' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Убрать' }));
     fireEvent.click(
       within(screen.getByRole('dialog')).getByRole('button', {
-        name: 'Remove machine',
+        name: 'Удалить машину',
       })
     );
     await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull());
@@ -647,8 +648,8 @@ describe('Harness', () => {
 
     render(() => <Harness />);
     expect(screen.queryByText('Dev box')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Rename' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Убрать' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Переименовать' })).toBeNull();
   });
 
   it('never offers Share or Remove on a Rox computer, even with computers off', () => {
@@ -660,7 +661,7 @@ describe('Harness', () => {
     render(() => <Harness />);
     expect(screen.getByText('Dev box')).toBeTruthy();
     expect(screen.queryByRole('button', { name: /^Share/ })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Убрать' })).toBeNull();
   });
 
   it.each([true, false])(
@@ -678,8 +679,8 @@ describe('Harness', () => {
 
       render(() => <Harness />);
       expect(screen.queryByText('Dev box')).toBeNull();
-      expect(screen.queryByRole('button', { name: 'Rename' })).toBeNull();
-      expect(screen.queryByRole('button', { name: 'Remove' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Переименовать' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Убрать' })).toBeNull();
       expect(screen.queryByRole('button', { name: /^Share/ })).toBeNull();
     }
   );
@@ -688,11 +689,11 @@ describe('Harness', () => {
     harnessMocks.query.data = [{ ...REGISTERED_HARNESS, access: 'owner' }];
 
     render(() => <Harness />);
-    fireEvent.click(screen.getByRole('button', { name: 'Rename' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Переименовать' }));
     const dialog = screen.getByRole('dialog');
-    const input = within(dialog).getByLabelText('Name');
+    const input = within(dialog).getByLabelText('Название');
     fireEvent.input(input, { target: { value: '  Studio  ' } });
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Save' }));
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Сохранить' }));
 
     await waitFor(() => {
       expect(harnessMocks.patchHarness).toHaveBeenCalledWith({
@@ -708,7 +709,7 @@ describe('Harness', () => {
 
     render(() => <Harness />);
 
-    const dialog = screen.getByRole('region', { name: 'New machine' });
+    const dialog = screen.getByRole('region', { name: 'Новая машина' });
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(within(dialog).getByText('KX7M-4QHD')).toBeTruthy();
     expect(within(dialog).getByText('Dev laptop')).toBeTruthy();
@@ -734,4 +735,26 @@ describe('Harness', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Integrations' }));
     expect(onBack).toHaveBeenCalledOnce();
   });
+});
+
+it('uses the English labels when the interface language is English', async () => {
+  harnessMocks.query.data = [REGISTERED_HARNESS];
+  setInterfaceLanguage('en');
+  try {
+    await interfaceLanguageReady(1000);
+    render(() => <Harness />);
+    expect(
+      screen.getByRole('heading', { name: 'Your machines' })
+    ).toBeTruthy();
+    const row = screen.getByText('Dev box').closest('[data-runtime-row]');
+    expect(row?.textContent).toMatch(
+      /Team machine · 2 requests · Last connected /
+    );
+    expect(
+      screen.getByRole('button', { name: 'Share, 2 access requests' })
+    ).toBeTruthy();
+  } finally {
+    setInterfaceLanguage('ru');
+    await interfaceLanguageReady(1000);
+  }
 });

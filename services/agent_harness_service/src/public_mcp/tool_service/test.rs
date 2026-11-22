@@ -42,7 +42,7 @@ async fn server_info_advertises_the_web_app_favicon() {
     };
 
     // The same file the web app's <link rel="icon"> points at.
-    assert_eq!(icon.src, "https://rox.one/app/macro-favicon.svg");
+    assert_eq!(icon.src, "https://rox.one/app/rox-favicon.svg");
     assert_eq!(icon.mime_type.as_deref(), Some("image/svg+xml"));
     assert_eq!(icon.sizes.as_deref(), Some(["any".to_owned()].as_slice()));
 }
@@ -194,7 +194,7 @@ fn additive_tools_set_neither_hint() {
 
 #[test]
 fn authenticated_user_id_is_read_from_http_request_parts() {
-    let expected_user_id = MacroUserIdStr::try_from_email("User@rox.one").unwrap();
+    let expected_user_id = RoxUserIdStr::try_from_email("User@rox.one").unwrap();
     let mut parts = http::Request::new(()).into_parts().0;
     parts.extensions.insert(expected_user_id.clone());
 
@@ -306,7 +306,7 @@ mod code_mode {
     impl UserCodeMode for Runs {
         async fn execute(
             &self,
-            user: &MacroUserIdStr<'static>,
+            user: &RoxUserIdStr<'static>,
             caller: &ToolCaller,
             session: Option<uuid::Uuid>,
             request: ExecuteRequest,
@@ -478,7 +478,7 @@ mod code_mode {
                     let user = request.headers()["x-user"].to_str().unwrap().to_owned();
                     request
                         .extensions_mut()
-                        .insert(MacroUserIdStr::try_from_email(&user).unwrap());
+                        .insert(RoxUserIdStr::try_from_email(&user).unwrap());
                     next.run(request).await
                 },
             ))
@@ -813,7 +813,7 @@ mod code_mode {
                     |mut request: axum::extract::Request, next: axum::middleware::Next| async move {
                         request
                             .extensions_mut()
-                            .insert(MacroUserIdStr::try_from_email(USER).unwrap());
+                            .insert(RoxUserIdStr::try_from_email(USER).unwrap());
                         next.run(request).await
                     },
                 ));
@@ -850,7 +850,7 @@ mod code_mode {
     impl agent_code_mode::domain::UserExecutionCredentials for NoCredentials {
         async fn issue(
             &self,
-            _: &MacroUserIdStr<'static>,
+            _: &RoxUserIdStr<'static>,
             _: &ToolCaller,
             _: Option<uuid::Uuid>,
         ) -> Result<code_execution::domain::RunEnvironment, CodeModeError> {

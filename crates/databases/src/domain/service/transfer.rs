@@ -57,7 +57,7 @@ where
     Cells: CellStore + DatabaseTransferRepo,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     #[tracing::instrument(skip(self, receipt, viewer, request), err)]
     async fn import_table(

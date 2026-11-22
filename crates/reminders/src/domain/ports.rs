@@ -1,7 +1,7 @@
 //! Ports (trait contracts) for the reminders domain.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{
@@ -38,7 +38,7 @@ pub trait RemindersRepo: Send + Sync + 'static {
     /// `thread_ids` optionally restricts candidates; None discovers the collection.
     fn email_candidates(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         thread_ids: Option<&[Uuid]>,
         cursor: Option<super::email_collection::EmailReminderCursor>,
         as_of: DateTime<Utc>,
@@ -192,14 +192,14 @@ pub trait RemindersService: Send + Sync + 'static {
     /// Read the most recent snooze on this caller's thread.
     fn get_email_followup(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread: Uuid,
     ) -> impl Future<Output = Result<Option<super::email_followup::EmailFollowup>, ReminderError>> + Send;
 
     /// Execute an idempotent email snooze command.
     fn execute_email_followup(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread: Uuid,
         command: super::email_followup::EmailFollowupCommand,
     ) -> impl Future<Output = Result<super::email_followup::EmailFollowup, ReminderError>> + Send;

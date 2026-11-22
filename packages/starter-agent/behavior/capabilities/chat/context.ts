@@ -1,5 +1,5 @@
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
-import { channel } from '@macro-inc/muppet/core/event';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
+import { channel } from '@rox-one/muppet/core/event';
 import { z } from 'zod';
 import type { Base } from '../../context/index.ts';
 import { batches } from '../../context/stream.ts';

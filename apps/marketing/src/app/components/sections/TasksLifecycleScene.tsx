@@ -37,7 +37,7 @@ import IconGithub from '../../../assets/icons/icon-github.svg';
 import avatarAidan from '../../../assets/people/aidan.webp';
 import avatarTeo from '../../../assets/people/teo.webp';
 import { viewportWidth } from '../../utils/utilBreakpoint';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 
 // ---------------------------------------------------------------------------
 // The lifecycle scene — one task, from a sentence typed into #bug reports to
@@ -360,7 +360,7 @@ const AgentDisc = (p: { size: number }) => (
       width: `${p.size}px`,
     }}
   >
-    <MacroMarkIcon
+    <RoxMarkIcon
       style={{
         color: 'var(--a0)',
         display: 'block',

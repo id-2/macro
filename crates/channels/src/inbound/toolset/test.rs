@@ -33,7 +33,7 @@ use entity_access::domain::{
     },
     ports::{EntityAccessService, NoOpEntityAccessService},
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId, user_id::MacroUserIdStr};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId, user_id::RoxUserIdStr};
 use std::{
     collections::HashMap,
     sync::{
@@ -305,13 +305,13 @@ impl messages::domain::api::MessageReader for RecordingMessages {
     }
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(TEST_USER_ID.to_string()).expect("valid macro user id")
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(TEST_USER_ID.to_string()).expect("valid macro user id")
 }
 
 type CreatedChannelCall = (
     Sender,
-    Option<MacroUserIdStr<'static>>,
+    Option<RoxUserIdStr<'static>>,
     CreateChannelRequest,
 );
 type PatchChannelCall = (Sender, Uuid, PatchChannelRequest);
@@ -330,9 +330,9 @@ struct ToolTestChannelService {
     adds: Arc<Mutex<Vec<AddParticipantsCall>>>,
     removes: Arc<Mutex<Vec<RemoveParticipantsCall>>>,
     metadata_name: Option<String>,
-    shares: Arc<Mutex<Vec<(MacroUserIdStr<'static>, Uuid, Vec<ReferencedShareItem>)>>>,
+    shares: Arc<Mutex<Vec<(RoxUserIdStr<'static>, Uuid, Vec<ReferencedShareItem>)>>>,
     deny_share: bool,
-    user_names: HashMap<MacroUserIdStr<'static>, String>,
+    user_names: HashMap<RoxUserIdStr<'static>, String>,
     fail_user_names: bool,
 }
 
@@ -340,7 +340,7 @@ impl ToolTestChannelService {
     fn record_created(
         &self,
         actor: Sender,
-        on_behalf_of: Option<MacroUserIdStr<'static>>,
+        on_behalf_of: Option<RoxUserIdStr<'static>>,
         req: CreateChannelRequest,
     ) -> Result<CreateChannelResponse, ChannelMutationErr> {
         if let Some(message) = &self.create_error {
@@ -415,7 +415,7 @@ impl ChannelService for ToolTestChannelService {
     async fn get_channel_metadata(
         &self,
         _channel_id: Uuid,
-        _viewer_user_id: MacroUserIdStr<'static>,
+        _viewer_user_id: RoxUserIdStr<'static>,
     ) -> Result<ChannelMetadata, crate::domain::ports::ChannelMessagesErr> {
         Ok(ChannelMetadata {
             channel_type: ChannelType::Private,
@@ -429,8 +429,8 @@ impl ChannelService for ToolTestChannelService {
 
     async fn get_user_display_names(
         &self,
-        user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> Result<HashMap<MacroUserIdStr<'static>, String>, crate::domain::ports::ChannelMessagesErr>
+        user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> Result<HashMap<RoxUserIdStr<'static>, String>, crate::domain::ports::ChannelMessagesErr>
     {
         if self.fail_user_names {
             return Err(crate::domain::ports::ChannelMessagesErr::Repo(
@@ -470,7 +470,7 @@ impl ChannelService for ToolTestChannelService {
 
     async fn create_channel_on_behalf(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         actor: BotId,
         req: CreateChannelRequest,
     ) -> Result<CreateChannelResponse, ChannelMutationErr> {
@@ -527,7 +527,7 @@ impl ChannelService for ToolTestChannelService {
 
     async fn share_referenced_items_with_channel(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         channel_id: Uuid,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<ReferenceShareResult>, ChannelMutationErr> {
@@ -577,7 +577,7 @@ impl Default for ToolTestAccessService {
 impl EntityAccessService for ToolTestAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -625,7 +625,7 @@ impl EntityAccessService for ToolTestAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -634,7 +634,7 @@ impl EntityAccessService for ToolTestAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         required_level: AccessLevel,
@@ -657,7 +657,7 @@ impl EntityAccessService for ToolTestAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -667,7 +667,7 @@ impl EntityAccessService for ToolTestAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -678,7 +678,7 @@ impl EntityAccessService for ToolTestAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
 
@@ -698,7 +698,7 @@ impl EntityAccessService for ToolTestAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(self.team)
     }
@@ -1423,7 +1423,7 @@ async fn manage_participants_adds_canonical_ids() {
     assert_eq!(added_id, channel_id);
     assert!(
         req.participants
-            .contains(&MacroUserIdStr::try_from_email("bo@acme.com").expect("email"))
+            .contains(&RoxUserIdStr::try_from_email("bo@acme.com").expect("email"))
     );
 }
 
@@ -1631,7 +1631,7 @@ async fn edit_channel_message_rejects_empty_content_before_any_access_check() {
 async fn edit_channel_message_explains_a_forbidden_edit() {
     let messages = RecordingMessages {
         stored_sender: Some(Sender::new_from_user(
-            MacroUserIdStr::try_from("macro|someone-else@example.com".to_string()).unwrap(),
+            RoxUserIdStr::try_from("macro|someone-else@example.com".to_string()).unwrap(),
         )),
         mutation_error: Some(|| messages::domain::ports::MessageError::Forbidden),
         ..RecordingMessages::default()
@@ -1900,8 +1900,8 @@ fn channel_message(
     }
 }
 
-fn person(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{email}")).expect("valid macro user id")
+fn person(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{email}")).expect("valid macro user id")
 }
 
 fn read_latest(channel_id: Uuid) -> ReadChannelMessages {

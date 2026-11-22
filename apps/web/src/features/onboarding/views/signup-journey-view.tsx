@@ -1,15 +1,10 @@
-import { LOCAL_ONLY } from '@core/constant/featureFlags';
-import { fireAndForget } from '@core/util/fireAndForget';
-import { type JSX, onCleanup, Show } from 'solid-js';
-import { BypassButton } from '../components/bypass-button';
-import { GoogleAccountsStep } from '../components/google-accounts-step';
+import { createEffect, type JSX, onCleanup, Show } from 'solid-js';
 import {
   animateStepChange,
   focusStepHeading,
 } from '../components/motion/step-change';
 import { OnboardingShell } from '../components/onboarding-shell';
 import { SignInInstead } from '../components/sign-in-instead';
-import { OnboardingTrustDetails } from '../components/trust-details';
 import {
   nextSignupStep,
   previousSignupStep,
@@ -18,7 +13,7 @@ import {
 import { createSignupJourney } from '../primitives/signup-journey';
 import { StoryStageView } from './story-stage-view';
 
-/** Public opening slides. Authentication happens only at the work-email step. */
+/** Opening slides, then the email form. Trust and inbox import never open. */
 export function SignupJourneyView(props: {
   /** Starts Google sign-up; on web the page navigates away. */
   onGoogle: () => Promise<void>;
@@ -29,7 +24,7 @@ export function SignupJourneyView(props: {
   onSignIn: () => void;
   /** Sends an agent to the agent signup page. */
   onAgentSignup: () => void;
-  /** The host's email sign-up form, shown in place of Google when chosen. */
+  /** The host's email sign-up form, shown instead of inbox import. */
   emailForm?: JSX.Element;
   showingEmail: boolean;
 }) {
@@ -49,8 +44,12 @@ export function SignupJourneyView(props: {
   };
   const storyStep = () => {
     const step = journey.step();
-    return step === 'work' ? undefined : step;
+    return step === 'welcome' || step === 'vision' ? step : undefined;
   };
+  // A saved draft can still name the trust slide. Open the email form instead.
+  createEffect(() => {
+    if (journey.step() === 'security') journey.commit('work');
+  });
 
   return (
     <OnboardingShell
@@ -60,7 +59,10 @@ export function SignupJourneyView(props: {
           ? undefined
           : () => {
               if (props.showingEmail) props.onBackFromEmail();
-              else goTo(previousSignupStep(journey.step()));
+              else {
+                const previous = previousSignupStep(journey.step());
+                goTo(previous === 'security' ? 'vision' : previous);
+              }
             }
       }
       heroFooter={
@@ -71,43 +73,17 @@ export function SignupJourneyView(props: {
           />
         ) : undefined
       }
-      overlay={
-        <Show when={LOCAL_ONLY && storyStep()}>
-          <BypassButton disabled={false} onBypass={() => goTo('work')} />
-        </Show>
-      }
-      explainer={
-        journey.step() === 'security' || journey.step() === 'work' ? (
-          <OnboardingTrustDetails
-            topic={journey.step() === 'security' ? 'security' : 'google'}
-            microsoft={journey.step() === 'work' && !!props.onMicrosoft}
-            legal={
-              journey.step() === 'work' ? (
-                <>
-                  Your work email becomes your Rox sign-in. By continuing, you
-                  agree to our{' '}
-                  <a href="/terms" class="underline underline-offset-2">
-                    terms
-                  </a>{' '}
-                  and{' '}
-                  <a href="/privacy" class="underline underline-offset-2">
-                    privacy policy
-                  </a>
-                  .
-                </>
-              ) : undefined
-            }
-          />
-        ) : undefined
-      }
     >
       <div ref={content} class="flex flex-col gap-8">
         <Show
-          when={journey.step() === 'work'}
+          when={journey.step() === 'work' || journey.step() === 'security'}
           fallback={
             <StoryStageView
-              step={storyStep() ?? 'security'}
-              onNext={() => goTo(nextSignupStep(journey.step()))}
+              step={storyStep() ?? 'welcome'}
+              onNext={() => {
+                const next = nextSignupStep(journey.step());
+                goTo(next === 'security' || next === 'work' ? 'work' : next);
+              }}
               onWorkspaceContinue={(color) => {
                 journey.setAccent(color);
                 goTo('vision');
@@ -115,46 +91,15 @@ export function SignupJourneyView(props: {
             />
           }
         >
-          <Show
-            when={props.showingEmail}
-            fallback={
-              <GoogleAccountsStep
-                mode="work"
-                connecting={journey.connecting() ? 'work' : undefined}
-                microsoftConnecting={journey.connecting() === 'microsoft'}
-                error={journey.error()}
-                onConnectWork={() =>
-                  fireAndForget(
-                    journey.connect('google', props.onGoogle),
-                    'onboarding'
-                  )
-                }
-                onConnectMicrosoft={
-                  props.onMicrosoft
-                    ? () => {
-                        const start = props.onMicrosoft;
-                        if (!start) return;
-                        fireAndForget(
-                          journey.connect('microsoft', start),
-                          'onboarding'
-                        );
-                      }
-                    : undefined
-                }
-                onConnectPersonal={() => {}}
-              />
-            }
-          >
-            <div class="mx-auto flex w-full max-w-sm flex-col gap-8">
-              <h1
-                tabindex="-1"
-                class="text-center font-[Roboto_Slab_Variable] text-[clamp(24px,7.6vw,30px)] font-[315] leading-tight tracking-tight"
-              >
-                Sign up with your email.
-              </h1>
-              {props.emailForm}
-            </div>
-          </Show>
+          <div class="mx-auto flex w-full max-w-sm flex-col gap-8">
+            <h1
+              tabindex="-1"
+              class="text-center font-[Roboto_Slab_Variable] text-[clamp(24px,7.6vw,30px)] font-[315] leading-tight tracking-tight"
+            >
+              Зарегистрируйтесь по почте.
+            </h1>
+            {props.emailForm}
+          </div>
         </Show>
       </div>
     </OnboardingShell>

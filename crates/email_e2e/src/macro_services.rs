@@ -188,7 +188,7 @@ impl HeldRequest {
 }
 
 /// The running stand-in server.
-pub(crate) struct MacroServices {
+pub(crate) struct RoxServices {
     address: SocketAddr,
     requests: Arc<Mutex<Vec<ServiceRequest>>>,
     gmail_token_requests: GmailTokenRequests,
@@ -199,7 +199,7 @@ pub(crate) struct MacroServices {
     tracker: TaskTracker,
 }
 
-impl MacroServices {
+impl RoxServices {
     /// Starts the server. `gmail_url` and `outlook_url` are the emulators'
     /// base URLs.
     pub(crate) async fn start(

@@ -35,7 +35,7 @@ fn operation_name(status: &NotificationStatus) -> &'static str {
 }
 
 fn notification_row(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     notification_id: Uuid,
     entity: Entity<'static>,
     status: &NotificationStatus,
@@ -74,7 +74,7 @@ fn notification_row(
 impl NotificationMutationService for CapturingNotificationService {
     async fn update_notifications(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         status: NotificationStatus,
     ) -> Result<Vec<UserNotificationRow<NotifEvent>>, Report> {
@@ -98,7 +98,7 @@ impl NotificationMutationService for CapturingNotificationService {
 
     async fn update_notifications_for_entities(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
         status: NotificationStatus,
     ) -> Result<Vec<UserNotificationRow<NotifEvent>>, Report> {
@@ -145,7 +145,7 @@ fn notification_operations_map_to_explicit_domain_statuses() {
 #[tokio::test]
 async fn update_notifications_maps_operation_and_returns_normalized_rows_in_order() {
     let service = Arc::new(CapturingNotificationService::default());
-    let user = MacroUserIdStr::try_from_email("user@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("user@example.com").unwrap();
     let first = Uuid::new_v4();
     let second = Uuid::new_v4();
     let schema = Schema::build(
@@ -188,7 +188,7 @@ async fn update_notifications_maps_operation_and_returns_normalized_rows_in_orde
 #[tokio::test]
 async fn update_notifications_for_entity_maps_entities_and_operation() {
     let service = Arc::new(CapturingNotificationService::default());
-    let user = MacroUserIdStr::try_from_email("entity-user@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("entity-user@example.com").unwrap();
     let schema = Schema::build(
         QueryRoot,
         NotificationMutationRoot::<CapturingNotificationService>::new(),

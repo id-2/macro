@@ -5,7 +5,7 @@ import {
   createMachine,
   type Machine,
   type MachineDef,
-} from '@macro-inc/machine';
+} from '@rox-one/machine';
 import { match, P } from 'ts-pattern';
 
 /**

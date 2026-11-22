@@ -4,7 +4,7 @@
 mod options;
 mod structure;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_databases::views::{
     Conjunction, FilterCondition, FilterGroup, FilterNode, FilterTest, NewView, NumberOperator,
     RequestedLayout, ViewId, ViewQuery,

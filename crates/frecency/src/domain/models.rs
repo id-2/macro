@@ -2,7 +2,7 @@
 use chrono::{DateTime, Utc};
 use cowlike::CowLike;
 use item_filters::ast::EntityFilterAst;
-use macro_user_id::{error::ParseErr, user_id::MacroUserIdStr};
+use rox_user_id::{error::ParseErr, user_id::RoxUserIdStr};
 use model_entity::Entity;
 use num_traits::ToPrimitive;
 use ordered_float::OrderedFloat;
@@ -100,7 +100,7 @@ pub struct TimestampWeight {
 #[derive(Debug, Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 pub struct AggregateId<'a> {
     /// The user id that created this [AggregateFrecency] record
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// the [Entity] that the [AggregateFrecency] record is referencing
     pub entity: Entity<'a>,
 }
@@ -109,7 +109,7 @@ impl<'a> AggregateId<'a> {
     #[allow(dead_code)]
     pub(crate) fn from_event_record<T>(r: &'a EventRecordWithId<'a, T>) -> Result<Self, ParseErr> {
         Ok(AggregateId {
-            user_id: MacroUserIdStr::parse_from_str(r.event_record.event.entity.user_id.as_ref())?,
+            user_id: RoxUserIdStr::parse_from_str(r.event_record.event.entity.user_id.as_ref())?,
             entity: r.event_record.event.entity.entity.copied(),
         })
     }
@@ -168,7 +168,7 @@ impl AggregateFrecency {
     pub fn new_mock(entity: Entity<'static>, frecency_score: f64) -> Self {
         AggregateFrecency {
             id: AggregateId {
-                user_id: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+                user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
                 entity,
             },
             data: FrecencyData {
@@ -214,7 +214,7 @@ impl AggregateFrecency {
     ) -> Result<Self, ParseErr> {
         let mut out = Self {
             id: AggregateId {
-                user_id: MacroUserIdStr::parse_from_str(&event.event.entity.user_id)?.into_owned(),
+                user_id: RoxUserIdStr::parse_from_str(&event.event.entity.user_id)?.into_owned(),
                 entity: event.event.entity.entity.into_owned(),
             },
             data: FrecencyData {
@@ -235,9 +235,9 @@ impl AggregateFrecency {
     }
 
     /// create a new instance of Self similar to [Self::new_from_initial_action]
-    /// but instead using an input [MacroUserIdStr]
+    /// but instead using an input [RoxUserIdStr]
     pub fn new_from_initial_action_and_user_id(
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         event: EventRecord<'_>,
         now: DateTime<Utc>,
     ) -> Self {
@@ -339,8 +339,8 @@ impl std::ops::AddAssign for EventAggregationStats {
 /// request to get a single page of a frecency from the service
 #[derive(Debug)]
 pub struct FrecencyPageRequest<'a> {
-    /// the [MacroUserIdStr] who is making the request
-    pub user_id: MacroUserIdStr<'a>,
+    /// the [RoxUserIdStr] who is making the request
+    pub user_id: RoxUserIdStr<'a>,
     /// the maximum score that can be returned in the response.
     /// This is used for pagination, if None is provided the max is unbounded (first page)
     pub from_score: Option<f64>,
@@ -350,10 +350,10 @@ pub struct FrecencyPageRequest<'a> {
     pub filters: Option<EntityFilterAst>,
 }
 
-/// request to get the frecency scores of some list of [Entity] for a specific user [MacroUserIdStr]
+/// request to get the frecency scores of some list of [Entity] for a specific user [RoxUserIdStr]
 pub struct FrecencyByIdsRequest<'a> {
     /// the user to fetch the frecency for
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// the list of entities to fetch
     pub ids: &'a [Entity<'a>],
 }

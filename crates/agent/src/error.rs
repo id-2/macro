@@ -28,7 +28,7 @@ pub enum AgentError {
     MalformedModel(String),
     /// Expected env var
     #[error(transparent)]
-    EnvVar(#[from] macro_env_var::VarNameErr),
+    EnvVar(#[from] rox_env_var::VarNameErr),
     /// Provider client error
     #[error(transparent)]
     ProviderClientError(#[from] rig_core::client::ProviderClientError),
@@ -37,7 +37,7 @@ pub enum AgentError {
     RigHttpClient(#[from] rig_core::http_client::Error),
     /// A provider's URL override could not be read
     #[error(transparent)]
-    ServiceUrl(#[from] macro_service_urls::ServiceUrlVarErr),
+    ServiceUrl(#[from] rox_service_urls::ServiceUrlVarErr),
 }
 
 impl AgentError {

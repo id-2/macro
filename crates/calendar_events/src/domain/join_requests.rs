@@ -247,7 +247,10 @@ where
 /// The address a requester without a connected calendar is invited at: their
 /// Rox account address, which the user id carries.
 fn account_email(requester_id: &str) -> &str {
-    requester_id.strip_prefix("macro|").unwrap_or(requester_id)
+    requester_id
+        .strip_prefix("macro|")
+        .or_else(|| requester_id.strip_prefix("rox|"))
+        .unwrap_or(requester_id)
 }
 
 impl<R, N, F> CalendarJoinRequestService for CalendarJoinRequestServiceImpl<R, N, F>

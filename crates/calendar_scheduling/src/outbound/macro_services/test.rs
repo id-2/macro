@@ -357,7 +357,7 @@ impl CalendarCreationRecoveryService for FakeMutations {
 /// The host's busy ranges with their primary calendar and a coworker's
 /// calendar they follow, which counts toward availability as `coworker_counts`.
 async fn busy_with(coworker_counts: bool, listing: OccurrenceListing) -> Vec<BusyRange> {
-    let calendars = MacroCalendars::new(
+    let calendars = RoxCalendars::new(
         Arc::new(FakeOccurrences {
             calendars: vec![
                 calendar(PRIMARY, "Host", true, true),
@@ -509,8 +509,8 @@ fn host(
     calendars: Vec<VisibleCalendar>,
     health: CalendarSyncHealth,
     status: CalendarSyncStatus,
-) -> MacroCalendars<FakeOccurrences, FakeMutations> {
-    MacroCalendars::new(
+) -> RoxCalendars<FakeOccurrences, FakeMutations> {
+    RoxCalendars::new(
         Arc::new(FakeOccurrences {
             calendars: calendars.clone(),
             listings: vec![listing(COWORKER)],
@@ -523,7 +523,7 @@ fn host(
 }
 
 async fn busy_for(
-    host: &MacroCalendars<FakeOccurrences, FakeMutations>,
+    host: &RoxCalendars<FakeOccurrences, FakeMutations>,
 ) -> Result<Vec<BusyRange>, Error> {
     host.busy(
         &[HOST.to_owned()],

@@ -52,7 +52,7 @@ import { useTaskFilters } from '../filters/use-task-filters';
 import { tasksTabSearch, tasksTabSearchCodec } from '../tasks-tab-search';
 import { useTasksView } from '../tasks-view-context';
 
-const LAYOUT_LABELS = { list: 'List', board: 'Board', gantt: 'Gantt' };
+const LAYOUT_LABELS = { list: 'Список', board: 'Доска', gantt: 'Гант' };
 
 function sortDirectionLabel(sort: TaskSavedViewConfig['sort'][number]) {
   if (sort.id.startsWith('due_date_')) return 'missing last';
@@ -105,11 +105,11 @@ function TaskSavedViewSummary(props: {
                 .map((id) => {
                   if (group.id === 'assignees' || group.id === 'created-by')
                     return id === TASK_VIEWER
-                      ? 'Me'
-                      : (people().get(id)?.label ?? 'Unavailable option');
+                      ? 'Я'
+                      : (people().get(id)?.label ?? 'Вариант недоступен');
                   return (
                     group.options.find((option) => option.id === id)?.label ??
-                    'Unavailable option'
+                    'Вариант недоступен'
                   );
                 })
                 .join(', ')}
@@ -117,10 +117,10 @@ function TaskSavedViewSummary(props: {
           </Show>
         )}
       </For>
-      <Show when={dueDateLabel()}>{(label) => <p>Due date: {label()}</p>}</Show>
-      <p>Layout: {LAYOUT_LABELS[props.config.layout]}</p>
+      <Show when={dueDateLabel()}>{(label) => <p>Срок: {label()}</p>}</Show>
+      <p>Макет: {LAYOUT_LABELS[props.config.layout]}</p>
       <p>
-        Group by:{' '}
+        Группировка:{' '}
         {
           TASK_GROUP_OPTIONS.find(
             (option) => option.id === props.config.groupBy
@@ -128,16 +128,16 @@ function TaskSavedViewSummary(props: {
         }
       </p>
       <p>
-        Sort:{' '}
+        Сортировка:{' '}
         {props.config.sort
           .map(
             (sort) =>
               `${TASK_SORT_OPTIONS.find((option) => option.id === sort.id)?.label} (${sortDirectionLabel(sort)})`
           )
-          .join(', ') || 'Default'}
+          .join(', ') || 'По умолчанию'}
       </p>
       <Show when={state.search.trim()}>
-        <p>Search text is not included.</p>
+        <p>Текст поиска не входит в вид.</p>
       </Show>
     </>
   );

@@ -9,7 +9,7 @@ use crate::domain::{
 use anyhow::Context;
 use entity_access_db_utils::update_entity_access_channel_share_permissions;
 use entity_registry::BotFacts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_permissions::share_permission::{
     LinkShare, SharePermissionV2, UpdateSharePermissionRequestV2,
@@ -103,7 +103,7 @@ impl<B: BotFacts + 'static> SessionSharingRepo for PgAgentSessionRepo<B> {
     async fn update_permissions(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         request: UpdateSharePermissionRequestV2,
         team_share: Option<AuthorizedTeamShareCommand>,
     ) -> Result<SharePermissionV2> {
@@ -125,7 +125,7 @@ impl<B: BotFacts + 'static> SessionSharingRepo for PgAgentSessionRepo<B> {
         let permission_id = match row.share_permission_id {
             Some(id) => id,
             None => {
-                let permission_id = macro_uuid::generate_uuid_v7().to_string();
+                let permission_id = rox_uuid::generate_uuid_v7().to_string();
                 sqlx::query!(
                     r#"INSERT INTO "SharePermission" (id, "createdAt", "updatedAt") VALUES ($1, NOW(), NOW())"#,
                     permission_id,

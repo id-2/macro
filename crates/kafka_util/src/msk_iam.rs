@@ -10,7 +10,7 @@ use rdkafka::consumer::ConsumerContext;
 /// Matches the fallback in `macro_aws_config`.
 const DEFAULT_AWS_REGION: &str = "us-east-1";
 
-macro_env_var::maybe_env_var! {
+rox_env_var::maybe_env_var! {
     /// AWS region used to sign MSK IAM auth tokens.
     struct AwsRegion;
 }

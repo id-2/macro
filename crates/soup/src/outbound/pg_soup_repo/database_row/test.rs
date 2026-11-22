@@ -15,8 +15,8 @@ use item_filters::ast::{
     project::ProjectLiteral,
     properties::{PropertiesLiteral, PropertyMatchValue},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::{GroupByField, GroupingConfig};
 use models_pagination::{
     Cursor, CursorVal, CursorWithValAndFilter, Identify, Query, SimpleSortMethod,
@@ -37,12 +37,12 @@ const DEAL_2: Uuid = Uuid::from_u128(0x70000000_0000_0000_0000_000000000002);
 const DEAL_3: Uuid = Uuid::from_u128(0x70000000_0000_0000_0000_000000000003);
 const NOTE: Uuid = Uuid::from_u128(0x70000000_0000_0000_0000_000000000005);
 
-fn viewer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap()
+fn viewer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap()
 }
 
-fn stranger() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|stranger@databases.test").unwrap()
+fn stranger() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|stranger@databases.test").unwrap()
 }
 
 /// Rows only: every other kind the dynamic query reads is ruled out the way
@@ -60,7 +60,7 @@ fn rows_of(row_filter: Option<Expr<DatabaseRowLiteral>>) -> EntityFilterAst {
 
 async fn page(
     pool: &PgPool,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     filter: EntityFilterAst,
 ) -> Vec<SoupItem<()>> {
     expanded_dynamic_cursor_soup(
@@ -81,7 +81,7 @@ async fn a_viewer_reads_the_won_deals_of_one_table(pool: PgPool) {
     let items = expanded_dynamic_cursor_soup(
         &pool,
         ExpandedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap(),
+            user_id: RoxUserIdStr::parse_from_str("macro|viewer@databases.test").unwrap(),
             limit: 20,
             cursor: Query::Sort(
                 SimpleSortMethod::CreatedAt.into(),

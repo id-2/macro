@@ -15,8 +15,8 @@ use axum::{
     response::{IntoResponse, Response},
     routing::post,
 };
-use macro_authorization::{
-    InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 use serde::Serialize;
 
@@ -33,12 +33,12 @@ const MAX_COMMAND_BYTES: usize = 1024 * 1024;
 /// Independent state for the scheduler-facing capability; no public control access.
 pub struct RoutineSessionsState<Service, Auth> {
     service: Arc<Service>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Service, Auth> RoutineSessionsState<Service, Auth> {
     /// Compose a domain capability with the shared authentication service.
-    pub fn new(service: Arc<Service>, authorization: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<Service>, authorization: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization,
@@ -55,7 +55,7 @@ impl<Service, Auth> Clone for RoutineSessionsState<Service, Auth> {
     }
 }
 
-impl<Service, Auth> FromRef<RoutineSessionsState<Service, Auth>> for MacroAuthorizationState<Auth> {
+impl<Service, Auth> FromRef<RoutineSessionsState<Service, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &RoutineSessionsState<Service, Auth>) -> Self {
         state.authorization.clone()
     }
@@ -64,7 +64,7 @@ impl<Service, Auth> FromRef<RoutineSessionsState<Service, Auth>> for MacroAuthor
 /// Internal routes, already mounted beneath `/internal/routine-sessions`.
 ///
 /// No browser OpenAPI schemas or public authentication policies are changed.
-pub fn routine_sessions_router<Service: RoutineSessions, Auth: MacroAuthorizationService>(
+pub fn routine_sessions_router<Service: RoutineSessions, Auth: RoxAuthorizationService>(
     state: RoutineSessionsState<Service, Auth>,
 ) -> Router {
     Router::new().nest(
@@ -162,41 +162,41 @@ async fn bounded_response(
     }
 }
 
-async fn validate<Service: RoutineSessions, Auth: MacroAuthorizationService>(
+async fn validate<Service: RoutineSessions, Auth: RoxAuthorizationService>(
     State(state): State<RoutineSessionsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<ValidateRoutineSession>, JsonRejection>,
 ) -> Result<Json<ValidatedRoutineSession>, ApiError> {
     Ok(Json(state.service.validate(command?.0).await?))
 }
 
-async fn prepare<Service: RoutineSessions, Auth: MacroAuthorizationService>(
+async fn prepare<Service: RoutineSessions, Auth: RoxAuthorizationService>(
     State(state): State<RoutineSessionsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<PrepareRoutineSession>, JsonRejection>,
 ) -> Result<Json<PreparedRoutineSession>, ApiError> {
     Ok(Json(state.service.prepare(command?.0).await?))
 }
 
-async fn prompt<Service: RoutineSessions, Auth: MacroAuthorizationService>(
+async fn prompt<Service: RoutineSessions, Auth: RoxAuthorizationService>(
     State(state): State<RoutineSessionsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<PromptRoutineSession>, JsonRejection>,
 ) -> Result<Json<RoutinePromptAccepted>, ApiError> {
     Ok(Json(state.service.prompt(command?.0).await?))
 }
 
-async fn status<Service: RoutineSessions, Auth: MacroAuthorizationService>(
+async fn status<Service: RoutineSessions, Auth: RoxAuthorizationService>(
     State(state): State<RoutineSessionsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<RoutineSessionAction>, JsonRejection>,
 ) -> Result<Json<RoutineActionStatus>, ApiError> {
     Ok(Json(state.service.status(command?.0).await?))
 }
 
-async fn cancel<Service: RoutineSessions, Auth: MacroAuthorizationService>(
+async fn cancel<Service: RoutineSessions, Auth: RoxAuthorizationService>(
     State(state): State<RoutineSessionsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<RoutineSessionAction>, JsonRejection>,
 ) -> Result<StatusCode, ApiError> {
     state.service.cancel(command?.0).await?;
@@ -206,18 +206,18 @@ async fn cancel<Service: RoutineSessions, Auth: MacroAuthorizationService>(
 #[cfg(test)]
 mod test;
 
-async fn delete<Service: RoutineSessions, Auth: MacroAuthorizationService>(
+async fn delete<Service: RoutineSessions, Auth: RoxAuthorizationService>(
     State(state): State<RoutineSessionsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<RoutineSessionAction>, JsonRejection>,
 ) -> Result<StatusCode, ApiError> {
     state.service.delete(command?.0).await?;
     Ok(StatusCode::NO_CONTENT)
 }
 
-async fn activity<Service: RoutineSessions, Auth: MacroAuthorizationService>(
+async fn activity<Service: RoutineSessions, Auth: RoxAuthorizationService>(
     State(state): State<RoutineSessionsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<RoutineSessionAction>, JsonRejection>,
 ) -> Result<Json<RoutineActivity>, ApiError> {
     Ok(Json(state.service.activity(command?.0).await?))

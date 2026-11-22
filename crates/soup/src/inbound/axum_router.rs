@@ -28,7 +28,7 @@ use entity_access::{
         models::{EntityAccessReceipt, MemberTeamRole},
         ports::EntityAccessService,
     },
-    inbound::axum_extractors::OptionalMacroUserTeamExtractorV2,
+    inbound::axum_extractors::OptionalRoxUserTeamExtractorV2,
 };
 use filter_ast::{Expr, ExprFrame};
 use item_filters::{
@@ -50,10 +50,10 @@ use item_filters::{
         properties::{PropertiesLiteral, PropertyEntityType},
     },
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use model_error_response::ErrorResponse;
 use models_grouping::{GroupByField, GroupingConfig};
@@ -547,7 +547,7 @@ pub struct SoupRouterState<T, U, EAS, Auth> {
     service: Arc<T>,
     email: EmailRouterState<U>,
     entity_access_service: Arc<EAS>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
     favorites: Arc<dyn SoupFavoritesReader>,
 }
 
@@ -575,7 +575,7 @@ impl<T, U, EAS, Auth> FromRef<SoupRouterState<T, U, EAS, Auth>> for Arc<EAS> {
     }
 }
 
-impl<T, U, EAS, Auth> FromRef<SoupRouterState<T, U, EAS, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, U, EAS, Auth> FromRef<SoupRouterState<T, U, EAS, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(input: &SoupRouterState<T, U, EAS, Auth>) -> Self {
         input.authorization.clone()
     }
@@ -586,14 +586,14 @@ where
     T: SoupService,
     U: EmailService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     /// Creates router state from the soup service, email service, entity access service, and authorization state.
     pub fn new(
         service: T,
         email: U,
         entity_access_service: Arc<EAS>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self::from_arc(
             Arc::new(service),
@@ -608,7 +608,7 @@ where
         service: Arc<T>,
         email: U,
         entity_access_service: Arc<EAS>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         SoupRouterState {
             service,
@@ -638,7 +638,7 @@ where
 
     async fn handle<R>(
         &self,
-        macro_user_id: MacroUserIdStr<'static>,
+        macro_user_id: RoxUserIdStr<'static>,
         link_ids: Vec<Uuid>,
         team_receipt_option: Option<EntityAccessReceipt<MemberTeamRole>>,
         ApiSoupRequestInner {
@@ -729,7 +729,7 @@ where
 
     async fn handle_grouped(
         &self,
-        macro_user_id: MacroUserIdStr<'static>,
+        macro_user_id: RoxUserIdStr<'static>,
         filters: EntityFilterAst,
         params: GroupedParams,
         cursor: Option<String>,
@@ -809,7 +809,7 @@ where
     T: SoupService,
     U: EmailService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync,
 {
     Router::new()
@@ -869,7 +869,7 @@ impl SoupApiItem {
 /// the soup query.
 async fn mark_favorited<'a>(
     favorites: &dyn SoupFavoritesReader,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     items: impl Iterator<Item = &'a mut SoupApiItem>,
 ) {
     let items: Vec<&mut SoupApiItem> = items.collect();
@@ -985,9 +985,9 @@ where
     T: SoupService,
     U: EmailService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
-    let macro_id = MacroUserIdStr::parse_from_str(macro_user_id).map_err(|e| {
+    let macro_id = RoxUserIdStr::parse_from_str(macro_user_id).map_err(|e| {
         SoupHandlerErr::Internal(SoupErr::SoupDbErr(anyhow::anyhow!(
             "invalid macro_user_id from extractor: {e}"
         )))
@@ -1017,8 +1017,8 @@ where
 )]
 pub async fn get_soup_handler<T, U, EAS, Auth>(
     State(service): State<SoupRouterState<T, U, EAS, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
-    team: OptionalMacroUserTeamExtractorV2<MemberTeamRole, EAS, Auth>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
+    team: OptionalRoxUserTeamExtractorV2<MemberTeamRole, EAS, Auth>,
     Query(params): Query<Params>,
     cursor: SoupCursor<EntityFilters>,
 ) -> Result<Json<PaginatedOpaqueCursor<SoupApiItem>>, SoupHandlerErr>
@@ -1026,7 +1026,7 @@ where
     T: SoupService,
     U: EmailService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let macro_user_id = authorization.authorization.user.macro_user_id;
     let link_ids = fetch_caller_link_ids(&service, macro_user_id.as_ref()).await?;
@@ -1097,8 +1097,8 @@ type SoupCursor<R> = Either5<
 #[tracing::instrument(err, skip_all)]
 pub async fn post_soup_handler<T, U, EAS, Auth>(
     State(service): State<SoupRouterState<T, U, EAS, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
-    team: OptionalMacroUserTeamExtractorV2<MemberTeamRole, EAS, Auth>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
+    team: OptionalRoxUserTeamExtractorV2<MemberTeamRole, EAS, Auth>,
     cursor: SoupCursor<EntityFilters>,
     Json(PostSoupRequest {
         filters,
@@ -1110,7 +1110,7 @@ where
     T: SoupService,
     U: EmailService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let macro_user_id = authorization.authorization.user.macro_user_id;
     let link_ids = fetch_caller_link_ids(&service, macro_user_id.as_ref()).await?;
@@ -1165,8 +1165,8 @@ pub struct PostSoupAstRequest {
 #[tracing::instrument(err, skip_all)]
 pub async fn post_soup_ast_handler<T, U, EAS, Auth>(
     State(service): State<SoupRouterState<T, U, EAS, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
-    team: OptionalMacroUserTeamExtractorV2<MemberTeamRole, EAS, Auth>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
+    team: OptionalRoxUserTeamExtractorV2<MemberTeamRole, EAS, Auth>,
     cursor: SoupCursor<ApiEntityFilterAst>,
     Json(PostSoupAstRequest {
         filters,
@@ -1178,7 +1178,7 @@ where
     T: SoupService,
     U: EmailService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let macro_user_id = authorization.authorization.user.macro_user_id;
     let link_ids = fetch_caller_link_ids(&service, macro_user_id.as_ref()).await?;
@@ -1258,7 +1258,7 @@ enum GroupedSoupRequestMode {
 #[tracing::instrument(err, skip_all)]
 pub async fn post_grouped_soup_ast_handler<T, U, EAS, Auth>(
     State(service): State<SoupRouterState<T, U, EAS, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(GroupedSoupCursorParams { cursor }): Query<GroupedSoupCursorParams>,
     Json(request): Json<PostGroupedSoupAstRequest>,
 ) -> Result<Json<GroupedSoupPage>, SoupHandlerErr>
@@ -1266,7 +1266,7 @@ where
     T: SoupService,
     U: EmailService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let macro_user_id = authorization.authorization.user.macro_user_id;
     let (filters, params, mode): (ApiEntityFilterAst, GroupedParams, GroupedSoupRequestMode) =

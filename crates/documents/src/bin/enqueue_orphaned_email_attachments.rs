@@ -18,8 +18,8 @@ use documents::domain::released_attachments::orphans::{
 };
 use documents::outbound::pg_released_attachments::PgReleasedAttachmentRepo;
 use documents::outbound::scan_state_file::ScanStateFile;
-use macro_entrypoint::MacroEntrypoint;
-use macro_env_var::env_vars;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env_var::env_vars;
 use rootcause::prelude::{Report, ResultExt as _};
 use sqlx::postgres::PgPoolOptions;
 use std::num::NonZeroU32;
@@ -63,7 +63,7 @@ struct Args {
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
-    let entrypoint = MacroEntrypoint::default().init();
+    let entrypoint = RoxEntrypoint::default().init();
     let result = run(Args::parse()).await;
     entrypoint.shutdown();
     result

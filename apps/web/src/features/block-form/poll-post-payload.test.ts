@@ -1,7 +1,7 @@
 import { createMentionsTracker } from '@channel/Input/mentions-tracker';
 import { buildPostMessageSendPayload } from '@channel/Input/message-payload';
 import { mentionsPlugin } from '@core/component/LexicalMarkdown/plugins/mentions/mentionsPlugin';
-import { SupportedNodeTypes } from '@macro-inc/lexical-core';
+import { SupportedNodeTypes } from '@rox-one/lexical-core';
 import { createEditor } from 'lexical';
 import { createRoot } from 'solid-js';
 import { expect, it, vi } from 'vitest';

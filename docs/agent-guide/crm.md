@@ -781,7 +781,9 @@ consent stays unchanged. Preference mutations return 503 while the deployment
 rollout is disabled; existing access checks continue to enforce stored denials.
 `GET /crm/member-access` reports current access even
 when record routes return access denied. Clients holding CRM caches may request
-the storage retirement hint with `x-macro-crm-access-signal: 1`; its three-second
+the storage retirement hint with `x-rox-crm-access-signal: 1` (its earlier
+name `x-macro-crm-access-signal` is still accepted), and the hint comes back as
+`x-rox-crm-access` and `x-macro-crm-access`; its three-second
 server memoization never applies to record checks or this fresh endpoint. The
 next opted-in request after expiry observes the change (or a missing hint that
 requires a fresh proof); idle/offline clients have no fixed retirement deadline.

@@ -8,7 +8,7 @@ use crate::domain::service::{CrmService, CrmServiceImpl};
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use crate::outbound::no_op_resolver::NoOpCompanyMetadataResolver;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

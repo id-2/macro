@@ -88,8 +88,8 @@ function fixturePages() {
       '# Child\nAnother service',
     ],
     [
-      'src/macro/classes/Macro.md',
-      '# Class: Macro\n\n## Properties\n\n| Property | Modifier | Type | Description |\n| ------ | ------ | ------ | ------ |\n| <a id="property-examplespace"></a> `exampleSpace` | `readonly` | [`ExampleNamespace`](../../entities/example/namespace/classes/ExampleNamespace.md) | Examples. |\n',
+      'src/rox/classes/Rox.md',
+      '# Class: Rox\n\n## Properties\n\n| Property | Modifier | Type | Description |\n| ------ | ------ | ------ | ------ |\n| <a id="property-examplespace"></a> `exampleSpace` | `readonly` | [`ExampleNamespace`](../../entities/example/namespace/classes/ExampleNamespace.md) | Examples. |\n',
     ],
   ]);
 }
@@ -116,7 +116,7 @@ describe('TypeDoc documentation packaging', () => {
   it('indexes an entity by symbol with signatures, summaries and its accessor', () => {
     const [entity] = pack().entities;
     expect(entity?.index).toContain(
-      '### ExampleNamespace (`macro.exampleSpace`)'
+      '### ExampleNamespace (`rox.exampleSpace`)'
     );
     expect(entity?.index).toContain(
       '- `ExampleNamespace.create`: create(opts): Promise<Example> — Create an example.'
@@ -232,14 +232,14 @@ describe('TypeDoc documentation packaging', () => {
     expect(guide('channels')).toContain('A form for a channel is a poll:');
     expect(guide('tasks')).toContain('Never edit, merge or delete');
     expect(guide('agentSessions')).toContain(
-      'macro.agentSessions.createManaged'
+      'rox.agentSessions.createManaged'
     );
     expect(guide('routines')).toContain('never sees this conversation');
     expect(guide('documents')).toContain('<m-document-mention>');
     expect(guide('documents')).toContain('document.edit(instructions)');
-    expect(guide('search')).toContain('macro.search.all');
-    expect(guide('search')).toContain('macro.documents.search');
-    expect(guide('search')).toContain('macro.workspace.page');
+    expect(guide('search')).toContain('rox.search.all');
+    expect(guide('search')).toContain('rox.documents.search');
+    expect(guide('search')).toContain('rox.workspace.page');
     expect(guide('core')).toBe('');
     expect(docs.symbols.DatabaseNamespace).toContain('## Agent guidance');
   });
@@ -269,11 +269,11 @@ describe('TypeDoc documentation packaging', () => {
     expect(docs.symbols.SessionReview).not.toContain('property-client');
     expect(docs.symbols.SessionReview).not.toContain('private constructor');
     expect(entity('documents')).toContain('`Document.content`');
-    expect(entity('core')).toContain('### Macro');
-    expect(docs.symbols.Macro).toContain('`agentSessions`');
-    expect(docs.symbols.Macro).toContain('`search`');
-    expect(docs.symbols.Macro).toContain('`workspace`');
-    expect(docs.symbols.Macro).toContain('`chats`');
+    expect(entity('core')).toContain('### Rox');
+    expect(docs.symbols.Rox).toContain('`agentSessions`');
+    expect(docs.symbols.Rox).toContain('`search`');
+    expect(docs.symbols.Rox).toContain('`workspace`');
+    expect(docs.symbols.Rox).toContain('`chats`');
     expect(entity('routines')).toContain('`RoutineOptions`');
     expect(entity('harnesses')).toContain('### HarnessNamespace');
     expect(entity('agents')).not.toContain('HarnessNamespace');
@@ -281,12 +281,12 @@ describe('TypeDoc documentation packaging', () => {
     expect(entity('entityMentions')).toContain('EntityMentionNamespace');
     expect(entity('githubPullRequests')).toContain('PullRequestChangeset');
     expect(entity('core')).toContain('`SharePermissionOptions`');
-    expect(entity('search')).toContain('### SearchNamespace (`macro.search`)');
+    expect(entity('search')).toContain('### SearchNamespace (`rox.search`)');
     expect(entity('search')).toContain('`SearchNamespace.all`');
     expect(entity('workspace')).toContain(
-      '### WorkspaceNamespace (`macro.workspace`)'
+      '### WorkspaceNamespace (`rox.workspace`)'
     );
-    expect(entity('chats')).toContain('### ChatNamespace (`macro.chats`)');
+    expect(entity('chats')).toContain('### ChatNamespace (`rox.chats`)');
     expect(entity('chats')).toContain('`Chat.history`');
     expect(entity('core')).not.toContain('SearchNamespace');
     expect(docs.symbols.SearchOptions).toContain('agentSessions');

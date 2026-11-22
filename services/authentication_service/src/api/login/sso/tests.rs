@@ -21,6 +21,12 @@ fn allowed_original_urls_are_accepted() {
         "https://dev.rox.one/app/login",
         "https://rox.one/app/login",
         "https://www.rox.one/app/login",
+        // The web app's own hosts: the Outlook admin-consent return URL comes
+        // from `location.origin`, so each of these has to be accepted.
+        "https://app.rox.one/app/inbox-link-callback",
+        "https://app-dev.rox.one/app/inbox-link-callback",
+        "https://app-staging.rox.one/app/inbox-link-callback",
+        "https://app-prod.rox.one/app/inbox-link-callback",
     ] {
         let original_url = Url::parse(original_url).expect("test URL should parse");
         assert!(

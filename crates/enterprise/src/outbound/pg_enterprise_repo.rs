@@ -3,7 +3,7 @@ use crate::domain::{
     EnterpriseError, EnterpriseRepository, Result, RuntimePreset, RuntimePresetAllowlist,
     VerifiedRoxIdentity,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::str::FromStr;
 use uuid::Uuid;
@@ -31,7 +31,7 @@ fn storage(error: sqlx::Error) -> EnterpriseError {
 impl EnterpriseRepository for PgEnterpriseRepository {
     async fn bind_verified(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        macro_user_id: &RoxUserIdStr<'_>,
         identity: VerifiedRoxIdentity,
     ) -> Result<()> {
         let written = sqlx::query!(
@@ -57,8 +57,8 @@ impl EnterpriseRepository for PgEnterpriseRepository {
 
     async fn commit_member_state(
         &self,
-        actor: &MacroUserIdStr<'_>,
-        member: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
         disabled: bool,
         result: AuditResult,
     ) -> Result<()> {
@@ -103,7 +103,7 @@ impl EnterpriseRepository for PgEnterpriseRepository {
         transaction.commit().await.map_err(storage)
     }
 
-    async fn member_disabled(&self, member: &MacroUserIdStr<'_>) -> Result<bool> {
+    async fn member_disabled(&self, member: &RoxUserIdStr<'_>) -> Result<bool> {
         sqlx::query_scalar!(
             r#"
             SELECT EXISTS (

@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import type { Agent, WakeContext, Woke } from '@macro-inc/muppet/core/agent';
+import type { Agent, WakeContext, Woke } from '@rox-one/muppet/core/agent';
 import { memoryDisk } from '../../context/test/fakes.ts';
 import { authority, authorized, type Team } from '../authority.ts';
 

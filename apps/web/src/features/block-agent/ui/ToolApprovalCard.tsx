@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import ShieldCheck from '@icon/system/regular/shield-check.svg';
 import { Button, Card, Item } from '@ui';
 import { Show } from 'solid-js';
@@ -40,7 +41,7 @@ export function ToolApprovalCard(props: ToolApprovalCardProps) {
       variant="filled"
       depth={3}
       role="region"
-      aria-label="Tool approval request"
+      aria-label={t('agentChat.toolApprovalRequest')}
       class="overflow-hidden text-ink"
     >
       <Card.Header class="pb-2">

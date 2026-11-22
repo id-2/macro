@@ -3,9 +3,9 @@ import {
   hydrateChannelEvent,
   userFromPrincipal,
 } from '../src/events/hydrate/channel';
-import type { MacroClient } from '../src/utils/client';
+import type { RoxClient } from '../src/utils/client';
 
-const client = {} as MacroClient;
+const client = {} as RoxClient;
 
 describe('userFromPrincipal', () => {
   test('resolves user principals, normalizing case', () => {

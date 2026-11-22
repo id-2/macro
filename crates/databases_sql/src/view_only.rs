@@ -12,8 +12,8 @@ use entity_access::domain::models::{
     EntityPermission, EntityType, RequiredPermission, TeamRole, UserTeamInfo,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
 use uuid::Uuid;
 
 /// `Access`, with every grant read as view.
@@ -57,7 +57,7 @@ fn capped_level(level: AccessLevel, required: AccessLevel) -> Result<AccessLevel
 impl<Access: EntityAccessService> EntityAccessService for ViewOnlyAccess<Access> {
     async fn generate_entity_access_receipt<Required: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -90,7 +90,7 @@ impl<Access: EntityAccessService> EntityAccessService for ViewOnlyAccess<Access>
 
     async fn get_access_level(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -103,7 +103,7 @@ impl<Access: EntityAccessService> EntityAccessService for ViewOnlyAccess<Access>
 
     async fn check_access(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         required_level: AccessLevel,
@@ -130,7 +130,7 @@ impl<Access: EntityAccessService> EntityAccessService for ViewOnlyAccess<Access>
 
     async fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         user_org_id: Option<i64>,
@@ -144,7 +144,7 @@ impl<Access: EntityAccessService> EntityAccessService for ViewOnlyAccess<Access>
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -159,7 +159,7 @@ impl<Access: EntityAccessService> EntityAccessService for ViewOnlyAccess<Access>
         &self,
         entity_id: &str,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         self.0.get_users_by_entity(entity_id, entity_type).await
     }
 
@@ -179,7 +179,7 @@ impl<Access: EntityAccessService> EntityAccessService for ViewOnlyAccess<Access>
 
     async fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         let team = self.0.get_user_team(user_id).await?;
         Ok(team.map(|team| UserTeamInfo {

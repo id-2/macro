@@ -17,7 +17,7 @@ records, and mute state.
 ## Scope
 
 - Owns: the `sqlx::query!` call sites for notification-related tables.
-- Not here: the tables' schema/migrations → `crates/macro_db_client/migrations`
+- Not here: the tables' schema/migrations → `crates/rox_db_client/migrations`
   (search for `create_notification_tables`); notification business logic →
   `notification`.
 
@@ -31,7 +31,7 @@ records, and mute state.
 - Add a query to an existing table: the module in `src/<table>/` → its tests
   → `nix develop --command just prepare_db` from the repo root if SQLx cache
   metadata is missing.
-- Add a new table: migration in `crates/macro_db_client/migrations` first →
+- Add a new table: migration in `crates/rox_db_client/migrations` first →
   new module here, `pub mod` it in `src/lib.rs`.
 
 ## Checks

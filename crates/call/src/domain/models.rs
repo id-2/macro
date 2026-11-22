@@ -7,7 +7,7 @@ use item_filters::{
     CallStatus,
     ast::{LiteralTree, call::CallLiteral},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Query, SimpleSortMethod};
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::team_share::{
@@ -93,7 +93,7 @@ pub struct ArchivedCall {
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct CallPeople {
     /// Rox accounts that joined the call, plus the owner of its meeting link.
-    pub user_ids: Vec<MacroUserIdStr<'static>>,
+    pub user_ids: Vec<RoxUserIdStr<'static>>,
     /// Email addresses invited to the calendar event carrying the call's
     /// meeting link. External guests join without an account, so this is the
     /// only record of who they are.
@@ -290,7 +290,7 @@ pub enum OnOtherCall {
 /// Inputs required by the RTC adapter to produce native VoIP invite payloads.
 pub struct VoipPushPayloadRequest<'a> {
     /// Users with resolved PushKit endpoints that should receive native VoIP invites.
-    pub recipients: &'a [MacroUserIdStr<'static>],
+    pub recipients: &'a [RoxUserIdStr<'static>],
     /// RTC room name the recipient will join.
     pub room_name: &'a str,
     /// Call record ID exposed to the client.
@@ -502,7 +502,7 @@ pub struct CallWebhookEvent {
     /// Room name associated with the event, if any.
     pub room_name: Option<String>,
     /// Participant identity associated with the event, if any.
-    pub participant_identity: Option<MacroUserIdStr<'static>>,
+    pub participant_identity: Option<RoxUserIdStr<'static>>,
     /// Bot identity, classified separately so it never becomes attendance.
     pub bot_identity: Option<bot_id::BotId>,
     /// Non-account guest identity, classified separately from Rox users.
@@ -630,7 +630,7 @@ pub struct EditCallRecordRequest {
 #[derive(Debug)]
 pub struct EditCallRecordRepoArgs {
     /// Authenticated actor, required when this edit enables a share link.
-    pub actor_id: Option<MacroUserIdStr<'static>>,
+    pub actor_id: Option<RoxUserIdStr<'static>>,
     /// Share permission updates, if changing (link and channel sharing).
     pub share_permission:
         Option<models_permissions::share_permission::UpdateSharePermissionRequestV2>,
@@ -649,7 +649,7 @@ pub struct EditCallRecordRepoArgs {
 ///
 /// `custom_speaker = None` clears any existing override for this
 /// `diarized_speaker_id`; `Some(macro_user_id)` sets it. The string is
-/// expected to parse as a `MacroUserId` (e.g. `macro|alice@example.com`);
+/// expected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);
 /// the service layer rejects malformed values with `400 Bad Request`.
 #[derive(Debug, Clone, serde::Deserialize)]
 #[cfg_attr(feature = "inbound", derive(utoipa::ToSchema))]
@@ -659,7 +659,7 @@ pub struct CustomSpeakerAssignment {
     pub diarized_speaker_id: String,
     #[cfg_attr(feature = "inbound", schema(value_type = String))]
     /// Rox user id to attribute matching rows to, or `None` to clear.
-    pub custom_speaker: Option<MacroUserIdStr<'static>>,
+    pub custom_speaker: Option<RoxUserIdStr<'static>>,
 }
 
 /// Body of `PATCH /call/record/{call_id}/transcript`.
@@ -909,7 +909,7 @@ pub struct GetBatchCallRecordPreviewResponse {
 #[derive(Debug)]
 pub struct GetCallRecordsRequest {
     /// The user whose call records to fetch.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Maximum number of records to return.
     pub limit: u32,
     /// Sort or cursor-based pagination query with optional filter.

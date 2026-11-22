@@ -4,8 +4,8 @@ use email_api_client::domain::{
     models::{AccessToken, EmailApiError, MailboxAccess, TokenError, TokenFreshness},
     ports::MailboxTokenSource,
 };
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{
     link::{Link, UserProvider},
     pubsub::LinkManagerMessage,
@@ -18,7 +18,7 @@ pub struct PgInboxHealth {
     pub queue: sqs_client::SQS,
 }
 impl InboxHealthRepository for PgInboxHealth {
-    async fn accessible(&self, actor: &MacroUserIdStr<'_>) -> Result<Vec<Link>, MailboxError> {
+    async fn accessible(&self, actor: &RoxUserIdStr<'_>) -> Result<Vec<Link>, MailboxError> {
         email_db_client::links::get::fetch_inboxes_for_macro_id(&self.db, actor.as_ref())
             .await
             .map_err(|_| MailboxError::Persistence)
@@ -29,10 +29,10 @@ impl InboxHealthRepository for PgInboxHealth {
             FROM email_links WHERE id=$1"#,link_id).fetch_optional(&self.db).await.map_err(|_|MailboxError::Persistence)? else {return Ok(None)};
         let link = Link {
             id: row.id,
-            macro_id: MacroUserIdStr::try_from(row.macro_id)
+            macro_id: RoxUserIdStr::try_from(row.macro_id)
                 .map_err(|_| MailboxError::Persistence)?,
             fusionauth_user_id: row.fusionauth_user_id,
-            email_address: macro_user_id::email::EmailStr::try_from(row.email_address)
+            email_address: rox_user_id::email::EmailStr::try_from(row.email_address)
                 .map_err(|_| MailboxError::Persistence)?,
             provider: match row.provider.as_str() {
                 "GMAIL" => UserProvider::Gmail,
@@ -84,7 +84,7 @@ pub struct ProviderInboxHealth<T, B, C> {
     pub broker: B,
     pub contacts: std::sync::Arc<C>,
 }
-impl<T: MailboxTokenSource, B: MacroEventBroker, C: ContactsIngress> InboxHealthGateway
+impl<T: MailboxTokenSource, B: RoxEventBroker, C: ContactsIngress> InboxHealthGateway
     for ProviderInboxHealth<T, B, C>
 {
     async fn acquire(

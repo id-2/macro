@@ -8,7 +8,7 @@ use attachment::{
 };
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
 use futures::future::join_all;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::chat::ChatMessageWithAttachments;
 use model_entity::{Entity, EntityType};
 use non_empty::NonEmpty;
@@ -35,7 +35,7 @@ impl<R: ChatRepo, ESvc: EntityAccessService> AttachmentService for ChatAttachmen
     #[tracing::instrument(skip_all)]
     async fn resolve_attachments<'a>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&'a Entity<'a>]>,
     ) -> Attachments<'a> {
         let user_id = &user_id;
@@ -59,7 +59,7 @@ impl<R: ChatRepo, ESvc: EntityAccessService> ChatAttachmentService<R, ESvc> {
     #[tracing::instrument(skip(self), err)]
     async fn resolve_one<'a>(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &'a Entity<'a>,
     ) -> Result<AttachmentContent<'a>, AttachmentError> {
         self.entity_access_service

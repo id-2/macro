@@ -12,7 +12,7 @@ struct OwnerSessions {
 impl CodingAgentUpdatesRepo for OwnerSessions {
     async fn candidates(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> Result<Vec<UpdateCandidate>, CodingAgentError> {
         self.asked_for
             .lock()
@@ -59,7 +59,7 @@ async fn updates(router: Router, caller: &str) -> serde_json::Value {
 #[tokio::test]
 async fn updates_list_only_the_callers_stalled_sessions() {
     let sessions = OwnerSessions::default();
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".into(),
@@ -71,7 +71,7 @@ async fn updates_list_only_the_callers_stalled_sessions() {
     let state = AgentSessionRouterState::new(
         sessions,
         Arc::new(entity_access::domain::ports::NoOpEntityAccessService),
-        MacroAuthorizationState::new(Arc::new(auth)),
+        RoxAuthorizationState::new(Arc::new(auth)),
     );
     let router: Router =
         crate::inbound::axum_router::updates::agent_session_updates_router(state.clone());

@@ -6,7 +6,7 @@
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EntityAccessReceipt, EntityType, ViewAccessLevel};
 use lol_html::{HtmlRewriter, Settings, element};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rand::RngCore;
 use rootcause::Report;
 use std::future::Future;
@@ -128,7 +128,7 @@ pub trait ReadReceiptRepository: Send + Sync + 'static {
     /// The user's own and delegated inboxes.
     fn accessible_inboxes(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Uuid>, Report>> + Send;
     /// Receipts of sent messages in the thread that belong to `link_ids`, newest first.
     fn thread_receipts(

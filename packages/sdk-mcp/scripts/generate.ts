@@ -195,7 +195,7 @@ function addressable(declaration: ts.ClassDeclaration): boolean {
   for (const parameter of byId.parameters) {
     const parameterName = parameter.name.getText();
     const type = checker.getTypeAtLocation(parameter);
-    if (type.getSymbol()?.name === 'MacroClient') {
+    if (type.getSymbol()?.name === 'RoxClient') {
       parameters.push({ name: parameterName, client: true });
       continue;
     }

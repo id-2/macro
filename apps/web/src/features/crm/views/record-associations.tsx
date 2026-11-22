@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import EmptyStateCallsGraphic from '@design/empty-state-calls.svg';
 import EmptyStateDocGraphic from '@design/empty-state-doc.svg';
 import { createSignal } from 'solid-js';
@@ -17,11 +18,11 @@ export function RecordFilesSection(props: { scope?: CrmRecordScope }) {
   const files = crm.createRecordFiles(() => props.scope);
   return (
     <RecordSection
-      title="Files"
+      title={t('crm.files')}
       search={search()}
       onSearchChange={setSearch}
       createAction={{
-        label: 'New note',
+        label: t('crm.newNote'),
         onClick: () => crm.openCreateItem('notes'),
       }}
     >
@@ -33,10 +34,10 @@ export function RecordFilesSection(props: { scope?: CrmRecordScope }) {
         emptyContent={
           <CrmListEmpty
             graphic={EmptyStateDocGraphic}
-            title="No files linked yet"
+            title={t('crm.noFilesLinked')}
             description={`Create a note and link it to this ${props.scope?.type ?? 'record'} through its Companies or Contacts property.`}
             action={{
-              label: 'New note',
+              label: t('crm.newNote'),
               onClick: () => crm.openCreateItem('notes'),
             }}
           />
@@ -56,11 +57,11 @@ export function RecordCallsSection(props: { scope?: CrmRecordScope }) {
   const calls = crm.createRecordCalls(() => props.scope);
   return (
     <RecordSection
-      title="Calls"
+      title={t('crm.calls')}
       search={search()}
       onSearchChange={setSearch}
       createAction={{
-        label: 'New call',
+        label: t('crm.newCall'),
         onClick: () => crm.openCreateItem('calls'),
       }}
     >
@@ -72,10 +73,10 @@ export function RecordCallsSection(props: { scope?: CrmRecordScope }) {
         emptyContent={
           <CrmListEmpty
             graphic={EmptyStateCallsGraphic}
-            title="No calls linked yet"
+            title={t('crm.noCallsLinked')}
             description={`Calls with a Companies or Contacts link to this ${props.scope?.type ?? 'record'} will appear here.`}
             action={{
-              label: 'New call',
+              label: t('crm.newCall'),
               onClick: () => crm.openCreateItem('calls'),
             }}
           />

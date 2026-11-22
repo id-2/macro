@@ -20,11 +20,11 @@ impl Notification for PasswordAccessRequestedMetadata {
     const TYPE_NAME: &'static str = "password_access_requested";
 }
 impl NotificationTitle for PasswordAccessRequestedMetadata {
-    fn format_title(&self, sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_title(&self, sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         let sender = comment_sender_label(sender, None);
         Ok(format!("{sender} requested access to {}", self.item_name))
     }
-    fn format_body(&self, _sender: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_body(&self, _sender: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         Ok(self.item_name.clone())
     }
 }
@@ -36,7 +36,7 @@ impl NotificationExtIos for PasswordAccessRequestedMetadata {
     // Delivered to the inbox and live connections only; never a push.
     fn as_apns<'a>(
         &self,
-        _sender: Option<MacroUserIdStr<'a>>,
+        _sender: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         _id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {

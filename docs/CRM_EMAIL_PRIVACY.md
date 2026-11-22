@@ -39,8 +39,10 @@ record details resolve only with separate record access. Text copied into a
 pipeline cell remains pipeline content and may itself identify a record.
 
 `GET /crm/member-access` reads current authority without caching. Storage adds
-`x-macro-crm-access` only when a client requests the retirement signal with
-`x-macro-crm-access-signal: 1`. Requests without that opt-in perform no signal
+the hint under `x-rox-crm-access` (and `x-macro-crm-access` for older clients)
+when a client requests the retirement signal with
+`x-rox-crm-access-signal: 1` (the earlier `x-macro-crm-access-signal` is still
+accepted). Requests without that opt-in perform no signal
 authentication or CRM lookup. The hint uses a per-instance, 10,000-user LRU with
 a non-sliding three-second lifetime from lookup start; concurrent requests for
 the same resident user share a lookup. Failures and cancellations are memoized

@@ -4,7 +4,7 @@ import type {
   WebSearchTopic,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 export type { WebFetchResponse, WebSearchResult, WebSearchTopic };
 
@@ -34,7 +34,7 @@ export interface WebFetchOptions {
  * Search the public web and read web pages, charged to the acting user's AI
  * allowance.
  *
- * @routing Use when finding or reading information on the public internet; not searching the user's Macro workspace (`macro.search`) or reading a URL's preview card (`macro.unfurls`).
+ * @routing Use when finding or reading information on the public internet; not searching the user's Macro workspace (`rox.search`) or reading a URL's preview card (`rox.unfurls`).
  *
  * @agent Search returns snippets, which often answer the question on their
  * own; fetch a result's URL only when you need the whole page. Cite the URL of
@@ -42,14 +42,14 @@ export interface WebFetchOptions {
  * JavaScript, may fail to fetch with `fetch_failed`.
  */
 export class WebNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Search the public web; returns title, URL and a query-relevant snippet per
    * page, best match first. Cite the URLs you use.
    *
    * @example
-   * const { results } = await macro.web.search('Tokio 1.48 release notes', {
+   * const { results } = await rox.web.search('Tokio 1.48 release notes', {
    *   domains: ['tokio.rs'],
    *   maxResults: 3,
    * });
@@ -82,7 +82,7 @@ export class WebNamespace {
    * whether it was). Use it when a search snippet is not enough; cite the URL.
    *
    * @example
-   * const page = await macro.web.fetch('https://tokio.rs/blog/2025-10-tokio-1-48');
+   * const page = await rox.web.fetch('https://tokio.rs/blog/2025-10-tokio-1-48');
    * console.log(page.content);
    *
    * @readonly

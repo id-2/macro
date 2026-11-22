@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { formatRelativeDate, isSameDay } from '@core/util/time';
 import { createMemo, Show } from 'solid-js';
 import type { ChannelMessageListMeta } from './list-meta';
@@ -24,6 +25,11 @@ export function isDateDividerVisible(
   return !isSameDay(new Date(createdAt), new Date(previousCreatedAt));
 }
 
+export function channelDayLabel(createdAt: string) {
+  const label = formatRelativeDate(createdAt);
+  return label === 'Today' ? t('nav.today') : label;
+}
+
 export function DateDivider(props: DateDividerProps) {
   const shouldRender = createMemo(
     () =>
@@ -33,7 +39,7 @@ export function DateDivider(props: DateDividerProps) {
 
   return (
     <Show when={shouldRender()}>
-      <MessageFlag text={formatRelativeDate(props.createdAt)} />
+      <MessageFlag text={channelDayLabel(props.createdAt)} />
     </Show>
   );
 }

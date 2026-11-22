@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use model_owner::{Owner, OwnerType};
 use shared_entity_registry::{EntityRegistryError, NewEntityRecord, RegisteredEntityType};
 use sqlx::PgPool;

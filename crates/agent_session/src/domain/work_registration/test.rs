@@ -6,8 +6,8 @@ use models_permissions::share_permission::access_level::AccessLevel;
 use super::*;
 use crate::domain::ports::SessionViewAccess;
 
-fn account(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).unwrap()
+fn account(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).unwrap()
 }
 
 fn registration_of(session: AgentSessionId, owner: &str) -> WorkRegistration {
@@ -46,7 +46,7 @@ struct FakeRepo {
 impl WorkRegistrationRepo for FakeRepo {
     async fn register(
         &self,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> Result<Registered> {
         Ok(Registered {
@@ -57,7 +57,7 @@ impl WorkRegistrationRepo for FakeRepo {
 
     async fn unregister(
         &self,
-        _account: &MacroUserIdStr<'static>,
+        _account: &RoxUserIdStr<'static>,
         _session: AgentSessionId,
     ) -> Result<bool> {
         Ok(self.unregistered)
@@ -65,7 +65,7 @@ impl WorkRegistrationRepo for FakeRepo {
 
     async fn active_registrations(
         &self,
-        _accounts: &[MacroUserIdStr<'static>],
+        _accounts: &[RoxUserIdStr<'static>],
         _limit: u32,
     ) -> Result<Vec<WorkRegistration>> {
         Ok(self.active.clone())
@@ -73,7 +73,7 @@ impl WorkRegistrationRepo for FakeRepo {
 
     async fn registration_states(
         &self,
-        _accounts: &[MacroUserIdStr<'static>],
+        _accounts: &[RoxUserIdStr<'static>],
         _sessions: &[AgentSessionId],
         _ended_after: DateTime<Utc>,
     ) -> Result<Vec<WorkRegistrationState>> {
@@ -130,7 +130,7 @@ struct ViewableSessions {
 impl SessionViewAccess for ViewableSessions {
     fn can_view<'a>(
         &'a self,
-        _viewer: &'a MacroUserIdStr<'static>,
+        _viewer: &'a RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> std::pin::Pin<Box<dyn Future<Output = Result<bool>> + Send + 'a>> {
         Box::pin(async move {

@@ -26,7 +26,7 @@ where
 
     let ids: Vec<uuid::Uuid> = mentions
         .iter()
-        .map(|_| macro_uuid::generate_uuid_v7())
+        .map(|_| rox_uuid::generate_uuid_v7())
         .collect();
     let entity_types: Vec<String> = mentions
         .iter()

@@ -3,7 +3,7 @@
 use std::{collections::HashMap, str::FromStr};
 
 use frecency::domain::{models::AggregateFrecency, ports::AggregateFrecencyStorage};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use uuid::Uuid;
 
@@ -13,7 +13,7 @@ mod test;
 async fn get_channel_frecency<'a, Frec: AggregateFrecencyStorage>(
     service: &Frec,
     include_frecency: bool,
-    user: MacroUserIdStr<'a>,
+    user: RoxUserIdStr<'a>,
     entities: &'a [model_entity::Entity<'a>],
 ) -> Result<Vec<AggregateFrecency>, Frec::Err> {
     if include_frecency {
@@ -107,7 +107,7 @@ where
             .iter()
             .flat_map(|chan| chan.participants.iter().map(|p| p.user_id.as_str()))
             .filter_map(|id| {
-                MacroUserIdStr::parse_from_str(id)
+                RoxUserIdStr::parse_from_str(id)
                     .ok()
                     .map(|id| id.into_owned())
             })
@@ -197,7 +197,7 @@ where
 
     fn get_activities(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Activity>, rootcause::Report>> + Send {
         self.channels.get_channel_list_activities(user)
     }
@@ -218,7 +218,7 @@ where
 
     fn get_names(
         &self,
-        names: std::collections::HashSet<MacroUserIdStr<'_>>,
+        names: std::collections::HashSet<RoxUserIdStr<'_>>,
     ) -> impl Future<Output = Result<Vec<UserName>, rootcause::Report>> + Send {
         self.users.get_names_for_ids(names)
     }
@@ -243,7 +243,7 @@ fn resolve_channel_name(
                 .iter()
                 .filter(|p| p.user_id != viewer_user_id)
                 .filter_map(|p| {
-                    MacroUserIdStr::try_from(p.user_id.clone())
+                    RoxUserIdStr::try_from(p.user_id.clone())
                         .ok()
                         .map(|id| id_to_display_name(&id, name_lookup))
                 })
@@ -259,7 +259,7 @@ fn resolve_channel_name(
             .iter()
             .filter(|p| p.user_id != viewer_user_id)
             .find_map(|p| {
-                MacroUserIdStr::try_from(p.user_id.clone())
+                RoxUserIdStr::try_from(p.user_id.clone())
                     .ok()
                     .map(|id| id_to_display_name(&id, name_lookup))
             })
@@ -267,7 +267,7 @@ fn resolve_channel_name(
     }
 }
 
-fn id_to_display_name(user_id: &MacroUserIdStr<'static>, name_lookup: &NameLookup) -> String {
+fn id_to_display_name(user_id: &RoxUserIdStr<'static>, name_lookup: &NameLookup) -> String {
     match name_lookup.get(user_id) {
         Some(name) if !name.trim().is_empty() => name.clone(),
         _ => fallback_user_name(user_id),
@@ -283,7 +283,7 @@ mod tests {
         let name_lookup = HashMap::new();
 
         let user_id =
-            MacroUserIdStr::try_from("macro|shepherd.hatton@gmail.com".to_string()).unwrap();
+            RoxUserIdStr::try_from("macro|shepherd.hatton@gmail.com".to_string()).unwrap();
 
         assert_eq!(
             id_to_display_name(&user_id, &name_lookup),

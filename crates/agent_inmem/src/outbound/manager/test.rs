@@ -16,7 +16,7 @@ use agent_session::domain::ports::{AgentSessionLogRepo as _, NoOpRealtime};
 use agent_session::domain::service::{AgentSessionService, AgentSessionServiceImpl};
 use agent_session::testing::InMemoryAgentSessionRepo;
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 
 use super::*;
@@ -137,7 +137,7 @@ fn without_invocation_context(message: &str) -> &str {
     let Some((turn, _)) = invocation.split_once('"') else {
         return message;
     };
-    if context["version"] == 1 && turn.parse::<macro_uuid::Uuid>().is_ok() {
+    if context["version"] == 1 && turn.parse::<rox_uuid::Uuid>().is_ok() {
         prose
     } else {
         message
@@ -168,8 +168,8 @@ async fn await_turns(engine: &ScriptedEngine, prompt: &str) {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id")
 }
 
 fn manager(repo: &InMemoryAgentSessionRepo, engine: Arc<ScriptedEngine>) -> InMemAgentManager {

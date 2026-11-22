@@ -13,9 +13,9 @@ pub use ports::*;
 use super::MailboxError;
 use super::connection::ConnectionSourceError;
 use super::inbox_sync::build_notification_recipients;
-use crate::domain::events::{EmailMacroEvent, LinkReauthRequiredMetadata};
+use crate::domain::events::{EmailRoxEvent, LinkReauthRequiredMetadata};
 use anyhow::{Context, anyhow};
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_email::service::link::Link;
 use models_email::service::pubsub::LinkManagerMessage;
 use std::future::Future;
@@ -52,7 +52,7 @@ where
     H: LinkManagerHealth,
     L: LinkManagerLifecycle,
     N: LinkManagerNotifications,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     D: LinkDeletion,
 {
     /// Decide acknowledgement after decoding and processing one delivery.
@@ -135,7 +135,7 @@ where
         // transition, so the event stays edge-triggered.
         let _ = self
             .broker
-            .send_event(&EmailMacroEvent::link_reauth_required(
+            .send_event(&EmailRoxEvent::link_reauth_required(
                 LinkReauthRequiredMetadata {
                     link_id: link.id,
                     owner: link.macro_id.clone(),

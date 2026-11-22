@@ -1,5 +1,5 @@
 use chrono::Utc;
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 use serde_json::json;
 use uuid::Uuid;
 
@@ -55,17 +55,17 @@ fn event_type_strings_follow_dot_convention() {
 
 #[test]
 fn events_are_keyed_by_mentioned_entity_id() {
-    assert_eq!(MentionMacroEvent::created(metadata()).key(), "bot-1");
-    assert_eq!(MentionMacroEvent::deleted(metadata()).key(), "bot-1");
-    assert_eq!(MentionMacroEvent::message_sent(metadata()).key(), "bot-1");
+    assert_eq!(MentionRoxEvent::created(metadata()).key(), "bot-1");
+    assert_eq!(MentionRoxEvent::deleted(metadata()).key(), "bot-1");
+    assert_eq!(MentionRoxEvent::message_sent(metadata()).key(), "bot-1");
 }
 
 #[test]
 fn decode_round_trips() {
-    let original = MentionMacroEvent::created(metadata());
+    let original = MentionRoxEvent::created(metadata());
 
     let payload = serde_json::to_vec(original.event()).expect("serializable");
-    let decoded = MentionMacroEvent::decode(original.key(), &payload).expect("decodable payload");
+    let decoded = MentionRoxEvent::decode(original.key(), &payload).expect("decodable payload");
 
     assert_eq!(decoded.key(), "bot-1");
     assert_eq!(decoded.event(), original.event());

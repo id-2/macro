@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_messages SET internal_date_ts = now() WHERE thread_id = $1 AND subject = 'Mixed normal mail'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "67fce309b68dd882b1b13279702661a5bb29d6e5e3d8f33b46491b46c293f1e5"
+}

@@ -2,12 +2,12 @@ use std::sync::Mutex;
 
 use axum::body::Body;
 use axum::http::{Request, header};
-use macro_authorization::{
-    CODE_EXECUTION_HEADER, CredentialOrigin, InternalIdentityClaims, MacroAuthorizationError,
+use rox_authorization::{
+    CODE_EXECUTION_HEADER, CredentialOrigin, InternalIdentityClaims, RoxAuthorizationError,
     ValidatedCredential, ValidatedIdentity,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::CreationPrincipal;
 use model_user::UserContext;
 use rootcause::Report;
@@ -22,8 +22,8 @@ use crate::domain::service::test::{OWNER, entity_suggestion, harness};
 #[derive(Clone)]
 struct Owner;
 
-impl MacroAuthorizationService for Owner {
-    async fn authorize(&self, _: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for Owner {
+    async fn authorize(&self, _: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         Ok(UserContext {
             user_id: OWNER.to_owned(),
             fusion_user_id: "owner".to_owned(),
@@ -34,7 +34,7 @@ impl MacroAuthorizationService for Owner {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt).await.map(ValidatedCredential::session)
     }
 
@@ -42,8 +42,8 @@ impl MacroAuthorizationService for Owner {
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -58,7 +58,7 @@ async fn the_person_themself_cannot_attach_a_draft(pool: PgPool) {
         .unwrap();
     let app: Router = suggestion_router(SuggestionRouterState {
         service: Arc::new(h.service),
-        authorization_state: MacroAuthorizationState::new(Arc::new(Owner)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(Owner)),
     });
     let response = app
         .oneshot(
@@ -97,18 +97,18 @@ fn context() -> UserContext {
     }
 }
 
-impl MacroAuthorizationService for FakeAuthorization {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorization {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             SESSION_JWT | AGENT_JWT => Ok(context()),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         match jwt {
             SESSION_JWT => Ok(ValidatedCredential::session(context())),
             AGENT_JWT => Ok(ValidatedCredential {
@@ -121,9 +121,9 @@ impl MacroAuthorizationService for FakeAuthorization {
                     organization_id: None,
                     permissions: None,
                 },
-                origin: CredentialOrigin::MacroApiJwt,
+                origin: CredentialOrigin::RoxApiJwt,
             }),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
@@ -131,8 +131,8 @@ impl MacroAuthorizationService for FakeAuthorization {
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -152,7 +152,7 @@ struct FakeSuggestions {
 impl FakeSuggestions {
     fn reach(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
     ) -> Result<(), SuggestionError> {
         self.callers
@@ -173,7 +173,7 @@ impl FakeSuggestions {
 impl SuggestionApi for FakeSuggestions {
     async fn feed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         _: Option<chrono_tz::Tz>,
         limit: Option<usize>,
@@ -189,7 +189,7 @@ impl SuggestionApi for FakeSuggestions {
 
     async fn viewed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
     ) -> Result<(), SuggestionError> {
         self.reach(user, caller)
@@ -197,7 +197,7 @@ impl SuggestionApi for FakeSuggestions {
 
     async fn accept(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         _: Uuid,
         accept: crate::domain::model::Accept,
@@ -208,7 +208,7 @@ impl SuggestionApi for FakeSuggestions {
 
     async fn dismiss(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         _: Uuid,
     ) -> Result<(), SuggestionError> {
@@ -217,7 +217,7 @@ impl SuggestionApi for FakeSuggestions {
 
     async fn restore(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         id: Uuid,
     ) -> Result<(), SuggestionError> {
@@ -296,7 +296,7 @@ async fn send(
 ) -> StatusCode {
     let router: Router = suggestion_router(SuggestionRouterState {
         service: Arc::clone(service),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorization)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorization)),
     });
     let mut request = Request::builder()
         .method(method)
@@ -430,7 +430,7 @@ async fn only_the_persons_own_session_accepts_as_the_person() {
     // Without the suggestion as read, accepting is refused.
     let router: Router = suggestion_router(SuggestionRouterState {
         service: Arc::clone(&service),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorization)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorization)),
     });
     let bare = Request::builder()
         .method("POST")

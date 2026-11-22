@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO crm_email_rule_threads (team_id, user_id, revision, thread_id) SELECT $1, $2, 1, id FROM email_threads WHERE provider_id = 'ph:blocked-draft'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a22a8c01a93e991df18af9d81b11e165815893f6a007e6bd5ef446a64ce1420f"
+}

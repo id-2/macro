@@ -18,9 +18,9 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 
 use super::*;
@@ -54,7 +54,7 @@ fn mail_projection(thread_id: Uuid) -> EmailThreadMailProjection {
 impl SoupEmailThreadMetadataEdgeReader for RecordingReader {
     async fn get_email_thread_metadata(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> HashMap<Uuid, EmailThreadMetadataLoad> {
         self.metadata_calls.fetch_add(1, Ordering::SeqCst);
@@ -85,7 +85,7 @@ impl SoupEmailThreadMetadataEdgeReader for RecordingReader {
 impl SoupEmailThreadMailProjectionEdgeReader for RecordingReader {
     async fn get_email_thread_mail_projections(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> HashMap<Uuid, EmailThreadMailProjectionLoad> {
         self.mail_projection_calls.fetch_add(1, Ordering::SeqCst);
@@ -104,7 +104,7 @@ impl SoupEmailThreadMailProjectionEdgeReader for RecordingReader {
 impl SoupEmailContentEdgeReader for RecordingReader {
     async fn get_email_content(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         keys: Vec<EmailContentKey>,
     ) -> HashMap<EmailContentKey, EmailContentLoad> {
         self.calls.fetch_add(1, Ordering::SeqCst);
@@ -122,7 +122,7 @@ struct TestAccessService {
 impl EntityAccessService for TestAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -131,7 +131,7 @@ impl EntityAccessService for TestAccessService {
             return Err(AccessError::Unauthorized);
         }
         Ok(EntityAccessReceipt::dangerously_assert_authenticated_user(
-            MacroUserIdStr::try_from_email("reader@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("reader@example.com").unwrap(),
             entity_id,
             entity_type,
         ))
@@ -149,7 +149,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -158,7 +158,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -177,7 +177,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -187,7 +187,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -198,7 +198,7 @@ impl EntityAccessService for TestAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
 
@@ -218,7 +218,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
@@ -271,7 +271,7 @@ impl EmailThreadMetadataService for RecordingContentService {
 impl EmailThreadMailProjectionService for RecordingContentService {
     async fn get_email_thread_mail_projections(
         &self,
-        _viewer: MacroUserIdStr<'static>,
+        _viewer: RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
     ) -> Result<HashMap<Uuid, EmailThreadMailProjection>, EmailErr> {
         self.mail_projection_calls.fetch_add(1, Ordering::SeqCst);
@@ -332,7 +332,7 @@ fn key(index: usize) -> EmailContentKey {
 #[tokio::test]
 async fn batches_distinct_threads_in_one_reader_call() {
     let reader = RecordingReader::default();
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let loader = email_content_loader(user_id, reader.clone());
     let first = key(1);
     let second = key(2);
@@ -353,7 +353,7 @@ async fn batches_distinct_threads_in_one_reader_call() {
 #[tokio::test]
 async fn batches_email_thread_metadata_in_one_reader_call() {
     let reader = RecordingReader::default();
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let loader = email_thread_metadata_loader(user_id, None, reader.clone());
     let first = Uuid::from_u128(1);
     let second = Uuid::from_u128(2);
@@ -380,7 +380,7 @@ async fn batches_email_thread_metadata_in_one_reader_call() {
 #[tokio::test]
 async fn batches_email_thread_mail_projections_in_one_reader_call() {
     let reader = RecordingReader::default();
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let loader = email_thread_mail_projection_loader(user_id, None, reader.clone());
     let first = Uuid::from_u128(1);
     let second = Uuid::from_u128(2);
@@ -403,7 +403,7 @@ async fn batches_email_thread_mail_projections_in_one_reader_call() {
 #[tokio::test]
 async fn rejects_oversized_batches_without_calling_the_reader() {
     let reader = RecordingReader::default();
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let loader = EmailContentLoader::new(user_id, reader.clone());
     let keys = (0..=MAX_EMAIL_CONTENT_KEYS).map(key).collect::<Vec<_>>();
 
@@ -416,7 +416,7 @@ async fn rejects_oversized_batches_without_calling_the_reader() {
 #[tokio::test]
 async fn rejects_excessive_requested_messages_without_calling_the_reader() {
     let reader = RecordingReader::default();
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let loader = EmailContentLoader::new(user_id, reader.clone());
     let keys = vec![
         EmailContentKey::page(Uuid::from_u128(1), 0, 51),
@@ -436,7 +436,7 @@ async fn authorized_keys_reach_the_email_domain() {
         content.clone(),
         Arc::new(TestAccessService { allow: true }),
     );
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let requested = key(1);
 
     let loaded = reader.get_email_content(&user_id, vec![requested]).await;
@@ -456,7 +456,7 @@ async fn authorized_metadata_keys_reach_the_email_domain_in_bulk() {
         content.clone(),
         Arc::new(TestAccessService { allow: true }),
     );
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let first = Uuid::from_u128(1);
     let second = Uuid::from_u128(2);
 
@@ -482,7 +482,7 @@ async fn authorized_mail_projection_keys_reach_the_email_domain_in_bulk() {
         content.clone(),
         Arc::new(TestAccessService { allow: true }),
     );
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let first = Uuid::from_u128(1);
     let second = Uuid::from_u128(2);
 
@@ -508,7 +508,7 @@ async fn unauthorized_mail_projection_keys_do_not_reach_the_email_domain() {
         content.clone(),
         Arc::new(TestAccessService { allow: false }),
     );
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let requested = Uuid::from_u128(1);
 
     let loaded = reader
@@ -531,7 +531,7 @@ async fn unauthorized_metadata_keys_do_not_reach_the_email_domain() {
         content.clone(),
         Arc::new(TestAccessService { allow: false }),
     );
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let requested = Uuid::from_u128(1);
 
     let loaded = reader
@@ -555,7 +555,7 @@ async fn authorized_threads_without_a_metadata_row_report_no_row() {
     });
     let reader =
         EmailServiceEmailContentReader::new(content, Arc::new(TestAccessService { allow: true }));
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let requested = Uuid::from_u128(1);
 
     let loaded = reader
@@ -607,7 +607,7 @@ async fn unavailable_threads_are_logged_in_the_request_span_with_the_reason_and_
             Arc::new(TestAccessService { allow: false }),
         )
     };
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let viewer_id = Uuid::from_u128(77);
     let thread_id = Uuid::from_u128(1);
     let metadata_loader =
@@ -662,7 +662,7 @@ async fn paginated_keys_forward_offset_and_limit_to_the_email_domain() {
         content.clone(),
         Arc::new(TestAccessService { allow: true }),
     );
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let requested = EmailContentKey::page(Uuid::from_u128(1), 7, 9);
 
     let loaded = reader.get_email_content(&user_id, vec![requested]).await;
@@ -685,7 +685,7 @@ async fn full_keys_use_only_the_full_email_domain_path() {
         content.clone(),
         Arc::new(TestAccessService { allow: true }),
     );
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let latest = EmailContentKey::latest_full(Uuid::from_u128(1));
     let page = EmailContentKey::page_full(Uuid::from_u128(2), 4, 6);
 
@@ -713,7 +713,7 @@ async fn unauthorized_keys_do_not_reach_the_email_domain() {
         content.clone(),
         Arc::new(TestAccessService { allow: false }),
     );
-    let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+    let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
     let requested = key(1);
 
     let loaded = reader.get_email_content(&user_id, vec![requested]).await;

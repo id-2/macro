@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 
@@ -177,14 +177,14 @@ impl crate::domain::ports::RoutineCode for Checks {
 
     async fn owner_time_zone(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> Option<String> {
         None
     }
 
     async fn run(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
         _: crate::domain::ports::CodeRun<'_>,
     ) -> crate::domain::ports::CodeOutcome {
         unreachable!("checked code isn't run by a sweep")
@@ -192,7 +192,7 @@ impl crate::domain::ports::RoutineCode for Checks {
 
     async fn reference(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
         _: &str,
     ) -> std::result::Result<String, crate::domain::ports::CodeUnavailable> {
         Ok(String::new())
@@ -204,7 +204,7 @@ impl crate::domain::ports::RoutineCode for Checks {
 
     async fn rewrite(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
         _: &routine_program::CodeStep,
         _: &str,
         _: &[String],

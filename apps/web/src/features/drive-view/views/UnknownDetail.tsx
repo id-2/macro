@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { UnknownFilePreview } from '@block-unknown/component/UnknownFilePreview';
 import { getPermissions } from '@core/component/SharePermissions';
 import { useShareModal } from '@core/component/TopBar/shareModal';
@@ -85,7 +86,7 @@ export function UnknownDetail(props: {
     <FileDetailLoadGate
       documentId={props.documentId}
       entityType="unknown"
-      label="file"
+      label={t('drive.entityFile')}
       load={loadUnknownDocument}
     >
       {(data) => (

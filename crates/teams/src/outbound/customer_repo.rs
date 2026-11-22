@@ -18,7 +18,7 @@ use computer_items::ComputerItem;
 use subscription_error::SubscriptionDataError;
 
 use anyhow::Context;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use stripe::{UpdateSubscription, UpdateSubscriptionItems};
 
 use crate::domain::{
@@ -77,7 +77,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
         &self,
         subscription: &stripe::SubscriptionId,
         schedule: &stripe::SubscriptionScheduleId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<ScheduledSeatPlan>, CustomerError> {
         Ok(self
             .read_scheduled_seat_plans(subscription, schedule)
@@ -88,7 +88,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
     async fn pending_seat_plan(
         &self,
         id: &stripe::SubscriptionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<ScheduledSeatPlan>, CustomerError> {
         Ok(self.pending_seat_plans(id).await?.remove(user.as_ref()))
     }
@@ -187,7 +187,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
     async fn schedule_seat_plan(
         &self,
         id: &stripe::SubscriptionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         plan: Option<SeatPlan>,
     ) -> Result<(), CustomerError> {
         let _billing = self.subscription_guard(id, None).await?;
@@ -513,7 +513,7 @@ impl CustomerRepository for CustomerRepositoryImpl {
         &self,
         subscription_id: &stripe::SubscriptionId,
         team_id: &uuid::Uuid,
-        team_owner_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        team_owner_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<(), CustomerError> {
         let _billing = self.subscription_guard(subscription_id, None).await?;
         let mut metadata = HashMap::new();

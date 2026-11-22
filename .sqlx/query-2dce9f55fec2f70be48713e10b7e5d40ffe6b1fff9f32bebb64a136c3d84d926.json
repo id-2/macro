@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM email_message_labels WHERE message_id = $1 AND label_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2dce9f55fec2f70be48713e10b7e5d40ffe6b1fff9f32bebb64a136c3d84d926"
+}

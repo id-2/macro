@@ -3,7 +3,7 @@ use crate::audit::AuditResult;
 use crate::domain::RuntimePresetAllowlist;
 use sqlx::{PgPool, Row};
 
-static TEST_MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../macro_db_client/migrations");
+static TEST_MIGRATOR: sqlx::migrate::Migrator = sqlx::migrate!("../rox_db_client/migrations");
 
 async fn migrate_for_test(pool: &PgPool) {
     // The integrated source currently has two migrations at 20261110150956.
@@ -29,7 +29,7 @@ async fn migrate_for_test(pool: &PgPool) {
     .unwrap();
 }
 
-async fn create_user(pool: &PgPool, email: &str) -> MacroUserIdStr<'static> {
+async fn create_user(pool: &PgPool, email: &str) -> RoxUserIdStr<'static> {
     let macro_uuid = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
@@ -49,10 +49,10 @@ async fn create_user(pool: &PgPool, email: &str) -> MacroUserIdStr<'static> {
         .execute(pool)
         .await
         .unwrap();
-    MacroUserIdStr::try_from_email(email).unwrap()
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
-async fn create_team(pool: &PgPool, owner: &MacroUserIdStr<'_>) -> Uuid {
+async fn create_team(pool: &PgPool, owner: &RoxUserIdStr<'_>) -> Uuid {
     let team_id = Uuid::new_v4();
     sqlx::query(
         "INSERT INTO team (id, name, owner_id, enterprise) VALUES ($1, 'enterprise', $2, true)",

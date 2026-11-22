@@ -12,7 +12,7 @@ use email::domain::{
     models::EmailErr,
 };
 use entity_access::domain::models::ViewAccessLevel;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::collections::HashSet;
 
@@ -24,7 +24,7 @@ struct Mailbox {
 impl EmailFollowupMailbox for Mailbox {
     async fn reminder_threads(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
         _: &ReminderThreadFilter,
     ) -> Result<Vec<Uuid>, EmailErr> {
@@ -43,14 +43,14 @@ impl EmailFollowupMailbox for Mailbox {
     }
     async fn followup_thread(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
     ) -> Result<Option<FollowupThread>, EmailErr> {
         unreachable!()
     }
     async fn set_followup_inbox(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: Uuid,
         _: Uuid,
         _: bool,
@@ -67,7 +67,7 @@ impl Clock for FixedClock {
 }
 fn viewer() -> EmailReminderViewer {
     EmailReminderViewer {
-        user_id: MacroUserIdStr::parse_from_str(USER_ID).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER_ID).unwrap(),
         org_id: None,
     }
 }

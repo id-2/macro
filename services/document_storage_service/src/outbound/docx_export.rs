@@ -59,7 +59,7 @@ impl DocxExportStore for ApiContext {
 
     #[tracing::instrument(skip_all, fields(document_id = %document_id), err)]
     async fn parts(&self, document_id: &str) -> Result<Vec<BomPart>, Self::Err> {
-        Ok(macro_db_client::document::get_document_bom(self.db.clone(), document_id).await?)
+        Ok(rox_db_client::document::get_document_bom(self.db.clone(), document_id).await?)
     }
 
     #[tracing::instrument(skip_all, fields(document_id = %document_id), err)]

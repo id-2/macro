@@ -9,13 +9,13 @@ pub(in crate::outbound) async fn enqueue(
     sqlx::query!(r#"INSERT INTO email_mailbox_settings_work(id,link_id,kind,resource_key,desired) VALUES($1,$2,'sender_block',$3,$4)
         ON CONFLICT(link_id,kind,resource_key) DO UPDATE SET desired=EXCLUDED.desired,
             revision=email_mailbox_settings_work.revision+1,next_run_at=now(),failure=NULL"#,
-        macro_uuid::generate_uuid_v7(),link,sender,blocked).execute(tx).await?;
+        rox_uuid::generate_uuid_v7(),link,sender,blocked).execute(tx).await?;
     Ok(())
 }
 
 pub(super) async fn commit(
     pool: &PgPool,
-    actor: &MacroUserIdStr<'_>,
+    actor: &RoxUserIdStr<'_>,
     link: Uuid,
     sender: &str,
     blocked: bool,
@@ -30,6 +30,6 @@ pub(super) async fn commit(
         email_filter::upsert_email_filter_by_address(&mut tx, link, sender, important).await?;
     }
     sqlx::query!(r#"INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES($1,$2,$3,'{"kind":"link_changed"}')"#,
-        macro_uuid::generate_uuid_v7(),link,binding.sync_generation).execute(&mut *tx).await?;
+        rox_uuid::generate_uuid_v7(),link,binding.sync_generation).execute(&mut *tx).await?;
     tx.commit().await
 }

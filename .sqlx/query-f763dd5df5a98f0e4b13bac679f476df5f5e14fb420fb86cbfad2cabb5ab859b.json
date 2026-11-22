@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_sync_streams SET initial_complete = true, position = 'checkpoint' WHERE link_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f763dd5df5a98f0e4b13bac679f476df5f5e14fb420fb86cbfad2cabb5ab859b"
+}

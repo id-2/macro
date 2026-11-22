@@ -7,8 +7,8 @@ use agent_client_protocol::schema::v1::{
 
 use super::*;
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("models@example.com").unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("models@example.com").unwrap()
 }
 
 fn options() -> Vec<SessionConfigOption> {
@@ -25,7 +25,7 @@ struct Access(bool);
 impl HarnessCapabilityAccess for Access {
     async fn can_use(
         &self,
-        _caller: &MacroUserIdStr<'static>,
+        _caller: &RoxUserIdStr<'static>,
         _harness: HarnessId,
     ) -> Result<bool, String> {
         Ok(self.0)
@@ -74,11 +74,11 @@ fn unsupported() -> Result<RawCapabilityProbe, CapabilityProbeError> {
 struct HangingCursor;
 
 impl CapabilityProbe for HangingCursor {
-    type Target = MacroUserIdStr<'static>;
+    type Target = RoxUserIdStr<'static>;
 
     async fn probe(
         &self,
-        _caller: &MacroUserIdStr<'static>,
+        _caller: &RoxUserIdStr<'static>,
         _model: Option<&str>,
     ) -> Result<RawCapabilityProbe, CapabilityProbeError> {
         std::future::pending().await

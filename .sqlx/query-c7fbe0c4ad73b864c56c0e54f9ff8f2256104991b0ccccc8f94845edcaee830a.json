@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT l.provider_label_id, ml.xmin::text AS \"xmin!\"\n        FROM email_message_labels ml\n        JOIN email_labels l ON l.id = ml.label_id\n        WHERE ml.message_id = $1\n        ORDER BY l.provider_label_id\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "provider_label_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "xmin!",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      null
+    ]
+  },
+  "hash": "c7fbe0c4ad73b864c56c0e54f9ff8f2256104991b0ccccc8f94845edcaee830a"
+}

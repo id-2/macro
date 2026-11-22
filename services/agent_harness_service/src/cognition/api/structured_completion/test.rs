@@ -7,8 +7,8 @@ use crate::cognition::service::structured_completion::{
     ToolFreeCompletion, ToolFreeCompletionError, ToolFreeRequest,
 };
 use axum::{Router, routing::post};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use std::sync::Mutex;
 use tower::ServiceExt;
@@ -23,7 +23,7 @@ struct OneShot(
 impl ToolFreeCompletion for OneShot {
     async fn complete(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: ToolFreeRequest,
     ) -> Result<serde_json::Value, ToolFreeCompletionError> {
         assert_eq!(request.model, chat::domain::models::FREE_MODEL);

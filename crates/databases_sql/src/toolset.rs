@@ -16,7 +16,7 @@ use contacts::domain::ports::ContactsService;
 use databases::domain::models::Viewer;
 use databases::domain::ports::DatabasesService;
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use soup::domain::ports::SoupService;
 
 use database_sql::run::RunError;
@@ -82,7 +82,7 @@ impl<Databases, Access, Soup, Contacts> DatabasesSqlToolContext<Databases, Acces
     }
 
     /// The requesting user, with this context's agent acting for them.
-    fn viewer(&self, user_id: &MacroUserIdStr<'static>) -> Viewer {
+    fn viewer(&self, user_id: &RoxUserIdStr<'static>) -> Viewer {
         Viewer {
             user_id: user_id.clone(),
             acting_bot: Some(self.actor),

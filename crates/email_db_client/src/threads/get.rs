@@ -393,7 +393,7 @@ pub async fn get_thread_ids_by_contact_ids(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::MACRO_DB_MIGRATIONS;
     use models_email::email::service::thread::UserThreadIds;
     use sqlx::types::uuid::uuid;
     use sqlx::{Pool, Postgres};

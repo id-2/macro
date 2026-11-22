@@ -1,5 +1,5 @@
 use email::domain::mailbox::reimport::ReimportMode;
-use macro_env_var::{env_vars, maybe_env_vars};
+use rox_env_var::{env_vars, maybe_env_vars};
 use rootcause::prelude::{Report, ResultExt as _};
 use uuid::Uuid;
 

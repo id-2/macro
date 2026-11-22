@@ -163,7 +163,7 @@ impl Queues {
     /// Creates every queue, each with its dead-letter queue, under names
     /// that start with `prefix`.
     pub(crate) async fn create(server_url: &str, prefix: &str) -> Result<Self, Report> {
-        let config = macro_aws_config::local_aws_config(server_url).await;
+        let config = rox_aws_config::local_aws_config(server_url).await;
         let client = aws_sdk_sqs::Client::new(&config);
 
         let mut created = Self {

@@ -4,6 +4,7 @@ import {
   type ViewBreadcrumbsSeparatorState,
   ViewSwitchTrigger,
 } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import type { FileOperation } from '@components/app/split-layout/components/SplitFileMenu';
 import { SplitFileMenu } from '@components/app/split-layout/components/SplitFileMenu';
 import { Permissions } from '@core/component/SharePermissions';
@@ -34,14 +35,14 @@ function FolderBreadcrumbMenu(props: {
     ...(props.onOpenInNewSplit
       ? [
           {
-            label: 'Open in new split',
+            label: t('nav.openInNewSplit'),
             icon: SplitIcon,
             action: () => props.onOpenInNewSplit?.(entity()),
           },
         ]
       : []),
     {
-      label: 'Share',
+      label: t('entityActions.share'),
       icon: ShareIcon,
       action: () => props.onShare(entity()),
       group: 'sharing',

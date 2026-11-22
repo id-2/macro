@@ -6,11 +6,11 @@ use axum::{
     http::{Request, StatusCode, header},
 };
 use futures::stream::BoxStream;
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rootcause::Report;
 use std::sync::{Arc, Mutex};
@@ -27,7 +27,7 @@ struct RecordingStreams {
 impl WebhookEventStreamService for RecordingStreams {
     async fn open_stream(
         &self,
-        _subscriber: MacroUserIdStr<'static>,
+        _subscriber: RoxUserIdStr<'static>,
         _scope: WebhookScope,
         _filters: WebhookFilters,
         after: Option<StreamCursor>,
@@ -40,10 +40,10 @@ impl WebhookEventStreamService for RecordingStreams {
 #[derive(Clone, Default)]
 struct SignedIn;
 
-impl MacroAuthorizationService for SignedIn {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for SignedIn {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: SUBSCRIBER_ID.to_string(),
@@ -54,27 +54,27 @@ impl MacroAuthorizationService for SignedIn {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_bot(
         &self,
         _bot_token: &str,
-        _bot_scope: macro_authorization::BotScope,
-        _acting_user: Option<macro_authorization::BotActingUserClaims>,
-    ) -> Result<macro_authorization::BotAuthentication, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+        _bot_scope: rox_authorization::BotScope,
+        _acting_user: Option<rox_authorization::BotActingUserClaims>,
+    ) -> Result<rox_authorization::BotAuthentication, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -88,7 +88,7 @@ async fn open(last_event_id: &str, extra_query: &str) -> (StatusCode, Option<Str
     let streams = RecordingStreams::default();
     let router = webhook_stream_router::<_, _, ()>(WebhookStreamRouterState::new(
         streams.clone(),
-        MacroAuthorizationState::new(Arc::new(SignedIn)),
+        RoxAuthorizationState::new(Arc::new(SignedIn)),
     ));
     // `[{"events":["document.updated"]}]`, percent-encoded.
     let filters = "%5B%7B%22events%22%3A%5B%22document.updated%22%5D%7D%5D";

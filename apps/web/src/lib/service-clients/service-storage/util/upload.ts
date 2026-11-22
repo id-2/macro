@@ -18,7 +18,7 @@ import {
 import { fireAndForget } from '@core/util/fireAndForget';
 import { holdAutomaticReload } from '@core/util/reloadForNewerBuild';
 import type { ResultError } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { cachedUserId } from '@queries/auth/cached-user-id';
 import { waitForDocumentContentReady } from '@queries/storage/document-location';
 import {

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   EntityDetail,
   entityDetailBlockType,
@@ -88,7 +89,7 @@ function DriveDetailTopBar() {
     <ViewShell.TopBar class="touch:flex">
       <ViewShell.TopBarTitle>
         <DriveBreadcrumbsOutlet
-          aria-label="File location"
+          aria-label={t('drive.fileLocation')}
           fallback={<EntityDetailBreadcrumbSkeleton />}
         />
       </ViewShell.TopBarTitle>
@@ -188,7 +189,7 @@ function StackEntityDetail(props: {
           previewHeaderLeading={
             <Show when={hasBlockHeader(props.entry.data) && props.order > 0}>
               <DriveBreadcrumbsOutlet
-                aria-label="File location"
+                aria-label={t('drive.fileLocation')}
                 class="max-w-[min(40vw,24rem)] overflow-hidden"
               >
                 <ViewBreadcrumbs.Separator />
@@ -263,7 +264,7 @@ export function DriveDetailView() {
                 fallback={(error, reset) => (
                   <MarkdownDetailBodyState
                     error={error}
-                    actionLabel="Reset"
+                    actionLabel={t('drive.reset')}
                     onAction={reset}
                   />
                 )}

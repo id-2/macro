@@ -1,4 +1,4 @@
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { afterEach, expect, it, vi } from 'vitest';
 import { createInputTelemetry } from './telemetry';
 

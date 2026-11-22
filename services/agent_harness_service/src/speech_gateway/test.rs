@@ -5,7 +5,7 @@ use ai_billing::domain::admission::AdmissionFuture;
 use ai_usage::UsageEvent;
 use base64::{Engine, engine::general_purpose::STANDARD};
 use jsonwebtoken::{DecodingKey, Validation};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use team_agents::domain::voice::VoiceProvider;
 use tokio_tungstenite::connect_async;
 use uuid::Uuid;
@@ -30,7 +30,7 @@ impl BrainAuthenticator for OneAgent {
                 return Err(rootcause::report!("database down"));
             }
             Ok((key == AGENT_KEY).then(|| BrainCaller {
-                user_id: MacroUserIdStr::parse_from_str(AGENT).unwrap().into_owned(),
+                user_id: RoxUserIdStr::parse_from_str(AGENT).unwrap().into_owned(),
                 team_id: TEAM,
             }))
         })
@@ -40,8 +40,8 @@ impl BrainAuthenticator for OneAgent {
 /// Agent teammates on or off for [`CREATOR`], who invited [`AGENT`], and the
 /// other way round for the agent's own account.
 fn rollout_for_creator(on: bool) -> BrainRollout {
-    let agent = MacroUserIdStr::parse_from_str(AGENT).unwrap().into_owned();
-    let creator = MacroUserIdStr::parse_from_str(CREATOR)
+    let agent = RoxUserIdStr::parse_from_str(AGENT).unwrap().into_owned();
+    let creator = RoxUserIdStr::parse_from_str(CREATOR)
         .unwrap()
         .into_owned();
     let mut creators = agent_credentials::FakeAgentCreators::default();
@@ -69,7 +69,7 @@ fn rollout_for_creator(on: bool) -> BrainRollout {
 struct CountingAdmission(AtomicUsize);
 
 impl AiAdmissionService for CountingAdmission {
-    fn admit<'a>(&'a self, _: &'a MacroUserIdStr<'_>, feature: AiFeature) -> AdmissionFuture<'a> {
+    fn admit<'a>(&'a self, _: &'a RoxUserIdStr<'_>, feature: AiFeature) -> AdmissionFuture<'a> {
         assert_eq!(feature, AiFeature::AgentSession);
         self.0.fetch_add(1, Ordering::SeqCst);
         Box::pin(async { Ok(()) })
@@ -310,7 +310,7 @@ fn sessions_are_pinned_to_the_priced_models_and_formats() {
 #[test]
 fn a_session_records_its_forwarded_usage_once_against_the_agent() {
     let recorder = Arc::new(Recorder::default());
-    let agent = MacroUserIdStr::parse_from_str(AGENT).unwrap().into_owned();
+    let agent = RoxUserIdStr::parse_from_str(AGENT).unwrap().into_owned();
     for (operation, audio_bytes, characters) in [
         (Operation::Stt, 32_000, 0),
         (Operation::Tts, 0, 5),
@@ -539,7 +539,7 @@ async fn the_catalog_keeps_aura_two_voices_and_each_sample_is_billed_once() {
     assert_eq!(catalog.catalog().await.unwrap(), voices);
     assert_eq!(catalog_requests.load(Ordering::SeqCst), 1);
 
-    let admin = MacroUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let admin = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
     let thalia = VoiceModel::parse("aura-2-thalia-en").unwrap();
     let first = catalog.sample(&admin, TEAM, &thalia).await.unwrap();
     let second = catalog.sample(&admin, TEAM, &thalia).await.unwrap();

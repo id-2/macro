@@ -25,7 +25,11 @@ function createPersistedDismissed(
 function createIsEnabled(
   permission: Accessor<NotificationPermission | UiDisabled>
 ): Accessor<boolean> {
-  return () => permission() === 'granted';
+  return () => {
+    const current = permission();
+    // On by default. Denied, or turned off in settings, stays off.
+    return current === 'granted' || current === 'default';
+  };
 }
 
 function createCanPrompt(

@@ -4,8 +4,8 @@
 use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessReceipt, EntityPermission, EntityType, ViewAccessLevel,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::views::{LaneKey, NewView, ViewLayout, ViewQuery};
 use models_databases::{
     CellValue, CellWrite, ColumnChange, ColumnKind, DatabaseOp, NewColumn, OpResult, OptionRef,
@@ -26,8 +26,8 @@ use crate::domain::ports::{CellStore, ColumnDefinitionStore, DatabasesService};
 
 const DUPLICATOR: &str = "macro|duplicator@rox.one";
 
-fn duplicator() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(DUPLICATOR)
+fn duplicator() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(DUPLICATOR)
         .unwrap()
         .into_owned()
 }

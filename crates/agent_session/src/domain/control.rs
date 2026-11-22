@@ -2,7 +2,7 @@
 
 use agent_runtime_protocol::domain::action::{AgentAction, AgentActionId};
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use trigger_context::TriggerContext;
 
 use super::error::{AgentSessionError, Result};
@@ -17,7 +17,7 @@ pub enum ControlPrincipal {
     /// but no right to answer interactions or name an app tab.
     Program,
     /// A bot, daemon, or internal service, possibly forwarding a user's request.
-    Runtime(Option<MacroUserIdStr<'static>>),
+    Runtime(Option<RoxUserIdStr<'static>>),
 }
 
 impl ControlPrincipal {

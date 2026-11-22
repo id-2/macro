@@ -6,7 +6,7 @@ use agent_session::domain::routines::{
     RoutinePromptAccepted, RoutineSessionAction, RoutineSessions, ValidateRoutineSession,
     ValidatedRoutineSession,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -122,13 +122,13 @@ struct PanickingHandBacks;
 
 #[async_trait::async_trait]
 impl DraftHandBacks for PanickingHandBacks {
-    async fn begin(&self, _: Uuid, _: &MacroUserIdStr<'static>, _: bot_id::BotId) -> Result<()> {
+    async fn begin(&self, _: Uuid, _: &RoxUserIdStr<'static>, _: bot_id::BotId) -> Result<()> {
         unreachable!()
     }
     async fn record(
         &self,
         _: Uuid,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &crate::domain::models::RoutineCheck,
         _: &[crate::domain::models::CreatedItem],
     ) -> Result<bool> {
@@ -167,7 +167,7 @@ async fn only_a_draft_sessions_own_check_is_kept_as_its_answer(pool: PgPool) {
 
     // Someone else's program can't answer this draft...
     let stranger = CreationPrincipal::User(
-        MacroUserIdStr::try_from("macro|stranger@rox.one".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|stranger@rox.one".to_owned()).unwrap(),
     );
     svc.check_action(&stranger, config.clone(), Vec::new(), Some(correlation))
         .await

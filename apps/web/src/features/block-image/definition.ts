@@ -59,7 +59,7 @@ export const definition = defineBlock({
           definition.accepted[
             documentMetadata.fileType as keyof typeof definition.accepted
           ]!,
-        // @ts-ignore: TODO: fix / replace @macro-inc/document-processing-job-types
+        // @ts-ignore: TODO: fix / replace @rox-one/document-processing-job-types
         metadata: documentMetadata,
       });
 

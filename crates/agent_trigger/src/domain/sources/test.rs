@@ -1,8 +1,8 @@
 use super::*;
 use channel_sender::ChannelSender;
 use chrono::Utc;
-use macro_event_broker::MessageParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::MessageParts;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::events::MessagePostedMetadata;
 use messages::domain::models::MessageParent;
 
@@ -24,19 +24,19 @@ impl MessageParts for Record {
     }
 }
 
-fn record<E: macro_event_broker::MacroEvent>(event: &E) -> Record
+fn record<E: rox_event_broker::RoxEvent>(event: &E) -> Record
 where
     E::EventPayload: serde::Serialize,
 {
     Record {
-        topic: <<E::EventPayload as macro_event_broker::TopicEvent>::Topic as macro_event_broker::Topic>::TOPIC_STR,
+        topic: <<E::EventPayload as rox_event_broker::TopicEvent>::Topic as rox_event_broker::Topic>::TOPIC_STR,
         key: event.key().to_owned(),
         payload: serde_json::to_vec(event.event()).unwrap(),
     }
 }
 
 fn sender() -> ChannelSender<'static> {
-    ChannelSender::new_from_user(MacroUserIdStr::try_from_email("asker@example.com").unwrap())
+    ChannelSender::new_from_user(RoxUserIdStr::try_from_email("asker@example.com").unwrap())
 }
 
 #[test]
@@ -53,7 +53,7 @@ fn the_message_source_carries_the_persisted_parent_through() {
         attachments: vec![],
         created_at: Utc::now(),
     };
-    let event = MessageMacroEvent::posted(posted.clone());
+    let event = MessageRoxEvent::posted(posted.clone());
     let trigger = MessageTriggerEvents::decode(&record(&event))
         .unwrap()
         .into_trigger();
@@ -66,7 +66,7 @@ fn the_message_source_carries_the_persisted_parent_through() {
         })
     );
 
-    let patched = MessageMacroEvent::patched(messages::domain::events::MessagePatchedMetadata {
+    let patched = MessageRoxEvent::patched(messages::domain::events::MessagePatchedMetadata {
         completed_reply: None,
         parent: MessageParent::parse("document", "doc-1").unwrap(),
         message_id: Uuid::from_u128(2),
@@ -102,8 +102,8 @@ fn a_task_joining_a_project_decodes_as_a_project_addition() {
     use system_properties::SystemPropertyKey;
 
     let project = InitiativeId::generate();
-    let user = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
-    let event = PropertyMacroEvent::entity_property_updated(EntityPropertyUpdatedMetadata {
+    let user = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
+    let event = PropertyRoxEvent::entity_property_updated(EntityPropertyUpdatedMetadata {
         inherited_from_project: None,
         entity_property_id: Uuid::now_v7(),
         entity_id: "task-a".to_owned(),
@@ -150,7 +150,7 @@ fn completed_bot_reply_mentions_reach_the_existing_trigger_path() {
         attachments: vec![],
         created_at: Utc::now(),
     };
-    let patched = MessageMacroEvent::patched(messages::domain::events::MessagePatchedMetadata {
+    let patched = MessageRoxEvent::patched(messages::domain::events::MessagePatchedMetadata {
         completed_reply: Some(posted.clone()),
         parent: posted.parent.clone(),
         message_id: posted.message_id,

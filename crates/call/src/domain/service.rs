@@ -16,9 +16,9 @@ use entity_access::domain::models::{
     ViewAccessLevel,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{RoxEventBroker, NoopRoxEventBroker};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::team_share::{
     AuthorizedTeamShareCommand, TeamShareLevel, TeamShareRequest, authorize_team_share,
@@ -40,7 +40,7 @@ use subtle::ConstantTimeEq;
 use uuid::Uuid;
 
 use crate::domain::events::{
-    CallArchiveReason, CallMacroEvent, CallRecordArchivedMetadata, CallRecordDeletedMetadata,
+    CallArchiveReason, CallRoxEvent, CallRecordArchivedMetadata, CallRecordDeletedMetadata,
     CallRecordSummarizedMetadata, CallRecordUpdatedMetadata, CallRecordingReadyMetadata,
     CallStartedMetadata,
 };
@@ -49,7 +49,7 @@ use crate::domain::models::{
     VoipPushPayloadRequest,
 };
 use crate::domain::notification_events::{
-    CallNotificationEvent, CallNotificationMacroEvent, CallNotificationMetadata,
+    CallNotificationEvent, CallNotificationRoxEvent, CallNotificationMetadata,
 };
 
 use super::meetings::{
@@ -82,7 +82,7 @@ pub struct CallServiceImpl<
     Sm: CallSummarizer = NoopCallSummarizer,
     V: VoipPushSender = (),
     Vr: VoiceRepository = NoOpVoiceRepository,
-    B: MacroEventBroker = NoopMacroEventBroker,
+    B: RoxEventBroker = NoopRoxEventBroker,
 > {
     repo: R,
     rtc_client: Arc<C>,
@@ -137,7 +137,7 @@ impl<
             voip_push_sender: Arc::new(()),
             voice_repo: NoOpVoiceRepository,
             ring_status_base_url: None,
-            event_broker: NoopMacroEventBroker,
+            event_broker: NoopRoxEventBroker,
             channel_threads: None,
             start_limiter: None,
             programmatic_call_gate: None,
@@ -155,7 +155,7 @@ impl<
     Sm: CallSummarizer,
     V: VoipPushSender,
     Vr: VoiceRepository,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 > CallServiceImpl<R, C, Cn, E, N, S, Sm, V, Vr, B>
 {
     /// Let new channel calls discuss in a thread in their channel.
@@ -260,7 +260,7 @@ impl<
     }
 
     /// Replace the event broker while preserving every other service dependency.
-    pub fn with_event_broker<B2: MacroEventBroker>(
+    pub fn with_event_broker<B2: RoxEventBroker>(
         self,
         event_broker: B2,
     ) -> CallServiceImpl<R, C, Cn, E, N, S, Sm, V, Vr, B2> {
@@ -285,7 +285,7 @@ impl<
         }
     }
 
-    fn publish_call_event(&self, event: &CallMacroEvent) {
+    fn publish_call_event(&self, event: &CallRoxEvent) {
         publish_call_event(&self.event_broker, event);
     }
 
@@ -332,7 +332,7 @@ impl<
         archived: &ArchivedCall,
         archive_reason: CallArchiveReason,
     ) {
-        let created_by = match MacroUserIdStr::parse_from_str(&archived.created_by) {
+        let created_by = match RoxUserIdStr::parse_from_str(&archived.created_by) {
             Ok(created_by) => created_by.into_owned(),
             Err(error) => {
                 tracing::error!(
@@ -348,7 +348,7 @@ impl<
             .participants
             .iter()
             .filter_map(|participant| {
-                MacroUserIdStr::parse_from_str(participant)
+                RoxUserIdStr::parse_from_str(participant)
                     .inspect_err(|error| {
                         tracing::error!(
                             error = ?error,
@@ -357,11 +357,11 @@ impl<
                         );
                     })
                     .ok()
-                    .map(MacroUserIdStr::into_owned)
+                    .map(RoxUserIdStr::into_owned)
             })
             .collect();
 
-        self.publish_call_event(&CallMacroEvent::record_archived(
+        self.publish_call_event(&CallRoxEvent::record_archived(
             CallRecordArchivedMetadata {
                 call_id: archived.call_id,
                 channel_id: archived.channel_id,
@@ -392,7 +392,7 @@ impl<
         channel_id: &Option<Uuid>,
         message_type: &str,
         message: &serde_json::Value,
-        triggered_by_user_id: Option<MacroUserIdStr<'_>>,
+        triggered_by_user_id: Option<RoxUserIdStr<'_>>,
     ) {
         let Some(channel_id) = channel_id else {
             return;
@@ -410,7 +410,7 @@ impl<
             }
         };
 
-        let users: Vec<MacroUserIdStr<'_>> = users
+        let users: Vec<RoxUserIdStr<'_>> = users
             .into_iter()
             .filter_map(|u| {
                 if triggered_by_user_id
@@ -450,10 +450,10 @@ impl<
             }
         };
 
-        let users: Vec<MacroUserIdStr<'static>> = participants
+        let users: Vec<RoxUserIdStr<'static>> = participants
             .into_iter()
             .filter_map(|p| {
-                MacroUserIdStr::parse_from_str(&p.user_id)
+                RoxUserIdStr::parse_from_str(&p.user_id)
                     .map(CowLike::into_owned)
                     .ok()
             })
@@ -476,7 +476,7 @@ impl<
         &self,
         channel_id: &Option<Uuid>,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) {
         let mut metadata = CallNotificationMetadata::new(*call_id, *channel_id);
         metadata.user_id = Some(user_id.to_string());
@@ -506,7 +506,7 @@ impl<
         &self,
         channel_id: &Option<Uuid>,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) {
         let mut metadata = CallNotificationMetadata::new(*call_id, *channel_id);
         metadata.user_id = Some(user_id.to_string());
@@ -531,7 +531,7 @@ impl<
     async fn decline_active_call(
         &self,
         call: &Call,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<(), CallError> {
         self.repo
             .record_decline(&call.id, user_id.copied())
@@ -546,7 +546,7 @@ impl<
     fn verify_ring_token(
         &self,
         bearer_token: &str,
-    ) -> Result<(String, MacroUserIdStr<'static>), CallError> {
+    ) -> Result<(String, RoxUserIdStr<'static>), CallError> {
         let verified = self
             .rtc_client
             .verify_access_token(bearer_token)
@@ -555,7 +555,7 @@ impl<
                 CallError::Auth
             })?;
         let room = verified.room.ok_or(CallError::Auth)?;
-        let identity = MacroUserIdStr::parse_from_str(&verified.identity)
+        let identity = RoxUserIdStr::parse_from_str(&verified.identity)
             .map_err(|_| CallError::Auth)?
             .into_owned();
         Ok((room, identity))
@@ -610,7 +610,7 @@ fn live_share_intent(request: TeamShareRequest) -> Result<Option<bool>, CallErro
     }
 }
 
-fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<MacroUserIdStr<'static>> {
+fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<RoxUserIdStr<'static>> {
     match auth {
         EntityAccessAuth::Authenticated(user_id) => Some(user_id.clone().into_owned()),
         EntityAccessAuth::Bot(_)
@@ -620,9 +620,9 @@ fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<MacroUserIdStr<'static
 }
 
 fn exclude_voip_recipients<'a>(
-    recipient_ids: HashSet<MacroUserIdStr<'a>>,
-    voip_recipient_ids: &HashSet<MacroUserIdStr<'static>>,
-) -> HashSet<MacroUserIdStr<'a>> {
+    recipient_ids: HashSet<RoxUserIdStr<'a>>,
+    voip_recipient_ids: &HashSet<RoxUserIdStr<'static>>,
+) -> HashSet<RoxUserIdStr<'a>> {
     recipient_ids
         .into_iter()
         .filter(|recipient_id| {
@@ -641,10 +641,10 @@ fn exclude_voip_recipients<'a>(
 /// channel by; recipients whose name could not be resolved share a `None`
 /// group. Named channels collapse into a single group.
 fn group_recipients_by_channel_name<'a>(
-    recipient_ids: impl IntoIterator<Item = MacroUserIdStr<'a>>,
-    channel_names_by_recipient: &HashMap<MacroUserIdStr<'static>, String>,
-) -> HashMap<Option<String>, HashSet<MacroUserIdStr<'a>>> {
-    let mut groups: HashMap<Option<String>, HashSet<MacroUserIdStr<'a>>> = HashMap::new();
+    recipient_ids: impl IntoIterator<Item = RoxUserIdStr<'a>>,
+    channel_names_by_recipient: &HashMap<RoxUserIdStr<'static>, String>,
+) -> HashMap<Option<String>, HashSet<RoxUserIdStr<'a>>> {
+    let mut groups: HashMap<Option<String>, HashSet<RoxUserIdStr<'a>>> = HashMap::new();
     for recipient_id in recipient_ids {
         let channel_name = channel_names_by_recipient
             .iter()
@@ -679,7 +679,7 @@ impl NotificationExtIos for CallStartedNotification {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &model_entity::Entity<'_>,
         notification_id: uuid::Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -721,10 +721,10 @@ impl<
     Sm: CallSummarizer + Clone,
     V: VoipPushSender,
     Vr: VoiceRepository + Clone,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 > CallService for CallServiceImpl<R, C, Cn, E, N, S, Sm, V, Vr, B>
 {
-    async fn programmatic_calls_enabled(&self, caller: MacroUserIdStr<'_>) -> bool {
+    async fn programmatic_calls_enabled(&self, caller: RoxUserIdStr<'_>) -> bool {
         match &self.programmatic_call_gate {
             Some(gate) => gate.enabled_for(caller).await,
             None => false,
@@ -733,30 +733,30 @@ impl<
 
     async fn prepare_meeting(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
     ) -> Result<MeetingPreparation, CallError> {
         self.prepare_invitation_room(actor).await
     }
     async fn cancel_meeting_preparation(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<(), CallError> {
         self.cancel_invitation_room(actor, id).await
     }
     async fn create_meeting(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         request: CreateMeetingRequest,
     ) -> Result<Meeting, CallError> {
         self.create_invitation(actor, request).await
     }
-    async fn list_meetings(&self, actor: MacroUserIdStr<'_>) -> Result<Vec<Meeting>, CallError> {
+    async fn list_meetings(&self, actor: RoxUserIdStr<'_>) -> Result<Vec<Meeting>, CallError> {
         self.repo.list_meetings(actor.as_ref()).await
     }
     async fn list_active_meetings(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
     ) -> Result<Vec<ActiveMeeting>, CallError> {
         self.repo
             .list_active_meetings(actor.as_ref())
@@ -765,7 +765,7 @@ impl<
     }
     async fn invite_to_meeting(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         token: MeetingToken,
         email: String,
     ) -> Result<(), CallError> {
@@ -773,14 +773,14 @@ impl<
     }
     async fn get_meeting_invite_permissions(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         token: MeetingToken,
     ) -> Result<MeetingInvitePermissions, CallError> {
         self.meeting_invite_permissions(actor, token).await
     }
     async fn invite_users_to_meeting(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         token: MeetingToken,
         request: InviteMeetingUsersRequest,
     ) -> Result<(), CallError> {
@@ -788,7 +788,7 @@ impl<
     }
     async fn update_meeting(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         meeting_id: &Uuid,
         request: UpdateMeetingRequest,
     ) -> Result<Meeting, CallError> {
@@ -799,7 +799,7 @@ impl<
     }
     async fn cancel_meeting(
         &self,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         meeting_id: &Uuid,
     ) -> Result<(), CallError> {
         if self.repo.cancel_meeting(meeting_id, actor.as_ref()).await? {
@@ -822,14 +822,14 @@ impl<
     async fn get_meeting_participants(
         &self,
         token: MeetingToken,
-        actor: Option<MacroUserIdStr<'_>>,
+        actor: Option<RoxUserIdStr<'_>>,
     ) -> Result<super::meetings::MeetingParticipants, CallError> {
         self.preview_invitation(token, actor).await
     }
     async fn join_meeting(
         &self,
         token: MeetingToken,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
     ) -> Result<CallTokenResponse, CallError> {
         self.join_invitation(
             token,
@@ -847,7 +847,7 @@ impl<
     async fn join_meeting_with_options(
         &self,
         token: MeetingToken,
-        actor: MacroUserIdStr<'_>,
+        actor: RoxUserIdStr<'_>,
         request: JoinCallRequest,
         credential_is_program: bool,
         agent_attributed: bool,
@@ -927,7 +927,7 @@ impl<
     #[tracing::instrument(err, skip(self))]
     async fn get_active_calls(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<ActiveCallsResponse, CallError> {
         let calls = self
             .repo
@@ -942,7 +942,7 @@ impl<
     async fn get_or_create_call(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<CallTokenResponse, CallError> {
         let (call, started) = match self
             .repo
@@ -995,9 +995,9 @@ impl<
                                 .ok();
                         }
 
-                        match MacroUserIdStr::parse_from_str(&call.created_by) {
+                        match RoxUserIdStr::parse_from_str(&call.created_by) {
                             Ok(created_by) => {
-                                self.publish_call_event(&CallMacroEvent::started(
+                                self.publish_call_event(&CallRoxEvent::started(
                                     CallStartedMetadata {
                                         call_id: call.id,
                                         channel_id: call.channel_id,
@@ -1126,7 +1126,7 @@ impl<
     async fn start_call(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         request: JoinCallRequest,
         credential_is_program: bool,
     ) -> Result<CallTokenResponse, CallError> {
@@ -1223,7 +1223,7 @@ impl<
     async fn join_call(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         request: JoinCallRequest,
         credential_is_program: bool,
     ) -> Result<CallTokenResponse, CallError> {
@@ -1372,7 +1372,7 @@ impl<
     async fn leave_call(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<LeaveCallResponse, CallError> {
         let call = self
             .repo
@@ -1397,7 +1397,7 @@ impl<
     async fn get_call_ring_state(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<RingStatusResponse, CallError> {
         let call = self
             .repo
@@ -1427,7 +1427,7 @@ impl<
     #[tracing::instrument(err, skip(self, user_id))]
     async fn get_live_calls(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<LiveCallsResponse, CallError> {
         let calls = self
             .repo
@@ -1482,7 +1482,7 @@ impl<
     async fn get_call_participants(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<LiveCallParticipantsResponse, CallError> {
         let call = self
             .repo
@@ -1508,7 +1508,7 @@ impl<
             .unwrap_or_default();
         for participant in &mut participants {
             if let Some(identity) = &participant.user_id {
-                let user = MacroUserIdStr::parse_from_str(identity)
+                let user = RoxUserIdStr::parse_from_str(identity)
                     .map_err(|e| CallError::Internal(e.into()))?;
                 participant.display_name = self
                     .repo
@@ -1525,7 +1525,7 @@ impl<
     async fn leave_or_end_call(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<LeaveCallResponse, CallError> {
         let Some(call) = self
             .repo
@@ -1569,7 +1569,7 @@ impl<
     async fn decline_call(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<(), CallError> {
         let call = self
             .repo
@@ -1912,7 +1912,7 @@ impl<
                         .set_recording_key(&call_id, recording_key)
                         .await
                         .map_err(|e| CallError::Internal(e.into()))?;
-                    self.publish_call_event(&CallMacroEvent::recording_ready(
+                    self.publish_call_event(&CallRoxEvent::recording_ready(
                         CallRecordingReadyMetadata {
                             call_id,
                             channel_id,
@@ -2039,7 +2039,7 @@ impl<
         if storage_keys.is_some()
             && let Some(channel_id) = channel_id
         {
-            self.publish_call_event(&CallMacroEvent::record_deleted(CallRecordDeletedMetadata {
+            self.publish_call_event(&CallRoxEvent::record_deleted(CallRecordDeletedMetadata {
                 call_id,
                 channel_id,
                 actor_user_id,
@@ -2156,7 +2156,7 @@ impl<
             )));
         }
 
-        let call_id = macro_uuid::string_to_uuid(&entity.entity_id)
+        let call_id = rox_uuid::string_to_uuid(&entity.entity_id)
             .map_err(|_| CallError::Internal(anyhow::anyhow!("invalid call entity receipt")))?;
         let actor_user_id = event_actor_user_id(receipt.auth());
 
@@ -2227,7 +2227,7 @@ impl<
             return Ok(());
         };
 
-        self.publish_call_event(&CallMacroEvent::record_updated(CallRecordUpdatedMetadata {
+        self.publish_call_event(&CallRoxEvent::record_updated(CallRecordUpdatedMetadata {
             call_id,
             channel_id: record.channel_id,
             actor_user_id,
@@ -2267,7 +2267,7 @@ impl<
             )));
         }
 
-        let call_id = macro_uuid::string_to_uuid(&entity.entity_id)
+        let call_id = rox_uuid::string_to_uuid(&entity.entity_id)
             .map_err(|_| CallError::Internal(anyhow::anyhow!("invalid call entity receipt")))?;
         let actor_user_id = event_actor_user_id(receipt.auth());
 
@@ -2307,7 +2307,7 @@ impl<
             self.repo.toggle_share_with_team(&call_id).await?
         };
 
-        self.publish_call_event(&CallMacroEvent::record_updated(CallRecordUpdatedMetadata {
+        self.publish_call_event(&CallRoxEvent::record_updated(CallRecordUpdatedMetadata {
             call_id,
             channel_id,
             actor_user_id,
@@ -2344,7 +2344,7 @@ impl<
             )));
         }
 
-        let call_id = macro_uuid::string_to_uuid(&entity.entity_id)
+        let call_id = rox_uuid::string_to_uuid(&entity.entity_id)
             .map_err(|_| CallError::Internal(anyhow::anyhow!("invalid call entity receipt")))?;
 
         self.repo
@@ -2357,7 +2357,7 @@ impl<
     async fn get_batch_call_record_previews<'a>(
         &self,
         request: GetBatchCallRecordPreviewRequest,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<GetBatchCallRecordPreviewResponse, CallError> {
         let previews = self
             .repo
@@ -2432,7 +2432,7 @@ impl<
         .await;
 
         if summary_persisted {
-            self.publish_call_event(&CallMacroEvent::record_summarized(
+            self.publish_call_event(&CallRoxEvent::record_summarized(
                 CallRecordSummarizedMetadata {
                     call_id: *call_id,
                     channel_id: record.channel_id,
@@ -2484,7 +2484,7 @@ impl<
     Sm: CallSummarizer + Clone,
     V: VoipPushSender,
     Vr: VoiceRepository + Clone,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 > CallServiceImpl<R, C, Cn, E, N, S, Sm, V, Vr, B>
 {
     /// Fire-and-forget spawn of [`CallService::summarize_call`] for `call_id`.
@@ -2564,7 +2564,7 @@ impl<
             if summary_persisted {
                 publish_call_event(
                     &event_broker,
-                    &CallMacroEvent::record_summarized(CallRecordSummarizedMetadata {
+                    &CallRoxEvent::record_summarized(CallRecordSummarizedMetadata {
                         call_id,
                         channel_id: record.channel_id,
                         ai_name_generated,
@@ -2594,19 +2594,19 @@ impl<
     }
 }
 
-pub(crate) fn publish_call_event<B: MacroEventBroker>(event_broker: &B, event: &CallMacroEvent) {
+pub(crate) fn publish_call_event<B: RoxEventBroker>(event_broker: &B, event: &CallRoxEvent) {
     drop(event_broker.send_event(event).inspect_err(|error| {
         tracing::error!(error = ?error, "failed to schedule call lifecycle event");
     }));
 }
 
-pub(crate) fn publish_call_notification<B: MacroEventBroker>(
+pub(crate) fn publish_call_notification<B: RoxEventBroker>(
     event_broker: &B,
     event: CallNotificationEvent,
 ) {
     drop(
         event_broker
-            .send_event(&CallNotificationMacroEvent::new(event))
+            .send_event(&CallNotificationRoxEvent::new(event))
             .inspect_err(|error| {
                 tracing::error!(error = ?error, "failed to schedule call notification");
             }),
@@ -2861,7 +2861,7 @@ impl CallSummarizer for NoopCallSummarizer {
     async fn generate_custom_speakers(
         &self,
         _transcript: Vec<EnrichedCallTranscript>,
-        _candidate_speakers: Vec<MacroUserIdStr<'static>>,
+        _candidate_speakers: Vec<RoxUserIdStr<'static>>,
     ) -> Result<Vec<CallTranscriptCustomSpeakerResult>, Self::Err> {
         unreachable!(
             "NoopCallSummarizer::generate_custom_speakers invoked; it exists only as a type placeholder when the optional summarizer is None"

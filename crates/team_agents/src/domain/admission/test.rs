@@ -6,15 +6,15 @@ use hosted_runtimes::domain::ids::ComputerId;
 const TEAM: Uuid = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_00aa);
 const OTHER_TEAM: Uuid = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_00bb);
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
-fn agent() -> MacroUserIdStr<'static> {
+fn agent() -> RoxUserIdStr<'static> {
     user("macro|sam-rivera-abc123@agents.macro.invalid")
 }
 
-fn admin() -> MacroUserIdStr<'static> {
+fn admin() -> RoxUserIdStr<'static> {
     user("macro|admin@example.com")
 }
 
@@ -43,7 +43,7 @@ impl AgentAccounts for FakeAccounts {
 
     async fn account_facts(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<Option<AgentAccountFacts>, Down> {
         if self.down {
             return Err(Down);
@@ -62,19 +62,19 @@ struct FakeComputers {
 impl ComputerAgents for FakeComputers {
     type Error = Down;
 
-    async fn agent_of(&self, _: ComputerId) -> Result<Option<MacroUserIdStr<'static>>, Down> {
+    async fn agent_of(&self, _: ComputerId) -> Result<Option<RoxUserIdStr<'static>>, Down> {
         unreachable!("admission looks computers up by agent")
     }
 
     async fn computer_for_agent(
         &self,
         _: Uuid,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<Option<ComputerId>, Down> {
         unreachable!("admission asks only whether one is live")
     }
 
-    async fn has_live_computer(&self, _: Uuid, _: &MacroUserIdStr<'_>) -> Result<bool, Down> {
+    async fn has_live_computer(&self, _: Uuid, _: &RoxUserIdStr<'_>) -> Result<bool, Down> {
         *self.calls.lock().unwrap() += 1;
         if self.down {
             return Err(Down);

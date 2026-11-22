@@ -4,11 +4,11 @@ import { initSync } from '@ironcalc/wasm';
 import {
   createInitializedSpreadsheetCalculator,
   type SpreadsheetCalculator,
-} from '@macro-inc/spreadsheet/calculation';
+} from '@rox-one/spreadsheet/calculation';
 import {
   readSpreadsheetCells,
   writeSpreadsheetCells,
-} from '@macro-inc/spreadsheet/spreadsheet-document';
+} from '@rox-one/spreadsheet/spreadsheet-document';
 import { LoroDoc } from 'loro-crdt';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import {

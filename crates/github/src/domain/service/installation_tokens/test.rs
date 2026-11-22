@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::models::AppJwt;
 use crate::domain::models::{
     EnrichedGithubPullRequest, GithubAuthenticatedUser, GithubKey, GithubPullRequestDetails,
-    GithubSetupAccessToken, GithubUserInstallation, MacroTaskId, ResolvedTeamTaskReference,
+    GithubSetupAccessToken, GithubUserInstallation, RoxTaskId, ResolvedTeamTaskReference,
     TeamTaskReference,
 };
 use std::collections::HashMap;
@@ -13,8 +13,8 @@ const TEST_PEM: &str = include_str!("test_key.pem");
 
 const INSTALLATION: u64 = 42;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
 }
 
 fn config() -> InstallationTokenConfig {
@@ -51,14 +51,14 @@ impl GithubSyncRepo for FakeRepo {
         Ok(self.teams.clone())
     }
 
-    async fn get_task_ids(&self, _github_key: GithubKey) -> Result<Vec<MacroTaskId>, Self::Err> {
+    async fn get_task_ids(&self, _github_key: GithubKey) -> Result<Vec<RoxTaskId>, Self::Err> {
         unimplemented!("minting a token does not read tasks")
     }
 
     async fn upsert_task_ids(
         &self,
         _github_key: GithubKey,
-        _task_ids: &[MacroTaskId],
+        _task_ids: &[RoxTaskId],
     ) -> Result<(), Self::Err> {
         unimplemented!("minting a token does not write tasks")
     }
@@ -66,8 +66,8 @@ impl GithubSyncRepo for FakeRepo {
     async fn filter_duplicate_tasks(
         &self,
         _github_key: GithubKey,
-        _task_ids: &[MacroTaskId],
-    ) -> Result<Vec<MacroTaskId>, Self::Err> {
+        _task_ids: &[RoxTaskId],
+    ) -> Result<Vec<RoxTaskId>, Self::Err> {
         unimplemented!("minting a token does not read tasks")
     }
 
@@ -104,7 +104,7 @@ impl GithubSyncRepo for FakeRepo {
     async fn get_team_member_ids(
         &self,
         _team_id: uuid::Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         unimplemented!("minting a token does not list team members")
     }
 

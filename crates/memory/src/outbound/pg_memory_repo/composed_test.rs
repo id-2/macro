@@ -1,8 +1,8 @@
 use super::PgMemoryRepo;
 use crate::domain::{models::*, ports::*};
 use chrono::NaiveDate;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
@@ -13,13 +13,13 @@ async fn explicit_edits_compare_revisions_and_cascade(pool: PgPool) {
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, macro_user_id)
     SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
     .unwrap();
     let repo = PgMemoryRepo::new(pool.clone());
-    let user = MacroUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
     assert_eq!(repo.explicit(&user).await.unwrap().revision, 0);
     let first = repo.save_explicit(&user, 0, "Be concise").await.unwrap();
     assert_eq!(first.revision, 1);
@@ -51,13 +51,13 @@ async fn generation_is_atomic_and_daily_rows_are_immutable(pool: PgPool) {
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, macro_user_id)
     SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
     .unwrap();
     let repo = PgMemoryRepo::new(pool);
-    let user = MacroUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
     let date = NaiveDate::from_ymd_opt(2026, 6, 17).unwrap();
     let mut daily = Activity {
         granularity: Granularity::Day,
@@ -91,13 +91,13 @@ async fn leases_preserve_first_failed_day_and_catch_up_sequentially(pool: PgPool
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, macro_user_id)
     SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
     .unwrap();
     let repo = PgMemoryRepo::new(pool.clone());
-    let user = MacroUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
     repo.enroll(&user).await.unwrap();
     sqlx::query!(
         "UPDATE memory_refresh_job SET created_at = '2026-06-18 12:00:00+00' WHERE user_id = $1",
@@ -154,13 +154,13 @@ async fn claims_count_attempts_per_day_and_retries_wait(pool: PgPool) {
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, macro_user_id)
     SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
     .unwrap();
     let repo = PgMemoryRepo::new(pool.clone());
-    let user = MacroUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
     repo.enroll(&user).await.unwrap();
     sqlx::query!(
         "UPDATE memory_refresh_job SET created_at = '2026-06-18 12:00:00+00' WHERE user_id = $1",
@@ -213,13 +213,13 @@ async fn staged_pieces_survive_until_the_day_commits(pool: PgPool) {
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, macro_user_id)
     SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
     .unwrap();
     let repo = PgMemoryRepo::new(pool);
-    let user = MacroUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|memory@example.com").unwrap();
     let date = NaiveDate::from_ymd_opt(2026, 6, 17).unwrap();
     let daily = Activity {
         granularity: Granularity::Day,

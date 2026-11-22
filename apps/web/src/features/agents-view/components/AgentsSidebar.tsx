@@ -154,7 +154,10 @@ function Row(props: {
   focused: boolean;
   onOpen: (event: MouseEvent) => void;
 }) {
-  const title = () => props.conversation.name || 'Untitled chat';
+  const title = () =>
+    props.conversation.name === 'Agent Session'
+      ? t('agentChat.defaultTitle')
+      : props.conversation.name || t('agentChat.untitledChat');
   return (
     <Show
       when={props.conversation.type === 'agent_session' && props.conversation}
@@ -396,15 +399,15 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
 
   return (
     <MaybeSoupEntityActionDrawerManager>
-      <ViewSidebar.Root ref={sidebar} aria-label="Agents navigation">
+      <ViewSidebar.Root ref={sidebar} aria-label="Навигация по агентам">
         <ViewSidebar.Header
-          searchLabel="Search conversations"
+          searchLabel="Поиск разговоров"
           searchOpen={searchOpen() || props.search.trim().length > 0}
           onSearchOpenChange={(open) => (open ? openSearch() : closeSearch())}
           search={() => (
             <ViewSidebar.Search
               ref={(element) => (searchInput = element)}
-              label="Search conversations"
+              label="Поиск разговоров"
               value={props.search}
               onValueChange={props.onSearchChange}
               focusResults={() => listRoot?.focus({ preventScroll: true })}
@@ -414,7 +417,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
         >
           <div class="flex min-w-0 items-center gap-1">
             <ViewSidebar.CloseButton />
-            <ViewSidebar.Title>Agents</ViewSidebar.Title>
+            <ViewSidebar.Title>Агенты</ViewSidebar.Title>
           </div>
         </ViewSidebar.Header>
 
@@ -431,14 +434,14 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
         <ViewSidebar.Content
           ref={listRoot}
           role="group"
-          aria-label="Conversations"
+          aria-label="Разговоры"
           tabIndex={isTouchDevice() ? undefined : -1}
           aria-activedescendant={focusedRowId()}
           class="gap-2 overflow-hidden pt-2 outline-none"
         >
           <SidebarRoutineSuggestions surface="agents" />
           <Show when={!isTouchDevice()}>
-            <ViewSidebar.Nav aria-label="Agent tools">
+            <ViewSidebar.Nav aria-label={t('agentChat.agentTools')}>
               <ViewSidebar.Item
                 active={props.activePage === 'agents'}
                 onClick={() => props.onOpenPage('agents')}
@@ -447,7 +450,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
                 <ViewSidebar.Icon>
                   <AgentIcon />
                 </ViewSidebar.Icon>
-                <span>Agents</span>
+                <span>Агенты</span>
               </ViewSidebar.Item>
               <ViewSidebar.Item
                 active={props.activePage === 'routines'}
@@ -456,7 +459,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
                 <ViewSidebar.Icon>
                   <RoutineIcon />
                 </ViewSidebar.Icon>
-                <span>Routines</span>
+                <span>Рутины</span>
               </ViewSidebar.Item>
               <ViewSidebar.Item
                 active={props.activePage === 'connections'}
@@ -465,7 +468,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
                 <ViewSidebar.Icon>
                   <PlugIcon />
                 </ViewSidebar.Icon>
-                <span>Connections</span>
+                <span>Подключения</span>
               </ViewSidebar.Item>
             </ViewSidebar.Nav>
           </Show>
@@ -480,7 +483,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
             >
               <CollapsibleSection.Header>
                 <CollapsibleSection.Trigger>
-                  <span class="min-w-0 truncate">Open PRs</span>
+                  <span class="min-w-0 truncate">{t('agentChat.openPrs')}</span>
                   <span class="text-ink-extra-muted tabular-nums">
                     {openPullRequests().length}
                   </span>
@@ -490,7 +493,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
               <CollapsibleSection.Content class="flex min-h-0 flex-col">
                 <ViewSidebar.Nav
                   class="min-h-0 shrink overflow-auto"
-                  aria-label="Open pull requests"
+                  aria-label={t('agentChat.openPullRequests')}
                 >
                   {rows('pull-request', openPullRequests)}
                 </ViewSidebar.Nav>
@@ -507,7 +510,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
           >
             <CollapsibleSection.Header>
               <CollapsibleSection.Trigger class="flex-1">
-                <span class="min-w-0 truncate">Conversations</span>
+                <span class="min-w-0 truncate">Разговоры</span>
                 <CollapsibleSection.Indicator />
               </CollapsibleSection.Trigger>
               <ConversationListControls
@@ -521,7 +524,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
               />
               <Show when={isTouchDevice()}>
                 <CollapsibleSection.Action
-                  aria-label="Search conversations"
+                  aria-label={t('agentChat.searchConversations')}
                   aria-pressed={searchOpen()}
                   class={cn(searchOpen() && 'bg-active text-ink')}
                   onClick={() => (searchOpen() ? closeSearch() : openSearch())}
@@ -534,8 +537,8 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
               <Show when={isTouchDevice() && searchOpen()}>
                 <SearchBar
                   ref={searchInput}
-                  placeholder="Search conversations"
-                  label="Search conversations"
+                  placeholder={t('agentChat.searchConversations')}
+                  label={t('agentChat.searchConversations')}
                   value={props.search}
                   onValueChange={props.onSearchChange}
                   onEscape={() => {
@@ -546,7 +549,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
               </Show>
               <ViewSidebar.Nav
                 class="min-h-0 flex-1 shrink overflow-auto"
-                aria-label="Recent conversations"
+                aria-label={t('agentChat.recentConversations')}
                 aria-busy={props.loading || props.loadingNextPage}
                 onScroll={loadMoreNearEnd}
               >
@@ -573,21 +576,23 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
                 <Show when={props.error}>
                   <ViewSidebar.Item onClick={props.onRetry}>
                     <ViewSidebar.Icon />
-                    <span class="truncate">Retry loading</span>
+                    <span class="truncate">{t('agentChat.retryLoading')}</span>
                   </ViewSidebar.Item>
                 </Show>
                 <Show when={!props.loading && !props.error && total() === 0}>
                   <p class="px-(--sidebar-item-inset) py-2 text-xs text-ink-muted">
                     {props.search.trim()
-                      ? `No results for "${props.search.trim()}"`
+                      ? `Нет результатов для «${props.search.trim()}»`
                       : filtering()
-                        ? 'No conversations match these filters.'
-                        : 'No conversations yet.'}
+                        ? 'Нет разговоров по этим фильтрам.'
+                        : 'Разговоров пока нет.'}
                   </p>
                   <Show when={filtering()}>
                     <ViewSidebar.Item onClick={props.onClearFilters}>
                       <ViewSidebar.Icon />
-                      <span class="truncate">Clear filters</span>
+                      <span class="truncate">
+                        {t('viewMenus.clearFilters')}
+                      </span>
                     </ViewSidebar.Item>
                   </Show>
                 </Show>
@@ -602,7 +607,7 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
               open={archivedOpen()}
               onOpenChange={setArchivedOpen}
               as="section"
-              aria-label="Archived conversations"
+              aria-label={t('agentChat.archivedConversations')}
               class={cn(
                 'mt-auto flex min-h-0 flex-col border-t border-edge-muted pt-2',
                 archivedOpen() ? 'basis-1/4' : 'shrink-0'
@@ -610,7 +615,9 @@ export function AgentsSidebar(props: AgentsSidebarProps) {
             >
               <CollapsibleSection.Header>
                 <CollapsibleSection.Trigger>
-                  <span class="min-w-0 truncate">Archived</span>
+                  <span class="min-w-0 truncate">
+                    {t('agentChat.archivedGroup')}
+                  </span>
                   <span class="text-ink-extra-muted tabular-nums">
                     {archived().length}
                   </span>
@@ -647,7 +654,7 @@ export function AgentCreateMenu(props: {
         as={ViewCreateButton}
         presentation="sidebar"
         menu
-        aria-label="New conversation or agent"
+        aria-label={t('agentChat.newConversationOrAgent')}
       />
       <Dropdown.Content
         class="w-80 max-w-[calc(100vw-2rem)]"

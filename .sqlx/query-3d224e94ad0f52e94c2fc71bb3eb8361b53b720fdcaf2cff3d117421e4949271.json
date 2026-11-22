@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT open_count, first_opened_at FROM email_message_read_receipts WHERE message_id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "open_count",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "first_opened_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true
+    ]
+  },
+  "hash": "3d224e94ad0f52e94c2fc71bb3eb8361b53b720fdcaf2cff3d117421e4949271"
+}

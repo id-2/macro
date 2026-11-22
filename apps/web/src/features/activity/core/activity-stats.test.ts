@@ -1,10 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   formatDayLabel,
   formatMonthName,
   formatStreak,
   summarizeActivity,
 } from './activity-stats';
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 describe('summarizeActivity', () => {
   it('returns empty peaks and zero streaks for an empty window', () => {

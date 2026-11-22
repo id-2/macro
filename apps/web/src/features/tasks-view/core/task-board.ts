@@ -13,11 +13,11 @@ export const TASK_BOARD_GROUP_OPTIONS: {
   id: TaskBoardGrouping;
   label: string;
 }[] = [
-  { id: 'status', label: 'Status' },
-  { id: 'priority', label: 'Priority' },
-  { id: 'assignee', label: 'Assignee' },
-  { id: 'project', label: 'Project' },
-  { id: 'due_date', label: 'Due date' },
+  { id: 'status', label: 'Статус' },
+  { id: 'priority', label: 'Приоритет' },
+  { id: 'assignee', label: 'Исполнитель' },
+  { id: 'project', label: 'Проект' },
+  { id: 'due_date', label: 'Срок' },
 ];
 
 /** List-only groupings display Status columns in the board layout. */

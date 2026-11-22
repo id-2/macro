@@ -1,6 +1,6 @@
 //! Implementation of [`AiProjectionRepository`] backed by RoxDB.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use crate::domain::{
@@ -401,7 +401,7 @@ impl AiProjectionRepository for AiProjectionRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn user_has_permission(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         permission: &str,
     ) -> Result<bool, AiProjectionError> {
         let has_permission = sqlx::query_scalar!(
@@ -426,7 +426,7 @@ impl AiProjectionRepository for AiProjectionRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn get_user_team_ids(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<uuid::Uuid>, AiProjectionError> {
         let team_ids = sqlx::query_scalar!(
             r#"

@@ -1,24 +1,24 @@
 use ::activity::{Action, Actor};
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType as ActivityEntityType;
 use uuid::Uuid;
 
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 use models_properties::service::property_value::PropertyValue;
 
 use super::*;
 use crate::domain::events::EntityPropertyUpdatedMetadata;
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn envelope(event: PropertyTopicEvent) -> Event<PropertyTopicEvent> {
     Event::with_event_id(Uuid::now_v7(), event)
 }
 
-fn update(actor: Option<MacroUserIdStr<'static>>) -> EntityPropertyUpdatedMetadata {
+fn update(actor: Option<RoxUserIdStr<'static>>) -> EntityPropertyUpdatedMetadata {
     EntityPropertyUpdatedMetadata {
         inherited_from_project: None,
         entity_property_id: Uuid::from_u128(4),

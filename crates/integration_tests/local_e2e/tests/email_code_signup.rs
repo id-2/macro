@@ -95,7 +95,7 @@ impl Auth {
             .and_then(Value::as_str)
             .map(str::to_owned)
             .context(
-                "passwordless start returned no code; build auth with return_passwordless_code",
+                "passwordless start returned no code; run auth with PASSWORDLESS_RETURN_CODE=true",
             )
     }
 

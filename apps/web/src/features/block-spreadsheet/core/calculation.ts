@@ -3,9 +3,9 @@ import wasmUrl from '@ironcalc/wasm/wasm_bg.wasm?url';
 import {
   createInitializedSpreadsheetCalculator,
   type SpreadsheetCalculator,
-} from '@macro-inc/spreadsheet/calculation';
+} from '@rox-one/spreadsheet/calculation';
 
-export * from '@macro-inc/spreadsheet/calculation';
+export * from '@rox-one/spreadsheet/calculation';
 
 // Browser-specific WASM loading stays here; calculation is shared with AI tools.
 let initialization: Promise<unknown> | undefined;

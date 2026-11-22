@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Json},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::document::list::{DocumentListFilters, ListDocumentsWithAccessResponse};
 use model::response::GenericErrorResponse;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -48,7 +48,7 @@ pub struct ListDocumentsWithAccessQuery {
 #[tracing::instrument(skip(ctx, user), fields(user_id=?user.authorization.user.macro_user_id))]
 pub async fn list_documents_with_access_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Query(query): Query<ListDocumentsWithAccessQuery>,
 ) -> impl IntoResponse {
     let page_size = if query.page_size <= 0 || query.page_size > MAX_PAGE_SIZE {
@@ -91,7 +91,7 @@ pub async fn list_documents_with_access_handler(
         None => AccessLevel::View,
     };
 
-    let documents = match macro_db_client::document::list_documents_with_access(
+    let documents = match rox_db_client::document::list_documents_with_access(
         &ctx.db,
         user.authorization.user.macro_user_id.as_ref(),
         &filters,

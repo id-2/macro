@@ -49,7 +49,7 @@ vi.mock('@app/features/local-runtime/local-runtime-setup', () => ({
 }));
 let currentUser: () => string | undefined = () => 'user-1';
 vi.mock('@core/context/user', () => ({ useUserId: () => currentUser }));
-vi.mock('@macro/tauri/roxd', () => ({
+vi.mock('@rox/tauri/roxd', () => ({
   roxdSupport: async () => ({
     supported: mocks.supported,
     defaultWorkspace: '/Users/me/Rox',

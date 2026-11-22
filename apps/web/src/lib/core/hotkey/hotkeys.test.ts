@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createRoot } from 'solid-js';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { createHotkeyGroup, registerHotkey, useHotKeyRoot } from './hotkeys';

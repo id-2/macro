@@ -7,7 +7,7 @@ use crate::outbound::email_api::{
 };
 use email::domain::ports::EmailService;
 use email_api_client::GmailApiClientRepository;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::gmail::gmail_ops::{GmailOpsOperation, GmailOpsPubsubMessage};
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -171,7 +171,7 @@ pub fn decode_label_op(body: &str) -> Option<LabelOp> {
 /// the service reported as not changed.
 pub async fn archive_many<S: EmailService>(
     service: &S,
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     threads: Vec<Uuid>,
     archived: bool,
 ) -> Result<Vec<Uuid>, String> {

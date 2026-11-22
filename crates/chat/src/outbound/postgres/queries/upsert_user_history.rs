@@ -1,13 +1,13 @@
 //! Upsert a chat entry in the user's history.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Postgres, Transaction};
 
 /// Record that the user accessed this chat in their history.
 #[tracing::instrument(err, skip(tx))]
 pub(crate) async fn upsert_user_history(
     tx: &mut Transaction<'_, Postgres>,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     chat_id: &str,
 ) -> anyhow::Result<()> {
     sqlx::query!(

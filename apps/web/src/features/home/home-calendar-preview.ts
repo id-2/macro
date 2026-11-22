@@ -16,7 +16,7 @@ import { homeCalendarRoute } from '@app/routes/routes';
 import { globalSplitManager } from '@app/signal/splitLayout';
 import { previewCalendarTarget } from '@components/app/previewTarget';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import deepEqual from 'fast-deep-equal';
 import { createSignal } from 'solid-js';
 import { homeCalendarNavigation } from './home-preview-navigation';

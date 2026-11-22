@@ -1,5 +1,5 @@
-import type { SpreadsheetCellValue } from '@macro-inc/spreadsheet/ai-types';
-import { TABLE_COLUMN_TYPES } from '@macro-inc/spreadsheet/sheet-tables';
+import type { SpreadsheetCellValue } from '@rox-one/spreadsheet/ai-types';
+import { TABLE_COLUMN_TYPES } from '@rox-one/spreadsheet/sheet-tables';
 import { z } from 'zod';
 
 const sheetId = z.string().min(1).max(64);

@@ -8,9 +8,9 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroCallsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxCallsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -22,7 +22,7 @@ pub struct CallStartedMetadata {
     /// Identifier of the channel containing the call.
     pub channel_id: Option<Uuid>,
     /// User who created the call.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// Time at which the call was created.
     pub created_at: DateTime<Utc>,
     /// Whether recording was enabled when the call started.
@@ -47,7 +47,7 @@ pub struct CallRecordArchivedMetadata {
     /// Identifier of the channel containing the call record.
     pub channel_id: Option<Uuid>,
     /// User who created the call.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// Time at which the call started.
     pub started_at: DateTime<Utc>,
     /// Time at which the call was archived.
@@ -59,7 +59,7 @@ pub struct CallRecordArchivedMetadata {
     /// Rox accounts that joined the call over its lifetime. Empty in events
     /// published before this field existed.
     #[serde(default)]
-    pub participants: Vec<MacroUserIdStr<'static>>,
+    pub participants: Vec<RoxUserIdStr<'static>>,
     /// Whether the call has an associated recording.
     pub has_recording: bool,
     /// Reason the call was archived.
@@ -78,7 +78,7 @@ pub struct CallRecordUpdatedMetadata {
     /// Identifier of the channel containing the call record.
     pub channel_id: Option<Uuid>,
     /// User who updated the record, or `None` for an internal caller.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// New custom display name, or `None` when unchanged.
     pub custom_name: Option<String>,
     /// New team-sharing value, or `None` when unchanged.
@@ -93,7 +93,7 @@ pub struct CallRecordDeletedMetadata {
     /// Identifier of the channel that contained the call record.
     pub channel_id: Option<Uuid>,
     /// User who deleted the record, or `None` for an internal caller.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
 }
 
 /// Metadata for [`CallTopicEvent::RecordSummarized`].
@@ -122,10 +122,10 @@ pub struct CallRecordImportedMetadata {
     /// Identifier of the created or refreshed call record.
     pub call_id: Uuid,
     /// Connected Rox user who owns the imported record.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
 }
 
-/// Lifecycle and recording events published to [`MacroCallsTopic`].
+/// Lifecycle and recording events published to [`RoxCallsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum CallTopicEvent {
@@ -153,18 +153,18 @@ pub enum CallTopicEvent {
 }
 
 impl TopicEvent for CallTopicEvent {
-    type Topic = MacroCallsTopic;
+    type Topic = RoxCallsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroCallsTopic`], keyed by the call's bare id.
-pub struct CallMacroEvent {
+/// Publishable event for [`RoxCallsTopic`], keyed by the call's bare id.
+pub struct CallRoxEvent {
     key: String,
     event: Event<CallTopicEvent>,
 }
 
-impl CallMacroEvent {
+impl CallRoxEvent {
     /// Build a call-started event keyed by the call id.
     pub fn started(metadata: CallStartedMetadata) -> Self {
         let key = metadata.call_id.to_string();
@@ -216,7 +216,7 @@ impl CallMacroEvent {
     }
 }
 
-impl MacroEvent for CallMacroEvent {
+impl RoxEvent for CallRoxEvent {
     type EventPayload = CallTopicEvent;
 
     fn key(&self) -> &str {

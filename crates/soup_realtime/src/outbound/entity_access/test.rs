@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use entity_access::domain::models::{AccessError, EntityAudience};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 
@@ -11,7 +11,7 @@ type LookupCalls = Arc<Mutex<Vec<(EntityType, Vec<String>)>>>;
 #[derive(Clone)]
 struct RecordingLookup {
     calls: LookupCalls,
-    users: Vec<MacroUserIdStr<'static>>,
+    users: Vec<RoxUserIdStr<'static>>,
 }
 
 impl EntityAudienceLookup for RecordingLookup {
@@ -35,8 +35,8 @@ impl EntityAudienceLookup for RecordingLookup {
     }
 }
 
-fn user(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 #[tokio::test]

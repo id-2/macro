@@ -56,7 +56,7 @@ It does not create teams or change Postgres.
 Ordinary container and stack restarts retain namespaces, mounts, auth roles,
 policies, values, versions, and TOTP seeds. Use `docker compose restart` with the
 instance's project and Compose files for a non-destructive restart. Set
-`MACRO_ENV_FILE` to the instance's absolute `local.generated.env` path when
+`ROX_ENV_FILE` to the instance's absolute `local.generated.env` path when
 invoking Compose manually; `--env-file` alone does not select the services'
 environment file. Compose
 `down` followed by `up` also preserves named volumes when `--volumes` is omitted.
@@ -84,10 +84,11 @@ JWT leeway is explicitly disabled; hosted issuer and provider clocks must stay
 synchronized so credential expiration and cleanup deadlines remain bounded.
 The JWT `audit_id` claim maps to token audit metadata for KV/auth correlation.
 Operators can correlate HMAC-protected metadata through OpenBao's audit hash API;
-TOTP HTTP requests also carry the nonsecret `x-macro-audit-id` header.
+TOTP HTTP requests also carry the nonsecret `x-rox-audit-id` header (older
+clients still write `x-macro-audit-id`).
 Declarative root namespace audit device `passwords` emits HMAC-redacted events to stdout;
 never enable `log_raw`. Standard local container log rotation bounds retention.
-Bootstrap allows the non-secret `x-macro-audit-id` header in cleartext audit records
+Bootstrap allows the non-secret `x-rox-audit-id` and `x-macro-audit-id` headers in cleartext audit records
 so application trace IDs can correlate provider operations without revealing values.
 
 Run the real-provider integration check against an isolated local OpenBao. Load

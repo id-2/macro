@@ -3,7 +3,7 @@ use crate::domain::released_attachments::ReleasedAttachmentRepo;
 use crate::domain::released_attachments::orphans::{
     OrphanCause, OrphanedAttachmentScan, ScanCounts, ScanOptions, ScanProgress, ScanProgressStore,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use std::sync::Mutex;
 

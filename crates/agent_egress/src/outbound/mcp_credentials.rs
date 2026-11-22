@@ -14,7 +14,7 @@
 //! connected in Rox is an app the sandbox can reach, with nothing to keep
 //! in sync.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::models::PipedreamConnection;
 use pipedream_mcp::domain::ports::ConnectionStore;
 use pipedream_mcp::outbound::api::McpUpstream;
@@ -57,7 +57,7 @@ where
     /// turned off, and turning it off has to take the sandbox's access with it.
     async fn connection(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         slug: &McpServerSlug,
     ) -> Result<Option<PipedreamConnection>, EgressError> {
         Ok(self
@@ -87,13 +87,13 @@ where
     #[tracing::instrument(skip_all, err, fields(%owner, ?destination))]
     async fn resolve(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         _agent: bot_id::BotId,
         _session: uuid::Uuid,
         destination: &McpDestination,
     ) -> Result<McpResolution, EgressError> {
         // Rox's own server is the composition root's to layer on with
-        // [`crate::outbound::macro_mcp::WithMacroMcp`]; these rows can never
+        // [`crate::outbound::macro_mcp::WithRoxMcp`]; these rows can never
         // answer for it.
         let McpDestination::Connected(slug) = destination else {
             return Err(EgressError::Internal(rootcause::report!(

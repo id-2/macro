@@ -1,5 +1,5 @@
-import { ARTIFACT_HTML_MAX_LENGTH } from '@macro-inc/graphics';
-import { ARTIFACT_LIBRARY_ENTRY_MAX_LENGTH } from '@macro-inc/graphics/loro';
+import { ARTIFACT_HTML_MAX_LENGTH } from '@rox-one/graphics';
+import { ARTIFACT_LIBRARY_ENTRY_MAX_LENGTH } from '@rox-one/graphics/loro';
 import { z } from 'zod';
 
 const coordinate = z.number().finite().min(-1_000_000).max(1_000_000);

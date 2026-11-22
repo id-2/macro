@@ -22,9 +22,9 @@ export function BotCreationResult(props: {
           <CheckCircleIcon class="size-5" />
         </div>
         <div class="min-w-0">
-          <h1 class="text-lg font-semibold tracking-[-0.01em]">Bot created</h1>
+          <h1 class="text-lg font-semibold tracking-[-0.01em]">Бот создан</h1>
           <p class="mt-0.5 text-sm text-ink-muted">
-            Copy the credentials now. The token is shown only once.
+            Скопируйте данные сейчас. Токен показывается только один раз.
           </p>
         </div>
       </header>
@@ -56,9 +56,9 @@ export function BotCreationResult(props: {
         <For each={props.channels}>
           {(channel) => (
             <CredentialField
-              label={`${channel.name} webhook URL`}
+              label={`Пример адреса вебхука: ${channel.name}`}
               value={channelWebhookUrl(channel.id)}
-              help="Paste into GitHub or any webhook provider"
+              help="Вставьте в GitHub или к другому поставщику вебхуков"
             />
           )}
         </For>
@@ -68,27 +68,27 @@ export function BotCreationResult(props: {
           fallback={
             <div class="rounded-lg border border-alert/30 bg-alert-bg px-3 py-2.5 text-xs text-alert-ink">
               {props.tokenFailed
-                ? 'The bot was created, but its first token could not be generated. Use New token on the Bots settings page to retry.'
-                : 'No token was generated.'}
+                ? 'Бот создан, но первый токен не удалось выпустить. Нажмите «Новый токен» на странице ботов и попробуйте снова.'
+                : 'Токен не был выпущен.'}
             </div>
           }
         >
           {(token) => (
             <>
               <CredentialField
-                label="Bot token"
+                label="Токен бота"
                 value={token()}
-                help="Use with the Rox SDK, or send as x-macro-channel-bot-token for webhooks."
+                help="Используйте с SDK Rox или передайте техническим заголовком для вебхуков."
               />
               <Show when={props.channels[0]}>
                 {(channel) => (
                   <CredentialField
-                    label="Example request"
+                    label="Пример запроса"
                     value={webhookExample(
                       channelWebhookUrl(channel().id),
                       token()
                     )}
-                    help="Copy and run"
+                    help="Скопируйте и выполните"
                   />
                 )}
               </Show>
@@ -98,8 +98,8 @@ export function BotCreationResult(props: {
 
         <Show when={props.channels.length === 0}>
           <div class="rounded-lg border border-edge-muted bg-ink/[0.025] px-3 py-2.5 text-xs text-ink-muted">
-            Invite this bot to a channel to get its webhook URL. The token above
-            will still work after it is invited.
+            Пригласите этого бота в канал, чтобы получить адрес вебхука. Токен
+            выше продолжит работать и после приглашения.
           </div>
         </Show>
       </div>
@@ -111,7 +111,7 @@ export function BotCreationResult(props: {
           size="sm"
           onClick={props.onDone}
         >
-          Done
+          Готово
         </Button>
       </div>
     </div>

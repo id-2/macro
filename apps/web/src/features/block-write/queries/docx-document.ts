@@ -1,5 +1,5 @@
 import { thrownResultErrorHasCode } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import { downloadExportedDocument } from '@service-storage/util/downloadExportedDocument';
 import { syncServiceClient } from '@service-sync/client';

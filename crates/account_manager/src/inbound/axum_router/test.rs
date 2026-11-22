@@ -4,9 +4,9 @@ use crate::domain::{
     ports::ClaimedCredential,
 };
 use axum::{body::Body, http::Request};
-use macro_authorization::{
-    CredentialOrigin, InternalAuthConfig, JwtValidator, MacroAuthorizationError,
-    MacroAuthorizationServiceImpl, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
+use rox_authorization::{
+    CredentialOrigin, InternalAuthConfig, JwtValidator, RoxAuthorizationError,
+    RoxAuthorizationServiceImpl, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
     ValidatedIdentity,
 };
 use rootcause::Report;
@@ -30,28 +30,28 @@ impl Reached {
 impl AccountManagerService for Reached {
     async fn request(
         &self,
-        _: &MacroUserIdStr<'static>,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: AccountManagerRole,
     ) -> Result<AccountManagerGrant, AccountManagerError> {
         self.reached()
     }
     async fn get(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
     ) -> Result<AccountManagerGrant, AccountManagerError> {
         self.reached()
     }
     async fn list_managers(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
     ) -> Result<Vec<AccountManagerGrant>, AccountManagerError> {
         self.reached()
     }
     async fn respond(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
         _: AccountManagerDecision,
     ) -> Result<AccountManagerGrant, AccountManagerError> {
@@ -59,14 +59,14 @@ impl AccountManagerService for Reached {
     }
     async fn claim(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
     ) -> Result<ClaimedCredential, AccountManagerError> {
         self.reached()
     }
     async fn revoke(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
     ) -> Result<AccountManagerGrant, AccountManagerError> {
         self.reached()
@@ -82,7 +82,7 @@ impl JwtValidator for Validator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         let agent = jwt.strip_prefix("agent:");
         let routine = jwt.strip_prefix("routine:");
         let user_id = agent.or(routine).unwrap_or(jwt);
@@ -90,7 +90,7 @@ impl JwtValidator for Validator {
             origin: if user_id == jwt {
                 CredentialOrigin::Session
             } else {
-                CredentialOrigin::MacroApiJwt
+                CredentialOrigin::RoxApiJwt
             },
             identity: ValidatedIdentity {
                 agent_id: agent.map(|_| bot_id::MACRO_AI_BOT_ID),
@@ -106,7 +106,7 @@ impl JwtValidator for Validator {
 }
 
 fn router(service: Arc<Reached>) -> axum::Router {
-    let authorization = MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
+    let authorization = RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
         Validator,
         InternalAuthConfig {
             api_key: "test-internal-key".to_owned(),
@@ -125,7 +125,7 @@ fn requests(bearer: &str, code_execution: bool) -> Vec<(&'static str, Request<Bo
             .header("authorization", format!("Bearer {bearer}"))
             .header("content-type", "application/json");
         if code_execution {
-            request = request.header(macro_authorization::CODE_EXECUTION_HEADER, "1");
+            request = request.header(rox_authorization::CODE_EXECUTION_HEADER, "1");
         }
         request.body(Body::from(body)).unwrap()
     };

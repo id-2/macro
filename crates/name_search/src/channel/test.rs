@@ -2,7 +2,7 @@
 
 use std::collections::BTreeSet;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 use super::*;
@@ -22,8 +22,8 @@ const UNKNOWN_BOT_DM: &str = "dddddddd-dddd-dddd-dddd-dddddddddddd";
 const MEMBER: &str = "macro|member@test.com";
 const GABRIEL: &str = "macro|gabriel@test.com";
 
-fn user(id: &str) -> MacroUserId<Lowercase<'_>> {
-    MacroUserId::parse_from_str(id).unwrap().lowercase()
+fn user(id: &str) -> RoxUserId<Lowercase<'_>> {
+    RoxUserId::parse_from_str(id).unwrap().lowercase()
 }
 
 fn ids(results: &PaginatedResult<NameSearchResult>) -> Vec<String> {
@@ -593,7 +593,7 @@ async fn results_match_the_names_the_viewer_sees(pool: Pool<Postgres>) -> anyhow
     .fetch_all(&pool)
     .await?;
     let resolved_names =
-        batch_resolve_channel_names(&pool, &channel_ids, MacroUserIdStr(viewer.clone())).await?;
+        batch_resolve_channel_names(&pool, &channel_ids, RoxUserIdStr(viewer.clone())).await?;
     assert_eq!(resolved_names.len(), 11);
 
     for term in [

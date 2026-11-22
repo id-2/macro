@@ -1,5 +1,5 @@
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::models::{
     AgentKeyError, AgentKeyStatus, AgentOwner, EncryptedProviderApiKey, ModelProvider,
@@ -47,7 +47,7 @@ pub trait AgentKeyRepo: Send + Sync + 'static {
     async fn stored(&self, bot_id: Uuid) -> Result<Option<StoredAgentKey>>;
 
     /// Whether `user` is currently a member of `team_id`.
-    async fn is_team_member(&self, user: &MacroUserIdStr<'_>, team_id: Uuid) -> Result<bool>;
+    async fn is_team_member(&self, user: &RoxUserIdStr<'_>, team_id: Uuid) -> Result<bool>;
 }
 
 /// Whether an agent owner's plan includes agents' own API keys.
@@ -71,14 +71,14 @@ pub trait AgentKeys: Send + Sync + 'static {
     async fn usable_provider(
         &self,
         bot_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<ModelProvider>>;
 
     /// The key the agent's next turn runs on, decrypted for that turn.
     async fn usable_key(
         &self,
         bot_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<UsableAgentKey>>;
 }
 
@@ -91,7 +91,7 @@ impl AgentKeys for NoAgentKeys {
     async fn usable_provider(
         &self,
         _bot_id: Uuid,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
     ) -> Result<Option<ModelProvider>> {
         Ok(None)
     }
@@ -99,7 +99,7 @@ impl AgentKeys for NoAgentKeys {
     async fn usable_key(
         &self,
         _bot_id: Uuid,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
     ) -> Result<Option<UsableAgentKey>> {
         Ok(None)
     }

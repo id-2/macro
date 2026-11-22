@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { VideoContent } from '@block-video/component/VideoContent';
 import { createFileDownload } from '@core/util/createFileDownload';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -72,7 +73,7 @@ export function VideoDetail(props: {
     <FileDetailLoadGate
       documentId={props.documentId}
       entityType="video"
-      label="video"
+      label={t('drive.entityVideo')}
       load={loadVideoDocument}
     >
       {(data) => (

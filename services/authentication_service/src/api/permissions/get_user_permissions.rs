@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 
 use crate::api::context::{ApiContext, AuthorizationService};
 
@@ -22,9 +22,9 @@ use crate::api::context::{ApiContext, AuthorizationService};
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=%authorization.authorization.user.user_context.user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, Response> {
-    let permissions = macro_db_client::user::get_permissions::get_user_permissions(
+    let permissions = rox_db_client::user::get_permissions::get_user_permissions(
         &ctx.db,
         &authorization.authorization.user.user_context.user_id,
     )

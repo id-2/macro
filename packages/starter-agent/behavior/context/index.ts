@@ -21,9 +21,9 @@ import {
   envFileCredentials,
   parseEnvFile,
   withheldCredentials,
-} from '@macro-inc/muppet/utilities/credentials';
-import type { Clock } from '@macro-inc/muppet/utilities/time';
-import { Macro } from '@macro-inc/sdk';
+} from '@rox-one/muppet/utilities/credentials';
+import type { Clock } from '@rox-one/muppet/utilities/time';
+import { Macro } from '@rox-one/sdk';
 import {
   type Authority,
   authority,
@@ -57,7 +57,7 @@ import { state as makeState, type State } from './state.ts';
 import { trace } from './telemetry.ts';
 
 /** The credential holding the key of the agent's own Rox account. */
-export const macroKey = 'MACRO_API_KEY';
+export const macroKey = 'ROX_API_KEY';
 
 type Environment = Readonly<Record<string, string | undefined>>;
 

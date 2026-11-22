@@ -131,23 +131,23 @@ lexical_client = { path = "../../crates/lexical_client" }
 lexical_mention_extractor = { path = "../../crates/lexical_mention_extractor" }
 log = { workspace = true }
 lru = { workspace = true }
-macro_auth = { path = "../../crates/macro_auth" }
-macro_authorization = { path = "../../crates/macro_authorization", features = ["axum", "outbound", "postgres"] }
-macro_aws_config = { path = "../../crates/macro_aws_config", features = ["s3"] }
-macro_config = { path = "../../crates/macro_config" }
-macro_cors = { path = "../../crates/macro_cors" }
-macro_db_client = { path = "../../crates/macro_db_client" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env = { path = "../../crates/macro_env" }
-macro_env_var = { path = "../../crates/macro_env_var" }
-macro_event_broker = { path = "../../crates/macro_event_broker", features = ["outbound"] }
+rox_auth = { path = "../../crates/rox_auth" }
+rox_authorization = { path = "../../crates/rox_authorization", features = ["axum", "outbound", "postgres"] }
+rox_aws_config = { path = "../../crates/rox_aws_config", features = ["s3"] }
+rox_config = { path = "../../crates/rox_config" }
+rox_cors = { path = "../../crates/rox_cors" }
+rox_db_client = { path = "../../crates/rox_db_client" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env = { path = "../../crates/rox_env" }
+rox_env_var = { path = "../../crates/rox_env_var" }
+rox_event_broker = { path = "../../crates/rox_event_broker", features = ["outbound"] }
 soup_realtime = { path = "../../crates/soup_realtime", default-features = false, features = ["outbound"] }
-macro_middleware = { path = "../../crates/macro_middleware", default-features = false, features = ["cloud_storage"] }
-macro_queues = { path = "../../crates/macro_queues" }
-macro_service_urls = { path = "../../crates/macro_service_urls" }
-macro_tower_layers = { path = "../../crates/macro_tower_layers" }
-macro_user_id = { path = "../../crates/macro_user_id" }
-macro_uuid = { path = "../../crates/macro_uuid" }
+rox_middleware = { path = "../../crates/rox_middleware", default-features = false, features = ["cloud_storage"] }
+rox_queues = { path = "../../crates/rox_queues" }
+rox_service_urls = { path = "../../crates/rox_service_urls" }
+rox_tower_layers = { path = "../../crates/rox_tower_layers" }
+rox_user_id = { path = "../../crates/rox_user_id" }
+rox_uuid = { path = "../../crates/rox_uuid" }
 mcp_auth_proxy = { path = "../mcp_auth_proxy" }
 mcp_client = { path = "../../crates/mcp_client" }
 mcp_select = { path = "../../crates/mcp_select" }
@@ -228,8 +228,8 @@ bot_id = { path = "../../crates/bot_id", features = ["test-utils"] }
 code_mode_assets = { path = "../../crates/code_mode_assets" }
 harness_id = { path = "../../crates/harness_id", features = ["test-utils"] }
 harnesses = { path = "../../crates/harnesses", default-features = false, features = ["test-utils"] }
-macro_auth = { path = "../../crates/macro_auth", features = ["testing"] }
-macro_db_migrator = { path = "../../crates/macro_db_migrator" }
+rox_auth = { path = "../../crates/rox_auth", features = ["testing"] }
+rox_db_migrator = { path = "../../crates/rox_db_migrator" }
 mcp_select = { path = "../../crates/mcp_select" }
 opentelemetry_sdk = { workspace = true, features = ["testing", "trace"] }
 schemars = { workspace = true }
@@ -240,5 +240,5 @@ wiremock = { workspace = true }
 
 [features]
 local = []
-local_auth = ["macro_authorization/local_auth"]
+local_auth = ["rox_authorization/local_auth"]
 local_queue = []

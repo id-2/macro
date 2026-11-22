@@ -1,7 +1,7 @@
 use super::*;
 use crate::outbound::pg_access_repo::queries::get_user_source_ids;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 const OWNER: &str = "macro|owner@team.com";
 const MEMBER: &str = "macro|member@team.com";
@@ -47,7 +47,7 @@ async fn insert_form(pool: &PgPool, audience: &str) -> Uuid {
 }
 
 async fn source_ids(pool: &PgPool, email: &str) -> SourceIds {
-    let user = MacroUserIdStr::try_from_email(email).unwrap();
+    let user = RoxUserIdStr::try_from_email(email).unwrap();
     get_user_source_ids(pool, Some(&user)).await.unwrap()
 }
 

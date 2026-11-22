@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_permissions::share_permission::team_share::{TeamShareRequest, authorize_team_share};
 use sqlx::PgPool;
 
@@ -460,11 +460,11 @@ async fn apply_project_team_share_copies_and_clears_nested_contents(
 async fn typed_owner_facts_match_sql_audiences_without_owner_escalation(
     pool: PgPool,
 ) -> rootcause::Result<()> {
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_user_id::user_id::RoxUserIdStr;
     use models_permissions::share_permission::team_share::TeamSharePolicyError;
 
     let team = Uuid::parse_str("90000000-0000-0000-0000-000000000011")?;
-    let actor = MacroUserIdStr::parse_from_str("macro|typed-owner@example.com")?;
+    let actor = RoxUserIdStr::parse_from_str("macro|typed-owner@example.com")?;
     let mut tx = pool.begin().await?;
     for (suffix, has_team) in [
         (31, true),

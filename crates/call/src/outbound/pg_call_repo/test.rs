@@ -13,8 +13,8 @@ use item_filters::{
     CallStatus,
     ast::{LiteralTree, call::CallLiteral},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::channel_share_permission::{
     UpdateChannelSharePermission, UpdateOperation,
@@ -89,14 +89,14 @@ pub(super) const CALL_ARCHIVED: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000
 const MACRO_USER_A: Uuid = Uuid::from_u128(0xaaaaaaaa_aaaa_aaaa_aaaa_aaaaaaaaaaa1);
 const MACRO_USER_B: Uuid = Uuid::from_u128(0xbbbbbbbb_bbbb_bbbb_bbbb_bbbbbbbbbbb2);
 const MACRO_USER_C: Uuid = Uuid::from_u128(0xcccccccc_cccc_cccc_cccc_ccccccccccc3);
-pub(super) static USER_A: LazyLock<MacroUserIdStr<'static>> =
-    LazyLock::new(|| MacroUserIdStr::parse_from_str("macro|user-a@test.com").unwrap());
-pub(super) static USER_B: LazyLock<MacroUserIdStr<'static>> =
-    LazyLock::new(|| MacroUserIdStr::parse_from_str("macro|user-b@test.com").unwrap());
-static USER_C: LazyLock<MacroUserIdStr<'static>> =
-    LazyLock::new(|| MacroUserIdStr::parse_from_str("macro|user-c@test.com").unwrap());
-static USER_D: LazyLock<MacroUserIdStr<'static>> =
-    LazyLock::new(|| MacroUserIdStr::parse_from_str("macro|user-d@test.com").unwrap());
+pub(super) static USER_A: LazyLock<RoxUserIdStr<'static>> =
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-a@test.com").unwrap());
+pub(super) static USER_B: LazyLock<RoxUserIdStr<'static>> =
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-b@test.com").unwrap());
+static USER_C: LazyLock<RoxUserIdStr<'static>> =
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-c@test.com").unwrap());
+static USER_D: LazyLock<RoxUserIdStr<'static>> =
+    LazyLock::new(|| RoxUserIdStr::parse_from_str("macro|user-d@test.com").unwrap());
 
 pub(super) fn repo(pool: Pool<Postgres>) -> PgCallRepo {
     PgCallRepo::new(pool)
@@ -133,7 +133,7 @@ async fn insert_voice(pool: &Pool<Postgres>, voice_id: Uuid, axis: usize) -> any
 
 pub(super) async fn insert_user_mapping(
     pool: &Pool<Postgres>,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     macro_user_id: Uuid,
 ) -> anyhow::Result<()> {
     sqlx::query(
@@ -1091,8 +1091,8 @@ async fn get_transcript_voice_id_for_speaker_uses_diarized_speaker_id(
 ) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
     let now = Utc::now();
-    let voice_a = macro_uuid::generate_uuid_v7();
-    let voice_b = macro_uuid::generate_uuid_v7();
+    let voice_a = rox_uuid::generate_uuid_v7();
+    let voice_b = rox_uuid::generate_uuid_v7();
     insert_voice(&pool, voice_a, 0).await?;
     insert_voice(&pool, voice_b, 1).await?;
 
@@ -1151,7 +1151,7 @@ async fn get_transcript_voice_id_for_speaker_falls_back_to_participant_id(
 ) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
     let now = Utc::now();
-    let voice_id = macro_uuid::generate_uuid_v7();
+    let voice_id = rox_uuid::generate_uuid_v7();
     insert_voice(&pool, voice_id, 0).await?;
 
     let segment = TranscriptSegmentRequest {
@@ -1376,8 +1376,8 @@ async fn get_stable_speaker_voices_for_call_record_returns_all_voices_for_consis
 ) -> anyhow::Result<()> {
     let repo = repo(pool.clone());
     let now = Utc::now();
-    let voice_a = macro_uuid::generate_uuid_v7();
-    let voice_b = macro_uuid::generate_uuid_v7();
+    let voice_a = rox_uuid::generate_uuid_v7();
+    let voice_b = rox_uuid::generate_uuid_v7();
     insert_voice(&pool, voice_a, 0).await?;
     insert_voice(&pool, voice_b, 1).await?;
     insert_user_mapping(&pool, USER_A.deref(), MACRO_USER_A).await?;
@@ -3804,7 +3804,7 @@ async fn authenticated_meeting_attendee_gets_only_call_access_and_owner_keeps_ow
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     insert_user_mapping(&pool, USER_B.deref(), MACRO_USER_B).await?;
-    let attendee = MacroUserIdStr::try_from_email("attendee@test.com")?;
+    let attendee = RoxUserIdStr::try_from_email("attendee@test.com")?;
     insert_user_mapping(&pool, &attendee, Uuid::now_v7()).await?;
     let repo = repo(pool.clone());
     let meeting = repo.create_meeting(standalone_meeting()).await?;
@@ -3945,7 +3945,7 @@ const DM_CHANNEL: Uuid = Uuid::from_u128(0x00000000_0000_0000_0000_000000000d01)
 
 async fn insert_named_user(
     pool: &Pool<Postgres>,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     macro_user_id: Uuid,
     first_name: &str,
     last_name: &str,
@@ -3970,7 +3970,7 @@ async fn insert_named_user(
 async fn insert_dm_channel(
     pool: &Pool<Postgres>,
     channel_id: Uuid,
-    participants: &[&MacroUserIdStr<'_>],
+    participants: &[&RoxUserIdStr<'_>],
 ) -> anyhow::Result<()> {
     sqlx::query!(
         r#"

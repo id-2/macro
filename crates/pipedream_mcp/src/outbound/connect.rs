@@ -1,9 +1,9 @@
 use crate::domain::models::{
-    CatalogEntry, CatalogPage, ConnectApp, MacroUserIdStr, McpServer, PipedreamConnection,
+    CatalogEntry, CatalogPage, ConnectApp, RoxUserIdStr, McpServer, PipedreamConnection,
     client_info,
 };
 use crate::domain::ports::{
-    ConnectedAppProxy, ConnectorCapabilities, ConnectorDirectory, MacroConnect, McpConnection,
+    ConnectedAppProxy, ConnectorCapabilities, ConnectorDirectory, RoxConnect, McpConnection,
     ProxyResponse,
 };
 use crate::domain::service::discovery::ConnectorTool;
@@ -138,9 +138,9 @@ fn catalog_entry(app: &wire::CatalogEntry, app_slug: &str, api_url: &Url) -> Cat
     }
 }
 
-impl MacroConnect for ConnectAdapter {
+impl RoxConnect for ConnectAdapter {
     /// The adapter is Connect itself.
-    async fn connect_only(&self, _user_id: &MacroUserIdStr<'static>) -> bool {
+    async fn connect_only(&self, _user_id: &RoxUserIdStr<'static>) -> bool {
         true
     }
 
@@ -161,7 +161,7 @@ impl MacroConnect for ConnectAdapter {
     #[tracing::instrument(skip(self, app), err, fields(app_id = %app.app_id))]
     async fn create_connect_session(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app: &ConnectApp,
     ) -> anyhow::Result<String> {
         let mut redirect = self.callback_url.clone();
@@ -179,7 +179,7 @@ impl MacroConnect for ConnectAdapter {
     #[tracing::instrument(skip(self), err)]
     async fn is_connected(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_id: &str,
     ) -> anyhow::Result<bool> {
         let connections = self
@@ -196,7 +196,7 @@ impl MacroConnect for ConnectAdapter {
     #[tracing::instrument(skip(self), err)]
     async fn delete_connection(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_id: &str,
     ) -> anyhow::Result<()> {
         match self
@@ -248,7 +248,7 @@ impl ConnectorCapabilities for ConnectAdapter {
     #[tracing::instrument(skip_all, err)]
     async fn tools(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Vec<ConnectorTool>> {
         let app = self
@@ -289,7 +289,7 @@ impl ConnectorDirectory for ConnectAdapter {
     #[tracing::instrument(skip(self), err)]
     async fn search(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         search: Option<&str>,
         cursor: Option<&str>,
         limit: u32,
@@ -320,7 +320,7 @@ impl ConnectorDirectory for ConnectAdapter {
     #[tracing::instrument(skip(self), err)]
     async fn retrieve(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Option<CatalogEntry>> {
         Ok(self

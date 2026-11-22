@@ -301,6 +301,10 @@ export function splitLocationFromContent(
     return { route: paneRoute({ id: 'settings', params: { tab: 'account' } }) };
   }
 
+  if (content.type === 'component' && content.id === 'account') {
+    return { route: paneRoute({ id: 'account', params: {} }) };
+  }
+
   if (content.type === 'component') {
     const viewId = `view-${content.id}`;
     if (routes.byId.has(viewId)) {
@@ -423,6 +427,7 @@ export function splitContentFromLocation(
     return { type: 'component', id: root.id.slice('view-'.length) };
   if (root.id === 'drive') return { type: 'component', id: 'documents' };
   if (root.id === 'settings') return { type: 'component', id: 'settings' };
+  if (root.id === 'account') return { type: 'component', id: 'account' };
   if (root.id === 'pr-detail') {
     const { foreignEntityId } = routeParams(location.route);
     if (typeof foreignEntityId === 'string' && foreignEntityId.length > 0) {

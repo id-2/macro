@@ -1,7 +1,7 @@
 //! Postgres transactions and durable delivery leases.
 use crate::domain::{models::*, ports::*};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::{share_permission::access_level::AccessLevel, sharing::SharingFacts};
 use rootcause::prelude::IntoRootcause;
 use sqlx::{PgPool, Postgres, Transaction, types::Json};
@@ -61,7 +61,7 @@ impl TryFrom<StoredRequest> for AccessRequest {
         };
         Ok(Self {
             id: r.id,
-            requester_id: MacroUserIdStr::try_from(r.requester_id)
+            requester_id: RoxUserIdStr::try_from(r.requester_id)
                 .map_err(|e| RequestError::Internal(e.into()))?,
             requested_level: r.requested_level,
             status,
@@ -141,7 +141,7 @@ impl RequestTransaction for PgRequestTransaction {
     }
     async fn mine(
         &mut self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<AccessRequest>, RequestError> {
         self.read(Some(user.as_ref()), None).await
     }
@@ -181,8 +181,8 @@ impl RequestTransaction for PgRequestTransaction {
     }
     async fn shares_team(
         &mut self,
-        a: &MacroUserIdStr<'_>,
-        b: &MacroUserIdStr<'_>,
+        a: &RoxUserIdStr<'_>,
+        b: &RoxUserIdStr<'_>,
     ) -> Result<bool, RequestError> {
         let shared = sqlx::query_scalar!(
             r#"SELECT EXISTS (
@@ -214,7 +214,7 @@ impl RequestTransaction for PgRequestTransaction {
     }
     async fn grant(
         &mut self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         level: Option<AccessLevel>,
         upgrade_only: bool,
     ) -> Result<(), RequestError> {
@@ -231,7 +231,7 @@ impl RequestTransaction for PgRequestTransaction {
     }
     async fn stopped_residents(
         &mut self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> Result<Vec<Resident>, RequestError> {
         if self.entity.entity_type != ShareEntityType::Harness {
             return Ok(Vec::new());

@@ -1,4 +1,4 @@
-import { screenToWorld, textTargetAt } from '@macro-inc/graphics';
+import { screenToWorld, textTargetAt } from '@rox-one/graphics';
 import type { CanvasState } from './create-canvas-state';
 /** Canvas text gestures stay separate from geometric drawing and pointer capture. */
 export function attachTextInput(root: HTMLElement, state: CanvasState) {

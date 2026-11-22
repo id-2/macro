@@ -2,7 +2,7 @@
 use super::*;
 use std::sync::Arc;
 
-macro_env_var::maybe_env_var! {
+rox_env_var::maybe_env_var! {
     struct RedisUrl;
 }
 
@@ -10,16 +10,16 @@ const STORED_REFRESH_TOKEN: &str = "fake-stored-refresh-token";
 const NEW_ACCESS_TOKEN: &str = "fake-new-access-token";
 const NEW_REFRESH_TOKEN: &str = "fake-new-refresh-token";
 
-fn cache() -> MacroCache {
+fn cache() -> RoxCache {
     let redis_url = RedisUrl::new();
     let url = redis_url
         .as_ref()
         .and_then(RedisUrl::value)
         .unwrap_or("redis://127.0.0.1:6379");
-    MacroCache::new(url)
+    RoxCache::new(url)
 }
 
-async fn stored_code(cache: &MacroCache) -> String {
+async fn stored_code(cache: &RoxCache) -> String {
     let code = crate::api::utils::generate_session_code();
     cache
         .set_mobile_login_session(&code, STORED_REFRESH_TOKEN)
@@ -99,7 +99,7 @@ async fn a_failed_refresh_leaves_the_code_for_a_retry() {
 async fn redemption_telemetry_carries_no_code_or_token() {
     // Fails a refresh (the code is restored), redeems the code, replays it,
     // then redeems another one.
-    async fn every_outcome(cache: &MacroCache, codes: &[String; 2]) {
+    async fn every_outcome(cache: &RoxCache, codes: &[String; 2]) {
         let _ = redeem_session_code(cache, &codes[0], refresh_fails).await;
         let _ = redeem_session_code(cache, &codes[0], refreshes).await;
         let _ = redeem_session_code(cache, &codes[0], refreshes).await;
@@ -133,7 +133,7 @@ async fn redemption_telemetry_carries_no_code_or_token() {
 
 #[tokio::test]
 async fn cache_errors_do_not_name_the_code() {
-    let cache = MacroCache::new("redis://127.0.0.1:1");
+    let cache = RoxCache::new("redis://127.0.0.1:1");
     let code = crate::api::utils::generate_session_code();
 
     let error = cache.take_mobile_login_session(&code).await.unwrap_err();

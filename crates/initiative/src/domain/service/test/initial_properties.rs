@@ -12,7 +12,7 @@ use std::{
 };
 
 type Recorded = (
-    MacroUserIdStr<'static>,
+    RoxUserIdStr<'static>,
     InitiativeId,
     Vec<InitialPropertyValue>,
 );
@@ -32,7 +32,7 @@ impl InitiativeResources for RecordingResources {
     }
     fn set_initial_properties(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         id: InitiativeId,
         values: Vec<InitialPropertyValue>,
     ) -> ResourceFuture<'_, ()> {

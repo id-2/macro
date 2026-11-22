@@ -14,7 +14,7 @@ async fn rate_limit_holds_the_shared_account_and_retries() {
     proxy.responses.lock().unwrap()[0]
         .headers
         .insert(http::header::RETRY_AFTER, "10".parse().unwrap());
-    let user = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let connections = Connections::new(
         Arc::new(support::Store),
         Some(proxy.clone()),

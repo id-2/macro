@@ -9,8 +9,8 @@ use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, Entity, EntityAccessReceipt, EntityPermission, EntityType,
     ViewAccessLevel,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::{
     CellValue, CellWrite, ColumnChange, ColumnKind, DatabaseOp, NewColumn, NewOption, OpResult,
     OptionId, OptionRef, RowChange, RowChanges, RowsChange, RowsResult,
@@ -31,8 +31,8 @@ use crate::outbound::pg_databases_repo::PgDatabasesRepo;
 pub(super) const WOLF: &str = "macro|wolf@rox.one";
 pub(super) const JULIA: &str = "macro|julia@rox.one";
 
-pub(super) fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+pub(super) fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
 pub(super) fn person(id: &str) -> Viewer {

@@ -3,7 +3,7 @@ use super::drain;
 use axum::{Json, Router, extract::State, http::StatusCode};
 use crm::domain::email_privacy::{EmailPrivacyChange, EmailPrivacyRepository};
 use crm::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_email::email::service::backfill::{BackfillOperation, BackfillPubsubMessage};
 use serde_json::{Value, json};
 use sqlx::PgPool;
@@ -41,7 +41,7 @@ impl TestQueue {
         let server = tokio::spawn(async move {
             axum::serve(listener, app).await.unwrap();
         });
-        let config = macro_aws_config::local_aws_config(&endpoint).await;
+        let config = rox_aws_config::local_aws_config(&endpoint).await;
         let config = aws_sdk_sqs::config::Builder::from(&config)
             .retry_config(aws_sdk_sqs::config::retry::RetryConfig::disabled())
             .build();

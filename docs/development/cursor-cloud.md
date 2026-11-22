@@ -41,9 +41,11 @@ walkthrough, frontend restarts, and login troubleshooting.
 - Do not replace the scripts with `just run_local` (it would compile every service
   instead of using the baked binaries), hand-rolled Compose, or `just stack up`. **`stack.sh --fresh` deliberately wipes and recreates the
   stack**; use it only with explicit approval, never to pick up code edits.
-- Sign in with any email; passwordless login creates the user on demand. The
-  auth service is built with `return_passwordless_code`, so the login API returns
-  the code. Codes also appear in Mailpit at <http://localhost:8025>.
+- Sign in with any email; passwordless login creates the user on demand. The login
+  screen asks for the six-digit code; read it in Mailpit at <http://localhost:8025>
+  (subject `Your Rox login code`). To let the page finish login without the inbox,
+  run the auth service with `PASSWORDLESS_RETURN_CODE=true` and build the web app
+  with `VITE_PASSWORDLESS_AUTO_CODE=true`; both are off by default.
 - Seeding is optional, not required for login. For multi-user permission fixtures,
   use `just seed-scenario apply --file seed/scenarios/team-perms.json` inside Nix.
 - An `agent_harness_service` restart loop is expected without AI provider keys;

@@ -9,6 +9,7 @@ import { useCalendarHotkeys } from '@app/features/calendar/hooks/use-calendar-ho
 import { calendarPeriodLabel } from '@app/features/calendar/utils/calendar-label';
 import { CalendarSchedulingActions } from '@app/features/scheduling/calendar-actions';
 import { createSizeBreakpoints } from '@app/util/create-size-breakpoints';
+import { formatLocale } from '@app/lib/i18n';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
 import { HeaderIsland } from '@components/app/split-layout/components/HeaderIsland';
 import {
@@ -43,11 +44,6 @@ import {
 } from './CalendarCreateItems';
 import { CalendarCreateMenu } from './CalendarCreateMenu';
 import { CalendarSearch } from './CalendarSearch';
-
-const formatMonthTitle = new Intl.DateTimeFormat(undefined, {
-  month: 'long',
-  year: 'numeric',
-}).format;
 
 function createLocalToday() {
   const [today, setToday] = createSignal(new Date());
@@ -151,7 +147,13 @@ export function Header(props: {
   const currentDate = createMemo(
     () => calendarPager.navigationDate() ?? initialDate
   );
-  const dateTitle = createMemo(() => formatMonthTitle(currentDate()));
+  const dateTitle = createMemo(
+    () =>
+      new Intl.DateTimeFormat(formatLocale(), {
+        month: 'long',
+        year: 'numeric',
+      }).format(currentDate())
+  );
   const periodLabel = createMemo(() =>
     calendarPeriodLabel(calendarView.displaySettings.periodView).toLowerCase()
   );
@@ -260,7 +262,7 @@ export function Header(props: {
         )}
         onClick={calendarPager.navigateToToday}
       >
-        <Show when={mobile} fallback="Today">
+        <Show when={mobile} fallback="Сегодня">
           <CalendarBlankIcon
             class="size-4 touch:size-6 shrink-0 pointer-events-none"
             aria-hidden="true"

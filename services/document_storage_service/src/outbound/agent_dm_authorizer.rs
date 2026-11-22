@@ -5,7 +5,7 @@ use bots::domain::ports::BotRepo;
 use bots::domain::ports::{AgentDmEligibility, BotError};
 use channels::domain::agent_dm::{AgentDmProfile, AgentDmProfiles, AgentDmRepo};
 use channels::domain::{agent_dm::AgentDmAuthorizer, ports::ChannelMutationErr};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -26,7 +26,7 @@ impl<C, B> AgentDmProfileReader<C, B> {
 impl<C: AgentDmRepo, B: BotRepo> AgentDmProfiles for AgentDmProfileReader<C, B> {
     async fn for_channels(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         channel_ids: &[Uuid],
     ) -> Result<HashMap<Uuid, AgentDmProfile>, rootcause::Report> {
         if channel_ids.is_empty() {
@@ -71,7 +71,7 @@ pub struct BotServiceDmAuthorizer<B>(pub B);
 impl<B: AgentDmEligibility> AgentDmAuthorizer for BotServiceDmAuthorizer<B> {
     async fn authorize(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<(), ChannelMutationErr> {
         self.0

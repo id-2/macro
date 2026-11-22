@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::{
     CreatedUserApiKey, UserApiKey, UserApiKeyError, UserApiKeyId, UserApiKeyInfo,
@@ -37,7 +37,7 @@ where
     #[tracing::instrument(err, skip_all)]
     async fn create_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         name: &str,
     ) -> Result<CreatedUserApiKey, UserApiKeyError> {
         let name = normalize_key_name(name)?;
@@ -65,7 +65,7 @@ where
     #[tracing::instrument(err, skip_all)]
     async fn replace_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         name: &str,
     ) -> Result<CreatedUserApiKey, UserApiKeyError> {
         let name = normalize_key_name(name)?;
@@ -83,7 +83,7 @@ where
     #[tracing::instrument(err, skip_all)]
     async fn list_keys(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<UserApiKeyInfo>, UserApiKeyError> {
         Ok(self
             .repo
@@ -95,7 +95,7 @@ where
     #[tracing::instrument(err, skip_all)]
     async fn delete_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
     ) -> Result<(), UserApiKeyError> {
         let removed = self

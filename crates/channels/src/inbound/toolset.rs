@@ -38,7 +38,7 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MessageServiceApi,
     models::MessageAttribution,
@@ -222,7 +222,7 @@ where
     /// than failing the read.
     pub(crate) async fn sender_names(
         &self,
-        user_senders: HashSet<MacroUserIdStr<'static>>,
+        user_senders: HashSet<RoxUserIdStr<'static>>,
     ) -> SenderNames {
         if user_senders.is_empty() {
             return SenderNames::new();
@@ -389,7 +389,7 @@ fn channel_name(name: &str) -> Result<String, ToolCallError> {
     Ok(trimmed.to_string())
 }
 
-fn parse_participants(entries: &[String]) -> Result<Vec<MacroUserIdStr<'static>>, ToolCallError> {
+fn parse_participants(entries: &[String]) -> Result<Vec<RoxUserIdStr<'static>>, ToolCallError> {
     let mut participants = Vec::new();
     let mut seen = std::collections::HashSet::new();
     let mut invalid = Vec::new();
@@ -422,13 +422,13 @@ fn parse_participants(entries: &[String]) -> Result<Vec<MacroUserIdStr<'static>>
     Ok(participants)
 }
 
-fn parse_participant(raw: &str) -> Result<MacroUserIdStr<'static>, ()> {
-    MacroUserIdStr::try_from(raw.to_string())
-        .or_else(|_| MacroUserIdStr::try_from_email(raw))
+fn parse_participant(raw: &str) -> Result<RoxUserIdStr<'static>, ()> {
+    RoxUserIdStr::try_from(raw.to_string())
+        .or_else(|_| RoxUserIdStr::try_from_email(raw))
         .map_err(|_| ())
 }
 
-fn participant_id_strings(participants: &[MacroUserIdStr<'static>]) -> Vec<String> {
+fn participant_id_strings(participants: &[RoxUserIdStr<'static>]) -> Vec<String> {
     participants
         .iter()
         .map(|user_id| user_id.as_ref().to_string())

@@ -1,5 +1,5 @@
 import { throwOnErr } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { authServiceClient } from '@service-auth/client';
 import { useMutation } from '@tanstack/solid-query';
 

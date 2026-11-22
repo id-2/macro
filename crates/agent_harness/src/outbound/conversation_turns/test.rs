@@ -9,15 +9,15 @@ use agent_fold::domain::model::TurnId;
 use agent_session::domain::agent_conversation::{AgentConversation, AgentConversationRepo};
 use bots::domain::ports::{AgentDmEligibility, BotError, MockBotRepo};
 use channels::{domain::agent_dm::AgentDmRepo, outbound::pg_channels_repo::PgChannelsRepo};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 struct Eligibility(bool);
 impl AgentDmEligibility for Eligibility {
     async fn authorize_agent_dm(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: bot_id::BotId,
     ) -> std::result::Result<(), BotError> {
         if self.0 {
@@ -50,7 +50,7 @@ fn conversations(
 }
 
 async fn setup(pool: PgPool) -> (PgConversationTurnStore, AgentSessionId, Uuid, OpenSession) {
-    let user = macro_user_id::user_id::MacroUserIdStr::try_from_email("dm@example.com").unwrap();
+    let user = rox_user_id::user_id::RoxUserIdStr::try_from_email("dm@example.com").unwrap();
     let channel = PgChannelsRepo::new(pool.clone())
         .ensure(user.clone(), bot_id::MACRO_NEW_BOT_ID)
         .await
@@ -61,7 +61,7 @@ async fn setup(pool: PgPool) -> (PgConversationTurnStore, AgentSessionId, Uuid, 
         .current_or_create(conversation(channel))
         .await
         .unwrap();
-    let source = macro_uuid::generate_uuid_v7();
+    let source = rox_uuid::generate_uuid_v7();
     let command = OpenSession {
         bot_id: bot_id::MACRO_NEW_BOT_ID,
         runtime: AgentRuntimeConfig {
@@ -103,7 +103,7 @@ fn flight(record: &ConversationTurn) -> InFlightTurn {
             thread_id: record.source_message_id,
             message_id: record.source_message_id,
         }),
-        announcement_message_id: Some(macro_uuid::generate_uuid_v7()),
+        announcement_message_id: Some(rox_uuid::generate_uuid_v7()),
         dispatched_at: chrono::Utc::now(),
         bot_id: None,
         speaks_as_chip: false,
@@ -195,7 +195,7 @@ async fn interrupted_work_holds_its_session_queue_until_an_explicit_decision(poo
         )
         .await
         .unwrap();
-    mention_origin_mut(&mut command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut command).message_id = rox_uuid::generate_uuid_v7();
     store
         .admit(session, channel, command.clone())
         .await
@@ -205,7 +205,7 @@ async fn interrupted_work_holds_its_session_queue_until_an_explicit_decision(poo
         .start_fresh(conversation(channel))
         .await
         .unwrap();
-    mention_origin_mut(&mut command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut command).message_id = rox_uuid::generate_uuid_v7();
     store.admit(fresh, channel, command).await.unwrap();
     let pending = store.pending(10).await.unwrap();
     assert_eq!(pending.len(), 1);
@@ -343,7 +343,7 @@ async fn reply_claims_release_on_drop_and_stale_finalizers_cannot_hide_a_late_an
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn starting_fresh_requires_owner_and_current_persona_access(pool: PgPool) {
     let (store, session, channel, command) = setup(pool.clone()).await;
-    let stranger = MacroUserIdStr::try_from_email("stranger@example.com").unwrap();
+    let stranger = RoxUserIdStr::try_from_email("stranger@example.com").unwrap();
     let service = conversations(pool.clone(), store.clone(), true);
     assert!(matches!(
         service
@@ -696,7 +696,7 @@ async fn recovery_offers_only_turns_a_claim_could_take(pool: PgPool) {
         .unwrap();
     let mut waiting = command.clone();
     if let crate::domain::model::SessionOrigin::Mention(origin) = &mut waiting.origin {
-        origin.message_id = macro_uuid::generate_uuid_v7();
+        origin.message_id = rox_uuid::generate_uuid_v7();
     }
     let waiting = store.admit(session, channel, waiting).await.unwrap();
     assert_eq!(
@@ -760,7 +760,7 @@ async fn turn_in(
     command: &mut OpenSession,
     state: ConversationTurnState,
 ) -> ConversationTurn {
-    mention_origin_mut(command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(command).message_id = rox_uuid::generate_uuid_v7();
     let record = store
         .admit(session, channel, command.clone())
         .await
@@ -871,7 +871,7 @@ async fn terminal_reply_ids_require_the_current_unfinalized_attempt_and_saved_fl
     let mut original = flight(&record);
     original.announcement_message_id = None;
     let mut reserved = original.clone();
-    reserved.presented.push(macro_uuid::generate_uuid_v7());
+    reserved.presented.push(rox_uuid::generate_uuid_v7());
     reserved.announcement_message_id = reserved.presented.last().copied();
     assert!(store.claim(record.action_id, &original).await.unwrap());
     assert!(
@@ -896,7 +896,7 @@ async fn terminal_reply_ids_require_the_current_unfinalized_attempt_and_saved_fl
             .unwrap()
     );
     let mut stale = reserved.clone();
-    stale.presented.push(macro_uuid::generate_uuid_v7());
+    stale.presented.push(rox_uuid::generate_uuid_v7());
     assert!(
         !store
             .record_reply_flight(record.action_id, &original, &stale)
@@ -958,7 +958,7 @@ async fn retry_racing_the_first_terminal_reservation_cannot_discard_a_postable_r
         .await
         .unwrap();
     let mut reserved = original.clone();
-    reserved.presented.push(macro_uuid::generate_uuid_v7());
+    reserved.presented.push(rox_uuid::generate_uuid_v7());
     reserved.announcement_message_id = reserved.presented.last().copied();
     let (retry, saved) = tokio::join!(
         store.retry(record.source_message_id, record.bot_id, record.action_id),

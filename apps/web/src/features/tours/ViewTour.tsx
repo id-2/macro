@@ -133,11 +133,11 @@ function ViewTourHint(props: { tour: ViewTourDefinition }) {
         <Tour.Progress />
       </div>
       <p class="mt-1.5 text-sm leading-5">
-        {tour.current().entryLabel ?? `Continue with ${props.tour.title}`}
+        {tour.current().entryLabel ?? `Продолжить: ${props.tour.title}`}
       </p>
       <div class="mt-3">
-        <Tour.Next variant="outline" size="md" doneLabel="Done">
-          Skip
+        <Tour.Next variant="outline" size="md" doneLabel="Готово">
+          Пропустить
         </Tour.Next>
       </div>
     </>
@@ -178,10 +178,10 @@ function ViewTourCard(props: ViewTourProps) {
       </div>
       <div class="mt-5 flex items-center justify-end gap-2">
         <Tour.Close variant="ghost" size="md">
-          Dismiss
+          Скрыть
         </Tour.Close>
-        <Tour.Next variant="primary" size="md" doneLabel="Got it">
-          Next
+        <Tour.Next variant="primary" size="md" doneLabel="Понятно">
+          Далее
         </Tour.Next>
       </div>
       <Show when={props.tour.video} keyed>
@@ -252,7 +252,7 @@ function McpConnectAction(props: {
 function ConnectButton(props: { label: string; onClick: () => void }) {
   return (
     <Button variant="secondary" size="sm" onClick={props.onClick}>
-      Connect {props.label}
+      Подключить {props.label}
     </Button>
   );
 }

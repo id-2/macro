@@ -1,11 +1,11 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use scheduled_action::domain::event_trigger::EventName;
 use serde_json::json;
 
 fn run(trigger: RunTrigger, end: RunEnd) -> FinishedRoutineRun {
     FinishedRoutineRun {
-        owner: MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+        owner: RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
         routine_id: uuid::Uuid::nil(),
         routine_name: "Morning brief".to_string(),
         parent_name: None,

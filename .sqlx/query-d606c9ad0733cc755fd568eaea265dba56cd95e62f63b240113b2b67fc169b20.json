@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM email_message_labels WHERE message_id = 'ee000003-0000-0000-0000-000000000003'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "d606c9ad0733cc755fd568eaea265dba56cd95e62f63b240113b2b67fc169b20"
+}

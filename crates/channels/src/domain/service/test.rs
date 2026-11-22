@@ -15,7 +15,7 @@ use crate::domain::{
 };
 use chrono::Utc;
 use entity_access::domain::models::{ParticipantRole as AccessRole, TeamRole};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::{
     collections::HashSet,
     sync::{Arc, Mutex},
@@ -52,7 +52,7 @@ struct FakeMutationRepoState {
     join_code: Option<Uuid>,
     participants: Vec<ChannelParticipant>,
     participant_additions: usize,
-    thread_participants: Vec<MacroUserIdStr<'static>>,
+    thread_participants: Vec<RoxUserIdStr<'static>>,
     activity_upserts: usize,
     touched_channel_ids: Vec<Uuid>,
     fail_channel_touches: bool,
@@ -95,7 +95,7 @@ impl FakeMutationRepo {
                 ],
                 participant_additions: 0,
                 thread_participants: vec![
-                    MacroUserIdStr::try_from("macro|thread@test.com".to_string()).unwrap(),
+                    RoxUserIdStr::try_from("macro|thread@test.com".to_string()).unwrap(),
                 ],
                 activity_upserts: 0,
                 touched_channel_ids: vec![],
@@ -189,7 +189,7 @@ impl ChannelRepo for FakeMutationRepo {
     async fn get_channel_metadata(
         &self,
         _channel_id: Uuid,
-        _viewer_user_id: MacroUserIdStr<'static>,
+        _viewer_user_id: RoxUserIdStr<'static>,
     ) -> Result<ChannelMetadata, Self::Err> {
         Ok(ChannelMetadata {
             channel_type: ChannelType::Private,
@@ -210,15 +210,15 @@ impl ChannelRepo for FakeMutationRepo {
     async fn resolve_channel_name(
         &self,
         _info: &ChannelInfo,
-        _viewer_user_id: MacroUserIdStr<'static>,
+        _viewer_user_id: RoxUserIdStr<'static>,
     ) -> Result<String, Self::Err> {
         Ok("Project".to_string())
     }
 
     async fn get_user_display_names(
         &self,
-        _user_ids: &[MacroUserIdStr<'static>],
-    ) -> Result<std::collections::HashMap<MacroUserIdStr<'static>, String>, Self::Err> {
+        _user_ids: &[RoxUserIdStr<'static>],
+    ) -> Result<std::collections::HashMap<RoxUserIdStr<'static>, String>, Self::Err> {
         Ok(std::collections::HashMap::new())
     }
 
@@ -228,7 +228,7 @@ impl ChannelRepo for FakeMutationRepo {
 
     async fn get_user_team_id(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<Uuid>, Self::Err> {
         let mut state = self.state.lock().unwrap();
         state.user_team_id_lookups += 1;
@@ -237,7 +237,7 @@ impl ChannelRepo for FakeMutationRepo {
 
     async fn create_channel(
         &self,
-        owner_id: MacroUserIdStr<'_>,
+        owner_id: RoxUserIdStr<'_>,
         _org_id: Option<i64>,
         req: crate::domain::models::CreateChannelRequest,
     ) -> Result<CreatedChannel, Self::Err> {
@@ -263,7 +263,7 @@ impl ChannelRepo for FakeMutationRepo {
     async fn auto_join_by_team_id(
         &self,
         _team_id: &Uuid,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
         Ok(())
     }
@@ -271,14 +271,14 @@ impl ChannelRepo for FakeMutationRepo {
     async fn leave_by_team_id(
         &self,
         _team_id: &Uuid,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<Uuid>, Self::Err> {
         Ok(Vec::new())
     }
 
     async fn restore_by_channel_ids(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _channel_ids: &[Uuid],
     ) -> Result<(), Self::Err> {
         Ok(())
@@ -298,15 +298,15 @@ impl ChannelRepo for FakeMutationRepo {
 
     async fn maybe_get_dm(
         &self,
-        _user_id: MacroUserIdStr<'_>,
-        _recipient_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
+        _recipient_id: RoxUserIdStr<'_>,
     ) -> Result<Option<Uuid>, Self::Err> {
         Ok(None)
     }
 
     async fn maybe_get_private_channel(
         &self,
-        _participants: std::collections::HashSet<MacroUserIdStr<'_>>,
+        _participants: std::collections::HashSet<RoxUserIdStr<'_>>,
     ) -> Result<Option<Uuid>, Self::Err> {
         Ok(None)
     }
@@ -328,7 +328,7 @@ impl ChannelRepo for FakeMutationRepo {
 
     async fn user_is_team_admin(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         Ok(self
@@ -348,7 +348,7 @@ impl ChannelRepo for FakeMutationRepo {
     async fn add_participant(
         &self,
         channel_id: Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         role: ParticipantRole,
     ) -> Result<bool, Self::Err> {
         let mut state = self.state.lock().unwrap();
@@ -429,7 +429,7 @@ impl ChannelRepo for FakeMutationRepo {
     async fn get_thread_participants(
         &self,
         _thread_id: Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         Ok(self.state.lock().unwrap().thread_participants.clone())
     }
 
@@ -486,7 +486,7 @@ impl ChannelReferenceSharePermissions for FakeReferenceSharing {
 
     async fn update_channel_share_permissions_for_referenced_items(
         &self,
-        _actor: MacroUserIdStr<'static>,
+        _actor: RoxUserIdStr<'static>,
         _channel_id: Uuid,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<crate::domain::models::ReferenceShareResult>, Self::Err> {
@@ -543,8 +543,8 @@ async fn share_referenced_items_with_channel_forwards_to_the_share_port() {
     assert_eq!(seen.lock().unwrap().as_slice(), &[item]);
 }
 
-fn macro_id(user_id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(user_id.to_string()).unwrap()
+fn macro_id(user_id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(user_id.to_string()).unwrap()
 }
 
 fn sender(user_id: &str) -> Sender {

@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use system_properties::{
     PgSystemPropertiesRepository, SystemPropertiesServiceImpl, SystemPropertyKey,
@@ -109,7 +109,7 @@ fn people(user_ids: &[&str], invitee_emails: &[&str]) -> CallPeople {
     CallPeople {
         user_ids: user_ids
             .iter()
-            .map(|id| MacroUserIdStr::parse_from_str(id).unwrap().into_owned())
+            .map(|id| RoxUserIdStr::parse_from_str(id).unwrap().into_owned())
             .collect(),
         invitee_emails: invitee_emails.iter().map(ToString::to_string).collect(),
     }

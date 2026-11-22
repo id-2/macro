@@ -1,5 +1,5 @@
 use crate::domain::{
-    models::{MacroUserIdStr, McpServerRecord, OAuthClientMetadata},
+    models::{RoxUserIdStr, McpServerRecord, OAuthClientMetadata},
     ports::{McpServerStore, OAuthClient},
     service::{AddServerError, AddedBy, ServerDirectory},
 };
@@ -10,8 +10,8 @@ use axum::{
     response::IntoResponse,
     routing::{delete, get, post, put},
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
@@ -36,7 +36,7 @@ pub type McpServerRemovedHook = McpAuthCompletedHook;
 pub struct McpRouterState<S, O, Auth> {
     store: Arc<S>,
     oauth: Arc<O>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
     client_metadata: OAuthClientMetadata,
     on_auth_completed: Option<McpAuthCompletedHook>,
     on_server_removed: Option<McpServerRemovedHook>,
@@ -55,7 +55,7 @@ impl<S, O, Auth> Clone for McpRouterState<S, O, Auth> {
     }
 }
 
-impl<S, O, Auth> FromRef<McpRouterState<S, O, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, O, Auth> FromRef<McpRouterState<S, O, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &McpRouterState<S, O, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -65,14 +65,14 @@ impl<S, O, Auth> McpRouterState<S, O, Auth>
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     /// Create a new router state from a server store, OAuth client, and
     /// authorization state.
     pub fn new(
         store: S,
         oauth: O,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
         client_metadata: OAuthClientMetadata,
     ) -> Self {
         Self {
@@ -110,7 +110,7 @@ pub fn mcp_router<S, O, Auth, Global>(state: McpRouterState<S, O, Auth>) -> Rout
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
     Global: Send + Sync,
 {
@@ -130,7 +130,7 @@ pub fn mcp_oauth_callback_router<S, O, Auth, Global>(
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
     Global: Send + Sync,
 {
@@ -295,12 +295,12 @@ impl IntoResponse for McpHandlerErr {
 #[tracing::instrument(skip_all, err)]
 pub async fn list_servers<S, O, Auth>(
     State(state): State<McpRouterState<S, O, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<ServerResponse>>, McpHandlerErr>
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -333,13 +333,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn add_server<S, O, Auth>(
     State(state): State<McpRouterState<S, O, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<AddServerRequest>,
 ) -> Result<(StatusCode, Json<ServerResponse>), McpHandlerErr>
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -381,13 +381,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn update_server<S, O, Auth>(
     State(state): State<McpRouterState<S, O, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<UpdateServerRequest>,
 ) -> Result<Json<ServerResponse>, McpHandlerErr>
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -430,13 +430,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn delete_server<S, O, Auth>(
     State(state): State<McpRouterState<S, O, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(params): Query<DeleteServerParams>,
 ) -> Result<StatusCode, McpHandlerErr>
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -460,7 +460,7 @@ where
 async fn remove_server<S>(
     store: &S,
     on_removed: Option<&McpServerRemovedHook>,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     server_url: &str,
 ) -> anyhow::Result<()>
 where
@@ -501,13 +501,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn start_auth<S, O, Auth>(
     State(state): State<McpRouterState<S, O, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<StartAuthRequest>,
 ) -> Result<Json<StartAuthResponse>, McpHandlerErr>
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let user = &authorization.authorization.user;
     let authorization_url = state
@@ -534,7 +534,7 @@ pub async fn client_metadata<S, O, Auth>(
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Json(state.client_metadata.clone())
 }
@@ -582,7 +582,7 @@ pub async fn auth_callback<S, O, Auth>(
 where
     S: McpServerStore,
     O: OAuthClient,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let (code, csrf_state) = parse_callback_params(params)?;
 

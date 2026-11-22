@@ -11,7 +11,7 @@ use std::{
 use chrono::{DateTime, Duration, NaiveDate, Utc};
 use chrono_tz::Tz;
 use futures::{StreamExt as _, stream};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use tracing::{Instrument as _, field::Empty};
 use uuid::Uuid;
@@ -159,7 +159,7 @@ pub struct FocusService<S, P, C, N, D, E> {
     /// Inboxes last seen with their owner in the rollout, which the sweep
     /// covers along with every inbox holding Focus. In memory: after a restart
     /// an inbox with no Focus yet joins again with its next mail.
-    enrolled: Mutex<HashMap<Uuid, MacroUserIdStr<'static>>>,
+    enrolled: Mutex<HashMap<Uuid, RoxUserIdStr<'static>>>,
     /// Threads a sweep checked at their latest mail without storing a result
     /// (rejected, nothing to classify, or a result already stored), so later
     /// sweeps skip them until new mail arrives. In memory: a restart retries
@@ -226,7 +226,7 @@ where
         self.settled.lock().unwrap_or_else(PoisonError::into_inner)
     }
 
-    fn enrolled(&self) -> MutexGuard<'_, HashMap<Uuid, MacroUserIdStr<'static>>> {
+    fn enrolled(&self) -> MutexGuard<'_, HashMap<Uuid, RoxUserIdStr<'static>>> {
         self.enrolled.lock().unwrap_or_else(PoisonError::into_inner)
     }
 
@@ -235,7 +235,7 @@ where
     async fn is_enrolled(
         &self,
         link_id: Uuid,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> Result<bool, Report> {
         let enrolled = self.enrollment.is_enrolled(owner).await?;
         let mut inboxes = self.enrolled();
@@ -562,7 +562,7 @@ where
             at_once: 1,
             due_dates: DueDates::Read,
         };
-        let mut inboxes: HashMap<Uuid, MacroUserIdStr<'static>> = self
+        let mut inboxes: HashMap<Uuid, RoxUserIdStr<'static>> = self
             .store
             .inboxes_with_focus()
             .await?
@@ -761,7 +761,7 @@ impl<S: FocusStore> FocusQueries<S> {
     /// either direction, so the limit keeps the newest threads.
     pub async fn focus_thread_ids(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         window_days: u16,
     ) -> Result<Vec<Uuid>, Report> {
         let days = window_days.clamp(1, MAX_WINDOW_DAYS);
@@ -781,7 +781,7 @@ impl<S: FocusStore> FocusQueries<S> {
     /// now.
     pub async fn focus_for_threads(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_ids: &[Uuid],
     ) -> Result<HashMap<Uuid, ThreadFocus>, Report> {
         if thread_ids.is_empty() {

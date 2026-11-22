@@ -4,13 +4,13 @@ import { SettingsCard, SettingsPage, SettingsRow } from '../primitives';
 export function DesktopAppDownload() {
   return (
     <SettingsPage
-      title="Desktop App (Alpha)"
-      description="Get Rox Alpha for your computer."
+      title="Приложение для компьютера (альфа)"
+      description="Установите альфа-версию Rox на компьютер."
     >
       <SettingsCard>
         <SettingsRow
-          label="Download Rox Alpha"
-          description="Get the latest release for macOS or Linux."
+          label="Скачать альфа-версию Rox"
+          description="Последний выпуск для macOS или Linux."
           stackOnNarrow
         >
           <a
@@ -19,7 +19,7 @@ export function DesktopAppDownload() {
             rel="noopener noreferrer"
             class={buttonClasses({ variant: 'secondary', size: 'md' })}
           >
-            Download desktop app
+            Скачать приложение
           </a>
         </SettingsRow>
       </SettingsCard>

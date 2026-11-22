@@ -4,9 +4,9 @@ import type {
   PatchBotRequest,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { Team } from '../teams/team';
 import { User } from '../users/user';
 import { BotToken } from './token';
@@ -55,20 +55,20 @@ export type BotOwner =
   | { type: 'team'; team: Team };
 
 /** A user- or team-owned bot: an identity that posts to channels through webhooks or the SDK. */
-export class Bot extends MacroEntity<BotRecord> {
+export class Bot extends RoxEntity<BotRecord> {
   /** A handle to a bot by id. */
-  static byId(client: MacroClient, id: string): Bot {
+  static byId(client: RoxClient, id: string): Bot {
     return new Bot(client, id);
   }
 
   /** Seed from a listed or created bot. */
-  static from(client: MacroClient, record: BotRecord): Bot {
+  static from(client: RoxClient, record: BotRecord): Bot {
     return new Bot(client, record.id, record);
   }
 
   /** Create a bot owned by the caller or by a team. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     options: CreateBotOptions,
   ): Promise<Bot> {
     const body: CreateBotRequest = {
@@ -83,7 +83,7 @@ export class Bot extends MacroEntity<BotRecord> {
   }
 
   /** The bots the caller can manage: their own and their teams'. */
-  static async list(client: MacroClient): Promise<Bot[]> {
+  static async list(client: RoxClient): Promise<Bot[]> {
     return unwrap(await client.storage.listBots()).map((record) =>
       Bot.from(client, record),
     );

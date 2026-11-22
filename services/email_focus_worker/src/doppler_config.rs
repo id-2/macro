@@ -1,7 +1,7 @@
 #![recursion_limit = "256"]
 //! Validates that the worker's configuration loads from both Doppler environments.
 
-use macro_env::Environment;
+use rox_env::Environment;
 
 #[expect(dead_code, reason = "only the configuration's shape is validated here")]
 mod config;

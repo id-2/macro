@@ -41,7 +41,8 @@ and DSS addresses.
 whose auto-join domain is a fresh domain, then requests a code for a new address
 at that domain with the referrer's code. Requesting the code must neither join
 the team nor track the referral; using the code must do both. It needs the
-authentication service built with `return_passwordless_code` (the local stack's
-default), reads `LOCAL_E2E_AUTHENTICATION_URL` (the proxy's `/auth`, falling
-back to the service's local port) and `LOCAL_E2E_DATABASE_URL`, and removes
-the team it seeded; the accounts it creates use unique addresses and stay.
+authentication service running with `PASSWORDLESS_RETURN_CODE=true`
+(`docker/docker-compose.local-e2e.yml` sets it), reads `LOCAL_E2E_AUTHENTICATION_URL`
+(the proxy's `/auth`, falling back to the service's local port) and
+`LOCAL_E2E_DATABASE_URL`, and removes the team it seeded; the accounts it
+creates use unique addresses and stay.

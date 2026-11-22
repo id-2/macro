@@ -1,7 +1,7 @@
 import type { GetContactResponses } from '../../../generated/storage/types.gen';
 import type { RichMessage } from '../../mentions';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { FavoritableEntity } from '../entity';
 import {
   DiscussionComment,
@@ -65,12 +65,12 @@ export class Contact extends FavoritableEntity<ContactDetail> {
   }
 
   /** A handle to a CRM contact by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Contact {
+  static byId(client: RoxClient, id: string): Contact {
     return new Contact(client, id);
   }
 
   /** Build a contact from an API record (pre-seeded, no fetch). */
-  static from(client: MacroClient, data: ContactDetail): Contact {
+  static from(client: RoxClient, data: ContactDetail): Contact {
     return new Contact(client, data.id, data);
   }
 

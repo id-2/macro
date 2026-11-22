@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::user_id::RoxUserId;
 use roles_and_permissions::domain::model::PermissionId;
 
 use crate::api::{context::ApiContext, permissions_extractor::DbPermissionsExtractor};
@@ -63,7 +63,7 @@ pub enum GetLegacyUserPermissionsError {
     #[error("Internal error")]
     InternalError(#[from] anyhow::Error),
     #[error("Invalid macro user id")]
-    InvalidMacroUserId,
+    InvalidRoxUserId,
 }
 
 impl IntoResponse for GetLegacyUserPermissionsError {
@@ -75,7 +75,7 @@ impl IntoResponse for GetLegacyUserPermissionsError {
                     message: "internal error".into(),
                 }),
             ),
-            GetLegacyUserPermissionsError::InvalidMacroUserId => (
+            GetLegacyUserPermissionsError::InvalidRoxUserId => (
                 StatusCode::BAD_REQUEST,
                 Json(ErrorResponse {
                     message: "invalid user id".into(),
@@ -105,7 +105,7 @@ pub async fn handler(
     State(ctx): State<ApiContext>,
     db_permissions: DbPermissionsExtractor,
 ) -> Result<GetLegacyUserPermissionsResponse, GetLegacyUserPermissionsError> {
-    let user_id = MacroUserId::parse_from_str(
+    let user_id = RoxUserId::parse_from_str(
         &db_permissions
             .authorization
             .authorization
@@ -113,12 +113,12 @@ pub async fn handler(
             .user_context
             .user_id,
     )
-    .map_err(|_| GetLegacyUserPermissionsError::InvalidMacroUserId)?
+    .map_err(|_| GetLegacyUserPermissionsError::InvalidRoxUserId)?
     .lowercase();
 
     let email = user_id.email_part().lowercase();
 
-    let legacy_user_info = macro_db_client::user::get::get_legacy_user_info(&ctx.db, &user_id)
+    let legacy_user_info = rox_db_client::user::get::get_legacy_user_info(&ctx.db, &user_id)
         .await
         .map_err(GetLegacyUserPermissionsError::InternalError)?;
 

@@ -15,7 +15,7 @@ use entity_access::domain::models::{
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::ChatAccessLevelExtractor;
 use entity_registry::{CreationPrincipalExtractor, NonUserOwners};
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model::response::StringIDResponse;
 use models_permissions::share_permission::SharePermissionV2;
 use roles_and_permissions::domain::port::UserRolesAndPermissionsService;
@@ -28,14 +28,14 @@ use crate::inbound::http::extractors::UserPermissionsState;
 
 /// Shared state for the chat router, wrapping a [`ChatService`] implementation,
 /// an [`EntityAccessService`] for entity authorization, a
-/// [`MacroAuthorizationService`] for caller authentication, a
+/// [`RoxAuthorizationService`] for caller authentication, a
 /// [`UserRolesAndPermissionsService`] for model-entitlement lookups, and the
 /// [`NonUserOwners`] gate deciding whether a team bot with no acting user may
 /// own the chats it creates.
 pub struct ChatRouterState<S, Svc, Auth, P> {
     inner: Arc<S>,
     access_service: Arc<Svc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
     permissions_state: UserPermissionsState<P>,
     non_user_owners: NonUserOwners,
 }
@@ -58,7 +58,7 @@ impl<S, Svc, Auth, P> FromRef<ChatRouterState<S, Svc, Auth, P>> for Arc<Svc> {
     }
 }
 
-impl<S, Svc, Auth, P> FromRef<ChatRouterState<S, Svc, Auth, P>> for MacroAuthorizationState<Auth> {
+impl<S, Svc, Auth, P> FromRef<ChatRouterState<S, Svc, Auth, P>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ChatRouterState<S, Svc, Auth, P>) -> Self {
         state.authorization_state.clone()
     }
@@ -79,7 +79,7 @@ impl<S, Svc, Auth, P> FromRef<ChatRouterState<S, Svc, Auth, P>> for NonUserOwner
 impl<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 > ChatRouterState<S, Svc, Auth, P>
 {
@@ -89,7 +89,7 @@ impl<
     pub fn new(
         service: S,
         access_service: Svc,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
         permissions_service: Arc<P>,
         non_user_owners: NonUserOwners,
     ) -> Self {
@@ -110,7 +110,7 @@ impl<
 pub fn chat_create_router<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
     T: Send + Sync + 'static,
 >(
@@ -132,7 +132,7 @@ pub fn chat_create_router<
 pub fn chat_view_router<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
     T: Send + Sync + 'static,
 >(
@@ -150,7 +150,7 @@ pub fn chat_view_router<
 pub fn chat_id_router<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
     T: Send + Sync + 'static,
 >(
@@ -224,7 +224,7 @@ pub struct CreateChatRequest {
 pub async fn create_chat_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     State(state): State<ChatRouterState<S, Svc, Auth, P>>,
@@ -263,7 +263,7 @@ pub async fn create_chat_handler<
 pub async fn get_chat_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<ViewAccessLevel, Svc, Auth>,
@@ -292,7 +292,7 @@ pub async fn get_chat_handler<
 pub async fn delete_chat_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
@@ -320,7 +320,7 @@ pub async fn delete_chat_handler<
 pub async fn permanently_delete_chat_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
@@ -364,7 +364,7 @@ pub struct PatchChatRequest {
 pub async fn patch_chat_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
@@ -412,7 +412,7 @@ pub async fn patch_chat_handler<
 pub async fn copy_chat_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<ViewAccessLevel, Svc, Auth>,
@@ -440,7 +440,7 @@ pub async fn copy_chat_handler<
 pub async fn revert_delete_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
@@ -479,7 +479,7 @@ pub struct GetChatPermissionsResponse {
 pub async fn get_chat_permissions_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<EditAccessLevel, Svc, Auth>,
@@ -571,7 +571,7 @@ pub struct RejectToolCallRequest {
 pub async fn update_tool_call_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
@@ -613,7 +613,7 @@ pub async fn update_tool_call_handler<
 pub async fn update_tool_response_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
@@ -656,7 +656,7 @@ pub async fn update_tool_response_handler<
 pub async fn call_tool_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
@@ -698,7 +698,7 @@ pub async fn call_tool_handler<
 pub async fn reject_tool_call_handler<
     S: ChatService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     P: UserRolesAndPermissionsService,
 >(
     access: ChatAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,

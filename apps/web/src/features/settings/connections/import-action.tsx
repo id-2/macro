@@ -1,7 +1,7 @@
 import { importSourceFor } from '@app/features/connector-import/core/catalog';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { lazyNamed } from '@core/util/lazyNamed';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createSignal, Show, Suspense } from 'solid-js';
 import { match } from 'ts-pattern';
 import { ConnectAction } from '../integration-ui';

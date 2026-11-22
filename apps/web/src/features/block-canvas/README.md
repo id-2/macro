@@ -202,7 +202,7 @@ gesture the system cancelled.
 Each finger reports its own moves, so the camera is moved once per animation
 frame, to where both fingers are by then, rather than once per event.
 `attachTouchNavigation` in `packages/graphics/src/browser` owns this for every
-`GraphicsSurface`; the glide and the pinch math are `@macro-inc/graphics/pan-zoom`,
+`GraphicsSurface`; the glide and the pinch math are `@rox-one/graphics/pan-zoom`,
 which the lightbox and opened images also use for their momentum.
 The Canvas panel's zoom menu offers **No grid snapping** (the default grid mode for each session),
 **Snap to px** (1 canvas px at every zoom), and **Auto snapping** (the smallest

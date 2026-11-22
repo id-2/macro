@@ -2,7 +2,7 @@
 
 use super::{entity_properties_get_query, entity_property_queries, property_option_queries};
 use chrono::Datelike;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_properties::service::property_value::PropertyValue;
 use models_properties::{DataType, EntityReference, EntityType};
 use sqlx::{Pool, Postgres};
@@ -349,7 +349,7 @@ async fn lookup_entity_property(pool: Pool<Postgres>) -> anyhow::Result<()> {
 async fn tagdoc_definition_ids(
     pool: &Pool<Postgres>,
     property_ids: &[Uuid],
-    tag_viewer: Option<&macro_user_id::user_id::MacroUserIdStr<'_>>,
+    tag_viewer: Option<&rox_user_id::user_id::RoxUserIdStr<'_>>,
 ) -> anyhow::Result<Vec<Uuid>> {
     let entity_refs = vec![EntityReference {
         entity_id: "tagdoc1".to_string(),
@@ -384,9 +384,9 @@ async fn get_bulk_filtered_includes_caller_visible_tags(
     // user1 sees the requested id plus their own and their team's tags,
     // never another user's personal tags.
     let user1 =
-        macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap();
     let user3 =
-        macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user3@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user3@test.com").unwrap();
 
     let ids = tagdoc_definition_ids(&pool, &[priority], Some(&user1)).await?;
     assert_eq!(ids.len(), 3);
@@ -584,7 +584,7 @@ async fn get_property_options_batch(pool: Pool<Postgres>) -> anyhow::Result<()> 
 async fn company1_definition_ids(
     pool: &Pool<Postgres>,
     property_ids: &[Uuid],
-    viewer: Option<&macro_user_id::user_id::MacroUserIdStr<'_>>,
+    viewer: Option<&rox_user_id::user_id::RoxUserIdStr<'_>>,
 ) -> anyhow::Result<Vec<Uuid>> {
     let entity_refs = vec![EntityReference {
         entity_id: "company1".to_string(),
@@ -615,11 +615,11 @@ async fn get_bulk_filtered_includes_viewer_team_deal_stage(
     let team1_region = Uuid::parse_str("dd333333-3333-3333-3333-333333333333")?;
     let customer_option = Uuid::parse_str("0dd11111-1111-1111-1111-111111111112")?;
     let user1 =
-        macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap();
     let user2 =
-        macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user2@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user2@test.com").unwrap();
     let user3 =
-        macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user3@test.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user3@test.com").unwrap();
 
     // Each viewer sees only their own team's Deal Stage.
     assert_eq!(

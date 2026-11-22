@@ -5,9 +5,9 @@ use axum::{
     body::{Body, to_bytes},
     http::{Request, StatusCode},
 };
-use macro_authorization::{
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
+use rox_authorization::{
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
 use serde_json::{Value, json};
 use tower::ServiceExt;
@@ -19,19 +19,19 @@ impl JwtValidator for Token {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, rootcause::Report<MacroAuthorizationError>>
+    ) -> Result<rox_authorization::ValidatedCredential, rootcause::Report<RoxAuthorizationError>>
     {
         let user_id = match jwt {
             "owner" => OWNER,
             "viewer" => VIEWER,
             _ => {
                 return Err(rootcause::Report::new(
-                    MacroAuthorizationError::InvalidCredentials,
+                    RoxAuthorizationError::InvalidCredentials,
                 ));
             }
         };
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -46,7 +46,7 @@ impl JwtValidator for Token {
 }
 
 fn app(world: &Shared) -> Router {
-    let authorization = MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
+    let authorization = RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
         Token,
         InternalAuthConfig {
             api_key: "test-internal-key".into(),

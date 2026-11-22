@@ -1,4 +1,5 @@
 import type { PaidPlanTier } from '@app/features/paywall/plans';
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { Button } from '@ui';
 import { type Accessor, type JSX, Show } from 'solid-js';
@@ -61,20 +62,20 @@ export function PlanStep(props: {
         >
           {plan.state().t === 'offer'
             ? trial.existingSubscription()
-              ? 'Manage your subscription.'
+              ? t('onboarding.planManageTitle')
               : trialEligible()
-                ? 'Free Claude & GPT for 30 days.'
-                : 'Get more with Pro.'
-            : 'Your workspace is ready.'}
+                ? t('onboarding.planTrialTitle')
+                : t('onboarding.planProTitle')
+            : t('onboarding.planReadyTitle')}
         </h1>
         <p class="mx-auto mt-6 max-w-[400px] text-sm leading-6 text-ink-muted text-balance sm:text-[15px]">
           {plan.state().t === 'offer'
             ? trial.existingSubscription()
-              ? 'You have an existing subscription. Review your subscription and payment details to restore access.'
+              ? t('onboarding.planExistingBody')
               : trialEligible()
-                ? 'Every feature, every AI model and 100 GB of storage. Your first 30 days are on us, then $40/user/month.'
-                : 'Every feature, every AI model and 100 GB of storage. $40/user/month.'
-            : "We're confirming your access so you can continue to your workspace."}
+                ? t('onboarding.planTrialBody')
+                : t('onboarding.planProBody')
+            : t('onboarding.planConfirmingBody')}
         </p>
       </header>
       <Show
@@ -84,26 +85,27 @@ export function PlanStep(props: {
         })()}
       >
         <p role="alert" class="mt-8 text-center text-sm text-ink-muted">
-          We're still waiting for payment confirmation. Please try again in a
-          moment.
+          {t('onboarding.planWaitingPayment')}
         </p>
       </Show>
       <div class="mt-9">
         <ContinueButton
           label={match(plan.state())
-            .with({ t: 'confirming' }, () => 'Confirming your subscription…')
+            .with({ t: 'confirming' }, () =>
+              t('onboarding.confirmingSubscription')
+            )
             .otherwise((state) =>
               props.finishing
-                ? 'Opening your workspace…'
+                ? t('onboarding.openingWorkspace')
                 : state.t === 'continue'
-                  ? 'Continue to workspace'
+                  ? t('onboarding.continueToWorkspace')
                   : trial.existingSubscription()
-                    ? 'Manage subscription'
+                    ? t('onboarding.manageSubscription')
                     : trial.eligibility().t === 'loading'
-                      ? 'Loading your Pro offer…'
+                      ? t('onboarding.loadingProOffer')
                       : trialEligible()
-                        ? 'Start 30 day trial'
-                        : 'Get Pro'
+                        ? t('onboarding.startTrial')
+                        : t('onboarding.getPro')
             )}
           // Free is always an exit from the offer, including when the lookup
           // fails or an invite is still loading: Pro must never be the only way
@@ -115,7 +117,7 @@ export function PlanStep(props: {
               }
             >
               <SecondaryButton
-                label="Continue with Free"
+                label={t('onboarding.continueFree')}
                 disabled={props.finishing || trial.managing()}
                 onClick={props.onContinueFree}
               />
@@ -146,11 +148,11 @@ export function PlanStep(props: {
       </div>
       <Show when={plan.state().t === 'offer' && !trial.existingSubscription()}>
         <p class="mx-auto mt-3 max-w-52 text-center text-xs leading-5 text-ink-extra-muted">
-          <span class="block">$40/user/month, billed monthly</span>
+          <span class="block">{t('onboarding.billedMonthly')}</span>
           <span class="block">
             {trialEligible()
-              ? 'after the trial. Cancel anytime.'
-              : 'Cancel anytime.'}
+              ? t('onboarding.afterTrialCancel')
+              : t('onboarding.cancelAnytime')}
           </span>
         </p>
       </Show>
@@ -162,10 +164,10 @@ export function PlanStep(props: {
         }
       >
         <div role="alert" class="mt-4 text-center text-sm text-ink-muted">
-          <p>Couldn't confirm your Pro offer.</p>
-          <p>You can continue with Free instead.</p>
+          <p>{t('onboarding.offerConfirmFailed')}</p>
+          <p>{t('onboarding.continueFreeInstead')}</p>
           <Button variant="ghost" size="sm" onClick={trial.retry}>
-            Try again
+            {t('onboarding.retry')}
           </Button>
         </div>
       </Show>

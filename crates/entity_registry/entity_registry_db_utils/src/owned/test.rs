@@ -1,7 +1,7 @@
 use super::*;
 use bot_id::{BotId, MACRO_AI_BOT_ID};
 use entity_registry::{Owner, RegisteredEntityType};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

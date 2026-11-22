@@ -3,7 +3,7 @@ import { MessageReferenceNavigation } from '@core/messages/message-reference-nav
 import type {
   ReplyTargetDecoratorProps,
   ReplyTargetParent,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { afterEach, expect, it, vi } from 'vitest';
 import { ReplyTarget } from './ReplyTarget';

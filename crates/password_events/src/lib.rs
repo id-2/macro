@@ -5,9 +5,9 @@
 #[cfg(test)]
 mod test;
 
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroPasswordsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxPasswordsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -32,7 +32,7 @@ pub struct AccessRequestResolvedMetadata {
     /// Agent account the event is addressed to; routing only, removed
     /// before delivery, so it is not part of the published schema.
     #[cfg_attr(feature = "schema", schema(ignore))]
-    pub recipient_user_id: MacroUserIdStr<'static>,
+    pub recipient_user_id: RoxUserIdStr<'static>,
     /// Team owning the item.
     pub team_id: Uuid,
     /// Requested item.
@@ -43,7 +43,7 @@ pub struct AccessRequestResolvedMetadata {
     pub status: AccessRequestResolution,
 }
 
-/// Events that can be published to [`MacroPasswordsTopic`].
+/// Events that can be published to [`RoxPasswordsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 #[cfg_attr(feature = "schema", derive(utoipa::ToSchema))]
@@ -54,18 +54,18 @@ pub enum PasswordTopicEvent {
 }
 
 impl TopicEvent for PasswordTopicEvent {
-    type Topic = MacroPasswordsTopic;
+    type Topic = RoxPasswordsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroPasswordsTopic`], keyed by the addressed user.
-pub struct PasswordMacroEvent {
+/// Publishable event for [`RoxPasswordsTopic`], keyed by the addressed user.
+pub struct PasswordRoxEvent {
     key: String,
     event: Event<PasswordTopicEvent>,
 }
 
-impl PasswordMacroEvent {
+impl PasswordRoxEvent {
     /// Build a resolution event with an explicit envelope id, so a redelivered
     /// outbox entry keeps its identity.
     pub fn access_request_resolved(
@@ -86,7 +86,7 @@ impl PasswordMacroEvent {
     }
 }
 
-impl MacroEvent for PasswordMacroEvent {
+impl RoxEvent for PasswordRoxEvent {
     type EventPayload = PasswordTopicEvent;
 
     fn key(&self) -> &str {

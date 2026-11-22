@@ -163,7 +163,7 @@ Postgres repo.
 
 ## 5. Lifecycle: rename, trash, delete, favorites
 
-- **`crates/macro_db_client/src/item_access/delete.rs`:** put the kind in the arm
+- **`crates/rox_db_client/src/item_access/delete.rs`:** put the kind in the arm
   for kinds with `entity_access` rows.
 - **Entity mutation:** implement the `crates/entity_mutation` capability traits
   (`RenameEntity`, `TrashEntity`, `RestoreEntity`, `DeleteEntityPermanently`, ...)
@@ -211,7 +211,7 @@ Postgres repo.
 
 Required for anything people act on; Recent is built from activity.
 
-- **Topic:** add it to `topics!` in `crates/macro_event_topics/src/lib.rs` (and its
+- **Topic:** add it to `topics!` in `crates/rox_event_topics/src/lib.rs` (and its
   test), then `cargo x kafka-topics`. Never hand-edit
   `.github/kafka-cluster-topics.json`. The topic must exist before the producer
   deploys, or events are lost.

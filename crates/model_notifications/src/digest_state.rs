@@ -1,5 +1,5 @@
-use crate::{ColleagueJoinedMacro, InviteToTeamMetadata, NewEmailMetadata};
-use invite_email::InviteToMacro;
+use crate::{ColleagueJoinedRox, InviteToTeamMetadata, NewEmailMetadata};
+use invite_email::InviteToRox;
 use notification::domain::models::email_notification_digest::{
     EmailBlockList, NotificationSetBuilder,
 };
@@ -11,7 +11,7 @@ mod test;
 pub fn digest_email_block_list() -> EmailBlockList {
     EmailBlockList::new::<NewEmailMetadata>()
         .append::<InviteToTeamMetadata>()
-        .append::<InviteToMacro>()
+        .append::<InviteToRox>()
         .append::<invite_email::CallInvite>()
-        .append::<ColleagueJoinedMacro>()
+        .append::<ColleagueJoinedRox>()
 }

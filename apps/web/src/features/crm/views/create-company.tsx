@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { ThrownResultError } from '@core/util/result';
 import EnvelopeIcon from '@icon/system/regular/envelope.svg';
@@ -11,13 +12,13 @@ import { useCreateCompanyMutation } from './use-crm';
 export function companyCreationError(cause: unknown): string {
   if (cause instanceof ThrownResultError) {
     if (cause.errors.some((e) => e.code === 'CONFLICT')) {
-      return 'A company with this domain already exists.';
+      return t('crm.companyExists');
     }
     if (cause.errors.some((e) => e.code === 'FORBIDDEN')) {
-      return "CRM isn't enabled for your team.";
+      return t('crm.crmNotEnabled');
     }
   }
-  return 'Failed to create company. Try again.';
+  return t('crm.failedCreateCompany');
 }
 
 export function CreateCompanyModal(props: {
@@ -54,11 +55,11 @@ export function CreateCompanyModal(props: {
   async function submit() {
     if (createCompanyMutation.isPending) return;
     if (!companyName()) {
-      setError('Enter a company name');
+      setError(t('crm.enterCompanyName'));
       return;
     }
     if (companyDomain() && !isCompanyDomain(companyDomain())) {
-      setError('Enter a valid domain like acme.com');
+      setError(t('crm.enterValidDomain'));
       return;
     }
 
@@ -82,7 +83,7 @@ export function CreateCompanyModal(props: {
         <Panel.Body>
           <form
             class="h-full min-h-0"
-            aria-label="New company"
+            aria-label={t('crm.newCompany')}
             onSubmit={(event) => {
               event.preventDefault();
               fireAndForget(submit(), 'crm');
@@ -101,15 +102,15 @@ export function CreateCompanyModal(props: {
           >
             <EntityComposer.Root>
               <EntityComposer.Header>
-                <Dialog.Title class="sr-only">New company</Dialog.Title>
+                <Dialog.Title class="sr-only">{t('crm.newCompany')}</Dialog.Title>
                 <EntityComposer.Title class="mb-0 min-w-0 flex-1 self-center">
                   <input
                     autofocus
-                    aria-label="Company name"
-                    placeholder="Company name"
+                    aria-label={t('crm.companyName')}
+                    placeholder={t('crm.companyName')}
                     autocomplete="off"
                     data-1p-ignore
-                    aria-invalid={error() === 'Enter a company name'}
+                    aria-invalid={error() === t('crm.enterCompanyName')}
                     class="ph-no-capture w-full min-w-0 text-xl/7 font-medium outline-none bg-transparent placeholder:text-ink-placeholder"
                     value={name()}
                     disabled={createCompanyMutation.isPending}
@@ -122,8 +123,8 @@ export function CreateCompanyModal(props: {
                 <Button
                   variant="ghost"
                   tabIndex={-1}
-                  aria-label="Close"
-                  tooltip="Close"
+                  aria-label={t('common.close')}
+                  tooltip={t('common.close')}
                   size="icon-md"
                   disabled={createCompanyMutation.isPending}
                   onClick={close}
@@ -138,13 +139,13 @@ export function CreateCompanyModal(props: {
                     class="size-4 shrink-0 text-ink-muted"
                   />
                   <input
-                    aria-label="Domain"
-                    placeholder="Domain (optional), like acme.com"
+                    aria-label={t('crm.domain')}
+                    placeholder={t('crm.domainPlaceholder')}
                     autocomplete="off"
                     spellcheck={false}
                     data-1p-ignore
                     aria-invalid={
-                      error() === 'Enter a valid domain like acme.com'
+                      error() === t('crm.enterValidDomain')
                     }
                     class="ph-no-capture w-full min-w-0 bg-transparent text-ink outline-none placeholder:text-ink-placeholder"
                     value={domain()}
@@ -168,8 +169,8 @@ export function CreateCompanyModal(props: {
                   <EnvelopeIcon class="size-4 shrink-0" />
                   <span class="truncate">
                     {companyDomain()
-                      ? 'Emails from this domain link to the company'
-                      : 'Add contacts to the company by email'}
+                      ? t('crm.emailsLinkDomain')
+                      : t('crm.addContactsByEmail')}
                   </span>
                 </span>
                 <EntityComposer.Submit
@@ -179,8 +180,8 @@ export function CreateCompanyModal(props: {
                   disabled={!canSubmit()}
                 >
                   {createCompanyMutation.isPending
-                    ? 'Creating…'
-                    : 'Create Company'}
+                    ? t('crm.creating')
+                    : t('crm.createCompany')}
                 </EntityComposer.Submit>
               </EntityComposer.Footer>
             </EntityComposer.Root>

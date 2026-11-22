@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { type CrmCompanyEntity, getCompanyOwnerId } from '@entity';
 import { SYSTEM_PROPERTY_IDS } from '@property/constants';
@@ -63,6 +64,8 @@ export function CrmExport(props: {
     // Keep the dialog open when the platform save flow is canceled or fails.
     if (saved) props.onClose();
   }
+  const kindLabel = () =>
+    props.kind === 'companies' ? t('crm.companies') : t('crm.people');
   return (
     <Dialog
       open
@@ -74,17 +77,16 @@ export function CrmExport(props: {
           <div class="flex max-h-[85vh] flex-col">
             <div class="px-5 pt-5 pb-4">
               <Dialog.Title class="text-base font-semibold">
-                Export {props.kind}
+                {t('crm.exportTitle', { kind: kindLabel() })}
               </Dialog.Title>
               <Dialog.Description class="mt-1 text-sm text-ink-muted">
-                Choose the records and columns for your CSV. Review the export
-                before downloading.
+                {t('crm.exportDescription')}
               </Dialog.Description>
             </div>
             <div class="min-h-0 overflow-auto px-5 pb-4 flex flex-col gap-5">
               <fieldset disabled={pending()} class="flex flex-col gap-2">
                 <legend class="mb-2 text-xs font-medium text-ink-muted">
-                  Records
+                  {t('crm.records')}
                 </legend>
                 <For each={['current', 'all'] as const}>
                   {(value) => (
@@ -104,23 +106,25 @@ export function CrmExport(props: {
                       <span>
                         <span class="block font-medium">
                           {value === 'current'
-                            ? `Current view · ${props.currentView}`
-                            : `All ${props.kind} across views`}
+                            ? t('crm.currentView', { name: props.currentView })
+                            : t('crm.allKindAcrossViews', { kind: kindLabel() })}
                         </span>
                         <span class="mt-1 block text-xs text-ink-muted">
                           {value === 'current'
-                            ? 'Includes all matching records, with the current filters and search.'
-                            : 'All visible records, once each. Ignores the current filters and search.'}
+                            ? t('crm.exportAllMatching')
+                            : t('crm.exportVisible')}
                         </span>
                       </span>
                     </label>
                   )}
                 </For>
               </fieldset>
-              <fieldset disabled={pending()} aria-label="Export columns">
+              <fieldset disabled={pending()} aria-label={t('crm.exportColumns')}>
                 <div class="mb-2 flex items-center justify-between gap-3">
                   <span class="text-xs font-medium text-ink-muted">
-                    Columns · {selectedColumns().length} selected
+                    {t('crm.columnsSelected', {
+                      count: selectedColumns().length,
+                    })}
                   </span>
                   <div class="flex gap-2 text-xs">
                     <button
@@ -130,7 +134,7 @@ export function CrmExport(props: {
                         setSelected(columns().map((column) => column.id))
                       }
                     >
-                      Select all
+                      {t('crm.selectAll')}
                     </button>
                     <span class="text-ink-extra-muted">/</span>
                     <button
@@ -138,7 +142,7 @@ export function CrmExport(props: {
                       class="text-ink-muted hover:text-ink"
                       onClick={() => setSelected([])}
                     >
-                      Clear
+                      {t('crm.clear')}
                     </button>
                   </div>
                 </div>
@@ -212,22 +216,23 @@ export function CrmExport(props: {
                 {(data) => (
                   <div class="flex flex-col gap-2">
                     <p role="status" class="text-sm font-medium">
-                      {data().length.toLocaleString()} {props.kind} ·{' '}
-                      {selectedColumns().length} columns
+                      {t('crm.exportPreviewCount', {
+                        count: data().length,
+                        columns: selectedColumns().length,
+                      })}
                     </p>
                     <Show
                       when={data().length}
                       fallback={
                         <p class="text-xs text-ink-muted">
-                          No records match. The CSV will contain column headers
-                          only.
+                          {t('crm.noRecordsMatch')}
                         </p>
                       }
                     >
                       <div class="overflow-x-auto rounded-lg bg-hover/40 p-2">
                         <table
                           class="w-full text-left text-xs"
-                          aria-label="Export preview"
+                          aria-label={t('crm.exportPreview')}
                         >
                           <thead>
                             <tr>
@@ -288,7 +293,7 @@ export function CrmExport(props: {
                 {filename()}
               </span>
               <Button variant="ghost" onClick={props.onClose}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="secondary"
@@ -303,10 +308,10 @@ export function CrmExport(props: {
                 }
               >
                 {pending()
-                  ? 'Preparing…'
+                  ? t('crm.preparing')
                   : rows()
-                    ? 'Download CSV'
-                    : 'Prepare export'}
+                    ? t('crm.downloadCsv')
+                    : t('crm.prepareExport')}
               </Button>
             </div>
           </div>

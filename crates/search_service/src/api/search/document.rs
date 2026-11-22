@@ -1,6 +1,6 @@
 use crate::api::search::simple::SearchError;
 use indexmap::IndexMap;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_opensearch::SearchEntityType;
 use models_properties::{EntityReference, EntityType};
 use models_search::SearchHighlight;
@@ -37,7 +37,7 @@ pub(in crate::api::search) async fn enrich_documents(
 
     // Fetch document metadata from database
     let document_histories =
-        macro_db_client::document::get_document_history::get_document_history_info(
+        rox_db_client::document::get_document_history::get_document_history_info(
             &ctx.db,
             user_id,
             &document_ids,
@@ -58,7 +58,7 @@ pub(in crate::api::search) async fn enrich_documents(
 
     // Scope tags to the viewer so another user's personal tags never leak into
     // the response. System properties still ride along via the key list.
-    let viewer_user_id = MacroUserIdStr::parse_from_str(user_id)
+    let viewer_user_id = RoxUserIdStr::parse_from_str(user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?;
     let properties_map = if !entity_refs.is_empty() {
         properties::outbound::entity_properties_get_query::get_bulk_entity_properties_values_filtered(
@@ -97,7 +97,7 @@ pub fn construct_search_result(
     search_results: Vec<opensearch_client::search::model::SearchHit>,
     document_histories: HashMap<
         String,
-        macro_db_client::document::get_document_history::DocumentHistoryInfo,
+        rox_db_client::document::get_document_history::DocumentHistoryInfo,
     >,
     properties_map: HashMap<String, Vec<SoupProperty>>,
     search_term: Option<&str>,

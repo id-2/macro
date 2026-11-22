@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ViewBreadcrumbs } from '@app/components/view-shell';
 import { SidePanel } from '@components/app/side-panel';
 import { EntityIcon } from '@core/component/EntityIcon';
@@ -323,7 +324,7 @@ function DetailError(props: {
           Try again
         </Button>
         <Button variant="ghost" size="sm" onClick={props.onBack}>
-          {props.nested ? 'Go back' : 'Back to view'}
+          {props.nested ? t('crm.goBack') : t('crm.backToView')}
         </Button>
       </div>
     </div>

@@ -192,7 +192,7 @@ struct CookieRewrites {
 /// bare copy would otherwise shadow the stack's own (cookie jars keep the last
 /// cookie of a name).
 fn cookie_rewrites(instance: &Instance) -> CookieRewrites {
-    let namespace = format!("macro-{}--", instance.name());
+    let namespace = format!("rox-{}--", instance.name());
     CookieRewrites {
         set_cookie: vec![
             // Every named cookie; a nameless one (no `=` before `;`) can't be

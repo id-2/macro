@@ -1,19 +1,19 @@
 import type { WhatsAppAccount as WhatsAppAccountRecord } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 
 /** The current user's WhatsApp account, connected through the Rox app. */
-export class WhatsAppAccount extends MacroEntity<WhatsAppAccountRecord> {
+export class WhatsAppAccount extends RoxEntity<WhatsAppAccountRecord> {
   /** Reference an account; reads still enforce the authenticated owner's scope. */
-  static byId(client: MacroClient, id: string): WhatsAppAccount {
+  static byId(client: RoxClient, id: string): WhatsAppAccount {
     return new WhatsAppAccount(client, id);
   }
 
   /** Seed an account handle from an API record. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     record: WhatsAppAccountRecord,
   ): WhatsAppAccount {
     return new WhatsAppAccount(client, record.id, record);
@@ -22,7 +22,7 @@ export class WhatsAppAccount extends MacroEntity<WhatsAppAccountRecord> {
   protected async fetch(): Promise<WhatsAppAccountRecord> {
     const { account } = unwrap(await this.client.storage.whatsappAccount());
     if (account?.id !== this.id) {
-      throw new MacroNotFoundError('WhatsApp account is not available');
+      throw new RoxNotFoundError('WhatsApp account is not available');
     }
     return account;
   }

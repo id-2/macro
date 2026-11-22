@@ -1,11 +1,11 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 fn connection() -> Connection {
     Connection {
-        id: macro_uuid::generate_uuid_v7(),
-        namespace: macro_uuid::generate_uuid_v7(),
-        user_id: MacroUserIdStr::parse_from_str("macro|granola-a@test.com")
+        id: rox_uuid::generate_uuid_v7(),
+        namespace: rox_uuid::generate_uuid_v7(),
+        user_id: RoxUserIdStr::parse_from_str("macro|granola-a@test.com")
             .unwrap()
             .into_owned(),
         account_id: "apn_test".into(),
@@ -20,7 +20,7 @@ fn connection() -> Connection {
 }
 fn event() -> Event {
     Event {
-        event_id: macro_uuid::generate_uuid_v7(),
+        event_id: rox_uuid::generate_uuid_v7(),
         event_type: EventType::Generated,
         note_id: NoteId("not_123456789abcde".into()),
         occurred_at: chrono::Utc::now(),
@@ -100,10 +100,10 @@ async fn encryption_is_bound_to_the_connection() {
         .connect_lazy("postgres://localhost/test")
         .unwrap();
     let repo = PgSyncRepository::new(pool, &[7; 32]);
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let encrypted = repo.encrypt(id, SigningSecret("secret".into())).unwrap();
     assert!(
-        repo.decrypt(macro_uuid::generate_uuid_v7(), encrypted)
+        repo.decrypt(rox_uuid::generate_uuid_v7(), encrypted)
             .is_err()
     );
 }
@@ -124,10 +124,10 @@ use std::sync::{
 struct Account(Arc<AtomicBool>);
 #[async_trait]
 impl Accounts for Account {
-    async fn account(&self, _: &MacroUserIdStr<'static>) -> Result<Option<String>> {
+    async fn account(&self, _: &RoxUserIdStr<'static>) -> Result<Option<String>> {
         Ok(self.0.load(Ordering::SeqCst).then(|| "apn_test".into()))
     }
-    async fn connected(&self) -> Result<Vec<(MacroUserIdStr<'static>, String)>> {
+    async fn connected(&self) -> Result<Vec<(RoxUserIdStr<'static>, String)>> {
         Ok(self
             .0
             .load(Ordering::SeqCst)
@@ -162,17 +162,17 @@ impl CallImportService for Calls {
     async fn ingest(&self, _: ImportedCall) -> Result<Uuid> {
         panic!("webhook receipt must only enqueue")
     }
-    async fn list(&self, _: &MacroUserIdStr<'static>) -> Result<Vec<ImportedCallPreview>> {
+    async fn list(&self, _: &RoxUserIdStr<'static>) -> Result<Vec<ImportedCallPreview>> {
         Ok(vec![])
     }
     async fn list_source_records(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: CallProvider,
     ) -> Result<Vec<ImportedCallRecord>> {
         Ok(vec![])
     }
-    async fn read(&self, _: &MacroUserIdStr<'static>, _: Uuid) -> Result<Option<CallEntityRecord>> {
+    async fn read(&self, _: &RoxUserIdStr<'static>, _: Uuid) -> Result<Option<CallEntityRecord>> {
         Ok(None)
     }
 }
@@ -207,7 +207,7 @@ async fn connecting_starts_sync_and_disconnecting_stops_it_without_leaking_deliv
         connection.id,
         "an active sync is not re-registered"
     );
-    let id = macro_uuid::generate_uuid_v7().to_string();
+    let id = rox_uuid::generate_uuid_v7().to_string();
     let timestamp = chrono::Utc::now().timestamp().to_string();
     let body = serde_json::to_vec(&serde_json::json!({
         "event_id":id, "event_type":"note.generated", "note_id":"not_123456789abcde",

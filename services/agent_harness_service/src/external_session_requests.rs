@@ -12,9 +12,9 @@ use agent_session::domain::model::{AgentSession, SessionSource};
 use agent_session::domain::ports::{
     AgentSessionRepo, ExternalSessionRequester, RequestedExternalSession,
 };
-use agent_trigger::domain::broker_events::{AgentSessionMacroEvent, AgentSessionRequestedEvent};
+use agent_trigger::domain::broker_events::{AgentSessionRoxEvent, AgentSessionRequestedEvent};
 use harnesses::outbound::pg_harness_repo::PgHarnessRepo;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use model_owner::Owner;
 
 /// How long a runtime gets to create the session before the request is
@@ -44,7 +44,7 @@ impl<Broker, Sessions> BrokerExternalSessionRequests<Broker, Sessions> {
 
 impl<Broker, Sessions> ExternalSessionRequester for BrokerExternalSessionRequests<Broker, Sessions>
 where
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Sessions: AgentSessionRepo,
 {
     async fn request(
@@ -67,7 +67,7 @@ where
             .runtime_user_for_bot(request.bot_id)
             .await
             .map_err(|error| AgentSessionError::Unknown(anyhow::anyhow!(error)))?;
-        let event = AgentSessionMacroEvent::requested_event(AgentSessionRequestedEvent {
+        let event = AgentSessionRoxEvent::requested_event(AgentSessionRequestedEvent {
             bot_id: request.bot_id,
             repo_url: request.repo_url,
             session_id,

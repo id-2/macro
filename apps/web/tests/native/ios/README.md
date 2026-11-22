@@ -81,7 +81,7 @@ obscures screenshots; do not interpret it as a scene-lifecycle error.
 ## Thread reply push notifications
 
 Run a native debug build with automatic bundle updates disabled. For a separate
-Vite server used by the native app, set `MACRO_DEV_PROXY=false` (or run it through
+Vite server used by the native app, set `ROX_DEV_PROXY=false` (or run it through
 the Tauri CLI); the browser-only hosted API proxy cannot be fetched through the
 native HTTP plugin from `tauri://localhost`.
 

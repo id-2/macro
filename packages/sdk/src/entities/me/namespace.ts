@@ -1,5 +1,5 @@
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { StaticImage } from '../images/image';
 import type { ProfilePicture } from '../users/profile-picture';
 import { User } from '../users/user';
@@ -19,7 +19,7 @@ export interface UpdateMeOptions {
   /**
    * An image from {@link MeNamespace.uploadProfilePicture}. To switch back to
    * an earlier upload without uploading again, pass its handle again, or
-   * `macro.images.byId(savedId)`. Setting is throttled to once a second per
+   * `rox.images.byId(savedId)`. Setting is throttled to once a second per
    * user; a faster call fails with 429.
    */
   profilePicture?: StaticImage;
@@ -28,10 +28,10 @@ export interface UpdateMeOptions {
 /**
  * The authenticated user's own profile.
  *
- * @routing Use when reading who the user is or changing their own name or profile picture; not looking up other people (`macro.users`).
+ * @routing Use when reading who the user is or changing their own name or profile picture; not looking up other people (`rox.users`).
  */
 export class MeNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Upload an image to use as your profile picture. This only stores it; pass
@@ -61,7 +61,7 @@ export class MeNamespace {
       body: data,
     });
     if (!response.ok) {
-      throw new MacroError(`image upload failed with ${response.status}`);
+      throw new RoxError(`image upload failed with ${response.status}`);
     }
     return StaticImage.byId(this.client, file_id);
   }
@@ -85,13 +85,13 @@ export class MeNamespace {
    * signing in, so teammates can tell who they are working with.
    *
    * @example
-   * const image = await macro.me.uploadProfilePicture(bytes, {
+   * const image = await rox.me.uploadProfilePicture(bytes, {
    *   fileName: 'avatar.png',
    *   contentType: 'image/png',
    * });
-   * await macro.me.update({ name: 'Research Agent', profilePicture: image });
+   * await rox.me.update({ name: 'Research Agent', profilePicture: image });
    * // Later, switch back to it from its saved id:
-   * await macro.me.update({ profilePicture: macro.images.byId(savedId) });
+   * await rox.me.update({ profilePicture: rox.images.byId(savedId) });
    *
    * @write
    * @idempotent

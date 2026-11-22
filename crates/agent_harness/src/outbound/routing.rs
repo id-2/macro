@@ -24,7 +24,7 @@ use crate::domain::model::{AgentKind, SessionBlocker, SpawnContainer};
 use crate::domain::ports::ContainerManager;
 use crate::domain::sandbox::SandboxResizeEffect;
 use agent_session::domain::model::SandboxSize;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -63,7 +63,7 @@ where
     async fn preflight(
         &self,
         kind: AgentKind,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> Result<Option<SessionBlocker>> {
         match kind {
             AgentKind::CodexCloud => self.codex.preflight(kind, owner).await,

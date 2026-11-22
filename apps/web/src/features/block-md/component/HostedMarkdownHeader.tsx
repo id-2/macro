@@ -1,5 +1,5 @@
 import { useSplitHeaderScope } from '@components/app/SplitHeaderScope';
-import type { SyncSourceStatus } from '@macro-inc/collaboration/collab/source';
+import type { SyncSourceStatus } from '@rox-one/collaboration/collab/source';
 import { type Accessor, Show } from 'solid-js';
 import { MobileMarkdownHeader } from '../views/mobile/markdown-header';
 

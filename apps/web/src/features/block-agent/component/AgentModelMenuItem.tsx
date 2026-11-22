@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   ModelRow,
   type ModelRowProps,
@@ -109,17 +110,19 @@ function EffortModelSubmenu(
             >
               Use {props.option.label}
             </Dropdown.Item>
-            <Dropdown.GroupLabel>Reasoning effort</Dropdown.GroupLabel>
+            <Dropdown.GroupLabel>
+              {t('agentChat.reasoningEffort')}
+            </Dropdown.GroupLabel>
             <Show
               when={effort()}
               fallback={
                 <div role="status" class="px-2 py-2 text-xs text-ink-muted">
                   {query.isFetching
-                    ? 'Loading effort options…'
+                    ? t('agentChat.loadingEffortOptions')
                     : query.isError
                       ? (providerCredentialRejectedMessage(query.error) ??
                         'Effort options unavailable.')
-                      : 'No effort options for this model.'}
+                      : t('agentChat.noEffortOptions')}
                 </div>
               }
             >

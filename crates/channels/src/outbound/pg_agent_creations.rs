@@ -4,7 +4,7 @@
 use crate::domain::{models::ReferencedShareItem, ports::AgentCreations};
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -31,7 +31,7 @@ impl AgentCreations for PgAgentCreations {
     async fn request_sent_at(
         &self,
         thread_root: Uuid,
-        person: &MacroUserIdStr<'static>,
+        person: &RoxUserIdStr<'static>,
         before: DateTime<Utc>,
     ) -> Result<Option<DateTime<Utc>>, Self::Err> {
         // The root by primary key, replies by the (thread_id, created_at) index.
@@ -61,7 +61,7 @@ impl AgentCreations for PgAgentCreations {
     async fn channel_request_sent_at(
         &self,
         channel_id: Uuid,
-        person: &MacroUserIdStr<'static>,
+        person: &RoxUserIdStr<'static>,
         before: DateTime<Utc>,
     ) -> Result<Option<DateTime<Utc>>, Self::Err> {
         // The parent timeline index, filtered to the person.
@@ -84,7 +84,7 @@ impl AgentCreations for PgAgentCreations {
     async fn created_since(
         &self,
         bot: BotId,
-        person: &MacroUserIdStr<'static>,
+        person: &RoxUserIdStr<'static>,
         since: DateTime<Utc>,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<ReferencedShareItem>, Self::Err> {

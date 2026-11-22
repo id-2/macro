@@ -1,4 +1,4 @@
-import { NOOP_SPAN, Telemetry } from '@macro-inc/observability';
+import { NOOP_SPAN, Telemetry } from '@rox-one/observability';
 import { afterEach, expect, it, vi } from 'vitest';
 
 vi.mock('./flow', () => ({ beginInteraction: vi.fn() }));

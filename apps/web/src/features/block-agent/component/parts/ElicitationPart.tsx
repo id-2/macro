@@ -13,6 +13,7 @@
  * under review opens the tool's own composer here.
  */
 
+import { t } from '@app/lib/i18n';
 import {
   LiveQuestionCard,
   parseDraftedTool,
@@ -79,7 +80,9 @@ export function ElicitationPart(props: {
   const respond: RespondToElicitation = (answer) =>
     interactions.respond({ ...identity(), answer });
   const waitingFor = () =>
-    interactions.canAnswer() ? 'Waiting for you' : 'Waiting for an editor';
+    interactions.canAnswer()
+      ? t('agentChat.waitingForYou')
+      : t('agentChat.waitingForEditor');
 
   return (
     <Show when={live()} fallback={<ResolvedElicitation part={props.part} />}>
@@ -236,7 +239,7 @@ function ResolvedQuestion(props: { part: ElicitationPartData }) {
 
   return (
     <ToolCard
-      title="Question"
+      title={t('agentChat.question')}
       subtitle={props.part.message}
       status={props.part.outcome.kind === 'errored' ? 'failed' : 'completed'}
       muted={props.part.outcome.kind === 'errored'}

@@ -21,13 +21,13 @@
 mod config;
 mod process;
 
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use rootcause::prelude::{Report, ResultExt as _};
 use sqlx::postgres::PgPoolOptions;
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
-    let entrypoint = MacroEntrypoint::default().init();
+    let entrypoint = RoxEntrypoint::default().init();
     let result = run().await;
     entrypoint.shutdown();
     result

@@ -3,7 +3,7 @@ import type {
   GenerateImageReference,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
 import { GeneratedImage, StaticImage } from './image';
 
@@ -33,10 +33,10 @@ export interface GenerateImageOptions {
 /**
  * Image generation, charged to the acting user's AI allowance.
  *
- * @routing Use when generating an image; not structured output or classification (`macro.ai`).
+ * @routing Use when generating an image; not structured output or classification (`rox.ai`).
  */
 export class ImagesNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * A handle to an image already in static file storage, such as a profile
@@ -53,7 +53,7 @@ export class ImagesNamespace {
    * let the message reserve space before the image loads.
    *
    * @example
-   * const image = await macro.images.generate({
+   * const image = await rox.images.generate({
    *   prompt: 'A watercolor lighthouse at dusk',
    *   aspectRatio: 'widescreen',
    * });

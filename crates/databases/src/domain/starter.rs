@@ -1,13 +1,13 @@
 //! A small, retry-safe first database. Blueprint and provisioning policy live here.
 
 use chrono::{DateTime, Utc};
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_databases::OptionId;
 use models_databases::position::{Position, PositionError, key_between};
 use models_databases::views::{Lane, LaneKey, ViewLayout, ViewQuery};
 use serde::Serialize;
 
-use super::events::{Attribution, DatabaseCreatedMetadata, DatabaseMacroEvent};
+use super::events::{Attribution, DatabaseCreatedMetadata, DatabaseRoxEvent};
 use super::models::{ColumnId, DatabaseError, DatabaseId, DatabaseView, TableId, ViewId, Viewer};
 
 /// Starter result. A missing database means the user already started or removed it.
@@ -52,15 +52,15 @@ impl Default for StarterBlueprint {
         Self {
             database_id: DatabaseId::new(),
             table_id: TableId::new(),
-            name: "Getting started",
-            table_name: "Ideas",
-            title_name: "Name",
-            stage_name: "Stage",
-            stages: ["To do", "Doing", "Done"],
+            name: "Начало работы",
+            table_name: "Идеи",
+            title_name: "Название",
+            stage_name: "Этап",
+            stages: ["Сделать", "В работе", "Готово"],
             rows: [
-                ("Add your first idea", 0),
-                ("Try moving a card", 1),
-                ("Explore table and board views", 2),
+                ("Добавьте первую идею", 0),
+                ("Попробуйте перетащить карточку", 1),
+                ("Изучите таблицу и доску", 2),
             ],
         }
     }
@@ -92,14 +92,14 @@ impl StarterBlueprint {
         };
         Ok([
             view(
-                "Table",
+                "Таблица",
                 table_position,
                 ViewLayout::Table {
                     columns: Vec::new(),
                 },
             ),
             view(
-                "Board",
+                "Доска",
                 board_position,
                 ViewLayout::Board {
                     group_by: stage_column,
@@ -154,7 +154,7 @@ impl<Repository, Broker> DatabaseStarterServiceImpl<Repository, Broker> {
     }
 }
 
-impl<Repository: DatabaseStarterRepo, Broker: MacroEventBroker> DatabaseStarterService
+impl<Repository: DatabaseStarterRepo, Broker: RoxEventBroker> DatabaseStarterService
     for DatabaseStarterServiceImpl<Repository, Broker>
 {
     async fn ensure_starter(&self, viewer: Viewer) -> Result<StarterDatabase, DatabaseError> {
@@ -165,7 +165,7 @@ impl<Repository: DatabaseStarterRepo, Broker: MacroEventBroker> DatabaseStarterS
             .await
             .map_err(|error| DatabaseError::Repo(rootcause::Report::new(error).into_dynamic()))?;
         if outcome.created {
-            let event = DatabaseMacroEvent::created(DatabaseCreatedMetadata {
+            let event = DatabaseRoxEvent::created(DatabaseCreatedMetadata {
                 database_id: blueprint.database_id,
                 owner: viewer.user_id.clone(),
                 name: blueprint.name.into(),

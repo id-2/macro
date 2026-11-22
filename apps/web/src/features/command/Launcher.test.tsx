@@ -78,7 +78,7 @@ vi.mock('@core/util/create', () => ({
 vi.mock('@core/component/Toast/Toast', () => ({
   toast: { failure: host.toastFailure },
 }));
-vi.mock('@macro-inc/lexical-core/markdown-golden', () => ({}));
+vi.mock('@rox-one/lexical-core/markdown-golden', () => ({}));
 vi.mock('@ui', () => ({}));
 vi.mock('@ui/components/Hotkey', () => ({}));
 vi.mock('./mobile/MobileCreateSheet', () => ({}));

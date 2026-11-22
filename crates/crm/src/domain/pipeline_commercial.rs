@@ -61,7 +61,7 @@ fn select(name: String, labels: &[&str]) -> ProvisionedColumn {
             .iter()
             .map(|label| {
                 (
-                    macro_uuid::generate_uuid_v7(),
+                    rox_uuid::generate_uuid_v7(),
                     PropertyOptionValue::String((*label).into()),
                 )
             })

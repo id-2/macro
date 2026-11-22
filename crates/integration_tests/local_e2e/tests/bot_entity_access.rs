@@ -9,10 +9,10 @@ use sqlx::{PgPool, postgres::PgPoolOptions};
 use uuid::Uuid;
 
 const DEFAULT_LOCAL_DATABASE_URL: &str = "postgres://user:password@localhost:5432/macrodb";
-const BOT_TOKEN_HEADER: &str = "x-macro-bot-token";
-const BOT_SCOPE_HEADER: &str = "x-macro-bot-scope";
-const BOT_FOR_MACRO_USER_ID_HEADER: &str = "x-macro-bot-for-macro-user-id";
-const BOT_FOR_FUSIONAUTH_USER_ID_HEADER: &str = "x-macro-bot-for-fusionauth-user-id";
+const BOT_TOKEN_HEADER: &str = "x-rox-bot-token";
+const BOT_SCOPE_HEADER: &str = "x-rox-bot-scope";
+const BOT_FOR_MACRO_USER_ID_HEADER: &str = "x-rox-bot-for-rox-user-id";
+const BOT_FOR_FUSIONAUTH_USER_ID_HEADER: &str = "x-rox-bot-for-fusionauth-user-id";
 
 #[tokio::test]
 #[ignore = "requires `just local-e2e-rust` plus document_storage_service"]

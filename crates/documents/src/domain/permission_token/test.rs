@@ -1,5 +1,5 @@
 use bot_id::{BotId, MACRO_AI_BOT_ID, NonSystemBotId};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::CreationPrincipal;
 use models_permissions::share_permission::access_level::AccessLevel;
 use uuid::Uuid;
@@ -8,8 +8,8 @@ use super::{decode_permission_token, encode_principal_permission_token};
 
 const SECRET: &str = "creation-token-secret";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|user@rox.one".to_string()).expect("valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|user@rox.one".to_string()).expect("valid user id")
 }
 
 fn identity_claims(principal: &CreationPrincipal) -> (Option<String>, Option<String>) {

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE email_messages\n        SET headers_jsonb = '[{\"name\":\"Subject\",\"value\":\"Invoice\"},{\"name\":\"DATE\",\"value\":\"Wed, 7 Oct 2026 21:00:00 -0500\"}]'::jsonb\n        WHERE id = $1\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "e9a4dffd1d0a5f073706f4b4c58b76f23d249ac08af92ff6383b27f4c8113732"
+}

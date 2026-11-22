@@ -21,7 +21,7 @@ use external_chat::domain::{
         view::{People, UNKNOWN_PERSON},
     },
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use uuid::Uuid;
 
@@ -78,7 +78,7 @@ impl ChatProvider for WhatsAppProvider {
         Ok(())
     }
 
-    async fn account(&self, user: &MacroUserIdStr<'_>) -> ExternalChatResult<Option<AccountRef>> {
+    async fn account(&self, user: &RoxUserIdStr<'_>) -> ExternalChatResult<Option<AccountRef>> {
         Ok(self
             .accounts
             .owned_account(user)
@@ -163,7 +163,7 @@ impl ChatProvider for WhatsAppProvider {
     )]
     async fn adopt(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         request: &AddChat,
     ) -> ExternalChatResult<ChatRef> {
         match request.provider {
@@ -250,7 +250,7 @@ impl ChatProvider for WhatsAppProvider {
     async fn stored_send(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         idempotency_key: Uuid,
     ) -> ExternalChatResult<Option<StoredSend>> {
         self.sends.stored_send(chat_id, user, idempotency_key).await
@@ -263,7 +263,7 @@ impl ChatProvider for WhatsAppProvider {
     async fn open_sends(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ExternalChatResult<Vec<SendProgress>> {
         self.sends.open_sends(chat_id, user).await
     }
@@ -271,7 +271,7 @@ impl ChatProvider for WhatsAppProvider {
     async fn sends_for(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         ids: &[Uuid],
     ) -> ExternalChatResult<Vec<SendProgress>> {
         self.sends.sends_for(chat_id, user, ids).await

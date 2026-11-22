@@ -8,7 +8,7 @@ use super::models::{
     WebhookWorkerDisposition,
 };
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{future::Future, time::Duration};
 
 /// Webhook repository.
@@ -23,7 +23,7 @@ pub trait WebhookRepo: Clone + Send + Sync + 'static {
     /// rather than an error.
     fn create_webhook(
         &self,
-        created_by_user_id: MacroUserIdStr<'static>,
+        created_by_user_id: RoxUserIdStr<'static>,
         workspace_id: String,
         request: CreateWebhookRequest,
         signing_secret: String,
@@ -82,7 +82,7 @@ pub trait WebhookRepo: Clone + Send + Sync + 'static {
     /// Look up the team workspace id for a user.
     fn get_user_team_workspace_id(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<String>, Self::Err>> + Send;
 }
 
@@ -94,14 +94,14 @@ pub trait WebhookWorkspaceResolver: Clone + Send + Sync + 'static {
     /// Resolve a deterministic, deduplicated set of personal and team workspace ids.
     fn resolve_workspace_ids(
         &self,
-        people: Vec<MacroUserIdStr<'static>>,
+        people: Vec<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<Vec<String>, Self::Err>> + Send;
 
     /// The caller's team workspace, matching persisted-webhook create/list:
     /// highest `team_role`, one team.
     fn get_user_team_workspace_id(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<String>, Self::Err>> + Send;
 }
 
@@ -114,8 +114,8 @@ pub trait WebhookContactChecker: Clone + Send + Sync + 'static {
     /// a contact-list read. `user == other` is the caller's concern.
     fn is_contact(
         &self,
-        user: MacroUserIdStr<'static>,
-        other: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
+        other: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 }
 
@@ -256,27 +256,27 @@ pub trait WebhookService: Clone + Send + Sync + 'static {
     /// Create a webhook.
     fn create_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         request: CreateWebhookRequest,
     ) -> impl Future<Output = Result<Webhook, WebhookError>> + Send;
 
     /// Get a webhook the caller is authorized to see.
     fn get_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> impl Future<Output = Result<Webhook, WebhookError>> + Send;
 
     /// List the webhooks the caller can see across their personal and team workspaces.
     fn list_webhooks(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<ListWebhooksResponse, WebhookError>> + Send;
 
     /// Patch a webhook.
     fn patch_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
         request: PatchWebhookRequest,
     ) -> impl Future<Output = Result<Webhook, WebhookError>> + Send;
@@ -284,14 +284,14 @@ pub trait WebhookService: Clone + Send + Sync + 'static {
     /// Validate a webhook endpoint.
     fn validate_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> impl Future<Output = Result<ValidateWebhookResponse, WebhookError>> + Send;
 
     /// Delete a webhook.
     fn delete_webhook(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         webhook_id: WebhookId,
     ) -> impl Future<Output = Result<(), WebhookError>> + Send;
 }

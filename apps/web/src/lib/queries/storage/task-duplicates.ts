@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import { markdownToEmbeddingText } from '@macro-inc/lexical-core/utils/parsers';
+import { markdownToEmbeddingText } from '@rox-one/lexical-core/utils/parsers';
 import { queryClient } from '@queries/client';
 import {
   storageServiceClient,

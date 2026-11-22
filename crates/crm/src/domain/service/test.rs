@@ -13,7 +13,7 @@ use crate::outbound::no_op_resolver::NoOpCompanyMetadataResolver;
 use entity_access::domain::models::{
     BotId, BotReceiptScope, Entity, EntityAccessReceipt, EntityPermission, EntityType, TeamRole,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde_json::json;
 use std::sync::{Arc, Mutex};
 
@@ -643,7 +643,7 @@ async fn unconsented_ingestion_stops_before_metadata_or_contact_writes() {
 }
 
 fn receipt_with_role(role: TeamRole) -> CrmTeamReceipt<MemberTeamRole> {
-    let user = MacroUserIdStr::parse_from_str("macro|user@example.com")
+    let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
         .unwrap()
         .into_owned();
     CrmTeamReceipt::from_team_receipt(
@@ -793,7 +793,7 @@ async fn contact_listing_requires_a_user_bot_to_match_its_acting_user() {
     let access = bot_receipt(
         uuid::Uuid::from_u128(42),
         BotReceiptScope::User {
-            acting_user: MacroUserIdStr::parse_from_str(viewer).unwrap().into_owned(),
+            acting_user: RoxUserIdStr::parse_from_str(viewer).unwrap().into_owned(),
         },
         TeamRole::Member,
     );
@@ -1298,7 +1298,7 @@ async fn contact_detail_reads_with_the_receipts_team_and_hidden_scope() {
     let team_id = uuid::Uuid::from_u128(42);
     let contact_id = uuid::Uuid::from_u128(7);
     for role in [TeamRole::Member, TeamRole::Admin] {
-        let user = MacroUserIdStr::parse_from_str("macro|user@example.com")
+        let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
             .unwrap()
             .into_owned();
         let receipt = EntityAccessReceipt::<ViewAccessLevel>::try_new_authenticated_user(

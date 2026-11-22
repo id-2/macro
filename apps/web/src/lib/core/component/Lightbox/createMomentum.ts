@@ -1,4 +1,4 @@
-import { createGlide } from '@macro-inc/graphics/pan-zoom';
+import { createGlide } from '@rox-one/graphics/pan-zoom';
 import { type Accessor, onCleanup } from 'solid-js';
 import type { ZoompinchHandle } from '../Zoompinch';
 

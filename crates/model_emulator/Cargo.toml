@@ -9,8 +9,8 @@ description = "Test support: a scripted stand-in for the Gemini GenerateContent 
 axum = { workspace = true }
 clap = { workspace = true }
 lazy-regex = { workspace = true }
-macro_entrypoint = { path = "../macro_entrypoint" }
-macro_env = { path = "../macro_env" }
+rox_entrypoint = { path = "../rox_entrypoint" }
+rox_env = { path = "../rox_env" }
 regex = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }

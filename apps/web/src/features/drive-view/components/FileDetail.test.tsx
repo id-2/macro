@@ -1,10 +1,11 @@
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { TraceFlow, useFlow } from '@app/observability/flow';
 import { initializeUiOperationTelemetry } from '@app/observability/ui-operation';
 import { ThrownResultError } from '@core/util/result';
 import type { AccessLevel } from '@service-storage/generated/schemas/accessLevel';
 import { type Accessor, createSignal, type JSX, onCleanup } from 'solid-js';
 import { render } from 'solid-js/web';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const analytics = vi.hoisted(() => ({ pageView: vi.fn(), track: vi.fn() }));
 vi.mock('@app/lib/analytics/analytics-context', () => ({
@@ -101,6 +102,8 @@ function mount(
   );
   return container;
 }
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 describe('file access errors', () => {
   it.each(['UNAUTHORIZED', 'FORBIDDEN'])(

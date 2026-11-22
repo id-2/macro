@@ -3,7 +3,7 @@
 use super::CrmRouterState;
 use crate::domain::{model::CrmError, service::CrmService};
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use serde::Serialize;
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -21,8 +21,8 @@ pub struct CrmMemberAccessResponse {
 #[utoipa::path(get, path = "/crm/member-access", operation_id = "get_crm_member_access",
     responses((status = 200, body = CrmMemberAccessResponse)))]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<C: CrmService, St, Eas, Auth: MacroAuthorizationService>(
-    auth: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+pub async fn handler<C: CrmService, St, Eas, Auth: RoxAuthorizationService>(
+    auth: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
 ) -> Result<Json<CrmMemberAccessResponse>, CrmError> {
     let access = state

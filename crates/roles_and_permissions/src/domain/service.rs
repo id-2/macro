@@ -1,5 +1,5 @@
 //! Contains the service logic for roles and permissions
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::{
     model::{ProductTier, RoleId, SubscriptionStatus, UserRolesAndPermissionsError},
@@ -38,7 +38,7 @@ where
     /// Given a user id and a subscription status, update the user's roles accordingly
     async fn update_user_roles_and_permissions_for_subscription(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         subscription_status: SubscriptionStatus,
         product_tier: ProductTier,
     ) -> Result<(), UserRolesAndPermissionsError> {
@@ -79,7 +79,7 @@ where
 
     async fn dangerous_upsert_roles_for_user(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         role_ids: non_empty::NonEmpty<&[RoleId]>,
     ) -> Result<(), UserRolesAndPermissionsError> {
         self.user_roles_and_permissions_repository
@@ -89,7 +89,7 @@ where
 
     async fn dangerous_remove_roles_from_user(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         role_ids: &non_empty::NonEmpty<&[RoleId]>,
     ) -> Result<(), UserRolesAndPermissionsError> {
         self.user_roles_and_permissions_repository
@@ -99,7 +99,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn get_user_permissions(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<std::collections::HashSet<super::model::PermissionId>, UserRolesAndPermissionsError>
     {
         Ok(self
@@ -114,7 +114,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn get_user_roles(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<std::collections::HashSet<RoleId>, UserRolesAndPermissionsError> {
         self.user_roles_and_permissions_repository
             .get_user_roles(user_id)

@@ -1,7 +1,7 @@
 /** Authentication queries used by the entity feature. */
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { fetchWithToken } from '@core/util/fetchWithToken';
-import type { MacroApiTokenResponse } from '@service-auth/generated/schemas/macroApiTokenResponse';
+import type { RoxApiTokenResponse } from '@service-auth/generated/schemas/roxApiTokenResponse';
 import {
   queryOptions,
   type SolidQueryOptions,
@@ -47,7 +47,7 @@ export async function withApiTokenRetry<T>(
 }
 
 export const fetchApiToken = async () => {
-  const result = await fetchWithToken<MacroApiTokenResponse>(
+  const result = await fetchWithToken<RoxApiTokenResponse>(
     `${authHost}/jwt/macro_api_token`
   );
 

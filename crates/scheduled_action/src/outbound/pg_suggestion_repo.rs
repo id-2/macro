@@ -2,8 +2,8 @@ use std::str::FromStr;
 
 use anyhow::Result;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use routine_program::Surface;
 use serde_json::Value;
 use sqlx::{PgConnection, PgPool};
@@ -145,7 +145,7 @@ struct Change<'a> {
 
 async fn log(
     conn: &mut sqlx::PgConnection,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     suggestion: Uuid,
     change: Change<'_>,
 ) -> Result<()> {
@@ -170,7 +170,7 @@ async fn log(
 }
 
 impl SuggestionRepo for PgSuggestionRepo {
-    async fn kept_by(&self, user: &MacroUserIdStr<'_>, session: Uuid) -> Result<u32> {
+    async fn kept_by(&self, user: &RoxUserIdStr<'_>, session: Uuid) -> Result<u32> {
         // By person first: their index bounds the scan to their suggestions.
         let count = sqlx::query_scalar!(
             r#"SELECT count(*) AS "count!" FROM routine_suggestion
@@ -185,7 +185,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn add(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         session: Uuid,
         generation: Uuid,
         suggestion: &CheckedSuggestion,
@@ -300,7 +300,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn retire(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         session: Uuid,
         generation: Uuid,
@@ -358,7 +358,7 @@ impl SuggestionRepo for PgSuggestionRepo {
         Ok(true)
     }
 
-    async fn suggestions(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<StoredSuggestion>> {
+    async fn suggestions(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<StoredSuggestion>> {
         let rows = sqlx::query!(
             r#"SELECT id, surfaces, catalog_key, knob_values, routine, reason, keep_probability,
                       state, dismissed_at, retired_at, created_at
@@ -396,7 +396,7 @@ impl SuggestionRepo for PgSuggestionRepo {
             .collect()
     }
 
-    async fn dismissed_templates(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<String>> {
+    async fn dismissed_templates(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<String>> {
         Ok(sqlx::query_scalar!(
             r#"SELECT catalog_key FROM routine_suggestion_dismissed_template WHERE user_id = $1 ORDER BY dismissed_at"#,
             user.as_ref(),
@@ -405,7 +405,7 @@ impl SuggestionRepo for PgSuggestionRepo {
         .await?)
     }
 
-    async fn dismiss(&self, user: &MacroUserIdStr<'_>, id: Uuid) -> Result<Option<Transition>> {
+    async fn dismiss(&self, user: &RoxUserIdStr<'_>, id: Uuid) -> Result<Option<Transition>> {
         let mut tx = self.pool.begin().await?;
         let applied = transition(
             &mut tx,
@@ -419,7 +419,7 @@ impl SuggestionRepo for PgSuggestionRepo {
         Ok(applied.map(|applied| applied.transition))
     }
 
-    async fn dismiss_template(&self, user: &MacroUserIdStr<'_>, key: &str) -> Result<()> {
+    async fn dismiss_template(&self, user: &RoxUserIdStr<'_>, key: &str) -> Result<()> {
         sqlx::query!(
             r#"INSERT INTO routine_suggestion_dismissed_template (user_id, catalog_key)
                VALUES ($1, $2) ON CONFLICT DO NOTHING"#,
@@ -431,7 +431,7 @@ impl SuggestionRepo for PgSuggestionRepo {
         Ok(())
     }
 
-    async fn saved_from(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<Uuid>> {
+    async fn saved_from(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<Uuid>> {
         Ok(sqlx::query_scalar!(
             r#"SELECT suggestion_id AS "suggestion_id!" FROM scheduled_action
                WHERE owner = $1 AND suggestion_id IS NOT NULL"#,
@@ -443,7 +443,7 @@ impl SuggestionRepo for PgSuggestionRepo {
 
     async fn drafted(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         ids: &[Uuid],
     ) -> Result<Vec<(Uuid, ActionConfiguration)>> {
         let rows = sqlx::query!(

@@ -4,8 +4,8 @@ use crate::domain::events::{
     MessageAttachmentCreatedMetadata, MessageAttachmentRemovedMetadata, MessageDeletedMetadata,
     MessageMentionedMetadata, MessagePatchedMetadata, MessagePostedMetadata,
 };
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroMessagesTopic;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxMessagesTopic;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -39,18 +39,18 @@ pub enum MessageTopicEvent {
 }
 
 impl TopicEvent for MessageTopicEvent {
-    type Topic = MacroMessagesTopic;
+    type Topic = RoxMessagesTopic;
     const SCHEMA_VERSION: u8 = 1;
 }
 
 /// Message facts keyed by thread root to preserve conversation ordering.
 #[derive(Debug, Clone)]
-pub struct MessageMacroEvent {
+pub struct MessageRoxEvent {
     key: String,
     event: Event<MessageTopicEvent>,
 }
 
-impl MessageMacroEvent {
+impl MessageRoxEvent {
     fn new(root_id: Uuid, event: MessageTopicEvent) -> Self {
         Self {
             key: root_id.to_string(),
@@ -95,7 +95,7 @@ impl MessageMacroEvent {
     }
 }
 
-impl MacroEvent for MessageMacroEvent {
+impl RoxEvent for MessageRoxEvent {
     type EventPayload = MessageTopicEvent;
     fn key(&self) -> &str {
         &self.key
@@ -122,7 +122,7 @@ impl<Broker> BrokerMessagePublisher<Broker> {
 }
 
 #[cfg(feature = "ports")]
-impl<Broker: macro_event_broker::MacroEventBroker> crate::domain::ports::MessageEventPublisher
+impl<Broker: rox_event_broker::RoxEventBroker> crate::domain::ports::MessageEventPublisher
     for BrokerMessagePublisher<Broker>
 {
     async fn publish(
@@ -144,7 +144,7 @@ impl<Broker: macro_event_broker::MacroEventBroker> crate::domain::ports::Message
 
 /// The topic facts a committed change produces, in publication order.
 #[cfg(feature = "ports")]
-pub fn topic_events(event: &crate::domain::ports::MessageEvent) -> Vec<MessageMacroEvent> {
+pub fn topic_events(event: &crate::domain::ports::MessageEvent) -> Vec<MessageRoxEvent> {
     use crate::domain::{events::MessageEventAttachment, ports::MessageChange};
     let Ok(actor) = channel_sender::ChannelSender::try_from(event.actor.clone()) else {
         return Vec::new();
@@ -154,9 +154,9 @@ pub fn topic_events(event: &crate::domain::ports::MessageEvent) -> Vec<MessageMa
             message, mentions, ..
         } => {
             let posted = MessagePostedMetadata::from_message(message, mentions.clone());
-            let mut facts = vec![MessageMacroEvent::posted(posted.clone())];
+            let mut facts = vec![MessageRoxEvent::posted(posted.clone())];
             if !posted.attachments.is_empty() {
-                facts.push(MessageMacroEvent::attachment_created(
+                facts.push(MessageRoxEvent::attachment_created(
                     MessageAttachmentCreatedMetadata {
                         parent: message.parent.clone(),
                         message_id: message.id,
@@ -172,7 +172,7 @@ pub fn topic_events(event: &crate::domain::ports::MessageEvent) -> Vec<MessageMa
                 if !seen.insert((mention.entity_type.as_str(), mention.entity_id.as_str())) {
                     continue;
                 }
-                facts.push(MessageMacroEvent::mentioned(MessageMentionedMetadata {
+                facts.push(MessageRoxEvent::mentioned(MessageMentionedMetadata {
                     parent: message.parent.clone(),
                     message_id: message.id,
                     thread_id: message.thread_id,
@@ -190,7 +190,7 @@ pub fn topic_events(event: &crate::domain::ports::MessageEvent) -> Vec<MessageMa
             previous_attachments,
             ..
         } => {
-            let mut facts = vec![MessageMacroEvent::patched(MessagePatchedMetadata {
+            let mut facts = vec![MessageRoxEvent::patched(MessagePatchedMetadata {
                 completed_reply: event.agent_trigger(),
                 parent: message.parent.clone(),
                 message_id: message.id,
@@ -213,7 +213,7 @@ pub fn topic_events(event: &crate::domain::ports::MessageEvent) -> Vec<MessageMa
                 .map(MessageEventAttachment::from)
                 .collect();
             if !added.is_empty() {
-                facts.push(MessageMacroEvent::attachment_created(
+                facts.push(MessageRoxEvent::attachment_created(
                     MessageAttachmentCreatedMetadata {
                         parent: message.parent.clone(),
                         message_id: message.id,
@@ -225,7 +225,7 @@ pub fn topic_events(event: &crate::domain::ports::MessageEvent) -> Vec<MessageMa
                 ));
             }
             if !removed.is_empty() {
-                facts.push(MessageMacroEvent::attachment_removed(
+                facts.push(MessageRoxEvent::attachment_removed(
                     MessageAttachmentRemovedMetadata {
                         parent: message.parent.clone(),
                         message_id: message.id,
@@ -239,7 +239,7 @@ pub fn topic_events(event: &crate::domain::ports::MessageEvent) -> Vec<MessageMa
             facts
         }
         MessageChange::MessageDeleted { message } => {
-            vec![MessageMacroEvent::deleted(MessageDeletedMetadata {
+            vec![MessageRoxEvent::deleted(MessageDeletedMetadata {
                 parent: message.parent.clone(),
                 message_id: message.id,
                 thread_id: message.thread_id,

@@ -47,7 +47,7 @@ export function CrmActivityTasks(props: { title?: JSX.Element }) {
               {
                 type: 'document',
                 id: task.id,
-                name: task.fallbackName ?? 'Task',
+                name: task.fallbackName ?? t('crm.taskFallback'),
                 fileType: 'md',
                 subType: { type: 'task' },
               },
@@ -135,27 +135,27 @@ function ActivityTasksBody(props: {
       </Show>
       <div class="min-h-0 flex-1">
         <TasksContent
-          loadingContent={<CrmListSkeleton label="Loading tasks" />}
+          loadingContent={<CrmListSkeleton label={t('crm.loadingTasks')} />}
           errorContent={
             <CrmListError
-              title="Tasks couldn’t be loaded."
+              title={t('crm.tasksLoadFailed')}
               onRetry={() => source.refresh()}
             />
           }
           emptyContent={
             state.search.trim() && source.hasMore() ? (
-              <span>Search more results to find matching tasks.</span>
+              <span>{t('crm.searchMoreResults')}</span>
             ) : state.search.trim() ? (
               <CrmListSearchEmpty
-                title="No tasks match this search"
+                title={t('crm.noTasksMatchSearch')}
                 onClearSearch={() => setState('search', '')}
               />
             ) : (
               <CrmListEmpty
-                title="No tasks linked yet"
+                title={t('crm.noTasksLinkedYet')}
                 graphic={EmptyStateTasksGraphic}
-                description="Create a task and choose a company or person to keep your follow-ups here."
-                action={{ label: 'New task', onClick: props.onCreateTask }}
+                description={t('crm.createTaskHint')}
+                action={{ label: t('crm.newTask'), onClick: props.onCreateTask }}
               />
             )
           }

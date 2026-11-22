@@ -52,6 +52,29 @@ type InviteKind = 'people' | 'agent';
 
 const EMPTY_INVITE: InviteEntry = { email: '' };
 
+function teamRoleLabel(role: string): string {
+  switch (role) {
+    case 'owner':
+      return 'Владелец';
+    case 'admin':
+      return 'Администратор';
+    case 'member':
+      return 'Участник';
+    default:
+      return role;
+  }
+}
+
+function sendInvitesLabel(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return `Отправить ${count} приглашение`;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return `Отправить ${count} приглашения`;
+  }
+  return `Отправить ${count} приглашений`;
+}
+
 function InviteEntryRow(props: {
   entry: InviteEntry;
   onEmailChange: (email: string) => void;
@@ -68,12 +91,12 @@ function InviteEntryRow(props: {
           value={props.entry.email}
           onInput={(e) => props.onEmailChange(e.currentTarget.value)}
           onBlur={() => props.onBlur()}
-          placeholder="Enter email address"
+          placeholder="Введите адрес электронной почты"
           class="settings-input flex-1 min-w-0"
           aria-invalid={!!props.error}
         />
         <Show when={props.showRemove}>
-          <Tooltip label="Remove">
+          <Tooltip label="Убрать">
             <Button
               variant="secondary"
               size="icon-sm"
@@ -100,12 +123,12 @@ function getEmailError(
 ): string | undefined {
   const trimmed = email.trim();
   if (trimmed === '') return undefined;
-  if (!emailSchema.safeParse(trimmed).success) return 'Invalid email address';
+  if (!emailSchema.safeParse(trimmed).success) return 'Неверный адрес электронной почты';
   const isDuplicate = existingEmails.some(
     (existing, i) =>
       i !== excludeIndex && existing.toLowerCase() === trimmed.toLowerCase()
   );
-  if (isDuplicate) return 'Email already added';
+  if (isDuplicate) return 'Этот адрес уже добавлен';
   return undefined;
 }
 
@@ -200,7 +223,7 @@ function InviteEmailsInput(props: {
         onClick={addRow}
       >
         <PlusIcon class="size-4" />
-        Add another
+        Добавить ещё
       </Button>
     </div>
   );
@@ -226,10 +249,12 @@ function UserInviteRow(props: {
         </div>
         <div class="min-w-0 flex-1">
           <div class="text-sm text-ink">
-            <InviterName inviterId={props.invite.invited_by} /> invited you to
-            join a team
+            <InviterName inviterId={props.invite.invited_by} /> приглашает вас
+            в команду
           </div>
-          <div class="text-xs text-ink-muted">as {props.invite.team_role}</div>
+          <div class="text-xs text-ink-muted">
+            Роль: {teamRoleLabel(props.invite.team_role)}
+          </div>
         </div>
       </div>
       <div class="flex items-center gap-2 shrink-0">
@@ -239,7 +264,7 @@ function UserInviteRow(props: {
           disabled={props.isAccepting || props.isDeclining}
           onClick={props.onDecline}
         >
-          <Show when={props.isDeclining} fallback="Decline">
+          <Show when={props.isDeclining} fallback="Отклонить">
             <SpinnerIcon class="size-4 animate-spin" />
           </Show>
         </Button>
@@ -249,7 +274,7 @@ function UserInviteRow(props: {
           disabled={props.isAccepting || props.isDeclining}
           onClick={props.onAccept}
         >
-          <Show when={props.isAccepting} fallback="Join">
+          <Show when={props.isAccepting} fallback="Присоединиться">
             <SpinnerIcon class="size-4 animate-spin" />
           </Show>
         </Button>
@@ -273,11 +298,11 @@ function TeamInvites() {
     rejectMutation.variables?.teamInviteId === inviteId;
 
   return (
-    <SettingsPage title="Team">
+    <SettingsPage title="Команда">
       <Show when={invites().length > 0}>
         <SettingsSection
-          title="Invitations"
-          description="You've been invited to join a team."
+          title="Приглашения"
+          description="Вас пригласили в команду."
         >
           <SettingsCard>
             <For each={invites()}>
@@ -310,8 +335,8 @@ export const teamNameSchema = z
   .pipe(
     z
       .string()
-      .min(1, 'Team name is required')
-      .max(TEAM_NAME_MAX_LENGTH, 'Team name is too long')
+      .min(1, 'Укажите название команды')
+      .max(TEAM_NAME_MAX_LENGTH, 'Название команды слишком длинное')
   );
 
 export function CreateTeamDialog(props: {
@@ -396,13 +421,13 @@ export function CreateTeamDialog(props: {
             <XIcon class="size-3.5 touch:size-6 shrink-0 pointer-events-none" />
           </Dialog.CloseButton>
           <Dialog.Title as="span" class="text-sm font-medium p-0 m-0">
-            Create Team
+            Создать команду
           </Dialog.Title>
         </Panel.Header>
         <Panel.Body class="p-3 flex flex-col gap-3">
           <div class="flex flex-col gap-1">
             <div class="flex items-center justify-between">
-              <label class="text-sm text-ink-muted">Team name</label>
+              <label class="text-sm text-ink-muted">Название команды</label>
               <span class={cn('text-xs', charCountColor())}>
                 {teamName().length}/{TEAM_NAME_MAX_LENGTH}
               </span>
@@ -413,7 +438,7 @@ export function CreateTeamDialog(props: {
               value={teamName()}
               onInput={(e) => handleTeamNameChange(e.currentTarget.value)}
               onBlur={() => validateTeamName()}
-              placeholder="My Team"
+              placeholder="Моя команда"
               class="settings-input w-full"
               aria-invalid={!!teamNameError()}
             />
@@ -423,7 +448,7 @@ export function CreateTeamDialog(props: {
           </div>
           <div class="flex flex-col gap-1">
             <label class="text-sm text-ink-muted">
-              Invite members (optional)
+              Пригласить участников (необязательно)
             </label>
             <InviteEmailsInput
               invites={invites()}
@@ -438,7 +463,7 @@ export function CreateTeamDialog(props: {
               disabled={createTeamMutation.isPending}
               onClick={props.onClose}
             >
-              Cancel
+              Отмена
             </Button>
             <Button
               variant="secondary"
@@ -449,7 +474,7 @@ export function CreateTeamDialog(props: {
               }
               onClick={handleCreate}
             >
-              <Show when={createTeamMutation.isPending} fallback="Create Team">
+              <Show when={createTeamMutation.isPending} fallback="Создать команду">
                 <SpinnerIcon class="size-4 animate-spin" />
               </Show>
             </Button>
@@ -561,8 +586,8 @@ export function InviteToTeamDialog(props: {
             <XIcon class="size-4 touch:size-6 shrink-0 pointer-events-none" />
           </Dialog.CloseButton>
           <Dialog.Title as="span" class="text-base font-medium p-0 m-0">
-            <Show when={sent()} fallback="Invite to Team">
-              Let them know it's coming
+            <Show when={sent()} fallback="Пригласить в команду">
+              Предупредите, что письмо уже в пути
             </Show>
           </Dialog.Title>
         </Panel.Header>
@@ -594,7 +619,7 @@ export function InviteToTeamDialog(props: {
               />
               <div class="h-px shrink-0 bg-edge-muted" />
               <div class="flex flex-col gap-3">
-                <div class="text-sm font-medium text-ink">Invite by email</div>
+                <div class="text-sm font-medium text-ink">Пригласить по почте</div>
                 <InviteEmailsInput
                   invites={invites()}
                   onChange={setInvites}
@@ -610,7 +635,7 @@ export function InviteToTeamDialog(props: {
               disabled={inviteToTeamMutation.isPending}
               onClick={close}
             >
-              Cancel
+              Отмена
             </Button>
             <Button
               variant="primary"
@@ -621,8 +646,8 @@ export function InviteToTeamDialog(props: {
                 when={inviteToTeamMutation.isPending}
                 fallback={
                   invites().length > 1
-                    ? `Send ${invites().length} invites`
-                    : 'Send invite'
+                    ? sendInvitesLabel(invites().length)
+                    : 'Отправить приглашение'
                 }
               >
                 <SpinnerIcon class="size-4 animate-spin" />
@@ -653,15 +678,16 @@ function InviteHeadsUpStep(props: {
             <div class="text-sm text-ink">
               <Show
                 when={props.emails.length === 1}
-                fallback={`Invites sent to ${props.emails.length} people`}
+                fallback={`Приглашения отправлены ${props.emails.length} людям`}
               >
-                Invite sent to{' '}
+                Приглашение отправлено на{' '}
                 <span class="font-medium">{props.emails[0]}</span>
               </Show>
             </div>
             <div class="text-sm text-ink-muted">
-              Invite emails from Rox are easy to miss. Send the invite link in
-              Slack, a text, or your own email so they know to look for it.
+              Письма с приглашением от Rox легко пропустить. Отправьте ссылку в
+              Slack, сообщением или со своей почты, чтобы получатели знали, что
+              её ждать.
             </div>
           </div>
           <Show when={props.emails.length > 1}>
@@ -676,7 +702,7 @@ function InviteHeadsUpStep(props: {
       <Panel.Footer class="justify-end gap-2 px-4 py-3">
         <CopyTeamInviteLinkButton teamId={props.teamId} />
         <Button variant="primary" onClick={() => props.onDone()}>
-          Done
+          Готово
         </Button>
       </Panel.Footer>
     </>
@@ -687,21 +713,21 @@ function EmptyTeamState() {
   const [showCreateModal, setShowCreateModal] = createSignal(false);
 
   return (
-    <SettingsPage title="Team">
+    <SettingsPage title="Команда">
       <SettingsSection>
         <SettingsCard>
           <div class="flex flex-col items-center justify-center py-12 text-center px-6">
             <div class="size-12 rounded-full bg-accent/10 flex items-center justify-center mb-4">
               <UsersIcon class="size-6 text-accent" />
             </div>
-            <h3 class="text-sm font-medium text-ink mb-1">No team yet</h3>
+            <h3 class="text-sm font-medium text-ink mb-1">Команды пока нет</h3>
             <p class="text-xs text-ink-muted max-w-xs mb-4">
-              Create a team to collaborate with others and manage access
-              together.
+              Создайте команду, чтобы работать вместе и совместно управлять
+              доступом.
             </p>
             <Button variant="primary" onClick={() => setShowCreateModal(true)}>
               <PlusIcon class="size-4" />
-              Create Team
+              Создать команду
             </Button>
           </div>
         </SettingsCard>

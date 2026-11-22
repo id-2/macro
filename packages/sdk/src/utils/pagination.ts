@@ -1,5 +1,5 @@
 import { rejectUnknownOptions } from './options';
-import { MacroError } from './unwrap';
+import { RoxError } from './unwrap';
 
 /** One page of a cursor-paginated list. */
 export interface Page<T, Cursor = string> {
@@ -61,7 +61,7 @@ export function iterate<T, Options extends IterationOptions>(
   } as Record<keyof Options, true>);
   const { maxItems } = given;
   if (maxItems !== undefined && !(Number.isInteger(maxItems) && maxItems > 0))
-    throw new MacroError(
+    throw new RoxError(
       `${method}: \`maxItems\` must be a positive whole number, not ${maxItems}.`,
     );
   return upTo(source(), maxItems);

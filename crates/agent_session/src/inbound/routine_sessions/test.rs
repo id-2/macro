@@ -3,14 +3,14 @@ use crate::domain::routines::RoutinePendingReason;
 use axum::body::{Body, to_bytes};
 use axum::http::Request;
 use bot_id::BotId;
-use macro_authorization::{
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims, BotAuthentication, BotAuthorizer,
     BotScope, HARNESS_TOKEN_HEADER, HarnessAuthentication, HarnessAuthorizationOwner,
     HarnessAuthorizer, INTERNAL_API_KEY_HEADER, InternalAuthConfig, JwtValidator,
-    MacroAuthorizationError, MacroAuthorizationServiceImpl, MacroUserAuthentication,
+    RoxAuthorizationError, RoxAuthorizationServiceImpl, RoxUserAuthentication,
     NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::{Value, json};
 use std::sync::Mutex;
@@ -30,9 +30,9 @@ impl JwtValidator for Credentials {
     fn validate_credential(
         &self,
         _: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -52,7 +52,7 @@ impl BotAuthorizer for Credentials {
         _: &str,
         bot_scope: BotScope,
         _: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         Ok(BotAuthentication {
             bot_id: BotId::TEST_A,
             token_id: Uuid::now_v7(),
@@ -68,19 +68,19 @@ impl HarnessAuthorizer for Credentials {
         &self,
         _: &str,
         _: Option<String>,
-    ) -> Result<HarnessAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<HarnessAuthentication, Report<RoxAuthorizationError>> {
         Ok(HarnessAuthentication {
             harness_id: harness_id::HarnessId::TEST_A,
             token_id: Uuid::now_v7(),
             owner: HarnessAuthorizationOwner::User {
                 user_id: OWNER.into(),
             },
-            acting_user: MacroUserAuthentication {
-                origin: macro_authorization::CredentialOrigin::Harness,
+            acting_user: RoxUserAuthentication {
+                origin: rox_authorization::CredentialOrigin::Harness,
                 agent_id: None,
                 agent_via: None,
                 routine_id: None,
-                macro_user_id: MacroUserIdStr::try_from(OWNER).unwrap(),
+                macro_user_id: RoxUserIdStr::try_from(OWNER).unwrap(),
                 user_context: model_user::UserContext {
                     user_id: OWNER.into(),
                     fusion_user_id: "fusion-owner".into(),
@@ -173,7 +173,7 @@ impl RoutineSessions for ServiceSpy {
 }
 
 fn app(service: Arc<ServiceSpy>) -> Router {
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         Credentials,
         InternalAuthConfig {
             api_key: INTERNAL_KEY.into(),
@@ -185,7 +185,7 @@ fn app(service: Arc<ServiceSpy>) -> Router {
     .with_harness_authorizer(Credentials);
     routine_sessions_router(RoutineSessionsState::new(
         service,
-        MacroAuthorizationState::new(Arc::new(auth)),
+        RoxAuthorizationState::new(Arc::new(auth)),
     ))
 }
 

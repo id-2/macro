@@ -45,7 +45,7 @@ impl<S: Subscriber> Layer<S> for RecordedValues {
 /// entry points, including a refused agent session that logs a warning.
 async fn check_everything(
     service: &EntityAccessServiceImpl<MockRepo>,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
 ) {
     let _ = service
         .generate_entity_access_receipt::<ViewAccessLevel>(

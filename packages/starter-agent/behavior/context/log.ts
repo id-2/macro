@@ -1,5 +1,5 @@
-import type { Clock } from '@macro-inc/muppet/utilities/time';
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import { type Disk, jsonLine } from './disk.ts';
 
 /**

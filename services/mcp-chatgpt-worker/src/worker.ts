@@ -1,7 +1,7 @@
 import {
   createWorkerTraceConfig,
   instrument,
-} from '@macro-inc/observability/worker';
+} from '@rox-one/observability/worker';
 import { createHandler } from './app';
 import { type Bindings, parseConfig } from './config';
 

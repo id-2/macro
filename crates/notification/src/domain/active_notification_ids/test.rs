@@ -18,7 +18,7 @@ struct FakeRepository {
 impl ActiveNotificationIdRepository for FakeRepository {
     async fn active_notification_ids(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         event_types: &[String],
         limit: u32,
     ) -> Result<Vec<Uuid>, ActiveNotificationIdStorageError> {
@@ -70,8 +70,8 @@ fn event_levels(span: &SpanData) -> Vec<String> {
         .collect()
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
 }
 
 #[tokio::test]

@@ -4,7 +4,7 @@ import type {
   BookingLink as BookingLinkRecord,
   Booking as BookingRecord,
 } from '../../../generated/calendar/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Team } from '../teams/team';
 import { BookingNamespace } from './booking-namespace';
 
@@ -83,7 +83,7 @@ describe('calendar.booking', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
     const team = Team.byId(client, 'team-1');
 
     const listing = await new BookingNamespace(client).links({
@@ -121,7 +121,7 @@ describe('calendar.booking', () => {
           return { data: { ...saved, revision: 4 } };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const link = await new BookingNamespace(client).createLink(draft, {
       userConfirmation: 'Yes, create it.',
@@ -194,7 +194,7 @@ describe('calendar.booking', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const [found] = await new BookingNamespace(client).bookings({
       from: '2026-01-01T00:00:00Z',

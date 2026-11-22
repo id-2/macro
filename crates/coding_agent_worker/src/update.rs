@@ -39,15 +39,15 @@ use release::{ReleaseClient, ReleaseSource, ReleaseVersion};
 mod test;
 
 mod environment {
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         /// `1` (or any value but `0`/`false`) turns self-update off.
         pub struct RoxdNoUpdate;
     }
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         /// A mirror to update from instead of GitHub releases.
         pub struct RoxdUpdateSource;
     }
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         /// Seconds between checks, for testing against a mirror.
         pub struct RoxdUpdateCheckSeconds;
     }

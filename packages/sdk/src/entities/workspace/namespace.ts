@@ -1,6 +1,6 @@
 import type { PostSoupAstRequest } from '../../../generated/storage/types.gen';
 import { type IterationOptions, iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { properties, workspaceItem } from './items';
 import { WorkspaceQuery } from './query';
 import type {
@@ -14,7 +14,7 @@ import type {
  * Browse recent workspace documents (including tasks), agent sessions, AI chats,
  * projects, email, channels, message threads, calls, calendar events and
  * foreign entities. Queries run with the caller's normal access permissions.
- * Use `macro.search` to find specific names/content; use this namespace for
+ * Use `rox.search` to find specific names/content; use this namespace for
  * activity and filtered lists.
  *
  * Each item has an existing `entity` handle plus a generated API `snapshot` for
@@ -24,7 +24,7 @@ import type {
  *
  * @example Important emails from a particular accessible inbox
  * ```js
- * const page = await macro.workspace.page({
+ * const page = await rox.workspace.page({
  *   emailPreset: 'signal', inbox: 'team@example.com', limit: 20,
  * });
  * const evidence = page.items.map(item => ({
@@ -37,8 +37,8 @@ import type {
  *
  * @example Tasks assigned to me, completed and updated within a time window
  * ```js
- * const owner = await macro.myPrincipalId();
- * const tasks = macro.workspace.list({
+ * const owner = await rox.myPrincipalId();
+ * const tasks = rox.workspace.list({
  *   includeTypes: ['document'],
  *   df: {'&': [{l: {dst: 'task'}}, {'&': [
  *     {l: {ua: {gte: '2026-10-14T00:00:00Z'}}},
@@ -60,7 +60,7 @@ import type {
  * @example Personal and team tags, favorites, and early stopping
  * ```js
  * let count = 0;
- * for await (const item of macro.workspace.list({
+ * for await (const item of rox.workspace.list({
  *   favoritesOnly: true, sortBy: 'recently_viewed',
  *   tags: [{label: 'Launch', scope: 'team'}], tagsMatch: 'all',
  * })) {
@@ -80,10 +80,10 @@ import type {
  * CRM, initiatives and database rows have their own namespaces and are not
  * included in this browsing surface.
  *
- * @routing Use when browsing the user's recent or filtered workspace items, such as what changed today; not keyword search (`macro.search`).
+ * @routing Use when browsing the user's recent or filtered workspace items, such as what changed today; not keyword search (`rox.search`).
  */
 export class WorkspaceNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * One bounded page of recent items, newest first by default; resume using nextCursor and the same options.

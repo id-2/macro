@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { ListFilterGroup } from '@app/components/view-shell';
 import { useContactFilterOptions } from '@core/user/use-contact-filter-options';
 import { useTagFilterGroup } from '@property/tags/use-tag-filter-group';
@@ -27,8 +28,8 @@ export function createCrmActivityFilters(
       ? [
           {
             id: 'created-by',
-            label: 'Created by',
-            searchPlaceholder: 'Search creators...',
+            label: t('crm.createdBy'),
+            searchPlaceholder: t('crm.searchCreators'),
             options: [],
             createSource: useContactFilterOptions,
           },
@@ -38,10 +39,19 @@ export function createCrmActivityFilters(
       ? [
           {
             id: 'audience',
-            label: 'Audience',
+            label: t('crm.audience'),
             selectionMode: 'single' as const,
             defaultOptionId: 'all',
-            options: [{ id: 'all', label: 'All' }, ...CALL_AUDIENCES],
+            options: [
+              { id: 'all', label: t('crm.all') },
+              ...CALL_AUDIENCES.map((audience) => ({
+                ...audience,
+                label:
+                  audience.id === 'call-internal'
+                    ? t('calls.audienceInternal')
+                    : t('calls.audienceExternal'),
+              })),
+            ],
           },
         ]
       : []),

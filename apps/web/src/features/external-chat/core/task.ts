@@ -1,4 +1,4 @@
-import { buildMentionMarkdownString } from '@macro-inc/lexical-core';
+import { buildMentionMarkdownString } from '@rox-one/lexical-core';
 import type { ChatDetail, ChatMessage } from './chat';
 import { mentionPattern } from './mentions';
 import type { Mention } from './rich';

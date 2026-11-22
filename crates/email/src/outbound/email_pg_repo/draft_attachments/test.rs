@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::AttachmentDraft;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 const ACTOR: &str = "macro|attachment-owner@example.com";

@@ -17,7 +17,7 @@ import { isFeatureEnabled, showDatabaseSql } from '@core/constant/featureFlags';
 import { fireAndForget } from '@core/util/fireAndForget';
 import DatabaseIcon from '@icon/system/regular/database.svg';
 import TableIcon from '@icon/system/regular/table.svg';
-import { decodeHtmlEntities } from '@macro-inc/lexical-core/utils/html-entities';
+import { decodeHtmlEntities } from '@rox-one/lexical-core/utils/html-entities';
 import {
   invalidateDatabase,
   useDatabaseDetailQuery,

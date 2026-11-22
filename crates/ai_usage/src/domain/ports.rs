@@ -1,8 +1,8 @@
 //! Cost model types and the ports the crate is built around.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use std::pin::Pin;
 use std::sync::LazyLock;
@@ -18,12 +18,12 @@ use super::financial::{
 /// The reserved system user recorded for completions with no originating
 /// end-user (background tasks, internal summarization, …).
 ///
-/// Building a [`MacroUserIdStr`] parses the id at runtime (there is no
+/// Building a [`RoxUserIdStr`] parses the id at runtime (there is no
 /// `const fn` constructor), so this is a `LazyLock` rather than a literal
-/// `const`. Deref yields a `&'static MacroUserIdStr`; clone it when an owned
+/// `const`. Deref yields a `&'static RoxUserIdStr`; clone it when an owned
 /// value is needed.
-pub static SYSTEM_USER_ID: LazyLock<MacroUserIdStr<'static>> = LazyLock::new(|| {
-    MacroUserIdStr::try_from("macro|ai-system@rox.one".to_string())
+pub static SYSTEM_USER_ID: LazyLock<RoxUserIdStr<'static>> = LazyLock::new(|| {
+    RoxUserIdStr::try_from("rox|ai-system@rox.one".to_string())
         .expect("system user id is valid")
 });
 
@@ -270,7 +270,7 @@ pub struct CompletionUsage {
     pub feature: AiFeature,
     /// The user the completion was performed for (the [system user](SYSTEM_USER_ID)
     /// for background work).
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// The entity the completion related to, if any.
     pub entity: Option<Uuid>,
     /// The agent's own API key that paid for the completion, if Rox
@@ -310,7 +310,7 @@ pub struct UsageApiParams {
     /// Exclusive upper bound on `created_at`.
     pub until: Option<DateTime<Utc>>,
     /// If empty, include all users.
-    pub include_users: Vec<MacroUserIdStr<'static>>,
+    pub include_users: Vec<RoxUserIdStr<'static>>,
     /// If empty, include all features.
     pub features: Vec<AiFeature>,
 }
@@ -322,7 +322,7 @@ pub struct UsageEvent {
     /// The feature that performed the completion.
     pub feature: AiFeature,
     /// The user the completion was performed for.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// The entity the completion related to, if any.
     pub entity: Option<Uuid>,
     /// The model api id.
@@ -345,7 +345,7 @@ pub struct UsageContext {
     /// The feature performing the completion.
     pub feature: AiFeature,
     /// The user the completion is for.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// The entity the completion relates to, if any.
     pub entity: Option<Uuid>,
     /// The agent's own API key the completion runs on, when Rox is
@@ -358,7 +358,7 @@ pub struct UsageContext {
 
 impl UsageContext {
     /// A context for a user-attributed completion.
-    pub fn new(feature: AiFeature, user: MacroUserIdStr<'static>) -> Self {
+    pub fn new(feature: AiFeature, user: RoxUserIdStr<'static>) -> Self {
         Self {
             feature,
             user,
@@ -589,14 +589,14 @@ pub trait UsageService: Send + Sync + 'static {
     /// Summarize recorded usage matching `params`.
     fn get_usage(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         params: UsageApiParams,
     ) -> impl Future<Output = Result<UsageSummary>> + Send;
 
     /// Set the pricing for a model and recompute all of its recorded rows.
     fn set_pricing(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         model: String,
         pricing: ModelPricing,
     ) -> impl Future<Output = Result<()>> + Send;

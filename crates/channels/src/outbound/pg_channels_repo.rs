@@ -39,7 +39,7 @@ use item_filters::ast::{
     LiteralTree,
     channel::{ChannelLiteral, ChannelThreadLiteral},
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_pagination::{CreatedAt, Query};
 #[cfg(feature = "list")]
 use recursion::CollapsibleExt;
@@ -182,7 +182,7 @@ struct UserIdRow {
 }
 
 #[derive(Debug, sqlx::FromRow)]
-struct MacroUserIdRow {
+struct RoxUserIdRow {
     user_id: String,
 }
 
@@ -205,7 +205,7 @@ where
         INSERT INTO comms_activity (id, user_id, channel_id, created_at, updated_at)
         VALUES ($1, $2, $3, NOW(), NOW())
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         user_id,
         channel_id,
     )
@@ -217,9 +217,9 @@ where
 async fn get_channel_participants_for_thread_id(
     pool: &PgPool,
     thread_id: Uuid,
-) -> anyhow::Result<Vec<MacroUserIdStr<'static>>> {
+) -> anyhow::Result<Vec<RoxUserIdStr<'static>>> {
     let rows = sqlx::query_as!(
-        MacroUserIdRow,
+        RoxUserIdRow,
         r#"
         SELECT DISTINCT id AS "user_id!" FROM (
             SELECT m.sender_id AS id
@@ -249,7 +249,7 @@ async fn get_channel_participants_for_thread_id(
     .await?;
     Ok(rows
         .into_iter()
-        .filter_map(|row| MacroUserIdStr::try_from(row.user_id).ok())
+        .filter_map(|row| RoxUserIdStr::try_from(row.user_id).ok())
         .collect())
 }
 
@@ -278,7 +278,7 @@ fn static_channel_name(
 async fn resolve_channel_display_name(
     pool: &PgPool,
     info: &ChannelInfo,
-    viewer_user_id: MacroUserIdStr<'_>,
+    viewer_user_id: RoxUserIdStr<'_>,
 ) -> anyhow::Result<String> {
     match info.channel_type {
         ChannelType::Public | ChannelType::Team => Ok(static_channel_name(
@@ -296,9 +296,9 @@ async fn resolve_channel_display_name(
         }
         ChannelType::Private | ChannelType::DirectMessage => {
             let principals = load_active_participant_principals(pool, info.id).await?;
-            let user_ids: Vec<MacroUserIdStr<'static>> = principals
+            let user_ids: Vec<RoxUserIdStr<'static>> = principals
                 .iter()
-                .filter_map(|principal| MacroUserIdStr::try_from(principal.clone()).ok())
+                .filter_map(|principal| RoxUserIdStr::try_from(principal.clone()).ok())
                 .collect();
             let bot_ids: Vec<BotId> = principals
                 .iter()
@@ -348,7 +348,7 @@ pub(super) fn principal_display_name(
     name_lookup: &NameLookup,
     bot_name_lookup: &HashMap<BotId, String>,
 ) -> Option<String> {
-    if let Ok(user_id) = MacroUserIdStr::try_from(principal.to_string()) {
+    if let Ok(user_id) = RoxUserIdStr::try_from(principal.to_string()) {
         return Some(id_to_display_name(&user_id, name_lookup));
     }
     let bot_id = bot_id::BotIdStr::parse_from_str(principal).ok()?.bot_id();
@@ -421,7 +421,7 @@ pub(super) async fn load_bot_display_names(
 
 pub(super) async fn load_user_display_names(
     pool: &PgPool,
-    user_ids: &[MacroUserIdStr<'static>],
+    user_ids: &[RoxUserIdStr<'static>],
 ) -> Result<NameLookup, sqlx::Error> {
     if user_ids.is_empty() {
         return Ok(NameLookup::new());
@@ -476,7 +476,7 @@ fn display_name(first_name: Option<&str>, last_name: Option<&str>) -> Option<Str
     }
 }
 
-fn id_to_display_name(user_id: &MacroUserIdStr<'static>, name_lookup: &NameLookup) -> String {
+fn id_to_display_name(user_id: &RoxUserIdStr<'static>, name_lookup: &NameLookup) -> String {
     match name_lookup.get(user_id) {
         Some(name) if !name.trim().is_empty() => name.clone(),
         _ => fallback_user_name(user_id),
@@ -824,7 +824,7 @@ fn push_channel_thread_sort_expr(
 fn push_channel_thread_filter_expr(
     builder: &mut QueryBuilder<'static, Postgres>,
     expr: &Expr<ChannelThreadLiteral>,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
 ) {
     match expr {
         Expr::And(a, b) => {
@@ -909,7 +909,7 @@ fn notification_state_predicate(state: item_filters::NotificationState) -> &'sta
 #[cfg(feature = "list")]
 fn push_channel_thread_participant_filter_expr(
     builder: &mut QueryBuilder<'static, Postgres>,
-    participant: &MacroUserIdStr<'_>,
+    participant: &RoxUserIdStr<'_>,
 ) {
     let participant = participant.as_ref().to_string();
     builder.push(
@@ -970,7 +970,7 @@ fn push_channel_message_participation_expr(
 #[cfg(feature = "list")]
 fn push_channel_thread_notification_filter_expr(
     builder: &mut QueryBuilder<'static, Postgres>,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     predicate_sql: &str,
 ) {
     builder.push(
@@ -1360,7 +1360,7 @@ impl ChannelListRow {
             auto_join_team: self.auto_join_team,
             created_at: self.created_at,
             updated_at: self.updated_at,
-            owner_id: MacroUserIdStr::parse_from_str(&self.owner_id)
+            owner_id: RoxUserIdStr::parse_from_str(&self.owner_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
         };
@@ -1843,7 +1843,7 @@ impl ChannelListRepo for PgChannelsRepo {
 
     async fn get_channel_list_activities(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<Vec<Activity>, rootcause::Report> {
         Ok(sqlx::query!(
             r#"
@@ -2002,7 +2002,7 @@ impl ChannelListRepo for PgChannelsRepo {
 impl ChannelListUserRepo for PgChannelsRepo {
     async fn get_names_for_ids(
         &self,
-        ids: HashSet<MacroUserIdStr<'_>>,
+        ids: HashSet<RoxUserIdStr<'_>>,
     ) -> Result<Vec<UserName>, rootcause::Report> {
         let ids = ids.into_iter().map(|s| s.to_string()).collect::<Vec<_>>();
         Ok(sqlx::query!(
@@ -2019,7 +2019,7 @@ impl ChannelListUserRepo for PgChannelsRepo {
         )
         .try_map(|row| {
             Ok(UserName {
-                id: MacroUserIdStr::parse_from_str(&row.user_profile_id)
+                id: RoxUserIdStr::parse_from_str(&row.user_profile_id)
                     .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                     .into_owned(),
                 first_name: row.first_name,
@@ -2198,7 +2198,7 @@ impl ChannelRepo for PgChannelsRepo {
         Ok(rows
             .into_iter()
             .filter_map(|row| {
-                let user_id = MacroUserIdStr::try_from(row.user_id).ok()?;
+                let user_id = RoxUserIdStr::try_from(row.user_id).ok()?;
                 Some(ChannelParticipant {
                     channel_id: row.channel_id,
                     user_id: user_id.as_ref().to_string(),
@@ -2439,7 +2439,7 @@ impl ChannelRepo for PgChannelsRepo {
     }
 
     async fn get_or_create_channel_join_code(&self, channel_id: Uuid) -> Result<Uuid, Self::Err> {
-        let candidate_join_code = macro_uuid::generate_uuid_v7();
+        let candidate_join_code = rox_uuid::generate_uuid_v7();
         let join_code = sqlx::query_scalar!(
             r#"
             UPDATE comms_channels
@@ -2483,7 +2483,7 @@ impl ChannelRepo for PgChannelsRepo {
     async fn get_channel_metadata(
         &self,
         channel_id: Uuid,
-        viewer_user_id: MacroUserIdStr<'static>,
+        viewer_user_id: RoxUserIdStr<'static>,
     ) -> Result<ChannelMetadata, Self::Err> {
         let info = self.get_channel_info(channel_id).await?;
         let channel_name = resolve_channel_display_name(&self.pool, &info, viewer_user_id).await?;
@@ -2549,14 +2549,14 @@ impl ChannelRepo for PgChannelsRepo {
     async fn resolve_channel_name(
         &self,
         info: &ChannelInfo,
-        viewer_user_id: MacroUserIdStr<'static>,
+        viewer_user_id: RoxUserIdStr<'static>,
     ) -> Result<String, Self::Err> {
         resolve_channel_display_name(&self.pool, info, viewer_user_id).await
     }
 
     async fn get_user_display_names(
         &self,
-        user_ids: &[MacroUserIdStr<'static>],
+        user_ids: &[RoxUserIdStr<'static>],
     ) -> Result<NameLookup, Self::Err> {
         Ok(load_user_display_names(&self.pool, user_ids).await?)
     }
@@ -2580,7 +2580,7 @@ impl ChannelRepo for PgChannelsRepo {
 
     async fn get_user_team_id(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<Uuid>, Self::Err> {
         sqlx::query_scalar!(
             r#"
@@ -2597,7 +2597,7 @@ impl ChannelRepo for PgChannelsRepo {
 
     async fn create_channel(
         &self,
-        owner_id: MacroUserIdStr<'_>,
+        owner_id: RoxUserIdStr<'_>,
         _org_id: Option<i64>,
         req: CreateChannelRequest,
     ) -> Result<CreatedChannel, Self::Err> {
@@ -2608,7 +2608,7 @@ impl ChannelRepo for PgChannelsRepo {
             auto_join_team,
             participants,
         } = req;
-        let channel_id = macro_uuid::generate_uuid_v7();
+        let channel_id = rox_uuid::generate_uuid_v7();
         let mut transaction = self.pool.begin().await?;
         sqlx::query!(
             r#"
@@ -2694,7 +2694,7 @@ impl ChannelRepo for PgChannelsRepo {
         .await
         .context("unable to fetch created channel participants")?
         .into_iter()
-        .map(MacroUserIdStr::try_from)
+        .map(RoxUserIdStr::try_from)
         .collect::<Result<Vec<_>, _>>()
         .context("created channel contains an invalid user id")?;
 
@@ -2711,7 +2711,7 @@ impl ChannelRepo for PgChannelsRepo {
     async fn auto_join_by_team_id(
         &self,
         team_id: &Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
         sqlx::query!(
             r#"
@@ -2737,7 +2737,7 @@ impl ChannelRepo for PgChannelsRepo {
     async fn leave_by_team_id(
         &self,
         team_id: &Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<Uuid>, Self::Err> {
         sqlx::query_scalar!(
             r#"
@@ -2760,7 +2760,7 @@ impl ChannelRepo for PgChannelsRepo {
 
     async fn restore_by_channel_ids(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         channel_ids: &[Uuid],
     ) -> Result<(), Self::Err> {
         sqlx::query!(
@@ -2790,8 +2790,8 @@ impl ChannelRepo for PgChannelsRepo {
 
     async fn maybe_get_dm(
         &self,
-        user_id: MacroUserIdStr<'_>,
-        recipient_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
+        recipient_id: RoxUserIdStr<'_>,
     ) -> Result<Option<Uuid>, Self::Err> {
         let pair = crate::domain::dm::DmPair::new(user_id, recipient_id)?;
         historical::find_dm(&mut *self.pool.acquire().await?, &pair).await
@@ -2799,7 +2799,7 @@ impl ChannelRepo for PgChannelsRepo {
 
     async fn maybe_get_private_channel(
         &self,
-        participants: HashSet<MacroUserIdStr<'_>>,
+        participants: HashSet<RoxUserIdStr<'_>>,
     ) -> Result<Option<Uuid>, Self::Err> {
         let participants: Vec<String> = participants
             .iter()
@@ -2957,7 +2957,7 @@ impl ChannelRepo for PgChannelsRepo {
     #[tracing::instrument(err, skip(self, user_id))]
     async fn user_is_team_admin(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         sqlx::query_scalar!(
@@ -2998,7 +2998,7 @@ impl ChannelRepo for PgChannelsRepo {
     async fn add_participant(
         &self,
         channel_id: Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         role: ParticipantRole,
     ) -> Result<bool, Self::Err> {
         add_participant(&self.pool, channel_id, user_id.as_ref(), role).await
@@ -3027,7 +3027,7 @@ impl ChannelRepo for PgChannelsRepo {
         &self,
         options: CreateEntityMentionOptions,
     ) -> Result<EntityMention, Self::Err> {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let mention = sqlx::query_as!(
             EntityMention,
             r#"
@@ -3120,7 +3120,7 @@ impl ChannelRepo for PgChannelsRepo {
     async fn get_thread_participants(
         &self,
         thread_id: Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         get_channel_participants_for_thread_id(&self.pool, thread_id).await
     }
 
@@ -3136,7 +3136,7 @@ impl ChannelRepo for PgChannelsRepo {
             ON CONFLICT (user_id, channel_id) DO UPDATE
             SET interacted_at = NOW(), updated_at = NOW()
             "#,
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             user_id.as_ref(),
             channel_id,
         )
@@ -3215,7 +3215,7 @@ impl ChannelRepo for PgChannelsRepo {
                     viewed_at as "viewed_at?: DateTime<Utc>",
                     interacted_at as "interacted_at?: DateTime<Utc>"
                 "#,
-                    macro_uuid::generate_uuid_v7(),
+                    rox_uuid::generate_uuid_v7(),
                     user_id,
                     channel_id,
                 )
@@ -3248,7 +3248,7 @@ impl ChannelRepo for PgChannelsRepo {
                     viewed_at as "viewed_at?: DateTime<Utc>",
                     interacted_at as "interacted_at?: DateTime<Utc>"
                 "#,
-                    macro_uuid::generate_uuid_v7(),
+                    rox_uuid::generate_uuid_v7(),
                     user_id,
                     channel_id,
                 )

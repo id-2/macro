@@ -350,7 +350,7 @@ impl AgentState {
     }
 
     /// The bot id of the agent this session belongs to, if any.
-    fn agent_bot(&self) -> Option<macro_uuid::Uuid> {
+    fn agent_bot(&self) -> Option<rox_uuid::Uuid> {
         self.store.get(&self.session_id).and_then(|session| {
             session
                 .identity
@@ -696,7 +696,7 @@ pub async fn serve(state: Arc<AgentState>, acp: AcpChannel) -> Result<(), AcpErr
                                 .to_owned(),
                         );
                     }
-                    let acp_id = SessionId::new(macro_uuid::generate_uuid_v7().to_string());
+                    let acp_id = SessionId::new(rox_uuid::generate_uuid_v7().to_string());
                     state.bind_acp_session(acp_id.clone(), false);
                     state.start_connect_mcp(request.mcp_servers);
                     let responded = responder.respond(
@@ -1182,12 +1182,23 @@ async fn run_turn(
             SessionUpdate::AgentMessageChunk(ContentChunk::new(reply.into())),
         ));
     }
-    state.push_turn(request_id, prompt, turn_parts);
+    // A turn that failed leaves nothing for the model to read back: its work
+    // never ran, and replaying its half-made calls (and the prompt that asked
+    // for them) only invites the next turn to repeat the same mistake. The
+    // reader still sees what they typed and the failure text; the model's
+    // copy starts clean at the next prompt.
+    if failure.is_none() {
+        state.push_turn(request_id, prompt, turn_parts);
+    }
 
-    // A failure first: the idle timeout cancels the stream itself, and a turn
-    // it stopped failed rather than being stopped by the user.
+    // A failed turn still ends like any other: replying to `session/prompt`
+    // with a JSON-RPC error leaves the session's transport dead, so every
+    // later prompt in the session reached nothing. Why it failed is in the
+    // log and in the reply text the reader got, and the next message starts
+    // a fresh turn.
     let result = if let Some(failure) = failure {
-        Err(AcpError::internal_error().data(failure))
+        tracing::error!(%failure, "turn failed; the session stays usable");
+        Ok(StopReason::Refusal)
     } else if was_cancelled || cancel.is_cancelled() {
         Ok(StopReason::Cancelled)
     } else {

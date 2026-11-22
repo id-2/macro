@@ -9,7 +9,7 @@ use super::ports::ActivityAudienceExpander;
 use crate::domain::ports::{ActivityFeedPage, ActivityRange, ActivityReads, EntityActivityMap};
 use crate::{ActivityOverview, ActivityRecord, ActivityWindow, EntityType};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{collections::HashSet, num::NonZeroU32};
 use uuid::Uuid;
 
@@ -57,7 +57,7 @@ impl<R, A> VisibleActivityReads<R, A> {
 impl<R, A: ActivityAudienceExpander> VisibleActivityReads<R, A> {
     async fn visible_keys(
         &self,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         keys: Vec<(EntityType, String)>,
     ) -> Result<HashSet<(EntityType, String)>, VisibleActivityError> {
         let keys: Vec<_> = keys
@@ -78,7 +78,7 @@ impl<R, A: ActivityAudienceExpander> VisibleActivityReads<R, A> {
         records: Vec<ActivityRecord>,
         needs_check: fn(EntityType) -> bool,
     ) -> Result<Vec<ActivityRecord>, VisibleActivityError> {
-        let viewer = MacroUserIdStr::parse_from_str(subject)
+        let viewer = RoxUserIdStr::parse_from_str(subject)
             .map_err(|_| VisibleActivityError::InvalidViewer)?;
         let visible = self
             .visible_keys(
@@ -180,7 +180,7 @@ impl<R: ActivityReads + Send + Sync, A: ActivityAudienceExpander> ActivityReads
             .subject_overview(subject_id, window)
             .await
             .map_err(|error| VisibleActivityError::Read(Box::new(error)))?;
-        let viewer = MacroUserIdStr::parse_from_str(subject_id)
+        let viewer = RoxUserIdStr::parse_from_str(subject_id)
             .map_err(|_| VisibleActivityError::InvalidViewer)?;
         let visible = self
             .visible_keys(

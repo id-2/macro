@@ -8,7 +8,7 @@ publish = false
 axum = [
   "dep:axum",
   "dep:axum-extra",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:rate_limit",
   "dep:rootcause",
 ]
@@ -22,12 +22,12 @@ async-trait.workspace = true
 axum = { workspace = true, optional = true }
 axum-extra = { workspace = true, optional = true }
 chrono.workspace = true
-macro_authorization = { path = "../macro_authorization", default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", default-features = false, features = [
   "axum",
 ], optional = true }
-macro_env_var = { path = "../macro_env_var" }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid" }
+rox_env_var = { path = "../rox_env_var" }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid" }
 rate_limit = { path = "../rate_limit", default-features = false, features = [
   "axum",
 ], optional = true }

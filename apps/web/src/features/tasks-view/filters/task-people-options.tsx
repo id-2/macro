@@ -9,16 +9,16 @@ import { TASK_VIEWER } from './task-facets';
 export function taskViewerOption(viewer: string | undefined) {
   return {
     id: TASK_VIEWER,
-    label: 'Me',
+    label: 'Я',
     content: () => (
-      <Tooltip label="Matches whoever opens this saved view." as="span">
-        Me
+      <Tooltip label="Совпадает с тем, кто открывает этот сохранённый вид." as="span">
+        Я
       </Tooltip>
     ),
     icon: () => (
       <UserIcon
         id={viewer ?? ''}
-        name="Me"
+        name="Я"
         size="sm"
         class="size-3.5"
         suppressClick

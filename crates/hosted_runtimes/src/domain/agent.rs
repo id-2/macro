@@ -10,7 +10,7 @@
 
 use std::{collections::BTreeMap, future::Future, pin::Pin};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::{enrollment::EnrollmentGeneration, ids::ComputerId};
@@ -112,7 +112,7 @@ impl Drop for AgentEnv {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct AgentEnrollment {
     /// The agent's Rox account.
-    pub agent_user_id: MacroUserIdStr<'static>,
+    pub agent_user_id: RoxUserIdStr<'static>,
     /// The environment the guest's brain runs with.
     pub env: AgentEnv,
 }
@@ -167,13 +167,13 @@ pub trait ComputerAgents: Send + Sync + 'static {
     fn agent_of(
         &self,
         computer: ComputerId,
-    ) -> impl Future<Output = Result<Option<MacroUserIdStr<'static>>, Self::Error>> + Send;
+    ) -> impl Future<Output = Result<Option<RoxUserIdStr<'static>>, Self::Error>> + Send;
 
     /// The team's computer bought for this agent, if any.
     fn computer_for_agent(
         &self,
         team_id: uuid::Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<ComputerId>, Self::Error>> + Send;
 
     /// Whether a computer runs this agent for the team: bought (not a
@@ -181,6 +181,6 @@ pub trait ComputerAgents: Send + Sync + 'static {
     fn has_live_computer(
         &self,
         team_id: uuid::Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, Self::Error>> + Send;
 }

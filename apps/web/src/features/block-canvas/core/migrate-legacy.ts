@@ -6,7 +6,7 @@ import {
   type ShapeItem,
   sortKeysBetween,
   translation,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { match } from 'ts-pattern';
 import { CANVAS_VERSION, type CanvasFile, isRecord } from './document-format';
 import {

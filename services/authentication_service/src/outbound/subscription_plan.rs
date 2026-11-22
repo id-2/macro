@@ -4,7 +4,7 @@ use crate::service::subscription_plan::{
 };
 use crate::service::subscription_status::{SubscriptionPlanFacts, SubscriptionStatusGateway};
 use ai_billing::domain::SubscriptionScope;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::sync::Arc;
 use teams::domain::{
@@ -89,9 +89,9 @@ impl<
 {
     async fn personal_subscription(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<PersonalSubscription, PlanChangeError> {
-        let id = macro_db_client::user::get::get_stripe_customer_id_by_user_id(&self.db, user)
+        let id = rox_db_client::user::get::get_stripe_customer_id_by_user_id(&self.db, user)
             .await
             .map_err(anyhow::Error::from)?
             .ok_or(PlanChangeError::MissingCustomer)?;
@@ -124,7 +124,7 @@ impl<
     }
     async fn apply(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         subscription: PersonalSubscription,
         target: SeatPlan,
         action: PlanAction,
@@ -160,7 +160,7 @@ impl<
     async fn billing_access(
         &self,
         scope: SubscriptionScope,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<crate::service::subscription_status::billing_facts::BillingAccess, PlanChangeError>
     {
         self.billing.access(scope, user).await
@@ -170,7 +170,7 @@ impl<
         &self,
         customer: &str,
         scope: SubscriptionScope,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         read_billing: bool,
     ) -> Result<Option<SubscriptionPlanFacts>, PlanChangeError> {
         let Some(subscription) = self.subscription(customer, scope).await? else {

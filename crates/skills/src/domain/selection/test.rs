@@ -58,7 +58,7 @@ impl Jev {
 impl Cognition for Jev {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         panic!("skill selection must not generate text")
@@ -66,7 +66,7 @@ impl Cognition for Jev {
 
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         let probabilities = request
@@ -113,7 +113,7 @@ impl Skills {
 impl SkillService for Skills {
     async fn read_skill(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         document_id: Uuid,
     ) -> Result<SkillContent, SkillError> {
         if self.unreadable.contains(&document_id) {
@@ -133,27 +133,27 @@ impl SkillService for Skills {
 
     async fn search_skills(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: &str,
         _: SkillMatchType,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         panic!("skill selection must not search")
     }
 
-    async fn list_skills(&self, _: &MacroUserIdStr<'_>) -> Result<Vec<SkillSummary>, SkillError> {
+    async fn list_skills(&self, _: &RoxUserIdStr<'_>) -> Result<Vec<SkillSummary>, SkillError> {
         panic!("skill selection lists routable skills")
     }
 
     async fn list_routable_skills(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         Ok(self.user.clone())
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
 }
 
 fn ids(selection: &SkillSelection) -> Vec<u128> {

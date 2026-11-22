@@ -62,7 +62,7 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use lexical_client::LexicalClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MessageServiceApi, models::MessageAttribution, ports::MessageError, service::MessageWrite,
 };
@@ -388,7 +388,7 @@ impl<
     }
 
     /// Who these tools create entities as when acting for `user`.
-    pub fn creation_principal(&self, user: MacroUserIdStr<'static>) -> CreationPrincipal {
+    pub fn creation_principal(&self, user: RoxUserIdStr<'static>) -> CreationPrincipal {
         CreationPrincipal::BotForUser {
             bot: self.actor,
             user,

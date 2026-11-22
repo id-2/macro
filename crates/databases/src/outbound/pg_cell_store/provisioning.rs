@@ -42,7 +42,7 @@ where
                 .create_database_definition_in(
                     transaction,
                     NewDatabaseDefinition {
-                        id: macro_uuid::generate_uuid_v7(),
+                        id: rox_uuid::generate_uuid_v7(),
                         database_id: database.id.into_uuid(),
                         name: &column.name,
                         data_type: column.data_type,

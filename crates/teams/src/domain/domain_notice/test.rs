@@ -8,8 +8,8 @@ use crate::domain::join_announcement::JoinAnnouncementError;
 
 const TEAM: Uuid = Uuid::from_u128(0x2222);
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 fn receipt(sender: &str) -> EntityAccessReceipt<AdminTeamRole> {
@@ -28,8 +28,8 @@ struct FakeDirectory {
 impl ColleagueDirectory for FakeDirectory {
     async fn contacts(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+        _user_id: &RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         if self.fail {
             return Err(rootcause::report!("contacts unavailable"));
         }

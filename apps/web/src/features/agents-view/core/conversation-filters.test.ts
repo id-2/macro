@@ -1,10 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   type ConversationFacts,
   conversationMatchesFilters,
   EMPTY_CONVERSATION_FILTERS,
   groupConversations,
 } from './conversation-filters';
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 const reviewFix: ConversationFacts = {
   mode: 'code',

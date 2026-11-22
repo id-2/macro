@@ -2,7 +2,7 @@ use crate::cognition::api::context::DcsAuthorizationService;
 use anyhow::Result;
 use axum::extract::{Json, State};
 use axum::{extract, http::StatusCode};
-use macro_authorization::{OptionalMacroAuthorizationExtractor, UserOrInternalService};
+use rox_authorization::{OptionalRoxAuthorizationExtractor, UserOrInternalService};
 use model::chat::preview::{ChatPreview, ChatPreviewData, ChatPreviewV2, WithChatId};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -35,7 +35,7 @@ pub async fn handler(
     // Anonymous access is allowed, but supplied invalid/expired credentials
     // are still rejected with a 401 (matches the pre-migration behavior of
     // the router-wide auth layer).
-    _user: OptionalMacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternalService>,
+    _user: OptionalRoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternalService>,
     req: extract::Json<GetBatchPreviewRequest>,
 ) -> Result<(StatusCode, Json<GetBatchPreviewResponse>), (StatusCode, String)> {
     // Ensure the document ids are unique to prevent duplicate work
@@ -43,7 +43,7 @@ pub async fn handler(
     let chat_ids: Vec<String> = unique_chat_ids.into_iter().collect();
 
     let chat_preview_results =
-        macro_db_client::chat::preview::batch_get_document_preview_v2(&db, &chat_ids)
+        rox_db_client::chat::preview::batch_get_document_preview_v2(&db, &chat_ids)
             .await
             .map_err(|e| {
                 tracing::error!(error = %e,  "unable to get batch preview");

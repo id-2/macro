@@ -586,14 +586,14 @@ fn channel_name_cursor_round_trips_through_the_unified_cursor() {
     assert_eq!(channel_cursor.as_updated_at(), Some((entity_id, ts(1000))));
 }
 
-fn caller(origin: macro_authorization::CredentialOrigin) -> MacroUserAuthentication {
+fn caller(origin: rox_authorization::CredentialOrigin) -> RoxUserAuthentication {
     let user_id = "macro|user@example.com";
-    MacroUserAuthentication {
+    RoxUserAuthentication {
         origin,
         agent_id: None,
         agent_via: None,
         routine_id: None,
-        macro_user_id: macro_user_id::user_id::MacroUserIdStr::try_from(user_id.to_string())
+        macro_user_id: rox_user_id::user_id::RoxUserIdStr::try_from(user_id.to_string())
             .expect("valid user id"),
         user_context: UserContext {
             user_id: user_id.to_string(),
@@ -630,7 +630,7 @@ fn the_unified_search_span_carries_the_mode_and_not_the_request() {
     };
 
     let span = unified_search_span(
-        &caller(macro_authorization::CredentialOrigin::Internal),
+        &caller(rox_authorization::CredentialOrigin::Internal),
         &query_params,
         &req,
     );
@@ -704,7 +704,7 @@ fn the_unified_search_span_defaults_the_page_size() {
     };
 
     let _span = unified_search_span(
-        &caller(macro_authorization::CredentialOrigin::Session),
+        &caller(rox_authorization::CredentialOrigin::Session),
         &query_params,
         &req,
     );

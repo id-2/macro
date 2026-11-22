@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { markNotificationsForEntityAsRead } from '@notifications/notification-helpers';
 import type { NotificationSource } from '@notifications/notification-source';
@@ -33,7 +34,7 @@ function ActiveSessionReadMarker(props: {
       await markNotificationsForEntityAsRead(props.notificationSource, entity);
     } catch (error) {
       console.error(
-        'Failed to mark agent session notifications as read',
+        t('agentChat.markReadFailed'),
         error
       );
     }

@@ -1,9 +1,9 @@
-import { cellPlainText } from '@macro-inc/spreadsheet/cell-mentions';
+import { cellPlainText } from '@rox-one/spreadsheet/cell-mentions';
 import {
   type CellSelection,
   selectionBounds,
-} from '@macro-inc/spreadsheet/grid-selection';
-import { displayNumber } from '@macro-inc/spreadsheet/number-display';
+} from '@rox-one/spreadsheet/grid-selection';
+import { displayNumber } from '@rox-one/spreadsheet/number-display';
 import {
   currentRegion,
   keepsHiddenRow,
@@ -24,26 +24,26 @@ import {
   tableDataRows,
   totalsFormula,
   totalsFunction,
-} from '@macro-inc/spreadsheet/sheet-tables';
+} from '@rox-one/spreadsheet/sheet-tables';
 import {
   columnTypeMismatch,
   createTypedTable,
   columnChoices as listChoices,
   setTableColumnType,
-} from '@macro-inc/spreadsheet/table-columns';
+} from '@rox-one/spreadsheet/table-columns';
 import {
   convertTableToRange,
   deleteTable,
   renameTable,
   type SheetChanges,
   workbookNames,
-} from '@macro-inc/spreadsheet/table-edits';
+} from '@rox-one/spreadsheet/table-edits';
 import {
   filterTable,
   type TableCellText,
-} from '@macro-inc/spreadsheet/table-filters';
-import { groupTableRows } from '@macro-inc/spreadsheet/table-groups';
-import { coloredTable } from '@macro-inc/spreadsheet/table-styles';
+} from '@rox-one/spreadsheet/table-filters';
+import { groupTableRows } from '@rox-one/spreadsheet/table-groups';
+import { coloredTable } from '@rox-one/spreadsheet/table-styles';
 import { type Accessor, createMemo, createSignal } from 'solid-js';
 import type { CellCopy, SpreadsheetCalculation } from '../core/calculation';
 import type { TableReferences } from '../core/formula-completion';

@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::service::billing::{SubscriptionObserved, SubscriptionStatus};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::str::FromStr;
 
 struct TeamCompPolicy;
@@ -144,7 +144,7 @@ async fn comped_quote_preserves_stripe_terms_and_requires_a_subscription() {
         let quote = service
             .offers(
                 TEAM,
-                MacroUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+                RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
             )
             .await
             .map(|offers| {

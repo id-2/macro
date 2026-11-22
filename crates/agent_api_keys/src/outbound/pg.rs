@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use sqlx::PgPool;
 
 use crate::domain::{
@@ -34,7 +34,7 @@ fn provider(stored: &str) -> Result<ModelProvider> {
 
 fn owner(user_id: Option<String>, team_id: Option<Uuid>) -> Result<AgentOwner> {
     match (user_id, team_id) {
-        (Some(user_id), None) => MacroUserIdStr::try_from(user_id)
+        (Some(user_id), None) => RoxUserIdStr::try_from(user_id)
             .map(AgentOwner::User)
             .map_err(|error| storage(anyhow::anyhow!("invalid owner user id: {error:?}"))),
         (None, Some(team_id)) => Ok(AgentOwner::Team(team_id)),
@@ -150,7 +150,7 @@ impl AgentKeyRepo for PgAgentKeyRepo {
         .transpose()
     }
 
-    async fn is_team_member(&self, user: &MacroUserIdStr<'_>, team_id: Uuid) -> Result<bool> {
+    async fn is_team_member(&self, user: &RoxUserIdStr<'_>, team_id: Uuid) -> Result<bool> {
         sqlx::query_scalar!(
             r#"SELECT EXISTS (SELECT 1 FROM team_user WHERE user_id = $1 AND team_id = $2) AS "member!""#,
             user.as_ref(),

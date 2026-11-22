@@ -1,5 +1,5 @@
 import type { FormSectionDetail } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError } from '../../utils';
+import { RoxNotFoundError } from '../../utils';
 import type { Form } from './form';
 import { FormQuestion } from './question';
 
@@ -27,7 +27,7 @@ export class FormSection {
       (candidate) => candidate.id === this.id,
     );
     if (!section)
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `section ${this.id} is not on form ${this.form.id}`,
       );
     return section;

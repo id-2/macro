@@ -12,9 +12,9 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use macro_auth::{
+use rox_auth::{
     credential::CredentialKind,
-    macro_api_token::MacroApiToken,
+    macro_api_token::RoxApiToken,
     middleware::decode_jwt::{JwtToken, JwtValidationArgs},
 };
 use serde::Serialize;
@@ -70,21 +70,21 @@ where
 }
 
 /// The request's Macro API tokens whose signatures verify, as
-/// [`macro_auth::credential::request_credential`] reads them: the one the
+/// [`rox_auth::credential::request_credential`] reads them: the one the
 /// request authenticates with, if it is one, and every other the request
 /// carries. A request is held to every scope any of them is in, so sending
 /// an unscoped token beside a scoped one gains nothing. Tokens of different
 /// users, or credentials that can't be told apart, are refused.
 struct VerifiedTokens {
-    authenticating: Option<MacroApiToken>,
-    others: Vec<MacroApiToken>,
+    authenticating: Option<RoxApiToken>,
+    others: Vec<RoxApiToken>,
 }
 
 fn verified_api_tokens(
     parts: &mut Parts,
     jwt: &JwtValidationArgs,
 ) -> Result<VerifiedTokens, CorrelationRejection> {
-    let credential = macro_auth::credential::request_credential(parts)
+    let credential = rox_auth::credential::request_credential(parts)
         .map_err(|_| CorrelationRejection(CorrelationError::ConflictingCredentials))?;
     let authenticating_token = match &credential.kind {
         CredentialKind::UserToken { token, .. } => Some(token.as_str()),
@@ -101,8 +101,8 @@ fn verified_api_tokens(
     // token that doesn't verify (expired, or another kind of bearer) signs
     // nothing.
     for token in &credential.user_tokens {
-        match macro_auth::middleware::decode_jwt::handler(jwt, token) {
-            Ok(JwtToken::MacroApiToken(decoded)) => {
+        match rox_auth::middleware::decode_jwt::handler(jwt, token) {
+            Ok(JwtToken::RoxApiToken(decoded)) => {
                 users.push(decoded.macro_user_id.clone());
                 if Some(token.as_str()) == authenticating_token {
                     verified.authenticating = Some(decoded);
@@ -110,7 +110,7 @@ fn verified_api_tokens(
                     verified.others.push(decoded);
                 }
             }
-            Ok(JwtToken::MacroAccessToken(decoded)) => users.push(decoded.macro_user_id),
+            Ok(JwtToken::RoxAccessToken(decoded)) => users.push(decoded.macro_user_id),
             Err(_) => {}
         }
     }
@@ -150,7 +150,7 @@ fn narrowest(first: Option<SessionScope>, second: Option<SessionScope>) -> Optio
 /// correlations up in), and name the narrowest of them.
 async fn other_tokens_scope(
     state: Option<&CorrelationState>,
-    others: &[MacroApiToken],
+    others: &[RoxApiToken],
     parts: &Parts,
 ) -> Result<Option<SessionScope>, CorrelationRejection> {
     let mut scope = None;
@@ -175,7 +175,7 @@ async fn other_tokens_scope(
 /// The scope `token` signs, or a refusal when the request is outside it. The
 /// signature is the claim's authority, so this needs no lookup.
 fn checked_signed_scope(
-    token: Option<&MacroApiToken>,
+    token: Option<&RoxApiToken>,
     parts: &Parts,
 ) -> Result<SignedScope, CorrelationRejection> {
     let scope = SignedScope::from_claim(token.and_then(|token| token.agent_scope.as_deref()));
@@ -197,15 +197,22 @@ fn checked_signed_scope(
 fn sdk_verb(parts: &Parts) -> Option<crate::AgentVerb> {
     parts
         .headers
-        .get("x-macro-sdk-verb")
+        .get(SDK_VERB_HEADER)
+        .or_else(|| parts.headers.get(LEGACY_SDK_VERB_HEADER))
         .and_then(|value| value.to_str().ok())
         .and_then(|value| value.parse().ok())
 }
 
+/// The display verb a current SDK writes.
+const SDK_VERB_HEADER: &str = "x-rox-sdk-verb";
+
+/// The display verb's name before the rename, still read from older SDKs.
+const LEGACY_SDK_VERB_HEADER: &str = "x-macro-sdk-verb";
+
 /// Validate the token's correlation claim against its agent session.
 async fn accept_correlation(
     state: &CorrelationState,
-    token: Option<&MacroApiToken>,
+    token: Option<&RoxApiToken>,
 ) -> Result<Option<(Uuid, Correlation)>, CorrelationRejection> {
     let Some((id, agent)) =
         token.and_then(|token| Some((token.agent_correlation_id?, token.agent_id)))

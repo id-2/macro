@@ -1,5 +1,5 @@
-import { Telemetry } from '@macro-inc/observability';
-import type { RangeMove } from '@macro-inc/spreadsheet/workbook-structure';
+import { Telemetry } from '@rox-one/observability';
+import type { RangeMove } from '@rox-one/spreadsheet/workbook-structure';
 import { type Accessor, createSignal } from 'solid-js';
 import {
   type CellPosition,

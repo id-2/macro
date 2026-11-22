@@ -1,7 +1,7 @@
 use super::*;
 
 fn owner() -> Owner {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 
 fn macro_id(n: u128) -> AgentSessionId {

@@ -168,7 +168,7 @@ export function createTaskBoard(options: {
           if (previous) retained.push(previous);
           return retained;
         });
-      setError({ scope, text: 'Could not move task. Refresh or try again.' });
+      setError({ scope, text: 'Не удалось переместить задачу. Обновите страницу или попробуйте снова.' });
       return false;
     } finally {
       setPending((ids) => ids.filter((id) => id !== request.id));

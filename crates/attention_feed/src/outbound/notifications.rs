@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, sync::Arc};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use model_notifications::NotifEvent;
 use notification::domain::{
@@ -46,7 +46,7 @@ where
 {
     async fn active(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> Result<HashMap<Entity<'static>, Vec<FeedNotification>>, Report> {
         // The default query is the active (unseen and seen) edge, unlimited.
@@ -65,7 +65,7 @@ where
 
     async fn transition(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         transition: NotificationTransition,
     ) -> Result<Vec<Uuid>, Report> {
@@ -87,7 +87,7 @@ where
 
     async fn reopen(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         unseen: Vec<Uuid>,
     ) -> Result<Vec<Uuid>, Report> {

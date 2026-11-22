@@ -91,7 +91,7 @@ export function observeSdk<T extends object>(
           const headers = new Headers(
             options.headers as HeadersInit | undefined,
           );
-          headers.set('x-macro-sdk-verb', verb);
+          headers.set('x-rox-sdk-verb', verb);
           const requestHeaders: Record<string, string> = {};
           headers.forEach((value, name) => {
             requestHeaders[name] = value;

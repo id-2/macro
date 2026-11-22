@@ -3,7 +3,7 @@ import CaretDownIcon from '@icon/system/regular/caret-down.svg';
 import RssIcon from '@icon/system/regular/rss.svg';
 import WarningIcon from '@icon/system/regular/warning.svg';
 import { Checkbox, Tooltip } from '@ui';
-import { createSignal, For, Show } from 'solid-js';
+import { createEffect, createSignal, For, Show } from 'solid-js';
 import type { CalendarSource } from '../types';
 import {
   type CalendarAccountGroup,
@@ -25,10 +25,10 @@ interface SourceControlsProps {
  */
 export function SourceControls(props: SourceControlsProps) {
   const groups = () => groupCalendarSourcesByAccount(props.sources);
-  // Accounts start folded; expanding one only reveals its calendars, which
-  // stay visible on the grid whether or not the group is expanded.
+  // Accounts start unfolded: a calendar created a second ago must be visible
+  // in the rail without hunting for its group. Collapsing one still sticks.
   const [expandedKeys, setExpandedKeys] = createSignal<ReadonlySet<string>>(
-    new Set()
+    new Set(groups().map((group) => group.key))
   );
   const toggleExpanded = (key: string) =>
     setExpandedKeys((current) => {
@@ -37,6 +37,35 @@ export function SourceControls(props: SourceControlsProps) {
       else next.add(key);
       return next;
     });
+  // The first list the panel sees is the baseline: nothing is revealed on
+  // arrival. A Rox calendar that shows up later can only have come from the
+  // create dialog, so its account opens to show it — unlike a synced Google
+  // or Outlook calendar, which must not disturb what the person folded away.
+  // Ids are remembered for good, so a refetch that briefly drops and restores
+  // a calendar never counts as a new one.
+  let knownCalendarIds: ReadonlySet<string> | undefined;
+  createEffect(() => {
+    const current = new Set(
+      groups().flatMap((group) => group.calendars.map((calendar) => calendar.id))
+    );
+    const baseline = knownCalendarIds;
+    knownCalendarIds = baseline
+      ? new Set([...baseline, ...current])
+      : current;
+    if (!baseline) return;
+    const createdGroups = groups().filter((group) =>
+      group.calendars.some(
+        (calendar) =>
+          calendar.provider === 'rox' && !baseline.has(calendar.id)
+      )
+    );
+    if (createdGroups.length === 0) return;
+    setExpandedKeys((currentKeys) => {
+      const next = new Set(currentKeys);
+      for (const group of createdGroups) next.add(group.key);
+      return next;
+    });
+  });
 
   return (
     <ul ref={props.ref} class="flex min-w-0 flex-col gap-(--sidebar-row-gap)">
@@ -116,6 +145,13 @@ export function CalendarAccountLabel(props: { group: CalendarAccountGroup }) {
   const primary = () =>
     props.group.calendars.find((calendar) => calendar.isPrimary) ??
     props.group.calendars[0];
+  const address = () => props.group.emailAddress;
+  const label = () => {
+    const current = address();
+    return current.startsWith('calendar-') && current.endsWith('@rox.one')
+      ? (primary()?.name ?? current)
+      : current;
+  };
 
   return (
     <>
@@ -124,7 +160,7 @@ export function CalendarAccountLabel(props: { group: CalendarAccountGroup }) {
         class="size-2.5 shrink-0 rounded-sm"
         style={{ 'background-color': primary()?.color }}
       />
-      <span class="min-w-0 flex-1 truncate">{props.group.emailAddress}</span>
+      <span class="min-w-0 flex-1 truncate">{label()}</span>
     </>
   );
 }

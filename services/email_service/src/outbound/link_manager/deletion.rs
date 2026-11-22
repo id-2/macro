@@ -40,7 +40,7 @@ impl LinkDeletionRepository for PgLinkDeletion {
 
 impl PromotedMailboxCleanup for PromotedCleanup {
     async fn delete_promoted_mailbox_user(&mut self, owner: &str) -> anyhow::Result<Option<Uuid>> {
-        macro_db_client::shared_inbox::delete_promoted_mailbox_user(&mut self.0, owner).await
+        rox_db_client::shared_inbox::delete_promoted_mailbox_user(&mut self.0, owner).await
     }
 }
 

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        UPDATE email_threads\n        SET latest_inbound_message_ts = $1, latest_outbound_message_ts = NULL\n        WHERE id = ANY($2)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Timestamptz",
+        "UuidArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "1db229278bfa42a7660d0e62736067a3b2742056366bd9efd91be35e3420d691"
+}

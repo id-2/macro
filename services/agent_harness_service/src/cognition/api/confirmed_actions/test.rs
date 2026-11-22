@@ -1,7 +1,7 @@
 use super::*;
 use crate::cognition::api::context::test::{authorized_request, test_api_context};
 use axum::{Router, routing::post};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use serde_json::json;
 use tower::ServiceExt;
 

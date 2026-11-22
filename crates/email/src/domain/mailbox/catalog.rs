@@ -2,7 +2,7 @@
 
 use super::*;
 use crate::domain::models::{EmailBackfillStatus, EmailSyncStatus};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{
     link::{Link, UserProvider},
     settings::Settings,
@@ -25,7 +25,7 @@ pub struct InboxCatalogEntry {
 pub trait InboxCatalogRepository: Send + Sync + 'static {
     fn accessible_details(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<InboxCatalogFacts>, MailboxError>> + Send;
 }
 
@@ -51,7 +51,7 @@ pub struct InboxCatalogService<R>(pub R);
 impl<R: InboxCatalogRepository> InboxCatalogService<R> {
     pub async fn list(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> Result<Vec<InboxCatalogEntry>, MailboxError> {
         Ok(self
             .0

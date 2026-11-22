@@ -13,11 +13,16 @@ use axum::{
 use axum_extra::extract::Cached;
 use crm::domain::{model::CrmError, service::CrmService};
 use lru::LruCache;
-use macro_authorization::{AnyPrincipal, MacroAuthorization, OptionalMacroAuthorizationExtractor};
+use rox_authorization::{AnyPrincipal, RoxAuthorization, OptionalRoxAuthorizationExtractor};
 use tokio::{sync::Mutex, time::Instant};
 
-pub(crate) const HEADER: &str = "x-macro-crm-access";
-pub(crate) const REQUEST_HEADER: &str = "x-macro-crm-access-signal";
+pub(crate) const HEADER: &str = "x-rox-crm-access";
+/// The hint's name before the rename. Older clients read only this one, so a
+/// hint is written under both names.
+pub(crate) const LEGACY_HEADER: &str = "x-macro-crm-access";
+pub(crate) const REQUEST_HEADER: &str = "x-rox-crm-access-signal";
+/// The opt-in's name before the rename, still accepted from older clients.
+pub(crate) const LEGACY_REQUEST_HEADER: &str = "x-macro-crm-access-signal";
 const TTL: Duration = Duration::from_secs(3);
 const QUERY_TIMEOUT: Duration = Duration::from_millis(200);
 const LOOKUP_TIMEOUT: Duration = Duration::from_millis(250);
@@ -121,7 +126,7 @@ pub(crate) async fn handler(
     let (mut parts, body) = request.into_parts();
     let auth = parts
         .extract_with_state::<
-            Cached<OptionalMacroAuthorizationExtractor<AuthorizationService, AnyPrincipal>>,
+            Cached<OptionalRoxAuthorizationExtractor<AuthorizationService, AnyPrincipal>>,
             _,
         >(&state)
         .await;
@@ -133,7 +138,7 @@ pub(crate) async fn handler(
         let user = auth
             .authorization
             .as_ref()
-            .and_then(MacroAuthorization::acting_user)?;
+            .and_then(RoxAuthorization::acting_user)?;
         Some(
             cache
                 .get(user.macro_user_id.as_ref(), async {
@@ -163,6 +168,7 @@ fn requested(request: &Request) -> bool {
     request
         .headers()
         .get(REQUEST_HEADER)
+        .or_else(|| request.headers().get(LEGACY_REQUEST_HEADER))
         .is_some_and(|value| value == "1")
 }
 
@@ -186,7 +192,10 @@ async fn respond(
     })) = authority
         && expires_at > Instant::now()
     {
-        response.headers_mut().insert(HEADER, value);
+        // Older clients read only the pre-rename name, so the hint goes out
+        // under both while they are deployed.
+        response.headers_mut().insert(HEADER, value.clone());
+        response.headers_mut().insert(LEGACY_HEADER, value);
     }
     response
 }

@@ -19,10 +19,10 @@ chrono = { workspace = true }
 connection_gateway_client = { path = "../connection_gateway_client" }
 dateparser = { workspace = true }
 futures = { workspace = true }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", default-features = false, features = [
   "axum",
 ] }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 mcp_select = { path = "../mcp_select" }
 model-entity = { path = "../model-entity" }
 import_notion = { path = "../import_notion" }
@@ -48,6 +48,6 @@ uuid = { workspace = true }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 model_user = { path = "../model_user" }
 tower = { workspace = true, features = ["util"] }

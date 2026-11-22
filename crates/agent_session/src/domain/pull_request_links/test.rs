@@ -34,7 +34,7 @@ impl SessionPullRequestLinkRepo for Arc<StubLinks> {
         &self,
         session: AgentSessionId,
         github_key: &str,
-        linked_by: &MacroUserIdStr<'static>,
+        linked_by: &RoxUserIdStr<'static>,
     ) -> Result<()> {
         let mut links = self.links.lock().unwrap();
         if !links
@@ -123,15 +123,15 @@ struct ViewableSessions(HashSet<AgentSessionId>);
 impl SessionViewAccess for ViewableSessions {
     fn can_view<'a>(
         &'a self,
-        _viewer: &'a MacroUserIdStr<'static>,
+        _viewer: &'a RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> Pin<Box<dyn Future<Output = Result<bool>> + Send + 'a>> {
         Box::pin(async move { Ok(self.0.contains(&session)) })
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("linker@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("linker@example.com").unwrap()
 }
 
 fn edit_access(session: AgentSessionId) -> EntityAccessReceipt<EditAccessLevel> {

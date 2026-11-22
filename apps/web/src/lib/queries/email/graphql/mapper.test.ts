@@ -33,7 +33,7 @@ const message: EmailThreadMessageFieldsFragment = {
   labels: [{ providerLabelId: 'INBOX', name: 'Inbox' }],
   bodyText: 'Plain text',
   bodyHtmlSanitized: '<p>HTML</p>',
-  bodyMacro: 'Rox',
+  bodyRox: 'Rox',
   bodyReplyless: '<p>Replyless</p>',
   attachments: [
     {
@@ -210,10 +210,23 @@ describe('mapGraphqlEmailThreadPage', () => {
     expect(mapped.messages).toHaveLength(1);
     expect(mapped.messages[0]).toMatchObject({
       db_id: 'message-1',
-      body_macro: 'Rox',
+      body_rox: 'Rox',
       scheduled_send_time: '2026-08-07T12:00:00Z',
       scheduled_send_status: 'unconfirmed',
     });
+  });
+
+  it('reads the editor document from the former Macro field name', () => {
+    const legacy = {
+      ...message,
+      bodyRox: undefined,
+      bodyMacro: 'Rox from an older server',
+    } as unknown as EmailThreadMessageFieldsFragment;
+    const mapped = mapGraphqlEmailThreadPage(
+      thread({ messages: [legacy] })
+    );
+
+    expect(mapped.messages[0]?.body_rox).toBe('Rox from an older server');
   });
 
   it('defaults an access level from a newer server to view-only', () => {

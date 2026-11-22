@@ -9,11 +9,11 @@ use axum::{
 };
 use chrono::{Duration, Utc};
 use http_body_util::BodyExt;
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rate_limit::{
     RateLimitConfig, RateLimitExceeded, RateLimitKey, RateLimitResult, RateLimitServiceImpl,
@@ -41,30 +41,30 @@ const OUTSIDER_USER_ID: &str = "macro|ada@startup.io";
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             STAFF_JWT => Ok(test_user_context(STAFF_USER_ID)),
             OUTSIDER_JWT => Ok(test_user_context(OUTSIDER_USER_ID)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -94,7 +94,7 @@ fn sample_link() -> InviteLink {
         recipient_email: Some("ada@startup.io".into()),
         note: None,
         promo_code: "1MF".parse().unwrap(),
-        created_by: MacroUserIdStr::try_from_email("valentina@rox.one").unwrap(),
+        created_by: RoxUserIdStr::try_from_email("valentina@rox.one").unwrap(),
         created_at: now,
         expires_at: now + Duration::hours(48),
         revoked_at: None,
@@ -107,7 +107,7 @@ fn sample_link() -> InviteLink {
 fn redeemed_link() -> InviteLink {
     InviteLink {
         redemption: Some(InviteRedemption {
-            user_id: MacroUserIdStr::try_from_email("ada@startup.io").unwrap(),
+            user_id: RoxUserIdStr::try_from_email("ada@startup.io").unwrap(),
             redeemed_at: Utc::now(),
             conversion: None,
         }),
@@ -150,7 +150,7 @@ impl GtmInviteService for FakeGtmInviteService {
 
     async fn create_link(
         &self,
-        _creator: &MacroUserIdStr<'_>,
+        _creator: &RoxUserIdStr<'_>,
         request: CreateInviteLink,
     ) -> Result<InviteLink, GtmInviteError> {
         Ok(InviteLink {
@@ -161,7 +161,7 @@ impl GtmInviteService for FakeGtmInviteService {
 
     async fn list_links(
         &self,
-        _caller: &MacroUserIdStr<'_>,
+        _caller: &RoxUserIdStr<'_>,
         _only_mine: bool,
     ) -> Result<Vec<InviteLink>, GtmInviteError> {
         Ok(vec![sample_link(), redeemed_link()])
@@ -169,7 +169,7 @@ impl GtmInviteService for FakeGtmInviteService {
 
     async fn revoke_link(
         &self,
-        _caller: &MacroUserIdStr<'_>,
+        _caller: &RoxUserIdStr<'_>,
         _id: Uuid,
     ) -> Result<InviteLink, GtmInviteError> {
         Ok(InviteLink {
@@ -185,21 +185,21 @@ impl GtmInviteService for FakeGtmInviteService {
     async fn redeem_link(
         &self,
         _token: &InviteToken,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
     ) -> Result<InviteLink, GtmInviteError> {
         Self::clone_result(&self.resolve).map(|_| redeemed_link())
     }
 
     async fn active_offer_for_user(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
     ) -> Result<Option<InviteLink>, GtmInviteError> {
         Ok(self.offer.clone())
     }
 
     async fn mark_converted(
         &self,
-        _user: &MacroUserIdStr<'_>,
+        _user: &RoxUserIdStr<'_>,
         _stripe_subscription_id: &str,
     ) -> Result<bool, GtmInviteError> {
         Ok(true)
@@ -243,7 +243,7 @@ fn build_router(service: FakeGtmInviteService, rate_limit_exceeded: bool) -> axu
     let state = GtmInviteRouterState {
         service: Arc::new(service),
         rate_limiter: rate_limiter(rate_limit_exceeded),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     };
     gtm_invite_router(state).layer(Extension(ConnectInfo(SocketAddr::from((
         [127, 0, 0, 1],

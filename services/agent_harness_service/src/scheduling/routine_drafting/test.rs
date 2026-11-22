@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::cowlike::CowLike as _;
+use rox_user_id::cowlike::CowLike as _;
 use models_search::SearchHighlight;
 use models_search::channel::{ChannelNameSearchResponse, ChannelNameSearchResponseItem};
 use models_search::document::{
@@ -23,8 +23,8 @@ const OWNER: &str = "macro|owner@example.com";
 const KEY_HEADER: &str = "x-document-storage-service-auth-key";
 const USER_HEADER: &str = "x-document-storage-service-user-id";
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap().into_owned()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap().into_owned()
 }
 
 fn names(server: &MockServer) -> SearchNames {

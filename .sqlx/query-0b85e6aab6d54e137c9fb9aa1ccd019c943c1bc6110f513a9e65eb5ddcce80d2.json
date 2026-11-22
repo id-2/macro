@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO email_message_reconciliation(link_id,generation,provider_id,is_import) VALUES\n            ($1,1,'imported',true),\n            ($1,1,'arrived',false)\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0b85e6aab6d54e137c9fb9aa1ccd019c943c1bc6110f513a9e65eb5ddcce80d2"
+}

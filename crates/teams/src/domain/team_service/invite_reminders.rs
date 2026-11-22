@@ -4,8 +4,8 @@
 use std::collections::HashSet;
 
 use channels::domain::ports::ChannelService;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use model_notifications::{InviteToTeamMetadata, InviteePlan};
 use notification::domain::{models::SendNotificationRequestBuilder, service::NotificationIngress};
@@ -82,7 +82,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker,
+    EB: RoxEventBroker,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -129,7 +129,7 @@ where
     TCRMS: TeamCrmSettingsRepository,
     TA: TeamAnalytics,
     CNE: ContactsEnqueuer,
-    EB: MacroEventBroker,
+    EB: RoxEventBroker,
     OSR: OpenSeatRelease,
     OEC: OwnedEntityCleanup,
 {
@@ -147,9 +147,9 @@ where
         err
     )]
     async fn send_invite_reminder(&self, reminder: &DueInviteReminder) -> anyhow::Result<()> {
-        let recipient = MacroUserIdStr::try_from_email(&reminder.email)
+        let recipient = RoxUserIdStr::try_from_email(&reminder.email)
             .map_err(|e| anyhow::anyhow!("invalid invitee email: {e:?}"))?;
-        let invited_by = MacroUserIdStr::parse_from_str(&reminder.invited_by)
+        let invited_by = RoxUserIdStr::parse_from_str(&reminder.invited_by)
             .map_err(|e| anyhow::anyhow!("invalid inviter id: {e:?}"))?
             .into_owned();
         let inviter_name = self.inviter_name(&invited_by).await;

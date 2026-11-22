@@ -6,7 +6,7 @@ use std::pin::Pin;
 use std::sync::Arc;
 
 use favorites::domain::ports::FavoritesService as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use soup::inbound::axum_router::SoupFavoritesReader;
 
@@ -22,7 +22,7 @@ impl SoupFavoritesReader for DssSoupFavoritesReader {
         entities: Vec<Entity<'static>>,
     ) -> Pin<Box<dyn Future<Output = anyhow::Result<HashSet<Entity<'static>>>> + Send + 'a>> {
         Box::pin(async move {
-            let user = MacroUserIdStr::parse_from_str(user_id)?;
+            let user = RoxUserIdStr::parse_from_str(user_id)?;
             Ok(self.0.favorited_entities(&user, &entities).await?)
         })
     }

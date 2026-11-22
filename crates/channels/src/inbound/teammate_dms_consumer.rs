@@ -18,12 +18,12 @@ use crate::domain::{
 };
 use anyhow::Context as _;
 use kafka_util::{GroupName, KafkaEventConsumer};
-use macro_event_broker::{
-    Event, KafkaConsumerAdapter, MacroEvent, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    Event, KafkaConsumerAdapter, RoxEvent, RoxEventCollection as _, RoxEventConsumerService,
     TopicEvent,
 };
-use macro_event_topics::MacroTeamsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_topics::RoxTeamsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message};
 use serde::{Deserialize, Serialize};
@@ -38,11 +38,11 @@ impl GroupName for TeammateDmsConsumerGroup {
     const GROUP_NAME: &'static str = "teammate-dms";
 }
 
-type TeammateDmsKafkaAdapter = KafkaConsumerAdapter<TeammateDmsConsumerGroup, DeclaredMacroEvent>;
+type TeammateDmsKafkaAdapter = KafkaConsumerAdapter<TeammateDmsConsumerGroup, DeclaredRoxEvent>;
 type TeammateDmsKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, TeammateDmsKafkaAdapter>;
+    RoxEventConsumerService<DeclaredRoxEvent, TeammateDmsKafkaAdapter>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: TeamsMacroEventForDms);
+rox_event_broker::declare_topics!(DeclaredRoxEvent: TeamsRoxEventForDms);
 
 /// Maximum in-process attempts per event before the consumer bails out.
 const MAX_ATTEMPTS: u32 = 5;
@@ -60,10 +60,10 @@ fn retry_strategy() -> impl Iterator<Item = Duration> {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub(crate) struct TeammateDmsJoinedMetadata {
     /// User who joined the team.
-    pub member_id: MacroUserIdStr<'static>,
+    pub member_id: RoxUserIdStr<'static>,
     /// Other current teammates the joining member should have a DM with.
     #[serde(default)]
-    pub teammate_ids: Vec<MacroUserIdStr<'static>>,
+    pub teammate_ids: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Tagged envelope around a `team.member_joined` payload.
@@ -92,18 +92,18 @@ pub(crate) enum TeamsTopicForDms {
 }
 
 impl TopicEvent for TeamsTopicForDms {
-    type Topic = MacroTeamsTopic;
+    type Topic = RoxTeamsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
 /// `macro.teams` record decoded for teammate-DM ensure.
-pub(crate) struct TeamsMacroEventForDms {
+pub(crate) struct TeamsRoxEventForDms {
     key: String,
     event: Event<TeamsTopicForDms>,
 }
 
-impl MacroEvent for TeamsMacroEventForDms {
+impl RoxEvent for TeamsRoxEventForDms {
     type EventPayload = TeamsTopicForDms;
 
     fn key(&self) -> &str {
@@ -229,11 +229,11 @@ where
 {
     let consumer = KafkaEventConsumer::<TeammateDmsConsumerGroup>::from_env(brokers)?;
     let consumer = KafkaConsumerAdapter::<TeammateDmsConsumerGroup, ()>::new(consumer)
-        .subscribe::<DeclaredMacroEvent>()
+        .subscribe::<DeclaredRoxEvent>()
         .map_err(|error| anyhow::anyhow!("failed to subscribe to team events: {error:?}"))?;
     let consumer = TeammateDmsKafkaConsumer::new(consumer);
     tracing::info!(
-        topics = ?DeclaredMacroEvent::topics(),
+        topics = ?DeclaredRoxEvent::topics(),
         group = TeammateDmsConsumerGroup::GROUP_NAME,
         "teammate DM consumer listening"
     );
@@ -255,7 +255,7 @@ where
                 };
                 let kafka_message = message.inner();
                 match message.decode_payload() {
-                    Ok(DeclaredMacroEvent::TeamsMacroEventForDms(event)) => {
+                    Ok(DeclaredRoxEvent::TeamsRoxEventForDms(event)) => {
                         agent_correlation::context::scope(event.event().agent_correlation_id, handle_with_retry(
                             &channels,
                             &event.event().event,

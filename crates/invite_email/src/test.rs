@@ -5,7 +5,7 @@ fn call_invitation_links_directly_to_guest_join_and_escapes_titles() {
     let invitation = CallInvite {
         title: "Review <script>alert(1)</script>".to_string(),
         share_token: "server-issued-test-token".to_string(),
-        invited_by: MacroUserIdStr::try_from_email("host@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("host@example.com").unwrap(),
         recipient_email: "guest@outside.example".to_string(),
     };
     let email = invitation.format_email();
@@ -20,10 +20,10 @@ fn call_invitation_links_directly_to_guest_join_and_escapes_titles() {
     assert!(email.subject.contains("host@example.com"));
 }
 
-fn make_colleague_joined() -> ColleagueJoinedMacro {
-    ColleagueJoinedMacro {
+fn make_colleague_joined() -> ColleagueJoinedRox {
+    ColleagueJoinedRox {
         team_name: "Acme".to_string(),
-        joined_by: MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        joined_by: RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
         joined_name: Some("Alice Example".to_string()),
         recipient_email: EmailStr::try_from("bob@example.com".to_string()).unwrap(),
     }
@@ -63,7 +63,7 @@ fn colleague_joined_is_an_organization_notice_that_links_to_signup() {
 #[test]
 fn colleague_joined_falls_back_to_the_email_without_a_usable_name() {
     for joined_name in [None, Some(" \n\t\u{7} ".to_string())] {
-        let email = ColleagueJoinedMacro {
+        let email = ColleagueJoinedRox {
             joined_name,
             ..make_colleague_joined()
         }
@@ -76,7 +76,7 @@ fn colleague_joined_falls_back_to_the_email_without_a_usable_name() {
 
 #[test]
 fn colleague_joined_puts_long_multiline_names_on_one_capped_line() {
-    let email = ColleagueJoinedMacro {
+    let email = ColleagueJoinedRox {
         joined_name: Some(format!("  Alice\r\nExample\t\u{0}{}", "x".repeat(100))),
         ..make_colleague_joined()
     }
@@ -90,7 +90,7 @@ fn colleague_joined_puts_long_multiline_names_on_one_capped_line() {
 
 #[test]
 fn colleague_joined_escapes_the_untrusted_name_in_the_body() {
-    let email = ColleagueJoinedMacro {
+    let email = ColleagueJoinedRox {
         joined_name: Some("<b>x</b>".to_string()),
         ..make_colleague_joined()
     }
@@ -107,7 +107,7 @@ fn colleague_joined_escapes_the_untrusted_name_in_the_body() {
 #[test]
 fn colleague_joined_rate_limit_key_is_per_recipient() {
     let to_bob = make_colleague_joined();
-    let to_carol = ColleagueJoinedMacro {
+    let to_carol = ColleagueJoinedRox {
         recipient_email: EmailStr::try_from("carol@example.com".to_string()).unwrap(),
         ..make_colleague_joined()
     };
@@ -127,7 +127,7 @@ fn team_invite_rate_limit_key_is_per_invite() {
         team_name: "Acme".to_string(),
         team_id: Uuid::from_u128(1),
         team_invite_id: Uuid::from_u128(10),
-        invited_by: MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
         role: None,
         sender_profile_picture_url: None,
         invitee_plan: InviteePlan::Free,
@@ -158,7 +158,7 @@ fn colleague_joined_serde_round_trip_keeps_the_wire_shape() {
         "recipient_email": "bob@example.com",
     });
     assert_eq!(serde_json::to_value(make_colleague_joined()).unwrap(), wire);
-    let parsed: ColleagueJoinedMacro = serde_json::from_value(wire).unwrap();
+    let parsed: ColleagueJoinedRox = serde_json::from_value(wire).unwrap();
     assert_eq!(parsed.team_name, "Acme");
     assert_eq!(parsed.joined_by.to_string(), "macro|alice@example.com");
     assert_eq!(parsed.joined_name.as_deref(), Some("Alice Example"));
@@ -167,7 +167,7 @@ fn colleague_joined_serde_round_trip_keeps_the_wire_shape() {
 
 fn make_channel_invite() -> ChannelInviteMetadata {
     ChannelInviteMetadata {
-        invited_by: MacroUserIdStr::try_from_email("sender@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("sender@example.com").unwrap(),
         channel_name: "general".to_string(),
         is_direct_message: false,
         message_id: None,
@@ -301,8 +301,8 @@ fn dm_invite_serde_round_trip_preserves_dm_wording() {
     assert_eq!(parsed.format_email().subject, invite.format_email().subject);
 }
 
-fn make_invite() -> InviteToMacro {
-    InviteToMacro {
+fn make_invite() -> InviteToRox {
+    InviteToRox {
         recipient_email: EmailStr::try_from("recipient@example.com".to_string()).unwrap(),
         referral_code: ReferralCode("ABC123".to_string()),
         sender_profile_picture_url: None,
@@ -317,7 +317,7 @@ fn invitation_headers_use_the_rox_text_wordmark() {
         team_name: "Acme".to_string(),
         team_id: Uuid::nil(),
         team_invite_id: Uuid::nil(),
-        invited_by: MacroUserIdStr::try_from_email("sender@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("sender@example.com").unwrap(),
         role: None,
         sender_profile_picture_url: None,
         invitee_plan: InviteePlan::Free,
@@ -374,7 +374,7 @@ fn format_email_with_sender_name() {
 
 #[test]
 fn format_email_falls_back_to_email_when_no_name() {
-    let invite = InviteToMacro {
+    let invite = InviteToRox {
         sender_name: None,
         ..make_invite()
     };
@@ -388,7 +388,7 @@ fn format_email_falls_back_to_email_when_no_name() {
 
 #[test]
 fn format_email_falls_back_to_generic_when_no_name_or_email() {
-    let invite = InviteToMacro {
+    let invite = InviteToRox {
         sender_name: None,
         sender_email: None,
         ..make_invite()
@@ -399,7 +399,7 @@ fn format_email_falls_back_to_generic_when_no_name_or_email() {
 
 #[test]
 fn rate_limit_config_does_not_panic() {
-    let config = InviteToMacro::rate_limit_config();
+    let config = InviteToRox::rate_limit_config();
     assert_eq!(config.max_count, 1);
     assert_eq!(config.window, Duration::from_mins(MINUTES_PER_WEEK));
 }
@@ -414,7 +414,7 @@ fn rate_limit_key_does_not_panic() {
 fn serialization_roundtrip() {
     let invite = make_invite();
     let json = serde_json::to_string(&invite).unwrap();
-    let deserialized: InviteToMacro = serde_json::from_str(&json).unwrap();
+    let deserialized: InviteToRox = serde_json::from_str(&json).unwrap();
     assert_eq!(deserialized.referral_code.0, "ABC123");
 }
 
@@ -426,7 +426,7 @@ fn deserialization_without_sender_email_uses_none() {
         "sender_profile_picture_url": null,
         "sender_name": "Test User"
     }"#;
-    let deserialized: InviteToMacro = serde_json::from_str(json).unwrap();
+    let deserialized: InviteToRox = serde_json::from_str(json).unwrap();
     assert!(deserialized.sender_email.is_none());
 }
 
@@ -438,7 +438,7 @@ fn dm_emails_deduplicate_retries_without_suppressing_later_messages() {
         ..make_channel_invite()
     };
     let other_recipient = ChannelInviteMetadata {
-        email_recipient: Some(MacroUserIdStr::try_from_email("other@example.com").unwrap()),
+        email_recipient: Some(RoxUserIdStr::try_from_email("other@example.com").unwrap()),
         ..first.clone()
     };
     assert_ne!(
@@ -476,7 +476,7 @@ fn make_team_invite(invitee_plan: InviteePlan) -> InviteToTeamMetadata {
         team_name: "Acme".to_string(),
         team_id: Uuid::from_u128(1),
         team_invite_id: Uuid::from_u128(10),
-        invited_by: MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        invited_by: RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
         role: None,
         sender_profile_picture_url: None,
         invitee_plan,

@@ -6,7 +6,7 @@ use super::{
 use ai_toolset::ToolCaller;
 use async_trait::async_trait;
 use code_execution::domain::{ExecuteRequest, ProgramExecutor, RunEnvironment};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -20,7 +20,7 @@ pub trait UserExecutionCredentials: Send + Sync + 'static {
     /// generated code; an agent caller's SDK writes are attributed to it.
     async fn issue(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: &ToolCaller,
         session: Option<uuid::Uuid>,
     ) -> Result<RunEnvironment, CodeModeError>;
@@ -50,7 +50,7 @@ pub trait UserCodeMode: Send + Sync + 'static {
     /// API writes stand.
     async fn execute(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: &ToolCaller,
         session: Option<uuid::Uuid>,
         request: ExecuteRequest,
@@ -92,7 +92,7 @@ impl UserCodeMode for UserCodeModeService {
     )]
     async fn execute(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: &ToolCaller,
         session: Option<uuid::Uuid>,
         request: ExecuteRequest,

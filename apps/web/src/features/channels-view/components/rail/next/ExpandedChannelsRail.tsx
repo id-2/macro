@@ -38,6 +38,7 @@ import { canLabelChannel } from '../../../core/channel-label-eligibility';
 import { CHANNELS_TOUR } from '../../../tour';
 import type { ChannelSectionKey, ChannelsGroup } from '../../../types';
 import { ConversationsCreateMenu } from '../../ConversationsCreateMenu';
+import { sectionChromeName } from '../ChannelLabelRows';
 import { ChannelOption } from '../ChannelOption';
 import {
   type ChannelRailRow,
@@ -94,7 +95,7 @@ function ExpandedHeader(props: { search: ChannelRailSearch }) {
   return (
     <div class="flex shrink-0 flex-col">
       <ViewSidebar.Header
-        searchLabel={t('channelSections.search')}
+        searchLabel="Поиск разговоров"
         searchOpen={props.search.isOpen()}
         onSearchOpenChange={(open) => {
           if (open) {
@@ -106,7 +107,7 @@ function ExpandedHeader(props: { search: ChannelRailSearch }) {
         search={() => (
           <ViewSidebar.Search
             ref={props.search.registerInput}
-            label={t('channelSections.search')}
+            label="Поиск разговоров"
             value={props.search.query()}
             hotkey="cmd+f"
             onValueChange={props.search.setQuery}
@@ -168,7 +169,7 @@ function SectionHeading(props: { group: 'favorites' | ChannelsGroup }) {
       const teamName = team.data?.team.name;
 
       if (teamName) {
-        return t('channelSections.namedTeamChannels', { name: teamName });
+        return `Каналы ${teamName}`;
       }
     }
 
@@ -233,14 +234,14 @@ function SectionStatus(props: { group: ChannelsGroup }) {
             size="sm"
             onClick={() => fireAndForget(source().loadMore(), 'channels-view')}
           >
-            {t('channelSections.loadMore')}
+            Загрузить ещё
           </Button>
         </Match>
         <Match when={!hasConversations()}>
           <ChannelSectionEmptyState>
             {rail.sectionPreferences(props.group).unreadOnly
-              ? t('channelSections.noUnreadConversations')
-              : t('channelSections.empty')}
+              ? 'Нет непрочитанных разговоров'
+              : 'Пока нет разговоров'}
           </ChannelSectionEmptyState>
         </Match>
       </Switch>
@@ -429,24 +430,24 @@ function BrowseSection(props: {
     }
 
     return row.kind === 'label'
-      ? row.label.name
+      ? sectionChromeName(row.label.name)
       : t(`channelSections.${row.group}`);
   };
 
   const emptyMessage = () => {
     if (rail.sectionPreferences(props.sectionKey).unreadOnly) {
-      return t('channelSections.noUnreadConversations');
+      return 'Нет непрочитанных разговоров';
     }
 
     const row = heading();
 
     if (row.kind === 'section') {
-      return t('channelSections.emptyFavorites');
+      return 'Добавьте разговоры в избранное, чтобы они остались здесь.';
     }
 
     return row.label.rule
-      ? t('channelSections.emptySmartSection')
-      : t('channelSections.emptySection');
+      ? 'Нет разговоров по этому правилу.'
+      : 'Пока нет каналов';
   };
 
   const [dragState] = useDragDropContext() ?? [];
@@ -910,7 +911,7 @@ export function ExpandedChannelsRail(props: { search: ChannelRailSearch }) {
         }}
         role="tree"
         tabIndex={-1}
-        aria-label={t('channelSections.conversations')}
+        aria-label="Разговоры"
         aria-activedescendant={
           rail.list.focus.key()
             ? domIdForRow(rail.railId, rail.list.focus.key()!)

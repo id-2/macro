@@ -3,7 +3,7 @@ import {
   type DatabaseQueryChart,
   type DatabaseQueryDisplayMode,
   isDatabaseQueryChartMode,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import { createMemo, For, Show } from 'solid-js';
 import type { AnswerRenderers } from '../context/answer-display';
 import {

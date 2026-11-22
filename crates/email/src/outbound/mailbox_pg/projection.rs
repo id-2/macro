@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::mailbox::projection::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashSet;
 
 impl MailboxProjectionRepository for PgMailboxSync {
@@ -68,7 +68,7 @@ impl MailboxProjectionRepository for PgMailboxSync {
         let mut viewers = HashSet::from([link.macro_id.clone()]);
         for delegate in delegates {
             viewers
-                .insert(MacroUserIdStr::try_from(delegate).map_err(|_| MailboxError::Persistence)?);
+                .insert(RoxUserIdStr::try_from(delegate).map_err(|_| MailboxError::Persistence)?);
         }
         let message_id = match &lease.event {
             ProjectionEvent::Message { message_id, .. }
@@ -126,7 +126,7 @@ impl PgMailboxSync {
                 m.provider_history_id,m.internal_date_ts,m.snippet,m.size_estimate,m.subject,m.from_name,
                 m.from_contact_id,m.sent_at,m.has_attachments,m.is_read,m.is_starred,m.is_sent,m.is_draft,
                 m.headers_jsonb,m.created_at,m.updated_at,
-                NULL::text AS body_text,NULL::text AS body_html_sanitized,NULL::text AS body_macro
+                NULL::text AS body_text,NULL::text AS body_html_sanitized,NULL::text AS body_rox
             FROM email_messages m WHERE m.id = $1 AND m.link_id = $2
         "#,message_id,link_id).fetch_optional(&self.db).await.map_err(db_error)?;
         let Some(db_message) = db_message else {

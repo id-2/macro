@@ -38,7 +38,7 @@ import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { useTouchOutsideToDismissKeyboard } from '@core/mobile/useTouchOutsideToDismissKeyboard';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { handleFileFolderDrop } from '@core/util/upload';
-import { $insertReferencedPaste } from '@macro-inc/lexical-core';
+import { $insertReferencedPaste } from '@rox-one/lexical-core';
 import { Button, ComposerSurface, SendButton } from '@ui';
 import {
   createEffect,
@@ -337,7 +337,7 @@ export function AgentInput(props: AgentInputProps) {
                   sits on the composer's edge, not inside it. */}
               <Input.DropOverlay
                 class="rounded-[26.25px] touch:rounded-3xl"
-                hint="Drop files here to send them to the agent"
+                hint={t('agentChat.dropFiles')}
               />
             </Show>
             <div
@@ -437,15 +437,15 @@ export function AgentInput(props: AgentInputProps) {
                       fallback={
                         <SendButton
                           appearance="composer"
-                          tooltip="Send"
+                          tooltip={t('agentChat.send')}
                           disabled={!canSend()}
                           onClick={send}
                         />
                       }
                     >
                       <Button
-                        aria-label="Stop"
-                        tooltip="Stop"
+                        aria-label={t('agentChat.stop')}
+                        tooltip={t('agentChat.stop')}
                         variant={isTouchDevice() ? 'ghost' : 'secondary'}
                         size="icon-md"
                         disabled={props.disabled || props.readOnly}

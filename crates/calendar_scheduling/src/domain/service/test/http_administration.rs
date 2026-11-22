@@ -7,35 +7,35 @@ use crate::{
     inbound::router::{RouterState, router},
     outbound::administration_client::SchedulingAdministrationClient,
 };
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
 use model_user::UserContext;
 use rootcause::Report;
 
 #[derive(Clone)]
 struct Identity;
-impl MacroAuthorizationService for Identity {
-    async fn authorize(&self, _: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+impl RoxAuthorizationService for Identity {
+    async fn authorize(&self, _: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
     async fn authorize_internal(
         &self,
         key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if key != "test-key" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(claims.user_id.map(|user_id| UserContext {
             user_id,
@@ -56,7 +56,7 @@ async fn client_and_router_preserve_authority_and_all_management_workflows() {
         "/calendar/scheduling",
         router(RouterState::new(
             service.clone(),
-            MacroAuthorizationState::new(Arc::new(Identity)),
+            RoxAuthorizationState::new(Arc::new(Identity)),
         )),
     );
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
@@ -152,7 +152,7 @@ async fn public_replacements_forward_time_zone_and_preserve_legacy_dates() {
         .unwrap();
     let app = router(RouterState::new(
         service,
-        MacroAuthorizationState::new(Arc::new(Identity)),
+        RoxAuthorizationState::new(Arc::new(Identity)),
     ));
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let url = format!(

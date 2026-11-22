@@ -18,7 +18,7 @@ use uuid::Uuid;
 
 impl LinkManagerRepository for PgGmailOps {
     async fn primaries(&self, owner: &str, link: Uuid) -> Result<Vec<String>, Self::Err> {
-        macro_db_client::macro_user_links::get_primaries_for_link(&self.0, owner, link)
+        rox_db_client::macro_user_links::get_primaries_for_link(&self.0, owner, link)
             .await
             .map_err(Into::into)
     }

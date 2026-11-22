@@ -1,10 +1,10 @@
-import type { ConditionalStyle } from '@macro-inc/spreadsheet/sheet-rules';
-import type { WorkbookTable } from '@macro-inc/spreadsheet/structured-references';
+import type { ConditionalStyle } from '@rox-one/spreadsheet/sheet-rules';
+import type { WorkbookTable } from '@rox-one/spreadsheet/structured-references';
 import {
   MAX_PIVOT_PART_LENGTH,
   MAX_SHEET_PIVOT_TABLES,
   type SheetPivotTable,
-} from '@macro-inc/spreadsheet/workbook-metadata';
+} from '@rox-one/spreadsheet/workbook-metadata';
 import {
   formatCellAddress,
   parseCellAddress,

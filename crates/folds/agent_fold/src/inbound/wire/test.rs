@@ -26,7 +26,7 @@ fn domain_parts_serialize_directly_into_the_browser_contract() {
         pending: false,
         posted_at: None,
     };
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(7));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
 
     assert_eq!(
         serde_json::to_value(FoldedMessage::new(session, message)).unwrap(),
@@ -125,7 +125,7 @@ fn domain_parts_serialize_directly_into_the_browser_contract() {
 fn empty_replacement_is_an_explicit_browser_event() {
     let event = FoldEvent::MessagesReplaced(std::borrow::Cow::Owned(vec![])).into_owned();
     assert!(event.message().is_none());
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(7));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
     assert_eq!(
         serde_json::to_value(FoldedStreamEvent::new(session, event)).unwrap(),
         json!({"kind":"replace", "messages":[]})
@@ -145,7 +145,7 @@ fn a_prompt_carries_when_it_was_posted() {
         pending: false,
         posted_at: Some("2026-10-15T14:02:00Z".parse().unwrap()),
     };
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(7));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
 
     assert_eq!(
         serde_json::to_value(FoldedMessage::new(session, message)).unwrap()["postedAt"],
@@ -166,7 +166,7 @@ fn a_message_key_names_its_turn_and_side() {
         pending: true,
         posted_at: None,
     };
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(7));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(7));
 
     assert_eq!(
         serde_json::to_value(FoldedMessage::new(session, message)).unwrap()["key"],

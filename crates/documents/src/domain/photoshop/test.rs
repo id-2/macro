@@ -1,6 +1,6 @@
 use super::*;
 use entity_access::domain::models::{Entity, EntityPermission, EntityType, RequiredPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use psd_engine::edit::{History, NewLayer, Op, Position};
 use psd_engine::model::{ParagraphRun, TextLayer, TextRun};
@@ -11,7 +11,7 @@ const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f01218141";
 
 fn receipt<T: RequiredPermission>(access_level: AccessLevel) -> EntityAccessReceipt<T> {
     EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::try_from("macro|photoshop@rox.one".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|photoshop@rox.one".to_owned()).unwrap(),
         Entity {
             entity_id: DOCUMENT.to_owned(),
             entity_type: EntityType::Document,

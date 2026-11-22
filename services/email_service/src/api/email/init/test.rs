@@ -8,7 +8,7 @@ fn classify_provider_init_error(error: EmailApiError) -> ConnectionError {
     email::domain::mailbox::connection::classify_provider_init_error(error)
 }
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 async fn insert_email_link(pool: &PgPool) -> Uuid {
@@ -102,7 +102,7 @@ async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(po
     let rox_link = crate::outbound::mailbox_init::ensure_rox_mailbox(
         &pool,
         &fusionauth_user_id.to_string(),
-        MacroUserIdStr::try_from(macro_user_id.clone()).unwrap(),
+        RoxUserIdStr::try_from(macro_user_id.clone()).unwrap(),
         true,
     )
     .await
@@ -111,7 +111,7 @@ async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(po
 
     assert_eq!(rox_link.provider, link::UserProvider::Rox);
     assert!(rox_link.is_primary);
-    let expected_address = format!("ada@{}", macro_user_id::handle::ROX_MAIL_DOMAIN);
+    let expected_address = format!("ada@{}", rox_user_id::handle::ROX_MAIL_DOMAIN);
     assert_eq!(rox_link.email_address.0.as_ref(), expected_address);
     assert_eq!(rox_link.macro_id.as_ref(), macro_user_id.as_str());
 
@@ -146,7 +146,7 @@ async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(po
 /// `is_primary`, the way old writers do, so the trigger decides the fact.
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn one_primary_link_per_account_after_the_rox_rollout(pool: PgPool) {
-    use macro_user_id::handle::ROX_MAIL_DOMAIN;
+    use rox_user_id::handle::ROX_MAIL_DOMAIN;
 
     // Placeholders are assembled from the domain constant and a local example
     // domain so the source carries no address literals.
@@ -242,7 +242,7 @@ async fn already_initialized_is_a_coded_400() {
 fn gmail_import_is_not_primary() {
     let link = new_gmail_link(
         Uuid::now_v7().to_string(),
-        MacroUserIdStr::try_from("macro|ada@example.com".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|ada@example.com".to_owned()).unwrap(),
         "ada@gmail.example".to_owned(),
     )
     .unwrap();

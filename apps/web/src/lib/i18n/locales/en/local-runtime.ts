@@ -5,7 +5,7 @@ export default {
   scanning: 'Looking for agents on this computer…',
   found: 'Found {{agent}} on this computer.',
   noAgents:
-    'No supported agents were found. Install Claude Code, Codex, OpenCode, or OpenClaw, then scan again.',
+    'No supported agents were found. Install Claude Code, Codex, OpenCode, OMP, or OpenClaw, then scan again.',
   scanAgain: 'Scan again',
   setUp: 'Set up',
   setUpWith: 'Set up {{agent}}',
@@ -18,6 +18,7 @@ export default {
   fullAccessHint:
     'Let agents run commands and edit files without asking each time.',
   connectorHint: 'A small connector is downloaded on first start.',
+  needsConnector: 'connector not installed',
   stepDetect: 'Find an agent',
   stepDetectDone: 'Found {{agent}}',
   stepConnect: 'Connect this computer',

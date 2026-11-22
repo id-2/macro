@@ -6,7 +6,7 @@ use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EntityAccessReceipt, MemberTeamRole};
 use item_filters::ast::EntityFilterAst;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use model_notifications::NotifEvent;
 use notification::domain::models::{NotificationState, UserNotificationRow};
@@ -23,7 +23,7 @@ pub type FeedNotification = Arc<UserNotificationRow<NotifEvent>>;
 #[derive(Debug, Clone)]
 pub struct FeedViewer {
     /// The authenticated user.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// The user's team membership, when they have one; foreign entities
     /// stored for the team and CRM records are visible through it.
     pub team: Option<EntityAccessReceipt<MemberTeamRole>>,

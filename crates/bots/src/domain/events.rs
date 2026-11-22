@@ -7,9 +7,9 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroBotsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxBotsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -33,7 +33,7 @@ pub struct BotCreatedMetadata {
     /// Optional bot avatar URL.
     pub avatar_url: Option<String>,
     /// Authenticated user who created the bot.
-    pub created_by_user_id: MacroUserIdStr<'static>,
+    pub created_by_user_id: RoxUserIdStr<'static>,
     /// Channel for a channel-scoped creation, if any.
     pub channel_id: Option<Uuid>,
     /// Creation timestamp reported by the repository.
@@ -48,7 +48,7 @@ pub struct BotUpdatedMetadata {
     /// User or team that owns the bot.
     pub owner: BotOwner,
     /// Authenticated user who updated the bot.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
     /// Requested display name, or `None` when the PATCH omitted it.
     pub name: Option<String>,
     /// Requested stable handle, or `None` when the PATCH omitted it.
@@ -69,10 +69,10 @@ pub struct BotDeletedMetadata {
     /// User or team that owned the bot.
     pub owner: BotOwner,
     /// Authenticated user who deleted the bot.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
 }
 
-/// Lifecycle events published to [`MacroBotsTopic`].
+/// Lifecycle events published to [`RoxBotsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum BotTopicEvent {
@@ -88,18 +88,18 @@ pub enum BotTopicEvent {
 }
 
 impl TopicEvent for BotTopicEvent {
-    type Topic = MacroBotsTopic;
+    type Topic = RoxBotsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable lifecycle event for [`MacroBotsTopic`], keyed by bot id.
-pub struct BotMacroEvent {
+/// Publishable lifecycle event for [`RoxBotsTopic`], keyed by bot id.
+pub struct BotRoxEvent {
     key: String,
     event: Event<BotTopicEvent>,
 }
 
-impl BotMacroEvent {
+impl BotRoxEvent {
     /// Build a created event keyed by the created bot id.
     pub fn created(metadata: BotCreatedMetadata) -> Self {
         let key = metadata.bot_id.to_string();
@@ -127,7 +127,7 @@ impl BotMacroEvent {
     }
 }
 
-impl MacroEvent for BotMacroEvent {
+impl RoxEvent for BotRoxEvent {
     type EventPayload = BotTopicEvent;
 
     fn key(&self) -> &str {

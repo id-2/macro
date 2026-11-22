@@ -1,4 +1,4 @@
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use models_pagination::{CreatedAt, Query};
 use notification::domain::models::TaggedContent;
@@ -24,14 +24,14 @@ use uuid::Uuid;
 /// This avoids needing real device registration records in the database.
 pub struct SandboxNotificationRepository {
     inner: DbNotificationRepository<PgPool>,
-    device_endpoints: HashMap<MacroUserIdStr<'static>, Vec<DeviceEndpoint>>,
+    device_endpoints: HashMap<RoxUserIdStr<'static>, Vec<DeviceEndpoint>>,
 }
 
 impl SandboxNotificationRepository {
     /// Create a new sandbox repository.
     pub fn new(
         inner: DbNotificationRepository<PgPool>,
-        device_endpoints: HashMap<MacroUserIdStr<'static>, Vec<DeviceEndpoint>>,
+        device_endpoints: HashMap<RoxUserIdStr<'static>, Vec<DeviceEndpoint>>,
     ) -> Self {
         Self {
             inner,
@@ -43,8 +43,8 @@ impl SandboxNotificationRepository {
 impl NotificationRepository for SandboxNotificationRepository {
     async fn get_muted_users<'a>(
         &self,
-        user_ids: &[MacroUserIdStr<'a>],
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+        user_ids: &[RoxUserIdStr<'a>],
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         self.inner.get_muted_users(user_ids).await
     }
 
@@ -52,8 +52,8 @@ impl NotificationRepository for SandboxNotificationRepository {
         &self,
         item_id: &str,
         is_direct_mention: bool,
-        user_ids: &[MacroUserIdStr<'a>],
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+        user_ids: &[RoxUserIdStr<'a>],
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         self.inner
             .get_unsubscribed_users(item_id, is_direct_mention, user_ids)
             .await
@@ -84,7 +84,7 @@ impl NotificationRepository for SandboxNotificationRepository {
     async fn update_sent_status<'a>(
         &self,
         notification_id: Uuid,
-        user_ids: &[MacroUserIdStr<'a>],
+        user_ids: &[RoxUserIdStr<'a>],
     ) -> Result<(), Report> {
         self.inner
             .update_sent_status(notification_id, user_ids)
@@ -93,15 +93,15 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn get_device_endpoints<'a>(
         &self,
-        _user_ids: &[MacroUserIdStr<'a>],
-    ) -> Result<HashMap<MacroUserIdStr<'static>, Vec<DeviceEndpoint>>, Report> {
+        _user_ids: &[RoxUserIdStr<'a>],
+    ) -> Result<HashMap<RoxUserIdStr<'static>, Vec<DeviceEndpoint>>, Report> {
         // Return sandbox-configured endpoints instead of querying DB.
         Ok(self.device_endpoints.clone())
     }
 
     async fn mark_notifications_seen(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
     ) -> Result<Vec<UserNotificationRow<serde_json::Value>>, Report> {
         self.inner
@@ -111,7 +111,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn mark_notifications_done(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
         done: bool,
     ) -> Result<Vec<UserNotificationRow<serde_json::Value>>, Report> {
@@ -122,7 +122,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn reopen_notifications(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
         unseen: &[Uuid],
     ) -> Result<Vec<UserNotificationRow<serde_json::Value>>, Report> {
@@ -133,7 +133,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn get_notification_ids_for_entities(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
         status: &NotificationStatus,
     ) -> Result<Vec<Uuid>, Report> {
@@ -151,7 +151,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn get_digest_eligible_notification_ids(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
     ) -> Result<HashSet<Uuid>, Report> {
         self.inner
@@ -161,7 +161,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn get_user_notifications<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         limit: u32,
         cursor: Query<Uuid, CreatedAt, ()>,
         filters: NotificationListFilters,
@@ -173,7 +173,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn get_user_notifications_by_event_item_ids<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         event_item_ids: &[Uuid],
         limit: u32,
         cursor: Query<Uuid, CreatedAt, ()>,
@@ -192,7 +192,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn get_entity_notifications_batch(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         entities: Vec<Entity<'static>>,
         query: notification::domain::models::entity_query::EntityNotificationQuery,
     ) -> Result<HashMap<Entity<'static>, Vec<UserNotificationRow<serde_json::Value>>>, Report> {
@@ -203,7 +203,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn get_user_notification_by_id<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> Result<Option<UserNotificationRow<T>>, Report> {
         self.inner
@@ -213,7 +213,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn delete_user_notification(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> Result<(), Report> {
         self.inner
@@ -223,7 +223,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn bulk_delete_user_notifications(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
     ) -> Result<(), Report> {
         self.inner
@@ -233,7 +233,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn delete_all_user_notifications(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<(), Report> {
         self.inner.delete_all_user_notifications(user_id).await
     }
@@ -250,7 +250,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn upsert_device(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_endpoint: &str,
         device_type: &DeviceType,
@@ -269,7 +269,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn delete_user_devices_by_token(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_type: &DeviceType,
     ) -> Result<Vec<String>, Report> {
@@ -296,8 +296,8 @@ impl NotificationRepository for SandboxNotificationRepository {
     async fn get_users_with_type_disabled<'a>(
         &self,
         notification_event_type: &str,
-        user_ids: &[MacroUserIdStr<'a>],
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+        user_ids: &[RoxUserIdStr<'a>],
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         self.inner
             .get_users_with_type_disabled(notification_event_type, user_ids)
             .await
@@ -305,14 +305,14 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn get_disabled_notification_types(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<Vec<notification::domain::models::DisabledNotificationType>, Report> {
         self.inner.get_disabled_notification_types(user_id).await
     }
 
     async fn disable_notification_type(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_event_type: &str,
     ) -> Result<(), Report> {
         self.inner
@@ -322,7 +322,7 @@ impl NotificationRepository for SandboxNotificationRepository {
 
     async fn enable_notification_type(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_event_type: &str,
     ) -> Result<(), Report> {
         self.inner

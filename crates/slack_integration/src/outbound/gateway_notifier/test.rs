@@ -87,7 +87,7 @@ async fn gateway_uses_requester_entity_and_json_object_for_string_framing() {
         "test".into(),
         endpoint,
     )));
-    let requester = MacroUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let requester = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
     notifier
         .invalidate(&requester, team(), job(), 9, JobStatus::Processing)
         .await
@@ -127,7 +127,7 @@ async fn gateway_failure_is_retryable_and_attempts_are_throttled() {
         "test".into(),
         endpoint,
     )));
-    let requester = MacroUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let requester = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
     assert_eq!(
         notifier
             .invalidate(&requester, team(), job(), 1, JobStatus::Uploading)

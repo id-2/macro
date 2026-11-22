@@ -79,8 +79,8 @@ async fn effects(
         system_properties_service: Arc::new(system_properties::SystemPropertiesServiceImpl::new(
             system_properties::PgSystemPropertiesRepository::new(db.clone()),
         )),
-        macro_event_broker: macro_event_broker::MacroEventBrokerService::new(
-            macro_event_broker::KafkaEventPublisher::new("127.0.0.1:9").unwrap(),
+        macro_event_broker: rox_event_broker::RoxEventBrokerService::new(
+            rox_event_broker::KafkaEventPublisher::new("127.0.0.1:9").unwrap(),
             tokio_util::task::TaskTracker::new(),
         ),
         db,

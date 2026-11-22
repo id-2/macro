@@ -6,7 +6,7 @@
  */
 import type { ApiDraftInputBcc } from './apiDraftInputBcc';
 import type { ApiDraftInputBodyHtml } from './apiDraftInputBodyHtml';
-import type { ApiDraftInputBodyMacro } from './apiDraftInputBodyMacro';
+import type { ApiDraftInputBodyRox } from './apiDraftInputBodyRox';
 import type { ApiDraftInputBodyText } from './apiDraftInputBodyText';
 import type { ApiDraftInputCc } from './apiDraftInputCc';
 import type { ApiDraftInputDbId } from './apiDraftInputDbId';
@@ -28,7 +28,7 @@ export interface ApiDraftInput {
   /** HTML body (base64 URL_SAFE_NO_PAD encoded). Sanitized before storage. */
   body_html?: ApiDraftInputBodyHtml;
   /** Rox body format. */
-  body_macro?: ApiDraftInputBodyMacro;
+  body_rox?: ApiDraftInputBodyRox;
   /** Plain text body. */
   body_text?: ApiDraftInputBodyText;
   /** Cc recipients. */

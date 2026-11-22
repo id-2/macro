@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::mailbox::initialization::{InitializationError, InitializeMailbox};
 use calendar_events::domain::models::{AppliedGoogleGrant, CalendarGrantIntent};
 use email_api_client::domain::models::{AccessToken, EmailApiError};
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::{Link, UserProvider};
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
@@ -86,7 +86,7 @@ impl Fake {
 
 pub(super) fn request(attempt: bool) -> ConnectionRequest {
     ConnectionRequest {
-        actor_macro_id: MacroUserIdStr::try_from("macro|actor@example.com".to_string()).unwrap(),
+        actor_macro_id: RoxUserIdStr::try_from("macro|actor@example.com".to_string()).unwrap(),
         actor_id: "macro|actor@example.com".into(),
         actor_fusion_id: OWNER.to_string(),
         attempt: attempt.then_some(ATTEMPT),
@@ -97,7 +97,7 @@ pub(super) fn request(attempt: bool) -> ConnectionRequest {
 pub(super) fn link(owner: &str) -> Link {
     Link {
         id: LINK,
-        macro_id: MacroUserIdStr::try_from(owner.to_string()).unwrap(),
+        macro_id: RoxUserIdStr::try_from(owner.to_string()).unwrap(),
         fusionauth_user_id: OWNER.to_string(),
         email_address: EmailStr::try_from("inbox@example.com".to_string()).unwrap(),
         provider: UserProvider::Gmail,
@@ -145,7 +145,7 @@ impl ConnectionLinks for Fake {
     async fn link_for_identity(
         &self,
         _: &str,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Option<Uuid>, FakeError> {
         self.record("by_identity")?;
         Ok(self

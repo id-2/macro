@@ -1,5 +1,4 @@
 import { type PaidPlanTier, PLAN_BY_TIER } from '@app/features/paywall/plans';
-import { plural } from '@core/util/string';
 import CalendarIcon from '@icon/system/regular/calendar-blank.svg';
 import EnvelopeIcon from '@icon/system/regular/envelope.svg';
 import { Button, Layer } from '@ui';
@@ -7,6 +6,16 @@ import { For, type JSX, Match, Show, Switch } from 'solid-js';
 import { type BillingState, describeSeatPlans } from '../core/billing-state';
 import { SettingsCard, SettingsPage } from '../primitives';
 import { BillingPlanCard, PlanFeatures } from './billing-plan-card';
+
+function ruUsers(count: number): string {
+  const n = Math.abs(count);
+  const mod10 = n % 10;
+  const mod100 = n % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'пользователь';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14))
+    return 'пользователя';
+  return 'пользователей';
+}
 
 export function BillingSettingsView(props: {
   state: BillingState;
@@ -42,15 +51,15 @@ export function BillingSettingsView(props: {
   };
   return (
     <SettingsPage
-      title="Billing"
+      title="Оплата"
       description={
         <>
-          For questions about billing,{' '}
+          По вопросам оплаты{' '}
           <a
             class="text-link hover:text-link-hover visited:text-link-visited inline-flex items-center"
             href="mailto:support@rox.one"
           >
-            contact us
+            напишите нам
             <EnvelopeIcon class="size-4 inline mx-1" />
           </a>
         </>
@@ -62,19 +71,19 @@ export function BillingSettingsView(props: {
         tabIndex={-1}
         class="flex scroll-mt-4 flex-col gap-4 outline-none"
       >
-        <h2 class="text-base font-medium text-ink">Subscription</h2>
+        <h2 class="text-base font-medium text-ink">Подписка</h2>
         <SettingsCard>
           <section class="flex flex-col gap-4 p-5">
             <header class="flex items-center gap-2">
               <div class="flex flex-col gap-1">
                 <div class="flex items-center gap-2">
                   <h3 class="text-lg font-medium text-ink">
-                    {PLAN_BY_TIER[props.state.tier].name} plan
+                    Тариф {PLAN_BY_TIER[props.state.tier].name}
                   </h3>
 
                   <Layer depth={3}>
                     <span class="text-xs text-ink-muted px-1.5 py-0.25 border border-edge-muted rounded-md bg-active">
-                      Current
+                      Текущий
                     </span>
                   </Layer>
                 </div>
@@ -86,14 +95,14 @@ export function BillingSettingsView(props: {
                     }
                   >
                     <p class="text-ink-extra-muted text-xs">
-                      Your seat is billed through your team. Team admins choose
-                      each seat's plan in{' '}
+                      Ваше место оплачивается через команду. Администраторы
+                      команды выбирают тариф каждого места в{' '}
                       <a
                         class="text-link hover:text-link-hover"
                         href="/app/settings/team-members"
                         onClick={props.onTeamSettings}
                       >
-                        Team settings
+                        настройках команды
                       </a>
                       .
                     </p>
@@ -107,14 +116,14 @@ export function BillingSettingsView(props: {
                   >
                     <p class="text-ink-extra-muted text-xs">
                       {props.teamSeatDescription ||
-                        `${props.state.teamPlans?.length} ${plural('user', props.state.teamPlans?.length ?? 0)} • ${describeSeatPlans(props.state.teamPlans ?? [])}`}{' '}
-                      • set each seat's plan in{' '}
+                        `${props.state.teamPlans?.length} ${ruUsers(props.state.teamPlans?.length ?? 0)} • ${describeSeatPlans(props.state.teamPlans ?? [])}`}{' '}
+                      • тариф каждого места задаётся в{' '}
                       <a
                         class="text-link hover:text-link-hover"
                         href="/app/settings/team-members"
                         onClick={props.onTeamSettings}
                       >
-                        Team settings
+                        настройках команды
                       </a>
                     </p>
                   </Match>
@@ -125,8 +134,8 @@ export function BillingSettingsView(props: {
                   {(date) => (
                     <p class="text-xs text-ink-extra-muted">
                       {scheduledChange()?.plan === 'free'
-                        ? 'Your subscription ends on '
-                        : 'Your current billing period ends on '}
+                        ? 'Подписка заканчивается '
+                        : 'Текущий расчётный период заканчивается '}
                       {date()}.
                     </p>
                   )}
@@ -145,7 +154,7 @@ export function BillingSettingsView(props: {
                   variant="secondary"
                   onClick={props.onManage}
                 >
-                  Manage
+                  Управлять
                 </Button>
               </Show>
             </header>
@@ -157,8 +166,8 @@ export function BillingSettingsView(props: {
               }
             >
               <p role="status" class="text-sm text-ink-muted">
-                You have an existing subscription. Use Manage to review your
-                subscription and payment details.
+                У вас уже есть подписка. Нажмите «Управлять», чтобы проверить
+                подписку и платёжные данные.
               </p>
             </Show>
             <ul class="border-t border-t-edge-muted pt-4 flex flex-wrap gap-4 text-sm text-ink-muted">
@@ -174,9 +183,9 @@ export function BillingSettingsView(props: {
             class="flex flex-wrap items-center gap-3 px-4 text-xs text-ink-muted"
             role="status"
           >
-            <p>Couldn't load your renewal details.</p>
+            <p>Не удалось загрузить сведения о продлении.</p>
             <Button variant="ghost" size="sm" onClick={props.onRefreshStatus}>
-              Try again
+              Повторить
             </Button>
           </div>
         </Show>
@@ -187,9 +196,8 @@ export function BillingSettingsView(props: {
                 <CalendarIcon class="size-4 shrink-0 text-ink-muted" />
                 <p class="min-w-0 flex-1 text-sm text-ink">
                   {change().plan === 'free'
-                    ? 'Your subscription cancellation'
-                    : `Your downgrade to ${PLAN_BY_TIER[change().plan].name}`}{' '}
-                  is scheduled for {change().date}.
+                    ? `Отмена подписки запланирована на ${change().date}.`
+                    : `Переход на тариф ${PLAN_BY_TIER[change().plan].name} запланирован на ${change().date}.`}
                 </p>
                 <Show
                   when={
@@ -205,7 +213,7 @@ export function BillingSettingsView(props: {
                       if (tier !== 'free') props.onKeepPlan?.(tier);
                     }}
                   >
-                    Keep {PLAN_BY_TIER[props.state.tier].name} plan
+                    Оставить тариф {PLAN_BY_TIER[props.state.tier].name}
                   </Button>
                 </Show>
               </div>
@@ -230,21 +238,21 @@ export function BillingSettingsView(props: {
         >
           <h2 class="text-base font-medium text-ink">
             {props.state.hasPaid && props.state.aiUsageEnabled
-              ? 'Need more AI?'
-              : 'Upgrade'}
+              ? 'Нужно больше ИИ?'
+              : 'Улучшить тариф'}
           </h2>
           <Show when={props.trialEligibilityFailed}>
             <div
               role="alert"
               class="flex flex-wrap items-center gap-3 text-sm text-ink-muted"
             >
-              <p>Couldn't confirm your Pro offer. Please try again.</p>
+              <p>Не удалось подтвердить предложение Pro. Попробуйте ещё раз.</p>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={props.onRefreshTrialEligibility}
               >
-                Try again
+                Повторить
               </Button>
             </div>
           </Show>

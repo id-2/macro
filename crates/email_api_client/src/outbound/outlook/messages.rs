@@ -443,7 +443,7 @@ pub(super) fn normalize(
         labels: Vec::new(),
         body_text,
         body_html_sanitized,
-        body_macro: None,
+        body_rox: None,
         attachments,
         attachments_draft: Vec::new(),
         attachments_forwarded: Vec::new(),

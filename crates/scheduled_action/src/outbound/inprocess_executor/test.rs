@@ -38,7 +38,7 @@ fn resource_encoding_is_closed_and_result_is_versioned() {
 fn history(result: Value) -> ActionExecutionRecord {
     ActionExecutionRecord {
         id: None,
-        action_id: macro_uuid::generate_uuid_v7(),
+        action_id: rox_uuid::generate_uuid_v7(),
         resource_id: Some("transcript".into()),
         start_time: Utc::now(),
         end_time: Utc::now(),
@@ -56,14 +56,14 @@ fn legacy_history_and_responses_remain_readable() {
         assert_eq!(resource.id, "transcript");
     }
     let response: InProgressExecution = serde_json::from_value(json!({
-        "action_id":macro_uuid::generate_uuid_v7(), "chat_id":"transcript"
+        "action_id":rox_uuid::generate_uuid_v7(), "chat_id":"transcript"
     }))
     .unwrap();
     assert!(response.resource.is_none());
     assert_eq!(response.chat_id.as_deref(), Some("transcript"));
     let update: ScheduledActionUpdate = serde_json::from_value(json!({
         "type":"started", "owner":"macro|runner@rox.one",
-        "action_id":macro_uuid::generate_uuid_v7(), "chat_id":"transcript"
+        "action_id":rox_uuid::generate_uuid_v7(), "chat_id":"transcript"
     }))
     .unwrap();
     assert!(matches!(

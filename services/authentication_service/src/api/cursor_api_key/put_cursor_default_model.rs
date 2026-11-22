@@ -2,7 +2,7 @@ use axum::{
     Json,
     extract::{self, State},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOnly};
+use rox_authorization::{RoxAuthorizationExtractor, UserOnly};
 use utoipa::ToSchema;
 
 use super::{CursorApiKeyError, CursorApiKeyStatus};
@@ -46,7 +46,7 @@ pub struct PutCursorDefaultModelRequest {
 #[tracing::instrument(skip(ctx, user_context), err, fields(user_id = %user_context.authorization.macro_user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOnly>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOnly>,
     extract::Json(req): extract::Json<PutCursorDefaultModelRequest>,
 ) -> Result<Json<CursorApiKeyStatus>, CursorApiKeyError> {
     let user_id = &user_context.authorization.macro_user_id;

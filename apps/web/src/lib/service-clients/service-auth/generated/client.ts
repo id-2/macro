@@ -70,7 +70,7 @@ import type {
   JoinTeamByInviteLinkResponse,
   ListGtmInviteLinksParams,
   MacroApiTokenParams,
-  MacroApiTokenResponse,
+  RoxApiTokenResponse,
   MergeGithubPullRequestRequest,
   MergeGithubPullRequestResponse,
   PasswordlessCallbackParams,
@@ -2475,34 +2475,34 @@ headers
 Authorization: Bearer <access_token>
 This returns a new macro-api-token
  */
-export type macroApiTokenResponse200 = {
-  data: MacroApiTokenResponse;
+export type roxApiTokenResponse200 = {
+  data: RoxApiTokenResponse;
   status: 200;
 };
 
-export type macroApiTokenResponse401 = {
+export type roxApiTokenResponse401 = {
   data: string;
   status: 401;
 };
 
-export type macroApiTokenResponse500 = {
+export type roxApiTokenResponse500 = {
   data: string;
   status: 500;
 };
 
-export type macroApiTokenResponseSuccess = macroApiTokenResponse200 & {
+export type roxApiTokenResponseSuccess = roxApiTokenResponse200 & {
   headers: Headers;
 };
-export type macroApiTokenResponseError = (
-  | macroApiTokenResponse401
-  | macroApiTokenResponse500
+export type roxApiTokenResponseError = (
+  | roxApiTokenResponse401
+  | roxApiTokenResponse500
 ) & {
   headers: Headers;
 };
 
-export type macroApiTokenResponse =
-  | macroApiTokenResponseSuccess
-  | macroApiTokenResponseError;
+export type roxApiTokenResponse =
+  | roxApiTokenResponseSuccess
+  | roxApiTokenResponseError;
 
 export const getMacroApiTokenUrl = (params: MacroApiTokenParams) => {
   const normalizedParams = new URLSearchParams();
@@ -2523,7 +2523,7 @@ export const getMacroApiTokenUrl = (params: MacroApiTokenParams) => {
 export const macroApiToken = async (
   params: MacroApiTokenParams,
   options?: RequestInit
-): Promise<macroApiTokenResponse> => {
+): Promise<roxApiTokenResponse> => {
   const res = await fetch(getMacroApiTokenUrl(params), {
     ...options,
     method: 'GET',
@@ -2531,12 +2531,12 @@ export const macroApiToken = async (
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
 
-  const data: macroApiTokenResponse['data'] = body ? JSON.parse(body) : {};
+  const data: roxApiTokenResponse['data'] = body ? JSON.parse(body) : {};
   return {
     data,
     status: res.status,
     headers: res.headers,
-  } as macroApiTokenResponse;
+  } as roxApiTokenResponse;
 };
 
 /**

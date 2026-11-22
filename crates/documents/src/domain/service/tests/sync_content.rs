@@ -22,7 +22,7 @@ async fn notifications_resolve_the_stored_type_and_preserve_attribution() {
                     agent_correlation_id: None,
                     actor: activity::Actor::try_from(actor.to_owned()).unwrap(),
                     on_behalf_of: Some(
-                        macro_user_id::user_id::MacroUserIdStr::try_from(user.to_owned()).unwrap(),
+                        rox_user_id::user_id::RoxUserIdStr::try_from(user.to_owned()).unwrap(),
                     ),
                 }],
             )

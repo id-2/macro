@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { BeforeLeaveEventArgs } from '@solidjs/router';
 import { cleanup, render } from '@solidjs/testing-library';
 import { createSignal, type JSX } from 'solid-js';
@@ -22,7 +22,7 @@ vi.mock('@solidjs/router', () => ({
     state.beforeLeave = handler;
   },
 }));
-vi.mock('@macro/tauri', () => ({ useTauri: () => undefined }));
+vi.mock('@rox/tauri', () => ({ useTauri: () => undefined }));
 vi.mock('../context/pdf-document-context', () => ({
   PdfDocumentProvider: (props: { children: JSX.Element }) => props.children,
   usePdfDocument: () => ({

@@ -1,12 +1,12 @@
 use super::*;
 use crate::domain::models::UserProvider;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::gmail::{SendAsAlias, SendAsVerificationStatus};
 
 fn link() -> Link {
     Link {
         id: Uuid::from_u128(1),
-        macro_id: MacroUserIdStr::try_from_email("base@example.com").unwrap(),
+        macro_id: RoxUserIdStr::try_from_email("base@example.com").unwrap(),
         fusionauth_user_id: "grant".to_owned(),
         email_address: EmailStr::try_from("base@example.com".to_owned()).unwrap(),
         provider: UserProvider::Gmail,

@@ -6,9 +6,9 @@ use axum::{
 };
 use entity_access::domain::models::EntityPermission;
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::document::get_document_version;
-use macro_db_client::user_document_view_location::get::get_user_document_view_location;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::document::get_document_version;
+use rox_db_client::user_document_view_location::get::get_user_document_view_location;
 use model::document::response::{GetDocumentResponse, GetDocumentResponseData};
 use model::response::{GenericErrorResponse, GenericResponse};
 use models_permissions::share_permission::access_level::{AccessLevel, ViewAccessLevel};
@@ -42,7 +42,7 @@ pub struct Params {
 pub async fn handler(
     access: DocumentAccessExtractor<ViewAccessLevel, EntityAccessService, AuthorizationService>,
     State(db): State<PgPool>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(Params {
         document_id,
         document_version_id,

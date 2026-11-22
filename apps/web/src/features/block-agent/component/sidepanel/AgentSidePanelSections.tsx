@@ -15,6 +15,7 @@ import { createAgentActivitySource } from '@app/features/agent-session-activity/
 import { AgentActivitySection } from '@app/features/agent-session-activity/views/agent-activity-section';
 import { useOptionalChanges } from '@app/features/changes/context/changes-controller';
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
+import { t } from '@app/lib/i18n';
 import { SidePanel } from '@components/app/side-panel';
 import { EntityMetadata } from '@components/app/side-panel/EntityMetadata';
 import { ModelIcon } from '@core/component/AI/component/ProviderIcon';
@@ -59,14 +60,14 @@ export function AgentSidePanelSections() {
       <Show when={sessionActivityFlag().enabled && sessionId()}>
         {(id) => <SessionActivitySection sessionId={id()} />}
       </Show>
-      <SidePanel.Section id="session" title="Session" defaultOpen order={10}>
+      <SidePanel.Section id="session" title={t('agentChat.session')} defaultOpen order={10}>
         <SidePanel.Grid>
-          <SidePanel.Row label="Status">
+          <SidePanel.Row label={t('agentChat.status')}>
             <SessionStatusPill status={sessionStatus(metadata())} />
           </SidePanel.Row>
           <Show when={bot()?.name}>
             {(name) => (
-              <SidePanel.Row label="Agent">
+              <SidePanel.Row label={t('agentChat.agent')}>
                 <SidePanel.Pill>
                   <span class="truncate">{name()}</span>
                 </SidePanel.Pill>
@@ -74,7 +75,7 @@ export function AgentSidePanelSections() {
             )}
           </Show>
           <Show when={showsSessionHarness(session() ?? {})}>
-            <SidePanel.Row label="Runtime">
+            <SidePanel.Row label={t('agentChat.runtime')}>
               <SidePanel.Pill>
                 <span class="truncate">
                   {sessionHarnessTitle(session() ?? {})}
@@ -84,7 +85,7 @@ export function AgentSidePanelSections() {
           </Show>
           <Show when={metadata()?.model ?? session()?.model}>
             {(model) => (
-              <SidePanel.Row label="Model">
+              <SidePanel.Row label={t('agentChat.model')}>
                 <SidePanel.Pill>
                   <ModelIcon model={model()} class="size-3" />
                   <span class="truncate">
@@ -99,7 +100,7 @@ export function AgentSidePanelSections() {
           </Show>
           <Show when={sessionRepositoryUrl(session())}>
             {(url) => (
-              <SidePanel.Row label="Repository">
+              <SidePanel.Row label={t('agentChat.repository')}>
                 <button
                   type="button"
                   class={`${SidePanel.pillClass} hover:bg-hover`}
@@ -113,14 +114,14 @@ export function AgentSidePanelSections() {
           </Show>
           <Show when={session()?.taskId}>
             {(taskId) => (
-              <SidePanel.Row label="Task">
+              <SidePanel.Row label={t('agentChat.task')}>
                 <AgentTaskChip taskId={taskId()} />
               </SidePanel.Row>
             )}
           </Show>
           <Show when={session()?.pullRequestUrl}>
             {(url) => (
-              <SidePanel.Row label="Pull request">
+              <SidePanel.Row label={t('agentChat.pullRequest')}>
                 <AgentPullRequestChip url={url()} />
               </SidePanel.Row>
             )}
@@ -130,7 +131,7 @@ export function AgentSidePanelSections() {
 
       <Show when={plan()}>
         {(entries) => (
-          <SidePanel.Section id="plan" title="Plan" defaultOpen order={15}>
+          <SidePanel.Section id="plan" title={t('agentChat.plan')} defaultOpen order={15}>
             <TodoList
               todos={entries().map((entry) => ({
                 content: entry.content,
@@ -146,7 +147,7 @@ export function AgentSidePanelSections() {
           id="files"
           title={
             <SidePanel.CountTitle
-              label="Changed files"
+              label={t('agentChat.changedFiles')}
               count={files().length}
             />
           }
@@ -180,7 +181,7 @@ export function AgentSidePanelSections() {
       </Show>
 
       <Show when={activity().some((item) => item.count > 0)}>
-        <SidePanel.Section id="activity" title="Activity" order={30}>
+        <SidePanel.Section id="activity" title={t('agentChat.activity')} order={30}>
           <div class="text-xs text-ink-muted">
             <CountSummary items={activity()} />
           </div>
@@ -224,7 +225,7 @@ function ReferencesSectionConditional(props: { sessionId?: string }) {
       {(sessionId) => (
         <SidePanel.Section
           id="references"
-          title={<SidePanel.CountTitle label="References" count={count()} />}
+          title={<SidePanel.CountTitle label={t('agentChat.references')} count={count()} />}
           order={40}
         >
           <Suspense fallback={<SidePanel.Loading />}>

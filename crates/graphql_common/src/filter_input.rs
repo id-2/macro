@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use async_graphql::ID;
 use filter_ast::Expr;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use uuid::Uuid;
 
 /// Conversion from a GraphQL filter input tree into a domain filter
@@ -33,13 +33,13 @@ pub fn parse_id(id: ID, field: &str) -> async_graphql::Result<Uuid> {
     parse_uuid(id.to_string(), field)
 }
 
-/// Parse a string field into an owned [`MacroUserIdStr`], reporting the field
+/// Parse a string field into an owned [`RoxUserIdStr`], reporting the field
 /// name on error.
 pub fn parse_macro_user_id(
     value: String,
     field: &str,
-) -> async_graphql::Result<MacroUserIdStr<'static>> {
-    MacroUserIdStr::parse_from_str(&value)
+) -> async_graphql::Result<RoxUserIdStr<'static>> {
+    RoxUserIdStr::parse_from_str(&value)
         .map(CowLike::into_owned)
         .map_err(|err| async_graphql::Error::new(format!("invalid {field} `{value}`: {err}")))
 }

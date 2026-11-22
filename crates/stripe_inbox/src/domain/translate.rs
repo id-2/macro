@@ -288,7 +288,7 @@ pub fn subscription_facts(object: &Value) -> Result<SubscriptionFacts, Translate
         .transpose()
         .map_err(|_| TranslateError::Invalid("subscription team_id metadata"))?;
     let owner_id = non_empty(&raw.metadata, OWNER_ID_METADATA_KEY).and_then(|owner| {
-        macro_user_id::user_id::MacroUserIdStr::try_from(owner)
+        rox_user_id::user_id::RoxUserIdStr::try_from(owner)
             .inspect_err(|_| {
                 tracing::warn!(subscription_id = %raw.id, "subscription has an invalid owner_id");
             })

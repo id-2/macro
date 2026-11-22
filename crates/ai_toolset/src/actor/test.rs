@@ -2,8 +2,8 @@ use super::*;
 
 #[test]
 fn account_selection_is_explicit_and_never_substitutes_the_owner() {
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
-    let requester = MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
+    let requester = RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     assert!(ToolActor::take(&json!({"query": "private"})).is_err());
     assert!(ToolActor::take(&json!({"acting_as": "somebody@example.com"})).is_err());
     let (actor, arguments) =

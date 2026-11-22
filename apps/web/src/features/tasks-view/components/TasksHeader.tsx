@@ -33,7 +33,7 @@ export function TaskViewBreadcrumbItem() {
   const tabTitle = () =>
     state.savedViewActive && savedViews
       ? taskSavedViewTitle(savedViews.view())
-      : (TASK_TABS.find((tab) => tab.id === state.tab)?.label ?? 'Tasks');
+      : (TASK_TABS.find((tab) => tab.id === state.tab)?.label ?? 'Задачи');
 
   return (
     <ViewBreadcrumbs.Item
@@ -90,7 +90,7 @@ export function TasksHeader(props: TasksHeaderProps) {
     scopeId: panel.splitHotkeyScope,
     enabled: () => panel.isPanelActive() && !isTouchDevice(),
     search: {
-      description: 'Search tasks',
+      description: 'Искать задачи',
       run: () => {
         focusSearch?.();
         return true;
@@ -103,7 +103,7 @@ export function TasksHeader(props: TasksHeaderProps) {
       <ListHeader
         title={
           <div class="flex min-w-0 items-center gap-1">
-            <ViewBreadcrumbs.Outlet aria-label="Task location" />
+            <ViewBreadcrumbs.Outlet aria-label="Место задачи" />
             <TaskSavedViewMenu />
           </div>
         }
@@ -113,7 +113,7 @@ export function TasksHeader(props: TasksHeaderProps) {
         <TasksControls />
         <TasksCreateAction presentation="toolbar" />
         <ListHeaderSearch
-          label="Search tasks"
+          label="Поиск задач"
           value={state.search}
           onValueChange={(search) => setState('search', search)}
           focusResults={props.focusSearchResults}

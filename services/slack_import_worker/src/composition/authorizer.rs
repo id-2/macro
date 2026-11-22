@@ -11,7 +11,7 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use import::{domain::models::ImportTargetKey, outbound::pg_import_repo::targets};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use slack_integration::domain::{
     importer::targets::{TargetAccess, TargetFacts, TargetKind, authorize_target},
     models::*,
@@ -39,7 +39,7 @@ impl<A: EntityAccessService> WorkerAuthorizer<A> {
         &self,
         tx: &mut Transaction<'_, Postgres>,
         key: &ImportTargetKey,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         kind: ConversationKind,
         channel: Uuid,
         required_reservation: bool,
@@ -59,7 +59,7 @@ impl<A: EntityAccessService> WorkerAuthorizer<A> {
 }
 
 impl<A: EntityAccessService> ImportAuthorizer for WorkerAuthorizer<A> {
-    async fn require_admin(&self, team: TeamId, user: &MacroUserIdStr<'_>) -> PortResult<()> {
+    async fn require_admin(&self, team: TeamId, user: &RoxUserIdStr<'_>) -> PortResult<()> {
         self.access
             .generate_entity_access_receipt::<AdminTeamRole>(
                 &user.0,
@@ -78,7 +78,7 @@ impl<A: EntityAccessService> ImportAuthorizer for WorkerAuthorizer<A> {
     async fn require_target(
         &self,
         team: TeamId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         metadata: &ConversationMetadata,
         target: Uuid,
     ) -> PortResult<()> {
@@ -99,7 +99,7 @@ impl<A: EntityAccessService> ImportAuthorizer for WorkerAuthorizer<A> {
 pub(super) async fn inspect(
     tx: &mut Transaction<'_, Postgres>,
     channel: Uuid,
-    requester: Option<&MacroUserIdStr<'_>>,
+    requester: Option<&RoxUserIdStr<'_>>,
 ) -> PortResult<Option<(TargetFacts, TargetAccess)>> {
     let Some(facts) = historical::inspect_in(tx, channel, requester)
         .await
@@ -132,7 +132,7 @@ pub(super) async fn inspect(
         }
         if kind == TargetKind::DirectMessage {
             dm_members.insert(
-                MacroUserIdStr::parse_from_str(&participant.user_id)
+                RoxUserIdStr::parse_from_str(&participant.user_id)
                     .map_err(retry)?
                     .into_owned(),
             );

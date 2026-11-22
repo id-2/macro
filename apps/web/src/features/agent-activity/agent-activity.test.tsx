@@ -1,4 +1,4 @@
-import type { AgentActivityRow } from '@macro-inc/lexical-core';
+import type { AgentActivityRow } from '@rox-one/lexical-core';
 import type {
   ActivityRow,
   FoldedMessage,
@@ -42,7 +42,7 @@ vi.mock('@app/features/dynamic-ui/DashboardToolView.lazy', () => ({
   ),
 }));
 
-import type { AgentActivityData } from '@macro-inc/lexical-core';
+import type { AgentActivityData } from '@rox-one/lexical-core';
 import { AgentActivity as Activity } from './agent-activity';
 
 function AgentActivity(props: AgentActivityData) {

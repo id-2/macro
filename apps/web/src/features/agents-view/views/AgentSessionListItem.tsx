@@ -1,5 +1,6 @@
 import { TextShimmer } from '@app/features/block-agent/ui';
 import { parseGithubPrUrl, prHtmlUrl } from '@app/features/block-pr/util/prKey';
+import { t } from '@app/lib/i18n';
 import { useSessionActivity } from '@core/agent-session/session-activity';
 import { openExternalUrl } from '@core/util/url';
 import type { AgentSessionEntity } from '@entity';
@@ -89,7 +90,11 @@ export function AgentSessionListItem(props: Props) {
     <AgentSessionRow
       id={props.entity.id}
       domId={props.domId}
-      title={props.entity.name || 'Untitled conversation'}
+      title={
+        !props.entity.name || props.entity.name === 'Agent Session'
+          ? t('agentChat.defaultTitle')
+          : props.entity.name
+      }
       kind={mode()}
       state={state()}
       failed={failed()}

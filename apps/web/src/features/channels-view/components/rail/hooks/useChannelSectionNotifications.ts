@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { useUserId } from '@core/context/user';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { markChannelsAsRead } from '@notifications/notification-helpers';
 import { openSnoozeNotifications } from '@notifications/SnoozeNotificationsDialog';
 import { useBulkNotificationPreferencesMutation } from '@queries/notification/unsubscribes';

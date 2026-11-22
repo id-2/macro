@@ -11,7 +11,7 @@ inbound = [
   "dep:agent_correlation",
   "dep:axum",
   "dep:ip_extractor",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:rate_limit",
   "dep:utoipa",
@@ -31,7 +31,7 @@ outbound = [
   "dep:feature_flags",
   "dep:livekit-api",
   "dep:livekit-protocol",
-  "dep:macro_aws_config",
+  "dep:rox_aws_config",
   "dep:pgvector",
   "dep:share_permission_db_utils",
   "dep:sqlx",
@@ -71,16 +71,16 @@ item_filters = { path = "../item_filters" }
 invite_email = { path = "../invite_email" }
 livekit-api = { workspace = true, optional = true }
 livekit-protocol = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = [
   "axum",
 ] }
-macro_aws_config = { path = "../macro_aws_config", optional = true, features = [
+rox_aws_config = { path = "../rox_aws_config", optional = true, features = [
   "s3",
 ] }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid" }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid" }
 feature_flags = { path = "../feature_flags", optional = true }
 messages = { path = "../messages", default-features = false, features = ["ports"], optional = true }
 model-entity = { path = "../model-entity" }
@@ -107,7 +107,7 @@ subtle = { workspace = true }
 
 [dev-dependencies]
 base64 = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 mockall = { workspace = true }
 model_user = { path = "../model_user" }
 rate_limit = { path = "../rate_limit", features = ["axum", "testing"] }

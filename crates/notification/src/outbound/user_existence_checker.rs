@@ -1,7 +1,7 @@
 //! Implementation of [UserExistenceChecker] that queries the database.
 
 use crate::domain::models::email_notification_digest::ports::UserExistenceChecker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sqlx::PgPool;
 
@@ -20,7 +20,7 @@ impl DbUserExistenceChecker {
 }
 
 impl UserExistenceChecker for DbUserExistenceChecker {
-    async fn user_exists<'a>(&self, id: MacroUserIdStr<'a>) -> Result<bool, Report> {
+    async fn user_exists<'a>(&self, id: RoxUserIdStr<'a>) -> Result<bool, Report> {
         let email = id.email_part();
 
         let result = sqlx::query!(

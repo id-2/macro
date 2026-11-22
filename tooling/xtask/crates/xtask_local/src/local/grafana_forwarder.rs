@@ -27,16 +27,16 @@ mod test;
 /// The forwarder's compose service and profile.
 const SERVICE: &str = "grafana-forwarder";
 /// Its container in the global compose project.
-const CONTAINER: &str = "macro-grafana-forwarder-1";
+const CONTAINER: &str = "rox-grafana-forwarder-1";
 /// The lgtm collector's container in the global compose project.
-pub(super) const LGTM_CONTAINER: &str = "macro-lgtm-1";
+pub(super) const LGTM_CONTAINER: &str = "rox-lgtm-1";
 /// The global compose project's `services` network, which the default instance
-/// shares; other instances' are `macro-<name>_services`.
-const GLOBAL_NETWORK: &str = "macro_services";
+/// shares; other instances' are `rox-<name>_services`.
+const GLOBAL_NETWORK: &str = "rox_services";
 /// Where the lgtm collector sends its copy, on the global `services` network.
 const FORWARDER_URL: &str = "http://grafana-forwarder:4318";
 /// What `docker/docker-compose.yml` passes on as lgtm's copy endpoint.
-pub(super) const LGTM_FORWARD_VAR: &str = "MACRO_LGTM_FORWARD_ENDPOINT";
+pub(super) const LGTM_FORWARD_VAR: &str = "ROX_LGTM_FORWARD_ENDPOINT";
 /// The lgtm image's switch for that copy (its `run-otelcol.sh`).
 const LGTM_EXPORT_VAR: &str = "OTEL_EXPORTER_OTLP_ENDPOINT";
 /// The forwarder's config in the repository, copied beside its token.
@@ -58,7 +58,7 @@ impl Forwarder {
     /// Read the settings, or `None` when this run has nothing to do: forwarding
     /// is off and no earlier run left it on, or the settings can't be used,
     /// which leaves the machine as it is rather than switching on a typo. Off
-    /// includes `MACRO_LOCAL_TELEMETRY` and `CI` turning telemetry off.
+    /// includes `ROX_LOCAL_TELEMETRY` and `CI` turning telemetry off.
     pub(super) fn from_settings(stage: &Stage) -> Option<Self> {
         let (forwarder, problem) = Self::from_paths(&Paths::for_user()?);
         if let Some(error) = problem {
@@ -117,11 +117,11 @@ impl Forwarder {
         // then; a changed config file changes the revision.
         let mut up = super::global_compose(SERVICE);
         up.args(["up", "-d", SERVICE])
-            .env("MACRO_MACHINE_NAME", forwarding.machine().as_str())
-            .env("MACRO_FORWARD_ENDPOINT", forwarding.endpoint())
-            .env("MACRO_GRAFANA_FORWARDER_DIR", &self.dir)
+            .env("ROX_MACHINE_NAME", forwarding.machine().as_str())
+            .env("ROX_FORWARD_ENDPOINT", forwarding.endpoint())
+            .env("ROX_GRAFANA_FORWARDER_DIR", &self.dir)
             .env(
-                "MACRO_GRAFANA_FORWARDER_REVISION",
+                "ROX_GRAFANA_FORWARDER_REVISION",
                 opaque_id(&String::from_utf8_lossy(&config)),
             );
         // A fixed label: it is also a step name in the run_local dashboard.
@@ -241,7 +241,7 @@ fn has_running_containers(network: &str) -> bool {
 
 /// Whether `name` is an instance's `services` network (`Instance::network_services`).
 fn is_instance_network(name: &str) -> bool {
-    name == GLOBAL_NETWORK || (name.starts_with("macro-") && name.ends_with("_services"))
+    name == GLOBAL_NETWORK || (name.starts_with("rox-") && name.ends_with("_services"))
 }
 
 /// The value of the lgtm copy switch in `docker inspect`'s environment lines,

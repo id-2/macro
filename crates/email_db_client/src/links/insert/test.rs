@@ -1,7 +1,7 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::email::EmailStr;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::email::EmailStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::service::link::{Link, UserProvider};
 use sqlx::{Pool, Postgres};
 
@@ -18,8 +18,8 @@ async fn upsert_link_in_transaction_persists_divergent_ids(
     let child_email = "child@personal.test";
 
     let link = Link {
-        id: macro_uuid::generate_uuid_v7(),
-        macro_id: MacroUserIdStr::try_from(child_macro_id.to_string())?,
+        id: rox_uuid::generate_uuid_v7(),
+        macro_id: RoxUserIdStr::try_from(child_macro_id.to_string())?,
         fusionauth_user_id: primary_fusion_id.to_string(),
         email_address: EmailStr::try_from(child_email.to_string())?,
         provider: UserProvider::Gmail,

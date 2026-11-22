@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_threads\n               (id, provider_id, link_id, inbox_visible, is_signal, latest_non_spam_message_ts)\n           SELECT md5('stream-plan-' || i)::uuid, 'stream-plan-' || i, $1, TRUE,\n                  i % 200 = 0 OR i IN (100, 200, 300),\n                  '2026-02-01'::timestamptz -\n                  CASE WHEN i IN (100, 200, 300) THEN 5100 ELSE i END * interval '1 minute'\n           FROM generate_series(1, 20000) i\n           ON CONFLICT (id) DO NOTHING",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5d311de8db523537f65b3a658031a0f55cfa2f4256f8e576bc522c182aee2687"
+}

@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use axum::body::{Body, to_bytes};
 use axum::http::{Request, StatusCode};
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rootcause::Report;
 use tower::ServiceExt as _;
@@ -18,10 +18,10 @@ const USER_ID: &str = "macro|repository-lister@example.com";
 #[derive(Clone)]
 struct TestAuthorizationService;
 
-impl MacroAuthorizationService for TestAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for TestAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: USER_ID.to_owned(),
@@ -34,18 +34,18 @@ impl MacroAuthorizationService for TestAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -59,7 +59,7 @@ struct StubRepositories {
 impl ReachableRepositories for StubRepositories {
     async fn for_user(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> crate::domain::error::Result<Vec<ReachableRepository>> {
         self.asked_for
             .lock()
@@ -87,7 +87,7 @@ enum StubBranchError {
 impl RepositoryBranches for StubBranches {
     async fn for_repository(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         owner: &str,
         name: &str,
     ) -> crate::domain::error::Result<Vec<String>> {
@@ -133,7 +133,7 @@ fn router_parts(
     let state = AgentRepositoriesRouterState::new(
         Arc::clone(&repositories) as Arc<dyn ReachableRepositories>,
         Arc::clone(&branch_listing) as Arc<dyn RepositoryBranches>,
-        MacroAuthorizationState::new(Arc::new(TestAuthorizationService)),
+        RoxAuthorizationState::new(Arc::new(TestAuthorizationService)),
     );
     (
         agent_repositories_router(state),

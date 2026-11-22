@@ -2,10 +2,10 @@
 //!
 //! These traits define the contracts that adapters must implement.
 
-use macro_user_id::{
+use rox_user_id::{
     email::EmailStr,
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use std::future::Future;
 
@@ -24,21 +24,21 @@ pub trait ReferralRepo: Send + Sync + 'static {
     /// This is generated from the users FusionAuth user id
     fn get_referral_code_for_user<'a>(
         &self,
-        user_id: &MacroUserId<Lowercase<'a>>,
+        user_id: &RoxUserId<Lowercase<'a>>,
     ) -> impl Future<Output = Result<ReferralCode, Self::Err>> + Send;
 
     /// Records that `referral_code` referred the user. Returns `None` when the
     /// user was already referred, so a referral is only ever recorded once.
     fn track_referral<'a>(
         &self,
-        referred_user_id: &MacroUserId<Lowercase<'a>>,
+        referred_user_id: &RoxUserId<Lowercase<'a>>,
         referral_code: &ReferralCode,
     ) -> impl Future<Output = Result<Option<TrackedReferral>, Self::Err>> + Send;
 
     /// Completes a referral
     fn complete_referral<'a>(
         &self,
-        referred_user_id: &MacroUserId<Lowercase<'a>>,
+        referred_user_id: &RoxUserId<Lowercase<'a>>,
         referral_code: &ReferralCode,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
@@ -46,7 +46,7 @@ pub trait ReferralRepo: Send + Sync + 'static {
     /// Returns `(profile_picture_url, display_name)`, either of which may be `None`.
     fn get_sender_info<'a>(
         &self,
-        user_id: &MacroUserId<Lowercase<'a>>,
+        user_id: &RoxUserId<Lowercase<'a>>,
     ) -> impl Future<Output = Result<(Option<String>, Option<String>), Self::Err>> + Send;
 }
 
@@ -57,8 +57,8 @@ pub trait ReferralRewarder: Send + Sync + 'static {
     /// referral, so a retry never pays twice.
     fn reward_referrer(
         &self,
-        referrer: MacroUserIdStr<'static>,
-        referred: MacroUserIdStr<'static>,
+        referrer: RoxUserIdStr<'static>,
+        referred: RoxUserIdStr<'static>,
         event_key: String,
     ) -> impl Future<Output = Result<(), anyhow::Error>> + Send;
 }
@@ -70,21 +70,21 @@ pub trait ReferralService: Send + Sync + 'static {
     /// Gets the referral code for the user
     fn get_referral_code_for_user<'a>(
         &self,
-        user_id: &MacroUserId<Lowercase<'a>>,
+        user_id: &RoxUserId<Lowercase<'a>>,
     ) -> impl Future<Output = Result<ReferralCode, ReferralError>> + Send;
 
     /// Records that a new user signed up with `referral_code` and rewards the
     /// referrer. A user can only be referred once.
     fn track_referral<'a>(
         &self,
-        referred_user_id: &MacroUserId<Lowercase<'a>>,
+        referred_user_id: &RoxUserId<Lowercase<'a>>,
         referral_code: &ReferralCode,
     ) -> impl Future<Output = Result<(), ReferralError>> + Send;
 
     /// Send a referral to an external user via email
     fn send_referral_invite(
         &self,
-        sending_user: MacroUserIdStr<'_>,
+        sending_user: RoxUserIdStr<'_>,
         recipient: EmailStr<'static>,
     ) -> impl Future<Output = Result<(), ReferralError>> + Send;
 }

@@ -1,4 +1,4 @@
-import { createNoopLiveSyncSource } from '@macro-inc/collaboration/collab/source';
+import { createNoopLiveSyncSource } from '@rox-one/collaboration/collab/source';
 import { okAsync } from 'neverthrow';
 import { createRoot } from 'solid-js';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
@@ -9,22 +9,22 @@ const doubles = vi.hoisted(() => ({
   readWal: vi.fn(async () => []),
   cleanup: vi.fn(),
 }));
-vi.mock('@macro-inc/collaboration/collab/manager', () => ({
+vi.mock('@rox-one/collaboration/collab/manager', () => ({
   createLoroManager: () => ({ ingest: doubles.ingest }),
 }));
-vi.mock('@macro-inc/collaboration/collab/snapshot-store', () => ({
+vi.mock('@rox-one/collaboration/collab/snapshot-store', () => ({
   LORO_SNAPSHOT_DB_NAME: 'snapshots',
   IDBSnapshotStore: class {
     load = doubles.load;
   },
 }));
-vi.mock('@macro-inc/collaboration/collab/wal', () => ({
+vi.mock('@rox-one/collaboration/collab/wal', () => ({
   LORO_WAL_DB_NAME: 'wal',
   BrowserWALStore: class {
     getAll = doubles.readWal;
   },
 }));
-vi.mock('@macro-inc/lexical-core/markdown-loro-schema', () => ({
+vi.mock('@rox-one/lexical-core/markdown-loro-schema', () => ({
   MARKDOWN_LORO_SCHEMA: {},
 }));
 

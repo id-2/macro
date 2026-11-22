@@ -1,6 +1,6 @@
 use cowlike::CowLike;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -12,8 +12,8 @@ use crate::domain::ports::FavoritesRepo;
 const USER_A: &str = "macro|user-a@rox.one";
 const USER_B: &str = "macro|user-b@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 async fn insert_user(pool: &PgPool, id: &str) {

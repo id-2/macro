@@ -19,7 +19,7 @@ async fn exact_lookup_resolves_paged_case_aliases_without_expanding_membership(p
     .await
     .unwrap();
     let repository = DbContactsRepository::new(pool);
-    let viewer = MacroUserIdStr::try_from_email("m@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("m@example.com").unwrap();
     let lookup = ContactLookup::new(
         [
             "ZETA@example.com",
@@ -34,7 +34,7 @@ async fn exact_lookup_resolves_paged_case_aliases_without_expanding_membership(p
             "ghost@example.com",
             "ZULU@example.com",
         ]
-        .map(|email| MacroUserIdStr::try_from_email(email).unwrap())
+        .map(|email| RoxUserIdStr::try_from_email(email).unwrap())
         .to_vec(),
     )
     .unwrap();
@@ -56,7 +56,7 @@ async fn exact_lookup_resolves_paged_case_aliases_without_expanding_membership(p
     assert!(
         repository
             .lookup_contact_ids(
-                MacroUserIdStr::try_from_email("stranger@example.com").unwrap(),
+                RoxUserIdStr::try_from_email("stranger@example.com").unwrap(),
                 &lookup
             )
             .await
@@ -123,8 +123,8 @@ async fn case_lookup_uses_point_reads_at_100k_in_custom_and_generic_plans(pool: 
     let requested: Vec<_> = (1..=250)
         .flat_map(|index| {
             [
-                MacroUserIdStr::try_from_email(&format!("a{index:06}@example.com")).unwrap(),
-                MacroUserIdStr::try_from_email(&format!("z{index:06}@example.com")).unwrap(),
+                RoxUserIdStr::try_from_email(&format!("a{index:06}@example.com")).unwrap(),
+                RoxUserIdStr::try_from_email(&format!("z{index:06}@example.com")).unwrap(),
             ]
         })
         .collect();
@@ -133,7 +133,7 @@ async fn case_lookup_uses_point_reads_at_100k_in_custom_and_generic_plans(pool: 
     assert_eq!(
         repository
             .lookup_contact_ids(
-                MacroUserIdStr::try_from_email("m@example.com").unwrap(),
+                RoxUserIdStr::try_from_email("m@example.com").unwrap(),
                 &lookup
             )
             .await

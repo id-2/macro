@@ -3,7 +3,7 @@ import type {
   QueuedActionDto,
 } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 /**
  * One action waiting in an agent session's server-side queue: a prompt or a
@@ -13,21 +13,21 @@ import type { MacroClient } from '../../utils/client';
  *
  * List-sourced only - there is no per-action GET, only the queue snapshot -
  * so this wraps whatever DTO the caller already has, the same shape
- * `DiscussionComment` wraps a list-sourced record, rather than `MacroEntity`'s
+ * `DiscussionComment` wraps a list-sourced record, rather than `RoxEntity`'s
  * lazy-fetch-by-id.
  *
  * @mcp-exclude Built from a listing record; no id-only reference an MCP call can pass.
  */
 export class QueuedAction {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     private readonly sessionId: string,
     private dto: QueuedActionDto,
   ) {}
 
   /** Wrap a queue entry already in hand (e.g. from `AgentSession.queue()`). */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     sessionId: string,
     dto: QueuedActionDto,
   ): QueuedAction {

@@ -1,18 +1,18 @@
 import { DocumentPreviewContent } from '@core/component/DocumentPreview';
 import { fileTypeToBlockName } from '@core/constant/allBlocks';
-import type { GraphicsEditor } from '@macro-inc/graphics';
-import type { GraphicsPresence } from '@macro-inc/graphics/loro';
+import type { GraphicsEditor } from '@rox-one/graphics';
+import type { GraphicsPresence } from '@rox-one/graphics/loro';
 import {
   attachPresencePointer,
   GraphicsPresenceOverlay,
-} from '@macro-inc/graphics/loro/solid';
+} from '@rox-one/graphics/loro/solid';
 import {
   ConnectorView,
   EllipseView,
   GraphicsSurface,
   RectangleView,
   TextView,
-} from '@macro-inc/graphics/solid';
+} from '@rox-one/graphics/solid';
 import {
   createContext,
   createSignal,

@@ -1,7 +1,7 @@
 //! Kafka event models for the `macro.mentions` topic.
 //!
 //! Follows the canonical pattern in `broker_events.rs`: a metadata struct, a
-//! [`TopicEvent`] enum tagged by `event_type`, and a [`MacroEvent`] wrapper.
+//! [`TopicEvent`] enum tagged by `event_type`, and a [`RoxEvent`] wrapper.
 //! Unlike per-domain topics, this one is keyed by the *mentioned* entity id
 //! rather than the source, so a consumer (e.g. a bot) can find mentions of
 //! its own id across both channel messages and docs. The payload is kept
@@ -11,8 +11,8 @@
 #[cfg(test)]
 mod test;
 
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroMentionsTopic;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxMentionsTopic;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::models::EntityMention;
@@ -50,7 +50,7 @@ impl From<&EntityMention> for MentionMetadata {
     }
 }
 
-/// Events that can be published to [`MacroMentionsTopic`].
+/// Events that can be published to [`RoxMentionsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum MentionTopicEvent {
@@ -66,19 +66,19 @@ pub enum MentionTopicEvent {
 }
 
 impl TopicEvent for MentionTopicEvent {
-    type Topic = MacroMentionsTopic;
+    type Topic = RoxMentionsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroMentionsTopic`], keyed by the mentioned
+/// Publishable event for [`RoxMentionsTopic`], keyed by the mentioned
 /// entity id.
-pub struct MentionMacroEvent {
+pub struct MentionRoxEvent {
     key: String,
     event: Event<MentionTopicEvent>,
 }
 
-impl MentionMacroEvent {
+impl MentionRoxEvent {
     /// Build a created event keyed by the mentioned entity id.
     pub fn created(metadata: MentionMetadata) -> Self {
         Self::new(
@@ -116,7 +116,7 @@ impl MentionMacroEvent {
     }
 }
 
-impl MacroEvent for MentionMacroEvent {
+impl RoxEvent for MentionRoxEvent {
     type EventPayload = MentionTopicEvent;
 
     fn key(&self) -> &str {

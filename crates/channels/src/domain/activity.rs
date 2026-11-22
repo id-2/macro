@@ -12,7 +12,7 @@ use ::activity::{
     EntityType, Ingest, ParticipantChange, event_time,
 };
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::broker_events::ChannelTopicEvent;
@@ -91,7 +91,7 @@ fn exclusive(
     event_id: Uuid,
     ordinal: u32,
     actor: Actor<'static>,
-    on_behalf_of: Option<MacroUserIdStr<'static>>,
+    on_behalf_of: Option<RoxUserIdStr<'static>>,
     channel_id: Uuid,
     action: ChannelAction,
     occurred_at: DateTime<Utc>,
@@ -113,7 +113,7 @@ fn exclusive(
 fn participant_activities(
     event_id: Uuid,
     actor: Actor<'static>,
-    users: &[MacroUserIdStr<'static>],
+    users: &[RoxUserIdStr<'static>],
     channel_id: Uuid,
     occurred_at: DateTime<Utc>,
     make_action: impl Fn(Actor<'static>) -> ChannelAction,
@@ -172,7 +172,7 @@ pub fn ingest_message_event(event_id: Uuid, event: &MessageTopicEvent) -> Ingest
             // manager, and remains that person's activity.
             let bot_trigger = m.sender.as_bot().and(m.triggered_by.as_deref());
             let on_behalf_of = bot_trigger.and_then(|id: &str| {
-                MacroUserIdStr::try_from(id.to_string())
+                RoxUserIdStr::try_from(id.to_string())
                     .inspect_err(|e| {
                         // Fall back to the sender as subject, but loudly: the
                         // triggering user's activity is being misattributed.

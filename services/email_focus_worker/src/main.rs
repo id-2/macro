@@ -33,8 +33,8 @@ use connection_gateway_client::ConnectionGatewayClient;
 use email::{domain::focus::FocusService, outbound::FocusPgRepository};
 use feature_flags::outbound::posthog_local::PostHogLocalFeatureFlags;
 use jev::{domain::JevClassifier, outbound::SystemOneJev};
-use macro_entrypoint::{MacroEntrypoint, shutdown_signal};
-use macro_service_urls::{AgentHarnessServiceUrl, ConnectionGatewayUrl, TypesafeApiUrl};
+use rox_entrypoint::{RoxEntrypoint, shutdown_signal};
+use rox_service_urls::{AgentHarnessServiceUrl, ConnectionGatewayUrl, TypesafeApiUrl};
 use memory::outbound::pg_memory_repo::PgMemoryRepo;
 use rootcause::Report;
 use sqlx::postgres::PgPoolOptions;
@@ -65,7 +65,7 @@ const MAX_WINDOW_DAYS: u16 = 90;
 #[tokio::main]
 async fn main() -> Result<(), Report> {
     let config = Config::from_env()?;
-    MacroEntrypoint::new(config.environment).init();
+    RoxEntrypoint::new(config.environment).init();
     let enforcement = ai_usage::config::load_ai_usage_enforcement()?;
 
     // Evaluated locally: PostHog bills each remote flag read, and the worker

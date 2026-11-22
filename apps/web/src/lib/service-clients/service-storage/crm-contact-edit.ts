@@ -1,7 +1,7 @@
 import { recordExternalWrite } from '@graphql-cache/exchange/external-writes';
 import { recordSessionCacheWrite } from '@graphql-cache/lifecycle';
 import { captureCacheWriteSession } from '@graphql-cache/session-writes';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { stringifyDocument } from '@urql/core';
 import type { CrmContactResponse } from './generated/schemas/crmContactResponse';
 import {

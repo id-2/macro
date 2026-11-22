@@ -12,8 +12,8 @@ mod provider_draft_trash;
 mod retention;
 mod trash;
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 fn link() -> Uuid {
     Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa").unwrap()
@@ -38,7 +38,7 @@ fn snapshot() -> SendSnapshot {
             bcc: vec![],
             body_text: Some("Approved body".into()),
             body_html: None,
-            body_macro: None,
+            body_rox: None,
             headers_json: None,
             send_time: None,
             include_signature: None,
@@ -50,7 +50,7 @@ fn snapshot() -> SendSnapshot {
         forwarded_attachment_ids: vec![],
         restore_body_html: None,
         restore_body_text: Some("Editable body".into()),
-        restore_body_macro: None,
+        restore_body_rox: None,
     }
 }
 fn prepared() -> PreparedSend {
@@ -73,7 +73,7 @@ fn prepared() -> PreparedSend {
             bcc: vec![],
             body_text: input.body_text.clone(),
             body_html: None,
-            body_macro: None,
+            body_rox: None,
             headers_json: None,
             send_time: Some(Utc::now() + chrono::Duration::seconds(5)),
             actor_id: Some(actor().to_string()),
@@ -87,7 +87,7 @@ fn prepared() -> PreparedSend {
         new_thread: None,
         restore_html: None,
         restore_text: snapshot.restore_body_text.clone(),
-        restore_macro: snapshot.restore_body_macro.clone(),
+        restore_rox: snapshot.restore_body_rox.clone(),
         snapshot,
     }
 }
@@ -107,7 +107,7 @@ async fn concurrent_replay_preserves_one_message_and_undo_deadline(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let actor = actor();
     let (first, second) = tokio::join!(
         repo.admit_send(&actor, link(), attempt, prepared()),
@@ -131,7 +131,7 @@ async fn concurrent_replay_preserves_one_message_and_undo_deadline(
         repo.admit_send(
             &actor,
             link(),
-            SendAttemptId(macro_uuid::generate_uuid_v7()),
+            SendAttemptId(rox_uuid::generate_uuid_v7()),
             prepared()
         )
         .await,
@@ -148,7 +148,7 @@ async fn cancellation_before_admission_is_a_durable_tombstone(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     assert_eq!(
         repo.cancel_send(&actor(), link(), attempt).await?.status,
         SendAttemptStatus::Cancelled
@@ -177,7 +177,7 @@ async fn cancellation_restores_body_and_cannot_cancel_a_later_resend(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let first = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let first = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), first, prepared()).await?;
     assert_eq!(
         repo.cancel_send(&actor(), link(), first).await?.status,
@@ -191,7 +191,7 @@ async fn cancellation_restores_body_and_cannot_cancel_a_later_resend(
     .await?;
     assert!(restored.is_draft);
     assert_eq!(restored.body_text.as_deref(), Some("Editable body"));
-    let second = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let second = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), second, {
         let mut next = prepared();
         next.message.draft_generation = 2;
@@ -216,7 +216,7 @@ async fn cancellation_restores_body_and_cannot_cancel_a_later_resend(
 )]
 async fn claimed_delivery_cannot_be_cancelled(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let mut input = prepared();
     input.undo_delay_secs = 0;
     repo.admit_send(&actor(), link(), attempt, input).await?;
@@ -250,12 +250,12 @@ async fn claimed_delivery_cannot_be_cancelled(pool: Pool<Postgres>) -> anyhow::R
 )]
 async fn attachment_mismatch_rolls_back_admission(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let mut input = prepared();
     input
         .snapshot
         .attachment_ids
-        .push(macro_uuid::generate_uuid_v7());
+        .push(rox_uuid::generate_uuid_v7());
     assert!(matches!(
         repo.admit_send(&actor(), link(), attempt, input).await,
         Err(EmailErr::InvalidSendSnapshot(_))
@@ -313,7 +313,7 @@ fn service(
         enqueuer: crate::domain::ports::NoOpEnqueuer,
         crm_service: crm::domain::service::NoOpCrmService,
         entity_access_management_service: (),
-        macro_event_broker: macro_event_broker::NoopMacroEventBroker,
+        macro_event_broker: rox_event_broker::NoopRoxEventBroker,
         sent_undo_delay_secs: 5,
         sender_provider: std::sync::Arc::new(
             crate::domain::senders::UnavailableEmailSenderProvider,
@@ -332,8 +332,8 @@ async fn service_authorizes_send_cancel_and_status_before_touching_attempts(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let service = service(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
-    let outsider = MacroUserIdStr::parse_from_str("macro|user2@test.com")?;
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
+    let outsider = RoxUserIdStr::parse_from_str("macro|user2@test.com")?;
     assert!(
         service
             .send_email(outsider.clone(), link(), attempt, snapshot())
@@ -404,14 +404,14 @@ async fn attachment_edits_cannot_change_accepted_snapshot(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     let attachment = models_email::service::attachment::AttachmentDraft {
         upload_pending: false,
         content_id: None,
         is_inline: false,
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         draft_id: message(),
         file_name: "file.txt".into(),
         content_type: "text/plain".into(),
@@ -446,7 +446,7 @@ async fn omitted_restoration_fields_preserve_the_approved_body_on_cancel(
     use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 
     let service = service(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let mut input = snapshot();
     input.message.to.push(crate::domain::models::ContactInfo {
         email: "recipient@example.com".into(),
@@ -455,7 +455,7 @@ async fn omitted_restoration_fields_preserve_the_approved_body_on_cancel(
     });
     let html = "<p>Approved body</p><script>alert('unsafe')</script>";
     input.message.body_html = Some(URL_SAFE_NO_PAD.encode(html));
-    input.message.body_macro = Some(r#"{"editor":"approved"}"#.into());
+    input.message.body_rox = Some(r#"{"editor":"approved"}"#.into());
     input.restore_body_text = None;
     service
         .send_email(actor(), link(), attempt, input.clone())
@@ -465,7 +465,7 @@ async fn omitted_restoration_fields_preserve_the_approved_body_on_cancel(
     assert_eq!(replay.status, SendAttemptStatus::Accepted);
     service.cancel_email_send(actor(), link(), attempt).await?;
     let restored = sqlx::query!(
-        "SELECT is_draft, body_html_sanitized, body_text, body_macro FROM email_messages WHERE id = $1",
+        "SELECT is_draft, body_html_sanitized, body_text, body_rox FROM email_messages WHERE id = $1",
         message()
     )
     .fetch_one(&pool)
@@ -477,7 +477,7 @@ async fn omitted_restoration_fields_preserve_the_approved_body_on_cancel(
     );
     assert_eq!(restored.body_text.as_deref(), Some("Approved body"));
     assert_eq!(
-        restored.body_macro.as_deref(),
+        restored.body_rox.as_deref(),
         Some(r#"{"editor":"approved"}"#)
     );
     Ok(())
@@ -491,7 +491,7 @@ async fn cancellation_repairs_draft_only_thread_metadata(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let thread_id = Uuid::parse_str("33333333-3333-3333-3333-333333333333")?;
     let message_id = Uuid::parse_str("ee000004-0000-0000-0000-000000000004")?;
     let mut input = prepared();
@@ -528,11 +528,11 @@ async fn delivery_remains_terminal_after_provider_deletes_the_message(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let cancelled = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let cancelled = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), cancelled, prepared())
         .await?;
     repo.cancel_send(&actor(), link(), cancelled).await?;
-    let sent = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let sent = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), sent, prepared_generation(2))
         .await?;
     email_db_client::messages::update::mark_message_as_sent(
@@ -588,7 +588,7 @@ async fn deletion_preserves_legacy_delivery_confirmation(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     // Simulate a delivery whose proof has not yet been projected onto the attempt.
@@ -623,7 +623,7 @@ async fn cancellation_waiting_on_delivery_cannot_cancel_a_deleted_sent_message(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     let mut delivery = pool.begin().await?;
@@ -684,7 +684,7 @@ async fn cancellation_waiting_on_legacy_changes_cannot_revoke_a_later_schedule(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     let mut changes = pool.begin().await?;
@@ -750,7 +750,7 @@ async fn failed_preparation_can_be_cancelled_and_restored(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!("UPDATE email_scheduled_messages SET processing = true, delivery_status = 'failed' WHERE message_id = $1", message())
@@ -786,7 +786,7 @@ async fn uncertain_delivery_stays_locked_on_cancel_and_schedule_changes(
 ) -> anyhow::Result<()> {
     use crate::domain::scheduled::{EmailSchedulingRepo, ScheduleChange};
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!("UPDATE email_scheduled_messages SET processing = true, delivery_status = 'unconfirmed', delivery_started_at = NOW() WHERE message_id = $1", message())
@@ -825,12 +825,12 @@ async fn deleted_message_preserves_uncertain_delivery_authority(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(
         "UPDATE email_scheduled_messages SET processing = true, delivery_started_at = NOW(), delivery_claim_id = $2 WHERE message_id = $1",
-        message(), macro_uuid::generate_uuid_v7(),
+        message(), rox_uuid::generate_uuid_v7(),
     ).execute(&pool).await?;
     sqlx::query!("DELETE FROM email_messages WHERE id = $1", message())
         .execute(&pool)
@@ -862,7 +862,7 @@ async fn deleted_legacy_processing_message_remains_uncertain(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(
@@ -889,12 +889,12 @@ async fn deleted_preparation_without_submission_can_be_cancelled(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(
         "UPDATE email_scheduled_messages SET processing = true, delivery_claim_id = $2 WHERE message_id = $1",
-        message(), macro_uuid::generate_uuid_v7(),
+        message(), rox_uuid::generate_uuid_v7(),
     ).execute(&pool).await?;
     sqlx::query!("DELETE FROM email_messages WHERE id = $1", message())
         .execute(&pool)
@@ -914,7 +914,7 @@ async fn legacy_snapshot_without_sender_replays_the_original_attempt(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let admitted = repo
         .admit_send(&actor(), link(), attempt, prepared())
         .await?;
@@ -948,7 +948,7 @@ async fn native_provider_attachments_are_part_of_the_approved_send(
     let native = Uuid::parse_str("00000000-0000-0000-0000-00000000aa99")?;
     sqlx::query!("INSERT INTO email_attachments(id,message_id,provider_attachment_id,filename,mime_type,size_bytes) VALUES($1,$2,'native-file','native.txt','text/plain',4)", native, message()).execute(&pool).await?;
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     assert!(matches!(
         repo.admit_send(&actor(), link(), attempt, prepared()).await,
         Err(EmailErr::InvalidSendSnapshot(_))
@@ -980,7 +980,7 @@ async fn outlook_delivery_stays_with_the_provider_coordinator(
     )
     .execute(&pool)
     .await?;
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let result = service(pool.clone())
         .send_email(actor(), link(), attempt, snapshot())
         .await;

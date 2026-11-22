@@ -197,7 +197,7 @@ async fn reconnect_serializes_another_refresh_and_disconnect_until_grant_is_stor
             }
         });
         started.notified().await;
-        let other_user = MacroUserIdStr::try_from_email("sharer@example.com")
+        let other_user = RoxUserIdStr::try_from_email("sharer@example.com")
             .unwrap()
             .0;
         let mut second = Box::pin(async {

@@ -1,13 +1,13 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::Language;
 use sqlx::{Pool, Postgres};
 
 use crate::domain::ports::UserLanguageRepo;
 use crate::outbound::pg_user_language_repo::PgUserLanguageRepo;
 
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 #[sqlx::test(

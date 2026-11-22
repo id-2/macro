@@ -1,7 +1,7 @@
 //! PostgreSQL facts for forwarded-attachment authorization and source selection.
 use email::domain::forwarded_attachments::{ForwardedAttachmentRepo, ForwardedAttachmentSource};
 use email::domain::models::{AttachmentForwarded, MessageAttachment};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Adapter for existing email attachment queries.
@@ -17,7 +17,7 @@ impl ForwardedAttachmentRepo for PgForwardedAttachmentRepo {
     type Err = ForwardedAttachmentRepoError;
 
     #[tracing::instrument(skip(self, actor), err)]
-    async fn accessible_inboxes(&self, actor: &MacroUserIdStr<'_>) -> Result<Vec<Uuid>, Self::Err> {
+    async fn accessible_inboxes(&self, actor: &RoxUserIdStr<'_>) -> Result<Vec<Uuid>, Self::Err> {
         Ok(
             email_db_client::links::get::fetch_inboxes_for_macro_id(&self.0, actor.as_ref())
                 .await?

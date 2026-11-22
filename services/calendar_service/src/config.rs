@@ -1,8 +1,8 @@
 use anyhow::Context;
 use calendar_events::domain::models::GoogleWatchConfig;
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::env_vars;
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::env_vars;
 use secretsmanager_client::LocalOrRemoteSecret;
 
 #[cfg(test)]
@@ -15,7 +15,7 @@ pub fn calendar_watch_config() -> Option<GoogleWatchConfig> {
     // A variable set to an empty string must count as unset: a blank token
     // would verify blank-header webhook requests.
     let read = |name| {
-        macro_env_var::maybe_read_env(name)
+        rox_env_var::maybe_read_env(name)
             .map(|value| value.trim().to_owned())
             .filter(|value| !value.is_empty())
     };
@@ -31,7 +31,7 @@ env_vars! {
     pub struct AuthenticationServiceSecretKey;
 }
 
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Outlook sync can be paused without stopping Google Calendar.
@@ -99,7 +99,7 @@ pub struct Config {
 
 impl Config {
     pub fn from_env() -> anyhow::Result<Self> {
-        macro_config::ConfigLoader::load::<Config>().context("failed to load config")
+        rox_config::ConfigLoader::load::<Config>().context("failed to load config")
     }
 
     /// The Outlook background loops this task runs.

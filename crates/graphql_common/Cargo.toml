@@ -11,10 +11,10 @@ axum-extra = { workspace = true }
 chrono = { workspace = true }
 filter_ast = { path = "../filter_ast" }
 item_filters = { path = "../item_filters" }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", default-features = false, features = [
   "axum",
 ] }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 model_owner = { path = "../model_owner" }
 models_properties = { path = "../models_properties" }

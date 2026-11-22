@@ -13,6 +13,7 @@ import {
   SplitHeaderLeft,
   SplitHeaderRight,
 } from '@components/app/split-layout/components/SplitHeader';
+import { t } from '@app/lib/i18n';
 import { StaticSplitLabel } from '@components/app/split-layout/components/SplitLabel';
 import { useBlockId } from '@core/block';
 import { BlockLiveIndicators } from '@core/component/LiveIndicators';
@@ -39,7 +40,7 @@ export function CallRecordingSplitHeaderLoading() {
       <div class="h-full my-auto flex min-w-0 items-center justify-start gap-3">
         <div class="ph-no-capture z-split-header-content relative flex h-full max-w-full min-w-0 shrink items-center gap-2">
           <StaticSplitLabel
-            label="Call Recording"
+            label={t('calls.recordingFallback')}
             icon={
               <PhoneCallIcon class="size-4 touch:size-6 shrink-0 text-ink-muted" />
             }
@@ -53,7 +54,7 @@ export function CallRecordingSplitHeaderLoading() {
 export function CallRecordingSplitHeader(props: { record: CallRecord }) {
   const record = () => props.record;
   const blockId = useBlockId();
-  const callName = () => record().customName ?? record().channelName ?? 'Call';
+  const callName = () => record().customName ?? record().channelName ?? t('calls.title');
   const permissions = useGetPermissions();
   const openShare = useShareModal(() => ({
     id: blockId,
@@ -72,7 +73,7 @@ export function CallRecordingSplitHeader(props: { record: CallRecord }) {
       ? [
           {
             group: 'file' as const,
-            label: 'Download',
+            label: t('entityActions.download'),
             icon: DownloadSimple,
             action: () =>
               fireAndForget(
@@ -86,7 +87,7 @@ export function CallRecordingSplitHeader(props: { record: CallRecord }) {
   ];
 
   const shareTool: BlockTool = {
-    label: 'Share',
+    label: t('entityActions.share'),
     icon: IconShared,
     action: openShare,
     buttonComponent: () => <ShareTrigger onClick={openShare} />,
@@ -95,7 +96,7 @@ export function CallRecordingSplitHeader(props: { record: CallRecord }) {
 
   const tools: BlockTool[] = [
     {
-      label: 'Ask Rox',
+      label: t('entityActions.askMacro'),
       icon: ChatWithAgentIcon,
       action: () =>
         openChatWithAgent({
@@ -107,7 +108,7 @@ export function CallRecordingSplitHeader(props: { record: CallRecord }) {
       condition: isMobile,
     },
     {
-      label: 'Chat',
+      label: t('calls.chat'),
       icon: ChatWithAgentIcon,
       action: () =>
         openChatWithAgent({
@@ -133,7 +134,7 @@ export function CallRecordingSplitHeader(props: { record: CallRecord }) {
 
   const menuTools: BlockTool[] = [
     {
-      label: 'Ask Rox',
+      label: t('entityActions.askMacro'),
       icon: ChatWithAgentIcon,
       action: () =>
         openChatWithAgent({

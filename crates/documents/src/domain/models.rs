@@ -1,7 +1,7 @@
 //! Domain models for the documents crate.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::response::DocumentResponseMetadata;
 use model::document::{DocumentMetadata, FileType};
 use model_owner::Owner;
@@ -424,7 +424,7 @@ pub struct ImportEmailAttachmentRepoArgs {
     /// The email attachment being imported.
     pub email_attachment_id: uuid::Uuid,
     /// The mailbox owner, who owns the imported document.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// How to create the document when no reusable import exists.
     pub document: NewDocument,
 }

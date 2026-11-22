@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::{
@@ -8,7 +8,7 @@ use crate::domain::{
     ports::{EmailMessageEnqueuer, EmailRepo},
 };
 use frecency::domain::ports::FrecencyQueryService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 
 use super::EmailServiceImpl;
 
@@ -19,12 +19,12 @@ where
     E: EmailMessageEnqueuer,
     CS: crm::domain::service::CrmService,
     Eam: Send + Sync + 'static,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err> + From<E::Err>,
 {
     async fn reminder_threads(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         receipts: Vec<
             entity_access::domain::models::EntityAccessReceipt<
                 entity_access::domain::models::ViewAccessLevel,
@@ -133,7 +133,7 @@ where
 
     async fn followup_thread(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<Option<FollowupThread>, EmailErr> {
         let Some(link) = self
@@ -204,7 +204,7 @@ where
 
     async fn set_followup_inbox(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread_id: Uuid,
         link_id: Uuid,
         visible: bool,

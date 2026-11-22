@@ -526,7 +526,7 @@ async fn storing_the_same_file_again_keeps_it(pool: PgPool) {
 
 /// The migration that tracks chats and people added before pictures were.
 const BACKFILL: &str = include_str!(
-    "../../../../../macro_db_client/migrations/20261113035846_whatsapp_profile_picture_backfill.sql"
+    "../../../../../rox_db_client/migrations/20261113035846_whatsapp_profile_picture_backfill.sql"
 );
 const CUSTOMER_LID: &str = "100000000000001@lid";
 

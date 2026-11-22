@@ -6,7 +6,7 @@ use axum::Json;
 use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal, UserOrInternalCaller};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal, UserOrInternalCaller};
 use model::response::ErrorResponse;
 use std::sync::Arc;
 use strum_macros::AsRefStr;
@@ -60,7 +60,7 @@ impl IntoResponse for BulkDeleteError {
 pub async fn handle_bulk_delete_file(
     State(metadata_client): State<DynamodbClient>,
     State(storage_client): State<Arc<S3Client>>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(req): Json<BulkDeleteRequest>,
 ) -> Result<Json<BulkDeleteResponse>, BulkDeleteError> {
     // Validate request

@@ -12,11 +12,11 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::extract::Cached;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationRejection, MacroAuthorizationService,
-    MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationRejection, RoxAuthorizationService,
+    RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use std::{marker::PhantomData, str::FromStr};
 use thiserror::Error;
@@ -99,7 +99,7 @@ pub enum EmailLinkErr {
     #[error("No inbox specified; provide the X-Email-Link-Id header")]
     NoInboxSelected,
     #[error(transparent)]
-    Authorization(#[from] MacroAuthorizationRejection),
+    Authorization(#[from] RoxAuthorizationRejection),
 }
 
 impl IntoResponse for EmailLinkErr {
@@ -127,7 +127,7 @@ impl IntoResponse for EmailLinkErr {
 fn resolve_target_link(
     links: Vec<Link>,
     header_link_id: Option<Uuid>,
-    caller: &MacroUserIdStr<'_>,
+    caller: &RoxUserIdStr<'_>,
 ) -> Result<Link, EmailLinkErr> {
     match header_link_id {
         Some(id) => links
@@ -158,16 +158,16 @@ fn parse_link_id_header(parts: &Parts) -> Result<Option<Uuid>, EmailLinkErr> {
 impl<S, U, Auth> FromRequestParts<S> for EmailLinkExtractor<U, Auth>
 where
     EmailRouterState<U>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     U: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = EmailLinkErr;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let header_link_id = parse_link_id_header(parts)?;
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>> =
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>> =
             parts
                 .extract_with_state(state)
                 .await
@@ -199,15 +199,15 @@ impl<U, Auth> Clone for MultiEmailLinkExtractor<U, Auth> {
 impl<S, U, Auth> FromRequestParts<S> for MultiEmailLinkExtractor<U, Auth>
 where
     EmailRouterState<U>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     U: EmailService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = EmailLinkErr;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        let Cached(authorization): Cached<MacroAuthorizationExtractor<Auth, UserOrInternal>> =
+        let Cached(authorization): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>> =
             parts
                 .extract_with_state(state)
                 .await

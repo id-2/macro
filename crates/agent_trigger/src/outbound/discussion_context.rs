@@ -15,7 +15,7 @@ use entity_access::domain::models::EntityAccessReceipt;
 use initiative::domain::{lookup::InitiativeReader, models::InitiativeId};
 use lexical_client::LexicalClient;
 use lexical_client::parse_markdown::ExtractedExplicitReply;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use messages::domain::agent_hops::agent_hops;
 use messages::domain::{
     api::MessageReader,

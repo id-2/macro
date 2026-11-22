@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::{
     pin::request::ReorderPinRequest,
     response::{GenericErrorResponse, GenericResponse, GenericSuccessResponse, SuccessResponse},
@@ -24,10 +24,10 @@ use model::{
 #[tracing::instrument(skip(ctx, user, req), fields(user_id=?user.authorization.user.macro_user_id))]
 pub async fn reorder_pins_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(req): extract::Json<Vec<ReorderPinRequest>>,
 ) -> impl IntoResponse {
-    match macro_db_client::pins::reorder_pins(
+    match rox_db_client::pins::reorder_pins(
         ctx.db.clone(),
         user.authorization.user.macro_user_id.as_ref(),
         req,

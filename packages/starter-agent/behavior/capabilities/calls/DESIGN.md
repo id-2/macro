@@ -14,7 +14,7 @@ options in `voices.ts`.
 
 ## What a call needs
 
-Only the agent's `MACRO_API_KEY`, and a call's process never holds it: it is
+Only the agent's `ROX_API_KEY`, and a call's process never holds it: it is
 started with the relay's environment (`base.relayed()`), and everything,
 speech included, goes through the agent's relay, which adds the key. On a
 computer it also runs under the agent's sandbox (`base.sandbox`), so neither
@@ -101,7 +101,7 @@ imported function in a script; `bin/agent describe <name>` has its docs.
 ## Rox's calls
 
 `macro.ts` is the only module that knows the SDK's shape, and it uses public
-methods only. Calls use `@macro-inc/sdk/calls/node` (`connectRoom`,
+methods only. Calls use `@rox-one/sdk/calls/node` (`connectRoom`,
 `publishScreen`). The SDK's helper, the agent and LiveKit Agents must all
 resolve the same `@livekit/rtc-node` installation: two native runtimes, even
 at the same version, make incompatible `Room` classes (a test in

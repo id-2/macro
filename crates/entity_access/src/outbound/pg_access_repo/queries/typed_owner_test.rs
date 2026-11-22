@@ -1,7 +1,7 @@
 //! All typed TEAM-link query implementations must agree, including explanations.
 use super::{SourceIds, chat_access, document_access, project_access};
 use crate::domain::models::AccessLevel;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

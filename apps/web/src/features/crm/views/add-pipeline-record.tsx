@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { registerHotkey, useHotkeyDOMScope } from '@core/hotkey/hotkeys';
 import { fireAndForget } from '@core/util/fireAndForget';
 import EnvelopeIcon from '@icon/system/regular/envelope.svg';
@@ -173,8 +174,8 @@ export function AddPipelineRecordDialog(
     );
   const required = () =>
     requiredStageFields(props.columns, props.requirements ?? [], values());
-  const noun = company ? 'deal' : 'contact';
-  const submitLabel = company ? 'Add deal' : 'Add contact';
+  const noun = company ? t('crm.deal') : t('crm.contact');
+  const submitLabel = company ? t('crm.addDeal') : t('crm.addContact');
   const existing = () => {
     const current = choice();
     return current?.kind === 'existing' ? current.record : undefined;
@@ -315,7 +316,7 @@ export function AddPipelineRecordDialog(
         option: newOption(),
       });
       if (saved) props.onClose();
-      else setError(`Could not add this ${noun}. Try again.`);
+      else setError(t('crm.couldNotAddRecord', { noun }));
     } catch (cause) {
       console.error(`Failed to add a pipeline ${noun}`, cause);
       setError(
@@ -359,19 +360,19 @@ export function AddPipelineRecordDialog(
         {(draft) => (
           <NewRecordFields
             name={draft().name}
-            namePlaceholder="Company name"
+            namePlaceholder={t('crm.companyName')}
             disabled={pending()}
             onName={(name) => changeChoice({ ...draft(), name })}
             onCancel={() => changeChoice(undefined)}
-            cancelLabel="Choose an existing company"
+            cancelLabel={t('crm.chooseExistingCompany')}
           >
             <GlobeIcon
               aria-hidden="true"
               class="size-4 shrink-0 text-ink-muted"
             />
             <input
-              aria-label="Domain"
-              placeholder="Domain (optional), like acme.com"
+              aria-label={t('crm.domain')}
+              placeholder={t('crm.domainPlaceholder')}
               autocomplete="off"
               spellcheck={false}
               data-1p-ignore
@@ -393,19 +394,19 @@ export function AddPipelineRecordDialog(
           <>
             <NewRecordFields
               name={draft().name}
-              namePlaceholder="Contact name"
+              namePlaceholder={t('crm.contactName')}
               disabled={pending()}
               onName={(name) => changeChoice({ ...draft(), name })}
               onCancel={() => changeChoice(undefined)}
-              cancelLabel="Choose an existing contact"
+              cancelLabel={t('crm.chooseExistingContact')}
             >
               <EnvelopeIcon
                 aria-hidden="true"
                 class="size-4 shrink-0 text-ink-muted"
               />
               <input
-                aria-label="Email"
-                placeholder="Email, like jane@example.com"
+                aria-label={t('crm.email')}
+                placeholder={t('crm.emailPlaceholder')}
                 type="email"
                 autocomplete="off"
                 spellcheck={false}
@@ -463,7 +464,7 @@ export function AddPipelineRecordDialog(
       column={column()}
       rowCells={values()}
       value={values()[column().id] ?? null}
-      emptyLabel="Empty"
+      emptyLabel={t('crm.empty')}
       canEdit={!pending()}
       renderTextEditor={props.renderTextEditor}
       renderTextValue={props.renderTextValue}
@@ -554,8 +555,8 @@ export function AddPipelineRecordDialog(
                 >
                   <p role="status" class="text-sm text-ink-muted">
                     {props.requirementsError
-                      ? 'Could not load stage requirements. Reopen this form to retry.'
-                      : 'Loading stage requirements…'}
+                      ? t('crm.couldNotLoadStageRequirements')
+                      : t('crm.loadingStageRequirements')}
                   </p>
                 </Show>
                 <Show when={error()}>
@@ -573,7 +574,7 @@ export function AddPipelineRecordDialog(
                   disabled={pending()}
                   onClick={close}
                 >
-                  Cancel
+                  {t('common.cancel')}
                   <Hotkey shortcut="escape" theme="subtle" />
                 </Button>
                 <EntityComposer.Submit
@@ -586,7 +587,7 @@ export function AddPipelineRecordDialog(
                     props.requirementsError
                   }
                 >
-                  {pending() ? 'Adding…' : submitLabel}
+                  {pending() ? t('crm.adding') : submitLabel}
                 </EntityComposer.Submit>
               </EntityComposer.Footer>
             </EntityComposer.Root>
@@ -618,7 +619,7 @@ function StackedField(props: {
             />
             <span class="truncate">{column().name}</span>
             <Show when={props.required}>
-              <span class="text-accent">Required</span>
+              <span class="text-accent">{t('crm.required')}</span>
             </Show>
           </div>
         )}

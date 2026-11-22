@@ -1,7 +1,7 @@
 use super::{models::*, ports::*};
 use async_trait::async_trait;
 use call::domain::imports::CallImportService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use tracing::Instrument;
 use uuid::Uuid;
@@ -18,17 +18,17 @@ const SETUP_LEASE: chrono::Duration = chrono::Duration::minutes(2);
 #[derive(Debug, Default, PartialEq)]
 pub(crate) struct Plan {
     pub stop: Vec<Uuid>,
-    pub start: Vec<MacroUserIdStr<'static>>,
+    pub start: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Every enabled Granola account should have one active webhook at the widest
 /// scope; syncs whose account went away are stopped.
 pub(crate) fn plan(
-    accounts: &[(MacroUserIdStr<'static>, String)],
+    accounts: &[(RoxUserIdStr<'static>, String)],
     states: &[SyncState],
     now: chrono::DateTime<chrono::Utc>,
 ) -> Plan {
-    let account = |user: &MacroUserIdStr<'static>| {
+    let account = |user: &RoxUserIdStr<'static>| {
         accounts
             .iter()
             .find(|(u, _)| u == user)
@@ -94,19 +94,19 @@ impl<R: SyncRepository, G: Granola, A: Accounts, V: DeliveryVerifier> Service<R,
     }
 
     #[tracing::instrument(name = "granola.start_sync", skip_all, fields(scope), err(Display))]
-    async fn start(&self, user: MacroUserIdStr<'static>) -> std::result::Result<(), SyncError> {
+    async fn start(&self, user: RoxUserIdStr<'static>) -> std::result::Result<(), SyncError> {
         let Some(account) = self.accounts.account(&user).await? else {
             return Ok(());
         };
         let old = self.repo.by_user(&user).await?;
         let connection = Connection {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             user_id: user,
             account_id: account,
             namespace: old
                 .as_ref()
                 .map(|c| c.namespace)
-                .unwrap_or_else(macro_uuid::generate_uuid_v7),
+                .unwrap_or_else(rox_uuid::generate_uuid_v7),
             scope: SCOPE_PREFERENCE[0],
             enabled: false,
             endpoint_id: None,

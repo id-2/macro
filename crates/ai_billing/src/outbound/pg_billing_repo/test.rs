@@ -1,10 +1,10 @@
 use super::*;
 use crate::domain::{BillingPeriod, OVERAGE_CHARGE_THRESHOLD_CENTS};
 use chrono::DurationRound;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
-fn payer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
+fn payer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
@@ -472,12 +472,12 @@ async fn settlement_uses_stored_overage_policy_and_flushes_at_period_end(pool: P
 async fn frozen_period_starts_lists_the_payers_periods_in_the_window(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let payer = payer();
-    let other = MacroUserIdStr::try_from("macro|other@example.com".to_string()).unwrap();
+    let other = RoxUserIdStr::try_from("macro|other@example.com".to_string()).unwrap();
     let now = Utc::now()
         .duration_trunc(chrono::Duration::microseconds(1))
         .unwrap();
     let month = chrono::Duration::days(30);
-    let seats = |user: &MacroUserIdStr<'static>| {
+    let seats = |user: &RoxUserIdStr<'static>| {
         vec![SeatAllowance {
             user: user.clone(),
             included_cents: 2_000,
@@ -547,7 +547,7 @@ async fn period_allowance_roundtrips_and_upserts_per_period(pool: PgPool) {
     };
     let open = period.open_start(now).unwrap();
     let earlier = open.start() - chrono::Duration::days(30);
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
     let seats = vec![
         SeatAllowance {
             user: payer.clone(),
@@ -1298,8 +1298,8 @@ async fn release_open_seat_removes_the_middle_pair_and_leaves_the_closed_row(poo
     .open_start(now)
     .unwrap();
     let closed_start = open_start - chrono::Duration::days(60);
-    let alice = MacroUserIdStr::try_from("macro|alice@example.com".to_string()).unwrap();
-    let bob = MacroUserIdStr::try_from("macro|bob@example.com".to_string()).unwrap();
+    let alice = RoxUserIdStr::try_from("macro|alice@example.com".to_string()).unwrap();
+    let bob = RoxUserIdStr::try_from("macro|bob@example.com".to_string()).unwrap();
     let users = vec![
         payer.as_ref().to_string(),
         alice.as_ref().to_string(),
@@ -1385,7 +1385,7 @@ async fn release_open_seat_removes_the_middle_pair_and_leaves_the_closed_row(poo
     );
     assert_eq!(seat_generation(&pool, payer.as_ref()).await, Some(2));
 
-    let outsider = MacroUserIdStr::try_from("macro|outsider@example.com".to_string()).unwrap();
+    let outsider = RoxUserIdStr::try_from("macro|outsider@example.com".to_string()).unwrap();
     repo.release_open_seat(&payer, open, &outsider)
         .await
         .unwrap();
@@ -1412,8 +1412,8 @@ async fn store_open_allowance_does_not_write_a_stale_generation(pool: PgPool) {
     }
     .open_start(now)
     .unwrap();
-    let alice = MacroUserIdStr::try_from("macro|alice@example.com".to_string()).unwrap();
-    let bob = MacroUserIdStr::try_from("macro|bob@example.com".to_string()).unwrap();
+    let alice = RoxUserIdStr::try_from("macro|alice@example.com".to_string()).unwrap();
+    let bob = RoxUserIdStr::try_from("macro|bob@example.com".to_string()).unwrap();
     let before = vec![
         SeatAllowance {
             user: payer(),
@@ -1491,7 +1491,7 @@ async fn release_open_seat_without_an_allowance_row_bumps_generation(pool: PgPoo
     }
     .open_start(now)
     .unwrap();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
 
     repo.release_open_seat(&payer(), open, &member)
         .await
@@ -1530,7 +1530,7 @@ async fn release_open_seat_without_an_allowance_row_bumps_generation(pool: PgPoo
 async fn rows_frozen_before_the_cost_column_read_as_the_current_allowance(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let payer = payer();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
     let users = vec![payer.as_ref().to_string(), member.as_ref().to_string()];
     let legacy_start = Utc::now() - chrono::Duration::days(40);
     let stale_start = legacy_start - chrono::Duration::days(30);
@@ -1658,7 +1658,7 @@ async fn credit_only_settlement_never_reserves_or_retries_direct_charges(pool: P
 async fn credit_purchases_respect_the_monthly_limit_and_retry_declined_invoices(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
 
     let PurchaseReservation::New(first) = repo
         .reserve_credit_purchase(&payer(), &member, 2_500, Some(5_000), now)
@@ -1759,7 +1759,7 @@ async fn automatic_reloads_ignore_open_purchases(pool: PgPool) {
 async fn voided_purchases_are_neither_retried_nor_counted(pool: PgPool) {
     let repo = PgBillingRepo::new(pool.clone(), AiPricing::testing());
     let now = Utc::now();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
 
     let PurchaseReservation::New(declined) = repo
         .reserve_credit_purchase(&payer(), &member, 2_500, Some(5_000), now)

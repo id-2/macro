@@ -13,7 +13,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     /// The stored guest list a mutation of `scope` addresses: the
@@ -56,6 +56,11 @@ where
         let target = self
             .resolve_mutation_target(requester_id, event_id, calendar_id)
             .await?;
+        if target.is_local {
+            return Err(CalendarMutationError::InvalidInput(
+                "Inviting guests to a Rox calendar is not supported yet".to_string(),
+            ));
+        }
         tracing::Span::current().record(
             "provider",
             tracing::field::debug(target.token_identity.provider),
@@ -166,7 +171,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     /// Store the guest policy Google reported when it refused an invite.

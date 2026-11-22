@@ -1,7 +1,7 @@
 use super::*;
 use chrono::TimeZone;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
@@ -42,7 +42,7 @@ impl MockRepo {
 impl LastOnlineRepo for MockRepo {
     async fn set_last_online(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         now: DateTime<Utc>,
     ) -> Result<(), Report> {
         self.data
@@ -54,14 +54,14 @@ impl LastOnlineRepo for MockRepo {
 
     async fn get_last_online(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> Result<Option<DateTime<Utc>>, Report> {
         Ok(self.data.lock().unwrap().get(user.as_ref()).copied())
     }
 }
 
-fn test_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap()
+fn test_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap()
 }
 
 #[tokio::test]
@@ -185,8 +185,8 @@ async fn multiple_users_tracked_independently() {
 
     let service = LastOnlineService::new(time, repo);
 
-    let user1 = MacroUserIdStr::parse_from_str("macro|user1@example.com").unwrap();
-    let user2 = MacroUserIdStr::parse_from_str("macro|user2@example.com").unwrap();
+    let user1 = RoxUserIdStr::parse_from_str("macro|user1@example.com").unwrap();
+    let user2 = RoxUserIdStr::parse_from_str("macro|user2@example.com").unwrap();
 
     service.record_last_online(user1.copied()).await.unwrap();
 

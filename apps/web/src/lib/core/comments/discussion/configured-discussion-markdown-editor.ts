@@ -10,7 +10,7 @@ import { tablePlugin } from '@core/component/LexicalMarkdown/plugins/tables/tabl
 import type { MentionLinkResolver } from '@core/component/LexicalMarkdown/plugins/text-paste/textPastePlugin';
 import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import type { IUser } from '@core/user/types';
-import type { EditorType } from '@macro-inc/lexical-core';
+import type { EditorType } from '@rox-one/lexical-core';
 import { isIOS } from '@solid-primitives/platform';
 import type { Accessor } from 'solid-js';
 

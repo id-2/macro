@@ -10,6 +10,7 @@
  * this file depends on chat context.
  */
 
+import { t } from '@app/lib/i18n';
 import { ItemPreview } from '@core/component/ItemPreview';
 import type {
   ToolDetail,
@@ -51,7 +52,7 @@ function outcomeLabel(outcome: UserToolOutcome): string {
     .with({ kind: 'draft' }, () => 'Saved as draft')
     .with({ kind: 'completed' }, () => 'Done')
     .with({ kind: 'rejected' }, () => 'Rejected')
-    .with({ kind: 'failed' }, () => 'Failed')
+    .with({ kind: 'failed' }, () => t('agentChat.failed'))
     .with({ kind: 'unrecognized' }, () => 'Answered')
     .exhaustive();
 }
@@ -223,7 +224,7 @@ export function EmailDraft(props: { email: SendEmail; inFlight: boolean }) {
           )}
         </For>
         <Show when={props.email.subject.trim() !== ''}>
-          <dt class="text-ink-muted">Subject</dt>
+          <dt class="text-ink-muted">{t('agentChat.subject')}</dt>
           <dd class="text-ink wrap-break-word">{props.email.subject}</dd>
         </Show>
       </dl>

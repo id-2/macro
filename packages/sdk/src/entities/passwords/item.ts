@@ -9,7 +9,7 @@ import type {
   PasswordPermission,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Team } from '../teams/team';
 
 /**
@@ -80,7 +80,7 @@ export function vaultHeaders(wake: AgentWake): {
  */
 export class PasswordItem {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The team that owns the item. */
     readonly team: Team,
     private readonly wake: AgentWake,
@@ -91,7 +91,7 @@ export class PasswordItem {
 
   /** A handle to an item from a search hit or write result. */
   static fromHit(
-    client: MacroClient,
+    client: RoxClient,
     team: Team,
     wake: AgentWake,
     hit: PasswordAgentSearchHit,
@@ -101,7 +101,7 @@ export class PasswordItem {
 
   /** A handle to an item by id, without metadata until a write returns it. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     team: Team,
     wake: AgentWake,
     id: string,

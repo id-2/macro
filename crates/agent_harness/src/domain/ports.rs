@@ -12,7 +12,7 @@ use agent_session::domain::ports::AgentConnector;
 use bot_id::BotId;
 use harness_id::HarnessId;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::error::{HarnessError, Result};
 use super::model::{
@@ -41,7 +41,7 @@ pub enum CommandTarget {
 #[async_trait::async_trait]
 pub trait ReachableRepositories: Send + Sync + 'static {
     /// Every repository `user` reaches, sorted by `owner/name`.
-    async fn for_user(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<ReachableRepository>>;
+    async fn for_user(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<ReachableRepository>>;
 }
 
 /// The branches on one repository a user can start a coding session from.
@@ -57,7 +57,7 @@ pub trait RepositoryBranches: Send + Sync + 'static {
     /// repository. An empty repository is an empty list.
     async fn for_repository(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         owner: &str,
         name: &str,
     ) -> Result<Vec<String>>;
@@ -110,7 +110,7 @@ pub trait HarnessBindings: Send + Sync + 'static {
     fn access_facts(
         &self,
         bot: BotId,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> impl Future<Output = anyhow::Result<Option<RuntimeAccessFacts>>> + Send;
 
     /// The sessions holding one of `acp_sessions` whose bot is bound to
@@ -155,18 +155,18 @@ pub trait CodingAgentSource: Send + Sync + 'static {
 
 /// One dial of a harness's runtime; a redial is a new connection.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub struct RuntimeConnectionId(macro_uuid::Uuid);
+pub struct RuntimeConnectionId(rox_uuid::Uuid);
 
 impl RuntimeConnectionId {
     /// Mint the identity of a new dial.
     #[must_use]
     pub fn generate() -> Self {
-        Self(macro_uuid::generate_uuid_v7())
+        Self(rox_uuid::generate_uuid_v7())
     }
 
     /// The raw uuid, for persistence.
     #[must_use]
-    pub fn as_uuid(self) -> macro_uuid::Uuid {
+    pub fn as_uuid(self) -> rox_uuid::Uuid {
         self.0
     }
 }
@@ -235,7 +235,7 @@ pub trait MessagePromptContext: Send + Sync + 'static {
     /// to exactly this parent and root before provisioning or dispatching work.
     fn authorize_origin(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         origin: &super::model::AnnounceOrigin,
     ) -> impl Future<Output = Result<()>> + Send;
 }
@@ -263,7 +263,7 @@ pub trait UserTimeZones: Send + Sync + 'static {
     /// failed lookup is `None`.
     fn time_zone(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Option<String>> + Send;
 }
 
@@ -280,18 +280,18 @@ pub trait PromptMentions: Send + Sync + 'static {
     fn share_with_mentioned<'a>(
         &'a self,
         session_id: AgentSessionId,
-        actor: Option<&'a MacroUserIdStr<'static>>,
+        actor: Option<&'a RoxUserIdStr<'static>>,
         prompt_markdown: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send + 'a>>;
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send + 'a>>;
 }
 
 impl<Mentions: PromptMentions + ?Sized> PromptMentions for Arc<Mentions> {
     fn share_with_mentioned<'a>(
         &'a self,
         session_id: AgentSessionId,
-        actor: Option<&'a MacroUserIdStr<'static>>,
+        actor: Option<&'a RoxUserIdStr<'static>>,
         prompt_markdown: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send + 'a>> {
         (**self).share_with_mentioned(session_id, actor, prompt_markdown)
     }
 }
@@ -305,9 +305,9 @@ impl PromptMentions for NoPromptMentions {
     fn share_with_mentioned<'a>(
         &'a self,
         _session_id: AgentSessionId,
-        _actor: Option<&'a MacroUserIdStr<'static>>,
+        _actor: Option<&'a RoxUserIdStr<'static>>,
         _prompt_markdown: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send + 'a>> {
+    ) -> Pin<Box<dyn Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send + 'a>> {
         Box::pin(async { Ok(Vec::new()) })
     }
 }
@@ -471,7 +471,7 @@ pub trait RuntimeConnections: Send + Sync + 'static {
     fn access_facts(
         &self,
         bot: BotId,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> impl Future<Output = anyhow::Result<Option<RuntimeAccessFacts>>> + Send;
 
     /// Whether this process currently holds `harness`'s physical runtime socket.
@@ -517,7 +517,7 @@ pub trait SandboxEgressProvisioner: Send + Sync + 'static {
     fn provision(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         selection: &AgentMcpServers,
     ) -> impl Future<Output = Result<ProvisionedEgress>> + Send;
 
@@ -529,7 +529,7 @@ pub trait SandboxEgressProvisioner: Send + Sync + 'static {
     /// connected since the spawn is advertised on the next attach.
     fn restore(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session_token: String,
         selection: &AgentMcpServers,
     ) -> impl Future<Output = Result<SandboxEgress>> + Send;
@@ -552,7 +552,7 @@ pub trait ContainerManager: Send + Sync + 'static {
     fn preflight(
         &self,
         kind: AgentKind,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<SessionBlocker>>> + Send {
         let _ = (kind, owner);
         async { Ok(None) }

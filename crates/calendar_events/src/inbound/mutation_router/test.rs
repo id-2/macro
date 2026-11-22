@@ -148,19 +148,19 @@ fn attendee_body_defaults_to_required_attendance() {
 
 #[test]
 fn macro_call_failures_map_to_transport_semantics() {
-    let failed = CalendarMutationApiError::from(MacroCallEventError::MeetingLink(
+    let failed = CalendarMutationApiError::from(RoxCallEventError::MeetingLink(
         MeetingLinkError::Failed("call service at 10.0.0.9 returned 502".to_string()),
     ));
     assert_eq!(
         (failed.status, failed.code),
         (
             StatusCode::SERVICE_UNAVAILABLE,
-            CalendarMutationErrorCode::MacroCallFailed
+            CalendarMutationErrorCode::RoxCallFailed
         )
     );
     assert!(!failed.message.contains("10.0.0.9"));
 
-    let invalid = CalendarMutationApiError::from(MacroCallEventError::MeetingLink(
+    let invalid = CalendarMutationApiError::from(RoxCallEventError::MeetingLink(
         MeetingLinkError::InvalidInput("title too long".to_string()),
     ));
     assert_eq!(
@@ -172,7 +172,7 @@ fn macro_call_failures_map_to_transport_semantics() {
     );
     assert_eq!(invalid.message, "title too long");
 
-    let calendar = CalendarMutationApiError::from(MacroCallEventError::Calendar(
+    let calendar = CalendarMutationApiError::from(RoxCallEventError::Calendar(
         CalendarMutationError::ReadOnly,
     ));
     assert_eq!(
@@ -230,7 +230,7 @@ fn a_copy_refusal_asks_the_caller_to_name_the_inbox() {
 fn a_program_cannot_create_an_event_the_user_has_not_seen() {
     let mut program = axum::http::HeaderMap::new();
     program.insert(
-        macro_authorization::CODE_EXECUTION_HEADER,
+        rox_authorization::CODE_EXECUTION_HEADER,
         "1".parse().unwrap(),
     );
     let browser = axum::http::HeaderMap::new();
@@ -249,7 +249,7 @@ fn a_program_cannot_create_an_event_the_user_has_not_seen() {
 fn an_owner_routine_code_step_creates_events_but_an_agent_program_does_not() {
     let mut code_step = axum::http::HeaderMap::new();
     code_step.insert(
-        macro_authorization::CODE_EXECUTION_HEADER,
+        rox_authorization::CODE_EXECUTION_HEADER,
         "1".parse().unwrap(),
     );
     // The runtime marks every code step's request; the signed owner routine
@@ -291,7 +291,7 @@ impl CalendarCopyConfirmation for TwoCopies {
 
 #[tokio::test]
 async fn every_program_names_the_copy_it_changes_even_an_owner_routine() {
-    let owner_step = macro_authorization::is_program_run(
+    let owner_step = rox_authorization::is_program_run(
         CredentialAttribution::Routine,
         &axum::http::HeaderMap::new(),
     );

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { match } from 'ts-pattern';
 import {
   type ConversationState,
@@ -105,25 +106,25 @@ export type ConversationGroup<Item> = {
 
 type GroupDefinition = {
   id: string;
-  label: string;
+  label: () => string;
   contains: (facts: ConversationFacts) => boolean;
 };
 
 const STATUS_GROUPS: GroupDefinition[] = [
   {
     id: 'waiting',
-    label: 'Needs you',
+    label: () => t('agentChat.needsYou'),
     contains: (facts) => facts.state === 'waiting',
   },
   {
     id: 'working',
-    label: 'Working',
+    label: () => t('agentChat.workingGroup'),
     contains: (facts) =>
       facts.state === 'working' || facts.state === 'starting',
   },
   {
     id: 'recent',
-    label: 'Recent',
+    label: () => t('agentChat.recent'),
     contains: (facts) => facts.state === 'dormant',
   },
 ];
@@ -131,7 +132,7 @@ const STATUS_GROUPS: GroupDefinition[] = [
 const TYPE_GROUPS: GroupDefinition[] = (['chat', 'code'] as const).map(
   (mode) => ({
     id: mode,
-    label: agentsModeLabel(mode),
+    label: () => agentsModeLabel(mode),
     contains: (facts) => facts.mode === mode,
   })
 );
@@ -148,7 +149,7 @@ export function groupConversations<Item>(
   return definitions
     .map((definition) => ({
       id: definition.id,
-      label: definition.label,
+      label: definition.label(),
       items: items.filter((item) => definition.contains(factsOf(item))),
     }))
     .filter((group) => group.items.length > 0);

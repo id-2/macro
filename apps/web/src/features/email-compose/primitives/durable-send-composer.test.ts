@@ -1,5 +1,5 @@
 import { $createListItemNode, $createListNode } from '@lexical/list';
-import { $createImageNode } from '@macro-inc/lexical-core';
+import { $createImageNode } from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $createTextNode,

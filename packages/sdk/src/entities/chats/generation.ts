@@ -1,13 +1,13 @@
 import type { ChatMessageWithAttachments } from '../../../generated/cognition/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { Chat } from './chat';
 
 /** A background chat generation. The stream belongs to exactly one chat. */
 export class ChatGeneration {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Parent chat. */
     readonly chat: Chat,
     /** Stream identity. */
@@ -18,7 +18,7 @@ export class ChatGeneration {
 
   /** Construct from a send receipt. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     chat: Chat,
     id: string,
     message: ChatMessage,
@@ -47,9 +47,9 @@ export class ChatGeneration {
 }
 
 /** A message scoped to an AI chat. */
-export class ChatMessage extends MacroEntity<ChatMessageWithAttachments> {
+export class ChatMessage extends RoxEntity<ChatMessageWithAttachments> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** Parent chat. */
     readonly chat: Chat,
     id: string,
@@ -58,7 +58,7 @@ export class ChatMessage extends MacroEntity<ChatMessageWithAttachments> {
   }
 
   /** Construct a chat message handle. */
-  static byId(client: MacroClient, chat: Chat, id: string): ChatMessage {
+  static byId(client: RoxClient, chat: Chat, id: string): ChatMessage {
     return new ChatMessage(client, chat, id);
   }
 
@@ -67,7 +67,7 @@ export class ChatMessage extends MacroEntity<ChatMessageWithAttachments> {
       await this.client.cognition.getChat({ path: { chat_id: this.chat.id } }),
     ).chat.messages.find((m) => m.id === this.id);
     if (!message)
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `Chat message ${this.id} is not yet available`,
       );
     return message;

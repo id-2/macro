@@ -10,7 +10,7 @@ use axum::{
     extract::{Path, State},
 };
 use entity_access::domain::{models::EditAccessLevel, ports::EntityAccessService};
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
 use utoipa::ToSchema;
@@ -48,7 +48,7 @@ pub async fn add_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: CrmContactAccessLevelExtractor<EditAccessLevel, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,
@@ -87,7 +87,7 @@ pub async fn remove_handler<
     C: CrmService,
     St,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: CrmContactAccessLevelExtractor<EditAccessLevel, Eas, Auth>,
     State(state): State<CrmRouterState<C, St, Eas, Auth>>,

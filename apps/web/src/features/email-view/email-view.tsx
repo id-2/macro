@@ -460,7 +460,7 @@ function EmailViewRoot() {
     focusEmailSearchResults(panel, listElement());
 
   onMount(() => {
-    panel.handle.setDisplayName('Email');
+    panel.handle.setDisplayName('Почта');
     panel.handle.updateMeta?.({ splitPanelLayout: 'composable' });
   });
 

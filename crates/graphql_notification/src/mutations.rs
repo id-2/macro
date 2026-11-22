@@ -2,7 +2,7 @@ use std::{marker::PhantomData, sync::Arc};
 
 use async_graphql::{Context, Enum, ID, InputObject, Object};
 use graphql_common::{GraphqlEntityType, parse_id, require_authenticated_user};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use model_notifications::NotifEvent;
 use notification::domain::{
@@ -27,7 +27,7 @@ pub trait NotificationMutationService: Send + Sync + 'static {
     /// Update user-owned notifications and return their authoritative active rows.
     fn update_notifications(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         status: NotificationStatus,
     ) -> impl Future<Output = Result<Vec<UserNotificationRow<NotifEvent>>, Report>> + Send;
@@ -35,7 +35,7 @@ pub trait NotificationMutationService: Send + Sync + 'static {
     /// Update every user-owned notification associated with any requested entity.
     fn update_notifications_for_entities(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
         status: NotificationStatus,
     ) -> impl Future<Output = Result<Vec<UserNotificationRow<NotifEvent>>, Report>> + Send;
@@ -47,7 +47,7 @@ where
 {
     async fn update_notifications(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         notification_ids: Vec<Uuid>,
         status: NotificationStatus,
     ) -> Result<Vec<UserNotificationRow<NotifEvent>>, Report> {
@@ -61,7 +61,7 @@ where
 
     async fn update_notifications_for_entities(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
         status: NotificationStatus,
     ) -> Result<Vec<UserNotificationRow<NotifEvent>>, Report> {
@@ -85,7 +85,7 @@ pub struct NoOpNotificationMutationService;
 impl NotificationMutationService for NoOpNotificationMutationService {
     async fn update_notifications(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         _notification_ids: Vec<Uuid>,
         _status: NotificationStatus,
     ) -> Result<Vec<UserNotificationRow<NotifEvent>>, Report> {
@@ -96,7 +96,7 @@ impl NotificationMutationService for NoOpNotificationMutationService {
 
     async fn update_notifications_for_entities(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         _entities: Vec<Entity<'static>>,
         _status: NotificationStatus,
     ) -> Result<Vec<UserNotificationRow<NotifEvent>>, Report> {

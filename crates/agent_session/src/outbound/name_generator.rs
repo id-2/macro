@@ -1,4 +1,4 @@
-//! Haiku-backed generation and retitling of concise agent-session names.
+//! Model-backed generation and retitling of concise agent-session names.
 
 #[cfg(test)]
 mod test;
@@ -6,7 +6,6 @@ mod test;
 use crate::domain::model::{AgentSession, MAX_AGENT_SESSION_NAME_CHARS};
 use crate::domain::ports::AgentSessionNameGenerator;
 use crate::domain::retitle::ConversationDigest;
-use agent::PredefinedModel;
 use ai_usage::{AiFeature, UsageContext, UsageRecorder};
 use std::sync::Arc;
 
@@ -54,13 +53,14 @@ Current title: Review Comment
 Conversation: the user asked to address a review comment about retry backoff in the email sync worker
 Output: Email Sync Retry Backoff"#;
 
-/// Generates agent-session names with the predefined fast model.
+/// Generates agent-session names with the fastest model this deployment can
+/// call ([`agent::provider_keys::fast_model`]).
 #[derive(Clone)]
-pub struct HaikuAgentSessionNameGenerator {
+pub struct ModelAgentSessionNameGenerator {
     recorder: Arc<dyn UsageRecorder>,
 }
 
-impl HaikuAgentSessionNameGenerator {
+impl ModelAgentSessionNameGenerator {
     /// Build a generator that records model usage through `recorder`.
     #[must_use]
     pub fn new(recorder: Arc<dyn UsageRecorder>) -> Self {
@@ -68,7 +68,7 @@ impl HaikuAgentSessionNameGenerator {
     }
 }
 
-impl AgentSessionNameGenerator for HaikuAgentSessionNameGenerator {
+impl AgentSessionNameGenerator for ModelAgentSessionNameGenerator {
     async fn generate_name(
         &self,
         session: &AgentSession,
@@ -87,7 +87,7 @@ impl AgentSessionNameGenerator for HaikuAgentSessionNameGenerator {
             .with_entity(Some(session.id.as_uuid()))
             .with_agent_session(Some(session.id.as_uuid()));
         let response = agent::complete(
-            PredefinedModel::Fast,
+            agent::provider_keys::fast_model(),
             AGENT_SESSION_RENAME_SYSTEM_PROMPT,
             &rename_request,
             self.recorder.as_ref(),
@@ -124,7 +124,7 @@ impl AgentSessionNameGenerator for HaikuAgentSessionNameGenerator {
             .with_entity(Some(session.id.as_uuid()))
             .with_agent_session(Some(session.id.as_uuid()));
         let response = agent::complete(
-            PredefinedModel::Fast,
+            agent::provider_keys::fast_model(),
             AGENT_SESSION_RETITLE_SYSTEM_PROMPT,
             &retitle_request,
             self.recorder.as_ref(),

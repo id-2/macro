@@ -10,8 +10,8 @@
 use std::{future::Future, time::Duration};
 
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection, RoxEventConsumerService,
 };
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message as _};
@@ -19,16 +19,16 @@ use rootcause::prelude::{Report, ResultExt as _};
 use tracing::Instrument as _;
 
 use crate::domain::{
-    events::{BotMacroEvent, BotTopicEvent},
+    events::{BotRoxEvent, BotTopicEvent},
     models::BotId,
     ports::{BotProfilePublisher, BotRepo},
     profile_fanout::BotProfileFanout,
 };
 
 mod source {
-    use super::BotMacroEvent;
+    use super::BotRoxEvent;
 
-    macro_event_broker::declare_topics!(BotSourceEvent: BotMacroEvent);
+    rox_event_broker::declare_topics!(BotSourceEvent: BotRoxEvent);
 }
 use source::BotSourceEvent;
 
@@ -98,7 +98,7 @@ impl<R: BotRepo, P: BotProfilePublisher> BotProfileConsumer<R, P> {
         let consumer = KafkaConsumerAdapter::<BotProfilePushGroup, ()>::new(consumer)
             .subscribe::<BotSourceEvent>()
             .context("failed to subscribe to the bot topic")?;
-        let consumer = MacroEventConsumerService::<BotSourceEvent, _>::new(consumer);
+        let consumer = RoxEventConsumerService::<BotSourceEvent, _>::new(consumer);
         tracing::info!(
             topics = ?BotSourceEvent::topics(),
             group = BotProfilePushGroup::GROUP_NAME,
@@ -131,7 +131,7 @@ impl<R: BotRepo, P: BotProfilePublisher> BotProfileConsumer<R, P> {
                         let _guard = span.enter();
                         message.decode_payload()
                     };
-                    let Ok(BotSourceEvent::BotMacroEvent(event)) = decoded else {
+                    let Ok(BotSourceEvent::BotRoxEvent(event)) = decoded else {
                         // Poison record: commit so it cannot wedge the partition.
                         commit_logged(&consumer, kafka_message);
                         continue;
@@ -157,8 +157,8 @@ impl<R: BotRepo, P: BotProfilePublisher> BotProfileConsumer<R, P> {
     }
 }
 
-fn commit_logged<C: MacroEventCollection + 'static>(
-    consumer: &MacroEventConsumerService<C, KafkaConsumerAdapter<BotProfilePushGroup, C>>,
+fn commit_logged<C: RoxEventCollection + 'static>(
+    consumer: &RoxEventConsumerService<C, KafkaConsumerAdapter<BotProfilePushGroup, C>>,
     message: &BorrowedMessage<'_>,
 ) {
     if let Err(error) = consumer.inner().commit_message(message, CommitMode::Async) {

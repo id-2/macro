@@ -1,11 +1,11 @@
 use super::*;
-use crate::config::{HarnessCredentials, MacroApi};
+use crate::config::{HarnessCredentials, RoxApi};
 use harness_id::HarnessId;
 use webhook::domain::models::WebhookFilter;
 
 fn test_client(storage_url: &str) -> EventStreamClient {
     EventStreamClient::new(
-        &MacroApi {
+        &RoxApi {
             egress_url: None,
             api_url: "http://unused".to_owned(),
             storage_url: storage_url.to_owned(),
@@ -56,7 +56,7 @@ async fn presence_check_tells_the_service_a_connection_is_held() {
 
     let request = server.await.unwrap();
     assert!(request.starts_with("get /harnesses/me "));
-    assert!(request.contains("x-macro-harness-runtime-connected: true"));
+    assert!(request.contains("x-rox-harness-runtime-connected: true"));
 }
 
 #[tokio::test]
@@ -156,7 +156,7 @@ async fn connect_resumes_after_the_cursor_it_is_given() {
 #[test]
 fn a_time_cursor_is_the_first_uuidv7_of_its_millisecond() {
     let time = std::time::UNIX_EPOCH + std::time::Duration::from_millis(1_700_000_000_123);
-    let cursor = macro_uuid::Uuid::parse_str(&cursor_at(time)).unwrap();
+    let cursor = rox_uuid::Uuid::parse_str(&cursor_at(time)).unwrap();
     assert_eq!(cursor.get_version_num(), 7);
     assert_eq!(
         cursor.get_timestamp().map(|timestamp| timestamp.to_unix()),

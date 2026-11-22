@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use model_entity::EntityType;
 use sqlx::PgPool;
 
@@ -10,7 +10,7 @@ const CHANNEL_2: &str = "22222222-2222-4222-8222-222222222222";
 fn new_surface(parent_type: EntityType, parent_id: &str) -> CollabSurface {
     let now = chrono::Utc::now();
     CollabSurface {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         parent: parent_type.with_entity_string(parent_id.to_string()),
         state: SurfaceState::Pending,
         created_at: now,
@@ -119,7 +119,7 @@ async fn is_deleted_reads_soft_deleted_rows_only(pool: PgPool) {
     assert!(!repo.is_deleted(live.id).await.unwrap());
     assert!(
         !repo
-            .is_deleted(macro_uuid::generate_uuid_v7())
+            .is_deleted(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
     );

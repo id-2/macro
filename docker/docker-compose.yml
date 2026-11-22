@@ -2,7 +2,7 @@
 # Freeze the Docker Compose project name so every checkout/worktree uses the
 # same local containers, networks, and anonymous Compose-managed resources.
 # Local setup is single-instance by design.
-name: macro
+name: rox
 
 include:
   - docker/docker-compose-databases.yml
@@ -16,14 +16,15 @@ x-common-env: &common-env
       max-size: "20m"
       max-file: "3"
   # The xtask orchestrator points this at a per-instance generated env file via
-  # MACRO_ENV_FILE (run-local/run-dev). Defaults to .env for any legacy/manual
+  # `ROX_ENV_FILE` (run-local/run-dev; `MACRO_ENV_FILE` is still honoured). Defaults
+  # to .env for any legacy/manual
   # `docker compose` invocation, and is optional so a missing file is not fatal.
   env_file:
-    - path: ${MACRO_ENV_FILE:-.env}
+    - path: ${ROX_ENV_FILE:-${MACRO_ENV_FILE:-.env}}
       required: false
 
 x-rust-services-image: &rust-services-image
-  image: macro-local-rust-services:dev
+  image: rox-local-rust-services:dev
   build:
     context: .
     dockerfile: docker/Dockerfile.dev
@@ -37,7 +38,7 @@ services:
       context: .
       dockerfile: docker/Dockerfile.dev
       target: services_bundle
-    image: macro-local-rust-services:dev
+    image: rox-local-rust-services:dev
 
   # ============================================================================
   # authentication-service (Port 8080)
@@ -631,7 +632,7 @@ services:
       # grafana-forwarder below while the local telemetry settings say
       # `services = true`; the collector then copies everything it receives
       # there. Changing it recreates the container (run_local does that).
-      OTEL_EXPORTER_OTLP_ENDPOINT: ${MACRO_LGTM_FORWARD_ENDPOINT:-}
+      OTEL_EXPORTER_OTLP_ENDPOINT: ${ROX_LGTM_FORWARD_ENDPOINT:-${MACRO_LGTM_FORWARD_ENDPOINT:-}}
     ports:
       - "3001:3000"
       - "4317:4317"
@@ -674,13 +675,13 @@ services:
       - --storage.path=/var/lib/alloy/data
       - /etc/macro-forwarder/config.alloy
     environment:
-      MACRO_MACHINE_NAME: ${MACRO_MACHINE_NAME:-}
-      MACRO_FORWARD_ENDPOINT: ${MACRO_FORWARD_ENDPOINT:-}
+      ROX_MACHINE_NAME: ${ROX_MACHINE_NAME:-${MACRO_MACHINE_NAME:-}}
+      ROX_FORWARD_ENDPOINT: ${ROX_FORWARD_ENDPOINT:-${MACRO_FORWARD_ENDPOINT:-}}
     labels:
       # A hash of the config, so a changed config recreates the container.
-      macro.forwarder.revision: ${MACRO_GRAFANA_FORWARDER_REVISION:-}
+      macro.forwarder.revision: ${ROX_GRAFANA_FORWARDER_REVISION:-${MACRO_GRAFANA_FORWARDER_REVISION:-}}
     volumes:
-      - ${MACRO_GRAFANA_FORWARDER_DIR:-./docker/grafana-forwarder}:/etc/macro-forwarder:ro,Z
+      - ${ROX_GRAFANA_FORWARDER_DIR:-${MACRO_GRAFANA_FORWARDER_DIR:-./docker/grafana-forwarder}}:/etc/macro-forwarder:ro,Z
     logging:
       driver: json-file
       options:
@@ -708,7 +709,7 @@ services:
     build:
       context: .
       dockerfile: docker/headless-chrome/Dockerfile
-    image: macro-local-headless-chrome:dev
+    image: rox-local-headless-chrome:dev
     restart: unless-stopped
     # Reap orphans from the display stack (x11vnc/websockify) — Chromium is
     # PID 1's exec target and doesn't reap.

@@ -44,7 +44,7 @@ impl EmailCodeSignupPort for FakePort {
 
     async fn join_domain_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> anyhow::Result<Option<uuid::Uuid>> {
         self.record(format!("join {user_id}"));
         if self.join_fails {
@@ -55,7 +55,7 @@ impl EmailCodeSignupPort for FakePort {
 
     async fn track_referral(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         referral_code: &str,
     ) -> anyhow::Result<()> {
         self.record(format!("referral {user_id} {referral_code}"));

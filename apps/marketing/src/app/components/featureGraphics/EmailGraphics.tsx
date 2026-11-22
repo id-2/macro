@@ -54,7 +54,7 @@ import {
   MagnifyingGlassIcon,
 } from '../graphics/EmailListCardGraphic';
 import { Cube, IsoFigure, Tile } from '../graphics/IsoLineArt';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 import { TabsInset } from '../graphics/MockupChrome';
 import { PreviewListDivider } from '../graphics/PreviewListDivider';
 import { PreviewWindow } from '../graphics/PreviewWindow';
@@ -3048,7 +3048,7 @@ function UnifiedInboxWindow() {
         }}
       >
         {/* Lead with the Rox mark, like the mockup's chrome. */}
-        <MacroMarkIcon
+        <RoxMarkIcon
           aria-label="Rox"
           style={{
             color: '#bfbfbf',

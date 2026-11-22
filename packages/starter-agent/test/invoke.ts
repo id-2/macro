@@ -6,9 +6,9 @@
  */
 import { rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Module } from '@macro-inc/muppet/core/capability';
-import { describeError } from '@macro-inc/muppet/core/error';
-import { checker } from '@macro-inc/muppet/utilities/scripts';
+import type { Module } from '@rox-one/muppet/core/capability';
+import { describeError } from '@rox-one/muppet/core/error';
+import { checker } from '@rox-one/muppet/utilities/scripts';
 import typescript from 'typescript';
 import { z } from 'zod';
 

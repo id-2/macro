@@ -48,4 +48,8 @@ export default {
   searchFailed: 'Search failed. Please try again.',
   retry: 'Retry',
   unableToOpenResult: 'Unable to open result. Please try again.',
+  resultCategories: 'Result categories',
+  openingComposer: 'Opening composer…',
+  newAction: 'New',
+  suggestedAction: 'Suggested action',
 };

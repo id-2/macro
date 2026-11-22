@@ -5,7 +5,7 @@ import puppeteer, {
   type Page,
 } from '@cloudflare/puppeteer';
 import { BrowserWebSocketTransport } from '@cloudflare/puppeteer/internal/common/BrowserWebSocketTransport.js';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { z } from 'zod';
 import type { CanvasBrowserConfig } from './render';
 

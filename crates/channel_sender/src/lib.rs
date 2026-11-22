@@ -2,7 +2,7 @@
 //! Message author identities: Macro users, bots, and call-scoped guests.
 
 use bot_id::{BotId, BotIdStr, cowlike::CowLike};
-use macro_user_id::{error::ParseErr, user_id::MacroUserIdStr};
+use rox_user_id::{error::ParseErr, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 
@@ -12,7 +12,7 @@ mod test;
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 enum InnerVal<'a> {
     Bot(BotIdStr<'a>),
-    User(MacroUserIdStr<'a>),
+    User(RoxUserIdStr<'a>),
     Guest(Cow<'a, str>),
     Participant(Cow<'a, str>),
 }
@@ -82,7 +82,7 @@ impl<'a> CowLike<'a> for ChannelSender<'a> {
 
 impl<'a> ChannelSender<'a> {
     /// attempt to return the user id str if this value contains a user
-    pub fn as_user(&self) -> Option<&MacroUserIdStr<'a>> {
+    pub fn as_user(&self) -> Option<&RoxUserIdStr<'a>> {
         match &self.0 {
             InnerVal::User(id) => Some(id),
             _ => None,
@@ -96,7 +96,7 @@ impl<'a> ChannelSender<'a> {
         }
     }
     /// attempt to return the user id str if this value contains a user
-    pub fn into_user(self) -> Option<MacroUserIdStr<'a>> {
+    pub fn into_user(self) -> Option<RoxUserIdStr<'a>> {
         match self.0 {
             InnerVal::User(id) => Some(id),
             _ => None,
@@ -124,14 +124,14 @@ impl<'a> ChannelSender<'a> {
         }
         match BotIdStr::try_from(value) {
             Ok(bot_id) => Ok(ChannelSender(InnerVal::Bot(bot_id))),
-            Err(_) => MacroUserIdStr::try_from(value)
+            Err(_) => RoxUserIdStr::try_from(value)
                 .map(InnerVal::User)
                 .map(ChannelSender),
         }
     }
 
-    /// create a new instance of self containing a [MacroUserIdStr]
-    pub fn new_from_user(user: MacroUserIdStr<'a>) -> Self {
+    /// create a new instance of self containing a [RoxUserIdStr]
+    pub fn new_from_user(user: RoxUserIdStr<'a>) -> Self {
         Self(InnerVal::User(user))
     }
 

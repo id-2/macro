@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { type Accessor, createEffect, onCleanup } from 'solid-js';
 
 /** Keep server error bodies and pairing material out of operation telemetry. */

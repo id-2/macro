@@ -10,7 +10,7 @@ fn work_request<'a>(
     only: Option<&'a [model_entity::Entity<'static>]>,
 ) -> AttentionCandidateRequest<'a> {
     AttentionCandidateRequest {
-        user_id: MacroUserIdStr::parse_from_str(USER_1).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER_1).unwrap(),
         limit: 50,
         own_work,
         keying: AttentionKeying::ThreadScoped,

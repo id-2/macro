@@ -40,7 +40,7 @@ pub fn router(service: PreviewService) -> Router {
         .fallback(any(handle))
         .with_state(service)
         .layer(
-            macro_tower_layers::MacroRequestIdAndTracingLayer::new(Duration::from_secs(2))
+            rox_tower_layers::RoxRequestIdAndTracingLayer::new(Duration::from_secs(2))
                 .into_inner(),
         )
 }
@@ -99,7 +99,8 @@ async fn handle(
     if let Some(peer) = service
         .peer_stream(
             &id,
-            request.headers().contains_key(super::peer::FORWARDED),
+            request.headers().contains_key(super::peer::FORWARDED)
+                || request.headers().contains_key(super::peer::LEGACY_FORWARDED),
             upgrade,
         )
         .await?
@@ -107,6 +108,7 @@ async fn handle(
         return super::peer::forward(request, peer).await;
     }
     request.headers_mut().remove(super::peer::FORWARDED);
+    request.headers_mut().remove(super::peer::LEGACY_FORWARDED);
     if request.uri().path() == AUTH_PATH {
         if request.method() != Method::POST
             || request
@@ -336,7 +338,11 @@ fn clean_request(
     strip_hop_headers(headers);
     let remove: Vec<_> = headers
         .keys()
-        .filter(|k| k.as_str().starts_with("x-forwarded-") || k.as_str().starts_with("x-macro-"))
+        .filter(|k| {
+            k.as_str().starts_with("x-forwarded-")
+                || k.as_str().starts_with("x-macro-")
+                || k.as_str().starts_with("x-rox-")
+        })
         .cloned()
         .collect();
     for key in remove {

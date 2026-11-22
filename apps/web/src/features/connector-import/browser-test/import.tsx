@@ -55,7 +55,7 @@ function Sidebar(props: { category: ImportCategory }) {
             headline={config.headline}
             pitch={config.pitch}
             action={{ label: config.action, onClick: () => setOpen(true) }}
-            dismissLabel={`Dismiss ${config.action.toLowerCase()}`}
+            dismissLabel={`Скрыть импорт: ${config.items}`}
             onDismiss={() => setHidden(true)}
           />
         )}

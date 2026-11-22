@@ -13,7 +13,7 @@ entity_access = { path = "../entity_access", default-features = false, features 
 futures = { workspace = true }
 graphql_common = { path = "../graphql_common" }
 graphql_soup = { path = "../graphql_soup" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 models_databases = { path = "../models_databases" }
 tracing = { workspace = true }

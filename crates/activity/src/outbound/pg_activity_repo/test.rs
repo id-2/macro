@@ -1,6 +1,6 @@
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -100,8 +100,8 @@ async fn presence_counts_touches_inside_the_range_but_not_views(pool: PgPool) {
     );
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn nz(limit: u32) -> NonZeroU32 {

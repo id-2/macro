@@ -1,11 +1,11 @@
 // The area composes with the rest of the agent, and its polling is a schedule like any other.
 import { expect, test } from 'bun:test';
-import { behavior } from '@macro-inc/muppet/core/behavior';
+import { behavior } from '@rox-one/muppet/core/behavior';
 import {
   memoryStore,
   scheduler,
   type scheduling,
-} from '@macro-inc/muppet/utilities/schedules';
+} from '@rox-one/muppet/utilities/schedules';
 import type { Base } from '../../../context/index.ts';
 import { fixedClock } from '../../../context/test/fakes.ts';
 import { secretsHandlers } from '../../../events/handlers/secrets.ts';

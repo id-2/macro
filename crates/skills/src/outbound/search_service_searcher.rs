@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 use document_sub_type::DocumentSubType;
 use item_filters::{DocumentFilters, EntityFilters};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_search::unified::{
     UnifiedSearchIndex, UnifiedSearchRequest, UnifiedSearchResponseItem,
     entity_filters_from_include,
@@ -36,7 +36,7 @@ impl SkillSearcher for SearchServiceSkillSearcher {
     #[tracing::instrument(skip(self), err)]
     async fn search_skills_by_name(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         query: &str,
         match_type: SkillMatchType,
     ) -> Result<Vec<SkillSummary>, SkillError> {

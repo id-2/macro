@@ -1,7 +1,7 @@
 use super::*;
 use item_filters::{NotificationState, ast::EntityFilterAst};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{CursorVal, CursorWithValAndFilter, Frecency};
 use std::sync::Arc;
 
@@ -63,7 +63,7 @@ async fn frecency_fallback_keeps_calendar_events_with_aggregates(
                 SimpleSortMethod::UpdatedAt,
                 Frecency,
             )),
-            user_id: MacroUserIdStr::parse_from_str(owner_id)?,
+            user_id: RoxUserIdStr::parse_from_str(owner_id)?,
         },
     )
     .await?;
@@ -143,7 +143,7 @@ async fn recency_sort_uses_reminder_delivery_time(pool: PgPool) -> anyhow::Resul
         SimpleSortRequest {
             limit: 10,
             cursor: SimpleSortQuery::NoFilter(Query::Sort(SimpleSortMethod::UpdatedAt, ())),
-            user_id: MacroUserIdStr::parse_from_str(owner_id)?,
+            user_id: RoxUserIdStr::parse_from_str(owner_id)?,
         },
     )
     .await?;
@@ -349,7 +349,7 @@ fn owner_request(
     SimpleSortRequest {
         limit,
         cursor,
-        user_id: MacroUserIdStr::parse_from_str(UNREAD_OWNER).expect("valid user id"),
+        user_id: RoxUserIdStr::parse_from_str(UNREAD_OWNER).expect("valid user id"),
     }
 }
 

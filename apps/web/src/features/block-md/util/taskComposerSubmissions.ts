@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { QueryClient } from '@tanstack/solid-query';
 import { createSignal, onCleanup } from 'solid-js';
 import { taskSubmissionSchema } from './taskComposerDraftSchema';

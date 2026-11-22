@@ -5,8 +5,8 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use github::domain::{models::GithubError, ports::GithubLinkService};
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserId};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserId};
 use model::authentication::github_token::GithubAccessToken;
 use model::response::ErrorResponse;
 
@@ -22,10 +22,10 @@ pub struct GithubAccessTokenParams {
 #[tracing::instrument(skip(ctx, _internal_authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Query(params): extract::Query<GithubAccessTokenParams>,
 ) -> Response {
-    let Ok(user_id) = MacroUserId::parse_from_str(&params.macro_user_id.to_lowercase())
+    let Ok(user_id) = RoxUserId::parse_from_str(&params.macro_user_id.to_lowercase())
         .map(|id| id.into_owned().lowercase())
     else {
         return error_response(StatusCode::BAD_REQUEST, "invalid macro user id");

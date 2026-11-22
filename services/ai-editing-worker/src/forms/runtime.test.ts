@@ -3,7 +3,7 @@ import {
   type CollaborativeLayout,
   readLayout,
   seedLayout,
-} from '@macro-inc/collaboration/forms/layout';
+} from '@rox-one/collaboration/forms/layout';
 import { LoroDoc } from 'loro-crdt';
 import { describe, expect, it } from 'vitest';
 import { prepareFormEdit } from './runtime';

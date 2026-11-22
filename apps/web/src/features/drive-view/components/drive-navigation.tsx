@@ -1,4 +1,5 @@
 import { ViewSidebar } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import ClockIcon from '@icon/system/regular/clock.svg';
 import FilesIcon from '@icon/system/regular/files.svg';
 import UsersIcon from '@icon/system/regular/users.svg';
@@ -16,7 +17,7 @@ export function DriveNavigation(props: {
   locationMenu: DriveLocationMenu;
 }) {
   return (
-    <ViewSidebar.Nav aria-label="Drive views">
+    <ViewSidebar.Nav aria-label={t('drive.driveViews')}>
       <For each={DRIVE_TABS}>
         {(tab) => (
           <props.locationMenu location={{ kind: 'tab', tab: tab.id }}>

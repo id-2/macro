@@ -49,8 +49,8 @@ use agent_runtime_protocol::domain::schema::v0::{
 use dashmap::DashMap;
 use dashmap::mapref::entry::Entry;
 use entity_access::domain::models::{EntityAccessReceipt, EntityType, OwnerAccessLevel};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use tokio::sync::{Mutex, mpsc, oneshot, watch};
 use tokio_util::{sync::CancellationToken, task::TaskTracker};
 use tracing::Instrument as _;
@@ -162,7 +162,7 @@ pub trait AgentSessionService: Send + Sync + 'static {
     fn present_tool(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         presentation: super::model::SessionToolPresentation,
     ) -> impl Future<Output = Result<()>> + Send {
         async move {
@@ -175,7 +175,7 @@ pub trait AgentSessionService: Send + Sync + 'static {
     fn tool_presentation_persisted(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         presentation: super::model::SessionToolPresentation,
     ) -> impl Future<Output = Result<bool>> + Send {
         async move {
@@ -256,7 +256,7 @@ pub trait AgentSessionService: Send + Sync + 'static {
     fn add_follower(
         &self,
         id: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Read the persisted identity of the current turn during recovery.
@@ -272,7 +272,7 @@ pub trait AgentSessionService: Send + Sync + 'static {
     /// [`AgentSessionError::TooManyPreviewIds`].
     fn preview_sessions(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         ids: Vec<AgentSessionId>,
     ) -> impl Future<Output = Result<Vec<AgentSessionPreview>>> + Send;
 
@@ -294,7 +294,7 @@ pub trait AgentSessionService: Send + Sync + 'static {
     /// Used by account cleanup, not access-based discovery.
     fn sessions_for_user_cleanup(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<AgentSession>>> + Send;
 
     /// Delete an agent session by id.
@@ -357,7 +357,7 @@ pub trait AgentSessionService: Send + Sync + 'static {
     fn send_action(
         &self,
         id: AgentSessionId,
-        user_id: Option<MacroUserIdStr<'static>>,
+        user_id: Option<RoxUserIdStr<'static>>,
         action: AgentAction,
         action_id: AgentActionId,
     ) -> impl Future<Output = Result<()>> + Send;
@@ -402,7 +402,7 @@ pub trait AgentSessionService: Send + Sync + 'static {
     fn session_participants(
         &self,
         id: AgentSessionId,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send;
 
     /// The user-message id the next prompt appended to this session will fold to.
     fn next_prompt_message_id(
@@ -470,26 +470,26 @@ pub trait AgentSessionService: Send + Sync + 'static {
     /// A missing preference is [`SandboxSize::Default`].
     fn user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<SandboxSize>> + Send;
 
     /// Upsert the user's default sandbox size for the next `@coder` mention.
     fn set_user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         size: SandboxSize,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// The user's coding preferences; every preference is off until set.
     fn user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<CodingPreferences>> + Send;
 
     /// Upsert the user's coding preferences, replacing every field.
     fn set_user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         preferences: CodingPreferences,
     ) -> impl Future<Output = Result<()>> + Send;
 }
@@ -499,7 +499,7 @@ struct UnrestrictedAgentSessions;
 impl enterprise::domain::AgentSessionAdmission for UnrestrictedAgentSessions {
     fn ensure_allowed<'a>(
         &'a self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _preset_id: &'a str,
     ) -> enterprise::domain::EnterpriseFuture<'a, ()> {
         Box::pin(async { Ok(()) })
@@ -766,7 +766,7 @@ impl<R, Folds, Rt, Namer> AgentSessionServiceImpl<R, Folds, Rt, Namer> {
     async fn deliver_action(
         &self,
         id: AgentSessionId,
-        user_id: Option<MacroUserIdStr<'static>>,
+        user_id: Option<RoxUserIdStr<'static>>,
         action: AgentAction,
         action_id: AgentActionId,
     ) -> Result<()> {
@@ -906,7 +906,7 @@ where
     async fn present_tool(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         presentation: super::model::SessionToolPresentation,
     ) -> Result<()> {
         self.present_to_actor(id, actor, presentation).await
@@ -915,7 +915,7 @@ where
     async fn tool_presentation_persisted(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         presentation: super::model::SessionToolPresentation,
     ) -> Result<bool> {
         let session = self.repo.get(id).await?;
@@ -1029,7 +1029,7 @@ where
         self.repo.set_turn_prompter(id, prompter).await
     }
 
-    async fn add_follower(&self, id: AgentSessionId, user: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn add_follower(&self, id: AgentSessionId, user: &RoxUserIdStr<'static>) -> Result<()> {
         self.repo.add_follower(id, user).await
     }
 
@@ -1039,7 +1039,7 @@ where
 
     async fn preview_sessions(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         ids: Vec<AgentSessionId>,
     ) -> Result<Vec<AgentSessionPreview>> {
         let ids: Vec<AgentSessionId> = ids
@@ -1104,7 +1104,7 @@ where
 
     async fn sessions_for_user_cleanup(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> Result<Vec<AgentSession>> {
         self.repo
             .recent_for_owner(owner, USER_CLEANUP_BATCH_SIZE)
@@ -1333,7 +1333,7 @@ where
     async fn send_action(
         &self,
         id: AgentSessionId,
-        user_id: Option<MacroUserIdStr<'static>>,
+        user_id: Option<RoxUserIdStr<'static>>,
         action: AgentAction,
         action_id: AgentActionId,
     ) -> Result<()> {
@@ -1407,7 +1407,7 @@ where
     async fn session_participants(
         &self,
         id: AgentSessionId,
-    ) -> Result<Vec<MacroUserIdStr<'static>>> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>> {
         self.repo.participants(id).await
     }
 
@@ -1467,13 +1467,13 @@ where
         self.repo.set_sandbox_size(id, size).await
     }
 
-    async fn user_sandbox_size(&self, user_id: &MacroUserIdStr<'static>) -> Result<SandboxSize> {
+    async fn user_sandbox_size(&self, user_id: &RoxUserIdStr<'static>) -> Result<SandboxSize> {
         self.repo.user_sandbox_size(user_id).await
     }
 
     async fn set_user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         size: SandboxSize,
     ) -> Result<()> {
         self.repo.set_user_sandbox_size(user_id, size).await
@@ -1481,14 +1481,14 @@ where
 
     async fn user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<CodingPreferences> {
         self.repo.user_coding_preferences(user_id).await
     }
 
     async fn set_user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         preferences: CodingPreferences,
     ) -> Result<()> {
         self.repo
@@ -2055,7 +2055,7 @@ where
 
         let log_id = match &self.claim {
             Some(_) if boundary.is_none() && turn_state.is_none() && batches(&log.content) => {
-                let id = macro_uuid::generate_uuid_v7();
+                let id = rox_uuid::generate_uuid_v7();
                 self.buffer.push(BufferedFrame {
                     id,
                     log: log.clone(),
@@ -2267,7 +2267,7 @@ where
 
     async fn preview(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         ids: &[AgentSessionId],
     ) -> Result<Vec<SessionPreviewCandidate>> {
         self.repo.preview(viewer, ids).await
@@ -2281,7 +2281,7 @@ where
         self.repo.set_turn_prompter(id, prompter).await
     }
 
-    async fn add_follower(&self, id: AgentSessionId, user: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn add_follower(&self, id: AgentSessionId, user: &RoxUserIdStr<'static>) -> Result<()> {
         self.repo.add_follower(id, user).await
     }
 
@@ -2305,7 +2305,7 @@ where
 
     async fn recent_for_owner(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         limit: std::num::NonZeroUsize,
     ) -> Result<Vec<super::model::AgentSession>> {
         self.repo.recent_for_owner(owner, limit).await
@@ -2381,13 +2381,13 @@ where
         self.repo.set_sandbox_size(id, size).await
     }
 
-    async fn user_sandbox_size(&self, user_id: &MacroUserIdStr<'static>) -> Result<SandboxSize> {
+    async fn user_sandbox_size(&self, user_id: &RoxUserIdStr<'static>) -> Result<SandboxSize> {
         self.repo.user_sandbox_size(user_id).await
     }
 
     async fn set_user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         size: SandboxSize,
     ) -> Result<()> {
         self.repo.set_user_sandbox_size(user_id, size).await
@@ -2395,14 +2395,14 @@ where
 
     async fn user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<CodingPreferences> {
         self.repo.user_coding_preferences(user_id).await
     }
 
     async fn set_user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         preferences: CodingPreferences,
     ) -> Result<()> {
         self.repo

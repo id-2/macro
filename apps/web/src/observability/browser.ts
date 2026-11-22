@@ -4,11 +4,11 @@ import { isIgnorableError } from '@core/util/ignorableErrors';
 import { getPlatform, isTauri } from '@core/util/platform';
 import { webviewFetch } from '@core/util/platformFetch';
 import { recordBrowserTursoCacheNavigation } from '@graphql-cache/rollout-observability';
-import { Telemetry, type TelemetryInitConfig } from '@macro-inc/observability';
+import { Telemetry, type TelemetryInitConfig } from '@rox-one/observability';
 import {
   createWebTracingProvider,
   StackContextManager,
-} from '@macro-inc/observability/web';
+} from '@rox-one/observability/web';
 import { startBootTrace } from './boot';
 import {
   createDesktopMemoryRecording,

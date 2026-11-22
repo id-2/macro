@@ -20,6 +20,7 @@ import {
   activeCalendarSyncController,
   type CalendarStaleReason,
   CalendarSyncController,
+  refetchCalendarList,
   setActiveCalendarSyncController,
 } from './sync-controller';
 
@@ -72,7 +73,16 @@ export function useCalendarCache(active: Accessor<boolean>): void {
   createEffect(() => {
     const cacheHost = host();
     if (!cacheHost || !active()) return;
-    const controller = new CalendarSyncController(cacheHost);
+    const controller = new CalendarSyncController(cacheHost, {
+      // A delta that pulled calendar records must reach the rail, so the list
+      // query re-reads the cache instead of keeping its older answer.
+      refetchCalendars: async () => {
+        await refetchCalendarList();
+        await queryClient.invalidateQueries({
+          queryKey: calendarKeys.visibleCalendars._def,
+        });
+      },
+    });
     setActiveCalendarSyncController(controller);
     const resync = (reason: CalendarStaleReason) => {
       controller.markStale(reason);

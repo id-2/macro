@@ -5,7 +5,7 @@ use email_api_client::domain::models::{
     EmailApiError, GateLimit, MailboxMessage, RateLimitOrigin, StreamPosition,
 };
 use email_api_client::domain::request_count;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
@@ -92,7 +92,7 @@ async fn enumerated_mailbox(db: &PgPool) -> (PgMailboxSync, Uuid) {
     .unwrap();
     sqlx::query!(
         "INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id,initial_complete) VALUES ($1,$2,1,'folder_catalog','mail',true)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link
     )
     .execute(db)
@@ -317,13 +317,13 @@ async fn persistence_errors_name_their_sqlstate(db: PgPool) {
 struct PendingUpload(Uuid);
 
 impl crate::domain::mailbox::projection::MailboxProjectionEffects for PendingUpload {
-    async fn publish(&self, _: crate::domain::events::EmailMacroEvent) -> Result<(), MailboxError> {
+    async fn publish(&self, _: crate::domain::events::EmailRoxEvent) -> Result<(), MailboxError> {
         Ok(())
     }
     async fn refresh(
         &self,
         _: Uuid,
-        _: &std::collections::HashSet<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _: &std::collections::HashSet<rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) -> Result<(), MailboxError> {
         Err(MailboxError::Effect(
             crate::domain::mailbox::EffectFailure::AttachmentUploadPending {
@@ -368,7 +368,7 @@ async fn effect_deferrals_name_the_effect_and_its_attachment(db: PgPool) {
     let (repo, link) = super::super::test::fixture(&db).await;
     sqlx::query!(
         "INSERT INTO email_projection_outbox (id,link_id,generation,payload,attempts) VALUES ($1,$2,1,$3,4)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link,
         serde_json::json!({"kind": "link_changed"})
     )
@@ -430,7 +430,7 @@ async fn effect_deferrals_name_the_effect_and_its_attachment(db: PgPool) {
 }
 
 async fn outlook_link(db: &PgPool, email: &str, active: bool, needs_reauth: bool) -> Uuid {
-    let link = macro_uuid::generate_uuid_v7();
+    let link = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider,grant_generation,is_sync_active,needs_reauth)
         VALUES ($1,$2,$3,$4,'OUTLOOK',1,$5,$6)"#,
@@ -457,7 +457,7 @@ async fn health_snapshot_counts_the_current_queue_streams_and_recent_imports(db:
             ($1,1,'leased',true,now() - interval '10 seconds',$2,now() + interval '60 seconds'),
             ($1,0,'old generation',true,now() - interval '1 hour',NULL,NULL)"#,
         active,
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&db)
     .await
@@ -477,7 +477,7 @@ async fn health_snapshot_counts_the_current_queue_streams_and_recent_imports(db:
     outlook_link(&db, "idle@example.com", false, false).await;
     sqlx::query!(
         "INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider) VALUES ($1,'macro|gmail@example.com','gmail-owner','gmail@example.com','GMAIL')",
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&db)
     .await

@@ -1,11 +1,11 @@
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_pagination::{CursorVal, Query};
 
 use super::date_ranges::{GraphqlDateBucketRange, GraphqlPropertyBucketingType};
 use super::*;
 
-fn test_macro_user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user@example.com")
+fn test_macro_user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user@example.com")
         .unwrap()
         .into_owned()
 }

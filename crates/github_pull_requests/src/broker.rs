@@ -1,7 +1,7 @@
 //! Broker envelopes and publication for persisted pull request updates.
 use crate::domain::events::GithubPullRequestUpdated;
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroGithubPullRequestsTopic;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxGithubPullRequestsTopic;
 use serde::{Deserialize, Serialize};
 
 /// Facts published to the pull request topic.
@@ -13,16 +13,16 @@ pub enum GithubPullRequestTopicEvent {
     Updated(GithubPullRequestUpdated),
 }
 impl TopicEvent for GithubPullRequestTopicEvent {
-    type Topic = MacroGithubPullRequestsTopic;
+    type Topic = RoxGithubPullRequestsTopic;
     const SCHEMA_VERSION: u8 = 1;
 }
 /// An event keyed by PR so updates retain per-PR ordering.
 #[derive(Debug, Clone)]
-pub struct GithubPullRequestMacroEvent {
+pub struct GithubPullRequestRoxEvent {
     key: String,
     event: Event<GithubPullRequestTopicEvent>,
 }
-impl GithubPullRequestMacroEvent {
+impl GithubPullRequestRoxEvent {
     /// Wrap a committed PR change.
     pub fn updated(update: GithubPullRequestUpdated) -> Self {
         Self {
@@ -31,7 +31,7 @@ impl GithubPullRequestMacroEvent {
         }
     }
 }
-impl MacroEvent for GithubPullRequestMacroEvent {
+impl RoxEvent for GithubPullRequestRoxEvent {
     type EventPayload = GithubPullRequestTopicEvent;
     fn key(&self) -> &str {
         &self.key
@@ -46,7 +46,7 @@ impl MacroEvent for GithubPullRequestMacroEvent {
 /// Publishes PR facts through the shared event broker.
 pub struct BrokerGithubPullRequestPublisher<B>(pub B);
 #[cfg(feature = "ports")]
-impl<B: macro_event_broker::MacroEventBroker> crate::domain::ports::GithubPullRequestEventPublisher
+impl<B: rox_event_broker::RoxEventBroker> crate::domain::ports::GithubPullRequestEventPublisher
     for BrokerGithubPullRequestPublisher<B>
 {
     fn publish_updated(
@@ -58,7 +58,7 @@ impl<B: macro_event_broker::MacroEventBroker> crate::domain::ports::GithubPullRe
         Box::pin(async move {
             use rootcause::prelude::ResultExt as _;
             self.0
-                .send_event(&GithubPullRequestMacroEvent::updated(update))
+                .send_event(&GithubPullRequestRoxEvent::updated(update))
                 .context("enqueueing PR update")?
                 .await
                 .context("joining PR publication")?

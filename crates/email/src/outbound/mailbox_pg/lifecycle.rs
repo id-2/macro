@@ -52,7 +52,7 @@ async fn enqueue(
     let payload = serde_json::to_value(effect).map_err(failed)?;
     sqlx::query!(
         "INSERT INTO email_mailbox_lifecycle_outbox(id,link_id,payload) VALUES ($1,$2,$3)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link,
         payload
     )
@@ -220,7 +220,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
                         ProjectionEvent::LinkChanged
                     };
                     let payload = serde_json::to_value(event).map_err(failed)?;
-                    sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),link,row.sync_generation,payload)
+                    sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),link,row.sync_generation,payload)
                         .execute(&mut *tx).await.map_err(failed)?;
                 }
             }
@@ -262,7 +262,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
                         already_in_progress: true,
                     }
                 } else {
-                    let id = macro_uuid::generate_uuid_v7();
+                    let id = rox_uuid::generate_uuid_v7();
                     let inserted=sqlx::query_scalar!(r#"INSERT INTO email_backfill_jobs(id,link_id,fusionauth_user_id,status,is_recovery) VALUES ($1,$2,$3,'Init',false)
                         ON CONFLICT(link_id) WHERE status IN ('Init','InProgress') DO NOTHING RETURNING id"#,id,link,current.credential_owner).fetch_optional(&mut *tx).await.map_err(failed)?;
                     if inserted.is_some() {
@@ -291,7 +291,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
                     OR EXISTS(SELECT 1 FROM email_message_reconciliation WHERE link_id = $1 AND generation = $2 AND is_import AND available_at <> 'infinity') AS "running!""#,link,current.sync_generation).fetch_one(&mut *tx).await.map_err(failed)?;
                 let run_id = stream
                     .as_ref()
-                    .map_or_else(macro_uuid::generate_uuid_v7, |stream| stream.id);
+                    .map_or_else(rox_uuid::generate_uuid_v7, |stream| stream.id);
                 if !in_progress || stream.is_none() {
                     sqlx::query!("INSERT INTO email_sync_streams(id,link_id,generation,kind,scope_id) VALUES ($1,$2,$3,'folder_catalog','mail') ON CONFLICT DO NOTHING",run_id,link,current.sync_generation).execute(&mut *tx).await.map_err(failed)?;
                     sqlx::query!(r#"UPDATE email_sync_streams SET position = NULL,initial_complete = false, attachments_rechecked = false,scan_id = gen_random_uuid(),next_run_at = now(),fence = fence + 1,lease_id = NULL,lease_until = NULL,
@@ -332,7 +332,7 @@ impl InboxLifecycleRepository for PgMailboxSync {
             .map(|row| {
                 Ok(DeletedUserBinding {
                     actor: InboxActor {
-                        macro_id: macro_user_id::user_id::MacroUserIdStr::try_from(row.actor_id)
+                        macro_id: rox_user_id::user_id::RoxUserIdStr::try_from(row.actor_id)
                             .map_err(failed)?,
                         credential_owner: owner.into(),
                     },

@@ -3,7 +3,7 @@ import type {
   SearchCachePage,
   SearchDocumentWire,
 } from '@graphql-cache/index';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { SpanStatusCode, trace } from '@opentelemetry/api';
 import {
   BasicTracerProvider,

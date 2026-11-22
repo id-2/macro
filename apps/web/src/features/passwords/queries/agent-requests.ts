@@ -2,7 +2,7 @@ import { SERVER_HOSTS } from '@core/constant/servers';
 import { fetchWithToken } from '@core/util/fetchWithToken';
 import { statusError } from '@core/util/safeFetch';
 import { sleep } from '@core/util/sleep';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { PasswordAgentAccessRequestPage } from '@service-storage/generated/schemas/passwordAgentAccessRequestPage';
 import type { PasswordAgentAccessRequestState } from '@service-storage/generated/schemas/passwordAgentAccessRequestState';
 import { PasswordAgentErrorCode } from '@service-storage/generated/schemas/passwordAgentErrorCode';

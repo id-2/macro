@@ -10,10 +10,10 @@ import { SettingsPage, SettingsSection } from './primitives';
 export function Agent() {
   return (
     <SettingsPage
-      title="Rox MCP server"
-      description="Connect other agents and tools to your Rox workspace."
+      title="MCP-сервер Rox"
+      description="Подключите других агентов и инструменты к рабочему пространству Rox."
     >
-      <SettingsSection title="Connect a client">
+      <SettingsSection title="Подключите клиент">
         <McpSetupCards class="max-w-none" />
       </SettingsSection>
     </SettingsPage>

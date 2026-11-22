@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_messages (id, thread_id, link_id, is_draft, is_sent, mailbox_state)\n           SELECT $1, t.id, t.link_id, $3, $4, $5 FROM email_threads t WHERE t.id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Bool",
+        "Bool",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "50e0bfd54fad1509f27257f4c7bb2885df2a35bc3da691944b194f3228c39890"
+}

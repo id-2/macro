@@ -35,7 +35,7 @@ never numbers.
   generative agents), or a changed stance, has the agent write one or two first-person
   sentences, in a shared and a private version.
 
-It needs only `MACRO_API_KEY` (to read who wrote a message) and the model access the agent's own
+It needs only `ROX_API_KEY` (to read who wrote a message) and the model access the agent's own
 runs use. The prompts name the agent by `config.identity.name`.
 
 ## Where the runs see it

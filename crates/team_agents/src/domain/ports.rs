@@ -7,7 +7,7 @@ use hosted_runtimes::domain::{
     agent::{AgentEnrollment, AgentEnrollmentError},
     enrollment::EnrollmentGeneration,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::admission::AgentAccountFacts;
@@ -35,7 +35,7 @@ pub trait TeamAgentRepository: Send + Sync + 'static {
     /// its account, see [`Self::remove_seat`].
     fn delete_account(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Delete the agent's `team_agents` row, so nothing admits it as an
@@ -43,13 +43,13 @@ pub trait TeamAgentRepository: Send + Sync + 'static {
     /// references the row.
     fn remove_seat(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// One agent, if the account is one.
     fn get(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<TeamAgentRecord>, Self::Err>> + Send;
 
     /// A team's agents, oldest first.
@@ -67,7 +67,7 @@ pub trait AgentAccounts: Send + Sync + 'static {
     /// The account's facts, or none if it has no `team_agents` row.
     fn account_facts(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<AgentAccountFacts>, Self::Err>> + Send;
 }
 
@@ -77,21 +77,21 @@ pub trait TeamMembership: Send + Sync + 'static {
     fn add_agent(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), TeamAgentError>> + Send;
 
     /// Take back [`Self::add_agent`] after a later step failed.
     fn undo_add_agent(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), TeamAgentError>> + Send;
 
     /// Remove the agent from the team through the normal removal path.
     fn remove_agent(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), TeamAgentError>> + Send;
 }
 
@@ -100,13 +100,13 @@ pub trait AgentApiKeys: Send + Sync + 'static {
     /// Revoke every key the agent has; it can't call Rox afterwards.
     fn revoke_all(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), TeamAgentError>> + Send;
 
     /// Mint a new key, replacing the agent's previous one.
     fn mint(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<AgentApiKey, TeamAgentError>> + Send;
 }
 
@@ -116,7 +116,7 @@ pub trait AgentRepos: Send + Sync + 'static {
     /// issue a new token; the previous token stops working.
     fn create(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         team_id: Uuid,
         seed: &PersonaSeed,
     ) -> impl Future<Output = Result<AgentRepo, TeamAgentError>> + Send;
@@ -124,20 +124,20 @@ pub trait AgentRepos: Send + Sync + 'static {
     /// Delete the repository; a missing one is success.
     fn delete(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), TeamAgentError>> + Send;
 
     /// The voice committed in the agent's repository, if it has a valid one.
     fn voice(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<Option<VoiceModel>, TeamAgentError>> + Send;
 
     /// Commit a voice to the agent's repository as Rox.
     fn set_voice(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         team_id: Uuid,
         voice: &VoiceModel,
     ) -> impl Future<Output = Result<(), TeamAgentError>> + Send;
@@ -155,14 +155,14 @@ pub trait Computers: Send + Sync + 'static {
     fn computer_for_agent(
         &self,
         team_id: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<ComputerId>, TeamAgentError>> + Send;
 
     /// The agent a computer runs, if any.
     fn agent_of(
         &self,
         computer_id: ComputerId,
-    ) -> impl Future<Output = Result<Option<MacroUserIdStr<'static>>, TeamAgentError>> + Send;
+    ) -> impl Future<Output = Result<Option<RoxUserIdStr<'static>>, TeamAgentError>> + Send;
 
     /// Where the computer is.
     fn state(
@@ -210,14 +210,14 @@ pub trait TeamAgentService: Send + Sync + 'static {
     fn delete(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), TeamAgentError>> + Send;
 
     /// The voice an agent on the receipt's team speaks with on calls.
     fn voice(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<AgentVoice, TeamAgentError>> + Send;
 
     /// Change the voice of an agent on the receipt's team; it applies from
@@ -225,7 +225,7 @@ pub trait TeamAgentService: Send + Sync + 'static {
     fn set_voice(
         &self,
         receipt: EntityAccessReceipt<AdminTeamRole>,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         voice: AgentVoice,
     ) -> impl Future<Output = Result<AgentVoice, TeamAgentError>> + Send;
 

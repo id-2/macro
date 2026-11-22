@@ -1,3 +1,5 @@
+import { t, type TranslationKey } from '@app/lib/i18n';
+
 /**
  * Event types the notification service lets a user disable.
  * Keep this list aligned with `BLOCKABLE_NOTIFICATIONS` in
@@ -23,239 +25,234 @@ export type NotificationEventGroupId =
 
 export type NotificationEventDefinition = {
   type: string;
-  label: string;
-  description: string;
+  labelKey: TranslationKey;
+  descriptionKey: TranslationKey;
   /** Shown only with `enable-macro-computers` on. */
   macroComputers?: true;
 };
 
 export type NotificationEventGroup = {
   id: NotificationEventGroupId;
-  label: string;
+  labelKey: TranslationKey;
   events: readonly NotificationEventDefinition[];
 };
 
 export const NOTIFICATION_EVENT_GROUPS: readonly NotificationEventGroup[] = [
   {
     id: 'sharing',
-    label: 'Sharing',
+    labelKey: 'settingsNotifications.groups.sharing',
     events: [
       {
         type: 'entity_access_requested',
-        label: 'Permission requests',
-        description: 'Requests for more access to items you manage',
+        labelKey: 'settingsNotifications.events.entity_access_requested.label',
+        descriptionKey: 'settingsNotifications.events.entity_access_requested.description',
       },
       {
         type: 'entity_access_granted',
-        label: 'Access granted',
-        description: 'When a permission request is approved',
+        labelKey: 'settingsNotifications.events.entity_access_granted.label',
+        descriptionKey: 'settingsNotifications.events.entity_access_granted.description',
       },
     ],
   },
   {
     id: 'channels',
-    label: 'Channels',
+    labelKey: 'settingsNotifications.groups.channels',
     events: [
       {
         type: 'channel_message_send',
-        label: 'New messages',
-        description: 'Messages in channels you belong to',
+        labelKey: 'settingsNotifications.events.channel_message_send.label',
+        descriptionKey: 'settingsNotifications.events.channel_message_send.description',
       },
       {
         type: 'channel_mention',
-        label: 'Mentions',
-        description: 'When someone mentions you in a channel',
+        labelKey: 'settingsNotifications.events.channel_mention.label',
+        descriptionKey: 'settingsNotifications.events.channel_mention.description',
       },
       {
         type: 'channel_message_reply',
-        label: 'Thread replies',
-        description: 'Replies in threads you are part of',
+        labelKey: 'settingsNotifications.events.channel_message_reply.label',
+        descriptionKey: 'settingsNotifications.events.channel_message_reply.description',
       },
       {
         type: 'channel_message_reaction',
-        label: 'Message reactions',
-        description: 'When someone reacts to one of your messages',
+        labelKey: 'settingsNotifications.events.channel_message_reaction.label',
+        descriptionKey: 'settingsNotifications.events.channel_message_reaction.description',
       },
       {
         type: 'channel_access_requested',
-        label: 'Requests to join',
-        description: 'When someone asks to join a channel you belong to',
+        labelKey: 'settingsNotifications.events.channel_access_requested.label',
+        descriptionKey: 'settingsNotifications.events.channel_access_requested.description',
       },
     ],
   },
   {
     id: 'documents',
-    label: 'Documents',
+    labelKey: 'settingsNotifications.groups.documents',
     events: [
       {
         type: 'document_mention',
-        label: 'Document mentions',
-        description: 'When a document is mentioned in a channel',
+        labelKey: 'settingsNotifications.events.document_mention.label',
+        descriptionKey: 'settingsNotifications.events.document_mention.description',
       },
       {
         type: 'mentioned_in_document_comment',
-        label: 'Comment mentions',
-        description: 'When you are mentioned in a document comment',
+        labelKey: 'settingsNotifications.events.mentioned_in_document_comment.label',
+        descriptionKey: 'settingsNotifications.events.mentioned_in_document_comment.description',
       },
       {
         type: 'replied_to_document_comment_thread',
-        label: 'Comment replies',
-        description: 'Replies on comment threads you are part of',
+        labelKey: 'settingsNotifications.events.replied_to_document_comment_thread.label',
+        descriptionKey: 'settingsNotifications.events.replied_to_document_comment_thread.description',
       },
       {
         type: 'commented_on_document',
-        label: 'New comments',
-        description: 'Comments on documents you own',
+        labelKey: 'settingsNotifications.events.commented_on_document.label',
+        descriptionKey: 'settingsNotifications.events.commented_on_document.description',
       },
     ],
   },
   {
     id: 'projects',
-    label: 'Projects',
+    labelKey: 'settingsNotifications.groups.projects',
     events: [
       {
         type: 'initiative_discussion',
-        label: 'Discussion',
-        description:
-          'Mentions, replies, and comments on projects you own or are assigned to',
+        labelKey: 'settingsNotifications.events.initiative_discussion.label',
+        descriptionKey: 'settingsNotifications.events.initiative_discussion.description',
       },
     ],
   },
   {
     id: 'crm',
-    label: 'Companies & contacts',
+    labelKey: 'settingsNotifications.groups.crm',
     events: [
       {
         type: 'crm_discussion',
-        label: 'Discussion',
-        description:
-          'Mentions, replies, and comments on companies you own and their contacts',
+        labelKey: 'settingsNotifications.events.crm_discussion.label',
+        descriptionKey: 'settingsNotifications.events.crm_discussion.description',
       },
     ],
   },
   {
     id: 'tasks',
-    label: 'Tasks',
+    labelKey: 'settingsNotifications.groups.tasks',
     events: [
       {
         type: 'task_assigned',
-        label: 'Assignments',
-        description: 'When a task is assigned to you',
+        labelKey: 'settingsNotifications.events.task_assigned.label',
+        descriptionKey: 'settingsNotifications.events.task_assigned.description',
       },
     ],
   },
   {
     id: 'calendar',
-    label: 'Calendar',
+    labelKey: 'settingsNotifications.groups.calendar',
     events: [
       {
         type: 'calendar_event_reminder',
-        label: 'Event reminders',
-        description: 'When a calendar event is about to start',
+        labelKey: 'settingsNotifications.events.calendar_event_reminder.label',
+        descriptionKey: 'settingsNotifications.events.calendar_event_reminder.description',
       },
       {
         type: 'calendar_event_join_request',
-        label: 'Requests to join',
-        description:
-          'When someone asks to be added to an event you shared in a channel',
+        labelKey: 'settingsNotifications.events.calendar_event_join_request.label',
+        descriptionKey: 'settingsNotifications.events.calendar_event_join_request.description',
       },
     ],
   },
   {
     id: 'passwords',
-    label: 'Passwords',
+    labelKey: 'settingsNotifications.groups.passwords',
     events: [
       {
         type: 'password_access_requested',
-        label: 'Agent access requests',
-        description: 'When an agent asks to use a password item you manage',
+        labelKey: 'settingsNotifications.events.password_access_requested.label',
+        descriptionKey: 'settingsNotifications.events.password_access_requested.description',
       },
     ],
   },
   {
     id: 'email',
-    label: 'Email',
+    labelKey: 'settingsNotifications.groups.email',
     events: [
       {
         type: 'new_email',
-        label: 'New email',
-        description: 'When a new email arrives',
+        labelKey: 'settingsNotifications.events.new_email.label',
+        descriptionKey: 'settingsNotifications.events.new_email.description',
       },
     ],
   },
   {
     id: 'ai',
-    label: 'AI',
+    labelKey: 'settingsNotifications.groups.ai',
     events: [
       {
         type: 'ai_response',
-        label: 'AI replies',
-        description: 'When an AI chat responds',
+        labelKey: 'settingsNotifications.events.ai_response.label',
+        descriptionKey: 'settingsNotifications.events.ai_response.description',
       },
       {
         type: 'agent_session_settled',
-        label: 'Agent finished',
-        description: 'When an agent session you took part in finishes a turn',
+        labelKey: 'settingsNotifications.events.agent_session_settled.label',
+        descriptionKey: 'settingsNotifications.events.agent_session_settled.description',
       },
       {
         type: 'agent_session_waiting_for_input',
-        label: 'Agent needs an answer',
-        description: 'When your agent stops to ask you something',
+        labelKey: 'settingsNotifications.events.agent_session_waiting_for_input.label',
+        descriptionKey: 'settingsNotifications.events.agent_session_waiting_for_input.description',
       },
       {
         type: 'agent_session_mentioned',
-        label: 'Agent session mentions',
-        description: 'When someone mentions you in an agent session',
+        labelKey: 'settingsNotifications.events.agent_session_mentioned.label',
+        descriptionKey: 'settingsNotifications.events.agent_session_mentioned.description',
       },
       {
         type: 'routine_run_finished',
-        label: 'Routine runs',
-        description: 'When one of your routines finishes or fails a run',
+        labelKey: 'settingsNotifications.events.routine_run_finished.label',
+        descriptionKey: 'settingsNotifications.events.routine_run_finished.description',
       },
       {
         type: 'agent_sign_in_expiry',
-        label: 'Computer agent sign-ins',
-        description:
-          "When an agent sign-in on your team's computer is about to expire",
+        labelKey: 'settingsNotifications.events.agent_sign_in_expiry.label',
+        descriptionKey: 'settingsNotifications.events.agent_sign_in_expiry.description',
         macroComputers: true,
       },
       {
         type: 'computer_setup',
-        label: 'Computer setup',
-        description:
-          'When a computer you bought is ready, or could not be set up',
+        labelKey: 'settingsNotifications.events.computer_setup.label',
+        descriptionKey: 'settingsNotifications.events.computer_setup.description',
         macroComputers: true,
       },
     ],
   },
   {
     id: 'github',
-    label: 'GitHub',
+    labelKey: 'settingsNotifications.groups.github',
     events: [
       {
         type: 'github_pr_status_changed',
-        label: 'PR status',
-        description: 'When a pull request changes lifecycle state',
+        labelKey: 'settingsNotifications.events.github_pr_status_changed.label',
+        descriptionKey: 'settingsNotifications.events.github_pr_status_changed.description',
       },
       {
         type: 'github_review_requested',
-        label: 'Review requested',
-        description: 'When your review is requested',
+        labelKey: 'settingsNotifications.events.github_review_requested.label',
+        descriptionKey: 'settingsNotifications.events.github_review_requested.description',
       },
       {
         type: 'github_pr_comment',
-        label: 'PR comments',
-        description: 'When someone comments on a pull request',
+        labelKey: 'settingsNotifications.events.github_pr_comment.label',
+        descriptionKey: 'settingsNotifications.events.github_pr_comment.description',
       },
       {
         type: 'github_pr_mention',
-        label: 'PR mentions',
-        description: 'When you are mentioned on a pull request',
+        labelKey: 'settingsNotifications.events.github_pr_mention.label',
+        descriptionKey: 'settingsNotifications.events.github_pr_mention.description',
       },
       {
         type: 'github_pr_review',
-        label: 'PR reviews',
-        description: 'When a review is submitted on your pull request',
+        labelKey: 'settingsNotifications.events.github_pr_review.label',
+        descriptionKey: 'settingsNotifications.events.github_pr_review.description',
       },
     ],
   },
@@ -266,25 +263,26 @@ export const BLOCKABLE_NOTIFICATION_EVENT_TYPES: readonly string[] =
     group.events.map((event) => event.type)
   );
 
-export const MUTED_ENTITY_TYPE_LABELS: Record<string, string> = {
-  calendar_event: 'Calendar event',
-  call: 'Call',
-  channel: 'Channel',
-  channel_message: 'Thread',
-  chat: 'Chat',
-  document: 'Document',
-  email: 'Email',
-  email_thread: 'Email',
-  foreign: 'GitHub',
-  foreign_entity: 'GitHub',
-  project: 'Folder',
-  initiative: 'Project',
-  crm_company: 'Company',
-  crm_contact: 'Contact',
-  reminder: 'Reminder',
-  team: 'Team',
+export const MUTED_ENTITY_TYPE_LABELS: Record<string, TranslationKey> = {
+  calendar_event: 'settingsNotifications.types.calendar_event',
+  call: 'settingsNotifications.types.call',
+  channel: 'settingsNotifications.types.channel',
+  channel_message: 'settingsNotifications.types.channel_message',
+  chat: 'settingsNotifications.types.chat',
+  document: 'settingsNotifications.types.document',
+  email: 'settingsNotifications.types.email',
+  email_thread: 'settingsNotifications.types.email_thread',
+  foreign: 'settingsNotifications.types.foreign',
+  foreign_entity: 'settingsNotifications.types.foreign_entity',
+  project: 'settingsNotifications.types.project',
+  initiative: 'settingsNotifications.types.initiative',
+  crm_company: 'settingsNotifications.types.crm_company',
+  crm_contact: 'settingsNotifications.types.crm_contact',
+  reminder: 'settingsNotifications.types.reminder',
+  team: 'settingsNotifications.types.team',
 };
 
 export function mutedEntityTypeLabel(itemType: string): string {
-  return MUTED_ENTITY_TYPE_LABELS[itemType] ?? itemType.replace(/_/g, ' ');
+  const key = MUTED_ENTITY_TYPE_LABELS[itemType];
+  return key ? t(key) : itemType.replace(/_/g, ' ');
 }

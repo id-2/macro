@@ -9,7 +9,7 @@ use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, OwnerAccessLevel, ViewAccessLevel,
 };
 use entity_mutation::EntityMutationErrorCode;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::ContentType;
 use model::folder::{UploadFolderRequest, UploadFolderResponseData, UploadFolderWithIdsResponse};
 use model::item::{Item, ItemWithUserAccessLevel};
@@ -427,7 +427,7 @@ pub trait ProjectService: Send + Sync + 'static {
     /// List projects visible through the user's project history.
     fn list_projects(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Project>, ProjectError>> + Send;
 
     /// List non-deleted projects the user can access via `entity_access`.
@@ -435,13 +435,13 @@ pub trait ProjectService: Send + Sync + 'static {
     /// Includes pending uploads so in-progress folder trees appear in Drive.
     fn list_accessible_projects(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<Project>, ProjectError>> + Send;
 
     /// List pending root projects owned by the user.
     fn list_pending_projects(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<PendingProject>, ProjectError>> + Send;
 
     /// Get project metadata and the caller's access level.
@@ -528,7 +528,7 @@ pub trait ProjectService: Send + Sync + 'static {
     /// Create a pending project tree and its upload destinations.
     fn upload_folder(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         internal: bool,
         args: UploadFolderRequest,
     ) -> impl Future<Output = Result<UploadFolderResponseData, ProjectError>> + Send;
@@ -536,14 +536,14 @@ pub trait ProjectService: Send + Sync + 'static {
     /// Create a tracked request for extracting an uploaded archive.
     fn create_upload_extract_request(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         args: UploadExtractFolderRequest,
     ) -> impl Future<Output = Result<UploadExtractFolderResponseData, ProjectError>> + Send;
 
     /// Where the caller's own archive extraction request stands.
     fn get_upload_extract_status(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         upload_request_id: &str,
     ) -> impl Future<Output = Result<UploadExtractStatusResponseData, ProjectError>> + Send;
 
@@ -556,7 +556,7 @@ pub trait ProjectService: Send + Sync + 'static {
     /// Get project previews without applying per-project access filtering.
     fn get_batch_preview(
         &self,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
         project_ids: Vec<String>,
     ) -> impl Future<Output = Result<Vec<ProjectPreview>, ProjectError>> + Send;
 

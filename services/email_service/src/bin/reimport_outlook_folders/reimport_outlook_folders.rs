@@ -29,7 +29,7 @@ mod config;
 use email::domain::mailbox::reimport::{FolderReimportService, LinkOutcome};
 use email::outbound::mailbox_pg::PgMailboxSync;
 use email_api_client::{OutlookApiClientRepository, domain::ports::FolderChangeReader};
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use rootcause::prelude::{Report, ResultExt as _};
 use sqlx::postgres::{PgConnectOptions, PgPoolOptions};
 use std::collections::BTreeMap;
@@ -37,7 +37,7 @@ use std::str::FromStr as _;
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
-    let entrypoint = MacroEntrypoint::default().init();
+    let entrypoint = RoxEntrypoint::default().init();
     let result = run().await;
     entrypoint.shutdown();
     result

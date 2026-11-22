@@ -6,7 +6,7 @@ import type {
   MessageThread,
 } from '../generated/storage/types.gen';
 import { hydrateMessageEvent } from '../src/events/hydrate/message';
-import { Macro, msg } from '../src/macro';
+import { Macro, msg } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 const host = 'https://storage.example.test';

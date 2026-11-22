@@ -49,11 +49,11 @@ fn slack_import_worker_uses_local_resources_and_starts_paused() {
     let env = local_env();
     assert_eq!(
         env["OVERRIDE_SLACK_IMPORT_QUEUE"],
-        resources::queue_url(macro_queues::SlackImportQueue::LOCAL)
+        resources::queue_url(rox_queues::SlackImportQueue::LOCAL)
     );
     assert_eq!(
         env["OVERRIDE_SLACK_IMPORT_DLQ"],
-        resources::queue_url(macro_queues::SlackImportDlq::LOCAL)
+        resources::queue_url(rox_queues::SlackImportDlq::LOCAL)
     );
     assert_eq!(env["UPLOAD_STAGING_BUCKET"], "bulk-upload-staging");
     assert_eq!(
@@ -100,7 +100,7 @@ fn emits_required_keys() {
         "POSTHOG_API_KEY",
         "POSTHOG_FEATURE_FLAGS_SECURE_API_KEY",
         "REDIS_HOST",
-        "MACRO_DB_URL",
+        "ROX_DB_URL",
         "INTERNAL_API_KEY",
         "PIPEDREAM_CLIENT_ID",
         "PIPEDREAM_CLIENT_SECRET",
@@ -196,8 +196,8 @@ fn boot_stubs_are_local_only() {
         Some("redis://redis:6379")
     );
     assert_eq!(
-        env.get("MACRO_DB_URL").map(String::as_str),
-        Some("postgres://user:password@postgres:5432/macrodb")
+        env.get("ROX_DB_URL").map(String::as_str),
+        Some("postgres://user:password@postgres:5432/roxdb")
     );
     // INTERNAL_API_KEY must agree with the internal-auth key other services
     // validate against, or every internal call 401s.
@@ -213,7 +213,7 @@ fn boot_stubs_are_local_only() {
     );
     assert_eq!(
         env.get("OPENSEARCH_USERNAME").map(String::as_str),
-        Some("macrouser")
+        Some("roxuser")
     );
 }
 
@@ -270,7 +270,7 @@ fn values_are_local_only() {
 fn emits_webhook_fifo_queue_override_url() {
     let env = local_env();
     assert_eq!(
-        env.get(macro_queues::WebhookEventQueue::OVERRIDE_ENV_VAR_NAME)
+        env.get(rox_queues::WebhookEventQueue::OVERRIDE_ENV_VAR_NAME)
             .map(String::as_str),
         Some("http://localstack:4566/000000000000/webhook-event-queue.fifo")
     );
@@ -502,7 +502,7 @@ fn local_sandboxes_join_the_instances_compose_network() {
         default_env
             .get("LOCAL_CONTAINER_NETWORK")
             .map(String::as_str),
-        Some("macro_services")
+        Some("rox_services")
     );
     assert_eq!(
         named_env.get("LOCAL_CONTAINER_NETWORK").map(String::as_str),
@@ -647,7 +647,7 @@ fn named_instance_separates_browser_and_container_aws_endpoints() {
     assert_eq!(
         env["EMAIL_SERVICE_CLOUDFRONT_DISTRIBUTION_URL"],
         format!(
-            "{}/local-storage/macro-email-attachments",
+            "{}/local-storage/rox-email-attachments",
             env["FRONTEND_ORIGIN"]
         )
     );

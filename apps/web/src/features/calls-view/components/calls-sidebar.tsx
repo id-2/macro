@@ -6,6 +6,7 @@ import { useSoupView } from '@app/features/next-soup/soup-view/soup-view-context
 import { useApplyPreset } from '@app/features/next-soup/soup-view/soup-view-tabs';
 import { VIEW_TAB_LISTS } from '@app/features/next-soup/soup-view/tab-lists';
 import { SidebarRoutineSuggestions } from '@app/features/routine-suggestions/routine-suggestions';
+import { t } from '@app/lib/i18n';
 import { usePreference } from '@app/preferences/use-preference';
 import { fireAndForget } from '@core/util/fireAndForget';
 import BuildingsIcon from '@icon/system/regular/buildings.svg';
@@ -51,6 +52,12 @@ const AUDIENCE_ICONS: Record<CallAudienceId, IconComponent> = {
 };
 
 const MIN_FILTERED_CALLS = 30;
+
+function audienceLabel(id: CallAudienceId): string {
+  return id === 'call-internal'
+    ? t('calls.audienceInternal')
+    : t('calls.audienceExternal');
+}
 
 type SectionId = 'type' | 'channels' | 'tags';
 
@@ -154,11 +161,11 @@ export function CallsSidebar(props: { onNavigate: () => void }) {
   };
 
   return (
-    <ViewSidebar.Root aria-label="Calls navigation">
+    <ViewSidebar.Root aria-label={t('calls.navigation')}>
       <ViewSidebar.Header>
         <div class="flex min-w-0 items-center gap-1">
           <ViewSidebar.CloseButton class="shrink-0" />
-          <ViewSidebar.Title>Calls</ViewSidebar.Title>
+          <ViewSidebar.Title>{t('calls.title')}</ViewSidebar.Title>
         </div>
       </ViewSidebar.Header>
       <ViewSidebar.Primary>
@@ -167,7 +174,7 @@ export function CallsSidebar(props: { onNavigate: () => void }) {
 
       <ViewSidebar.Content>
         <SidebarRoutineSuggestions surface="calls" />
-        <ViewSidebar.Nav aria-label="Call views">
+        <ViewSidebar.Nav aria-label={t('calls.viewsLabel')}>
           <For each={VIEW_TAB_LISTS.calls}>
             {(tab) => (
               <Row
@@ -184,7 +191,7 @@ export function CallsSidebar(props: { onNavigate: () => void }) {
         </ViewSidebar.Nav>
 
         <Section
-          title="Type"
+          title={t('calls.typeSection')}
           open={isOpen('type')}
           onOpenChange={(open) => setOpen('type', open)}
         >
@@ -193,7 +200,7 @@ export function CallsSidebar(props: { onNavigate: () => void }) {
               <Row
                 active={soup.predicates.isActive(audience.id)}
                 icon={AUDIENCE_ICONS[audience.id]}
-                label={audience.label}
+                label={audienceLabel(audience.id)}
                 onClick={() => selectAudience(audience.id)}
               />
             )}
@@ -202,7 +209,7 @@ export function CallsSidebar(props: { onNavigate: () => void }) {
 
         <Show when={channels().length > 0}>
           <Section
-            title="Channels"
+            title={t('calls.channelsSection')}
             open={isOpen('channels')}
             onOpenChange={(open) => setOpen('channels', open)}
           >

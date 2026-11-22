@@ -26,17 +26,17 @@ export function TaskDueDateRangeDialog(props: {
     >
       <div class="flex flex-col gap-4 p-5">
         <Dialog.Title id={titleId} class="text-base font-medium">
-          Due date range
+          Диапазон срока
         </Dialog.Title>
         <p class="text-sm text-ink-muted">
-          Include tasks due on these dates. Leave either end empty for an
-          open-ended range.
+          Включить задачи со сроком в эти даты. Оставьте любой край пустым,
+          чтобы диапазон был открытым.
         </p>
         <div class="grid grid-cols-2 gap-3">
           <label class="flex flex-col gap-1 text-sm">
-            From
+            С
             <DatePicker
-              aria-label="Due date from"
+              aria-label="Срок с"
               value={props.value?.start ?? ''}
               max={props.value?.end || undefined}
               onChange={(start) =>
@@ -45,9 +45,9 @@ export function TaskDueDateRangeDialog(props: {
             />
           </label>
           <label class="flex flex-col gap-1 text-sm">
-            Through
+            По
             <DatePicker
-              aria-label="Due date through"
+              aria-label="Срок по"
               value={props.value?.end ?? ''}
               min={props.value?.start || undefined}
               onChange={(end) =>
@@ -57,9 +57,9 @@ export function TaskDueDateRangeDialog(props: {
           </label>
         </div>
         <div class="flex justify-end gap-2">
-          <Button onClick={() => props.onChange(undefined)}>Cancel</Button>
+          <Button onClick={() => props.onChange(undefined)}>Отмена</Button>
           <Button variant="accent" disabled={!valid()} onClick={props.onApply}>
-            Apply
+            Применить
           </Button>
         </div>
       </div>

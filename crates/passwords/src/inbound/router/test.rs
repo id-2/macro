@@ -5,16 +5,16 @@ use axum::{
     body::{Body, to_bytes},
     http::Request,
 };
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError, ValidatedCredential};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError, ValidatedCredential};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use model_user::UserContext;
 use rootcause::Report;
 use tower::ServiceExt;
 
 #[derive(Clone)]
 pub(crate) struct Authorization;
-impl MacroAuthorizationService for Authorization {
-    async fn authorize(&self, token: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for Authorization {
+    async fn authorize(&self, token: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         Ok(UserContext {
             user_id: if token == "agent-session" {
                 "macro|agent@example.test"
@@ -30,23 +30,23 @@ impl MacroAuthorizationService for Authorization {
     async fn authorize_identity(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         let mut credential = ValidatedCredential::session(self.authorize(token).await?);
         credential.origin = match token {
             "session" | "agent-session" => CredentialOrigin::Session,
-            "api" => CredentialOrigin::MacroApiJwt,
+            "api" => CredentialOrigin::RoxApiJwt,
             "key" => CredentialOrigin::UserApiKey,
             "agent" => CredentialOrigin::Bot,
             "internal" => CredentialOrigin::Internal,
-            _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         };
         Ok(credential)
     }
     async fn authorize_user_api_key(
         &self,
         _: &str,
-    ) -> Result<macro_authorization::AuthorizedUserApiKey, Report<MacroAuthorizationError>> {
-        Ok(macro_authorization::AuthorizedUserApiKey {
+    ) -> Result<rox_authorization::AuthorizedUserApiKey, Report<RoxAuthorizationError>> {
+        Ok(rox_authorization::AuthorizedUserApiKey {
             user_context: self.authorize("session").await?,
             account_manager: None,
         })
@@ -55,7 +55,7 @@ impl MacroAuthorizationService for Authorization {
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         Ok(Some(self.authorize("session").await?))
     }
 }
@@ -82,14 +82,14 @@ fn flagged_app(
     let provider = Arc::new(FakeProvider::new());
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
     for user in ["macro|synthetic@example.test", "macro|agent@example.test"] {
-        use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+        use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
         flags.set(
-            MacroUserIdStr::parse_from_str(user).unwrap().into_owned(),
+            RoxUserIdStr::parse_from_str(user).unwrap().into_owned(),
             actor_result.clone(),
         );
     }
     let app = router(PasswordRouterState {
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
         service: Arc::new(PasswordService {
             repository: repository.clone(),
             provider: provider.clone(),
@@ -338,7 +338,7 @@ impl Availability for Enabled {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgPool) {
     use crate::domain::ports::Repository;
-    use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+    use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
     async fn finish_lease_rollbacks(pool: &sqlx::PgPool) {
         // SQLx queues rollback on transaction Drop. Check out every connection so
         // the next independent request cannot race the preceding lease's release.
@@ -397,7 +397,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
     let repository = Arc::new(PgRepository::new(pool.clone()).expect("repository capacity"));
     let now = chrono::Utc::now();
     let record = Record {
-        user_id: MacroUserIdStr::parse_from_str("macro|synthetic@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|synthetic@example.test")
             .expect("identity")
             .into_owned(),
         grants: vec![],
@@ -444,7 +444,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
         .await
         .expect("provider fixture");
     let app: Router = router(PasswordRouterState {
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
         service: Arc::new(PasswordService {
             repository: repository.clone(),
             provider: provider.clone(),
@@ -671,7 +671,11 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
 #[tokio::test]
 async fn every_route_rejects_verified_internal_and_api_key_headers() {
     for (method, path, body) in routes() {
-        for credential_header in ["x-internal-auth-key", "x-macro-user-api-key"] {
+        for credential_header in [
+            "x-internal-auth-key",
+            "x-rox-user-api-key",
+            "x-macro-user-api-key",
+        ] {
             let response = app()
                 .oneshot(
                     Request::builder()
@@ -762,7 +766,7 @@ async fn lifecycle_routes_reject_human_agent_and_api_credentials_before_any_muta
     use crate::domain::service::test::fakes::FakeRepository;
     let repository = Arc::new(FakeRepository::new());
     let app: Router = internal_router(PasswordRouterState {
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
         service: Arc::new(PasswordService {
             repository: repository.clone(),
             provider: Arc::new(UnavailableProvider),

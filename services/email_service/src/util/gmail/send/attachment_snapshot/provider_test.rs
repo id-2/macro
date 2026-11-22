@@ -2,7 +2,7 @@ use super::*;
 use email::domain::attachment_access::{AttachmentReadRecord, AttachmentReadRepository};
 use email::domain::mailbox::MailboxError;
 use futures::future::BoxFuture;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_email::service::message;
 use std::sync::{Arc, Mutex};
 

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import EmptyStateCompaniesGraphic from '@design/empty-state-companies.svg';
 import { EmptyStatePanel } from '@ui';
 import { Match, Switch } from 'solid-js';
@@ -38,22 +39,22 @@ export function CrmEmptyState(
     <Switch>
       <Match when={teamQuery.isError && !teamResolved()}>
         <CrmListError
-          title="Couldn't load CRM settings."
+          title={t('crm.couldNotLoadSettings')}
           onRetry={() => teamQuery.refetch()}
         />
       </Match>
       <Match when={!teamResolved()}>
-        <CrmListSkeleton label="Loading CRM" />
+        <CrmListSkeleton label={t('crm.loadingCrm')} />
       </Match>
       <Match when={hasNoTeam()}>
         <EmptyStatePanel
           centered
           topSpacerClass="grow-[0.5] basis-0 mobile:basis-0"
           graphic={EmptyStateCompaniesGraphic}
-          title="Join a team to enable CRM"
-          description="Create or join a team in Settings > Team."
+          title={t('crm.teamRequiredTitle')}
+          description={t('crm.teamRequiredDescription')}
           primaryAction={{
-            label: 'Open team settings',
+            label: t('crm.openTeamSettings'),
             onClick: () => host.openTeamSettings(),
           }}
         />
@@ -62,10 +63,10 @@ export function CrmEmptyState(
         <CrmListSearchEmpty
           title={
             peopleVisibility.showRemoved()
-              ? 'No matching archived people'
-              : 'No matching people'
+              ? t('crm.noArchivedPeople')
+              : t('crm.noPeopleMatchFilters')
           }
-          description="Try a different name or email address."
+          description={t('crm.tryDifferentName')}
           onClearSearch={props.onClearPeopleSearch}
         />
       </Match>
@@ -73,33 +74,33 @@ export function CrmEmptyState(
         <CrmListEmpty
           title={
             activeTab() === 'people'
-              ? 'No archived people'
-              : 'No archived companies'
+              ? t('crm.noArchivedPeople')
+              : t('crm.noArchivedCompanies')
           }
         />
       </Match>
       <Match when={activeTab() === 'people' && props.filtered}>
         <CrmListEmpty
           filtered
-          title="No people match these filters"
-          description="Try adjusting or clearing your filters."
+          title={t('crm.noPeopleMatchFilters')}
+          description={t('crm.adjustFiltersHint')}
           action={
             props.onClearFilters
-              ? { label: 'Clear filters', onClick: props.onClearFilters }
+              ? { label: t('crm.clearFilters'), onClick: props.onClearFilters }
               : undefined
           }
         />
       </Match>
       <Match when={activeTab() === 'people'}>
         <CrmListEmpty
-          title="No people yet"
-          description="People connected to your CRM companies will appear here."
-          action={{ label: 'Add person', onClick: () => openCreateContact() }}
+          title={t('crm.noPeopleYet')}
+          description={t('crm.peopleWillAppear')}
+          action={{ label: t('crm.addPerson'), onClick: () => openCreateContact() }}
         />
       </Match>
       <Match when={!!searchText().trim()}>
         <CrmListSearchEmpty
-          title="No matching companies"
+          title={t('crm.noMatchingCompanies')}
           onClearSearch={() => setSearchText('')}
         />
       </Match>
@@ -112,11 +113,11 @@ export function CrmEmptyState(
       >
         <CrmListEmpty
           filtered
-          title="No companies match these filters"
-          description="Try adjusting the stage or owner filters."
+          title={t('crm.noCompaniesMatchFilters')}
+          description={t('crm.adjustStageOwnerHint')}
           action={
             props.onClearFilters
-              ? { label: 'Clear filters', onClick: props.onClearFilters }
+              ? { label: t('crm.clearFilters'), onClick: props.onClearFilters }
               : undefined
           }
         />
@@ -125,23 +126,23 @@ export function CrmEmptyState(
         <CrmListEmpty
           title={
             !activeTab() || activeTab() === 'active'
-              ? 'No customers yet'
+              ? t('crm.noCustomersYet')
               : activeTab()?.startsWith('list:')
-                ? 'No companies in this list'
-                : 'No companies in this view'
+                ? t('crm.noCompaniesInList')
+                : t('crm.noCompaniesInView')
           }
           description={
             !activeTab() || activeTab() === 'active'
-              ? 'Add a company, or opt in to discover companies from eligible emails.'
+              ? t('crm.addCompanyOrOptIn')
               : activeTab()?.startsWith('list:')
-                ? 'Use Edit list to add companies to this collection.'
-                : 'Companies that match this view will appear here.'
+                ? t('crm.editListHint')
+                : t('crm.companiesWillAppear')
           }
           action={
             !activeTab() || activeTab() === 'active'
-              ? { label: 'Add company', onClick: openCreateCompany }
+              ? { label: t('crm.addCompany'), onClick: openCreateCompany }
               : props.onEditList
-                ? { label: 'Edit list', onClick: props.onEditList }
+                ? { label: t('crm.editList'), onClick: props.onEditList }
                 : undefined
           }
         />

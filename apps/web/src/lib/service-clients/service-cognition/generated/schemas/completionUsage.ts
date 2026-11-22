@@ -7,7 +7,7 @@
 
 import type { AiFeature } from './aiFeature';
 import type { CompletionUsageEntity } from './completionUsageEntity';
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { Usage } from './usage';
 
 /**
@@ -21,5 +21,5 @@ export interface CompletionUsage {
   /** Feature that performed the invocation. */
   feature: AiFeature;
   /** User the invocation was performed for. */
-  user: MacroUserIdStr;
+  user: RoxUserIdStr;
 }

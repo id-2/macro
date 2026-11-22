@@ -1,6 +1,7 @@
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { createSignal, type ParentProps } from 'solid-js';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, expect, it, vi } from 'vitest';
 
 const [active, setActive] = createSignal<{ value: string }>();
 const navigate = vi.fn();
@@ -44,6 +45,8 @@ afterEach(() => {
   setActive(undefined);
   vi.clearAllMocks();
 });
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 it('offers sign-in instead of loading a list without an active document', () => {
   render(() => <SignedOutDriveWorkspace />);

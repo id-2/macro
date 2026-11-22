@@ -20,7 +20,7 @@ async fn page_fixture(pool: &PgPool) -> (QueryTable, Vec<RowId>) {
         if let Some(value) = value {
             sqlx::query!(
                 "INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values) VALUES ($1, $2, 'DATABASE_ROW', $3, $4)",
-                macro_uuid::generate_uuid_v7(), row.id.to_string(), definition,
+                rox_uuid::generate_uuid_v7(), row.id.to_string(), definition,
                 serde_json::to_value(PropertyValue::Num(value)).unwrap(),
             ).execute(pool).await.unwrap();
         }
@@ -144,7 +144,7 @@ async fn formula_fixture(pool: &PgPool) -> (QueryTable, Vec<RowId>) {
     use models_properties::DataType;
     let (repo, table, _) = fixture(pool).await;
     let [price, qty, due, total, double, ratio, follow_up] =
-        [(); 7].map(|_| macro_uuid::generate_uuid_v7());
+        [(); 7].map(|_| rox_uuid::generate_uuid_v7());
     let column = |id: Uuid| {
         Box::new(Formula::Column {
             column: ColumnId::from_uuid(id),
@@ -344,7 +344,7 @@ async fn values(
     for (row, value) in rows.iter().zip(values) {
         sqlx::query!(
             "INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values) VALUES ($1, $2, 'DATABASE_ROW', $3, $4) ON CONFLICT (entity_id, entity_type, property_definition_id) DO UPDATE SET values = EXCLUDED.values",
-            macro_uuid::generate_uuid_v7(), row.to_string(), table.columns[0].id,
+            rox_uuid::generate_uuid_v7(), row.to_string(), table.columns[0].id,
             value.map(|value| serde_json::to_value(value).unwrap()),
         ).execute(pool).await.unwrap();
     }

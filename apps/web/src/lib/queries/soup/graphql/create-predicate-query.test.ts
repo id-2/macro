@@ -1,5 +1,5 @@
 import type { TypedDocumentNode } from '@graphql-typed-document-node/core';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { gql } from '@urql/core';
 import { createComputed, createRoot, createSignal } from 'solid-js';
 import { afterEach, expect, it, vi } from 'vitest';

@@ -1,6 +1,6 @@
 import { fireAndForget } from '@core/util/fireAndForget';
 import { throwOnErr } from '@core/util/result';
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 import { type MutationCallbacks, withCallbacks } from '@queries/utils';
 import type { ApiChannelWithLatest } from '@service-storage/channel-list-types';
 import {

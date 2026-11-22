@@ -2,11 +2,11 @@ import {
   plainRichText,
   richTextPlainText,
   validCanvasText,
-} from '@macro-inc/lexical-core/canvas-text';
+} from '@rox-one/lexical-core/canvas-text';
 import type {
   SerializedUserMentionNode,
   UserMentionInfo,
-} from '@macro-inc/lexical-core/nodes/UserMentionNode';
+} from '@rox-one/lexical-core/nodes/UserMentionNode';
 import { canvasUserMentionSchema } from './schema';
 
 export type CanvasUserMention = Pick<

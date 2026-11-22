@@ -12,7 +12,7 @@ async fn provider_delete_lookup_locks_the_snapshot_until_deletion_is_deferred(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(
@@ -76,7 +76,7 @@ async fn provider_delete_lookup_does_not_adopt_a_replacement_sent_identity(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(

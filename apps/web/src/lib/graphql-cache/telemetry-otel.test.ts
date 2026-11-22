@@ -8,7 +8,7 @@ const span = vi.hoisted(() => ({
 const anonymousSpan = vi.hoisted(() => vi.fn(() => span));
 const warn = vi.hoisted(() => vi.fn());
 
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { anonymousSpan, warn },
 }));
 

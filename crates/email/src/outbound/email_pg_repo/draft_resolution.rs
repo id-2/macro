@@ -2,7 +2,7 @@ use crate::domain::models::{
     EmailErr,
     mailbox_operation::{MessageResolutionAction, MessageResolutionPlan},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -10,7 +10,7 @@ use uuid::Uuid;
 /// version and operation phase still match the decision the user reviewed.
 pub(super) async fn commit(
     pool: &PgPool,
-    actor: &MacroUserIdStr<'_>,
+    actor: &RoxUserIdStr<'_>,
     plan: MessageResolutionPlan,
 ) -> Result<Uuid, EmailErr> {
     let id = plan.message_id;
@@ -40,7 +40,7 @@ pub(super) async fn commit(
             return Err(EmailErr::MessageDeliveryConflict(id));
         }
         let payload = serde_json::json!({"kind":"organization","thread_id":message.thread_id});
-        sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),link.id,link.sync_generation,payload).execute(&mut *tx).await.map_err(anyhow::Error::from)?;
+        sqlx::query!("INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),link.id,link.sync_generation,payload).execute(&mut *tx).await.map_err(anyhow::Error::from)?;
         tx.commit().await.map_err(anyhow::Error::from)?;
         return Ok(message.thread_id);
     }
@@ -90,7 +90,7 @@ pub(super) async fn commit(
                     "#,id,message.provider_version,actor.as_ref()).execute(&mut *tx).await.map_err(anyhow::Error::from)?;
                     // Force current provider content through normal ingestion even
                     // when this version was already observed during the conflict.
-                    sqlx::query!("UPDATE email_messages SET provider_version = NULL,body_macro = NULL WHERE id = $1",id).execute(&mut *tx).await.map_err(anyhow::Error::from)?;
+                    sqlx::query!("UPDATE email_messages SET provider_version = NULL,body_rox = NULL WHERE id = $1",id).execute(&mut *tx).await.map_err(anyhow::Error::from)?;
                     sqlx::query!(r#"
                         INSERT INTO email_message_reconciliation (link_id,generation,provider_id,revision,is_import)
                         VALUES ($1,$2,$3,1,false) ON CONFLICT (link_id,generation,provider_id) DO UPDATE SET
@@ -127,7 +127,7 @@ pub(super) async fn commit(
     let payload = serde_json::json!({"kind":"organization","thread_id":message.thread_id});
     sqlx::query!(
         "INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link.id,
         link.sync_generation,
         payload

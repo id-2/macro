@@ -88,7 +88,7 @@ async fn subscription_responses_from(
     let request = async_graphql::Request::new(format!(
         "subscription {{ soupUpdates {{ {PATCH_SELECTION} }} }}"
     ))
-    .data(MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap())
+    .data(RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap())
     .data(list_loader)
     .data(hydration_loader);
     tokio::time::timeout(
@@ -385,7 +385,7 @@ async fn mutation_effects_share_non_nullable_hydration_and_omit_misses() {
     )
     .data(loader)
     .data(entity_mutation::EntityMutationActor {
-        user_id: MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
         organization_id: None,
     })
     .finish();
@@ -429,7 +429,7 @@ async fn mutation_effects_omit_entities_soup_does_not_represent() {
         )
         .data(loader)
         .data(entity_mutation::EntityMutationActor {
-            user_id: MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+            user_id: RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
             organization_id: None,
         })
         .finish();

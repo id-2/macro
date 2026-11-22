@@ -7,7 +7,7 @@ import {
 import { ViewCreateMenu } from '@app/features/command/view-create-menu';
 import { FavoriteUnreadIndicator } from '@app/features/favorites/FavoriteUnreadIndicator';
 import { SidebarRoutineSuggestions } from '@app/features/routine-suggestions/routine-suggestions';
-import { t } from '@app/lib/i18n';
+import { type TranslationKey, t } from '@app/lib/i18n';
 import { globalSplitManager } from '@app/signal/splitLayout';
 import { PrOriginIcon } from '@block-pr/component/PrLinks';
 import { PrStatusIcon } from '@block-pr/component/PrStatus';
@@ -55,13 +55,13 @@ import { ReviewsStatusTabs } from './ReviewsStatusTabs';
 
 const SCOPE_ITEMS: Record<
   ReviewsScope,
-  { label: string; icon: Component<{ class?: string }> }
+  { label: TranslationKey; icon: Component<{ class?: string }> }
 > = {
-  all: { label: 'Pull requests', icon: GitPullRequestIcon },
-  authored: { label: 'Authored by me', icon: UserIcon },
-  assigned: { label: 'Assigned to me', icon: UserCircleCheckIcon },
-  involving: { label: 'Involves me', icon: UsersThreeIcon },
-  review_requests: { label: 'Review requests', icon: EyeIcon },
+  all: { label: 'reviews.scopeAll', icon: GitPullRequestIcon },
+  authored: { label: 'reviews.scopeAuthored', icon: UserIcon },
+  assigned: { label: 'reviews.scopeAssigned', icon: UserCircleCheckIcon },
+  involving: { label: 'reviews.scopeInvolving', icon: UsersThreeIcon },
+  review_requests: { label: 'reviews.scopeReviewRequests', icon: EyeIcon },
 };
 
 function ReviewFavoriteRow(props: {
@@ -161,11 +161,11 @@ function ReviewFavorites(props: {
     <Show when={pullRequests().length > 0}>
       <CollapsibleSection.Root open={open()} onOpenChange={setOpen}>
         <CollapsibleSection.Trigger>
-          <span class="min-w-0 truncate">Favorites</span>
+          <span class="min-w-0 truncate">{t('viewMenus.favorites')}</span>
           <CollapsibleSection.Indicator />
         </CollapsibleSection.Trigger>
         <CollapsibleSection.Content>
-          <ViewSidebar.Nav aria-label="Favorite pull requests">
+          <ViewSidebar.Nav aria-label={t('reviews.favoritePullRequests')}>
             <For each={pullRequests()}>
               {({ favorite, data }) => (
                 <ReviewFavoriteRow
@@ -201,11 +201,11 @@ function ReviewLabels(props: {
     <Show when={props.labels.length > 0}>
       <CollapsibleSection.Root open={open()} onOpenChange={setOpen}>
         <CollapsibleSection.Trigger>
-          <span class="min-w-0 truncate">Labels</span>
+          <span class="min-w-0 truncate">{t('reviews.filterLabel')}</span>
           <CollapsibleSection.Indicator />
         </CollapsibleSection.Trigger>
         <CollapsibleSection.Content>
-          <ViewSidebar.Nav aria-label="Pull request labels">
+          <ViewSidebar.Nav aria-label={t('reviews.pullRequestLabels')}>
             <For each={props.labels}>
               {(label) => (
                 <ViewSidebar.Item
@@ -248,11 +248,11 @@ function ReviewAgents(props: {
     <Show when={props.tools.length > 0}>
       <CollapsibleSection.Root open={open()} onOpenChange={setOpen}>
         <CollapsibleSection.Trigger>
-          <span class="min-w-0 truncate">Agents</span>
+          <span class="min-w-0 truncate">{t('viewMenus.agents')}</span>
           <CollapsibleSection.Indicator />
         </CollapsibleSection.Trigger>
         <CollapsibleSection.Content>
-          <ViewSidebar.Nav aria-label="Pull request agents">
+          <ViewSidebar.Nav aria-label={t('reviews.pullRequestAgents')}>
             <For each={props.tools}>
               {(tool) => (
                 <ViewSidebar.Item
@@ -310,11 +310,11 @@ export function ReviewsSidebar(props: {
   });
 
   return (
-    <ViewSidebar.Root aria-label="Reviews navigation">
+    <ViewSidebar.Root aria-label={t('reviews.reviewsNav')}>
       <ViewSidebar.Header>
         <div class="flex min-w-0 items-center gap-1">
           <ViewSidebar.CloseButton />
-          <ViewSidebar.Title>Reviews</ViewSidebar.Title>
+          <ViewSidebar.Title>{t('reviews.title')}</ViewSidebar.Title>
         </div>
       </ViewSidebar.Header>
       <Show when={!isTouchDevice()}>
@@ -325,8 +325,8 @@ export function ReviewsSidebar(props: {
       <Show when={isTouchDevice()}>
         <ViewSidebar.Primary class="flex flex-col gap-2">
           <SearchBar
-            label="Search reviews"
-            placeholder="Search reviews"
+            label={t('reviews.searchReviews')}
+            placeholder={t('reviews.searchReviews')}
             autocomplete="off"
             value={props.search}
             onValueChange={props.onSearchChange}
@@ -345,7 +345,7 @@ export function ReviewsSidebar(props: {
       </Show>
       <ViewSidebar.Content>
         <SidebarRoutineSuggestions surface="reviews" />
-        <ViewSidebar.Nav aria-label="Pull request views">
+        <ViewSidebar.Nav aria-label={t('reviews.pullRequestViews')}>
           <For each={REVIEWS_SCOPES}>
             {(scope) => {
               const Icon = SCOPE_ITEMS[scope].icon;
@@ -357,7 +357,7 @@ export function ReviewsSidebar(props: {
                   <ViewSidebar.Icon>
                     <Icon class="size-4" />
                   </ViewSidebar.Icon>
-                  <span class="truncate">{SCOPE_ITEMS[scope].label}</span>
+                  <span class="truncate">{t(SCOPE_ITEMS[scope].label)}</span>
                 </ViewSidebar.Item>
               );
             }}

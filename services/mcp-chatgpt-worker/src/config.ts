@@ -8,7 +8,7 @@ export type Bindings = {
   RESOURCE_URL?: string;
   AUTHORIZATION_SERVER_URL?: string;
   TOOL_GROUPING?: string;
-  MACRO_HOSTS?: string;
+  ROX_HOSTS?: string;
   OTEL_EXPORTER_OTLP_ENDPOINT?: string;
   DD_API_KEY?: string;
   OPENAI_APPS_CHALLENGE?: string;
@@ -28,7 +28,7 @@ const CONFIG = z
     /** `entity` tools (`documents_read`) or one tool per operation. */
     TOOL_GROUPING: z.enum(['entity', 'method']),
     /** Local only: service hosts of a named local stack, as JSON. */
-    MACRO_HOSTS: z
+    ROX_HOSTS: z
       .string()
       .optional()
       .transform((hosts) =>

@@ -49,10 +49,10 @@ export default {
     other: 'waiting {{count}} hours',
   },
   replyDrafted: 'A reply is drafted',
-  draftedByMacro: 'Drafted by Macro',
+  draftedByMacro: 'Drafted by Rox',
   draftedFromThread: 'from this thread',
   rewriteDraft: 'Rewrite',
-  rewriteDraftHint: 'Ask Macro to rewrite this draft',
+  rewriteDraftHint: 'Ask Rox to rewrite this draft',
   runFailed:
     'The run didn’t finish. Nothing more will happen unless you retry it.',
   actionFailed: 'That didn’t work. Try again.',

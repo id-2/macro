@@ -8,7 +8,7 @@ use crate::{
     domain::models::AccessGrant, outbound::pg_access_repo::queries::list_entity_access_grants,
 };
 use crate::{domain::models::AccessLevel, outbound::pg_access_repo::queries::SourceIds};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 #[cfg(feature = "explain_binary")]
 use model_entity::EntityType;
 use sqlx::PgPool;
@@ -20,7 +20,7 @@ pub async fn get_document_access(
     pool: &PgPool,
     document_id: &uuid::Uuid,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Option<AccessLevel>, sqlx::Error> {
     // Check share permission access only
     if source_ids.0.is_empty() {
@@ -218,7 +218,7 @@ pub async fn get_documents_access(
     pool: &PgPool,
     document_ids: &[uuid::Uuid],
     source_ids: &SourceIds,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<HashMap<uuid::Uuid, AccessLevel>, sqlx::Error> {
     let mut highest: HashMap<uuid::Uuid, AccessLevel> = HashMap::new();
     if document_ids.is_empty() {
@@ -255,7 +255,7 @@ pub async fn explain_document_access(
     pool: &PgPool,
     document_id: &uuid::Uuid,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let mut grants =
         list_entity_access_grants(pool, document_id, EntityType::Document, source_ids).await?;
@@ -340,7 +340,7 @@ async fn explain_document_email_attachments(
     pool: &PgPool,
     document_id: &uuid::Uuid,
     source_ids: &SourceIds,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let user_id_str = user_id.as_ref();
     let rows = sqlx::query!(
@@ -408,7 +408,7 @@ pub async fn get_legacy_document_access(
     pool: &PgPool,
     document_id: &str,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Option<AccessLevel>, sqlx::Error> {
     let levels = sqlx::query_scalar!(
         r#"

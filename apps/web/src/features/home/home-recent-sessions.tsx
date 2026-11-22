@@ -4,12 +4,15 @@ import { DebugSuspense } from '@channel/DebugSuspense';
 import { useSplitPanel } from '@components/app/split-layout/layoutUtils';
 import { ChatProviderIcon } from '@entity/components/ChatProviderIcon';
 import ChevronRightIcon from '@icon/system/regular/caret-right.svg';
+import SparkleIcon from '@icon/system/regular/sparkle.svg';
 import {
   type SoupItemsQueryArgs,
   useSoupItemsQuery,
 } from '@queries/soup/items';
 import { formatDistanceToNowStrict } from 'date-fns';
+import { ru } from 'date-fns/locale';
 import { ErrorBoundary, For, Show } from 'solid-js';
+import type { AgentConversationTarget } from '../agents-view/core/recent-conversations';
 
 /*******************************************************************************
  * CRITICAL STYLING INVARIANT — DO NOT MODIFY
@@ -45,19 +48,29 @@ const SESSION_ROW_ARROW_CLASSES =
 
 const DEFAULT_LIMIT = 3;
 
-/** Chats only, most recently updated first. */
-const RECENT_CHATS_ARGS: SoupItemsQueryArgs = {
+/**
+ * Conversations only: plain chats and agent sessions (the sessions Home and
+ * Agents start), most recently worked on first. Both kinds are opted in by
+ * dropping their base exclusion, the way Home's own feed does.
+ */
+const RECENT_CONVERSATIONS_ARGS: SoupItemsQueryArgs = {
   params: { sort_method: 'updated_at', limit: 10 },
-  body: { ...QUERY_FILTERS_BASE, chat_filters: undefined },
+  body: {
+    ...QUERY_FILTERS_BASE,
+    chat_filters: undefined,
+    agent_session_filters: undefined,
+  },
 };
 
-/** The user's most recently updated AI chats, newest first. */
+/** The user's most recently updated AI conversations, newest first. */
 export function useRecentChatSessions(limit = DEFAULT_LIMIT) {
-  const query = useSoupItemsQuery(() => RECENT_CHATS_ARGS);
+  const query = useSoupItemsQuery(() => RECENT_CONVERSATIONS_ARGS);
   return () =>
     (query.data ?? [])
-      .filter((entity) => entity.type === 'chat')
-      .filter((chat) => chat.name)
+      .filter(
+        (entity) => entity.type === 'chat' || entity.type === 'agent_session'
+      )
+      .filter((conversation) => conversation.name)
       .slice(0, limit);
 }
 
@@ -80,14 +93,21 @@ function RecentSessionsContent(props: { limit?: number }) {
   const sessions = useRecentChatSessions(props.limit);
   const splitPanel = useSplitPanel();
 
-  const openChat = (id: string, event: MouseEvent) => {
+  const openConversation = (
+    conversation: AgentConversationTarget,
+    event: MouseEvent
+  ) => {
+    const next = {
+      type: conversation.type === 'agent_session' ? 'agent' : 'chat',
+      id: conversation.id,
+    } as const;
     if (splitPanel && !event.shiftKey) {
-      splitPanel.handle.replace({ next: { type: 'chat', id } });
+      splitPanel.handle.replace({ next });
     } else {
-      globalSplitManager()?.openWithSplit(
-        { type: 'chat', id },
-        { activate: true, preferNewSplit: event.shiftKey }
-      );
+      globalSplitManager()?.openWithSplit(next, {
+        activate: true,
+        preferNewSplit: event.shiftKey,
+      });
     }
   };
 
@@ -95,7 +115,7 @@ function RecentSessionsContent(props: { limit?: number }) {
     <Show when={sessions().length > 0}>
       <section>
         <div class="mb-2 flex items-center px-1">
-          <span class="text-sm text-ink-muted">Recent sessions</span>
+          <span class="text-sm text-ink-muted">Недавние сеансы</span>
         </div>
         <div class="flex flex-col gap-2">
           <For each={sessions()}>
@@ -103,13 +123,22 @@ function RecentSessionsContent(props: { limit?: number }) {
               <button
                 type="button"
                 class="group flex w-full items-center gap-3.5 rounded-xl border border-edge-muted bg-active px-4 py-3 text-left transition-colors hover:bg-hover"
-                onClick={(event) => openChat(session.id, event)}
+                onClick={(event) => openConversation(session, event)}
               >
-                <ChatProviderIcon
-                  id={session.id}
-                  model={session.model}
-                  class="size-4 shrink-0"
-                />
+                <Show
+                  when={session.type === 'chat' ? session : undefined}
+                  fallback={
+                    <SparkleIcon class="size-4 shrink-0 text-ink-muted" />
+                  }
+                >
+                  {(chat) => (
+                    <ChatProviderIcon
+                      id={chat().id}
+                      model={chat().model}
+                      class="size-4 shrink-0"
+                    />
+                  )}
+                </Show>
                 <span class="flex-1 truncate text-sm font-medium text-ink">
                   {session.name}
                 </span>
@@ -118,6 +147,7 @@ function RecentSessionsContent(props: { limit?: number }) {
                     <span class="shrink-0 text-xs tabular-nums text-ink-extra-muted">
                       {formatDistanceToNowStrict(updatedAt(), {
                         addSuffix: true,
+                        locale: ru,
                       })}
                     </span>
                   )}

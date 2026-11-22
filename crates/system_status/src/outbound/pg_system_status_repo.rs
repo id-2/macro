@@ -4,7 +4,7 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -62,7 +62,7 @@ impl TryFrom<StatusUpdateRow> for StatusUpdate {
         Ok(Self {
             id: row.id,
             status,
-            user_id: MacroUserIdStr::try_from(row.user_id).map_err(|_| invalid())?,
+            user_id: RoxUserIdStr::try_from(row.user_id).map_err(|_| invalid())?,
             created_at: row.created_at,
         })
     }

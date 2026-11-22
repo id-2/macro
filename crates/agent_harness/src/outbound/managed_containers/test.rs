@@ -1,7 +1,7 @@
 use super::*;
 
 fn session(n: u128) -> AgentSessionId {
-    AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(n))
+    AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(n))
 }
 
 fn never_skip<Id>(_: &Id) -> bool {

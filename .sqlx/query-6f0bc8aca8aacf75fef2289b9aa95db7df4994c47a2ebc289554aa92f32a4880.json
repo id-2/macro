@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_mailbox_lifecycle_outbox(id,link_id,payload,available_at) VALUES($1,$2,$3,now() + make_interval(secs => $4))",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Jsonb",
+        "Float8"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6f0bc8aca8aacf75fef2289b9aa95db7df4994c47a2ebc289554aa92f32a4880"
+}

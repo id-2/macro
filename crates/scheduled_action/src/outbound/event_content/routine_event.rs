@@ -7,8 +7,8 @@ use call::domain::models::CallRecord;
 use channel_sender::ChannelSender;
 use channels::domain::models::{ChannelMetadata, ChannelType as ChannelKind};
 use email::domain::models::{ContactInfo, ParsedMessage};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::models::{Message, MessageThread};
 use model::document::DocumentBasic;
 use models_properties::service::{
@@ -476,7 +476,7 @@ fn principal(id: &str) -> ContextPerson {
     }
 }
 
-fn user_person(user: &MacroUserIdStr<'_>) -> ContextPerson {
+fn user_person(user: &RoxUserIdStr<'_>) -> ContextPerson {
     ContextPerson {
         id: user.as_ref().to_owned(),
         name: user.email_str().to_owned(),

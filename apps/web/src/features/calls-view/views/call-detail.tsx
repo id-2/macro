@@ -1,4 +1,5 @@
 import { ViewBreadcrumbs } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import { createSearchParams, useRouteParams } from '@app/lib/split-router';
 import { callsCallRoute } from '@app/routes/routes';
 import { callDetailSearch } from '@block-call/call-route';
@@ -27,14 +28,16 @@ export function CallsCallDetail() {
                 class="gap-1.5"
                 isActive={item.isActive()}
                 onClick={item.onSelect}
-                tooltip={data()?.name ?? 'Call Recording'}
+                tooltip={data()?.name ?? t('calls.recordingFallback')}
               >
                 <PhoneCallIcon class="size-4 shrink-0" />
-                <span class="truncate">{data()?.name ?? 'Call Recording'}</span>
+                <span class="truncate">
+                  {data()?.name ?? t('calls.recordingFallback')}
+                </span>
               </ViewBreadcrumbs.Button>
             )}
           </ViewBreadcrumbs.Item>
-          <ViewBreadcrumbs.Outlet aria-label="Call location" />
+          <ViewBreadcrumbs.Outlet aria-label={t('calls.callLocation')} />
         </>
       )}
     />

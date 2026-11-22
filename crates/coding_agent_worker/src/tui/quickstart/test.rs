@@ -1,7 +1,7 @@
 use crossterm::event::{KeyCode, KeyEvent, KeyModifiers};
 
 use super::*;
-use crate::config::{Harness, MacroApi, Workspace};
+use crate::config::{Harness, RoxApi, Workspace};
 
 fn key(code: KeyCode) -> KeyEvent {
     KeyEvent::new(code, KeyModifiers::NONE)
@@ -114,7 +114,7 @@ fn unpaired_config_prefills_custom_command_with_all_arguments() {
 fn config(harness: Harness) -> Config {
     let mut config: Config =
         toml::from_str(include_str!("../../../config.example.toml")).expect("example config");
-    config.macro_api = MacroApi {
+    config.macro_api = RoxApi {
         egress_url: None,
         api_url: "https://agent-harness.example.com".to_owned(),
         storage_url: "https://storage.example.com".to_owned(),

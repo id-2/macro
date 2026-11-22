@@ -4,7 +4,7 @@ use crate::{
     domain::{agent::ports::RequestLimits, ports::Repository},
     outbound::postgres::test::support::folder_fixture,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const LIMITS: RequestLimits = RequestLimits {
     denied_cooldown: chrono::TimeDelta::hours(1),
@@ -12,7 +12,7 @@ const LIMITS: RequestLimits = RequestLimits {
     window: chrono::TimeDelta::hours(1),
 };
 
-async fn account(pool: &PgPool, id: &str, agent: bool) -> MacroUserIdStr<'static> {
+async fn account(pool: &PgPool, id: &str, agent: bool) -> RoxUserIdStr<'static> {
     let email = id.strip_prefix("macro|").expect("fixture prefix");
     let account = Uuid::now_v7();
     sqlx::query!(
@@ -34,12 +34,12 @@ async fn account(pool: &PgPool, id: &str, agent: bool) -> MacroUserIdStr<'static
     .execute(pool)
     .await
     .expect("user");
-    MacroUserIdStr::parse_from_str(id)
+    RoxUserIdStr::parse_from_str(id)
         .expect("fixture")
         .into_owned()
 }
 
-fn request(record: &Record, agent: &MacroUserIdStr<'static>, limits: RequestLimits) -> NewRequest {
+fn request(record: &Record, agent: &RoxUserIdStr<'static>, limits: RequestLimits) -> NewRequest {
     NewRequest {
         team: record.metadata.team_id,
         item: record.metadata.id,

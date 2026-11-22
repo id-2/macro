@@ -1,7 +1,7 @@
 //! Domain models for the platform status.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -113,7 +113,7 @@ pub struct StatusUpdate {
     pub status: SystemStatus,
     /// The staff member who set it.
     #[cfg_attr(feature = "inbound", schema(value_type = String))]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// When it was set.
     pub created_at: DateTime<Utc>,
 }

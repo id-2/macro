@@ -6,13 +6,13 @@ use crm::domain::service::NoOpCrmService;
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
 
 struct RecordingBroker(Arc<std::sync::Mutex<Vec<serde_json::Value>>>);
-impl macro_event_broker::MacroEventBroker for RecordingBroker {
-    fn send_event<E: macro_event_broker::MacroEvent + ?Sized>(
+impl rox_event_broker::RoxEventBroker for RecordingBroker {
+    fn send_event<E: rox_event_broker::RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<
-        tokio::task::JoinHandle<Result<(), macro_event_broker::EventBrokerError>>,
-        macro_event_broker::EventBrokerError,
+        tokio::task::JoinHandle<Result<(), rox_event_broker::EventBrokerError>>,
+        rox_event_broker::EventBrokerError,
     > {
         self.0
             .lock()
@@ -34,7 +34,7 @@ async fn archive_publishes_one_user_attributed_event_after_commit(
 ) -> anyhow::Result<()> {
     let events = Arc::new(std::sync::Mutex::new(Vec::new()));
     let service = service(pool).with_macro_event_broker(RecordingBroker(events.clone()));
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let id = Uuid::parse_str("33333333-3333-3333-3333-333333333333")?;
     service
         .set_thread_archived_impl(owner.clone(), id, true)
@@ -121,7 +121,7 @@ async fn archive_sends_gmail_only_the_messages_still_in_the_inbox(
 ) -> anyhow::Result<()> {
     let enqueuer = RecordingEnqueuer::default();
     let service = service_with_enqueuer(pool.clone(), enqueuer.clone());
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let thread = Uuid::parse_str("11111111-1111-1111-1111-111111111111")?;
     let link = Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")?;
     let first = Uuid::parse_str("11111111-aaaa-aaaa-aaaa-111111111111")?;
@@ -220,7 +220,7 @@ async fn archive_enqueue_failure_restores_only_changed_labels_and_the_original_f
     assert!(matches!(
         service
             .set_thread_archived_impl(
-                MacroUserIdStr::try_from_email("user1@test.com")?,
+                RoxUserIdStr::try_from_email("user1@test.com")?,
                 thread,
                 true,
             )
@@ -266,7 +266,7 @@ async fn failed_enqueue_hands_markers_back_to_the_write_still_on_its_way(
     let enqueuer = RecordingEnqueuer::default();
     let queued = service_with_enqueuer(pool.clone(), enqueuer.clone());
     let unqueued = service_with_enqueuer(pool.clone(), FailingEnqueuer);
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let thread = Uuid::parse_str("11111111-1111-1111-1111-111111111111")?;
     let first = Uuid::parse_str("11111111-aaaa-aaaa-aaaa-111111111111")?;
     let second = Uuid::parse_str("11111111-bbbb-bbbb-bbbb-111111111111")?;
@@ -331,7 +331,7 @@ async fn archive_undo_redo_are_idempotent_and_use_the_threads_own_inbox(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let service = service(pool.clone());
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let first = Uuid::parse_str("11111111-1111-1111-1111-111111111111")?;
     let second = Uuid::parse_str("33333333-3333-3333-3333-333333333333")?;
     for archived in [true, true, false, false, true] {
@@ -381,7 +381,7 @@ async fn archive_rejects_inaccessible_and_empty_threads(
         assert!(matches!(
             service
                 .set_thread_archived_impl(
-                    MacroUserIdStr::try_from_email("stranger@test.com")?,
+                    RoxUserIdStr::try_from_email("stranger@test.com")?,
                     first,
                     archived,
                 )
@@ -393,7 +393,7 @@ async fn archive_rejects_inaccessible_and_empty_threads(
     assert!(matches!(
         service
             .set_thread_archived_impl(
-                MacroUserIdStr::try_from_email("user1@test.com")?,
+                RoxUserIdStr::try_from_email("user1@test.com")?,
                 Uuid::parse_str("22222222-2222-2222-2222-222222222222")?,
                 true,
             )
@@ -421,7 +421,7 @@ async fn failed_archive_rolls_back_inbox_label_removal(pool: Pool<Postgres>) -> 
     assert!(matches!(
         service
             .set_thread_archived_impl(
-                MacroUserIdStr::try_from_email("user1@test.com")?,
+                RoxUserIdStr::try_from_email("user1@test.com")?,
                 thread,
                 true,
             )
@@ -592,7 +592,7 @@ async fn unarchive_uses_messages_when_the_inbox_sort_timestamp_is_missing(
     );
     service
         .set_thread_archived_impl(
-            MacroUserIdStr::try_from_email("user1@test.com")?,
+            RoxUserIdStr::try_from_email("user1@test.com")?,
             thread,
             false,
         )
@@ -612,7 +612,7 @@ async fn unarchive_rejects_sent_only_and_drafts_but_accepts_self_addressed_mail(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let service = service(pool);
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     for id in [
         "44444444-4444-4444-4444-444444444444",
         "55555555-5555-5555-5555-555555555555",
@@ -642,7 +642,7 @@ async fn outlook_archive_moves_the_thread_through_mailbox_commands(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let service = service(pool);
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let received = Uuid::parse_str("0a000000-0000-0000-0000-0000000000a1")?;
     let sent_only = Uuid::parse_str("0a000000-0000-0000-0000-0000000000a2")?;
     let inbox_visible = |thread| {
@@ -677,7 +677,7 @@ async fn bulk_archive_sends_one_gmail_write_per_inbox_and_reports_threads_it_ski
 ) -> anyhow::Result<()> {
     let enqueuer = RecordingEnqueuer::default();
     let service = service_with_enqueuer(pool.clone(), enqueuer.clone());
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     let primary_thread = Uuid::parse_str("11111111-1111-1111-1111-111111111111")?;
     let empty_thread = Uuid::parse_str("22222222-2222-2222-2222-222222222222")?;
     let secondary_thread = Uuid::parse_str("33333333-3333-3333-3333-333333333333")?;
@@ -776,7 +776,7 @@ async fn bulk_archive_reports_an_enqueue_outage_instead_of_failing_every_thread(
 
     let result = service
         .set_threads_archived_impl(
-            MacroUserIdStr::try_from_email("user1@test.com")?,
+            RoxUserIdStr::try_from_email("user1@test.com")?,
             vec![primary_thread, secondary_thread],
             true,
         )
@@ -851,7 +851,7 @@ async fn bulk_archive_reverts_only_the_threads_whose_write_could_not_be_queued(
 
     let result = service
         .set_threads_archived_impl(
-            MacroUserIdStr::try_from_email("user1@test.com")?,
+            RoxUserIdStr::try_from_email("user1@test.com")?,
             vec![queued_thread, unqueued_thread],
             true,
         )
@@ -911,7 +911,7 @@ async fn bulk_archive_counts_repeated_threads_once_against_the_limit(
 
     let result = service
         .set_threads_archived_impl(
-            MacroUserIdStr::try_from_email("user1@test.com")?,
+            RoxUserIdStr::try_from_email("user1@test.com")?,
             vec![thread; MAX_BULK_ARCHIVE_THREADS + 1],
             true,
         )
@@ -944,7 +944,7 @@ async fn bulk_archive_rejects_more_threads_than_one_request_may_change(
     assert!(matches!(
         service
             .set_threads_archived_impl(
-                MacroUserIdStr::try_from_email("user1@test.com")?,
+                RoxUserIdStr::try_from_email("user1@test.com")?,
                 thread_ids,
                 true,
             )

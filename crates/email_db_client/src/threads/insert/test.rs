@@ -1,7 +1,7 @@
 use super::*;
 use crate::threads::get::get_thread_by_id_and_link_id;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use std::time::Duration;
 
@@ -373,7 +373,7 @@ async fn oversized_provider_values_do_not_block_the_thread_insert(
             labels: vec![],
             body_text: Some("body".to_string()),
             body_html_sanitized: None,
-            body_macro: None,
+            body_rox: None,
             attachments: vec![],
             attachments_draft: vec![],
             attachments_forwarded: vec![],

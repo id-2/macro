@@ -5,8 +5,8 @@ use document_sub_type::DocumentSubType;
 use filter_ast::Expr;
 use foreign_entity::domain::models::SourceId;
 use item_filters::ast::{EntityFilterAst, document::DocumentLiteral};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use sqlx::{Pool, Postgres};
 use std::sync::Arc;
@@ -66,7 +66,7 @@ fn req<'a>(
     sources: &'a [SourceId],
 ) -> AttentionCandidateRequest<'a> {
     AttentionCandidateRequest {
-        user_id: MacroUserIdStr::parse_from_str(USER_1).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER_1).unwrap(),
         limit: 50,
         own_work,
         keying: AttentionKeying::ThreadScoped,
@@ -571,7 +571,7 @@ async fn team_notifications_are_candidates_only_for_members(
     let mut teammate = req(ATTENTION, &link_ids, &sources);
     teammate.types = &[EntityType::Team];
     teammate.keying = AttentionKeying::FiledEntity;
-    teammate.user_id = MacroUserIdStr::parse_from_str("macro|user-2@example.com")?;
+    teammate.user_id = RoxUserIdStr::parse_from_str("macro|user-2@example.com")?;
     assert!(attention_soup_page(&pool, teammate).await?.is_empty());
     Ok(())
 }

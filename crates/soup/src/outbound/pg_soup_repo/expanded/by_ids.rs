@@ -3,7 +3,7 @@ use crate::{
     outbound::pg_soup_repo::type_err,
 };
 use document_sub_type::DocumentSubType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 #[cfg(test)]
 use models_soup::item::SoupItem;
@@ -22,7 +22,7 @@ use uuid::Uuid;
 #[tracing::instrument(err, skip(db, entities))]
 async fn expanded_soup_by_ids_hydrated<'a>(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     entities: impl IntoIterator<Item = &'a Entity<'a>>,
 ) -> Result<Vec<SoupProjectionHydration>, sqlx::Error> {
     let mut document_ids = Vec::new();
@@ -206,7 +206,7 @@ async fn expanded_soup_by_ids_hydrated<'a>(
 #[tracing::instrument(err, skip(db, entities))]
 pub async fn expanded_soup_by_ids_with_projection<'a>(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     entities: impl IntoIterator<Item = &'a Entity<'a>>,
 ) -> Result<Vec<SoupProjectionHydration>, sqlx::Error> {
     expanded_soup_by_ids_hydrated(db, user_id, entities).await
@@ -217,7 +217,7 @@ pub async fn expanded_soup_by_ids_with_projection<'a>(
 #[tracing::instrument(err, skip(db, entities))]
 pub async fn expanded_soup_by_ids<'a>(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     entities: impl IntoIterator<Item = &'a Entity<'a>>,
 ) -> Result<Vec<SoupItem<()>>, sqlx::Error> {
     Ok(expanded_soup_by_ids_hydrated(db, user_id, entities)

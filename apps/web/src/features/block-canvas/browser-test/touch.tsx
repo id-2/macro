@@ -12,7 +12,7 @@ import {
   type GraphicsEditor,
   screenToWorld,
   translation,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 import { DragDropProvider } from '@thisbeyond/solid-dnd';
 import { onCleanup, Show } from 'solid-js';

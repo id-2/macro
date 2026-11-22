@@ -130,7 +130,7 @@ export function useUpcomingCalendarEventsSource(options: SourceOptions) {
       activeWindows().some(({ query }) => query.isPending),
     error: () =>
       activeWindows().some(({ query }) => query.isError)
-        ? 'Could not load upcoming events.'
+        ? 'Не удалось загрузить ближайшие события.'
         : undefined,
     refresh: () => {
       for (const { query } of activeWindows())

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_messages m SET is_draft = true, draft_generation = m.draft_generation + 1, body_html_sanitized = a.restore_body_html,\n                       body_text = a.restore_body_text, body_rox = a.restore_body_rox, updated_at = NOW()\n                       FROM email_send_attempts a WHERE a.user_id = $1 AND a.link_id = $2 AND a.attempt_id = $3\n                       AND m.id = a.message_id AND m.link_id = a.link_id AND NOT m.is_sent",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a36bb07e8d1be35fe5574438d6d18a72f308e488352c6dc90b599e7b14063ac7"
+}

@@ -1,5 +1,5 @@
-const QUICK_START = `npm install @macro-inc/sdk
-export MACRO_API_KEY="<your token>"`;
+const QUICK_START = `npm install @rox-one/sdk
+export ROX_API_KEY="<your token>"`;
 
 const PROFILE_SNIPPET = `const macro = new Macro({});
 const image = await macro.me.uploadProfilePicture(bytes, {
@@ -10,6 +10,9 @@ await macro.me.update({ name: 'Your Name', profilePicture: image });`;
 
 const NEW_TOKEN_SNIPPET = `const { secret } = await macro.apiKeys.create('my token');`;
 
+// Published installer is still the macro-inc raw URL. Checked 2026-11-19:
+// https://raw.githubusercontent.com/rox-one/rox/main/crates/coding_agent_worker/install/install.sh
+// returns 404, and install.sh in this repo still downloads releases from macro-inc/macro.
 const ROXD_INSTALL = `curl -fsSL https://raw.githubusercontent.com/macro-inc/macro/main/crates/coding_agent_worker/install/install.sh | sh
 ~/.local/bin/roxd detect-agents`;
 

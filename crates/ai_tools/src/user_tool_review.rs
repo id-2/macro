@@ -26,7 +26,7 @@ use agent::{FinishedUserTool, PendingUserTool, UserToolFinisher};
 use ai_toolset::tool_object::UserToolResponse;
 use ai_toolset::{AsyncToolCollection, RequestContext};
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Map, Value};
 use tokio_util::sync::CancellationToken;
 
@@ -153,7 +153,7 @@ pub trait UserToolReviewer: Send + Sync {
 pub fn user_tool_finisher<Context>(
     tools: Arc<AsyncToolCollection<Context>>,
     context: Context,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     reviewer: Arc<dyn UserToolReviewer>,
     cancel: CancellationToken,
 ) -> UserToolFinisher
@@ -173,7 +173,7 @@ pub type UserToolAuthorizer = Arc<
             String,
             Value,
         )
-            -> Pin<Box<dyn Future<Output = Result<MacroUserIdStr<'static>, ReviewError>> + Send>>
+            -> Pin<Box<dyn Future<Output = Result<RoxUserIdStr<'static>, ReviewError>> + Send>>
         + Send
         + Sync,
 >;

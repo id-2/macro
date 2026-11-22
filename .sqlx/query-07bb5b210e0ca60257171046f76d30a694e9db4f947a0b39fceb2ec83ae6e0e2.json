@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_attachments SET upload_claimed_at = now() - interval '5 minutes' WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "07bb5b210e0ca60257171046f76d30a694e9db4f947a0b39fceb2ec83ae6e0e2"
+}

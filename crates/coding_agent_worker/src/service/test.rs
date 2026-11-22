@@ -46,8 +46,11 @@ fn creates_a_config_from_setup_flags() {
             profile: None,
             agent: Some("custom".to_owned()),
             workspace: Some(workspace.clone()),
+            deployment: DeploymentUrls::default(),
+            approval_token: None,
         },
         Some(agent),
+        &DeploymentUrls::default(),
     )
     .expect("configure");
 
@@ -73,8 +76,11 @@ fn reconfigures_without_dropping_credentials() {
             profile: None,
             agent: Some("custom".to_owned()),
             workspace: Some(workspace),
+            deployment: DeploymentUrls::default(),
+            approval_token: None,
         },
         Some(agent),
+        &DeploymentUrls::default(),
     )
     .expect("configure");
 
@@ -97,8 +103,11 @@ fn reconfigures_without_dropping_credentials() {
             profile: None,
             agent: None,
             workspace: Some(moved.clone()),
+            deployment: DeploymentUrls::default(),
+            approval_token: None,
         },
         None,
+        &DeploymentUrls::default(),
     )
     .expect("reconfigure");
 
@@ -151,8 +160,11 @@ path = "{workspace}"
             profile: None,
             agent: Some("custom".to_owned()),
             workspace: Some(workspace.clone()),
+            deployment: DeploymentUrls::default(),
+            approval_token: None,
         },
         Some(agent_catalog::custom("hermes acp").expect("custom agent")),
+        &DeploymentUrls::default(),
     )
     .expect("reconfigure an old config");
 
@@ -180,8 +192,11 @@ fn creating_a_config_requires_an_agent() {
             profile: None,
             agent: None,
             workspace: Some(directory.path().to_owned()),
+            deployment: DeploymentUrls::default(),
+            approval_token: None,
         },
         None,
+        &DeploymentUrls::default(),
     )
     .expect_err("creation without an agent must fail");
     assert!(format!("{error}").contains("--agent"));

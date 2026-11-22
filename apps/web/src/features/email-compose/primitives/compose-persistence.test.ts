@@ -1,4 +1,4 @@
-import { $createImageNode } from '@macro-inc/lexical-core';
+import { $createImageNode } from '@rox-one/lexical-core';
 import { $getRoot } from 'lexical';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { message } from '../../email-message/tests/messages';

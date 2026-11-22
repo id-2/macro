@@ -9,8 +9,8 @@ use std::time::Duration;
 
 use chrono::NaiveDate;
 use email::domain::focus::{DueDateExtractor, DueDateInput};
-use macro_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::{Client, Url, header::HeaderValue};
 use rootcause::Report;
 use universal_input::domain::temporal::thread_due_date::{
@@ -59,7 +59,7 @@ fn request_failed(error: reqwest::Error) -> Report {
 impl DueDateExtractor for HarnessDueDates {
     async fn due_on(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_id: Uuid,
         input: &DueDateInput,
     ) -> Result<Option<NaiveDate>, Report> {
@@ -77,7 +77,7 @@ impl DueDateExtractor for HarnessDueDates {
                 .collect(),
         };
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .client
             .post(self.url.clone())

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { makeFlaggedPersisted } from '@app/preferences/make-flagged-persisted';
 import { useEntryState } from '@components/app/split-layout/entry-state';
 import { UserIcon } from '@core/component/UserIcon';
@@ -23,7 +24,7 @@ import { createCrmFilterSelections } from './primitives/filter-selections';
 function noOwnerOption(): SearchableOption {
   return {
     id: NO_ASSIGNEE,
-    label: 'No owner',
+    label: t('crm.noOwner'),
     icon: () => <CircleDashedIcon class="size-3.5 text-ink-muted" />,
   };
 }
@@ -92,7 +93,7 @@ export function createCrmCollectionFilters(
     })),
     {
       id: NO_STAGE,
-      label: 'No stage',
+      label: t('crm.noStage'),
       icon: () => <CircleDashedIcon class="size-3.5 text-ink-muted" />,
     },
   ]);
@@ -135,8 +136,8 @@ export function createCrmCollectionFilters(
   const facets: CollectionSelectFilter[] = [
     {
       id: 'stage',
-      label: 'Stage',
-      placeholder: 'Filter stages...',
+      label: t('crm.stage'),
+      placeholder: t('crm.filterStages'),
       values: stageFilter,
       effectiveValues: actions.effectiveStages,
       options: stageOptions,
@@ -155,8 +156,8 @@ export function createCrmCollectionFilters(
     },
     {
       id: 'owner',
-      label: 'Owner',
-      placeholder: 'Search owners...',
+      label: t('crm.owner'),
+      placeholder: t('crm.searchOwners'),
       values: ownerFilter,
       effectiveValues: ownerFilter,
       options: ownerOptions,

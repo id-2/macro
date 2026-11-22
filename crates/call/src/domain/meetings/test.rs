@@ -19,8 +19,8 @@ fn teammate_invitations_reject_bot_and_invalid_principals() {
 
 #[test]
 fn teammate_invitation_batches_are_bounded_distinct_and_exclude_self() {
-    let actor = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
-    let teammate = MacroUserIdStr::try_from_email("teammate@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
+    let teammate = RoxUserIdStr::try_from_email("teammate@example.com").unwrap();
     let request = |user_ids| InviteMeetingUsersRequest { user_ids };
     assert!(request(vec![]).recipients(&actor).is_err());
     assert!(request(vec![actor.clone()]).recipients(&actor).is_err());

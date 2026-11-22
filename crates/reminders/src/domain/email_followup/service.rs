@@ -4,7 +4,7 @@ use super::*;
 use crate::domain::ports::{Clock, SystemClock};
 use chrono::{DateTime, Utc};
 use email::domain::followup::EmailFollowupMailbox;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Email-specialized reminder lifecycle over the existing reminders repository.
@@ -40,7 +40,7 @@ impl<R: EmailFollowupRepo, E: EmailFollowupMailbox, C: Clock> EmailFollowupServi
     /// Read after reconciling reply/access facts; never expose another user's thread.
     pub async fn get(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread: Uuid,
     ) -> Result<Option<EmailFollowup>, ReminderError> {
         let _guard = self.repo.lock_followup(&user, thread).await?;
@@ -63,7 +63,7 @@ impl<R: EmailFollowupRepo, E: EmailFollowupMailbox, C: Clock> EmailFollowupServi
     /// Persist an idempotent command, then finish its email effect under the lock.
     pub async fn execute(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread: Uuid,
         command: EmailFollowupCommand,
     ) -> Result<EmailFollowup, ReminderError> {
@@ -73,7 +73,7 @@ impl<R: EmailFollowupRepo, E: EmailFollowupMailbox, C: Clock> EmailFollowupServi
 
     pub(crate) async fn execute_locked(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread: Uuid,
         command: EmailFollowupCommand,
     ) -> Result<EmailFollowup, ReminderError> {

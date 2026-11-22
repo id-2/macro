@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use connection_gateway_client::ConnectionGatewayClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use rootcause::{Report, compat::IntoRootcause};
 
@@ -32,7 +32,7 @@ impl BotProfilePublisher for ConnectionGatewayBotProfilePublisher {
     async fn publish_profile(
         &self,
         profile: BotOwnerProfile,
-        recipients: Vec<MacroUserIdStr<'static>>,
+        recipients: Vec<RoxUserIdStr<'static>>,
     ) -> Result<(), Report> {
         let message = serde_json::to_value(profile).map_err(Report::new)?;
         // Each request stays far under the gateway's 2 MB body limit; a failed

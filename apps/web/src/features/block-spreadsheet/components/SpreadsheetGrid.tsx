@@ -2,29 +2,29 @@ import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { fireAndForget } from '@core/util/fireAndForget';
 import CaretDown from '@icon/system/regular/caret-down.svg';
 import Square from '@icon/system/regular/square.svg';
-import { cellPlainText } from '@macro-inc/spreadsheet/cell-mentions';
+import { cellPlainText } from '@rox-one/spreadsheet/cell-mentions';
 import {
   checkboxChecked,
   selectedCheckboxes,
-} from '@macro-inc/spreadsheet/checkboxes';
-import type { ConditionalAppearance } from '@macro-inc/spreadsheet/conditional-formatting';
+} from '@rox-one/spreadsheet/checkboxes';
+import type { ConditionalAppearance } from '@rox-one/spreadsheet/conditional-formatting';
 import {
   accountingParts,
   literalNumber,
   literalNumberDisplay,
-} from '@macro-inc/spreadsheet/number-display';
+} from '@rox-one/spreadsheet/number-display';
 import type {
   DrawingPlacement,
   SheetChart,
   SheetDrawing,
-} from '@macro-inc/spreadsheet/sheet-drawings';
-import { sqrefBounds } from '@macro-inc/spreadsheet/sheet-rules';
+} from '@rox-one/spreadsheet/sheet-drawings';
+import { sqrefBounds } from '@rox-one/spreadsheet/sheet-rules';
 import {
   type SheetTable,
   tableAt,
   tableBounds,
-} from '@macro-inc/spreadsheet/sheet-tables';
-import { tableCellLook } from '@macro-inc/spreadsheet/table-styles';
+} from '@rox-one/spreadsheet/sheet-tables';
+import { tableCellLook } from '@rox-one/spreadsheet/table-styles';
 import CheckSquare from '@phosphor-fill/check-square-fill.svg';
 import { createElementSize } from '@solid-primitives/resize-observer';
 import {

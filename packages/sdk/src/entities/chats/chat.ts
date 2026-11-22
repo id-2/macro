@@ -5,7 +5,7 @@ import type {
 } from '../../../generated/cognition/types.gen';
 import { type Mentionable, type MentionPart, wrapXml } from '../../mentions';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { PropertiedEntity } from '../entity';
 import { Project } from '../projects/project';
 import type { EntityReference } from '../reference';
@@ -75,13 +75,13 @@ export class Chat extends PropertiedEntity<ChatDetail> implements Mentionable {
   }
 
   /** A handle to a chat by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Chat {
+  static byId(client: RoxClient, id: string): Chat {
     return new Chat(client, id);
   }
 
   /** Create a chat, optionally named and attached to a project. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts?: { name?: string; project?: Project },
   ): Promise<Chat> {
     const { id } = unwrap(

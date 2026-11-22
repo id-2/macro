@@ -30,13 +30,13 @@ export function CallsHeader() {
     scopeId: panel.splitHotkeyScope,
     enabled: panel.isPanelActive,
     search: {
-      description: 'Search calls',
+      description: t('calls.searchCalls'),
       run: () => {
         focusSearch?.();
         return true;
       },
     },
-    sort: { description: 'Sort calls', run: () => setSortOpen(true) },
+    sort: { description: t('calls.sortCalls'), run: () => setSortOpen(true) },
   });
   const { consolidatedFiltersList, resetToTabDefaults } =
     useFilterRefinements();
@@ -51,14 +51,14 @@ export function CallsHeader() {
       <ListHeader
         title={<ViewSidebar.Title caret={false}>{title()}</ViewSidebar.Title>}
       >
-        <HeaderActionGroup label="Call filters" size="md">
+        <HeaderActionGroup label={t('calls.filtersLabel')} size="md">
           <UnifiedFilterDropdown grouped hideLabel variant="ghost" />
         </HeaderActionGroup>
-        <HeaderActionGroup label="Call view options" size="md">
+        <HeaderActionGroup label={t('calls.viewOptionsLabel')} size="md">
           <ListSortDropdown
             grouped
             size="icon-md"
-            label="Sort calls"
+            label={t('calls.sortCalls')}
             value={
               DEFAULT_SORT_OPTIONS.find(
                 (option) => option.value === view.soup.sort.active()[0]?.id
@@ -77,7 +77,7 @@ export function CallsHeader() {
         </HeaderActionGroup>
         <NewCallButton />
         <ListHeaderSearch
-          label="Search calls"
+          label={t('calls.searchCalls')}
           value={view.searchText()}
           onValueChange={view.setSearchText}
           focusResults={() => panel.panelRef()?.focus()}

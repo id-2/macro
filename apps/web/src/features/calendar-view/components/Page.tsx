@@ -169,14 +169,14 @@ function CalendarPageDataStatus(props: {
         >
           <div class="flex max-w-sm flex-col items-center gap-3">
             <div class="text-sm font-semibold text-ink">
-              Calendar unavailable
+              Календарь недоступен
             </div>
             <p class="text-xs text-ink-muted">
-              We couldn’t load your calendar events. Try again.
+              Не удалось загрузить события. Попробуйте ещё раз.
             </p>
             <Button
-              aria-label="Retry loading calendar"
-              tooltip="Retry loading calendar"
+              aria-label="Повторить загрузку календаря"
+              tooltip="Повторить загрузку календаря"
               variant="primary"
               size="sm"
               onClick={() =>
@@ -186,7 +186,7 @@ function CalendarPageDataStatus(props: {
                 )
               }
             >
-              Retry
+              Повторить
             </Button>
           </div>
         </div>

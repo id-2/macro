@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -39,7 +39,7 @@ fn thread(messages: Vec<FocusMessage>, sent_notes: Vec<SentNote>) -> FocusThread
     FocusThread {
         thread_id: Uuid::new_v4(),
         link_id: Uuid::new_v4(),
-        owner: MacroUserIdStr::try_from_email("owner@acme.example").unwrap(),
+        owner: RoxUserIdStr::try_from_email("owner@acme.example").unwrap(),
         owner_email: "owner@acme.example".to_owned(),
         is_signal: true,
         inbox_visible: true,

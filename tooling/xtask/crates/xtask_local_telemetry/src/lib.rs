@@ -3,7 +3,7 @@
 //! sent to Loki as OTLP logs (the same design as CI's
 //! `service_name="ci-telemetry"` events) and, as spans, to Tempo.
 //!
-//! Off unless `MACRO_LOCAL_TELEMETRY` is explicitly on (see [`config`]). Unset
+//! Off unless `ROX_LOCAL_TELEMETRY` is explicitly on (see [`config`]). Unset
 //! means off for this local runner, and the runner does not create a settings
 //! file. [`Recorder::start`] then returns `None` and nothing is written or sent;
 //! it does the same while a recent attempt to provision the token failed (see

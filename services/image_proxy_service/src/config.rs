@@ -1,10 +1,10 @@
 use anyhow::Context;
-use macro_auth::InternalApiKey;
+use rox_auth::InternalApiKey;
 
-pub use macro_env::Environment;
+pub use rox_env::Environment;
 
 /// The configuration parameters for the application.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// The port to listen on.
@@ -19,7 +19,7 @@ pub struct Config {
 
 impl Config {
     pub fn from_env() -> anyhow::Result<Self> {
-        macro_config::ConfigLoader::load::<Config>()
+        rox_config::ConfigLoader::load::<Config>()
             .context("failed to load image proxy service config")
     }
 }

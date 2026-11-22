@@ -70,7 +70,7 @@ pub(crate) fn agent_task() -> Value {
 #[tokio::test]
 async fn local_validation_precedes_remote_authorization() {
     let sessions = Arc::new(Sessions::default());
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let validator = TargetValidation::new(sessions.clone());
     for task in [
         json!({}),
@@ -91,7 +91,7 @@ async fn local_validation_precedes_remote_authorization() {
 #[tokio::test]
 async fn model_selection_validates_a_macro_session() {
     let sessions = Arc::new(Sessions::default());
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     TargetValidation::new(sessions.clone())
         .validate_task(
             &json!({"model":"runtime/model", "prompt":"instructions", "user_prompt":"task"}),
@@ -109,7 +109,7 @@ async fn model_selection_validates_a_macro_session() {
 
 #[tokio::test]
 async fn a_validator_without_sessions_rejects_agents() {
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let error = ModelOnlyTargets
         .validate_task(&agent_task(), &owner)
         .await
@@ -125,7 +125,7 @@ async fn a_validator_without_sessions_rejects_agents() {
 #[tokio::test]
 async fn hands_an_owned_agent_to_the_session_check() {
     let sessions = Arc::new(Sessions::default());
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     TargetValidation::new(sessions.clone())
         .validate_task(&agent_task(), &owner)
         .await
@@ -138,7 +138,7 @@ async fn hands_an_owned_agent_to_the_session_check() {
 
 #[tokio::test]
 async fn rejects_a_deleted_agent() {
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let error = TargetValidation::new(Arc::new(Sessions::default()))
         .validate_task(
             &json!({"agent":{"bot_id":"01960000-0000-7000-8000-0000000000ff"}, "prompt":"instructions", "user_prompt":"task"}),
@@ -156,7 +156,7 @@ async fn rejects_a_deleted_agent() {
 async fn authorizes_owner_and_override_without_starting_external_runtime() {
     let sessions = Arc::new(Sessions::default());
     let validator = TargetValidation::new(sessions.clone());
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     for model in [None, Some("external/model")] {
         let mut task = agent_task();
         if let Some(model) = model {
@@ -169,7 +169,7 @@ async fn authorizes_owner_and_override_without_starting_external_runtime() {
         assert_eq!(call.bot_id.to_string(), BOT);
         assert_eq!(call.model.as_deref(), model);
     }
-    let foreign = MacroUserIdStr::parse_from_str("macro|other@rox.one").unwrap();
+    let foreign = RoxUserIdStr::parse_from_str("macro|other@rox.one").unwrap();
     let error = validator
         .validate_task(&agent_task(), &foreign)
         .await
@@ -198,7 +198,7 @@ fn requires_explicit_null_to_remove_even_an_unparseable_historical_selection() {
 #[tokio::test]
 async fn hands_the_routine_apps_to_the_session_check() {
     let sessions = Arc::new(Sessions::default());
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     TargetValidation::new(sessions.clone())
         .validate_task(
             &json!({
@@ -240,7 +240,7 @@ async fn hands_the_routine_apps_to_the_session_check() {
 
 #[tokio::test]
 async fn a_validator_that_cannot_check_connections_rejects_routine_apps() {
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let error = ModelOnlyTargets
         .validate_task(
             &json!({
@@ -277,7 +277,7 @@ fn an_update_must_restate_the_routine_apps_to_keep_or_clear_them() {
 #[tokio::test]
 async fn every_agent_step_is_authorized_and_structural_errors_name_the_rule() {
     let sessions = Arc::new(Sessions::default());
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let program = json!({ "steps": [
         { "type": "code", "title": "Label it", "source": "export async function main() {}" },
         { "type": "agent", "agent": { "bot_id": BOT }, "instructions": "Escalate" }
@@ -351,7 +351,7 @@ fn an_update_from_before_steps_cannot_replace_them() {
 #[tokio::test]
 async fn a_program_hands_its_apps_to_its_agent_and_an_update_must_restate_them() {
     let sessions = Arc::new(Sessions::default());
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     let program = json!({
         "steps": [{ "type": "agent", "agent": { "bot_id": BOT }, "instructions": "File it" }],
         "mcp_servers": [{ "app_slug": "linear", "server_name": "Linear" }],

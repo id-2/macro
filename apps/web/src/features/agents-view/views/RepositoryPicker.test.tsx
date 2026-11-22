@@ -1,3 +1,4 @@
+import { interfaceLanguageReady, setInterfaceLanguage } from '@app/lib/i18n';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import {
   cleanup,
@@ -6,7 +7,7 @@ import {
   screen,
   waitFor,
 } from '@solidjs/testing-library';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { ReachableRepository } from '../core/repository';
 import { RepositoryPicker } from './RepositoryPicker';
 
@@ -50,15 +51,17 @@ function picker(
   return handlers;
 }
 const openRepositories = () =>
-  fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
+  fireEvent.click(screen.getByRole('button', { name: 'Репозиторий' }));
 const search = () =>
-  screen.getByRole('combobox', { name: 'Search repositories' });
+  screen.getByRole('combobox', { name: 'Поиск репозиториев' });
 const optionNames = () =>
   screen
     .getAllByRole('option')
     .map((option) => option.textContent?.replace(/\s+/g, ' ').trim());
 
 describe('RepositoryPicker', () => {
+  beforeAll(() => setInterfaceLanguage('ru'));
+
   beforeEach(() => {
     vi.mocked(isTouchDevice).mockReturnValue(false);
     vi.stubGlobal('scrollTo', vi.fn());
@@ -82,10 +85,10 @@ describe('RepositoryPicker', () => {
     const handlers = picker();
     openRepositories();
     expect(
-      await screen.findByRole('dialog', { name: 'Repository' })
+      await screen.findByRole('dialog', { name: 'Репозиторий' })
     ).toBeTruthy();
     const field = await screen.findByRole('combobox', {
-      name: 'Search repositories',
+      name: 'Поиск репозиториев',
     });
     await waitFor(() => expect(document.activeElement).toBe(field));
     fireEvent.input(field, { target: { value: 'infra' } });
@@ -99,12 +102,12 @@ describe('RepositoryPicker', () => {
   it('searches and selects branches in the mobile drawer', async () => {
     vi.mocked(isTouchDevice).mockReturnValue(true);
     const handlers = picker({ repoUrl: macro.url });
-    fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ветка' }));
     expect(
-      await screen.findByRole('dialog', { name: 'Starting branch' })
+      await screen.findByRole('dialog', { name: 'Начальная ветка' })
     ).toBeTruthy();
     const field = await screen.findByRole('combobox', {
-      name: 'Search branches',
+      name: 'Поиск ветвей',
     });
     await waitFor(() => expect(document.activeElement).toBe(field));
     fireEvent.input(field, { target: { value: 'feature/home' } });
@@ -117,12 +120,12 @@ describe('RepositoryPicker', () => {
 
   it('keeps a runtime-enforced branch visible without opening the branch menu', () => {
     const handlers = picker({ repoUrl: macro.url, branchLocked: true });
-    const branch = screen.getByRole('button', { name: 'Branch' });
+    const branch = screen.getByRole('button', { name: 'Ветка' });
     expect(branch.textContent).toContain('main');
     expect(branch.hasAttribute('disabled')).toBe(true);
     fireEvent.click(branch);
     expect(
-      screen.queryByRole('combobox', { name: 'Search branches' })
+      screen.queryByRole('combobox', { name: 'Поиск ветвей' })
     ).toBeNull();
     expect(handlers.onSelectBranch).not.toHaveBeenCalled();
   });
@@ -130,11 +133,11 @@ describe('RepositoryPicker', () => {
   it('lists automatic first, then recents, then the rest, marking the selection', () => {
     picker({ repoUrl: infra.url, recentRepositories: [infra.url] });
     expect(
-      screen.getByRole('button', { name: 'Repository' }).textContent
+      screen.getByRole('button', { name: 'Репозиторий' }).textContent
     ).toContain('macro-inc/infra');
     openRepositories();
     expect(optionNames()).toEqual([
-      'Auto-detect',
+      'Определять автоматически',
       'macro-inc/infra',
       'macro-inc/macro',
     ]);
@@ -161,7 +164,7 @@ describe('RepositoryPicker', () => {
     openRepositories();
     expect(
       screen
-        .getByRole('option', { name: 'Auto-detect' })
+        .getByRole('option', { name: 'Определять автоматически' })
         .getAttribute('aria-selected')
     ).toBe('true');
     fireEvent.keyDown(search(), { key: 'ArrowDown' });
@@ -183,7 +186,7 @@ describe('RepositoryPicker', () => {
       target: { value: 'https://github.com/macro-inc/other.git' },
     });
     expect(screen.queryAllByRole('option')).toHaveLength(0);
-    expect(screen.getByText(/No repositories match/).textContent).toContain(
+    expect(screen.getByText(/Нет репозиториев по запросу/).textContent).toContain(
       'macro-inc/other'
     );
     expect(handlers.onSelectRepository).not.toHaveBeenCalled();
@@ -195,7 +198,7 @@ describe('RepositoryPicker', () => {
     });
     openRepositories();
     expect(optionNames()).toEqual([
-      'Auto-detect',
+      'Определять автоматически',
       'macro-inc/macro',
       'macro-inc/infra',
     ]);
@@ -214,7 +217,7 @@ describe('RepositoryPicker', () => {
     openRepositories();
     fireEvent.input(search(), { target: { value: 'nothing here' } });
     expect(screen.queryAllByRole('option')).toHaveLength(0);
-    expect(screen.getByText(/No repositories match/).textContent).toContain(
+    expect(screen.getByText(/Нет репозиториев по запросу/).textContent).toContain(
       'nothing here'
     );
     fireEvent.submit(search().closest('form') as HTMLFormElement);
@@ -225,33 +228,33 @@ describe('RepositoryPicker', () => {
   it('leaves the choice to the coder with Auto-detect', () => {
     const handlers = picker({ repoUrl: macro.url });
     openRepositories();
-    fireEvent.click(screen.getByRole('option', { name: 'Auto-detect' }));
+    fireEvent.click(screen.getByRole('option', { name: 'Определять автоматически' }));
     expect(handlers.onSelectRepository).toHaveBeenCalledWith(undefined);
   });
 
   it('shows the loading, failed, and empty listings', () => {
     const handlers = picker({ repositories: [], repositoriesLoading: true });
     openRepositories();
-    expect(screen.getByText('Loading your repositories…')).toBeTruthy();
+    expect(screen.getByText('Загрузка ваших репозиториев…')).toBeTruthy();
     cleanup();
 
     const failed = picker({ repositories: [], repositoriesError: true });
     openRepositories();
-    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
     expect(failed.onRetryRepositories).toHaveBeenCalledOnce();
     cleanup();
 
     const empty = picker({ repositories: [] });
     openRepositories();
-    expect(screen.getByText(/No repositories yet/)).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Connect GitHub' }));
+    expect(screen.getByText(/Репозиториев пока нет/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Подключить GitHub' }));
     expect(empty.onConnectGitHub).toHaveBeenCalledOnce();
     expect(handlers.onSelectRepository).not.toHaveBeenCalled();
   });
 
   it('shows the branch only with a repository and picks a listed one', () => {
     expect(picker().onSelectBranch).not.toHaveBeenCalled();
-    expect(screen.queryByRole('button', { name: 'Branch' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Ветка' })).toBeNull();
     cleanup();
 
     const handlers = picker({
@@ -259,11 +262,11 @@ describe('RepositoryPicker', () => {
       branch: 'develop',
       branches: ['main', 'develop', 'feature/home'],
     });
-    const branch = screen.getByRole('button', { name: 'Branch' });
+    const branch = screen.getByRole('button', { name: 'Ветка' });
     expect(branch.textContent).toContain('develop');
     fireEvent.click(branch);
     expect(optionNames()).toEqual([
-      'develop (default)',
+      'develop (по умолчанию)',
       'main',
       'feature/home',
     ]);
@@ -279,23 +282,23 @@ describe('RepositoryPicker', () => {
       branch: 'develop',
       branches: ['main', 'develop', 'feature/home'],
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
-    const field = screen.getByRole('combobox', { name: 'Search branches' });
+    fireEvent.click(screen.getByRole('button', { name: 'Ветка' }));
+    const field = screen.getByRole('combobox', { name: 'Поиск ветвей' });
     fireEvent.input(field, { target: { value: 'HOME' } });
-    expect(optionNames()).toEqual(['feature/home', 'Use HOME']);
+    expect(optionNames()).toEqual(['feature/home', 'Использовать HOME']);
     fireEvent.input(field, { target: { value: 'feature/other' } });
-    expect(optionNames()).toEqual(['Use feature/other']);
-    fireEvent.click(screen.getByRole('option', { name: 'Use feature/other' }));
+    expect(optionNames()).toEqual(['Использовать feature/other']);
+    fireEvent.click(screen.getByRole('option', { name: 'Использовать feature/other' }));
     expect(handlers.onSelectBranch).toHaveBeenCalledWith('feature/other');
   });
 
   it('refuses to submit text that is not a branch name', () => {
     const handlers = picker({ repoUrl: infra.url, branch: 'develop' });
-    fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
-    const field = screen.getByRole('combobox', { name: 'Search branches' });
+    fireEvent.click(screen.getByRole('button', { name: 'Ветка' }));
+    const field = screen.getByRole('combobox', { name: 'Поиск ветвей' });
     fireEvent.input(field, { target: { value: 'bad..name' } });
     fireEvent.submit(field.closest('form') as HTMLFormElement);
-    expect(screen.getByRole('alert').textContent).toContain('valid branch');
+    expect(screen.getByRole('alert').textContent).toContain('допустимое имя ветки');
     expect(handlers.onSelectBranch).not.toHaveBeenCalled();
   });
 
@@ -305,8 +308,8 @@ describe('RepositoryPicker', () => {
       branches: [],
       branchesLoading: true,
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
-    expect(screen.getByText('Loading branches…')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Ветка' }));
+    expect(screen.getByText('Загрузка ветвей…')).toBeTruthy();
     cleanup();
 
     const failed = picker({
@@ -314,13 +317,35 @@ describe('RepositoryPicker', () => {
       branches: [],
       branchesError: true,
     });
-    fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Retry' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Ветка' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Повторить' }));
     expect(failed.onRetryBranches).toHaveBeenCalledOnce();
     cleanup();
 
     picker({ repoUrl: infra.url, branches: [] });
-    fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
-    expect(screen.getByText(/No branches yet/)).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Ветка' }));
+    expect(screen.getByText(/Ветвей пока нет/)).toBeTruthy();
+  });
+
+  it('keeps the English labels when the interface language is English', async () => {
+    setInterfaceLanguage('en');
+    try {
+      await interfaceLanguageReady(1000);
+      picker({ repoUrl: macro.url });
+      fireEvent.click(screen.getByRole('button', { name: 'Repository' }));
+      expect(
+        screen.getByRole('combobox', { name: 'Search repositories' })
+      ).toBeTruthy();
+      expect(
+        screen.getByRole('option', { name: 'Auto-detect' })
+      ).toBeTruthy();
+      fireEvent.click(screen.getByRole('button', { name: 'Branch' }));
+      expect(
+        screen.getByRole('combobox', { name: 'Search branches' })
+      ).toBeTruthy();
+    } finally {
+      setInterfaceLanguage('ru');
+      await interfaceLanguageReady(1000);
+    }
   });
 });

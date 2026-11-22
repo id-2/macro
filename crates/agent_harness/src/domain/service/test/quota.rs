@@ -13,7 +13,7 @@ struct AdmissionMock {
 impl AiAdmissionService for AdmissionMock {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         self.calls.lock().unwrap().push((user.to_string(), feature));
@@ -126,7 +126,7 @@ async fn denied_or_unavailable_trigger_open_has_no_side_effects() {
                 SessionOrigin::TaskAssignment(crate::domain::model::TaskAssignmentOrigin {
                     trigger_origin: trigger_context::TriggerOrigin::Unknown,
                     parent: MessageParent::parse("document", "assigned-task").unwrap(),
-                    discussion_id: macro_uuid::generate_uuid_v7(),
+                    discussion_id: rox_uuid::generate_uuid_v7(),
                     actor: staff_sender(),
                     prompt: "Work on this task".to_owned(),
                     context: None,
@@ -730,7 +730,7 @@ async fn rejection_persistence_failure_keeps_work_and_defers_reply_resolution() 
             action: command.action,
             actor: command.actor,
             announce: command.announce,
-            announced: Some(macro_uuid::generate_uuid_v7()),
+            announced: Some(rox_uuid::generate_uuid_v7()),
             created_at: chrono::Utc::now(),
             context: None,
             client: None,

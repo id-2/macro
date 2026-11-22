@@ -12,7 +12,7 @@ use bots::domain::models::{AgentChannelScope, BotKind, BotOwner};
 use bots::domain::ports::BotRepo;
 use bots::outbound::pg_bots_repo::PgBotsRepo;
 use harnesses::domain::ports::HarnessTeamAgents;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::computers::PgHarnessService;
 
@@ -43,7 +43,7 @@ impl BotDirectory for PgBotDirectory {
         };
         let (owner_user_id, owner_team_id) = match row.owner {
             Some(BotOwner::User { user_id }) => {
-                let owner = MacroUserIdStr::try_from(user_id).map_err(|error| {
+                let owner = RoxUserIdStr::try_from(user_id).map_err(|error| {
                     AgentSessionError::Unknown(anyhow::anyhow!(
                         "bot has an unparseable owner: {error}"
                     ))
@@ -104,8 +104,8 @@ impl BotDirectory for PgBotDirectory {
 
     async fn user_has_team(
         &self,
-        user: MacroUserIdStr<'static>,
-        team_id: macro_uuid::Uuid,
+        user: RoxUserIdStr<'static>,
+        team_id: rox_uuid::Uuid,
     ) -> Result<bool> {
         self.repo
             .user_has_team(user, team_id)
@@ -115,7 +115,7 @@ impl BotDirectory for PgBotDirectory {
 
     async fn user_shares_channel_with_bot(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<bool> {
         self.repo

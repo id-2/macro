@@ -8,7 +8,7 @@ use crate::domain::models::email_notification_digest::ports::{
     ClaimResult, DigestBatch, DigestBatcher,
 };
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use redis::aio::MultiplexedConnection;
 use redis::{AsyncCommands, SortedSetAddOptions};
 use rootcause::Report;
@@ -170,7 +170,7 @@ impl DigestBatcher for RedisDigestBatcher {
             return Ok(ClaimResult::Empty);
         }
 
-        let user_id = MacroUserIdStr::try_from(user_id_str)?;
+        let user_id = RoxUserIdStr::try_from(user_id_str)?;
 
         let notifications: Vec<_> = items
             .into_iter()

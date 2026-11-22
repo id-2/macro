@@ -12,15 +12,15 @@ use agent_session::domain::ports::MockAgentSessionRepo;
 use bots::domain::models::{Agent, AgentChannelScope, AgentMcpServers, Bot, BotKind, BotOwner};
 use channel_sender::ChannelSender;
 use chrono::Utc;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::models::SimpleMention;
 
 use crate::domain::broker_events::TriggerDecision;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|trigger-service-test@rox.one")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|trigger-service-test@rox.one")
         .expect("valid user id")
         .into_owned()
 }
@@ -117,7 +117,7 @@ fn session(id: AgentSessionId, bot_id: BotId) -> AgentSession {
         name: agent_session::domain::model::DEFAULT_AGENT_SESSION_NAME.to_owned(),
         archived: None,
         owner_id: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@example.com").expect("valid macro user id"),
+            RoxUserIdStr::try_from_email("owner@example.com").expect("valid macro user id"),
         ),
         thread_id: Some(Uuid::from_u128(3)),
         thread_parent: Some(MessageParent::Channel(Uuid::from_u128(1))),
@@ -209,7 +209,7 @@ fn service_reading(
 }
 
 fn allow_invocation(
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     parent: &MessageParent,
     root_id: Uuid,
 ) -> std::pin::Pin<Box<dyn Future<Output = Result<Option<AuthorizedInvocation>>> + Send>> {
@@ -311,7 +311,7 @@ async fn mention_yields_event(posted: &MessagePostedMetadata, facts: impl Into<F
 async fn a_private_global_agent_is_unavailable_to_another_user() {
     let mut posted = message(vec![mention_of(BotId::TEST_A)]);
     posted.sender = ChannelSender::new_from_user(
-        MacroUserIdStr::try_from_email("outsider@example.com").expect("valid user id"),
+        RoxUserIdStr::try_from_email("outsider@example.com").expect("valid user id"),
     );
     let mut bots = MockAgentBotLookup::new();
     bots.expect_get_agent()
@@ -1223,7 +1223,7 @@ async fn a_discussion_cannot_invoke_another_users_private_agent() {
         let mut posted = message(vec![mention_of(BotId::TEST_A)]);
         posted.parent = parent.clone();
         posted.sender = ChannelSender::new_from_user(
-            MacroUserIdStr::try_from_email("other@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("other@example.com").unwrap(),
         );
         let mut bots = MockAgentBotLookup::new();
         bots.expect_get_agent()
@@ -1384,7 +1384,7 @@ async fn a_crm_discussion_cannot_invoke_another_users_private_agent() {
         let mut posted = message(vec![mention_of(BotId::TEST_A)]);
         posted.parent = parent;
         posted.sender = ChannelSender::new_from_user(
-            MacroUserIdStr::try_from_email("other@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("other@example.com").unwrap(),
         );
         let mut bots = MockAgentBotLookup::new();
         bots.expect_get_agent()

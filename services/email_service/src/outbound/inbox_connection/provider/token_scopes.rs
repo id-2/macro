@@ -1,4 +1,4 @@
-use macro_service_urls::GoogleOauthTokenInfoUrl;
+use rox_service_urls::GoogleOauthTokenInfoUrl;
 
 #[cfg(test)]
 mod test;

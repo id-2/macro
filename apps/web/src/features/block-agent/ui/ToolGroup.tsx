@@ -9,6 +9,7 @@
  * because the cards themselves appear once it opens.
  */
 
+import { t } from '@app/lib/i18n';
 import { CollapseTransition } from '@ui/components/CollapseTransition';
 import { createSignal, createUniqueId, type JSX, Show } from 'solid-js';
 import { ActivityLine, type ActivityLineStep } from './ActivityLine';
@@ -84,7 +85,7 @@ export function ToolGroup(props: ToolGroupProps) {
         <div
           id={contentId}
           role="region"
-          aria-label="Tool calls"
+          aria-label={t('agentChat.toolCalls')}
           class="flex min-w-0 flex-col"
         >
           {props.children}

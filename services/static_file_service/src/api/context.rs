@@ -3,14 +3,14 @@ use crate::service::dynamodb::client::DynamodbClient;
 use crate::service::s3::client::S3Client;
 use aws_sdk_sqs::Client;
 use axum::extract::FromRef;
-use macro_authorization::{
-    MacroAuthJwtValidator, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_authorization::{
+    RoxAuthJwtValidator, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
-use macro_service_urls::StaticFilePublicUrl;
+use rox_service_urls::StaticFilePublicUrl;
 use std::sync::Arc;
 
-/// Concrete authorization service used by the `MacroAuthorizationExtractor` in handlers.
-pub(crate) type AuthorizationService = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+/// Concrete authorization service used by the `RoxAuthorizationExtractor` in handlers.
+pub(crate) type AuthorizationService = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 
 #[derive(Clone, FromRef)]
 pub struct AppState {
@@ -20,5 +20,5 @@ pub struct AppState {
     pub config: Arc<Config>,
     /// Base that permalinks are stamped with.
     pub public_url: Arc<StaticFilePublicUrl>,
-    pub authorization_state: MacroAuthorizationState<AuthorizationService>,
+    pub authorization_state: RoxAuthorizationState<AuthorizationService>,
 }

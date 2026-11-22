@@ -11,8 +11,8 @@ use item_filters::ast::{
     LiteralTree,
     channel::{ChannelLiteral, ChannelThreadLiteral},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{CreatedAt, Cursor, CursorVal, Query, SimpleSortMethod};
 use sqlx::{Pool, Postgres};
 use std::{
@@ -58,8 +58,8 @@ fn repo(pool: Pool<Postgres>) -> PgChannelsRepo {
     PgChannelsRepo::new(pool)
 }
 
-fn macro_user_id(user_id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(user_id.to_owned()).expect("valid macro user id")
+fn macro_user_id(user_id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(user_id.to_owned()).expect("valid macro user id")
 }
 
 #[sqlx::test(
@@ -2292,7 +2292,7 @@ async fn channel_participant_readers_handle_bot_principals(
 
     let repo = repo(pool);
     let metadata = repo
-        .get_channel_metadata(channel_id, MacroUserIdStr::try_from(USER_A.to_string())?)
+        .get_channel_metadata(channel_id, RoxUserIdStr::try_from(USER_A.to_string())?)
         .await?;
     let participants = repo.get_participants(channel_id).await?;
 

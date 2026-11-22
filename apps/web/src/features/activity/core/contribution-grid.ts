@@ -2,12 +2,12 @@ import {
   addDays,
   eachDayOfInterval,
   eachWeekOfInterval,
-  format,
   getDate,
   isBefore,
   isValid,
 } from 'date-fns';
 import {
+  formatMonthAxisLabel,
   formatOverviewDate,
   OVERVIEW_TZ,
   parseOverviewDate,
@@ -160,10 +160,6 @@ export function scrollLeftAtWeeksFromEnd(
   return Math.max(0, area.scrollWidth - area.clientWidth - weeks * pitch);
 }
 
-function labelMonth(day: ContributionDay): string {
-  return format(parseOverviewDate(day.date), 'MMM', { in: OVERVIEW_TZ });
-}
-
 function isInWindow(day: Date, from: Date, to: Date): boolean {
   return !isBefore(day, from) && isBefore(day, to);
 }
@@ -217,7 +213,10 @@ export function buildContributionGrid(overview: {
     );
     const labelDay = firstOfMonth ?? (weekIndex === 0 ? visibleDays[0] : null);
     if (labelDay) {
-      monthLabels.push({ label: labelMonth(labelDay), weekIndex });
+      monthLabels.push({
+        label: formatMonthAxisLabel(labelDay.date),
+        weekIndex,
+      });
     }
   }
   if (monthLabels[0]?.weekIndex === 0 && monthLabels[1]?.weekIndex === 1) {

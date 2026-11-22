@@ -3,7 +3,7 @@ import {
   timeRangeFromInstants,
   timeRangeToInstants,
 } from '../../database/core/cell-date-range';
-import { NUMBER_DECIMAL_PLACES } from '../constants';
+import { NUMBER_DECIMAL_PLACES, systemPropertyDisplayName } from '../constants';
 import type {
   DateRangeValue,
   EntityPropertyWithDefinition,
@@ -58,7 +58,10 @@ export function entityPropertyFromApi(
   const baseProperty = {
     propertyId: apiProperty.property.id,
     propertyDefinitionId: apiProperty.definition.id,
-    displayName: apiProperty.definition.display_name,
+    displayName: systemPropertyDisplayName(
+      apiProperty.definition.id,
+      apiProperty.definition.display_name
+    ),
     isMultiSelect: apiProperty.definition.is_multi_select,
     isMetadata: apiProperty.definition.is_metadata,
     isSystemProperty: apiProperty.definition.is_system,

@@ -1,5 +1,5 @@
 use crate::domain::models::mailbox_action::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -27,7 +27,7 @@ pub(super) async fn messages(
 pub(super) async fn enqueue(
     pool: &PgPool,
     link_id: Uuid,
-    actor: MacroUserIdStr<'_>,
+    actor: RoxUserIdStr<'_>,
     action: &MailboxAction,
     targets: &[MailboxActionTarget],
 ) -> Result<Uuid, sqlx::Error> {
@@ -46,7 +46,7 @@ pub(super) async fn enqueue(
             return Err(sqlx::Error::RowNotFound);
         }
     }
-    let command_id = macro_uuid::generate_uuid_v7();
+    let command_id = rox_uuid::generate_uuid_v7();
     let intent = serde_json::to_value(action).map_err(|e| sqlx::Error::Encode(Box::new(e)))?;
     sqlx::query!(
         r#"
@@ -119,7 +119,7 @@ pub(super) async fn enqueue(
             r#"
             INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)
         "#,
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             link_id,
             binding.sync_generation,
             payload

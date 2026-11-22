@@ -155,12 +155,12 @@ export function decodeTaskSavedView(
 ): Result<TaskSavedViewConfig, string> {
   const parsed = taskSavedViewSchema.safeParse(value);
   if (!parsed.success)
-    return err('This view contains unsupported or invalid task filters.');
+    return err('В этом виде есть неподдерживаемые или неверные фильтры задач.');
   const definitions = new Map<string, string>();
   for (const tag of parsed.data.filters.tags) {
     const previous = definitions.get(tag.optionId);
     if (previous && previous !== tag.propertyDefinitionId)
-      return err('This view contains conflicting tag filters.');
+      return err('В этом виде конфликтуют фильтры тегов.');
     definitions.set(tag.optionId, tag.propertyDefinitionId);
   }
   return ok(canonical(parsed.data));
@@ -185,7 +185,7 @@ export function readTaskSavedView(value: unknown): TaskSavedViewRead {
         issue.code === 'unrecognized_keys'
           ? issue.keys.map((key) => ({
               path: [...issue.path.map(String), key],
-              message: 'This field is not supported.',
+              message: 'Это поле не поддерживается.',
             }))
           : [{ path: issue.path.map(String), message: issue.message }]
       );
@@ -336,16 +336,16 @@ export function captureTaskSavedView(input: {
   context: TaskFacetContext;
 }): Result<TaskSavedViewConfig, string> {
   if (isProjectTab(input.tab))
-    return err('Open a task list to save its filters.');
+    return err('Откройте список задач, чтобы сохранить его фильтры.');
   if (
     Object.keys(input.facets).some((id) => !SAVED_TASK_FACET_IDS.includes(id))
   )
-    return err('These task filters cannot be saved yet.');
+    return err('Эти фильтры задач пока нельзя сохранить.');
   const tags = [];
   for (const id of input.facets.tags ?? []) {
     const definition = input.context.tagPropertyDefinitionByOptionId.get(id);
     if (!definition)
-      return err('A selected tag is unavailable. Remove it before saving.');
+      return err('Выбранный тег недоступен. Уберите его перед сохранением.');
     tags.push({ optionId: id, propertyDefinitionId: definition });
   }
   const facets = withTaskTabFilters(input.tab, input.facets);

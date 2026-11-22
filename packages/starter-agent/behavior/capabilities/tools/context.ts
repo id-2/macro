@@ -1,4 +1,4 @@
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
 import type { Base } from '../../context/index.ts';
 import { toolsConfig } from './config.ts';
 import type { Random } from './secrets.ts';

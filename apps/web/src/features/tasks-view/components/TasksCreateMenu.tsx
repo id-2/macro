@@ -27,8 +27,8 @@ export function TasksCreateMenu(props: {
         presentation={props.presentation}
         aria-label={
           props.onCreateProject
-            ? 'New task, subtask, project, or tag'
-            : 'New task, subtask, or tag'
+            ? 'Новая задача, подзадача, проект или тег'
+            : 'Новая задача, подзадача или тег'
         }
         menu
       />

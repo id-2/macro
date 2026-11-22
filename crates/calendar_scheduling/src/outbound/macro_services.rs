@@ -5,7 +5,7 @@ use crate::domain::{
 };
 use calendar_events::domain::{
     labels::{CalendarLabels, attends_meeting},
-    meeting_links::{MacroCallEventError, create_event_with_macro_call, first_macro_call_url},
+    meeting_links::{RoxCallEventError, create_event_with_macro_call, first_macro_call_url},
     models::{
         CalendarAttendeeInput, CalendarEvent, CalendarEventDraft, ConferenceChange, EventTime,
         EventTransparency, OccurrenceRange, VisibleCalendar,
@@ -23,13 +23,13 @@ use teams::domain::{model::TeamRole, team_repo::TeamRepository};
 use uuid::Uuid;
 
 /// Adapter composed from existing domain services, never their outbound implementations.
-pub struct MacroCalendars<O, M, L = UnavailableMeetingLinks> {
+pub struct RoxCalendars<O, M, L = UnavailableMeetingLinks> {
     occurrences: Arc<O>,
     mutations: Arc<M>,
     meeting_links: Arc<L>,
     management_origin: Option<String>,
 }
-impl<O, M> MacroCalendars<O, M, UnavailableMeetingLinks> {
+impl<O, M> RoxCalendars<O, M, UnavailableMeetingLinks> {
     /// Wire the host's calendar domain capabilities without Rox call creation.
     pub fn new(occurrences: Arc<O>, mutations: Arc<M>, management_origin: Option<String>) -> Self {
         Self::with_meeting_links(
@@ -40,7 +40,7 @@ impl<O, M> MacroCalendars<O, M, UnavailableMeetingLinks> {
         )
     }
 }
-impl<O, M, L> MacroCalendars<O, M, L> {
+impl<O, M, L> RoxCalendars<O, M, L> {
     /// Wire calendar capabilities and the meeting service that mints Rox calls.
     pub fn with_meeting_links(
         occurrences: Arc<O>,
@@ -56,7 +56,7 @@ impl<O, M, L> MacroCalendars<O, M, L> {
         }
     }
 }
-impl<O: CalendarSyncHealthReader, M, L> MacroCalendars<O, M, L> {
+impl<O: CalendarSyncHealthReader, M, L> RoxCalendars<O, M, L> {
     /// Check that `calendars`, the host's, are current enough to offer their
     /// free time.
     async fn check_availability(
@@ -82,7 +82,7 @@ impl<O: CalendarSyncHealthReader, M, L> MacroCalendars<O, M, L> {
         })
     }
 }
-impl<O, M, L> MacroCalendars<O, M, L>
+impl<O, M, L> RoxCalendars<O, M, L>
 where
     O: CalendarOccurrenceService,
     M: CalendarCreationRecoveryService,
@@ -106,8 +106,8 @@ where
         .map_err(|error| {
             tracing::error!(error = ?error, "scheduling macro call creation failed");
             match &error {
-                MacroCallEventError::Calendar(error) => calendar_failure(error),
-                MacroCallEventError::MeetingLink(_) => Error::CalendarUnavailable,
+                RoxCallEventError::Calendar(error) => calendar_failure(error),
+                RoxCallEventError::MeetingLink(_) => Error::CalendarUnavailable,
             }
         })?;
         let minted = created.meeting_link.url;
@@ -141,7 +141,7 @@ where
         Ok((created.event.id, url))
     }
 }
-impl<O, M, L> Calendars for MacroCalendars<O, M, L>
+impl<O, M, L> Calendars for RoxCalendars<O, M, L>
 where
     O: CalendarOccurrenceService + CalendarSyncHealthReader,
     M: CalendarCreationRecoveryService,
@@ -288,7 +288,7 @@ where
             .ok_or(Error::CalendarRejected)?;
         let mut emails = vec![record.booking.email.clone()];
         for host in record.booking.hosts.iter().skip(1) {
-            let user: macro_user_id::user_id::MacroUserIdStr<'_> = host
+            let user: rox_user_id::user_id::RoxUserIdStr<'_> = host
                 .as_str()
                 .try_into()
                 .map_err(|_| Error::CalendarRejected)?;
@@ -494,7 +494,7 @@ impl<T: TeamRepository> Directory for RoxDirectory<T> {
     }
 }
 
-impl<O, M, L> crate::domain::ports::AttachmentReadiness for MacroCalendars<O, M, L>
+impl<O, M, L> crate::domain::ports::AttachmentReadiness for RoxCalendars<O, M, L>
 where
     O: CalendarSyncHealthReader,
     M: calendar_events::domain::ports::CalendarMutationService,

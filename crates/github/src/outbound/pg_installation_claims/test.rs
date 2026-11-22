@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 
 use super::PgGithubInstallationClaims;
@@ -55,8 +55,8 @@ async fn relink(pool: &Pool<Postgres>, user: &str, github_user_id: Option<&str>)
     }
 }
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 #[sqlx::test(

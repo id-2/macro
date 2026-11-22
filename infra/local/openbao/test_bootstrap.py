@@ -11,7 +11,13 @@ import unittest
 from uuid import uuid4
 
 from bootstrap import LocalOpenBao
-from openbao_provisioning import OpenBaoRequestError, configure_kv, provision_team as bootstrap
+from openbao_provisioning import (
+    AUDIT_ID_HEADER,
+    LEGACY_AUDIT_ID_HEADER,
+    OpenBaoRequestError,
+    configure_kv,
+    provision_team as bootstrap,
+)
 
 
 def encoded(value):
@@ -37,8 +43,9 @@ class BootstrapIntegration(unittest.TestCase):
             ]).decode()
             for team in (first_team, second_team):
                 bootstrap(root, team, public_key, "local-integration")
-            auditing = root.request("GET", "sys/config/auditing/request-headers/x-macro-audit-id")
-            self.assertFalse(auditing["x-macro-audit-id"]["hmac"])
+            for header in (AUDIT_ID_HEADER, LEGACY_AUDIT_ID_HEADER):
+                auditing = root.request("GET", f"sys/config/auditing/request-headers/{header}")
+                self.assertFalse(auditing[header]["hmac"])
 
             header = encoded(json.dumps({"alg": "RS256", "typ": "JWT"}).encode())
             audit_id = uuid4().hex
@@ -166,7 +173,7 @@ class BootstrapIntegration(unittest.TestCase):
         client = LocalOpenBao(
             os.environ["PASSWORDS_TEST_OPENBAO_ADDRESS"], os.environ["BAO_TOKEN"], audit_id,
         )
-        client.request("POST", "sys/config/auditing/request-headers/x-macro-audit-id", {"hmac": False})
+        client.request("POST", f"sys/config/auditing/request-headers/{AUDIT_ID_HEADER}", {"hmac": False})
         mount = "audit-check-" + uuid4().hex
         client.request("POST", "sys/mounts/" + mount, {"type": "kv", "options": {"version": "2"}})
         try:

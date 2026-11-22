@@ -31,7 +31,7 @@ struct Source {
 impl EmailSearchSource for Source {
     async fn shared_threads(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
         own_link_ids: &[Uuid],
         requested: &[Uuid],
         limit: usize,
@@ -52,7 +52,7 @@ impl EmailSearchSource for Source {
 
     async fn project_threads(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
         _: &[Uuid],
         project_ids: &[String],
         requested: &[Uuid],
@@ -79,7 +79,7 @@ impl EmailSearchSource for Source {
 
     async fn project_shared_threads(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
         _: &[Uuid],
         thread_ids: &[Uuid],
     ) -> Result<Vec<SharedThread>, Report> {
@@ -107,7 +107,7 @@ impl EmailSearchSource for Source {
 
     async fn threads_in_states(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
         thread_ids: &[Uuid],
         states: &ThreadStates,
     ) -> Result<HashSet<Uuid>, Report> {
@@ -126,8 +126,8 @@ impl EmailSearchSource for Source {
     }
 }
 
-fn viewer() -> MacroUserId<Lowercase<'static>> {
-    MacroUserId::parse_from_str("macro|viewer@example.com")
+fn viewer() -> RoxUserId<Lowercase<'static>> {
+    RoxUserId::parse_from_str("macro|viewer@example.com")
         .unwrap()
         .lowercase()
 }

@@ -2,7 +2,7 @@ use super::*;
 
 fn native(url: &str, enabled: bool, authenticated: bool) -> McpServerRecord {
     McpServerRecord {
-        user_id: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
         url: url.to_owned(),
         server_name: "Sentry (work)".into(),
         enabled,

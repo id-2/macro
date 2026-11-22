@@ -3,7 +3,7 @@
 use crate::domain::active_notification_ids::{
     ActiveNotificationIdRepository, ActiveNotificationIdStorageError,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -17,7 +17,7 @@ pub struct PgActiveNotificationIdRepository(pub PgPool);
 impl ActiveNotificationIdRepository for PgActiveNotificationIdRepository {
     async fn active_notification_ids(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         event_types: &[String],
         limit: u32,
     ) -> Result<Vec<Uuid>, ActiveNotificationIdStorageError> {

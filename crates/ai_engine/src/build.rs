@@ -214,10 +214,10 @@ enum FrameKind {
     Layer,
     /// A form XObject's group.
     Form {
-        /// Named by `/MacroGroup` (a group made here): kept as it is.
+        /// Named by `/RoxGroup` (a group made here): kept as it is.
         named: bool,
     },
-    /// A group from `/MacroGroup` marked content.
+    /// A group from `/RoxGroup` marked content.
     Group,
 }
 
@@ -230,7 +230,7 @@ struct Frame {
     clip_base: usize,
     /// Clip groups open in the frame: the clip's serial, and the group.
     open: Vec<(u64, NodeIdx)>,
-    /// The group's own clip is the next one set (`/MacroGroup` with a
+    /// The group's own clip is the next one set (`/RoxGroup` with a
     /// clip).
     own_clip: bool,
     /// Nothing has been added yet.
@@ -256,9 +256,9 @@ enum Marked {
     Layer(usize),
     /// Hidden objects'.
     Hidden,
-    /// A `/MacroGroup` that made a group (pops its frame).
+    /// A `/RoxGroup` that made a group (pops its frame).
     Group(usize),
-    /// A `/MacroGroup` that named the form it starts (nothing to pop).
+    /// A `/RoxGroup` that named the form it starts (nothing to pop).
     Named,
     /// Edited text's or a masked path's: the object comes from the marked
     /// content's properties, and its drawing is skipped.
@@ -288,7 +288,7 @@ struct Builder<'a, 'p> {
     skip: usize,
     /// Inside hidden objects' marked content.
     hidden: usize,
-    /// The name `/MacroName` gives the next object added.
+    /// The name `/RoxName` gives the next object added.
     name: Option<String>,
     /// A layer has started on this page.
     seen_layer: bool,

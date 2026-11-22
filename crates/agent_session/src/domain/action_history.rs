@@ -16,7 +16,7 @@ pub enum RecordedAction {
     Running {
         turn: TurnId,
         /// Original authenticated sender; absent on a system event.
-        actor: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        actor: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     },
     /// The original ACP response, even if a later load replaced its transcript.
     Finished {

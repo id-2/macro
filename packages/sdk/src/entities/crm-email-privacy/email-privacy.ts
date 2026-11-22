@@ -9,8 +9,8 @@ import type {
   EmailPrivacySettings,
   EmailRuleValidation,
 } from '../../../generated/storage/types.gen';
-import { MacroError, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, paginate, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { rejectUnknownOptions } from '../../utils/options';
 import { type IterationOptions, iterate } from '../../utils/pagination';
 import { AgentSession } from '../agent-sessions/agent-session';
@@ -131,7 +131,7 @@ export type CrmExcludedEmailThread = {
  * Explain that a matching participant shares the whole past/future thread, contact/company targets resolve live, and all exclusions override inclusions. Narrowing or withdrawal hides this member's ineligible copies while CRM records remain; another member's independently eligible copy stays visible. `settings()` and `excludedThreads()` read existing exclusions separately. Preview counts are optional, mailbox-local and bounded: only complete is exact; partial is a lower bound and stale/cancelled is not a current estimate. Replayed mutations describe the original commit, so inspect again to report current sharing.
  */
 export class CrmEmailPrivacyNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Inspect your sharing and token without initializing consent; read exclusions separately with settings and excludedThreads.
@@ -372,7 +372,7 @@ export class CrmEmailPrivacyNamespace {
   async settings(): Promise<CrmEmailPrivacySettings> {
     const settings = unwrap(await this.client.storage.getCrmEmailPrivacy());
     if (!('personal_domains' in settings))
-      throw new MacroError('Expected full CRM email privacy settings.');
+      throw new RoxError('Expected full CRM email privacy settings.');
     return this.privacySettings(settings);
   }
 
@@ -390,7 +390,7 @@ export class CrmEmailPrivacyNamespace {
     inbox?: Link,
   ): Promise<CrmEmailPrivacySettings> {
     if (enabled && !inbox)
-      throw new MacroError(
+      throw new RoxError(
         'Choose the primary inbox before enabling contribution.',
       );
     return this.changePrivacy({

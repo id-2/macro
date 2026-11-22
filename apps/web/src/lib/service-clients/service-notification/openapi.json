@@ -2701,7 +2701,7 @@
           }
         }
       },
-      "MacroUserIdStr": {
+      "RoxUserIdStr": {
         "type": "string"
       },
       "MentionedInDocumentCommentMetadata": {
@@ -3575,7 +3575,7 @@
                     "type": "null"
                   },
                   {
-                    "$ref": "#/components/schemas/MacroUserIdStr",
+                    "$ref": "#/components/schemas/RoxUserIdStr",
                     "description": "The user who triggered the notification."
                   }
                 ]

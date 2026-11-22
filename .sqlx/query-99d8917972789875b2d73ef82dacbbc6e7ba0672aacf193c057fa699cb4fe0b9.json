@@ -1,0 +1,21 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            INSERT INTO email_messages (\n                id, thread_id, link_id, provider_id, is_sent, from_contact_id, internal_date_ts,\n                subject, body_text, has_attachments, is_read, is_starred, is_draft, created_at, updated_at\n            )\n            VALUES ($1, $2, $3, $4, $5, $6, $7, 'Rescheduled: Demo', '', false, true, false, $8, NOW(), NOW())\n            ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Text",
+        "Bool",
+        "Uuid",
+        "Timestamptz",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "99d8917972789875b2d73ef82dacbbc6e7ba0672aacf193c057fa699cb4fe0b9"
+}

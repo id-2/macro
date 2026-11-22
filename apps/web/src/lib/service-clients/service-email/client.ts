@@ -5,7 +5,7 @@ import {
 } from '@core/util/fetchWithToken';
 import type { ObjectLike, ResultError } from '@core/util/result';
 import type { SafeFetchInit } from '@core/util/safeFetch';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type {
   CalendarEvent,
   CalendarEventProviderUrl,
@@ -19,6 +19,7 @@ import type {
   RespondToJoinRequestRequest,
   RsvpCalendarEventRequest,
   UpdateCalendarEventRequest,
+  VisibleCalendar,
 } from '@service-calendar/generated/schemas';
 import type { AvailabilityCalendarBody } from '@service-calendar/generated/schemas/availabilityCalendarBody';
 import type { AvailabilityCalendarsResponse } from '@service-calendar/generated/schemas/availabilityCalendarsResponse';
@@ -816,6 +817,13 @@ export const emailClient = {
   async listCalendars() {
     return fetchWithToken<ListCalendarsResponse>(`${calendarHost}/calendars`, {
       method: 'GET',
+    });
+  },
+
+  async createPersonalCalendar(name: string, timeZone: string) {
+    return fetchWithToken<VisibleCalendar>(`${calendarHost}/calendars`, {
+      method: 'POST',
+      body: JSON.stringify({ name, timeZone }),
     });
   },
 

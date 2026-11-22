@@ -88,13 +88,13 @@ import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { onElementConnect } from '@core/util/onElementConnect';
 import { bufToString } from '@core/util/string';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
 import {
   $isInlineSearchNode,
   createPeerIdValidator,
   type PeerIdValidator,
-} from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import { useDocTags } from '@property/tags';
 import { EntityType } from '@service-properties/generated/schemas/entityType';
 import { isIOS } from '@solid-primitives/platform';

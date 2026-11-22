@@ -1,5 +1,5 @@
 import { match } from 'ts-pattern';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { AgentSession } from '../agent-sessions/agent-session';
 import { CalendarEvent } from '../calendar/event';
 import { CallRecord } from '../calls/call-record';
@@ -25,7 +25,7 @@ import { User } from '../users/user';
  * addressed by more than their own id (channel messages, database rows).
  */
 export function activityEntity(
-  client: MacroClient,
+  client: RoxClient,
   type: string,
   id: string,
 ): EntityReference | undefined {

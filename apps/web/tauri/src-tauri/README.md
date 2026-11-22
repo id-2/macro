@@ -129,7 +129,7 @@ native change: it ships with the next desktop release.
 Only desktop icons carry the ALPHA badge; iOS and Android icons are unbadged.
 The macOS icon uses the badged artwork in the Icon Composer source
 `icons/macos/Macro.icon`; this artwork is no longer copied from iOS. The macOS-only
-Tauri configuration bundles its compiled `Assets.car` and `Macro.icns`, and
+Tauri configuration bundles its compiled `Assets.car` and `Rox.icns`, and
 declares the icon names in the hand-maintained `icons/macos/Info.plist`, which
 the script below does not overwrite. Tahoe uses the icon
 composition; older macOS uses the generated fallback. The artwork has no
@@ -297,7 +297,7 @@ editing the contract, run from the repository root with the development native
 environment configured:
 
 ```sh
-UPDATE_NATIVE_DIAGNOSTIC_TYPES=1 cargo test --manifest-path apps/web/tauri/Cargo.toml --locked -p app -p macro_bundle_updater_plugin --lib --no-default-features diagnostic_wire_types
+UPDATE_NATIVE_DIAGNOSTIC_TYPES=1 cargo test --manifest-path apps/web/tauri/Cargo.toml --locked -p app -p rox_bundle_updater_plugin --lib --no-default-features diagnostic_wire_types
 ```
 
 The same tests without that environment variable check for drift.
@@ -556,7 +556,7 @@ plain title and subtitle. A Developer ID build carries the entitlement only with
 an embedded provisioning profile, so the release workflow requires the
 `MACOS_DEVELOPER_ID_PROVISIONING_PROFILE_BASE64` secret next to the certificate.
 Create it in the Apple Developer portal: enable **Communication Notifications**
-on the `com.macro.app.prod` App ID, create a **Developer ID** macOS provisioning
+on the `com.rox.app.prod` App ID, create a **Developer ID** macOS provisioning
 profile for that App ID and the certificate, and store the base64 profile as the
 secret. The DMG build fails if the profile is missing or does not grant the
 entitlement to the bundle identifier; renew the secret when the profile expires.

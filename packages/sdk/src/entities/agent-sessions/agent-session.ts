@@ -17,11 +17,11 @@ import type {
   WorkRegistrationResponse,
 } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Agent } from '../agents/agent';
 import type { Channel } from '../channels/channel';
 import { shareWithChannel } from '../channels/share';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { EntityAccess } from '../sharing/access';
 import {
   type SharePermissionOptions,
@@ -208,7 +208,7 @@ export type CreateManagedSessionOptions = {
 };
 
 /** A managed or externally hosted coding-agent session. */
-export class AgentSession extends MacroEntity<AgentSessionResponse> {
+export class AgentSession extends RoxEntity<AgentSessionResponse> {
   /** Access requests and direct user grants. */
   readonly access = new EntityAccess(this.client, 'agent_session', this);
 
@@ -276,7 +276,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
   }
 
   /** A handle to an agent session by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): AgentSession {
+  static byId(client: RoxClient, id: string): AgentSession {
     return new AgentSession(client, id);
   }
 
@@ -289,7 +289,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
    * and it starts as Cursor.
    */
   static async createManaged(
-    client: MacroClient,
+    client: RoxClient,
     opts?: CreateManagedSessionOptions,
   ): Promise<AgentSession> {
     const { session } = unwrap(
@@ -315,7 +315,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
    * nowhere they reach.
    */
   static async repositories(
-    client: MacroClient,
+    client: RoxClient,
   ): Promise<SelectableRepository[]> {
     const { repositories } = unwrap(
       await client.agentHarness.listAgentRepositories(),
@@ -333,7 +333,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
    * lists.
    */
   static async repositoryBranches(
-    client: MacroClient,
+    client: RoxClient,
     repoUrl: string,
   ): Promise<string[]> {
     const { branches } = unwrap(
@@ -351,7 +351,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
    * caller is out of AI quota.
    */
   static async chooseMode(
-    client: MacroClient,
+    client: RoxClient,
     prompt: string,
   ): Promise<AgentMode> {
     const { mode } = unwrap(
@@ -431,7 +431,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
    * can view, oldest link first.
    */
   static async forPullRequest(
-    client: MacroClient,
+    client: RoxClient,
     url: string,
   ): Promise<AgentSession[]> {
     const { sessionIds } = unwrap(
@@ -445,7 +445,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
    * for over 20 minutes, newest activity first. Only the 25 most recent such
    * sessions are inspected.
    */
-  static async updates(client: MacroClient): Promise<AgentSessionUpdates> {
+  static async updates(client: RoxClient): Promise<AgentSessionUpdates> {
     const { items, truncated, truncationNotice } = unwrap(
       await client.agentHarness.listAgentSessionUpdates(),
     );
@@ -667,7 +667,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
 
   /** The caller's active registrations, newest first. */
   static async listRegisteredWork(
-    client: MacroClient,
+    client: RoxClient,
   ): Promise<RegisteredWork[]> {
     const registrations = unwrap(
       await client.agentHarness.listAgentWorkRegistrations(),
@@ -678,7 +678,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
   }
 
   private static registeredWork(
-    client: MacroClient,
+    client: RoxClient,
     registration: WorkRegistrationResponse,
   ): RegisteredWork {
     return {
@@ -734,13 +734,13 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
   }
 
   /** The caller's default sandbox size for new `@coder` sessions. */
-  static async defaultSandboxSize(client: MacroClient): Promise<SandboxSize> {
+  static async defaultSandboxSize(client: RoxClient): Promise<SandboxSize> {
     return unwrap(await client.agentHarness.getAgentSandboxSize()).size;
   }
 
   /** Set the caller's default sandbox size for the next `@coder` mention. */
   static async setDefaultSandboxSize(
-    client: MacroClient,
+    client: RoxClient,
     size: SandboxSize,
   ): Promise<SandboxSize> {
     return unwrap(
@@ -752,21 +752,21 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
 
   /** What the caller's new coding sessions are told to do beyond their assignment. */
   static async codingPreferences(
-    client: MacroClient,
+    client: RoxClient,
   ): Promise<CodingPreferencesBody> {
     return unwrap(await client.agentHarness.getAgentCodingPreferences());
   }
 
   /** Which triggers archive the caller's sessions by default; each is off unless chosen. */
   static async autoArchivePreferences(
-    client: MacroClient,
+    client: RoxClient,
   ): Promise<AutoArchivePreferencesBody> {
     return unwrap(await client.agentHarness.getAgentAutoArchivePreferences());
   }
 
   /** Replace which triggers archive the caller's sessions by default. */
   static async setAutoArchivePreferences(
-    client: MacroClient,
+    client: RoxClient,
     preferences: AutoArchivePreferencesBody,
   ): Promise<AutoArchivePreferencesBody> {
     return unwrap(
@@ -778,7 +778,7 @@ export class AgentSession extends MacroEntity<AgentSessionResponse> {
 
   /** Replace the caller's coding preferences. */
   static async setCodingPreferences(
-    client: MacroClient,
+    client: RoxClient,
     preferences: CodingPreferencesBody,
   ): Promise<CodingPreferencesBody> {
     return unwrap(

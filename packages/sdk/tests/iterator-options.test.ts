@@ -20,7 +20,7 @@ import { SearchNamespace } from '../src/entities/search/namespace';
 import { TaskNamespace } from '../src/entities/tasks/namespace';
 import { Team } from '../src/entities/teams/team';
 import { WorkspaceNamespace } from '../src/entities/workspace/namespace';
-import type { MacroClient } from '../src/utils/client';
+import type { RoxClient } from '../src/utils/client';
 
 /** A client that records every service call and serves nothing. */
 function recordingClient() {
@@ -43,7 +43,7 @@ function recordingClient() {
           ? target[key as keyof typeof target]
           : service(String(key)),
     },
-  ) as unknown as MacroClient;
+  ) as unknown as RoxClient;
   return { client, calls };
 }
 
@@ -52,7 +52,7 @@ const bogus: any = { total: 15 };
 
 const iterators: Record<
   string,
-  (client: MacroClient) => AsyncIterable<unknown>
+  (client: RoxClient) => AsyncIterable<unknown>
 > = {
   'channels.list': (c) => new ChannelNamespace(c).list(bogus),
   'channels.search': (c) => new ChannelNamespace(c).search('q', bogus),
@@ -129,12 +129,12 @@ describe('auto-paginating iterators', () => {
 test.each([
   [
     'email.inbox',
-    (c: MacroClient) => new EmailNamespace(c).inbox({ limit: 15 } as never),
+    (c: RoxClient) => new EmailNamespace(c).inbox({ limit: 15 } as never),
     '`pageSize`, `sort`, `maxItems`',
   ],
   [
     'documents.recent',
-    (c: MacroClient) => new DocumentNamespace(c).recent({ limit: 50 } as never),
+    (c: RoxClient) => new DocumentNamespace(c).recent({ limit: 50 } as never),
     '`pageSize`, `fileType`, `maxItems`',
   ],
 ])('%s rejects a total `limit` and names the options it takes', async (_, make, options) => {
@@ -173,7 +173,7 @@ describe('maxItems', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const threads = await Array.fromAsync(
       new EmailNamespace(client).inbox({ pageSize: 10, maxItems: 15 }),
@@ -202,7 +202,7 @@ describe('maxItems', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const channels = await Array.fromAsync(
       new ChannelNamespace(client).list({ maxItems: 3 }),
@@ -237,7 +237,7 @@ describe('maxItems', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const channels = await Array.fromAsync(
       new ChannelNamespace(client).search('q', { maxItems: 2 }),

@@ -4,7 +4,7 @@ import type {
 } from '../../../generated/storage/types.gen';
 import { type RichMessage, type SimpleMention, toBody } from '../../mentions';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { FavoritableEntity } from '../entity';
 import { User } from '../users/user';
 import { Channel } from './channel';
@@ -76,7 +76,7 @@ export class Message extends FavoritableEntity<MessageRecord> {
   readonly entityType = 'channel_message';
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     readonly channelId: string,
     id: string,
     /** Entities mentioned in this message, when a list, thread, or event supplied them. */
@@ -98,7 +98,7 @@ export class Message extends FavoritableEntity<MessageRecord> {
 
   /** A handle to a message by id. Fields load on first access. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     channelId: string,
     id: string,
     mentions: SimpleMention[] = [],
@@ -108,7 +108,7 @@ export class Message extends FavoritableEntity<MessageRecord> {
 
   /** Build a root or reply from a message record (pre-seeded, no fetch). */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     channelId: string,
     data: MessageRecord,
   ): Message {
@@ -138,7 +138,7 @@ export class Message extends FavoritableEntity<MessageRecord> {
 
   /**
    * The message's URL in the Rox web app: its channel, scrolled to it. Pass
-   * the message to `macro.ui.open` to show it to the user.
+   * the message to `rox.ui.open` to show it to the user.
    *
    * @readonly
    */

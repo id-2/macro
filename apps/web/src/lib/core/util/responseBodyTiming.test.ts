@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { timeResponseBody } from './responseBodyTiming';
 

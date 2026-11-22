@@ -1,6 +1,6 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use sqlx::Postgres;
 
@@ -22,7 +22,7 @@ async fn hydrates_only_teams_the_viewer_belongs_to(
     let request = |user: &'static str| -> anyhow::Result<_> {
         Ok(AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(user)?,
+            user_id: RoxUserIdStr::parse_from_str(user)?,
         })
     };
 

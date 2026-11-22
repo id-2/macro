@@ -2,7 +2,7 @@
 
 use crate::domain::media_upload::{StaticMediaReservation, StaticMediaStore};
 use anyhow::Context;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use static_file_service_client::StaticFileServiceClient;
 
 /// Reserves channel media in the static-file service.
@@ -21,7 +21,7 @@ impl StaticFileMediaUploads {
 impl StaticMediaStore for StaticFileMediaUploads {
     async fn reserve(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         file_name: &str,
         content_type: &str,
     ) -> anyhow::Result<StaticMediaReservation> {

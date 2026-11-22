@@ -1,6 +1,6 @@
 import '@app/index.css';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
-import type { SerializedCustomCodeNode } from '@macro-inc/lexical-core';
+import type { SerializedCustomCodeNode } from '@rox-one/lexical-core';
 import type { SerializedEditorState } from 'lexical';
 import { render } from 'solid-js/web';
 import { buildConfig } from '../../../builder/MarkdownConfigBuilder';

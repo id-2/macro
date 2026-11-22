@@ -1,5 +1,5 @@
-use macro_event_broker::{Event, MacroEvent};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -24,8 +24,8 @@ fn bot_id() -> BotId {
     BotId::parse_uuid_str(BOT_ID).expect("valid bot id")
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
@@ -253,23 +253,23 @@ fn topic_events() -> Vec<(TeamTopicEvent, Value)> {
     ]
 }
 
-fn macro_events() -> Vec<TeamMacroEvent> {
+fn macro_events() -> Vec<TeamRoxEvent> {
     topic_events()
         .into_iter()
         .map(|(event, _)| match event {
-            TeamTopicEvent::Created(metadata) => TeamMacroEvent::created(metadata),
-            TeamTopicEvent::Updated(metadata) => TeamMacroEvent::updated(metadata),
-            TeamTopicEvent::Deleted(metadata) => TeamMacroEvent::deleted(metadata),
-            TeamTopicEvent::InviteCreated(metadata) => TeamMacroEvent::invite_created(metadata),
-            TeamTopicEvent::InviteRejected(metadata) => TeamMacroEvent::invite_rejected(metadata),
-            TeamTopicEvent::InviteRevoked(metadata) => TeamMacroEvent::invite_revoked(metadata),
-            TeamTopicEvent::MemberJoined(metadata) => TeamMacroEvent::member_joined(metadata),
-            TeamTopicEvent::MemberRemoved(metadata) => TeamMacroEvent::member_removed(metadata),
+            TeamTopicEvent::Created(metadata) => TeamRoxEvent::created(metadata),
+            TeamTopicEvent::Updated(metadata) => TeamRoxEvent::updated(metadata),
+            TeamTopicEvent::Deleted(metadata) => TeamRoxEvent::deleted(metadata),
+            TeamTopicEvent::InviteCreated(metadata) => TeamRoxEvent::invite_created(metadata),
+            TeamTopicEvent::InviteRejected(metadata) => TeamRoxEvent::invite_rejected(metadata),
+            TeamTopicEvent::InviteRevoked(metadata) => TeamRoxEvent::invite_revoked(metadata),
+            TeamTopicEvent::MemberJoined(metadata) => TeamRoxEvent::member_joined(metadata),
+            TeamTopicEvent::MemberRemoved(metadata) => TeamRoxEvent::member_removed(metadata),
             TeamTopicEvent::MemberRoleChanged(metadata) => {
-                TeamMacroEvent::member_role_changed(metadata)
+                TeamRoxEvent::member_role_changed(metadata)
             }
             TeamTopicEvent::AutoJoinDomainToggled(metadata) => {
-                TeamMacroEvent::auto_join_domain_toggled(metadata)
+                TeamRoxEvent::auto_join_domain_toggled(metadata)
             }
         })
         .collect()
@@ -297,7 +297,7 @@ fn every_variant_has_exact_json_envelope() {
 fn every_variant_round_trips() {
     for original in macro_events() {
         let payload = serde_json::to_vec(original.event()).expect("serializable event");
-        let decoded = TeamMacroEvent::decode(original.key(), &payload).expect("decodable event");
+        let decoded = TeamRoxEvent::decode(original.key(), &payload).expect("decodable event");
 
         assert_eq!(decoded.key(), TEAM_ID);
         assert_eq!(decoded.event(), original.event());

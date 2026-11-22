@@ -1,6 +1,7 @@
+import { t } from '@app/lib/i18n';
 import ResetIcon from '@icon/system/regular/arrow-clockwise.svg';
 import HomeIcon from '@icon/system/regular/house.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { Button, Dialog, Surface } from '@ui';
 import { Show } from 'solid-js';
 
@@ -20,23 +21,25 @@ export function FatalError(props: FatalErrorProps) {
         <div class="p-6 sm:p-8 font-sans">
           <div class="text-center">
             <h1 class="text-ink text-lg/7 font-semibold mb-4">
-              Something went terribly wrong
+              {t('fatalError.title')}
             </h1>
+
+            <p class="text-ink-muted text-sm mb-6">
+              {t('fatalError.apology')}
+            </p>
 
             <Show when={props.error} keyed>
               {(error) => (
-                <div class="mb-6 p-3 bg-failure-bg border border-edge rounded text-left">
-                  <p class="text-sm text-failure-ink font-mono break-all">
+                <details class="mb-6 text-left">
+                  <summary class="cursor-pointer select-none text-xs text-ink-muted">
+                    {t('fatalError.details')}
+                  </summary>
+                  <p class="mt-2 p-3 bg-failure-bg border border-edge rounded text-sm text-failure-ink font-mono break-all">
                     {error.message || error.toString()}
                   </p>
-                </div>
+                </details>
               )}
             </Show>
-
-            <p class="text-ink-muted text-sm mb-6">
-              We apologize for the inconvenience. Please try again or contact
-              support.
-            </p>
 
             <div class="flex flex-row gap-3 justify-center">
               <Button
@@ -45,10 +48,10 @@ export function FatalError(props: FatalErrorProps) {
                   window.location.href = window.location.origin + '/app';
                 }}
               >
-                <HomeIcon class="size-4" /> Home
+                <HomeIcon class="size-4" /> {t('fatalError.home')}
               </Button>
               <Button variant="secondary" onClick={props.reset}>
-                <ResetIcon class="size-4" /> Try Again
+                <ResetIcon class="size-4" /> {t('fatalError.tryAgain')}
               </Button>
             </div>
           </div>

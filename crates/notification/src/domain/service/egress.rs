@@ -24,7 +24,7 @@ use crate::domain::ports::{
 use cowlike::CowLike;
 use either::Either;
 use futures::stream::{FuturesUnordered, StreamExt};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::prelude::ResultExt;
 use rootcause::{Report, report};
 use std::time::Duration;
@@ -84,7 +84,7 @@ impl MobilePayload<'_> {
 
 fn android_notification(
     apns: &APNSTargets<serde_json::Value>,
-    recipient_id: MacroUserIdStr<'static>,
+    recipient_id: RoxUserIdStr<'static>,
 ) -> FCMMessage<serde_json::Value> {
     let data = apns.notif.push_notification_data.clone();
     let identifier = apns.attributes.collapse_key.clone();
@@ -114,7 +114,7 @@ fn android_notification(
 
 fn ios_notification(
     apns: &APNSPushNotification<serde_json::Value>,
-    recipient_id: &MacroUserIdStr<'_>,
+    recipient_id: &RoxUserIdStr<'_>,
 ) -> APNSPushNotification<serde_json::Value> {
     let mut notification = apns.clone();
     if let Some(data) = notification.push_notification_data.as_object_mut() {
@@ -480,7 +480,7 @@ where
                 v @ ClaimResult::Empty | v @ ClaimResult::Wait(_) => return Ok(v.map(|_| ())),
             };
 
-        let recipient: MacroUserIdStr<'static> = batch.user_id.clone();
+        let recipient: RoxUserIdStr<'static> = batch.user_id.clone();
         let notification_ids: Vec<_> = batch
             .notifications
             .iter()

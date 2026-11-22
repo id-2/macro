@@ -93,7 +93,7 @@ impl<Properties: Send + Sync + 'static> DatabaseSharingRepo for PgDatabasesRepo<
             // The team share's state lives in a SharePermission row, made
             // the first time it is set.
             if row.share_permission_id.is_none() {
-                let permission_id = macro_uuid::generate_uuid_v7().to_string();
+                let permission_id = rox_uuid::generate_uuid_v7().to_string();
                 share_permission_db_utils::create_private_share_permission(
                     &mut *transaction,
                     &permission_id,

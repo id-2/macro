@@ -19,7 +19,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 
@@ -84,7 +84,7 @@ pub enum FromGateway {
         /// Gateway-local id of the websocket connection.
         conn: ConnId,
         /// User the gateway authenticated at the socket edge.
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     },
     /// One client frame, in per-connection order, unparsed.
     Frame {

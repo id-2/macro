@@ -314,7 +314,7 @@ export * from './loadAgentModelsResponseCurrentModel';
 export * from './logDirectionDto';
 export * from './logFrameDto';
 export * from './logFrameDtoContent';
-export * from './macroUserIdStr';
+export * from './roxUserIdStr';
 export * from './messageParent';
 export * from './messageParentOneOf';
 export * from './messageParentOneOfFive';

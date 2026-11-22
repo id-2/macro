@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {

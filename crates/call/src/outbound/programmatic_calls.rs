@@ -1,5 +1,5 @@
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::ports::ProgrammaticCallGate;
 
@@ -10,7 +10,7 @@ pub struct FlaggedProgrammaticCalls<F>(pub F);
 
 #[async_trait::async_trait]
 impl<F: FeatureFlags + Send + Sync + 'static> ProgrammaticCallGate for FlaggedProgrammaticCalls<F> {
-    async fn enabled_for(&self, caller: MacroUserIdStr<'_>) -> bool {
+    async fn enabled_for(&self, caller: RoxUserIdStr<'_>) -> bool {
         match self.0.load(&caller).await {
             Ok(flags) => flags.is_enabled(ENABLE_PROGRAMMATIC_CALLS),
             Err(error) => {

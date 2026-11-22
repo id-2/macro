@@ -1,6 +1,6 @@
 use super::*;
 use entity_access_db_utils::team_share::{acquire_guard, upsert_direct};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_permissions::share_permission::access_level::AccessLevel;
 use uuid::Uuid;
 

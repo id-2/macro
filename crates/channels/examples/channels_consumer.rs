@@ -1,9 +1,9 @@
 //! Kafka consumer example for the `macro.channels` topic.
 //!
 //! Connects with the same `KAFKA_BROKERS` env var and environment-driven
-//! transport as [`macro_event_broker::KafkaEventPublisher`] (plaintext for
+//! transport as [`rox_event_broker::KafkaEventPublisher`] (plaintext for
 //! `ENVIRONMENT=local`, TLS + SASL/OAUTHBEARER with MSK IAM otherwise),
-//! subscribes to the [`ChannelMacroEvent`] topic and prints every channel event
+//! subscribes to the [`ChannelRoxEvent`] topic and prints every channel event
 //! it receives.
 //!
 //! The consumer follows the standard poll-loop / worker split: a Kafka poll
@@ -24,16 +24,16 @@
 //! ```
 
 use anyhow::Context as _;
-use channels::domain::broker_events::{ChannelMacroEvent, ChannelTopicEvent};
+use channels::domain::broker_events::{ChannelRoxEvent, ChannelTopicEvent};
 use kafka_util::{GroupName, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::Message;
 use tokio::sync::mpsc;
 
-macro_env_var::env_var! {
+rox_env_var::env_var! {
     struct ConsumerEnvVars {
         KafkaBrokers,
     }
@@ -50,17 +50,17 @@ impl GroupName for ChannelsConsumerGroup {
 /// Bounded capacity of the channel between the poll loop and the processor.
 const CHANNEL_CAPACITY: usize = 128;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: ChannelMacroEvent);
+rox_event_broker::declare_topics!(DeclaredRoxEvent: ChannelRoxEvent);
 
-type ChannelsKafkaAdapter = KafkaConsumerAdapter<ChannelsConsumerGroup, DeclaredMacroEvent>;
-type ChannelsConsumerService = MacroEventConsumerService<DeclaredMacroEvent, ChannelsKafkaAdapter>;
+type ChannelsKafkaAdapter = KafkaConsumerAdapter<ChannelsConsumerGroup, DeclaredRoxEvent>;
+type ChannelsConsumerService = RoxEventConsumerService<DeclaredRoxEvent, ChannelsKafkaAdapter>;
 
 /// A decoded event plus the Kafka coordinates it came from, as handed from the
 /// poll loop to the processor over the channel.
 struct ReceivedEvent {
     partition: i32,
     offset: i64,
-    event: ChannelMacroEvent,
+    event: ChannelRoxEvent,
 }
 
 fn event_type(event: &ChannelTopicEvent) -> &'static str {
@@ -115,12 +115,12 @@ async fn main() -> anyhow::Result<()> {
     let consumer =
         KafkaEventConsumer::<ChannelsConsumerGroup>::from_env(env.kafka_brokers.as_ref())?;
     let consumer = KafkaConsumerAdapter::<ChannelsConsumerGroup, ()>::new(consumer)
-        .subscribe::<DeclaredMacroEvent>()
+        .subscribe::<DeclaredRoxEvent>()
         .map_err(|error| anyhow::anyhow!("failed to subscribe to channels topic: {error:?}"))?;
     let consumer = ChannelsConsumerService::new(consumer);
     println!(
         "listening on topic={} group={} brokers={} (ctrl-c to stop)",
-        DeclaredMacroEvent::topics()[0],
+        DeclaredRoxEvent::topics()[0],
         ChannelsConsumerGroup::GROUP_NAME,
         env.kafka_brokers.as_ref(),
     );
@@ -146,7 +146,7 @@ async fn main() -> anyhow::Result<()> {
 
                 let kafka_message = message.inner();
                 match message.decode_payload() {
-                    Ok(DeclaredMacroEvent::ChannelMacroEvent(event)) => {
+                    Ok(DeclaredRoxEvent::ChannelRoxEvent(event)) => {
                         events_tx
                             .send(ReceivedEvent {
                                 partition: kafka_message.partition(),

@@ -1,8 +1,9 @@
+import { formatLocale, t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { useUserId } from '@core/context/user';
 import { useDateSearch } from '@core/util/dateSearch/useDateSearch';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useBulkNotificationPreferencesMutation } from '@queries/notification/unsubscribes';
 import type { UserUnsubscribe } from '@service-notification/generated/schemas/userUnsubscribe';
 import {
@@ -69,7 +70,10 @@ function SnoozeNotificationsDialog(
       if (actorId !== userId()) return;
       props.onOpenChange(false);
       toast.success(
-        `Snoozed ${count} ${count === 1 ? 'item' : 'items'} until ${formatSnoozeDeadline(until)}`
+        t('settingsNotifications.snoozedToast', {
+          count,
+          date: formatSnoozeDeadline(until, formatLocale()),
+        })
       );
     },
   });

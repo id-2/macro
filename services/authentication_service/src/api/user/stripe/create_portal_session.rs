@@ -1,5 +1,5 @@
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use serde::Deserialize;
 use utoipa::ToSchema;
 
@@ -30,11 +30,11 @@ pub struct CreatePortalSessionRequest {
 #[tracing::instrument(skip(ctx, authorization), err, fields(user_id = %authorization.authorization.user.macro_user_id))]
 pub async fn create_portal_session(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(req): Json<CreatePortalSessionRequest>,
 ) -> Result<Json<StripeSessionResponse>, StripeOperationError> {
     // Get the stripe customer ID from the database
-    let stripe_customer_id = macro_db_client::user::get::get_stripe_customer_id_by_user_id(
+    let stripe_customer_id = rox_db_client::user::get::get_stripe_customer_id_by_user_id(
         &ctx.db,
         &authorization.authorization.user.macro_user_id,
     )

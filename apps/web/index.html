@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="ru">
   <head>
     <title>Rox</title>
     <meta charset="utf-8" />
@@ -9,7 +9,7 @@
     />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="theme-color" content="#FFFFFF" />
-    <meta name="description" content="Rox AI Workspace" />
+    <meta name="description" content="Rox — рабочее пространство для команды и ИИ" />
     <meta name="macro-bundle-build" content="__MACRO_BUNDLE_BUILD__" />
     <link
       rel="shortcut icon"
@@ -84,11 +84,29 @@
           background: var(--bs-panel);
         }
       }
+      /* The entry mark: large enough that the eye reads as the Rox mark on
+         first paint, inset by its own share of padding so it keeps a margin
+         from the frame instead of hugging the shell edges. */
       .bs-mark {
-        width: 44px;
-        height: 44px;
+        width: 112px;
+        height: 112px;
+        box-sizing: content-box;
+        padding: 10px;
         margin: auto;
-        fill: color-mix(in oklch, var(--bs-ink) 18%, transparent);
+      }
+      @media (max-width: 420px), (max-height: 420px) {
+        .bs-mark {
+          width: 88px;
+          height: 88px;
+          padding: 8px;
+        }
+      }
+      /* The mark must not fade under reduced motion; the dismiss timeout
+         removes the shell either way. */
+      @media (prefers-reduced-motion: reduce) {
+        #boot-shell {
+          transition: none;
+        }
       }
       /* Touch devices have no rail. */
       @media (pointer: coarse) {

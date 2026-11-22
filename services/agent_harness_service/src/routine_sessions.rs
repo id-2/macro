@@ -9,9 +9,9 @@ use agent_session::domain::routines::{ConnectedApps, RoutineSessionsService};
 use agent_session::domain::service::AgentSessionService;
 use agent_session::inbound::routine_sessions::{RoutineSessionsState, routine_sessions_router};
 use axum::Router;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::ports::ConnectionStore;
 
 use crate::external_session_requests::BrokerExternalSessionRequests;
@@ -23,16 +23,16 @@ pub fn router<Bots, Harness, Sessions, Broker, Repo, Connections, Auth>(
     sessions: Sessions,
     external_requests: BrokerExternalSessionRequests<Broker, Repo>,
     connections: Connections,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 ) -> Router
 where
     Bots: BotDirectory,
     Harness: SessionOpener + AgentSessionNotificationRecipient + Clone,
     Sessions: AgentSessionService,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Repo: AgentSessionRepo,
     Connections: ConnectionStore,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let service = RoutineSessionsService::new(
         bots,
@@ -52,7 +52,7 @@ pub struct PipedreamConnectedApps<Connections>(pub Connections);
 impl<Connections: ConnectionStore> ConnectedApps for PipedreamConnectedApps<Connections> {
     async fn connected_app_slugs(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> anyhow::Result<Vec<String>> {
         Ok(self
             .0

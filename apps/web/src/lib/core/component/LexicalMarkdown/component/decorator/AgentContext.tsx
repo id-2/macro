@@ -1,4 +1,4 @@
-import type { AgentContextDecoratorProps } from '@macro-inc/lexical-core';
+import type { AgentContextDecoratorProps } from '@rox-one/lexical-core';
 import type { Component } from 'solid-js';
 
 /**

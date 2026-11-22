@@ -5,7 +5,7 @@ use axum::{
     extract::{Query, State},
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model_error_response::ErrorResponse;
 
 use super::InitiativeRouterState;
@@ -33,13 +33,13 @@ use crate::domain::{
 #[tracing::instrument(err, skip_all)]
 pub async fn page_initiatives_handler<S, Eas, Auth>(
     State(state): State<InitiativeRouterState<S, Eas, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(request): Query<InitiativePageRequest>,
 ) -> Result<Json<InitiativePage>, InitiativeError>
 where
     S: InitiativeService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let page = state
         .service

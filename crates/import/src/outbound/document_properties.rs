@@ -7,7 +7,7 @@
 
 use std::sync::Arc;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::api::{
     AddPropertyOptionRequest, AddStringOptionRequest, CreatePropertyDefinitionRequest,
     CreatePropertyScope, PropertyDataType, SetPropertyValue,
@@ -48,7 +48,7 @@ impl<P: PropertiesService> DocumentPropertiesApplicator<P> {
     /// Apply imported tags and ordinary properties to an editable document.
     pub async fn apply(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         access: &EditReceipt,
         document_id: &str,
         imported: &ImportedDocumentProperties,
@@ -61,7 +61,7 @@ impl<P: PropertiesService> DocumentPropertiesApplicator<P> {
 
     async fn apply_tags(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         access: &EditReceipt,
         document_id: &str,
         labels: &[String],
@@ -119,7 +119,7 @@ impl<P: PropertiesService> DocumentPropertiesApplicator<P> {
 
     async fn apply_values(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         access: &EditReceipt,
         document_id: &str,
         imported: &[ImportedDocumentProperty],
@@ -197,7 +197,7 @@ impl<P: PropertiesService> DocumentPropertiesApplicator<P> {
 
     async fn property_value(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         document_id: &str,
         property: &ImportedDocumentProperty,
         definition: &PropertyDefinition,
@@ -248,7 +248,7 @@ impl<P: PropertiesService> DocumentPropertiesApplicator<P> {
 
     async fn select_value(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         document_id: &str,
         property: &ImportedDocumentProperty,
         definition: &PropertyDefinition,
@@ -303,7 +303,7 @@ impl<P: PropertiesService> DocumentPropertiesApplicator<P> {
 
     async fn find_or_create_string_option(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         document_id: &str,
         definition: &PropertyDefinition,
         options: &mut Vec<PropertyOption>,
@@ -374,13 +374,13 @@ trait ImportedPropertyDefinitions: Send + Sync {
 
     async fn create_imported_definition(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         request: &CreatePropertyDefinitionRequest,
     ) -> Result<PropertyDefinition, Self::Error>;
 
     async fn list_imported_definitions(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Vec<PropertyDefinition>, Self::Error>;
 }
 
@@ -390,7 +390,7 @@ impl<P: PropertiesService> ImportedPropertyDefinitions for P {
 
     async fn create_imported_definition(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         request: &CreatePropertyDefinitionRequest,
     ) -> Result<PropertyDefinition, Self::Error> {
         PropertiesService::create_property_definition(self, user, None, request).await
@@ -398,7 +398,7 @@ impl<P: PropertiesService> ImportedPropertyDefinitions for P {
 
     async fn list_imported_definitions(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Vec<PropertyDefinition>, Self::Error> {
         PropertiesService::list_property_definitions(
             self,
@@ -413,7 +413,7 @@ impl<P: PropertiesService> ImportedPropertyDefinitions for P {
 
 async fn find_or_create_definition<P: ImportedPropertyDefinitions>(
     properties: &P,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     document_id: &str,
     property: &ImportedDocumentProperty,
     descriptor: &ImportedPropertyDescriptor,
@@ -504,7 +504,7 @@ fn log_definition_conflict(document_id: &str, property_name: &str, conflict: Def
 
 async fn create_or_recover_definition<P: ImportedPropertyDefinitions>(
     properties: &P,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     document_id: &str,
     property_name: &str,
     descriptor: &ImportedPropertyDescriptor,

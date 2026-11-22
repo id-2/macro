@@ -1,4 +1,4 @@
-import type { MediaGeometry } from '@macro-inc/graphics';
+import type { MediaGeometry } from '@rox-one/graphics';
 export type CanvasAsset = { id: string; name: string; fileType: string };
 export type PreparedMedia = {
   type: 'image' | 'video';

@@ -35,7 +35,7 @@ if (firebaseConfigured) {
 }
 gradle.taskGraph.whenReady {
     if (!firebaseConfigured && allTasks.any { it.name.contains("Release") }) {
-        throw GradleException("Release builds require app/google-services.json for com.macro.workspace.mobile; see docs/development/android.md")
+        throw GradleException("Release builds require app/google-services.json for com.rox.workspace.mobile; see docs/development/android.md")
     }
     if (allTasks.any { it.name.contains("Release") }) {
         releaseSigningProperties.getOrThrow()
@@ -56,9 +56,9 @@ android {
         targetCompatibility = JavaVersion.VERSION_1_8
     }
     compileSdk = 36
-    namespace = "com.macro.workspace.mobile"
+    namespace = "com.rox.workspace.mobile"
     defaultConfig {
-        applicationId = "com.macro.workspace.mobile"
+        applicationId = "com.rox.workspace.mobile"
         minSdk = 24
         targetSdk = 36
         versionCode = tauriProperties.getProperty("tauri.android.versionCode", "1").toInt()

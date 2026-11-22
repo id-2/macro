@@ -1,7 +1,7 @@
 //! Kafka event models for the `macro.calendar` topic.
 
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroCalendarTopic;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxCalendarTopic;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -19,7 +19,7 @@ pub struct CalendarEventMetadata {
     pub owner_id: String,
 }
 
-/// Calendar events published to [`MacroCalendarTopic`].
+/// Calendar events published to [`RoxCalendarTopic`].
 ///
 /// The variants report what happened to the canonical `calendar_events` row,
 /// not what a caller asked for: an idempotent re-create that lands on the
@@ -59,21 +59,21 @@ impl CalendarTopicEvent {
 }
 
 impl TopicEvent for CalendarTopicEvent {
-    type Topic = MacroCalendarTopic;
+    type Topic = RoxCalendarTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroCalendarTopic`], keyed by the event entity id.
+/// Publishable event for [`RoxCalendarTopic`], keyed by the event entity id.
 ///
 /// Keying by entity id keeps every change to one event on one partition, so a
 /// consumer sharding by key applies them in order.
-pub struct CalendarMacroEvent {
+pub struct CalendarRoxEvent {
     key: String,
     event: Event<CalendarTopicEvent>,
 }
 
-impl CalendarMacroEvent {
+impl CalendarRoxEvent {
     /// Builds an event for one change, keyed by the event entity id.
     pub fn for_change(event: CalendarTopicEvent) -> Self {
         let key = event.event_id().to_string();
@@ -94,7 +94,7 @@ impl CalendarMacroEvent {
     }
 }
 
-impl MacroEvent for CalendarMacroEvent {
+impl RoxEvent for CalendarRoxEvent {
     type EventPayload = CalendarTopicEvent;
 
     fn key(&self) -> &str {

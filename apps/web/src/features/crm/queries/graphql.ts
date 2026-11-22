@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { CrmCompanyEntity, CrmContactEntity } from '@entity';
 import {
   type CacheHost,
@@ -38,7 +39,7 @@ export async function materializeCachedGraphqlCrmCompanies(
         id,
         teamId: record.teamId,
         ownerId: record.teamId,
-        name: record.name || record.domains[0] || 'Unknown Company',
+        name: record.name || record.domains[0] || t('crm.unknownCompany'),
         hidden: record.hidden,
         createdAt: record.createdAt,
         updatedAt: record.updatedAt,

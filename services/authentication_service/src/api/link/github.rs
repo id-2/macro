@@ -9,8 +9,8 @@ use github::domain::{
     models::{GithubError, GithubLinkStatus},
     ports::GithubLinkService,
 };
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
-use macro_middleware::tracking::ClientIp;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
+use rox_middleware::tracking::ClientIp;
 use model::response::{EmptyResponse, ErrorResponse};
 use serde_utils::urlencode::UrlEncoded;
 use upstream_error::{UpstreamError, UpstreamErrorResponse};
@@ -25,6 +25,30 @@ use crate::{
 mod test;
 
 pub const REAUTHENTICATION_REQUIRED_MESSAGE: &str = "ReauthenticationRequired";
+
+/// Stable code for the configuration gap that stops a GitHub link from starting.
+pub const GITHUB_NOT_CONFIGURED_CODE: &str = "github_not_configured";
+
+/// What to fix when FusionAuth has no `github` identity provider. The name of
+/// the provider and both settings are spelled out: the generic failure this
+/// replaces told neither the user nor an operator what was missing.
+pub const GITHUB_NOT_CONFIGURED_MESSAGE: &str =
+    "GitHub не подключён на этом стенде: в FusionAuth нет провайдера github. \
+     Задайте настоящие GITHUB_CLIENT_ID и GITHUB_CLIENT_SECRET GitHub OAuth-приложения \
+     в окружении authentication-service, перезапустите стенд и создайте провайдер github.";
+
+/// The answer to a link start that cannot work in this deployment.
+#[derive(Debug, serde::Serialize, utoipa::ToSchema)]
+pub struct GithubLinkNotConfiguredResponse {
+    /// Stable machine-readable code for this configuration gap.
+    pub code: String,
+    /// What is missing and which settings fix it, written for the user.
+    pub message: String,
+    /// The callback URL the GitHub OAuth app must accept.
+    pub redirect_uri: String,
+    /// The service settings that are empty or still hold placeholders.
+    pub missing_settings: Vec<String>,
+}
 
 #[derive(serde::Deserialize, serde::Serialize, Debug, utoipa::ToSchema)]
 pub struct GithubLinkStatusResponse {
@@ -59,9 +83,14 @@ pub enum InitGithubLinkError {
     /// Internal github error
     #[error("internal error occurred")]
     GithubServiceError(#[from] GithubError),
-    /// The identity provider was not found
+    /// The identity provider was not found for a reason other than an
+    /// unconfigured connector.
     #[error("identity provider not found")]
     IdentityProviderNotFound,
+    /// FusionAuth has no `github` identity provider: the GitHub OAuth app is
+    /// not configured for this deployment, so no link can start.
+    #[error("github identity provider not configured")]
+    NotConfigured { redirect_uri: String },
     /// The sign-in service could not be reached to look up the provider.
     #[error(transparent)]
     Upstream(UpstreamError),
@@ -71,6 +100,21 @@ impl IntoResponse for InitGithubLinkError {
     fn into_response(self) -> Response {
         let message = self.to_string();
         let status_code: StatusCode = match self {
+            InitGithubLinkError::NotConfigured { redirect_uri } => {
+                return (
+                    StatusCode::CONFLICT,
+                    Json(GithubLinkNotConfiguredResponse {
+                        code: GITHUB_NOT_CONFIGURED_CODE.to_string(),
+                        message: GITHUB_NOT_CONFIGURED_MESSAGE.to_string(),
+                        redirect_uri,
+                        missing_settings: vec![
+                            "GITHUB_CLIENT_ID".to_string(),
+                            "GITHUB_CLIENT_SECRET".to_string(),
+                        ],
+                    }),
+                )
+                    .into_response();
+            }
             InitGithubLinkError::InvalidUserId(_) => StatusCode::BAD_REQUEST,
             InitGithubLinkError::TooManyInProgressLinks => StatusCode::TOO_MANY_REQUESTS,
             InitGithubLinkError::Upstream(error)
@@ -93,6 +137,15 @@ impl IntoResponse for InitGithubLinkError {
 }
 
 const NO_GITHUB_LINK_MESSAGE: &str = "no github link found";
+
+/// Whether a provider lookup failed because FusionAuth knows no provider by
+/// that name, as opposed to failing to answer at all.
+fn is_missing_identity_provider(error: &fusionauth::error::FusionAuthClientError) -> bool {
+    matches!(
+        error,
+        fusionauth::error::FusionAuthClientError::NoIdentityProviderFound
+    )
+}
 
 fn error_response(status_code: StatusCode, message: &'static str) -> Response {
     (
@@ -140,7 +193,7 @@ impl IntoResponse for GithubLinkStatusError {
 pub async fn check_github_link_status_handler(
     State(ctx): State<ApiContext>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Response, GithubLinkStatusError> {
     let user_id = &authorization.authorization.user.macro_user_id;
     let status = ctx
@@ -186,6 +239,7 @@ pub(crate) struct InitGithubLinkQueryParams {
         responses(
             (status = 200, body=InitGithubLinkResponse),
             (status = 400, body=ErrorResponse),
+            (status = 409, body=GithubLinkNotConfiguredResponse),
             (status = 429, body=ErrorResponse),
             (status = 401, body=ErrorResponse),
             (status = 500, body=ErrorResponse),
@@ -198,16 +252,46 @@ pub async fn init_github_link_handler(
     State(ctx): State<ApiContext>,
     query: Query<InitGithubLinkQueryParams>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<InitGithubLinkResponse>, InitGithubLinkError> {
     let Query(InitGithubLinkQueryParams { original_url }) = query;
     let fusion_user_id = &authorization.authorization.user.user_context.fusion_user_id;
     let initiator =
-        macro_uuid::string_to_uuid(fusion_user_id).context("fusion user id must be a uuid")?;
+        rox_uuid::string_to_uuid(fusion_user_id).context("fusion user id must be a uuid")?;
+
+    // The callback the GitHub OAuth app has to accept. Resolved before any
+    // state is written so a misconfiguration can name it.
+    let redirect_uri = crate::api::oauth2::format_redirect_uri(LinkProvider::Github.as_str());
+
+    // Get Github integration identity provider ID from context. Look it up
+    // before creating the pending link: a deployment without the provider
+    // would otherwise leave one dangling row per click until the user hits the
+    // in-progress cap and gets a misleading "too many links" answer.
+    let github_idp_id = &ctx
+        .auth_client
+        .get_identity_provider_id_by_name("github")
+        .await
+        .map_err(|error| match error.upstream() {
+            Some(upstream) => InitGithubLinkError::Upstream(upstream),
+            None if is_missing_identity_provider(&error) => {
+                tracing::warn!(
+                    redirect_uri=%redirect_uri,
+                    "FusionAuth has no github identity provider; refusing to start a link"
+                );
+                InitGithubLinkError::NotConfigured {
+                    redirect_uri: redirect_uri.clone(),
+                }
+            }
+            None => {
+                tracing::error!(error=?error, "failed to look up the github identity provider");
+                InitGithubLinkError::IdentityProviderNotFound
+            }
+        })?;
+
     // TODO: this should probably be a middleware or extractor
     // Check count of in-progress links
     let count =
-        macro_db_client::in_progress_user_link::count_existing_in_progress_user_links_for_user(
+        rox_db_client::in_progress_user_link::count_existing_in_progress_user_links_for_user(
             &ctx.db,
             fusion_user_id,
         )
@@ -218,24 +302,11 @@ pub async fn init_github_link_handler(
     }
 
     // Create in-progress link
-    let link_id = macro_db_client::in_progress_user_link::create_in_progress_user_link(
+    let link_id = rox_db_client::in_progress_user_link::create_in_progress_user_link(
         &ctx.db,
         fusion_user_id,
     )
     .await?;
-
-    // Get Github integration identity provider ID from context
-    let github_idp_id = &ctx
-        .auth_client
-        .get_identity_provider_id_by_name("github")
-        .await
-        .map_err(|error| match error.upstream() {
-            Some(upstream) => InitGithubLinkError::Upstream(upstream),
-            None => {
-                tracing::error!(error=?error, "failed to look up the github identity provider");
-                InitGithubLinkError::IdentityProviderNotFound
-            }
-        })?;
 
     // Build the signed OAuth state. The callback refuses state it did not sign,
     // state issued for another provider, and state whose pending link belongs
@@ -249,9 +320,6 @@ pub async fn init_github_link_handler(
     );
     let state = sign_account_link_state(&state, &ctx.account_link_state_key)
         .context("failed to sign OAuth state")?;
-
-    // Build Github OAuth URL
-    let redirect_uri = crate::api::oauth2::format_redirect_uri(LinkProvider::Github.as_str());
 
     let authorization_url = ctx
         .github_link_service
@@ -314,7 +382,7 @@ impl IntoResponse for DeleteGithubLinkError {
 pub async fn delete_github_link_handler(
     State(ctx): State<ApiContext>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<EmptyResponse>, DeleteGithubLinkError> {
     ctx.github_link_service
         .delete_user_link(&authorization.authorization.user.macro_user_id)

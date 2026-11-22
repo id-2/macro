@@ -1,5 +1,5 @@
-import { shapePayload } from '@macro-inc/graphics';
-import type { PeerPresence } from '@macro-inc/graphics/loro';
+import { shapePayload } from '@rox-one/graphics';
+import type { PeerPresence } from '@rox-one/graphics/loro';
 import { z } from 'zod';
 
 const finite = z.number().finite();

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_gmail_pending_label_writes SET expires_at = now() - interval '1 second' WHERE write_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "af1eac737b9e2bf80ecc46bac4a116a95e68918852661f85888f1632785f527d"
+}

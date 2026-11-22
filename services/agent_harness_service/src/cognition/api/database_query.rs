@@ -5,7 +5,7 @@ use super::structured_completion::StructuredCompletionError;
 use crate::cognition::service::database_query::{self, DatabaseQueryAnswer, DatabaseQueryRequest};
 use ai_billing::inbound::admission::admission_status;
 use axum::{Json, extract::State, http::StatusCode};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::Instrument;
@@ -34,7 +34,7 @@ fn discovery_tools() -> ai_toolset::AsyncToolCollection<ai_tools::ToolServiceCon
 pub async fn generate_database_query(
     State(state): State<ApiContext>,
     model_access: DcsChatModelAccess,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     Json(request): Json<DatabaseQueryRequest>,
 ) -> Result<Json<DatabaseQueryAnswer>, StructuredCompletionError> {
     if !model_access.has_access(&request.model) {

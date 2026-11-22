@@ -20,7 +20,7 @@ import {
   type CellDateMention,
   cellTextParts,
   encodeCellMention,
-} from '@macro-inc/spreadsheet/cell-mentions';
+} from '@rox-one/spreadsheet/cell-mentions';
 import { For, Suspense } from 'solid-js';
 import type { SpreadsheetMentions } from './context/spreadsheet-mentions';
 import { SpreadsheetCellLinks } from './spreadsheet-cell-links';

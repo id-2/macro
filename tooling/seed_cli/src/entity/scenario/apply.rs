@@ -15,8 +15,8 @@ use comms_db_client::channels::seed_channel::SeedChannelOptions;
 use comms_db_client::messages::seed_message::SeedMessageOptions;
 use comms_db_client::model::SimpleMention;
 use entity_access_db_utils::{AccessLevel, EntityAccessSourceType, EntityType};
-use macro_db_client::document::v2::create::CreateDocumentArgs;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_client::document::v2::create::CreateDocumentArgs;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use model::item::ShareableItemType;
 use models_email::email::service::address::ContactInfo;
@@ -590,7 +590,7 @@ async fn seed_documents(
         let name = document.name.as_deref().unwrap_or(key);
         let owner_id = spec.user_id(&document.owner);
         let owner =
-            MacroUserIdStr::parse_from_str(owner_id.clone().leak()).context("valid owner id")?;
+            RoxUserIdStr::parse_from_str(owner_id.clone().leak()).context("valid owner id")?;
 
         let file_type = match (&document.content, document.file.as_deref()) {
             (Some(_), _) => Some(FileType::Md),
@@ -703,7 +703,7 @@ async fn seed_tasks(ctx: &SeedCliContext, spec: &ScenarioSpec) -> anyhow::Result
         let name = task.name.as_deref().unwrap_or(key);
         let owner_id = spec.user_id(&task.owner);
         let owner =
-            MacroUserIdStr::parse_from_str(owner_id.clone().leak()).context("valid owner id")?;
+            RoxUserIdStr::parse_from_str(owner_id.clone().leak()).context("valid owner id")?;
 
         let project_id = task.project.as_deref().map(|p| spec.project_id(p));
         let project_name = task.project.as_deref().map(|p| {
@@ -927,9 +927,9 @@ async fn seed_emails(ctx: &SeedCliContext, spec: &ScenarioSpec) -> anyhow::Resul
             .unwrap_or_else(|| owner.email.clone());
         let link_id = spec.email_link_id(key);
 
-        let macro_id = MacroUserIdStr::parse_from_str(spec.user_id(&account.owner).leak())
+        let macro_id = RoxUserIdStr::parse_from_str(spec.user_id(&account.owner).leak())
             .context("valid inbox owner id")?;
-        let email_str = macro_user_id::email::EmailStr::try_from(address.clone())
+        let email_str = rox_user_id::email::EmailStr::try_from(address.clone())
             .map_err(|e| anyhow::anyhow!("invalid inbox address {address}: {e:?}"))?;
         let is_primary = Link::derive_is_primary(UserProvider::Gmail);
 
@@ -1087,7 +1087,7 @@ fn build_thread(
             thread_spec.body_html.as_deref(),
             &body_text,
         )),
-        body_macro: None,
+        body_rox: None,
         attachments: vec![],
         attachments_draft: vec![],
         attachments_forwarded: vec![],

@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT import_started_at > now() - interval '1 minute' AS \"restarted!\", import_completed_at\n        FROM email_sync_streams WHERE link_id = $1 AND kind = 'folder_catalog'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "restarted!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "import_completed_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null,
+      true
+    ]
+  },
+  "hash": "1dd5895ce9edbfea0387fae2b78e147bf6874ce598a9a50000f8fe16ec4805ed"
+}

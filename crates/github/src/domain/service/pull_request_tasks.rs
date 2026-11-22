@@ -5,7 +5,7 @@
 //! Both write the same additive `github_pr_tasks` record, so later webhook
 //! events (merge, close) reach the task either way.
 
-use crate::domain::models::{GithubError, GithubKey, MacroTaskId};
+use crate::domain::models::{GithubError, GithubKey, RoxTaskId};
 use crate::domain::ports::GithubSyncRepo;
 
 #[cfg(test)]
@@ -28,7 +28,7 @@ impl<Repo: GithubSyncRepo> PullRequestTaskLinkService<Repo> {
     pub async fn link(
         &self,
         pull_request: GithubKey,
-        task: MacroTaskId,
+        task: RoxTaskId,
     ) -> Result<(), GithubError> {
         self.repo
             .upsert_task_ids(pull_request, &[task])

@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashSet;
 fn value(realtime: bool, apns: bool) -> InboxSyncNotification {
     InboxSyncNotification {
@@ -8,9 +8,9 @@ fn value(realtime: bool, apns: bool) -> InboxSyncNotification {
         thread_id: Uuid::nil(),
         subject: "Subject".into(),
         snippet: "Snippet".into(),
-        sender_id: Some(MacroUserIdStr::try_from("macro|sender@example.com".to_owned()).unwrap()),
+        sender_id: Some(RoxUserIdStr::try_from("macro|sender@example.com".to_owned()).unwrap()),
         recipients: HashSet::from([
-            MacroUserIdStr::try_from("macro|staff@rox.one".to_owned()).unwrap()
+            RoxUserIdStr::try_from("macro|staff@rox.one".to_owned()).unwrap()
         ]),
         realtime,
         apns,

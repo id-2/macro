@@ -4,7 +4,7 @@ import { exportIosFile, hasIosFileExport } from '@core/mobile/iosFiles';
 import { isPlatform } from '@core/util/platform';
 import type { ResultError } from '@core/util/result';
 import { downloadFile } from '@filesystem/download';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import type { FetchProgress } from '@service-storage/util/fetchPresigned';
 import type { Result } from 'neverthrow';
 import {

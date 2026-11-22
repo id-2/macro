@@ -15,7 +15,7 @@ import {
   MagnifyingGlassIcon,
 } from '../graphics/EmailListCardGraphic';
 import { EmptyInboxTray } from '../graphics/EmptyInboxTray';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 import { APP_PREVIEW_HEIGHT } from './SceneAppPreview';
 
 // The /email hero: a purpose-built, fully interactive inbox. No app sidebar, no
@@ -932,7 +932,7 @@ export function EmailTurboInbox(props: {
                             gap: mobile() ? '10px' : '25px',
                           }}
                         >
-                          <MacroMarkIcon
+                          <RoxMarkIcon
                             aria-label="Rox"
                             style={{
                               color: INK.textDim,

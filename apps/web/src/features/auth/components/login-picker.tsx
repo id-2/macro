@@ -1,6 +1,7 @@
 import IconApple from '@icon/macro-apple.svg';
 import { Show } from 'solid-js';
 import { AuthButton } from './form-fields';
+import { entryCopy } from './entry-copy';
 
 export function LoginPicker(props: {
   /** Sign in with Apple is required for App Store review and iOS-only. */
@@ -11,7 +12,7 @@ export function LoginPicker(props: {
   return (
     <div class="flex flex-col gap-3">
       <AuthButton autofocus onClick={props.onEmail}>
-        Continue with email
+        {entryCopy().continueEmail}
       </AuthButton>
       <Show when={props.showApple}>
         <AuthButton variant="secondary" onClick={props.onApple}>
@@ -20,7 +21,7 @@ export function LoginPicker(props: {
             class="size-5 shrink-0"
             aria-hidden="true"
           />
-          Continue with Apple
+          {entryCopy().continueApple}
         </AuthButton>
       </Show>
     </div>

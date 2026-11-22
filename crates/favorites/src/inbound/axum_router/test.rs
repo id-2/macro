@@ -5,10 +5,10 @@ use axum::http::header;
 use chrono::{TimeZone, Utc};
 use entity_access::domain::ports::NoOpEntityAccessService;
 use http_body_util::BodyExt;
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use model_user::UserContext;
 use rootcause::Report;
@@ -22,10 +22,10 @@ const VALID_JWT: &str = "valid";
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != VALID_JWT {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: USER_ID.to_string(),
@@ -38,18 +38,18 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -95,7 +95,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn add_favorite_with_established_access(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _entity: &Entity<'_>,
     ) -> Result<Favorite, FavoritesError> {
         unimplemented!("the list boundary does not add favorites")
@@ -103,7 +103,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn list_favorites(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         filter: &FavoriteFilter,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         self.filters
@@ -123,7 +123,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn remove_favorite_by_entity(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _entity: &Entity<'_>,
     ) -> Result<(), FavoritesError> {
         unimplemented!("the list boundary does not remove favorites")
@@ -131,7 +131,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn reorder_favorites(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _ordered: &[Entity<'_>],
     ) -> Result<(), FavoritesError> {
         unimplemented!("the list boundary does not reorder favorites")
@@ -139,7 +139,7 @@ impl FavoritesService for FakeFavoritesService {
 
     async fn favorited_entities(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _entities: &[Entity<'_>],
     ) -> Result<HashSet<Entity<'static>>, FavoritesError> {
         unimplemented!("the list boundary does not read favorite edges")
@@ -150,7 +150,7 @@ fn build_router(service: FakeFavoritesService) -> axum::Router {
     favorites_router(FavoritesRouterState::new(
         Arc::new(service),
         Arc::new(NoOpEntityAccessService),
-        macro_authorization::MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        rox_authorization::RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     ))
 }
 

@@ -1,5 +1,5 @@
 use backends::Storage;
-use macro_sync_service_jwt::session::SessionKind;
+use rox_sync_service_jwt::session::SessionKind;
 use snapshot::SnapshotStorage;
 use tracing::trace;
 use worker::{Env, Error, Result, State};

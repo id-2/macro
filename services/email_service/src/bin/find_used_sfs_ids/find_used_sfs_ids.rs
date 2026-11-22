@@ -25,7 +25,7 @@ use std::time::Instant;
 
 use anyhow::Context;
 use futures::future::join_all;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::PgPool;
 use sqlx::postgres::PgPoolOptions;
 use tokio::sync::mpsc;
@@ -61,7 +61,7 @@ async fn main() -> anyhow::Result<()> {
     println!("=== Find Used SFS IDs ===\n");
 
     // Initialize and load configuration
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = load_and_print_config()?;
 
     // Connect to database

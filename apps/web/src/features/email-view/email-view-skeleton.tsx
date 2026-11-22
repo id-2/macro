@@ -4,9 +4,9 @@ import { ViewSkeleton } from '@app/components/view-shell/ViewSkeleton';
 export function EmailViewSkeleton() {
   return (
     <ViewSkeleton.Root asidePreferenceKey="email">
-      <ViewSkeleton.Sidebar title="Email" createLabel="New email" />
+      <ViewSkeleton.Sidebar title="Почта" createLabel="Создать почту Rox" />
       <ViewSkeleton.Main
-        title="Inbox"
+        title="Входящие"
         tabs={['Signal', 'Noise']}
         controls={[2, 1, '+ New', 1]}
         searchPlaceholder="Search email"

@@ -8,38 +8,38 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use config::Config;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState,
 };
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     let config = Config::from_env().context("expected to be able to generate config")?;
 
     tracing::trace!("initialized config");
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
-        aws_sdk_secretsmanager::Client::new(&macro_aws_config::get_macro_aws_config().await),
+        aws_sdk_secretsmanager::Client::new(&rox_aws_config::get_macro_aws_config().await),
     );
 
     let jwt_args =
         JwtValidationArgs::new_with_secret_manager(config.environment, &secretsmanager_client)
             .await?;
-    let authorization_service = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_service = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
-    let authorization_state = MacroAuthorizationState::new(Arc::new(authorization_service));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(authorization_service));
 
     let http_client = api::proxy::build_http_client().context("failed to build http client")?;
 

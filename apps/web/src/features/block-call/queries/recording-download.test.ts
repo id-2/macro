@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { CallRecord } from '@service-call/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 

@@ -4,7 +4,7 @@ use axum::{Json, extract::State};
 use entity_access::{
     domain::ports::EntityAccessService, inbound::axum_extractors::DocumentAccessExtractor,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_entity::EntityAppearance;
 use models_permissions::share_permission::access_level::EditAccessLevel;
 
@@ -25,7 +25,7 @@ use crate::domain::{models::DocumentError, ports::DocumentService};
 pub async fn set_appearance<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: DocumentAccessExtractor<EditAccessLevel, Svc, Auth>,
     State(state): State<DocumentRouterState<T, Svc, Auth>>,

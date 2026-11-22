@@ -2,7 +2,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use super::*;
 use crate::outbound::pg_access_repo::queries::get_entity_users;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const OWNER: &str = "macro|owner@corp.test";
 const TEAM_MEMBER: &str = "macro|member@corp.test";

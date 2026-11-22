@@ -9,7 +9,7 @@ use anyhow::Context as _;
 use clap::Parser;
 use database_env_vars::DatabaseUrl;
 use databases::backfill::{backfill_table, tables_with_formulas};
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::postgres::PgPoolOptions;
 
 #[derive(Parser)]
@@ -29,7 +29,7 @@ struct Progress {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let arguments = Arguments::parse();
 
     let database_url = DatabaseUrl::new().context("DATABASE_URL must be provided")?;

@@ -9,29 +9,29 @@
 
 import { fireAndForget } from '@core/util/fireAndForget';
 import { schema } from '@loro-mirror/core';
-import { createAwareness } from '@macro-inc/collaboration/collab/awareness';
-import type { Chatter } from '@macro-inc/collaboration/collab/chatter';
-import { createSyncEngine } from '@macro-inc/collaboration/collab/engine';
-import { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import { createAwareness } from '@rox-one/collaboration/collab/awareness';
+import type { Chatter } from '@rox-one/collaboration/collab/chatter';
+import { createSyncEngine } from '@rox-one/collaboration/collab/engine';
+import { LoroManager } from '@rox-one/collaboration/collab/manager';
 import {
   IDBSnapshotStore,
   LORO_SNAPSHOT_DB_NAME,
   loadCachedState,
   type SnapshotStore,
-} from '@macro-inc/collaboration/collab/snapshot-store';
+} from '@rox-one/collaboration/collab/snapshot-store';
 import {
   type InitialSync,
   type LiveSyncSource,
   SyncError,
   type SyncSourceEvent,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
+} from '@rox-one/collaboration/collab/source';
 import {
   BrowserWALStore,
   LORO_WAL_DB_NAME,
   type WALStore,
   WALSyncer,
-} from '@macro-inc/collaboration/collab/wal';
+} from '@rox-one/collaboration/collab/wal';
 import { LoroDoc } from 'loro-crdt';
 import { errAsync, type ResultAsync } from 'neverthrow';
 import {

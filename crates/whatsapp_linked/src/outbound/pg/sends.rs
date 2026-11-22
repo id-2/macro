@@ -7,7 +7,7 @@ use crate::domain::{events::*, ports::SendRepository};
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 use external_chat::domain::ports::{MutationTarget, SendIntent, StoredSend};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 struct SendRow {
     id: Uuid,
@@ -68,7 +68,7 @@ impl SendRepository for PgWhatsAppRepository {
     async fn stored_send(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         idempotency_key: Uuid,
     ) -> ExternalChatResult<Option<StoredSend>> {
         let user = user.as_ref();
@@ -238,7 +238,7 @@ impl SendRepository for PgWhatsAppRepository {
     async fn open_sends(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ExternalChatResult<Vec<SendProgress>> {
         let user = user.as_ref();
         sqlx::query_as!(
@@ -289,7 +289,7 @@ impl SendRepository for PgWhatsAppRepository {
     async fn sends_for(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         ids: &[Uuid],
     ) -> ExternalChatResult<Vec<SendProgress>> {
         let user = user.as_ref();

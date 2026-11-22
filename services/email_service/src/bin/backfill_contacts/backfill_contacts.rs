@@ -2,12 +2,12 @@ mod config;
 mod process;
 
 use anyhow::Context;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::postgres::PgPoolOptions;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     println!("Loading configuration...");
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = config::Config::from_env().context("Failed to load configuration")?;
 
     println!("Connecting to the database...");
@@ -24,12 +24,12 @@ async fn main() -> anyhow::Result<()> {
         .map(|id| id.trim().to_string())
         .collect();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
 
     let contacts_ingress = contacts::domain::service::SqsContactsIngress {
         queue: contacts::outbound::ingress::SqsContactsQueue::new(
             aws_sdk_sqs::Client::new(&aws_config),
-            macro_queues::ContactsQueue::new().to_string(),
+            rox_queues::ContactsQueue::new().to_string(),
         ),
     };
 

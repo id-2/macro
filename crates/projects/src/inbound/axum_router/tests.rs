@@ -20,12 +20,12 @@ use entity_access::domain::{
 };
 use entity_registry::NonUserOwners;
 use http_body_util::BodyExt;
-use macro_authorization::{
+use rox_authorization::{
     BOT_FOR_MACRO_USER_ID_HEADER, BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims,
-    BotAuthentication, BotScope, InternalIdentityClaims, MacroAuthorizationError,
-    MacroAuthorizationService, MacroAuthorizationState, MacroUserAuthentication,
+    BotAuthentication, BotScope, InternalIdentityClaims, RoxAuthorizationError,
+    RoxAuthorizationService, RoxAuthorizationState, RoxUserAuthentication,
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId, user_id::MacroUserIdStr};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId, user_id::RoxUserIdStr};
 use model::{
     folder::{FileSystemNodeWithIds, UploadFolderRequest, UploadFolderResponseData},
     item::ItemWithUserAccessLevel,
@@ -113,21 +113,21 @@ impl FakeProjectService {
 impl ProjectService for FakeProjectService {
     async fn list_projects(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<Project>, ProjectError> {
         Ok(vec![project()])
     }
 
     async fn list_accessible_projects(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<Project>, ProjectError> {
         Ok(vec![project()])
     }
 
     async fn list_pending_projects(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<PendingProject>, ProjectError> {
         Ok(Vec::new())
     }
@@ -283,7 +283,7 @@ impl ProjectService for FakeProjectService {
 
     async fn upload_folder(
         &self,
-        _actor: MacroUserIdStr<'static>,
+        _actor: RoxUserIdStr<'static>,
         internal: bool,
         _args: UploadFolderRequest,
     ) -> Result<UploadFolderResponseData, ProjectError> {
@@ -302,7 +302,7 @@ impl ProjectService for FakeProjectService {
 
     async fn create_upload_extract_request(
         &self,
-        _actor: MacroUserIdStr<'static>,
+        _actor: RoxUserIdStr<'static>,
         _args: UploadExtractFolderRequest,
     ) -> Result<UploadExtractFolderResponseData, ProjectError> {
         panic!("upload extraction is not used by these tests")
@@ -310,7 +310,7 @@ impl ProjectService for FakeProjectService {
 
     async fn get_upload_extract_status(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         upload_request_id: &str,
     ) -> Result<UploadExtractStatusResponseData, ProjectError> {
         if actor.as_ref() != USER_ID || upload_request_id != "request-1" {
@@ -336,7 +336,7 @@ impl ProjectService for FakeProjectService {
 
     async fn get_batch_preview(
         &self,
-        _actor: Option<MacroUserIdStr<'static>>,
+        _actor: Option<RoxUserIdStr<'static>>,
         _project_ids: Vec<String>,
     ) -> Result<Vec<ProjectPreview>, ProjectError> {
         Ok(Vec::new())
@@ -362,7 +362,7 @@ struct FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -382,7 +382,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -391,7 +391,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -410,7 +410,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -420,7 +420,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -431,7 +431,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         panic!("unexpected user lookup")
     }
 
@@ -451,7 +451,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         panic!("unexpected team lookup")
     }
@@ -460,10 +460,10 @@ impl EntityAccessService for FakeEntityAccessService {
 #[derive(Clone, Default)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, token: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, token: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if token != TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(user_context(USER_ID))
     }
@@ -471,19 +471,19 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(claims.user_id.map(|user_id| user_context(&user_id)))
     }
@@ -493,9 +493,9 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         bot_token: &str,
         bot_scope: BotScope,
         acting_user: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         if bot_token != BOT_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(BotAuthentication {
             bot_id: BotId::TEST_A,
@@ -504,8 +504,8 @@ impl MacroAuthorizationService for FakeAuthorizationService {
             team_id: Some(TEAM_ID),
             acting_user: acting_user
                 .and_then(|claims| claims.user_id)
-                .map(|user_id| MacroUserAuthentication {
-                    origin: macro_authorization::CredentialOrigin::Bot,
+                .map(|user_id| RoxUserAuthentication {
+                    origin: rox_authorization::CredentialOrigin::Bot,
                     agent_id: None,
                     agent_via: None,
                     routine_id: None,
@@ -529,14 +529,14 @@ fn router_with(
         ProjectRouterState {
             service: Arc::new(service),
             access_service: Arc::new(FakeEntityAccessService { access_level }),
-            authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
             non_user_owners,
         },
     )
 }
 
-fn user(user_id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(user_id.to_string()).expect("test user id should be valid")
+fn user(user_id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(user_id.to_string()).expect("test user id should be valid")
 }
 
 fn user_context(value: &str) -> UserContext {
@@ -1167,7 +1167,7 @@ async fn internal_upload_accepts_a_ten_thousand_file_folder() {
     >(ProjectRouterState {
         service: Arc::new(service),
         access_service: Arc::new(FakeEntityAccessService { access_level: None }),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
         non_user_owners: NonUserOwners::Disabled,
     });
 
@@ -1340,7 +1340,7 @@ async fn mark_uploaded_preserves_exact_lambda_request_and_response_json() {
     let state = ProjectRouterState {
         service: Arc::new(FakeProjectService::with_project(USER_ID, false)),
         access_service: Arc::new(FakeEntityAccessService { access_level: None }),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
         non_user_owners: NonUserOwners::Disabled,
     };
     let router = Router::new()

@@ -30,7 +30,7 @@ pub(crate) fn get_presigned_url(
 ) -> anyhow::Result<String> {
     let constructed_url = format!("{}/{}", cloudfront_distribution_url, key);
 
-    let signed_url = if !macro_aws_config::is_local_aws() {
+    let signed_url = if !rox_aws_config::is_local_aws() {
         get_signed_url(&constructed_url, options)?
     } else {
         constructed_url

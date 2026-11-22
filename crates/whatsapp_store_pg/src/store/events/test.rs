@@ -1,5 +1,5 @@
 use chrono::{TimeZone, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use whatsmeow::store::{
     EventBuffer, LidStore, MessageSecretInsert, MsgSecretStore, NctSaltStore, PrivacyToken,

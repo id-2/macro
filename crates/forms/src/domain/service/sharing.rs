@@ -7,7 +7,7 @@ use std::collections::HashSet;
 
 use databases::domain::ports::{DatabaseMetadataReads, DatabaseRowReads, DatabasesService};
 use entity_access::domain::models::{EntityAccessReceipt, OwnerAccessLevel};
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_permissions::share_permission::access_level::AccessLevel as ShareAccessLevel;
 use models_permissions::share_permission::channel_share_permission::UpdateOperation;
 use models_permissions::share_permission::{SharePermissionV2, UpdateSharePermissionRequestV2};
@@ -32,7 +32,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {

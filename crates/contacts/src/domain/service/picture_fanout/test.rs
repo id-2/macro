@@ -6,8 +6,8 @@ use std::sync::{Arc, Mutex};
 type Sent = Arc<Mutex<Vec<(String, Vec<String>)>>>;
 type Cursors = Arc<Mutex<Vec<Option<String>>>>;
 
-fn user(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn entry(value: &str) -> ContactIdEntry {
@@ -23,15 +23,15 @@ struct PagedRepo {
 impl ContactsPageRepository for PagedRepo {
     async fn lookup_contact_ids(
         &self,
-        _viewer: MacroUserIdStr<'_>,
+        _viewer: RoxUserIdStr<'_>,
         _lookup: &ContactLookup,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         unreachable!("fan-out only pages")
     }
 
     async fn contact_id_page(
         &self,
-        _viewer: MacroUserIdStr<'_>,
+        _viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> Result<ContactIdPage, Report> {
@@ -53,8 +53,8 @@ struct RecordingNotifier {
 impl UserPictureNotifier for RecordingNotifier {
     async fn notify_picture_changed(
         &self,
-        user_id: &MacroUserIdStr<'_>,
-        recipients: &[MacroUserIdStr<'static>],
+        user_id: &RoxUserIdStr<'_>,
+        recipients: &[RoxUserIdStr<'static>],
     ) -> Result<(), Report> {
         if self.fail {
             return Err(report!("gateway down"));

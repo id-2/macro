@@ -71,7 +71,7 @@ async fn cached_mail_previews_preserve_message_sender_names(
     let thread_ids = EXPECTED_SENDERS.map(|(id, _)| id);
     let rows = repo
         .thread_mail_projections_by_ids(
-            MacroUserIdStr::parse_from_str("macro|user1@test.com")?,
+            RoxUserIdStr::parse_from_str("macro|user1@test.com")?,
             &thread_ids,
         )
         .await?;

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   ListFilterDropdown,
   ListGroupDropdown,
@@ -12,19 +13,22 @@ import { createSignal, For, Show } from 'solid-js';
 import type { ActivityFilters } from '../context/crm-context';
 import type { CrmActivityViewState } from '../core/activity-view';
 
-const SORT_OPTIONS = [
-  { id: 'updated_at', label: 'Last updated' },
-  { id: 'created_at', label: 'Date created' },
-  { id: 'viewed_at', label: 'Last viewed' },
-] satisfies { id: CrmActivityViewState['sort']; label: string }[];
-const GROUP_OPTIONS = [
-  { id: 'date', label: 'Date' },
-  { id: 'none', label: 'None' },
-] satisfies { id: CrmActivityViewState['groupBy']; label: string }[];
-const DIRECTION_OPTIONS = [
-  { id: 'desc', label: 'Newest first' },
-  { id: 'asc', label: 'Oldest first' },
-] satisfies { id: CrmActivityViewState['direction']; label: string }[];
+const sortOptions = () =>
+  [
+    { id: 'updated_at' as const, label: t('viewMenus.sortLastUpdated') },
+    { id: 'created_at' as const, label: t('viewMenus.sortDateCreated') },
+    { id: 'viewed_at' as const, label: t('viewMenus.sortLastViewed') },
+  ] satisfies { id: CrmActivityViewState['sort']; label: string }[];
+const groupOptions = () =>
+  [
+    { id: 'date' as const, label: t('viewMenus.date') },
+    { id: 'none' as const, label: t('viewMenus.groupNone') },
+  ] satisfies { id: CrmActivityViewState['groupBy']; label: string }[];
+const directionOptions = () =>
+  [
+    { id: 'desc' as const, label: t('crm.sortNewestFirst') },
+    { id: 'asc' as const, label: t('crm.sortOldestFirst') },
+  ] satisfies { id: CrmActivityViewState['direction']; label: string }[];
 
 export function ActivityControls(props: {
   label: string;
@@ -42,14 +46,14 @@ export function ActivityControls(props: {
         <MobileFilterDrawer
           open={drawerOpen()}
           onOpenChange={setDrawerOpen}
-          triggerLabel={`Open ${props.label} filters`}
-          label={`${props.label} list controls`}
+          triggerLabel={t('crm.openFiltersFor', { label: props.label })}
+          label={t('crm.listControlsFor', { label: props.label })}
           activeCount={props.filters.activeCount()}
           onClear={props.filters.clear}
         >
-          <MobileDrawer.Label class="pt-4">Sort</MobileDrawer.Label>
-          <MobileDrawer.Section role="radiogroup" aria-label="Sort">
-            <For each={SORT_OPTIONS}>
+          <MobileDrawer.Label class="pt-4">{t('crm.sort')}</MobileDrawer.Label>
+          <MobileDrawer.Section role="radiogroup" aria-label={t('crm.sort')}>
+            <For each={sortOptions()}>
               {(option) => (
                 <MobileFilterDrawer.Option
                   selectionMode="single"
@@ -61,8 +65,8 @@ export function ActivityControls(props: {
               )}
             </For>
           </MobileDrawer.Section>
-          <MobileDrawer.Section role="radiogroup" aria-label="Direction">
-            <For each={DIRECTION_OPTIONS}>
+          <MobileDrawer.Section role="radiogroup" aria-label={t('crm.sortDirection')}>
+            <For each={directionOptions()}>
               {(option) => (
                 <MobileFilterDrawer.Option
                   selectionMode="single"
@@ -74,9 +78,9 @@ export function ActivityControls(props: {
               )}
             </For>
           </MobileDrawer.Section>
-          <MobileDrawer.Label class="pt-4">Group</MobileDrawer.Label>
-          <MobileDrawer.Section role="radiogroup" aria-label="Group">
-            <For each={GROUP_OPTIONS}>
+          <MobileDrawer.Label class="pt-4">{t('crm.group')}</MobileDrawer.Label>
+          <MobileDrawer.Section role="radiogroup" aria-label={t('crm.group')}>
+            <For each={groupOptions()}>
               {(option) => (
                 <MobileFilterDrawer.Option
                   selectionMode="single"
@@ -88,7 +92,7 @@ export function ActivityControls(props: {
               )}
             </For>
           </MobileDrawer.Section>
-          <MobileDrawer.Label class="pt-4">Filters</MobileDrawer.Label>
+          <MobileDrawer.Label class="pt-4">{t('crm.filters')}</MobileDrawer.Label>
           <Accordion
             multiple
             collapsible
@@ -154,9 +158,11 @@ export function ActivityControls(props: {
         </MobileFilterDrawer>
       }
     >
-      <HeaderActionGroup label={`${props.label} filters`}>
+      <HeaderActionGroup
+        label={t('crm.filtersFor', { label: props.label })}
+      >
         <ListFilterDropdown
-          label={`Filter ${props.label}`}
+          label={t('crm.filterFor', { label: props.label })}
           activeCount={props.filters.activeCount()}
           groups={props.filters.groups()}
           isSelected={props.filters.isSelected}
@@ -165,23 +171,25 @@ export function ActivityControls(props: {
           onClear={props.filters.clear}
         />
       </HeaderActionGroup>
-      <HeaderActionGroup label={`${props.label} view options`}>
+      <HeaderActionGroup
+        label={t('crm.viewOptionsFor', { label: props.label })}
+      >
         <ListSortDropdown
-          label={`Sort ${props.label}`}
+          label={t('crm.sortFor', { label: props.label })}
           value={props.state.sort}
-          options={SORT_OPTIONS}
+          options={sortOptions()}
           onChange={props.setSort}
         />
         <ListSortDropdown
-          label="Sort direction"
+          label={t('crm.sortDirection')}
           value={props.state.direction}
-          options={DIRECTION_OPTIONS}
+          options={directionOptions()}
           onChange={props.setDirection}
         />
         <ListGroupDropdown
-          label="Group by"
+          label={t('crm.groupBy')}
           value={props.state.groupBy}
-          options={GROUP_OPTIONS}
+          options={groupOptions()}
           onChange={props.setGroupBy}
         />
       </HeaderActionGroup>

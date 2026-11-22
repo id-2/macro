@@ -1,8 +1,8 @@
 //! Postgres adapter for agent teammate accounts.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -40,9 +40,9 @@ impl PgTeamAgentsRepo {
     }
 }
 
-fn user_id(raw: String) -> Result<MacroUserIdStr<'static>, PgTeamAgentsError> {
-    MacroUserIdStr::parse_from_str(&raw)
-        .map(MacroUserIdStr::into_owned)
+fn user_id(raw: String) -> Result<RoxUserIdStr<'static>, PgTeamAgentsError> {
+    RoxUserIdStr::parse_from_str(&raw)
+        .map(RoxUserIdStr::into_owned)
         .map_err(|_| PgTeamAgentsError::MalformedUserId)
 }
 
@@ -158,7 +158,7 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn delete_account(&self, user_id: &MacroUserIdStr<'_>) -> Result<(), Self::Err> {
+    async fn delete_account(&self, user_id: &RoxUserIdStr<'_>) -> Result<(), Self::Err> {
         // Deleting macro_user cascades to "User" and everything keyed on it,
         // including the team membership, the team_agents row and agent_repos.
         sqlx::query!(
@@ -175,7 +175,7 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn remove_seat(&self, user_id: &MacroUserIdStr<'_>) -> Result<(), Self::Err> {
+    async fn remove_seat(&self, user_id: &RoxUserIdStr<'_>) -> Result<(), Self::Err> {
         sqlx::query!(
             "DELETE FROM team_agents WHERE user_id = $1",
             user_id.as_ref()
@@ -189,7 +189,7 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
     #[tracing::instrument(skip_all, err)]
     async fn get(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<TeamAgentRecord>, Self::Err> {
         let row = sqlx::query_as!(
             AgentRow,
@@ -235,7 +235,7 @@ impl AgentAccounts for PgTeamAgentsRepo {
     #[tracing::instrument(skip_all, err)]
     async fn account_facts(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Option<AgentAccountFacts>, Self::Err> {
         let row = sqlx::query!(
             r#"

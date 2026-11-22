@@ -1,6 +1,6 @@
 import { getNativeMobilePlatform } from '@core/util/platform';
 import { holdAutomaticReload } from '@core/util/reloadForNewerBuild';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { invoke } from '@tauri-apps/api/core';
 
 export type NativeAuthResult = {
@@ -16,17 +16,17 @@ function nativeAuthOutcome(result: NativeAuthResult) {
 
 /**
  * Where the hosted flow sends the desktop app's session code. The deep-link
- * bridge turns `macro:///login?token=...` into a `/login` router navigation,
+ * bridge turns `rox:///login?token=...` into a `/login` router navigation,
  * and that route redeems the code — so it is pinned here rather than derived
  * from the page the user signed in from, which is usually `/welcome` and
  * ignores the code entirely.
  */
-export const DESKTOP_AUTH_CALLBACK_URL = 'macro:///login';
+export const DESKTOP_AUTH_CALLBACK_URL = 'rox:///login';
 
 /**
  * Hand the hosted flow to the system browser. Unlike the mobile sheet this
  * never resolves with a token: the desktop shell has no in-app browser, so
- * the session code comes back out-of-band through the `macro://` deep link.
+ * the session code comes back out-of-band through the `rox://` deep link.
  * Success here only means the browser was launched.
  */
 export async function openDesktopAuthSession(
@@ -46,8 +46,8 @@ export async function openDesktopAuthSession(
 export function createNativeAuthSession(iosCallbackHost: string) {
   const android = getNativeMobilePlatform() === 'android';
   const callbackUrl = android
-    ? `macro://android-auth/${crypto.randomUUID()}`
-    : `macro://${iosCallbackHost}`;
+    ? `rox://android-auth/${crypto.randomUUID()}`
+    : `rox://${iosCallbackHost}`;
 
   return {
     callbackUrl,
@@ -69,7 +69,7 @@ export function createNativeAuthSession(iosCallbackHost: string) {
             {
               payload: android
                 ? { authUrl, callbackUrl }
-                : { authUrl, callbackScheme: 'macro', ephemeralSession: true },
+                : { authUrl, callbackScheme: 'rox', ephemeralSession: true },
             }
           );
           span.setAttr(

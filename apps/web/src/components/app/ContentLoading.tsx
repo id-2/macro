@@ -1,4 +1,5 @@
 import { ListSkeleton } from '@app/components/view-shell/ListSkeleton';
+import { t } from '@app/lib/i18n';
 import { For } from 'solid-js';
 
 const ROW_WIDTHS = ['w-1/2', 'w-2/3', 'w-2/5', 'w-3/5', 'w-3/4', 'w-1/2'];
@@ -12,10 +13,10 @@ export function ContentLoading() {
   return (
     <div
       role="status"
-      aria-label="Loading"
+      aria-label={t('nav.loading')}
       class="flex size-full min-h-24 flex-col overflow-hidden"
     >
-      <span class="sr-only">Loading</span>
+      <span class="sr-only">{t('nav.loading')}</span>
       <div aria-hidden="true" class="flex h-12 shrink-0 items-center px-4">
         <ListSkeleton.Bar class="h-3 w-24" />
       </div>

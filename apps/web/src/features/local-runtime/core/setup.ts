@@ -2,7 +2,7 @@ import type {
   RoxdDetectedAgent,
   RoxdStartOptions,
   RoxdStatus,
-} from '@macro/tauri/roxd';
+} from '@rox/tauri/roxd';
 import type { LoadAgentModelsResponse } from '@service-agent-harness/generated/schemas';
 import { match } from 'ts-pattern';
 
@@ -87,6 +87,7 @@ const AGENT_PREFERENCE = [
   'claude-code',
   'codex',
   'opencode',
+  'omp',
   'openclaw',
   'hermes',
 ];

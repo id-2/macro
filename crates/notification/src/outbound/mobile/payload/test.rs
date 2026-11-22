@@ -16,7 +16,7 @@ fn android_alert_uses_sns_fcm_v1_with_string_data() {
             recipient_id: None,
             navigation: None,
         },
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
     );
     let sns: Value =
         serde_json::from_str(&SnsTarget::Android(&notification).as_json().unwrap()).unwrap();
@@ -41,7 +41,7 @@ fn android_clear_is_silent_and_preserves_the_display_identifier() {
     let notification = FCMMessage::clear(
         "stable-identifier".into(),
         json!({}),
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
     );
     let sns: Value =
         serde_json::from_str(&SnsTarget::Android(&notification).as_json().unwrap()).unwrap();
@@ -89,7 +89,7 @@ fn payload_serialization_errors_are_returned_without_panicking() {
     let notification = FCMMessage::clear(
         "id".into(),
         InvalidMetadata,
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("alice@example.com").unwrap(),
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("alice@example.com").unwrap(),
     );
     assert!(SnsTarget::Android(&notification).as_json().is_err());
 }

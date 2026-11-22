@@ -23,12 +23,12 @@ mod process;
 mod upload;
 
 use anyhow::Context;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx_core::types::chrono;
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     println!("Loading configuration...");
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = config::Config::from_env().context("Failed to load configuration")?;
 
     println!("Connecting to the database...");

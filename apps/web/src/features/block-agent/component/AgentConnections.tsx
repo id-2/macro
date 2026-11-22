@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { AppConnectionContext } from '@core/pipedream/connection-context';
 import { reportAgentSessionAppConnected } from '@queries/agent-session/app-connections';
@@ -28,13 +29,13 @@ export function AgentConnections(props: ParentProps) {
     connect: connectPipedreamApp,
     resume: async (app) => {
       const sessionId = state.sessionId();
-      if (!sessionId) throw new Error('No agent session to continue');
+      if (!sessionId) throw new Error(t('agentChat.noSessionToContinue'));
       const result = await reportAgentSessionAppConnected(
         sessionId,
         app.appSlug
       );
       if (result.isErr())
-        throw new Error('Could not continue the agent session');
+        throw new Error(t('agentChat.continueSessionFailed'));
     },
     notify: (message) => toast.alert(message),
   });

@@ -36,6 +36,17 @@ use model::response::ErrorResponse;
 use tower_cookies::Cookies;
 
 pub(in crate::api) fn format_redirect_uri(provider: &str) -> String {
+    // A GitHub OAuth app registers one exact callback per deployment, and that
+    // callback is not derivable from BASE_URL (which also drives the Google
+    // mail links and their own registration). The run env names it directly.
+    if provider == LinkProvider::Github.as_str() {
+        if let Ok(redirect_uri) = std::env::var("GITHUB_OAUTH_REDIRECT_URI") {
+            let redirect_uri = redirect_uri.trim();
+            if !redirect_uri.is_empty() {
+                return redirect_uri.to_string();
+            }
+        }
+    }
     format!("{}/oauth2/{provider}/callback", *BASE_URL)
 }
 
@@ -275,7 +286,7 @@ async fn verify_pending_link_owner(
     ctx: &ApiContext,
     state: &AccountLinkState,
 ) -> Result<(), Response> {
-    let owner = macro_db_client::in_progress_user_link::get_macro_user_id_by_link_id(
+    let owner = rox_db_client::in_progress_user_link::get_macro_user_id_by_link_id(
         &ctx.db,
         &state.link_id,
     )

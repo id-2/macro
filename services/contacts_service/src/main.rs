@@ -11,12 +11,12 @@ use contacts::inbound::http::{ApiDoc, ContactsRouterState, contacts_router};
 use contacts::inbound::worker::{ContactsWorker, OutboxWorker};
 use contacts::outbound::gateway::ConnectionGatewayNotifier;
 use contacts::outbound::repository::DbContactsRepository;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_service_urls::ConnectionGatewayUrl;
+use rox_entrypoint::RoxEntrypoint;
+use rox_service_urls::ConnectionGatewayUrl;
 use rate_limit::{RateLimitServiceImpl, RedisRateLimitAdapter};
 use sqlx::postgres::PgPoolOptions;
 use sqs_worker::SQSWorker;
@@ -42,8 +42,8 @@ async fn connect_to_database(config: &Config) -> anyhow::Result<sqlx::PgPool> {
 }
 
 async fn create_sqs_worker(config: &Config) -> SQSWorker {
-    let queue_url = macro_queues::ContactsQueue::new().to_string();
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let queue_url = rox_queues::ContactsQueue::new().to_string();
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
 
     let sqs_client = aws_sdk_sqs::Client::new(&aws_config);
     sqs_worker::SQSWorker::new(
@@ -64,7 +64,7 @@ async fn create_sqs_worker(config: &Config) -> SQSWorker {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     let config = Config::from_env().context("expected to be able to generate config")?;
 
@@ -72,7 +72,7 @@ async fn main() -> anyhow::Result<()> {
     let sqs_worker = create_sqs_worker(&config).await;
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
-        aws_sdk_secretsmanager::Client::new(&macro_aws_config::get_macro_aws_config().await),
+        aws_sdk_secretsmanager::Client::new(&rox_aws_config::get_macro_aws_config().await),
     );
 
     let notifier = Some(
@@ -105,21 +105,21 @@ async fn main() -> anyhow::Result<()> {
         outbox_worker.run().await;
     });
 
-    let jwt_args = macro_auth::middleware::decode_jwt::JwtValidationArgs::new_with_secret_manager(
+    let jwt_args = rox_auth::middleware::decode_jwt::JwtValidationArgs::new_with_secret_manager(
         config.environment,
         &secretsmanager_client,
     )
     .await?;
-    let authorization_service = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_service = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     );
-    let authorization_state = MacroAuthorizationState::new(Arc::new(authorization_service));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(authorization_service));
 
     let redis_client = redis::Client::open(config.redis_uri.to_string().as_str())
         .context("failed to create redis client")?;
@@ -130,7 +130,7 @@ async fn main() -> anyhow::Result<()> {
         },
     };
 
-    let cors = macro_cors::cors_layer();
+    let cors = rox_cors::cors_layer();
     let port = config.port;
 
     let correlation = agent_correlation::inbound::CorrelationState::new(db.clone(), jwt_args);

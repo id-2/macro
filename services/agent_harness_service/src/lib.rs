@@ -63,7 +63,7 @@ use agent_egress::domain::service::EgressServiceImpl;
 use agent_egress::outbound::custom_mcp::WithCustomMcp;
 use agent_egress::outbound::forwarder::ReqwestForwarder;
 use agent_egress::outbound::github_tokens::GithubAppTokens;
-use agent_egress::outbound::macro_mcp::{MacroApiTokenSigner, WithMacroMcp};
+use agent_egress::outbound::macro_mcp::{RoxApiTokenSigner, WithRoxMcp};
 use agent_egress::outbound::mcp_credentials::PipedreamMcpCredentials;
 use agent_egress::outbound::session_authority::StoredTokenSessionAuthority;
 use agent_egress::outbound::tool_approvals::{PgToolApprovalSignals, PgToolApprovalStore};
@@ -123,10 +123,10 @@ use agent_session::inbound::axum_router::{
 };
 use agent_session::outbound::broker_lifecycle_publisher::BrokerLifecyclePublisher;
 use agent_session::outbound::connection_gateway_realtime::ConnectionGatewayAgentSessionRealtime;
-use agent_session::outbound::name_generator::HaikuAgentSessionNameGenerator;
+use agent_session::outbound::name_generator::ModelAgentSessionNameGenerator;
 use agent_session::outbound::postgres::PgAgentSessionRepo;
 use agent_session_realtime::outbound::redis_stream::publisher::RedisLogStreamRealtime;
-use agent_trigger::domain::broker_events::AgentSessionMacroEvent;
+use agent_trigger::domain::broker_events::AgentSessionRoxEvent;
 use anyhow::Context as _;
 use bot_id::BotId;
 use bots::outbound::pg_bots_repo::PgBotsRepo;
@@ -158,18 +158,18 @@ use harness_bindings::{PgHarnessBindings, PgHarnessPresence, RUNTIME_CONNECTION_
 use harnesses::outbound::pg_harness_repo::PgHarnessRepo;
 use kafka_util::{GroupName, KafkaEventConsumer, consumer_span, record_span_error};
 use lexical_client::LexicalClient;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, PgBotAuthorizationRepo, PgBotAuthorizer, PgHarnessAuthorizationRepo,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, PgBotAuthorizationRepo, PgBotAuthorizer, PgHarnessAuthorizationRepo,
     PgHarnessAuthorizer, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_entrypoint::shutdown_signal;
-use macro_event_broker::{
-    KafkaConsumerAdapter, KafkaEventPublisher, MacroEvent as _, MacroEventBrokerService,
-    MacroEventCollection as _, MacroEventConsumerService,
+use rox_entrypoint::shutdown_signal;
+use rox_event_broker::{
+    KafkaConsumerAdapter, KafkaEventPublisher, RoxEvent as _, RoxEventBrokerService,
+    RoxEventCollection as _, RoxEventConsumerService,
 };
-use macro_service_urls::{
+use rox_service_urls::{
     AgentHarnessEgressUrl, ConnectionGatewayUrl, LexicalServiceUrl, McpServiceUrl,
     StaticFilePublicUrl, StaticFileServiceUrl,
 };
@@ -210,10 +210,10 @@ impl GroupName for AgentHarnessConsumerGroup {
     const GROUP_NAME: &'static str = "agent-harness-service";
 }
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: AgentSessionMacroEvent);
+rox_event_broker::declare_topics!(DeclaredRoxEvent: AgentSessionRoxEvent);
 
-type HarnessKafkaAdapter = KafkaConsumerAdapter<AgentHarnessConsumerGroup, DeclaredMacroEvent>;
-type HarnessConsumer = MacroEventConsumerService<DeclaredMacroEvent, HarnessKafkaAdapter>;
+type HarnessKafkaAdapter = KafkaConsumerAdapter<AgentHarnessConsumerGroup, DeclaredRoxEvent>;
+type HarnessConsumer = RoxEventConsumerService<DeclaredRoxEvent, HarnessKafkaAdapter>;
 
 fn commit_message(consumer: &HarnessConsumer, message: &BorrowedMessage<'_>) -> anyhow::Result<()> {
     consumer
@@ -264,7 +264,7 @@ fn internal_mcp_handler(
 pub async fn run() -> anyhow::Result<()> {
     agent_harness::install_tls_provider();
     // AWS first, because the config's secrets resolve through Secrets Manager.
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
     let secrets = secretsmanager_client::SecretsManager::new(aws_sdk_secretsmanager::Client::new(
         &aws_config,
     ));
@@ -334,10 +334,10 @@ pub async fn run() -> anyhow::Result<()> {
     // One broker for channel side effects and session lifecycle facts alike;
     // every session service instance publishes lifecycle through the same
     // adapter, so a rename from any of them lands on the topic.
-    let broker = MacroEventBrokerService::new(
+    let broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
-        macro_event_broker::GlobalSpawner,
+        rox_event_broker::GlobalSpawner,
     );
     // Registered work viewers hear session changes as Soup patches, which the GraphQL process
     // already streams to each of them. Signals run off the publishing task.
@@ -356,7 +356,7 @@ pub async fn run() -> anyhow::Result<()> {
     let notifications = Arc::new(notification::domain::service::SqsNotificationIngress {
         queue: notification::outbound::queue::SqsQueue::new(
             aws_sdk_sqs::Client::new(&aws_config),
-            macro_queues::NotificationIngressQueue::new().to_string(),
+            rox_queues::NotificationIngressQueue::new().to_string(),
         ),
     });
     let admission = ai_billing::composition::pg_admission_service(
@@ -436,7 +436,7 @@ pub async fn run() -> anyhow::Result<()> {
         // TypeSafe key, names stay as first generated.
         agent_session::domain::name_generation::AdmittedAgentSessionNameGenerator::new(
             agent_session::domain::name_generation::ClassifiedRetitle::new(
-                HaikuAgentSessionNameGenerator::new(recorder.clone()),
+                ModelAgentSessionNameGenerator::new(recorder.clone()),
                 config
                     .typesafe_api_key
                     .value()
@@ -572,13 +572,13 @@ pub async fn run() -> anyhow::Result<()> {
     // connections. The `macro` credential is signed inline with the same key
     // authentication_service holds; what this process hands out is always
     // single-user and minutes from expiry.
-    let mcp_credentials = WithMacroMcp::new(
+    let mcp_credentials = WithRoxMcp::new(
         WithCustomMcp::new(
             PipedreamMcpCredentials::new(Arc::clone(&mcp_connections), connectors),
             Arc::clone(&mcp_servers),
             mcp_http.clone(),
         ),
-        MacroApiTokenSigner::new(
+        RoxApiTokenSigner::new(
             pool.clone(),
             config.macro_api_token_issuer.as_ref(),
             config.macro_api_token_private_secret_key.as_ref(),
@@ -630,7 +630,7 @@ pub async fn run() -> anyhow::Result<()> {
         .with_preview_mcp(
             url::Url::parse(&format!(
                 "{}/mcp",
-                macro_service_urls::PreviewGatewayUrl::new()?
+                rox_service_urls::PreviewGatewayUrl::new()?
             ))?,
             matches!(config.environment, Environment::Local),
         )?
@@ -766,7 +766,7 @@ pub async fn run() -> anyhow::Result<()> {
             routine_code::SdkRoutineCode::new(
                 Arc::new(routines.clone()),
                 Arc::clone(checker) as Arc<dyn code_execution::domain::ProgramChecker>,
-                MacroApiTokenSigner::new(
+                RoxApiTokenSigner::new(
                     pool.clone(),
                     config.macro_api_token_issuer.as_ref(),
                     config.macro_api_token_private_secret_key.as_ref(),
@@ -797,13 +797,13 @@ pub async fn run() -> anyhow::Result<()> {
         Arc::clone(&notifications),
         search_service_client::SearchServiceClient::new(
             config.document_storage_service_auth_key.clone(),
-            macro_service_urls::DocumentStorageServiceUrl::new()?.to_string(),
+            rox_service_urls::DocumentStorageServiceUrl::new()?.to_string(),
         ),
     )
     .await?;
     let scheduling_router = scheduling_runtime.router.clone();
     let preview_router = preview::build(
-        macro_config::ConfigLoader::load::<preview::config::Config>()?,
+        rox_config::ConfigLoader::load::<preview::config::Config>()?,
         config.database_url.as_ref(),
         pool.clone(),
         service_shutdown.clone(),
@@ -833,7 +833,7 @@ pub async fn run() -> anyhow::Result<()> {
                     correlations: agent_correlation::outbound::PgCorrelationRepository(
                         pool.clone(),
                     ),
-                    signer: MacroApiTokenSigner::new(
+                    signer: RoxApiTokenSigner::new(
                         pool.clone(),
                         config.macro_api_token_issuer.as_ref(),
                         config.macro_api_token_private_secret_key.as_ref(),
@@ -851,7 +851,7 @@ pub async fn run() -> anyhow::Result<()> {
         tool_context.clone(),
         pool.clone(),
         aws_sdk_kms::Client::new(&aws_config),
-        macro_auth::middleware::decode_jwt::JwtValidationArgs::new_with_secret_manager(
+        rox_auth::middleware::decode_jwt::JwtValidationArgs::new_with_secret_manager(
             config.environment,
             &secrets,
         )
@@ -944,7 +944,7 @@ pub async fn run() -> anyhow::Result<()> {
             Arc::new(code_mode::RunCredentials {
                 egress: code_egress.clone(),
                 correlations: agent_correlation::outbound::PgCorrelationRepository(pool.clone()),
-                signer: MacroApiTokenSigner::new(
+                signer: RoxApiTokenSigner::new(
                     pool.clone(),
                     config.macro_api_token_issuer.as_ref(),
                     config.macro_api_token_private_secret_key.as_ref(),
@@ -958,7 +958,7 @@ pub async fn run() -> anyhow::Result<()> {
             Arc::new(code_mode::images::StaticFileModelImages(
                 static_file_service_client::StaticFileServiceClient::with_timeout(
                     config.internal_api_key.clone(),
-                    macro_service_urls::StaticFileServiceUrl::new()?.to_string(),
+                    rox_service_urls::StaticFileServiceUrl::new()?.to_string(),
                     std::time::Duration::from_secs(10),
                 ),
             )),
@@ -995,7 +995,7 @@ pub async fn run() -> anyhow::Result<()> {
                 )),
             ),
             session_metadata_realtime.clone(),
-            macro_service_urls::AppServiceUrl::new()?.as_ref(),
+            rox_service_urls::AppServiceUrl::new()?.as_ref(),
         ),
     );
     let session_pull_requests: Arc<dyn agent_session::domain::pull_request::SessionPullRequests> =
@@ -1024,7 +1024,7 @@ pub async fn run() -> anyhow::Result<()> {
             cognition: tool_context.cognition_tool_context.service.clone(),
             reviews: reviews_cell.clone(),
             gate: owner_tool_gate.clone(),
-            app_url: macro_service_urls::AppServiceUrl::new()?.as_str().into(),
+            app_url: rox_service_urls::AppServiceUrl::new()?.as_str().into(),
         },
     );
     // One connector for the agent and the telemetry catalog. It pools each
@@ -1059,7 +1059,7 @@ pub async fn run() -> anyhow::Result<()> {
     // making local URLs reachable, this supplies the MIME type Gemini requires
     // and decodes formats that providers cannot consume directly.
     let public_base = StaticFilePublicUrl::new()?.parse_url()?;
-    let cdn_base = match (&config.environment, macro_aws_config::LocalAwsUrl::new()) {
+    let cdn_base = match (&config.environment, rox_aws_config::LocalAwsUrl::new()) {
         (Environment::Local, Some(local_aws)) => format!(
             "{}/{}",
             local_aws.as_ref().trim_end_matches('/'),
@@ -1086,6 +1086,10 @@ pub async fn run() -> anyhow::Result<()> {
             ),
         ),
     );
+    // A deployment key left as a placeholder would stamp every session with a
+    // model that cannot answer. Open them on one this deployment can call:
+    // the configured model while its key is real, else the working default.
+    let inmem_model = agent_inmem::domain::models::default_model(&config.inmem_model).to_owned();
     // Agents' own Anthropic and OpenAI keys, under the Cursor key's CMK this
     // role already decrypts with. Decrypt-only for the same reason as Cursor
     // keys: saving them is the authentication service's job. Only agents
@@ -1191,7 +1195,7 @@ pub async fn run() -> anyhow::Result<()> {
         cursor_cloud_agents::outbound::static_file_artifacts::StaticFileArtifactStore::new(
             static_file_service_client::StaticFileServiceClient::new(
                 config.internal_api_key.clone(),
-                macro_service_urls::StaticFileServiceUrl::new()?.to_string(),
+                rox_service_urls::StaticFileServiceUrl::new()?.to_string(),
             ),
         ),
     )
@@ -1268,7 +1272,7 @@ pub async fn run() -> anyhow::Result<()> {
         inmem_bot,
         AgentRuntimeConfig {
             kind: AgentKind::InMemory,
-            model: config.inmem_model.clone(),
+            model: inmem_model.clone(),
             harness: config.inmem_harness_slug.clone(),
             instructions: String::new(),
             mcp_servers: AgentMcpServers::OwnerConnections,
@@ -1318,7 +1322,7 @@ pub async fn run() -> anyhow::Result<()> {
     let contacts_ingress = Arc::new(contacts::domain::service::SqsContactsIngress {
         queue: contacts::outbound::ingress::SqsContactsQueue::new(
             aws_sdk_sqs::Client::new(&aws_config),
-            macro_queues::ContactsQueue::new().to_string(),
+            rox_queues::ContactsQueue::new().to_string(),
         ),
     });
     // The same message service the storage API composes, so an announcement
@@ -1539,7 +1543,7 @@ pub async fn run() -> anyhow::Result<()> {
         inmem_bot,
         SessionDefaults {
             bot_id: inmem_bot,
-            model: config.inmem_model.clone(),
+            model: inmem_model.clone(),
             harness: config.inmem_harness_slug.clone(),
             // Stamped but unused: the in-process agent has no
             // workspace to clone anything into.
@@ -1590,7 +1594,7 @@ pub async fn run() -> anyhow::Result<()> {
             PgChannelsRepo::new(pool.clone()),
             bots::domain::service::BotServiceImpl::new(
                 PgBotsRepo::new(pool.clone()),
-                macro_event_broker::NoopMacroEventBroker,
+                rox_event_broker::NoopRoxEventBroker,
                 computers::harness_service(&pool),
             ),
             PgBotsRepo::new(pool.clone()),
@@ -1711,7 +1715,7 @@ pub async fn run() -> anyhow::Result<()> {
         )),
         PgGithubPullRequestRepo::new(pool.clone()),
         S3GithubPullRequestPatchStore::new(
-            macro_aws_config::s3_client().await,
+            rox_aws_config::s3_client().await,
             config.github_pull_request_patch_bucket.clone(),
         ),
     ));
@@ -1720,7 +1724,7 @@ pub async fn run() -> anyhow::Result<()> {
         changes_extractor,
         PgChangesetRepo::new(pool.clone()),
         S3ChangesetBlobStore::new(
-            macro_aws_config::s3_client().await,
+            rox_aws_config::s3_client().await,
             config.agent_session_changes_bucket.clone(),
         ),
         ConnectionGatewayAgentSessionRealtime::new(
@@ -1808,8 +1812,8 @@ pub async fn run() -> anyhow::Result<()> {
     // The complete session API is served from this process because it owns the
     // live sessions. Spawned rather than awaited: the Kafka loop below owns the
     // main task, and both run until shutdown.
-    let authorization_service = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(
+    let authorization_service = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(
             JwtValidationArgs::new_with_secret_manager(config.environment, &secrets).await?,
         ),
         InternalAuthConfig {
@@ -1829,7 +1833,7 @@ pub async fn run() -> anyhow::Result<()> {
                     VisibleHarnessAccess::new(computers::harness_service(&pool)),
                     InMemoryModels::new(
                         Some(Arc::clone(&inmem_model_engine)),
-                        config.inmem_model.clone(),
+                        inmem_model.clone(),
                         Arc::clone(&inmem_model_access),
                     ),
                     CursorModels::new(cursor_keys.clone(), cursor_api_base_url()),
@@ -1837,14 +1841,14 @@ pub async fn run() -> anyhow::Result<()> {
                     model_probe_timeout,
                 ),
             ),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let model_service = Arc::new(AgentModelsServiceImpl::new(
         VisibleHarnessAccess::new(computers::harness_service(&pool)),
         InMemoryModels::new(
             Some(inmem_model_engine),
-            config.inmem_model.clone(),
+            inmem_model.clone(),
             inmem_model_access,
         ),
         CursorModels::new(cursor_keys, cursor_api_base_url()),
@@ -1854,7 +1858,7 @@ pub async fn run() -> anyhow::Result<()> {
     ));
     let model_state = AgentModelsRouterState::new(
         model_service,
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     );
     let read_state = AgentSessionRouterState::new(
         AgentSessionServiceImpl::new(
@@ -1879,17 +1883,17 @@ pub async fn run() -> anyhow::Result<()> {
             agent_session::domain::audience::EntityAccessSessionView::new((*entity_access).clone()),
         )),
         entity_access.clone(),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     );
     let changes_state = AgentChangesRouterState::new(
         changes,
         entity_access.clone(),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     );
     let control_state = AgentSessionControlState::new(
         harness.clone(),
         entity_access.clone(),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     );
     let bots_directory = Arc::new(PgBotDirectory::new(
         PgBotsRepo::new(pool.clone()),
@@ -1906,7 +1910,7 @@ pub async fn run() -> anyhow::Result<()> {
             ),
         ),
         harness.clone(),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         non_user_owners,
     );
     let routine_sessions = routine_sessions::router(
@@ -1919,7 +1923,7 @@ pub async fn run() -> anyhow::Result<()> {
             PgHarnessRepo::new(pool.clone()),
         ),
         PgConnectionRepo::new(pool.clone()),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     );
     let coding_agents = coding_agents::router(
         coding_agents::AvailableCodingAgents::new(
@@ -1945,12 +1949,12 @@ pub async fn run() -> anyhow::Result<()> {
             routine_sessions::PipedreamConnectedApps(PgConnectionRepo::new(pool.clone())),
         ),
         session_repo.clone(),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     );
     let computer_claude = computers::claude::router(
         harnessd.clone(),
         Arc::new(computers::harness_service(&pool)),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         feature_flags
             .clone()
             .map(hosted_runtimes::domain::rollout::ComputerRollout::new)
@@ -1966,11 +1970,11 @@ pub async fn run() -> anyhow::Result<()> {
             feature_flags.clone(),
         )),
         access: entity_access.clone(),
-        authorization: MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        authorization: RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     });
     let gateway_state = RuntimeGatewayState::new(
         runtimes,
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     );
     // Served to the app by `POST /agent-mode-choice` for the composer's Auto mode.
     let mode_classifier = match (
@@ -2007,14 +2011,14 @@ pub async fn run() -> anyhow::Result<()> {
                     admission.clone(),
                 ),
             ),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     // Served to the app by `GET /agent-repositories`; see `open_repositories`.
     let repositories_state = AgentRepositoriesRouterState::new(
         reachable_repositories,
         repository_branches,
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     );
     let http_runtime_commands_readiness = runtime_commands_readiness.clone();
     let http_port = config.port;
@@ -2030,28 +2034,28 @@ pub async fn run() -> anyhow::Result<()> {
                     ),
                 ),
                 entity_access.clone(),
-                MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+                RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
             ),
         );
     let session_task_links = agent_session::inbound::axum_router::task::agent_session_task_router(
         AgentSessionRouterState::new(
             session_tasks,
             entity_access.clone(),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let updates = agent_session::inbound::axum_router::updates::agent_session_updates_router(
         AgentSessionRouterState::new(
             session_repo.clone(),
             entity_access.clone(),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let auto_archive = agent_session::inbound::axum_router::auto_archive::agent_auto_archive_router(
         AgentSessionRouterState::new(
             auto_archive_settings,
             entity_access.clone(),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let work_registrations_service = WorkRegistrationService::new(
@@ -2066,7 +2070,7 @@ pub async fn run() -> anyhow::Result<()> {
             AgentSessionRouterState::new(
                 work_registrations_service.clone(),
                 entity_access.clone(),
-                MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+                RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
             ),
         );
     let code_executions = agent_code_mode::inbound::axum_router::code_execution_router(
@@ -2076,26 +2080,26 @@ pub async fn run() -> anyhow::Result<()> {
             connected_apps,
             ui_commands,
             entity_access.clone(),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let sharing = agent_session::inbound::axum_router::sharing::agent_session_sharing_router(
         AgentSessionRouterState::new(
             agent_session::domain::sharing::SessionSharingService::new(session_repo.clone()),
             entity_access.clone(),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let conversations = agent_harness::inbound::conversations::agent_conversation_router(
         agent_harness::inbound::conversations::AgentConversationRouterState::new(
             conversations_service,
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let tool_approval_answers = tool_approvals_router(ToolApprovalsRouterState::new(
         tool_approvals,
         entity_access.clone(),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
     ));
     let notification_service = Arc::new(agent_session::domain::notifications::NotificationService(
         Arc::new(agent_session::outbound::notifications::PgNotificationStore(
@@ -2119,12 +2123,12 @@ pub async fn run() -> anyhow::Result<()> {
                 ),
             ),
             entity_access.clone(),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let notification_ingress = agent_session::inbound::notifications::notification_router(
         agent_session::inbound::notifications::NotificationRouterState {
-            authorization: MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            authorization: RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
             service: notification_service,
         },
     );
@@ -2136,7 +2140,7 @@ pub async fn run() -> anyhow::Result<()> {
         agent_session::inbound::axum_router::activity::AgentActivityState::new(
             activity::outbound::pg_activity_repo::PgActivityRepo::new(pool.clone()),
             entity_access.clone(),
-            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         ),
     );
     let agent_git_tasks = tokio_util::task::TaskTracker::new();
@@ -2147,7 +2151,7 @@ pub async fn run() -> anyhow::Result<()> {
             pushes_per_minute: config.pushes_per_minute,
         },
         pool.clone(),
-        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
         agent_git_tasks.clone(),
         feature_flags.clone(),
     )
@@ -2188,14 +2192,14 @@ pub async fn run() -> anyhow::Result<()> {
                 universal_input::inbound::axum_router::axum_router(
                     universal_input::inbound::axum_router::UniversalInputRouterState::new(
                         input_service,
-                        MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+                        RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
                     ),
                 )
                 .merge(
                     universal_input::inbound::axum_router::thread_due_date_router(
                         universal_input::inbound::axum_router::ThreadDueDateRouterState::new(
                             thread_due_dates,
-                            MacroAuthorizationState::new(Arc::new(authorization_service.clone())),
+                            RoxAuthorizationState::new(Arc::new(authorization_service.clone())),
                         ),
                     ),
                 ),
@@ -2421,14 +2425,14 @@ pub async fn run() -> anyhow::Result<()> {
     let consumer =
         KafkaEventConsumer::<AgentHarnessConsumerGroup>::from_env(config.kafka_brokers.as_ref())?;
     let consumer = KafkaConsumerAdapter::<AgentHarnessConsumerGroup, ()>::new(consumer)
-        .subscribe::<DeclaredMacroEvent>()
+        .subscribe::<DeclaredRoxEvent>()
         .map_err(|error| {
             anyhow::anyhow!("failed to subscribe to agent session events: {error:?}")
         })?;
     let consumer = HarnessConsumer::new(consumer);
 
     tracing::info!(
-        topics = ?DeclaredMacroEvent::topics(),
+        topics = ?DeclaredRoxEvent::topics(),
         group = AgentHarnessConsumerGroup::GROUP_NAME,
         %bot_id,
         environment = %config.environment,
@@ -2483,7 +2487,7 @@ pub async fn run() -> anyhow::Result<()> {
                 let processing = async {
                     let kafka_message = message.inner();
                     let event = match message.decode_payload() {
-                        Ok(DeclaredMacroEvent::AgentSessionMacroEvent(event)) => event,
+                        Ok(DeclaredRoxEvent::AgentSessionRoxEvent(event)) => event,
                         Err(error) => {
                             record_span_error(&tracing::Span::current(), &error);
                             tracing::error!(

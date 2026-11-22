@@ -33,7 +33,7 @@ use super::*;
 #[derive(Debug)]
 struct RecordedRequest {
     /// User attached to the request.
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     /// Requested page size.
     limit: u16,
     /// Inbox IDs attached to the request.
@@ -47,12 +47,12 @@ struct RecordingSoupService {
     /// Requests received by the service.
     calls: Arc<Mutex<Vec<RecordedRequest>>>,
     /// Items returned for each user.
-    responses: Arc<Mutex<HashMap<MacroUserIdStr<'static>, Vec<SoupItem<()>>>>>,
+    responses: Arc<Mutex<HashMap<RoxUserIdStr<'static>, Vec<SoupItem<()>>>>>,
 }
 
 impl RecordingSoupService {
     /// Configure the items returned for a user.
-    fn with_response(self, user_id: MacroUserIdStr<'static>, items: Vec<SoupItem<()>>) -> Self {
+    fn with_response(self, user_id: RoxUserIdStr<'static>, items: Vec<SoupItem<()>>) -> Self {
         self.responses
             .lock()
             .expect("responses lock")
@@ -139,7 +139,7 @@ impl SoupService for RecordingSoupService {
 
     async fn group_labels<'a>(
         &'a self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
         _group_by: &'a soup::domain::models::grouping::GroupByField,
         _keys: &'a [String],
     ) -> Result<soup::domain::models::grouping::GroupLabels, SoupErr> {
@@ -148,7 +148,7 @@ impl SoupService for RecordingSoupService {
 
     async fn caller_tag_sets<'a>(
         &self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, SoupErr> {
         unreachable!("loader does not load tag definitions")
     }
@@ -158,15 +158,15 @@ impl SoupService for RecordingSoupService {
 #[derive(Clone, Default)]
 struct RecordingThreadReader {
     /// Users and thread ids whose previews were requested.
-    calls: Arc<Mutex<Vec<(MacroUserIdStr<'static>, Vec<Uuid>)>>>,
+    calls: Arc<Mutex<Vec<(RoxUserIdStr<'static>, Vec<Uuid>)>>>,
     /// Previews returned for each user.
-    responses: Arc<HashMap<MacroUserIdStr<'static>, Vec<SoupEnrichedEmailThreadPreview<()>>>>,
+    responses: Arc<HashMap<RoxUserIdStr<'static>, Vec<SoupEnrichedEmailThreadPreview<()>>>>,
 }
 
 impl SoupEmailThreadReader for RecordingThreadReader {
     async fn read_threads(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> Result<Vec<SoupEnrichedEmailThreadPreview<()>>, SoupItemLoaderError> {
         self.calls
@@ -178,8 +178,8 @@ impl SoupEmailThreadReader for RecordingThreadReader {
 }
 
 /// Build a stable test user ID.
-fn user(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 /// Build a document Soup item for loader result mapping.
@@ -637,7 +637,7 @@ struct CurrentTeam(Mutex<Option<EntityAccessReceipt<MemberTeamRole>>>);
 impl SoupTeamReader for CurrentTeam {
     fn team_receipt(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> BoxFuture<'_, Result<Option<EntityAccessReceipt<MemberTeamRole>>, SoupItemLoaderError>>
     {
         Box::pin(async { Ok(self.0.lock().unwrap().clone()) })

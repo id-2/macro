@@ -1,14 +1,15 @@
+import { t } from '@app/lib/i18n';
 import { type Accessor, createMemo } from 'solid-js';
 import { match } from 'ts-pattern';
 import type { ActivityContext } from '../context/activity-context';
 import { parseActor } from '../core/actor';
 
 /**
- * The name an activity row shows for its actor. The viewer reads "You",
- * other users read their display name, bots read their bot name (the
- * system principal reads "System"), and ids the app cannot parse read
- * "Unknown". Resolvers are created lazily per actor kind so a user row
- * never subscribes to the bots list.
+ * The name an activity row shows for its actor. The viewer reads the
+ * dictionary's "Вы" (English "You"), other users read their display name,
+ * bots read their bot name (the system principal reads "System"), and ids
+ * the app cannot parse read "Unknown". Resolvers are created lazily per
+ * actor kind so a user row never subscribes to the bots list.
  */
 export function createActorName(
   context: Pick<ActivityContext, 'currentUserId' | 'displayName' | 'botName'>,
@@ -16,7 +17,7 @@ export function createActorName(
 ): Accessor<string> {
   const resolver = createMemo<Accessor<string>>(() => {
     const id = actorId();
-    if (id === context.currentUserId()) return () => 'You';
+    if (id === context.currentUserId()) return () => t('activity.actorYou');
     return match(parseActor(id))
       .with({ kind: 'user' }, (actor) => {
         const remote = context.displayName(() => actor.id);

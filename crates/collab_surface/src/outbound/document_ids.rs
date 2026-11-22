@@ -25,7 +25,7 @@ impl DocumentIds for PgDocumentIds {
         // Document ids are canonical lowercase text, and the sync-service
         // session key is that exact spelling. Soft-deleted documents keep their
         // session, so the helper deliberately counts them.
-        macro_db_client::dcs::does_document_exist::does_document_exist(
+        rox_db_client::dcs::does_document_exist::does_document_exist(
             self.pool.clone(),
             &id.to_string(),
         )

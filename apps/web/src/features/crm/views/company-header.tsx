@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ListSkeleton } from '@app/components/view-shell/ListSkeleton';
 import { EntityIcon } from '@core/component/EntityIcon';
 import { InlineTitleEditor } from '@core/component/InlineTitleEditor';
@@ -49,7 +50,7 @@ function Description(props: { text: string }) {
           onClick={() => setExpanded(!expanded())}
           class="text-xs text-ink-muted underline hover:text-ink"
         >
-          {expanded() ? 'Show less' : 'Show more'}
+          {expanded() ? t('crm.showLess') : t('crm.showMore')}
         </button>
       </Show>
     </div>
@@ -63,8 +64,8 @@ function TitleEditor(props: { company: CrmCompanyEntity }) {
   return (
     <InlineTitleEditor
       value={props.company.name}
-      placeholder="Company"
-      ariaLabel="Company name"
+      placeholder={t('crm.companyName')}
+      ariaLabel={t('crm.companyNameLabel')}
       class="w-full text-2xl"
       onRename={(name) =>
         renameMutation.mutate({ companyId: props.company.id, name })

@@ -23,6 +23,7 @@ import {
   viewedProjectIdFromContent,
 } from '@app/features/soup';
 import { DEBUG_SETTING_KEYS, useDebugSetting } from '@app/lib/debugSettings';
+import { t } from '@app/lib/i18n';
 import { makePersistedState } from '@app/lib/persistence';
 import { useGlobalNotificationSource } from '@components/app/GlobalAppState';
 import { PullToRefresh } from '@components/app/mobile/PullToRefresh';
@@ -581,7 +582,7 @@ export function HomeList(props: HomeListProps) {
       <div
         ref={setListRoot}
         role="grid"
-        aria-label="Home"
+        aria-label={t('nav.home')}
         aria-busy={source.isLoading() || source.isLoadingMore()}
         aria-multiselectable="true"
         aria-activedescendant={list.focus.key()}
@@ -649,7 +650,7 @@ export function HomeList(props: HomeListProps) {
                   ref={setEmptyViewport}
                   class="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 overflow-y-auto pb-[max(1rem,var(--mobile-content-inset-bottom,0px))] touch:pt-(--mobile-content-inset-top) text-sm text-ink-muted"
                 >
-                  <span>Home couldn’t be loaded.</span>
+                  <span>{t('nav.home')} couldn’t be loaded.</span>
                   <Button
                     variant="secondary"
                     size="sm"

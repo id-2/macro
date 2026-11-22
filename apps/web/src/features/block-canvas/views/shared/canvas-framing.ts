@@ -1,4 +1,4 @@
-import type { Camera, FitViewport, GraphicsEditor } from '@macro-inc/graphics';
+import type { Camera, FitViewport, GraphicsEditor } from '@rox-one/graphics';
 import { onCleanup } from 'solid-js';
 
 /** Screen pixels kept between what is being typed and the frame's edges. */

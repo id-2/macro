@@ -12,12 +12,12 @@ use entity_access::domain::models::{
     RequiredPermission, TeamRole, UserTeamInfo, ViewAccessLevel,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
+use rox_authorization::{
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
 use models_permissions::share_permission::{SharePermissionV2, UpdateSharePermissionRequestV2};
 use rootcause::Report;
 use uuid::Uuid;
@@ -46,15 +46,15 @@ impl JwtValidator for Tokens {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         let (user_id, agent_id) = match jwt {
             "owner" => (OWNER, None),
             "respondent" => (RESPONDENT, None),
             "agent" => (OWNER, Some(AGENT)),
-            _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         };
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::MacroApiJwt,
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::RoxApiJwt,
             identity: ValidatedIdentity {
                 agent_id,
                 agent_via: None,
@@ -68,10 +68,10 @@ impl JwtValidator for Tokens {
     }
 }
 
-pub(super) type Authorization = MacroAuthorizationServiceImpl<Tokens>;
+pub(super) type Authorization = RoxAuthorizationServiceImpl<Tokens>;
 
-fn authorization_state() -> MacroAuthorizationState<Authorization> {
-    MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
+fn authorization_state() -> RoxAuthorizationState<Authorization> {
+    RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
         Tokens,
         InternalAuthConfig {
             api_key: "forms-router-internal-key".to_string(),
@@ -93,7 +93,7 @@ pub(super) struct Grants {
 impl EntityAccessService for Grants {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -105,7 +105,7 @@ impl EntityAccessService for Grants {
             .ok_or(AccessError::Unauthorized)?;
         EntityAccessReceipt::try_new(
             EntityAccessAuth::Authenticated(
-                MacroUserIdStr::try_from(user_id.as_ref().to_string()).expect("a user id"),
+                RoxUserIdStr::try_from(user_id.as_ref().to_string()).expect("a user id"),
             ),
             entity_access::domain::models::Entity {
                 entity_id: entity_id.to_string(),
@@ -129,7 +129,7 @@ impl EntityAccessService for Grants {
 
     async fn get_access_level(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -141,7 +141,7 @@ impl EntityAccessService for Grants {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -160,7 +160,7 @@ impl EntityAccessService for Grants {
 
     async fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -175,7 +175,7 @@ impl EntityAccessService for Grants {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -186,7 +186,7 @@ impl EntityAccessService for Grants {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Ok(Vec::new())
     }
 
@@ -206,7 +206,7 @@ impl EntityAccessService for Grants {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(None)
     }

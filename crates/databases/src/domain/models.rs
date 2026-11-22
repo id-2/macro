@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::service::property_value::PropertyValue;
@@ -320,7 +320,7 @@ pub struct CreateDatabase {
     /// Display name.
     pub name: String,
     /// Owner.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// The agent creating it for the owner; `None` when the owner acts.
     pub acting_bot: Option<BotId>,
     /// The first table's display name; "Table 1" when `None`. A caller that
@@ -357,7 +357,7 @@ pub struct InferColumnTypeOutcome {
 #[derive(Debug, Clone)]
 pub struct Viewer {
     /// The user acting.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The agent acting for that user; `None` when the user acts. Only
     /// attribution reads it: what the viewer can reach stays scoped to
     /// `user_id`.
@@ -669,7 +669,7 @@ pub struct Writes {
     /// The database every write is in.
     pub database_id: DatabaseId,
     /// Who the inserted rows are created by.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// The writes, in the order the ops were sent.
     pub writes: Vec<Write>,
     /// Rows relation cells point at, each with the table it must belong to.

@@ -10,15 +10,15 @@ import { PosthogProvider } from '@app/lib/analytics/posthog';
 import { UserContextProvider } from '@core/context/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { onElementConnect } from '@core/util/onElementConnect';
-import { createLoroManager } from '@macro-inc/collaboration/collab/manager';
+import { createLoroManager } from '@rox-one/collaboration/collab/manager';
 import {
   type LiveSyncSource,
   type SyncSourceEvent,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
-import { createPeerIdValidator } from '@macro-inc/lexical-core';
-import { MARKDOWN_LORO_SCHEMA } from '@macro-inc/lexical-core/markdown-loro-schema';
-import { markdownToLoroSnapshot } from '@macro-inc/lexical-core/markdown-loro-snapshot';
+} from '@rox-one/collaboration/collab/source';
+import { createPeerIdValidator } from '@rox-one/lexical-core';
+import { MARKDOWN_LORO_SCHEMA } from '@rox-one/lexical-core/markdown-loro-schema';
+import { markdownToLoroSnapshot } from '@rox-one/lexical-core/markdown-loro-snapshot';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 import { DragDropProvider } from '@thisbeyond/solid-dnd';
 import {

@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::EmailPgRepo;
@@ -11,7 +11,7 @@ use crate::domain::{
 impl EmailFollowupRepo for EmailPgRepo {
     async fn followup_messages(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         thread_id: Uuid,
         link_id: Uuid,
     ) -> Result<Vec<FollowupMessage>, EmailErr> {

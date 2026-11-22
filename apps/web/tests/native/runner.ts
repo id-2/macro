@@ -138,7 +138,7 @@ try {
     {
       MODE: 'development',
       // The isolated fixture and Tauri dev URL both use loopback HTTP.
-      MACRO_DEV_HTTPS: 'false',
+      ROX_DEV_HTTPS: 'false',
       PORT: '3009',
       VITE_LOCAL_SERVERS: 'ALL',
       VITE_LOCAL_BACKEND_ORIGIN: fixture.origin,

@@ -29,7 +29,7 @@ import { FolderDropZone } from './FolderDropZone';
 import { useSoupView } from './soup-view-context';
 
 type FallbackContent = {
-  plural: string;
+  title: string;
   graphic?: Component<{ class?: string }>;
   description?: JSXElement;
   create?: { label: string; blockName: CreatableName };
@@ -46,29 +46,29 @@ export function shouldShowLoadError(options: {
 
 const FALLBACK_CONTENT: Partial<Record<ListView, FallbackContent>> = {
   documents: {
-    plural: 'documents',
+    title: 'Нет документов',
     graphic: EmptyStateDocGraphic,
     description:
-      'Write, collaborate, and share documents right inside Rox. Create notes, specs, or any long-form content and keep it alongside your conversations.',
-    create: { label: 'New document', blockName: 'md' },
+      'Пишите, совместно редактируйте и делитесь документами прямо в Rox. Создавайте заметки, спецификации и любой длинный текст рядом с перепиской.',
+    create: { label: 'Новый документ', blockName: 'md' },
     documentationUrl: `${DOCS_BASE}/product/docs`,
   },
   channels: {
-    plural: 'channels',
+    title: 'Нет каналов',
     graphic: EmptyStateChannelsGraphic,
     description:
-      'Channels are shared spaces for team conversations organized by topic, project, or team. Create a channel to start collaborating with your team.',
-    create: { label: 'New channel', blockName: 'channel' },
+      'Каналы — общие пространства для разговоров команды по теме, проекту или составу. Создайте канал, чтобы начать работу с командой.',
+    create: { label: 'Новый канал', blockName: 'channel' },
     documentationUrl: `${DOCS_BASE}/product/channels`,
   },
   calls: {
-    plural: 'calls',
+    title: 'Нет звонков',
     graphic: EmptyStateCallsGraphic,
     description: (
       <>
-        See recordings, transcriptions and summaries of your Rox calls.
+        Здесь записи, расшифровки и краткие итоги звонков Rox.
         <br />
-        Calls are available to agents.
+        Звонки доступны агентам.
       </>
     ),
     documentationUrl: `${DOCS_BASE}/product/calls`,
@@ -104,11 +104,12 @@ export function EmptyState(props: {
           graphic={EmptyStateNoSearchMatchGraphic}
           title={
             soup.searchText().trim().length > 0
-              ? `No results for "${soup.searchText()}"`
-              : 'No results'
+              ? `Ничего не найдено по запросу «${soup.searchText()}»`
+              : 'Нет результатов'
           }
-          description="Search across messages, documents, tasks, and more. Try a different query or broaden your filters."
+          description="Ищите по сообщениям, документам, задачам и другому. Попробуйте другой запрос или ослабьте фильтры."
           documentationUrl={`${DOCS_BASE}/product/search`}
+          documentationLabel="Документация"
         />
       </Match>
 
@@ -116,8 +117,8 @@ export function EmptyState(props: {
         <EmptyStatePanel
           centered
           graphic={EmptyStateNoFilterMatchGraphic}
-          title="No items matching the filters"
-          description="Try adjusting or clearing your filters to see more results."
+          title="Нет элементов по этим фильтрам"
+          description="Измените или сбросьте фильтры, чтобы увидеть больше результатов."
         >
           {props.onClearFilters && (
             <FilteredHiddenBanner
@@ -137,26 +138,28 @@ export function EmptyState(props: {
       <Match when={props.listView === 'home' && !emailActive()}>
         <EmptyStatePanel
           graphic={EmptyStateInboxTrayGraphic}
-          title="Your inbox is empty"
-          description="Bring your inbox into Rox to triage signal from noise, reply faster, and let agents work alongside your mail."
+          title="Входящие пусты"
+          description="Перенесите входящие в Rox, чтобы отделять важное от остального, отвечать быстрее и работать с письмами вместе с агентами."
           primaryAction={{
-            label: 'Connect email',
+            label: 'Подключить почту',
             onClick: onConnectEmail,
           }}
           documentationUrl={`${DOCS_BASE}/product/home`}
+          documentationLabel="Документация"
         />
       </Match>
 
       <Match when={props.listView === 'mail' && !emailActive()}>
         <EmptyStatePanel
           graphic={EmptyStateEmailGraphic}
-          title="Connect your email"
-          description="Bring your inbox into Rox to triage signal from noise, reply faster, and let agents work alongside your mail."
+          title="Подключите почту"
+          description="Перенесите входящие в Rox, чтобы отделять важное от остального, отвечать быстрее и работать с письмами вместе с агентами."
           primaryAction={{
-            label: 'Connect email',
+            label: 'Подключить почту',
             onClick: onConnectEmail,
           }}
           documentationUrl={`${DOCS_BASE}/product/email`}
+          documentationLabel="Документация"
         />
       </Match>
 
@@ -169,26 +172,25 @@ export function EmptyState(props: {
           const { title, description } =
             tab === 'noise'
               ? {
-                  title: 'No noise',
+                  title: 'Нет шума',
                   description: (
                     <>
-                      Low-priority items like newsletters and notifications
-                      collect here.
+                      Сюда попадают маловажные элементы: рассылки и уведомления.
                       <br />
-                      Nothing to clear right now.
+                      Сейчас разбирать нечего.
                     </>
                   ),
                 }
               : tab === 'all'
                 ? {
-                    title: 'Inbox zero',
+                    title: 'Входящие пусты',
                     description:
-                      "You're all caught up. New items will appear here as they arrive.",
+                      'Вы всё разобрали. Новые элементы появятся здесь по мере поступления.',
                   }
                 : {
-                    title: 'Inbox zero',
+                    title: 'Входящие пусты',
                     description:
-                      "You're all caught up. Important items will appear here as they arrive.",
+                      'Вы всё разобрали. Важные элементы появятся здесь по мере поступления.',
                   };
           return (
             <EmptyStatePanel
@@ -196,6 +198,7 @@ export function EmptyState(props: {
               title={title}
               description={description}
               documentationUrl={`${DOCS_BASE}/product/home`}
+              documentationLabel="Документация"
             />
           );
         })()}
@@ -204,23 +207,25 @@ export function EmptyState(props: {
       <Match when={props.listView === 'mail' && emailActive()}>
         <EmptyStatePanel
           graphic={EmptyStateInboxTrayGraphic}
-          title="Inbox zero"
-          description="You're all caught up. New email will appear here as it arrives."
+          title="Входящие пусты"
+          description="Вы всё разобрали. Новые письма появятся здесь по мере поступления."
           documentationUrl={`${DOCS_BASE}/product/email`}
+          documentationLabel="Документация"
         />
       </Match>
 
       <Match when={props.listView === 'tasks'}>
         <EmptyStatePanel
           graphic={EmptyStateTasksGraphic}
-          title="Nothing to do"
-          description="Tasks you create or that get assigned to you will show up here."
+          title="Нечего делать"
+          description="Здесь появятся задачи, которые вы создадите или которые вам назначат."
           primaryAction={{
-            label: 'New task',
+            label: 'Новая задача',
             icon: PlusIcon,
             onClick: () => runCreateAction('task'),
           }}
           documentationUrl={`${DOCS_BASE}/product/tasks`}
+          documentationLabel="Документация"
         />
       </Match>
 
@@ -229,14 +234,15 @@ export function EmptyState(props: {
       >
         <EmptyStatePanel
           graphic={EmptyStateRoutinesGraphic}
-          title="No routines to show"
-          description="Routines run in the background to handle repetitive work for you — like triaging messages, updating tasks, or sending follow-ups."
+          title="Нет рутин"
+          description="Рутины работают в фоне и берут на себя повторяющиеся дела: разбирают сообщения, обновляют задачи и отправляют напоминания."
           primaryAction={{
-            label: 'New routine',
+            label: 'Новая рутина',
             icon: PlusIcon,
             onClick: () => runCreateAction('routine'),
           }}
           documentationUrl={`${DOCS_BASE}/product/agents`}
+          documentationLabel="Документация"
         />
       </Match>
 
@@ -245,28 +251,30 @@ export function EmptyState(props: {
       >
         <EmptyStatePanel
           graphic={EmptyStateAiGraphic}
-          title="No skills yet"
-          description="Skills are markdown documents with instructions AI follows. Reference one with / in any AI input."
+          title="Навыков пока нет"
+          description="Навыки — документы Markdown с указаниями, которым следует ИИ. Упомяните навык через / в любом поле ввода ИИ."
           primaryAction={{
-            label: 'New skill',
+            label: 'Новый навык',
             icon: PlusIcon,
             onClick: () => runCreateAction('skill'),
           }}
           documentationUrl={`${DOCS_BASE}/product/agents`}
+          documentationLabel="Документация"
         />
       </Match>
 
       <Match when={props.listView === 'agents'}>
         <EmptyStatePanel
           graphic={EmptyStateAiGraphic}
-          title="Get started with agents"
-          description="Create an agent, or use Rox with your favorite AI chat client or code editor via MCP."
+          title="Начните с агентов"
+          description="Создайте агента или используйте Rox в любимом чате с ИИ или редакторе кода через MCP."
           primaryAction={{
-            label: 'New agent',
+            label: 'Новый агент',
             icon: PlusIcon,
             onClick: () => runCreateAction('agent'),
           }}
           documentationUrl={`${DOCS_BASE}/product/agents`}
+          documentationLabel="Документация"
         />
       </Match>
 
@@ -281,14 +289,15 @@ export function EmptyState(props: {
       >
         <EmptyStatePanel
           graphic={EmptyStateFolderGraphic}
-          title="No folders"
-          description="Folders let you organize conversations, documents, and tasks into projects. Create a folder or drop files below to get started."
+          title="Нет папок"
+          description="Папки собирают переписки, документы и задачи в проекты. Создайте папку или перетащите файлы ниже, чтобы начать."
           primaryAction={{
-            label: 'New folder',
+            label: 'Новая папка',
             icon: PlusIcon,
             onClick: () => runCreateAction('project'),
           }}
           documentationUrl={`${DOCS_BASE}/product/drive`}
+          documentationLabel="Документация"
         >
           <FolderDropZone />
         </EmptyStatePanel>
@@ -298,26 +307,27 @@ export function EmptyState(props: {
         <EmptyStatePanel
           centered
           graphic={EmptyStateNoSearchMatchGraphic}
-          title="No items to show"
+          title="Нет элементов"
           description={
             <>
-              Search across messages, documents, tasks, and more.
+              Ищите по сообщениям, документам, задачам и другому.
               {/* The rail opens Search directly, so point to the command menu here. */}
               <Show when={commandMenuKey()}>
                 {(key) => (
                   <>
                     <br />
-                    Press{' '}
+                    Нажмите{' '}
                     <kbd class="rounded border border-edge-muted bg-inset px-1 font-sans text-xs text-ink">
                       {key()}
-                    </kbd>{' '}
-                    to jump to anything or run a command.
+                    </kbd>
+                    , чтобы перейти к чему угодно или выполнить команду.
                   </>
                 )}
               </Show>
             </>
           }
           documentationUrl={`${DOCS_BASE}/product/search`}
+          documentationLabel="Документация"
         />
       </Match>
 
@@ -325,7 +335,7 @@ export function EmptyState(props: {
         {(() => {
           const fallback = (props.listView &&
             FALLBACK_CONTENT[props.listView]) ?? {
-            plural: 'items',
+            title: 'Нет элементов',
           };
           // A gated creatable is not offered here either. Nothing else stops
           // this button: a view can be reachable while the thing it creates is
@@ -350,10 +360,11 @@ export function EmptyState(props: {
           return (
             <EmptyStatePanel
               graphic={fallback.graphic ?? EmptyStateInboxZeroGraphic}
-              title={`No ${fallback.plural} to show`}
+              title={fallback.title}
               description={fallback.description}
               primaryAction={createAction()}
               documentationUrl={fallback.documentationUrl}
+              documentationLabel="Документация"
             />
           );
         })()}

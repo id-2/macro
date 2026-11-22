@@ -2,7 +2,7 @@ import type { Link as EmailLink } from '../../../generated/email/types.gen';
 import type { TagSetResponse } from '../../../generated/properties/types.gen';
 import type { PostSoupAstRequest } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type {
   WorkspaceListOptions,
   WorkspaceTag,
@@ -72,7 +72,7 @@ function validateFilter(expression: unknown, path: string): void {
  */
 export class WorkspaceQuery {
   private tagSets?: Promise<TagSetResponse[]>;
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   private sets(): Promise<TagSetResponse[]> {
     this.tagSets ??= this.client.properties.listTags({}).then(unwrap);

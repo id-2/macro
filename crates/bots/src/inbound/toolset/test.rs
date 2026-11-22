@@ -30,7 +30,7 @@ use entity_access::domain::{
     },
     ports::{EntityAccessService, NoOpEntityAccessService},
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId, user_id::MacroUserIdStr};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId, user_id::RoxUserIdStr};
 use std::sync::{
     Arc, Mutex,
     atomic::{AtomicUsize, Ordering},
@@ -39,8 +39,8 @@ use uuid::Uuid;
 
 const TEST_USER_ID: &str = "macro|bot-manager@example.com";
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(TEST_USER_ID.to_string()).expect("valid macro user id")
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(TEST_USER_ID.to_string()).expect("valid macro user id")
 }
 
 fn sample_bot(handle: &str) -> Bot {
@@ -108,7 +108,7 @@ struct ToolTestBotService {
 impl BotService for ToolTestBotService {
     async fn create_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _req: CreateAgentRequest,
     ) -> Result<Agent, BotError> {
         unimplemented!()
@@ -116,7 +116,7 @@ impl BotService for ToolTestBotService {
 
     async fn update_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: UpdateAgentRequest,
     ) -> Result<Agent, BotError> {
@@ -125,7 +125,7 @@ impl BotService for ToolTestBotService {
 
     async fn manageable_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<Agent, BotError> {
         unimplemented!()
@@ -133,7 +133,7 @@ impl BotService for ToolTestBotService {
 
     async fn patch_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         bot_id: BotId,
         req: PatchAgentRequest,
     ) -> Result<Agent, BotError> {
@@ -156,13 +156,13 @@ impl BotService for ToolTestBotService {
         Ok(agent)
     }
 
-    async fn list_agents(&self, _caller: MacroUserIdStr<'static>) -> Result<Vec<Agent>, BotError> {
+    async fn list_agents(&self, _caller: RoxUserIdStr<'static>) -> Result<Vec<Agent>, BotError> {
         Ok(vec![sample_agent("bug-fixer")])
     }
 
     async fn create_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         req: CreateBotRequest,
     ) -> Result<Bot, BotError> {
         *self.created.lock().expect("create lock") = Some(req.clone());
@@ -171,7 +171,7 @@ impl BotService for ToolTestBotService {
 
     async fn create_channel_scoped_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         channel_id: Uuid,
         req: CreateChannelScopedBotRequest,
     ) -> Result<CreateChannelScopedBotResponse, BotError> {
@@ -185,13 +185,13 @@ impl BotService for ToolTestBotService {
         })
     }
 
-    async fn list_bots(&self, _caller: MacroUserIdStr<'static>) -> Result<Vec<Bot>, BotError> {
+    async fn list_bots(&self, _caller: RoxUserIdStr<'static>) -> Result<Vec<Bot>, BotError> {
         unimplemented!()
     }
 
     async fn get_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<Bot, BotError> {
         let mut bot = sample_bot("build-bot");
@@ -209,7 +209,7 @@ impl BotService for ToolTestBotService {
 
     async fn patch_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: PatchBotRequest,
     ) -> Result<Bot, BotError> {
@@ -218,7 +218,7 @@ impl BotService for ToolTestBotService {
 
     async fn delete_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<(), BotError> {
         *self.deleted.lock().expect("delete lock") = Some(bot_id);
@@ -239,7 +239,7 @@ impl BotService for ToolTestBotService {
 
     async fn remove_bot_from_channel(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _channel_id: Uuid,
         _bot_id: BotId,
     ) -> Result<(), BotError> {
@@ -261,7 +261,7 @@ impl BotService for ToolTestBotService {
 
     async fn create_token(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: CreateBotTokenRequest,
     ) -> Result<CreateBotTokenResponse, BotError> {
@@ -270,7 +270,7 @@ impl BotService for ToolTestBotService {
 
     async fn list_tokens(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<Vec<BotToken>, BotError> {
         unimplemented!()
@@ -278,7 +278,7 @@ impl BotService for ToolTestBotService {
 
     async fn revoke_token(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _token_id: Uuid,
     ) -> Result<(), BotError> {
@@ -325,7 +325,7 @@ struct AllowingEntityAccessService {
 impl EntityAccessService for AllowingEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -350,7 +350,7 @@ impl EntityAccessService for AllowingEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -359,7 +359,7 @@ impl EntityAccessService for AllowingEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -378,7 +378,7 @@ impl EntityAccessService for AllowingEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -388,7 +388,7 @@ impl EntityAccessService for AllowingEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -399,7 +399,7 @@ impl EntityAccessService for AllowingEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
 
@@ -419,7 +419,7 @@ impl EntityAccessService for AllowingEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(None)
     }
@@ -589,7 +589,7 @@ async fn create_bot_for_channel_returns_webhook_and_credential_proposal() {
         setup.webhook.webhook_url,
         format!("https://storage.example.com/channels/{channel_id}/webhook")
     );
-    assert_eq!(setup.credential_header, "x-macro-bot-token");
+    assert_eq!(setup.credential_header, "x-rox-bot-token");
     assert_eq!(access_calls.load(Ordering::SeqCst), 1);
     assert!(created.lock().expect("create lock").is_some());
     assert!(added.lock().expect("add lock").is_some());
@@ -728,8 +728,8 @@ async fn webhook_response_uses_preferred_bot_authentication_headers() {
     .await
     .expect("manageable bot channels should produce webhook metadata");
 
-    assert_eq!(response.credential_header, "x-macro-bot-token");
-    assert_eq!(response.credential_scope_header, "x-macro-bot-scope");
+    assert_eq!(response.credential_header, "x-rox-bot-token");
+    assert_eq!(response.credential_scope_header, "x-rox-bot-scope");
     assert_eq!(response.credential_scope, "user");
     assert_eq!(
         response.webhooks[0].webhook_url,

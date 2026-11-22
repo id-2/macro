@@ -1,3 +1,4 @@
+import { Model } from '@core/component/AI/constant/model';
 import { useAgentsQuery } from '@queries/agents/agents';
 import { useAgentModelsQuery } from '@queries/agents/models';
 import { useCursorApiKeyStatusQuery } from '@queries/auth/cursor-api-key';
@@ -45,9 +46,14 @@ export function createAgentRosterSource(): AgentRosterSource {
       runtimes: harnessesQuery.isSuccess ? harnessesQuery.data : [],
       cursorConnected: cursorConnected(),
       cursorNeedsConnection: cursorNeedsConnection(),
-      macroDefaultModel: macroDefaults.isSuccess
-        ? (macroDefaults.data.currentModel ?? undefined)
-        : undefined,
+      macroDefaultModel: (() => {
+        const discovered = macroDefaults.isSuccess
+          ? (macroDefaults.data.currentModel ?? undefined)
+          : undefined;
+        return !discovered || discovered === Model.gemini38Flash
+          ? Model.roxR1Max
+          : discovered;
+      })(),
       cursorDefaultModel: cursorStatus.isSuccess
         ? (cursorStatus.data.defaultModelId ??
           (cursorDefaults.isSuccess

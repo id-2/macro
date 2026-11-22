@@ -1,6 +1,6 @@
 //! Memory composition root. The domain never depends on the combined tool host.
 use crate::{ToolEmailToolContext, ToolServiceContext, base_toolset};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use memory::{
     domain::{ports::*, service::MemoryServiceImpl},
     outbound::{
@@ -18,7 +18,7 @@ struct MemoryTeamRepository<R>(R);
 #[async_trait::async_trait]
 impl<R: TeamRepository> MemoryTeams for MemoryTeamRepository<R> {
     #[tracing::instrument(skip_all, err)]
-    async fn members(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<(uuid::Uuid, Vec<String>)>> {
+    async fn members(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<(uuid::Uuid, Vec<String>)>> {
         let teams = self
             .0
             .get_user_teams(user)
@@ -49,7 +49,7 @@ struct MemoryActivityLog<R>(R);
 #[async_trait::async_trait]
 impl<R: activity::SubjectActivityPresence + Send + Sync> MemoryActivity for MemoryActivityLog<R> {
     #[tracing::instrument(skip_all, fields(date = %date), err)]
-    async fn acted_on(&self, user: &MacroUserIdStr<'_>, date: chrono::NaiveDate) -> Result<bool> {
+    async fn acted_on(&self, user: &RoxUserIdStr<'_>, date: chrono::NaiveDate) -> Result<bool> {
         let from = date.and_time(chrono::NaiveTime::MIN).and_utc();
         self.0
             .touched_between(user.as_ref(), from, from + chrono::Duration::days(1))

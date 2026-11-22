@@ -25,7 +25,7 @@ impl BotProfilePublisher for RecordingProfilePublisher {
     async fn publish_profile(
         &self,
         profile: BotOwnerProfile,
-        recipients: Vec<MacroUserIdStr<'static>>,
+        recipients: Vec<RoxUserIdStr<'static>>,
     ) -> Result<(), Report> {
         let mut recipients = recipients
             .iter()
@@ -44,7 +44,7 @@ impl BotProfilePublisher for RecordingProfilePublisher {
 async fn a_renamed_team_bot_reaches_its_team_and_the_people_in_its_channels(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -52,7 +52,7 @@ async fn a_renamed_team_bot_reaches_its_team_and_the_people_in_its_channels(
     request.team_id = Some(team_id);
     let bot = service.create_bot(user_id(TEAM_ADMIN), request).await?;
 
-    let channel_id = macro_uuid::generate_uuid_v7();
+    let channel_id = rox_uuid::generate_uuid_v7();
     insert_channel_member(&pool, channel_id, USER_OTHER).await?;
     sqlx::query!(
         r#"
@@ -120,11 +120,11 @@ async fn a_deleted_bot_reaches_the_people_in_the_channels_its_deletion_left(
         .await?;
     let repo = PgBotsRepo::new(pool.clone());
 
-    let kept_channel_id = macro_uuid::generate_uuid_v7();
+    let kept_channel_id = rox_uuid::generate_uuid_v7();
     insert_channel_member(&pool, kept_channel_id, USER_OTHER).await?;
     repo.add_bot_to_channel(kept_channel_id, bot.id).await?;
 
-    let earlier_channel_id = macro_uuid::generate_uuid_v7();
+    let earlier_channel_id = rox_uuid::generate_uuid_v7();
     insert_channel_member(&pool, earlier_channel_id, TEAM_OTHER).await?;
     repo.add_bot_to_channel(earlier_channel_id, bot.id).await?;
     repo.remove_bot_from_channel(earlier_channel_id, bot.id)

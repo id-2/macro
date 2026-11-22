@@ -2,7 +2,7 @@
 //! message, schedule; provider work never holds these locks.
 use super::{EmailPgRepo, draft, thread};
 use crate::domain::{models::EmailErr, send_attempt::*};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgConnection;
 use uuid::Uuid;
 
@@ -10,7 +10,7 @@ mod inbox_move;
 
 async fn lock_attempt(
     tx: &mut PgConnection,
-    actor: &MacroUserIdStr<'_>,
+    actor: &RoxUserIdStr<'_>,
     link: Uuid,
     attempt: SendAttemptId,
 ) -> Result<(), EmailErr> {
@@ -103,7 +103,7 @@ fn attempt_from_row(row: AttemptRow) -> SendAttempt {
 
 async fn read_attempt(
     tx: &mut PgConnection,
-    actor: &MacroUserIdStr<'_>,
+    actor: &RoxUserIdStr<'_>,
     link: Uuid,
     attempt: SendAttemptId,
     snapshot: Option<&SendSnapshot>,
@@ -138,7 +138,7 @@ async fn read_attempt(
 impl EmailSendRepo for EmailPgRepo {
     async fn pending_send_attempts(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link_ids: &[Uuid],
         after: Option<&SendAttemptCursor>,
     ) -> Result<Vec<(SendAttemptCursor, SendAttempt)>, EmailErr> {
@@ -183,7 +183,7 @@ impl EmailSendRepo for EmailPgRepo {
             r#"SELECT draft_generation, id, provider_id, thread_id, provider_thread_id, replying_to_id,
                global_id, link_id, provider_history_id, internal_date_ts, snippet,
                size_estimate, subject, sent_at, has_attachments, is_read, is_starred,
-               is_sent, is_draft, body_text, body_html_sanitized, body_macro,
+               is_sent, is_draft, body_text, body_html_sanitized, body_rox,
                headers_jsonb, created_at, updated_at
                FROM email_messages WHERE (id, link_id) IN (SELECT * FROM unnest($1::uuid[], $2::uuid[]))"#,
             message_ids, link_ids,
@@ -200,7 +200,7 @@ impl EmailSendRepo for EmailPgRepo {
             r#"SELECT draft_generation, id, provider_id, thread_id, provider_thread_id, replying_to_id,
                global_id, link_id, provider_history_id, internal_date_ts, snippet,
                size_estimate, subject, sent_at, has_attachments, is_read, is_starred,
-               is_sent, is_draft, body_text, body_html_sanitized, body_macro,
+               is_sent, is_draft, body_text, body_html_sanitized, body_rox,
                headers_jsonb, created_at, updated_at
                FROM email_messages WHERE id = $1 AND link_id = $2"#,
             message_id,
@@ -213,7 +213,7 @@ impl EmailSendRepo for EmailPgRepo {
     }
     async fn read_send_attempt(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         attempt: SendAttemptId,
         snapshot: Option<&SendSnapshot>,
@@ -224,7 +224,7 @@ impl EmailSendRepo for EmailPgRepo {
 
     async fn admit_send(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         attempt: SendAttemptId,
         mut prepared: PreparedSend,
@@ -319,14 +319,14 @@ impl EmailSendRepo for EmailPgRepo {
             .persisted_request()
             .map_err(anyhow::Error::from)?;
         sqlx::query!(
-            r#"INSERT INTO email_send_attempts (user_id, link_id, attempt_id, request, message_id, thread_id, send_time, restore_body_html, restore_body_text, restore_body_macro, prepared_content, draft_handles, draft_link_ids)
+            r#"INSERT INTO email_send_attempts (user_id, link_id, attempt_id, request, message_id, thread_id, send_time, restore_body_html, restore_body_text, restore_body_rox, prepared_content, draft_handles, draft_link_ids)
                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11,
                  ARRAY(SELECT client_id FROM email_draft_client_ids WHERE message_id=$5
                        UNION SELECT $5 UNION SELECT $12::uuid WHERE $12 IS NOT NULL),
                  ARRAY(SELECT link_id FROM email_draft_client_ids WHERE message_id=$5
                        UNION SELECT $2 UNION SELECT $13::uuid WHERE $13 IS NOT NULL))"#,
             actor.as_ref(), link, attempt.0, request, ids.message_db_id, ids.thread_db_id, send_time,
-            prepared.restore_html, prepared.restore_text, prepared.restore_macro,
+            prepared.restore_html, prepared.restore_text, prepared.restore_rox,
             prepared_content,
             prepared.snapshot.message.db_id, prepared.source_inbox.map(|source| source.link_id),
         ).execute(&mut *tx).await.map_err(anyhow::Error::from)?;
@@ -344,7 +344,7 @@ impl EmailSendRepo for EmailPgRepo {
 
     async fn cancel_send(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         attempt: SendAttemptId,
     ) -> Result<SendAttempt, EmailErr> {
@@ -414,7 +414,7 @@ impl EmailSendRepo for EmailPgRepo {
                 .map_err(anyhow::Error::from)?;
                 sqlx::query!(
                     r#"UPDATE email_messages m SET is_draft = true, draft_generation = m.draft_generation + 1, body_html_sanitized = a.restore_body_html,
-                       body_text = a.restore_body_text, body_macro = a.restore_body_macro, updated_at = NOW()
+                       body_text = a.restore_body_text, body_rox = a.restore_body_rox, updated_at = NOW()
                        FROM email_send_attempts a WHERE a.user_id = $1 AND a.link_id = $2 AND a.attempt_id = $3
                        AND m.id = a.message_id AND m.link_id = a.link_id AND NOT m.is_sent"#,
                     actor.as_ref(), link, attempt.0,

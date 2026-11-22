@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest';
 import {
   afterOnboardingTarget,
   onboardingPathWithStep,
-  onboardingRedirectPath,
   sanitizeNext,
 } from './next-target';
 
@@ -40,22 +39,5 @@ describe('onboarding entry links', () => {
     expect(onboardingPathWithStep(['work'])).toBe('/onboarding?step=work');
     expect(onboardingPathWithStep('email')).toBe('/onboarding');
     expect(onboardingPathWithStep(undefined)).toBe('/onboarding');
-  });
-
-  it('carries step beside next, and drops it from a generic entry', () => {
-    expect(onboardingRedirectPath('/channel/launch?step=team')).toBe(
-      '/onboarding?next=%2Fchannel%2Flaunch&step=team'
-    );
-    expect(onboardingRedirectPath('/channel/launch?ref=1&step=nope')).toBe(
-      '/onboarding?next=%2Fchannel%2Flaunch%3Fref%3D1'
-    );
-    expect(onboardingRedirectPath('/?step=plan')).toBe('/onboarding?step=plan');
-    expect(onboardingRedirectPath('/home?step=work')).toBe(
-      '/onboarding?step=work'
-    );
-    expect(onboardingRedirectPath('/home')).toBe('/onboarding');
-    expect(onboardingRedirectPath('/channel/abc')).toBe(
-      '/onboarding?next=%2Fchannel%2Fabc'
-    );
   });
 });

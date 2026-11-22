@@ -1,6 +1,6 @@
 use super::*;
 use email::domain::models::EmailErr;
-use macro_authorization::CODE_EXECUTION_HEADER;
+use rox_authorization::CODE_EXECUTION_HEADER;
 
 fn status_and_code(error: EventForwardError) -> (StatusCode, ForwardCalendarEventErrorCode) {
     let error = ForwardCalendarEventError::from(error);

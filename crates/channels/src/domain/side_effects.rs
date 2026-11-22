@@ -4,11 +4,11 @@ use crate::domain::{
     access_requests::ChannelAccessRequest,
     broker_events::{
         ChannelAccessRequestedMetadata, ChannelCreatedMetadata, ChannelDeletedMetadata,
-        ChannelMacroEvent, ChannelParticipantAddedMetadata, ChannelParticipantRemovedMetadata,
+        ChannelRoxEvent, ChannelParticipantAddedMetadata, ChannelParticipantRemovedMetadata,
         ChannelUpdatedMetadata,
     },
     events::ChannelEvent,
-    mention_events::{EntityRef, MentionMacroEvent, MentionMetadata},
+    mention_events::{EntityRef, MentionRoxEvent, MentionMetadata},
     models::{
         BotId, BotSenderProfile, ChannelMetadata, ChannelParticipant, ChannelType, MutatedMessage,
     },
@@ -18,8 +18,8 @@ use crate::domain::{
     },
 };
 use bot_id::BotIdStr;
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_event_broker::{RoxEventBroker, NoopRoxEventBroker};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use messages::domain::models::{PostMessageNotificationPolicy, SimpleMention};
 use std::collections::HashSet;
 use tracing::Instrument as _;
@@ -49,14 +49,14 @@ pub enum ChannelRealtimeEffect {
     /// Invalidate a channel picture after a durable change.
     PictureChanged {
         /// Recipients whose picture caches should be refreshed.
-        recipients: Vec<MacroUserIdStr<'static>>,
+        recipients: Vec<RoxUserIdStr<'static>>,
         /// Channel whose picture changed.
         channel_id: Uuid,
     },
     /// Refresh a request to join after it was made or answered.
     AccessRequestChanged {
         /// Participants and the requester.
-        recipients: Vec<MacroUserIdStr<'static>>,
+        recipients: Vec<RoxUserIdStr<'static>>,
         /// Channel the request is for.
         channel_id: Uuid,
         /// The changed attempt.
@@ -68,7 +68,7 @@ pub enum ChannelRealtimeEffect {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum NotificationSender {
     /// A user sender.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
     /// A bot sender resolved to its public display name.
     Bot {
         /// Bot display name.
@@ -78,7 +78,7 @@ pub enum NotificationSender {
 
 impl NotificationSender {
     /// The sender's user id, when the sender is a user.
-    pub fn as_user(&self) -> Option<&MacroUserIdStr<'static>> {
+    pub fn as_user(&self) -> Option<&RoxUserIdStr<'static>> {
         match self {
             NotificationSender::User(id) => Some(id),
             NotificationSender::Bot { .. } => None,
@@ -121,7 +121,7 @@ pub struct ChannelDocumentMention {
     /// Document display name.
     pub document_name: String,
     /// Document owner.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Optional document file type.
     pub file_type: Option<String>,
     /// Optional document subtype.
@@ -132,13 +132,13 @@ pub struct ChannelDocumentMention {
 #[derive(Debug, Clone, Default)]
 pub struct ThreadNotificationContext {
     /// Users participating in the thread.
-    pub participants: Vec<MacroUserIdStr<'static>>,
+    pub participants: Vec<RoxUserIdStr<'static>>,
     /// Sender of the thread parent message.
-    pub parent_sender_id: Option<MacroUserIdStr<'static>>,
+    pub parent_sender_id: Option<RoxUserIdStr<'static>>,
     /// People connected to the call, when the thread belongs to a live call.
     /// The thread is the call's chat, so they hear about its messages like
     /// followers do, even before they post in it.
-    pub connected_call_participants: Vec<MacroUserIdStr<'static>>,
+    pub connected_call_participants: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Notification requested by the channel domain.
@@ -149,7 +149,7 @@ pub enum ChannelNotificationEffect {
         /// Common mention payload.
         mention: ChannelMentionNotification,
         /// Users that should receive the notification.
-        recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        recipient_ids: HashSet<RoxUserIdStr<'static>>,
     },
     /// A document was mentioned in a channel message.
     DocumentMention {
@@ -158,7 +158,7 @@ pub enum ChannelNotificationEffect {
         /// Mentioned document metadata.
         document: ChannelDocumentMention,
         /// Users that should receive the notification.
-        recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        recipient_ids: HashSet<RoxUserIdStr<'static>>,
     },
     /// A reply was posted in a thread.
     Reply {
@@ -175,13 +175,13 @@ pub enum ChannelNotificationEffect {
         /// Whether the reply has attachments.
         has_attachments: bool,
         /// Sender of the thread parent message.
-        thread_parent_sender_id: Option<MacroUserIdStr<'static>>,
+        thread_parent_sender_id: Option<RoxUserIdStr<'static>>,
         /// Channel display metadata.
         metadata: ChannelMetadata,
         /// Optional sender profile picture URL.
         sender_profile_picture_url: Option<String>,
         /// Users that should receive the notification.
-        recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        recipient_ids: HashSet<RoxUserIdStr<'static>>,
     },
     /// A reaction was added to a user's message.
     Reaction {
@@ -196,13 +196,13 @@ pub enum ChannelNotificationEffect {
         /// Emoji added by the reactor.
         emoji: String,
         /// User who added the reaction.
-        sender_id: MacroUserIdStr<'static>,
+        sender_id: RoxUserIdStr<'static>,
         /// Channel display metadata.
         metadata: ChannelMetadata,
         /// Optional reactor profile picture URL.
         sender_profile_picture_url: Option<String>,
         /// Message author who should receive the notification.
-        recipient_id: MacroUserIdStr<'static>,
+        recipient_id: RoxUserIdStr<'static>,
     },
     /// A normal channel message was posted.
     ChannelMessage {
@@ -221,7 +221,7 @@ pub enum ChannelNotificationEffect {
         /// Optional sender profile picture URL.
         sender_profile_picture_url: Option<String>,
         /// Users that should receive the notification.
-        recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        recipient_ids: HashSet<RoxUserIdStr<'static>>,
     },
     /// Someone asked to join a channel.
     AccessRequested {
@@ -232,14 +232,14 @@ pub enum ChannelNotificationEffect {
         /// Channel display metadata.
         metadata: ChannelMetadata,
         /// Participants who may answer it.
-        recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        recipient_ids: HashSet<RoxUserIdStr<'static>>,
     },
     /// A request to join was answered or withdrawn; its notifications are done.
     AccessRequestResolved {
         /// The resolved attempt, which is also its notification id.
         request_id: Uuid,
         /// Participants who were notified about it.
-        recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        recipient_ids: HashSet<RoxUserIdStr<'static>>,
     },
     /// Participants were invited to a channel.
     Invite {
@@ -248,11 +248,11 @@ pub enum ChannelNotificationEffect {
         /// Channel receiving participants.
         channel_id: Uuid,
         /// User that invited the participants.
-        invited_by_user_id: MacroUserIdStr<'static>,
+        invited_by_user_id: RoxUserIdStr<'static>,
         /// Existing application users.
-        registered_recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        registered_recipient_ids: HashSet<RoxUserIdStr<'static>>,
         /// Recipients that do not yet exist as application users.
-        unregistered_recipient_ids: HashSet<MacroUserIdStr<'static>>,
+        unregistered_recipient_ids: HashSet<RoxUserIdStr<'static>>,
         /// Optional inviter profile picture URL.
         sender_profile_picture_url: Option<String>,
         /// Optional message content associated with the invite.
@@ -264,7 +264,7 @@ pub enum ChannelNotificationEffect {
 
 /// Domain service that derives and dispatches side effects for channel events.
 #[derive(Clone)]
-pub struct ChannelSideEffectService<C, R, N, K, B = NoopMacroEventBroker> {
+pub struct ChannelSideEffectService<C, R, N, K, B = NoopRoxEventBroker> {
     context: C,
     realtime: R,
     notifications: N,
@@ -275,8 +275,8 @@ pub struct ChannelSideEffectService<C, R, N, K, B = NoopMacroEventBroker> {
 struct InviteNotificationRequest {
     message_id: Option<Uuid>,
     channel_id: Uuid,
-    invited_by_user_id: MacroUserIdStr<'static>,
-    recipient_user_ids: Vec<MacroUserIdStr<'static>>,
+    invited_by_user_id: RoxUserIdStr<'static>,
+    recipient_user_ids: Vec<RoxUserIdStr<'static>>,
     existing_user_ids: HashSet<String>,
     sender_profile_picture_url: Option<String>,
     message_content: Option<String>,
@@ -294,14 +294,14 @@ impl<C, R, N, K> ChannelSideEffectService<C, R, N, K> {
             realtime,
             notifications,
             contacts,
-            macro_event_broker: NoopMacroEventBroker,
+            macro_event_broker: NoopRoxEventBroker,
         }
     }
 }
 
 impl<C, R, N, K, B> ChannelSideEffectService<C, R, N, K, B> {
     /// Configure a macro event broker to publish channel events to.
-    pub fn with_macro_event_broker<B2: MacroEventBroker>(
+    pub fn with_macro_event_broker<B2: RoxEventBroker>(
         self,
         macro_event_broker: B2,
     ) -> ChannelSideEffectService<C, R, N, K, B2> {
@@ -349,7 +349,7 @@ where
     R: ChannelRealtimePublisher + Clone,
     N: ChannelNotificationSender + Clone,
     K: ChannelContactsDispatcher + Clone,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 {
     async fn handle(&self, event: ChannelEvent) {
         let contact_sync_users = contact_sync_users_for_event(&event);
@@ -548,7 +548,7 @@ where
     async fn publish_access_request_change(
         &self,
         request: &ChannelAccessRequest,
-        participant_user_ids: &[MacroUserIdStr<'static>],
+        participant_user_ids: &[RoxUserIdStr<'static>],
     ) {
         let mut recipients = participant_user_ids.to_vec();
         recipients.push(request.requester_id.clone());
@@ -990,8 +990,8 @@ where
     async fn send_participants_added_notification(
         &self,
         channel_id: Uuid,
-        invited_by_user_id: MacroUserIdStr<'static>,
-        recipient_user_ids: Vec<MacroUserIdStr<'static>>,
+        invited_by_user_id: RoxUserIdStr<'static>,
+        recipient_user_ids: Vec<RoxUserIdStr<'static>>,
         metadata: ChannelMetadata,
         message_content: Option<String>,
     ) {
@@ -1084,13 +1084,13 @@ struct PostedMessageNotificationContext {
     /// call's thread, the channel members connected to the call.
     thread_audience: Vec<String>,
     excluded_user_ids: Vec<String>,
-    recipients_without_sender: HashSet<MacroUserIdStr<'static>>,
-    recipients_without_sender_and_mentions: HashSet<MacroUserIdStr<'static>>,
+    recipients_without_sender: HashSet<RoxUserIdStr<'static>>,
+    recipients_without_sender_and_mentions: HashSet<RoxUserIdStr<'static>>,
     is_first_top_level_message: bool,
 }
 
 /// Whether a participant principal id refers to a bot (e.g. `bot|<uuid>`).
-/// Bots are not user recipients and are not valid `MacroUserIdStr`s, so they are
+/// Bots are not user recipients and are not valid `RoxUserIdStr`s, so they are
 /// skipped before parsing to avoid spurious parse warnings.
 fn is_bot_principal(id: &str) -> bool {
     BotIdStr::parse_from_str(id).is_ok()
@@ -1099,17 +1099,17 @@ fn is_bot_principal(id: &str) -> bool {
 fn recipients_excluding<'a>(
     recipients: impl IntoIterator<Item = &'a str>,
     exclude: impl IntoIterator<Item = &'a str>,
-) -> impl Iterator<Item = MacroUserIdStr<'static>> {
+) -> impl Iterator<Item = RoxUserIdStr<'static>> {
     let exclude_set: HashSet<&str> = exclude.into_iter().collect();
     recipients
         .into_iter()
         .filter(move |id| !exclude_set.contains(id))
         .filter(|id| !is_bot_principal(id))
-        .filter_map(|id| MacroUserIdStr::parse_from_str(id).ok())
+        .filter_map(|id| RoxUserIdStr::parse_from_str(id).ok())
         .map(|u| u.into_owned())
 }
 
-fn contact_sync_users_for_event(event: &ChannelEvent) -> Option<HashSet<MacroUserIdStr<'static>>> {
+fn contact_sync_users_for_event(event: &ChannelEvent) -> Option<HashSet<RoxUserIdStr<'static>>> {
     match event {
         ChannelEvent::ChannelCreated {
             channel_type: ChannelType::Private | ChannelType::DirectMessage,
@@ -1142,11 +1142,11 @@ fn contact_sync_users_for_event(event: &ChannelEvent) -> Option<HashSet<MacroUse
 
 /// Map an internal channel event to the wire events published to the
 /// `macro.channels` topic.
-fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelMacroEvent> {
+fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelRoxEvent> {
     match event {
         ChannelEvent::PictureChanged {
             channel_id, actor, ..
-        } => vec![ChannelMacroEvent::picture_changed(
+        } => vec![ChannelRoxEvent::picture_changed(
             super::broker_events::ChannelPictureChangedMetadata {
                 channel_id: *channel_id,
                 actor: actor.clone(),
@@ -1159,7 +1159,7 @@ fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelMacroEvent> {
             channel_type,
             channel_name,
             participant_user_ids,
-        } => vec![ChannelMacroEvent::created(ChannelCreatedMetadata {
+        } => vec![ChannelRoxEvent::created(ChannelCreatedMetadata {
             channel_id: *channel_id,
             actor: actor.clone(),
             on_behalf_of: on_behalf_of.clone(),
@@ -1172,14 +1172,14 @@ fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelMacroEvent> {
             actor,
             previous_name,
             channel_name,
-        } => vec![ChannelMacroEvent::updated(ChannelUpdatedMetadata {
+        } => vec![ChannelRoxEvent::updated(ChannelUpdatedMetadata {
             channel_id: *channel_id,
             actor: actor.clone(),
             previous_name: previous_name.clone(),
             channel_name: channel_name.clone(),
         })],
         ChannelEvent::ChannelDeleted { channel_id, actor } => {
-            vec![ChannelMacroEvent::deleted(ChannelDeletedMetadata {
+            vec![ChannelRoxEvent::deleted(ChannelDeletedMetadata {
                 channel_id: *channel_id,
                 actor: actor.clone(),
             })]
@@ -1192,7 +1192,7 @@ fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelMacroEvent> {
             invited_by,
             recipient_user_ids,
             ..
-        } => vec![ChannelMacroEvent::participant_added(
+        } => vec![ChannelRoxEvent::participant_added(
             ChannelParticipantAddedMetadata {
                 channel_id: *channel_id,
                 channel_type: *channel_type,
@@ -1208,7 +1208,7 @@ fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelMacroEvent> {
         } => user_id
             .as_user()
             .map(|joined| {
-                vec![ChannelMacroEvent::participant_added(
+                vec![ChannelRoxEvent::participant_added(
                     ChannelParticipantAddedMetadata {
                         channel_id: *channel_id,
                         channel_type: *channel_type,
@@ -1223,7 +1223,7 @@ fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelMacroEvent> {
             channel_type,
             actor,
             removed_user_ids,
-        } => vec![ChannelMacroEvent::participant_removed(
+        } => vec![ChannelRoxEvent::participant_removed(
             ChannelParticipantRemovedMetadata {
                 channel_id: *channel_id,
                 channel_type: *channel_type,
@@ -1236,7 +1236,7 @@ fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelMacroEvent> {
             requester_name,
             ..
         } => {
-            vec![ChannelMacroEvent::access_requested(
+            vec![ChannelRoxEvent::access_requested(
                 ChannelAccessRequestedMetadata {
                     channel_id: request.channel_id,
                     request_id: request.id,
@@ -1257,14 +1257,14 @@ fn broker_events_for_event(event: &ChannelEvent) -> Vec<ChannelMacroEvent> {
 /// Channel messages publish on-send only (`message.sent`, no on-delete for
 /// message mentions); generic entity mentions (e.g. docs) publish on-create
 /// and on-delete (`mention.created`/`mention.deleted`).
-fn mention_broker_events_for_event(event: &ChannelEvent) -> Vec<MentionMacroEvent> {
+fn mention_broker_events_for_event(event: &ChannelEvent) -> Vec<MentionRoxEvent> {
     match event {
         ChannelEvent::MessagePosted {
             message, mentions, ..
         } => mentions
             .iter()
             .map(|mention| {
-                MentionMacroEvent::message_sent(MentionMetadata {
+                MentionRoxEvent::message_sent(MentionMetadata {
                     source: EntityRef {
                         id: message.id.to_string(),
                         kind: "message".to_string(),
@@ -1277,10 +1277,10 @@ fn mention_broker_events_for_event(event: &ChannelEvent) -> Vec<MentionMacroEven
             })
             .collect(),
         ChannelEvent::EntityMentionCreated { mention } => {
-            vec![MentionMacroEvent::created(mention.into())]
+            vec![MentionRoxEvent::created(mention.into())]
         }
         ChannelEvent::EntityMentionDeleted { mention } => {
-            vec![MentionMacroEvent::deleted(mention.into())]
+            vec![MentionRoxEvent::deleted(mention.into())]
         }
         _ => Vec::new(),
     }

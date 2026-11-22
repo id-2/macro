@@ -15,17 +15,17 @@ export function RecordDetailsSection(props: {
   return (
     <SidePanel.Section
       id="crm-record-details"
-      title="Record details"
+      title={t('crm.recordDetails')}
       order={10}
       defaultOpen
     >
       <div class="flex min-w-0 flex-col gap-2">
-        <EntityMetadataRow label="Name">
+        <EntityMetadataRow label={t('crm.name')}>
           {props.company?.name ?? props.contact?.name ?? '—'}
         </EntityMetadataRow>
         <Show when={props.company}>
           {(company) => (
-            <EntityMetadataRow label="Website">
+            <EntityMetadataRow label={t('crm.website')}>
               <For each={company().domains}>
                 {(domain) => <div>{domain.domain}</div>}
               </For>

@@ -174,7 +174,11 @@ fn exported_value(value: &FieldValue) -> String {
         // People leave as emails, which another team can match.
         FieldValue::References(ids) => ids
             .iter()
-            .map(|id| id.strip_prefix("macro|").unwrap_or(id))
+            .map(|id| {
+                id.strip_prefix("macro|")
+                    .or_else(|| id.strip_prefix("rox|"))
+                    .unwrap_or(id)
+            })
             .collect::<Vec<_>>()
             .join(", "),
     }

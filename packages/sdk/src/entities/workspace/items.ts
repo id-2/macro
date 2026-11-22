@@ -2,7 +2,7 @@ import type {
   SoupApiItem,
   SoupProperty,
 } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { AgentSession } from '../agent-sessions/agent-session';
 import { CalendarEvent } from '../calendar/event';
 import { CallRecord } from '../calls/call-record';
@@ -56,7 +56,7 @@ export function visibleTags(
 
 /** @internal */
 export function workspaceItem(
-  client: MacroClient,
+  client: RoxClient,
   item: SoupApiItem,
   tagMap: Map<string, WorkspaceTag>,
 ): WorkspaceItem {

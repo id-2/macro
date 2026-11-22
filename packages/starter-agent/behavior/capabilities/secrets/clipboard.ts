@@ -14,7 +14,7 @@
  * Typing into a focused password field is not done in v1: there is no
  * reliable way here to know the focused field is a password field.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import type { Shell } from '../../context/shell.ts';
 import { clipboard as limits } from './config.ts';
 

@@ -21,7 +21,7 @@ vi.mock('@core/util/platform', () => ({
 vi.mock('@core/component/Toast/Toast', () => ({
   toast: { failure, dismiss },
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: telemetryError },
 }));
 vi.mock('@app/lib/i18n', () => ({ t: (key: string) => key }));

@@ -5,8 +5,8 @@ use std::str::FromStr;
 
 use anyhow::Context;
 use clap::{Args, Subcommand};
-use macro_db_client::document::v2::create::CreateDocumentArgs;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_client::document::v2::create::CreateDocumentArgs;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use models_permissions::share_permission::{
     LinkShare, SharePermissionV2, access_level::AccessLevel,
@@ -104,7 +104,7 @@ impl DocumentArgs {
 async fn create(args: CreateArgs, ctx: SeedCliContext) -> anyhow::Result<()> {
     tracing::info!("creating document");
 
-    let owner = MacroUserIdStr::parse_from_str(args.owner.leak()).context("valid owner id")?;
+    let owner = RoxUserIdStr::parse_from_str(args.owner.leak()).context("valid owner id")?;
 
     let generated_id;
     let id = match args.id.as_deref() {
@@ -197,7 +197,7 @@ pub(crate) async fn seed_from_file_ref(
     println!("Found {} documents to seed", rows.len());
 
     let owner_user_id = args.user_id.clone();
-    let owner = MacroUserIdStr::parse_from_str(owner_user_id.leak()).context("valid owner id")?;
+    let owner = RoxUserIdStr::parse_from_str(owner_user_id.leak()).context("valid owner id")?;
 
     let mut created = 0;
     let mut failed = 0;

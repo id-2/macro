@@ -11,11 +11,11 @@ use axum::{
     extract::{FromRef, FromRequestParts, Path},
     http::request::Parts,
 };
-use macro_authorization::{
-    AnyPrincipal, BotAuthentication, MacroAuthorization, MacroAuthorizationService,
-    MacroAuthorizationState, OptionalMacroAuthorizationExtractor,
+use rox_authorization::{
+    AnyPrincipal, BotAuthentication, RoxAuthorization, RoxAuthorizationService,
+    RoxAuthorizationState, OptionalRoxAuthorizationExtractor,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Level;
 
 use super::{ExtractorError, RequiredPermission, bot::generate_bot_entity_access_receipt};
@@ -46,19 +46,19 @@ pub struct InitiativeAccessExtractor<T: RequiredPermission, Svc, Auth> {
 enum Caller<'a> {
     Bot(&'a BotAuthentication),
     InternalService,
-    Person(Option<MacroUserIdStr<'static>>),
+    Person(Option<RoxUserIdStr<'static>>),
 }
 
-impl<'a> From<Option<&'a MacroAuthorization>> for Caller<'a> {
-    fn from(authorization: Option<&'a MacroAuthorization>) -> Self {
+impl<'a> From<Option<&'a RoxAuthorization>> for Caller<'a> {
+    fn from(authorization: Option<&'a RoxAuthorization>) -> Self {
         match authorization {
-            Some(MacroAuthorization::Bot(bot)) => Self::Bot(bot),
-            Some(MacroAuthorization::Internal(None)) => Self::InternalService,
-            Some(MacroAuthorization::User(user))
-            | Some(MacroAuthorization::Internal(Some(user))) => {
+            Some(RoxAuthorization::Bot(bot)) => Self::Bot(bot),
+            Some(RoxAuthorization::Internal(None)) => Self::InternalService,
+            Some(RoxAuthorization::User(user))
+            | Some(RoxAuthorization::Internal(Some(user))) => {
                 Self::Person(Some(user.macro_user_id.clone()))
             }
-            Some(MacroAuthorization::Harness(harness)) => {
+            Some(RoxAuthorization::Harness(harness)) => {
                 Self::Person(Some(harness.acting_user.macro_user_id.clone()))
             }
             None => Self::Person(None),
@@ -71,8 +71,8 @@ where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -82,7 +82,7 @@ where
         let service = <Arc<Svc>>::from_ref(state);
 
         let authorization =
-            OptionalMacroAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(
+            OptionalRoxAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(
                 parts, state,
             )
             .await
@@ -122,7 +122,7 @@ where
 
 async fn person_receipt<T: RequiredPermission>(
     service: &impl EntityAccessService,
-    user: Option<MacroUserIdStr<'static>>,
+    user: Option<RoxUserIdStr<'static>>,
     initiative_id: String,
 ) -> Result<EntityAccessReceipt<T>, ExtractorError> {
     let access_level = service

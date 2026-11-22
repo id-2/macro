@@ -1,6 +1,6 @@
 use super::*;
 
-macro_env_var::env_var! {
+rox_env_var::env_var! {
     #[derive(Debug)]
     struct TestSecretName;
 }

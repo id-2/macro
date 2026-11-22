@@ -1,7 +1,7 @@
 import { usePendingEntityAppearance } from '@app/features/entity-appearance/queries/pending-appearance';
 import { usePending } from '@app/observability/flow';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { until } from '@solid-primitives/promise';
 import type { CombinedError } from '@urql/core';
 import {

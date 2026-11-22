@@ -3,7 +3,7 @@ mod test;
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_entity_access_management::EntityAccessSourceType;
 use serde::Serialize;
 use uuid::Uuid;
@@ -15,7 +15,7 @@ use super::{AccessLevel, Entity, EntityPermission, ParticipantRole, TeamRole};
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct AccessExplanation {
     /// The user whose access was explained.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The entity that was queried.
     pub entity: Entity,
     /// The strongest permission implied by [`Self::grants`].
@@ -29,7 +29,7 @@ pub struct AccessExplanation {
 impl AccessExplanation {
     /// Build an explanation from already-resolved grants.
     pub fn from_grants(
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entity: Entity,
         grants: Vec<AccessGrant>,
     ) -> Self {
@@ -182,7 +182,7 @@ pub enum AccessGrant {
     /// The caller is the primary on a delegated inbox.
     InboxDelegate {
         /// The mailbox owner whose inbox was delegated.
-        mailbox_owner: MacroUserIdStr<'static>,
+        mailbox_owner: RoxUserIdStr<'static>,
     },
     /// The thread's containing project has an `entity_access` row for the caller.
     ContainingProject {

@@ -15,7 +15,7 @@ use agent_runtime_protocol::domain::action::{
 use agent_runtime_protocol::domain::schema::v0::{
     AcpMessage, SystemEvent, ToRuntimeMessage, ToServerMessage,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::PROTOCOL_VERSION;
 use crate::domain::error::AgentSessionError;
@@ -53,7 +53,7 @@ fn command(text: &str, token: u32) -> Input<u32> {
 
 fn command_with_id(text: &str, action_id: AgentActionId, token: u32) -> Input<u32> {
     Input::Command {
-        from: Some(MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")),
+        from: Some(RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")),
         action: AgentAction::prompt(text),
         action_id,
         token,
@@ -175,7 +175,7 @@ fn recovery_waits_for_prompt_then_loads_with_a_new_durable_boundary() {
         let mut machine = machine();
         begin_opening(&mut machine);
         machine.handle(session_opened("cursor-session"));
-        machine.initialization_persisted(macro_uuid::generate_uuid_v7());
+        machine.initialization_persisted(rox_uuid::generate_uuid_v7());
         let prompt = if active {
             Some(sent_request_ids(&machine.handle(command("current", 1)))[0].clone())
         } else {
@@ -201,7 +201,7 @@ fn recovery_waits_for_prompt_then_loads_with_a_new_durable_boundary() {
         assert_eq!(sent_methods(&effects), ["initialize"]);
         let initialize = sent_request_ids(&effects)[0].clone();
         assert!(machine.handle(command("queued", 2)).is_empty());
-        let boundary = macro_uuid::generate_uuid_v7();
+        let boundary = rox_uuid::generate_uuid_v7();
         machine.initialization_persisted(boundary);
         let response = InitializeResponse::new(PROTOCOL_VERSION).agent_capabilities(
             AgentCapabilities::new()
@@ -254,7 +254,7 @@ fn recovery_while_a_load_reply_is_queued_loads_again_before_dispatch() {
         })
     };
     let initialize = sent_request_ids(&machine.handle(requirement()))[0].clone();
-    machine.initialization_persisted(macro_uuid::generate_uuid_v7());
+    machine.initialization_persisted(rox_uuid::generate_uuid_v7());
     let opening = machine.handle(frame(RawJsonRpcMessage::response(
         initialize,
         Ok(serde_json::to_value(
@@ -940,7 +940,7 @@ fn permission_request(id: RequestId, options: Vec<PermissionOption>) -> Input<u3
 
 fn permission_answer(request_id: RequestId, option_id: &str, token: u32) -> Input<u32> {
     Input::Command {
-        from: Some(MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")),
+        from: Some(RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")),
         action: AgentAction::RespondToPermission(AgentPermissionAction {
             request_id,
             answer: PermissionAnswer::Selected {
@@ -1081,7 +1081,7 @@ fn actions_go_out_under_the_ids_they_were_accepted_with() {
 
 fn stop(token: u32) -> Input<u32> {
     Input::Command {
-        from: Some(MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")),
+        from: Some(RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")),
         action: AgentAction::Stop,
         action_id: AgentActionId::mint(),
         token,
@@ -1444,7 +1444,7 @@ fn only_matching_successful_load_selects_its_connection_initialization() {
             PermissionPolicy::Prompt,
         );
         machine.handle(acp_ready());
-        let initialization_log_id = macro_uuid::generate_uuid_v7();
+        let initialization_log_id = rox_uuid::generate_uuid_v7();
         machine.initialization_persisted(initialization_log_id);
         let capabilities = if resume {
             AgentCapabilities::new()
@@ -1499,7 +1499,7 @@ fn failed_or_interrupted_load_never_selects_history() {
             PermissionPolicy::Prompt,
         );
         machine.handle(acp_ready());
-        machine.initialization_persisted(macro_uuid::generate_uuid_v7());
+        machine.initialization_persisted(rox_uuid::generate_uuid_v7());
         machine.handle(initialized_with(
             InitializeResponse::new(PROTOCOL_VERSION)
                 .agent_capabilities(AgentCapabilities::new().load_session(true)),
@@ -1516,7 +1516,7 @@ fn failed_or_interrupted_load_never_selects_history() {
         PermissionPolicy::Prompt,
     );
     machine.handle(acp_ready());
-    machine.initialization_persisted(macro_uuid::generate_uuid_v7());
+    machine.initialization_persisted(rox_uuid::generate_uuid_v7());
     machine.handle(initialized_with(
         InitializeResponse::new(PROTOCOL_VERSION)
             .agent_capabilities(AgentCapabilities::new().load_session(true)),
@@ -1561,7 +1561,7 @@ fn load_without_durable_initialization_cannot_become_live() {
 
 #[test]
 fn late_load_response_from_a_previous_actor_cannot_select_history() {
-    fn start() -> (SessionMachine<u32>, RequestId, macro_uuid::Uuid) {
+    fn start() -> (SessionMachine<u32>, RequestId, rox_uuid::Uuid) {
         let mut machine = SessionMachine::resume(
             AgentSessionId::TEST_A,
             "acp-42".into(),
@@ -1569,8 +1569,8 @@ fn late_load_response_from_a_previous_actor_cannot_select_history() {
             vec![],
             PermissionPolicy::Prompt,
         )
-        .with_connection_context(macro_uuid::generate_uuid_v7());
-        let initialization = macro_uuid::generate_uuid_v7();
+        .with_connection_context(rox_uuid::generate_uuid_v7());
+        let initialization = rox_uuid::generate_uuid_v7();
         machine.initialization_persisted(initialization);
         let effects = machine.handle(Input::Ready {
             restore: SessionRestoreSupport {
@@ -1648,7 +1648,7 @@ mod elicitation {
     fn answer(id: ElicitationRequestId, answer: ElicitationAnswer, token: u32) -> Input<u32> {
         Input::Command {
             from: Some(
-                MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
+                RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id"),
             ),
             action: AgentAction::respond_elicitation(id, answer),
             action_id: AgentActionId::mint(),

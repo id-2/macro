@@ -47,7 +47,7 @@ function DriveDatabases(props: { onNavigate?: () => void }) {
           'max-h-[calc(10*var(--sidebar-row-height)+9*var(--sidebar-row-gap))] touch:max-h-[calc(10*2.75rem+9*var(--sidebar-row-gap))]'
       )}
     >
-      <ViewSidebar.Nav aria-label="Databases">
+      <ViewSidebar.Nav aria-label={t('drive.databases')}>
         <For each={sidebar.databases()}>
           {(database) => (
             <ViewSidebar.Item
@@ -140,11 +140,11 @@ export function DriveSidebarContent(props: { onNavigate?: () => void }) {
           onOpenChange={state.setFavoritesOpen}
         >
           <CollapsibleSection.Trigger>
-            <span class="min-w-0 truncate">Favorites</span>
+            <span class="min-w-0 truncate">Избранное</span>
             <CollapsibleSection.Indicator />
           </CollapsibleSection.Trigger>
           <CollapsibleSection.Content>
-            <ViewSidebar.Nav aria-label="Favorite files and folders">
+            <ViewSidebar.Nav aria-label={t('drive.favoriteFilesAndFolders')}>
               <For each={sidebar.favorites()}>
                 {(favorite) => (
                   <DriveFavorite
@@ -163,7 +163,7 @@ export function DriveSidebarContent(props: { onNavigate?: () => void }) {
           onOpenChange={state.setDatabasesOpen}
         >
           <CollapsibleSection.Trigger>
-            <span class="min-w-0 truncate">Databases</span>
+            <span class="min-w-0 truncate">{t('drive.databases')}</span>
             <CollapsibleSection.Indicator />
           </CollapsibleSection.Trigger>
           <CollapsibleSection.Content>
@@ -177,11 +177,11 @@ export function DriveSidebarContent(props: { onNavigate?: () => void }) {
       >
         <CollapsibleSection.Header>
           <CollapsibleSection.Trigger class="flex-1">
-            <span class="min-w-0 truncate">Folders</span>
+            <span class="min-w-0 truncate">{t('drive.folders')}</span>
             <CollapsibleSection.Indicator />
           </CollapsibleSection.Trigger>
           <CollapsibleSection.Action
-            aria-label="Search folders"
+            aria-label={t('drive.searchFolders')}
             onClick={() => {
               const open = !searchingFolders();
 
@@ -197,14 +197,14 @@ export function DriveSidebarContent(props: { onNavigate?: () => void }) {
         <CollapsibleSection.Content>
           <Show when={searchingFolders()}>
             <SearchBar
-              label="Search folders"
-              placeholder="Search folders"
+              label={t('drive.searchFolders')}
+              placeholder={t('drive.searchFolders')}
               value={folderSearch()}
               onValueChange={setFolderSearch}
               class="mb-2"
             />
           </Show>
-          <ViewSidebar.Nav aria-label="Folders">
+          <ViewSidebar.Nav aria-label={t('drive.folders')}>
             <DriveLocationMenu location={{ kind: 'folder', id: null }}>
               <div
                 ref={(element) => rootDropTarget?.ref(element)}
@@ -221,7 +221,7 @@ export function DriveSidebarContent(props: { onNavigate?: () => void }) {
                   <ViewSidebar.Icon>
                     <FolderIcon class="size-4" />
                   </ViewSidebar.Icon>
-                  <span>Drive</span>
+                  <span>{t('drive.title')}</span>
                 </ViewSidebar.Item>
               </div>
             </DriveLocationMenu>
@@ -233,7 +233,7 @@ export function DriveSidebarContent(props: { onNavigate?: () => void }) {
                     role="status"
                     class="px-3 py-2 text-sm text-ink-extra-muted"
                   >
-                    Loading folders…
+                    {t('drive.loadingFolders')}
                   </p>
                 }
               >
@@ -241,14 +241,14 @@ export function DriveSidebarContent(props: { onNavigate?: () => void }) {
                   when={!sidebar.foldersError()}
                   fallback={
                     <div class="p-3 text-sm text-ink-muted">
-                      Folders couldn’t be loaded.
+                      {t('drive.foldersLoadFailed')}
                       <Button
                         variant="ghost"
                         onClick={() =>
                           fireAndForget(sidebar.retryFolders(), 'drive-view')
                         }
                       >
-                        Try again
+                        {t('common.tryAgain')}
                       </Button>
                     </div>
                   }
@@ -266,8 +266,8 @@ export function DriveSidebarContent(props: { onNavigate?: () => void }) {
                   <Show when={filteredTree().length === 0}>
                     <p class="px-3 py-2 text-sm text-ink-extra-muted">
                       {folderSearch()
-                        ? 'No matching folders'
-                        : 'No folders yet'}
+                        ? t('drive.noMatchingFolders')
+                        : t('drive.noFoldersYet')}
                     </p>
                   </Show>
                 </Show>
@@ -290,14 +290,14 @@ function DriveImportPromotion() {
       alternatives={[
         {
           icon: UploadIcon,
-          label: 'Upload files',
-          description: 'Choose files from this computer.',
+          label: t('drive.uploadFiles'),
+          description: t('drive.uploadFilesDescription'),
           onSelect: actions.uploadFiles,
         },
         {
           icon: FolderIcon,
-          label: 'Upload a folder',
-          description: 'Bring over a folder and everything in it.',
+          label: t('drive.uploadFolder'),
+          description: t('drive.uploadFolderDescription'),
           onSelect: actions.uploadFolder,
         },
       ]}
@@ -333,11 +333,11 @@ export function DriveSidebar() {
     createDragAutoScroll({ getViewport: content, axis: 'both' });
   }
   return (
-    <ViewSidebar.Root aria-label="Drive navigation">
+    <ViewSidebar.Root aria-label={t('drive.driveNavigation')}>
       <ViewSidebar.Header>
         <div class="flex min-w-0 items-center gap-1">
           <ViewSidebar.CloseButton />
-          <ViewSidebar.Title>Drive</ViewSidebar.Title>
+          <ViewSidebar.Title>{t('drive.title')}</ViewSidebar.Title>
         </div>
       </ViewSidebar.Header>
       <ViewSidebar.Primary>

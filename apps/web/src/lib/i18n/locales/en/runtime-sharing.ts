@@ -11,6 +11,12 @@ export default {
     other: '{{count}} requests',
   },
   yourRuntimes: 'Your machines',
+  connected: 'Connected',
+  offline: 'Offline',
+  lastConnected: 'Last connected {{time}}',
+  neverConnected: 'Never connected',
+  rename: 'Rename',
+  defaultModel: 'Default model',
   teammatesRuntimes: "Teammates' machines",
   teammatesRuntimesHint:
     'Machines your teammates own. Ask an owner for access to run agents on one.',

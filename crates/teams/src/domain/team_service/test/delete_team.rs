@@ -252,7 +252,7 @@ fn published_team_deleted() -> Step {
 }
 
 fn owner_receipt() -> EntityAccessReceipt<OwnerTeamRole> {
-    let owner = MacroUserIdStr::parse_from_str(OWNER).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(OWNER).unwrap();
     test_team_receipt::<OwnerTeamRole>(TEAM_ID, &owner)
 }
 

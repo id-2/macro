@@ -1,28 +1,24 @@
 import { t } from '@app/lib/i18n';
 import { Avatar, AvatarGroup, Button } from '@ui';
 import { For } from 'solid-js';
-import presenterPhoto from '../assets/presenter.jpg';
-import juliaPhoto from '../assets/support-julia.jpg';
-import teoPhoto from '../assets/support-teo.jpg';
+import { TUTORIAL_STAFF } from '../core/presenter';
 
-/** Three of the Rox team in every support channel, shown as faces only. */
-const SUPPORT_TEAM_PHOTOS = [juliaPhoto, teoPhoto, presenterPhoto];
+/** The people a person can write to, shown as faces only. */
+const SUPPORT_TEAM_PHOTOS = TUTORIAL_STAFF.slice(0, 3).map(
+  (person) => person.photo
+);
 
 /**
- * The strip under the video, on the dialog's own surface: the faces of
- * people on the Rox team, overlapping like a block's live viewers, then
- * "Have questions about Rox CRM? Talk to us in your support channel."
+ * The strip under the notice: faces, then a question, then the way into the
+ * person's own support channel.
  */
 export function TutorialSupportLip(props: {
-  /** The block the video teaches, like "Rox CRM". */
+  /** The block the lesson is about, like "Rox CRM". */
   block: string;
   onSelect: () => void;
 }) {
   return (
     <div class="-mt-1 flex min-h-10 shrink-0 flex-wrap items-center justify-center px-4 pb-1 text-center text-sm text-ink-muted">
-      {/* Decorative: they show there are real people in the channel. The
-          separator rings take the dialog's surface, as the live viewers'
-          take the header's. */}
       <AvatarGroup
         size="md"
         aria-hidden="true"
@@ -39,7 +35,7 @@ export function TutorialSupportLip(props: {
       </AvatarGroup>
       <span>{t('tutorials.supportQuestion', { block: props.block })}</span>
       <Button variant="link" size="sm" onClick={props.onSelect}>
-        {t('tutorials.supportChannel')}
+        Написать в канал поддержки
       </Button>
     </div>
   );

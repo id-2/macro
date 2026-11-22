@@ -10,8 +10,8 @@ use super::profile_picture_change::{
 };
 use crate::api::context::{ApiContext, AuthorizationService};
 
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::user::update_profile_picture::update_profile_picture;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::user::update_profile_picture::update_profile_picture;
 use model::response::{EmptyResponse, ErrorResponse};
 use serde::Deserialize;
 
@@ -38,7 +38,7 @@ pub struct ProfilePictureQueryParams {
 pub async fn handler(
     State(ctx): State<ApiContext>,
     Query(params): Query<ProfilePictureQueryParams>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, Response> {
     let macro_user_id = authorization.authorization.user.macro_user_id.clone();
     throttle_set(&ctx, macro_user_id.as_ref())

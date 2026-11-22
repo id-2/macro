@@ -20,8 +20,12 @@ use tracing::Instrument;
 use tracing_opentelemetry::OpenTelemetrySpanExt;
 
 /// Marks a request as a program's, as the in-realm fetch wrapper does; the
-/// same name as `macro_authorization::CODE_EXECUTION_HEADER`.
-const CODE_EXECUTION_HEADER: &str = "x-macro-code-execution";
+/// same name as `rox_authorization::CODE_EXECUTION_HEADER`.
+const CODE_EXECUTION_HEADER: &str = "x-rox-code-execution";
+
+/// The pre-rename name: a program may set it, so it never crosses the
+/// forwarder either, and the forwarder's own mark replaces it.
+const LEGACY_CODE_EXECUTION_HEADER: &str = "x-macro-code-execution";
 
 /// One run's forwarder, listening until it is stopped or dropped.
 pub(crate) struct RunEgress {
@@ -142,6 +146,7 @@ fn forwarded(name: &HeaderName) -> bool {
             | "traceparent"
             | "tracestate"
             | CODE_EXECUTION_HEADER
+            | LEGACY_CODE_EXECUTION_HEADER
     )
 }
 
@@ -180,7 +185,7 @@ async fn forward(State(routes): State<Arc<Routes>>, request: Request) -> Respons
     headers.insert(CODE_EXECUTION_HEADER, HeaderValue::from_static("1"));
     let body = reqwest::Body::wrap_stream(request.into_body().into_data_stream());
     async move {
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let started = Instant::now();
         let answer = routes
             .client

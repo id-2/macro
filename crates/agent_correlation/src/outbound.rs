@@ -57,7 +57,7 @@ impl CorrelationRepository for PgCorrelationRepository {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
     #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
     async fn invocations_are_fresh_bound_to_agent_and_independent_of_session_state(

@@ -2,20 +2,20 @@ import type {
   Anchor as AnchorRecord,
   EditPdfPlaceableCommentAnchorRequest,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { Document } from './document';
 
 /** A PDF annotation scoped to its document. */
-export class DocumentAnchor extends MacroEntity<AnchorRecord> {
+export class DocumentAnchor extends RoxEntity<AnchorRecord> {
   /** Serialize identity with its owning resource. */
   override toJSON() {
     return { ...super.toJSON(), documentId: this.document.id };
   }
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** Owning document. */
     readonly document: Document,
     id: string,
@@ -26,7 +26,7 @@ export class DocumentAnchor extends MacroEntity<AnchorRecord> {
 
   /** Construct a document scoped annotation handle. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     document: Document,
     id: string,
   ): DocumentAnchor {
@@ -35,7 +35,7 @@ export class DocumentAnchor extends MacroEntity<AnchorRecord> {
 
   /** Seed an annotation from a document annotation listing. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     document: Document,
     record: AnchorRecord,
   ): DocumentAnchor {
@@ -49,7 +49,7 @@ export class DocumentAnchor extends MacroEntity<AnchorRecord> {
       }),
     ).data.find((a) => a.uuid === this.id);
     if (!record)
-      throw new MacroNotFoundError(`Annotation ${this.id} is unavailable`);
+      throw new RoxNotFoundError(`Annotation ${this.id} is unavailable`);
     return record;
   }
 

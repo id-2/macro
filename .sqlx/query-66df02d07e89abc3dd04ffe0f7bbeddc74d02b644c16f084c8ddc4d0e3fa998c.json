@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_message_labels (message_id, label_id)\n                     SELECT id, '10000013-0000-0000-0000-000000000013' FROM email_messages\n                     WHERE thread_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "66df02d07e89abc3dd04ffe0f7bbeddc74d02b644c16f084c8ddc4d0e3fa998c"
+}

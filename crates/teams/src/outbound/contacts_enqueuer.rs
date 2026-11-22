@@ -6,7 +6,7 @@ mod test;
 use std::sync::Arc;
 
 use contacts::domain::{models::messages::ContactConnection, ports::ContactsIngress};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::contacts_enqueuer::ContactsEnqueuer;
 
@@ -39,7 +39,7 @@ where
     #[tracing::instrument(skip(self, connections), err)]
     async fn enqueue_contact_connections(
         &self,
-        connections: Vec<(MacroUserIdStr<'static>, MacroUserIdStr<'static>)>,
+        connections: Vec<(RoxUserIdStr<'static>, RoxUserIdStr<'static>)>,
     ) -> Result<(), Self::Err> {
         let connections = connections
             .into_iter()

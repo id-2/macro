@@ -1,11 +1,11 @@
 //! Message-label batch writes and compensation when a provider write cannot be queued.
 
-use super::events::{EmailEventOrigin, EmailMacroEvent, LabelRef};
+use super::events::{EmailEventOrigin, EmailRoxEvent, LabelRef};
 use super::models::UserProvider;
 use super::models::mailbox_action::{MailboxAction, MailboxActionMessage, MailboxActionTarget};
 use super::ports::EmailMessageEnqueuer;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Provider settlement and retry policy for queued Gmail label writes.
@@ -24,7 +24,7 @@ pub const MAX_MESSAGE_LABEL_BATCH: usize = 10;
 /// An authenticated caller's requested label change.
 pub struct MessageLabelChange {
     /// Caller whose own and delegated inboxes may resolve the first message.
-    pub caller: MacroUserIdStr<'static>,
+    pub caller: RoxUserIdStr<'static>,
     /// Authentication identity used by the existing message lookup scope.
     pub caller_fusionauth_user_id: String,
     /// Message ids in request order, including any duplicates.
@@ -100,7 +100,7 @@ pub struct MessageLabelInbox {
     /// Database identifier of the inbox.
     pub id: Uuid,
     /// Inbox owner attributed in label-change events.
-    pub macro_id: MacroUserIdStr<'static>,
+    pub macro_id: RoxUserIdStr<'static>,
     /// Provider the label change is written to.
     pub provider: UserProvider,
 }
@@ -197,7 +197,7 @@ pub trait MessageLabelRepository: Send + Sync + 'static {
     fn enqueue_mailbox_action(
         &self,
         link_id: Uuid,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         action: &MailboxAction,
         targets: &[MailboxActionTarget],
     ) -> impl Future<Output = Result<Uuid, Self::Err>> + Send;
@@ -218,7 +218,7 @@ where
     R: MessageLabelRepository,
     Q: EmailMessageEnqueuer,
     Q::Err: std::fmt::Debug,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// Stage a label batch, publish its events, and queue or compensate the provider write.
     pub async fn change(
@@ -272,7 +272,7 @@ where
         let mut thread_ids: Vec<Uuid> = db_messages.iter().map(|m| m.thread_db_id).collect();
         thread_ids.sort_unstable();
         thread_ids.dedup();
-        let pending_write_id = macro_uuid::generate_uuid_v7();
+        let pending_write_id = rox_uuid::generate_uuid_v7();
         let provider_label_id = label.provider_label_id.clone();
         let is_adding = request.add;
         let provider_messages = self
@@ -289,7 +289,7 @@ where
 
         let actor = Some(link.macro_id.clone());
         for thread_id in &thread_ids {
-            let event = EmailMacroEvent::thread_label_change(
+            let event = EmailRoxEvent::thread_label_change(
                 link.id,
                 link.macro_id.clone(),
                 actor.clone(),
@@ -361,7 +361,7 @@ where
     async fn queue_outlook_category(
         &self,
         link_id: Uuid,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         action: MailboxAction,
         messages: &[MessageLabelTarget],
         missing_ids: Vec<Uuid>,

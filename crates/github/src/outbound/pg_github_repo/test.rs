@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::{Pool, Postgres};
 
 use crate::domain::models::GithubLink;
@@ -13,7 +13,7 @@ use crate::outbound::pg_github_repo::PgGithubRepo;
 async fn test_get_github_link_by_user_id(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned();
     let link = repo
@@ -38,7 +38,7 @@ async fn test_get_github_link_by_user_id(pool: Pool<Postgres>) {
 async fn test_get_github_link_by_user_id_not_found(pool: Pool<Postgres>) {
     let repo = PgGithubRepo::new(pool);
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|nonexistent@user.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|nonexistent@user.com")
         .unwrap()
         .into_owned();
     let result = repo.get_github_link_by_user_id(&user_id.0).await;
@@ -114,7 +114,7 @@ async fn test_insert_github_link(pool: Pool<Postgres>) {
     let now = chrono::Utc::now();
     let link = GithubLink {
         id: uuid::Uuid::parse_str("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee").unwrap(),
-        macro_id: MacroUserIdStr::parse_from_str("macro|new@user.com")
+        macro_id: RoxUserIdStr::parse_from_str("macro|new@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::parse_str("ffffffff-ffff-ffff-ffff-ffffffffffff").unwrap(),
@@ -145,7 +145,7 @@ async fn test_insert_github_link_shared_github_user_id_succeeds(pool: Pool<Postg
     let link = GithubLink {
         id,
         // Different macro user than the fixture owner of github_user_id 12345.
-        macro_id: MacroUserIdStr::parse_from_str("macro|sharer@user.com")
+        macro_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -177,7 +177,7 @@ async fn test_insert_github_link_duplicate_macro_and_github_user_id_fails(pool: 
     let link = GithubLink {
         id: uuid::Uuid::new_v4(),
         // Existing fixture user who already owns github_user_id 12345.
-        macro_id: MacroUserIdStr::parse_from_str("macro|user@user.com")
+        macro_id: RoxUserIdStr::parse_from_str("macro|user@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -206,7 +206,7 @@ async fn test_get_github_link_by_github_user_id_returns_owner(pool: Pool<Postgre
     let later = chrono::Utc::now() + chrono::Duration::days(1);
     let sharer_link = GithubLink {
         id: uuid::Uuid::new_v4(),
-        macro_id: MacroUserIdStr::parse_from_str("macro|sharer@user.com")
+        macro_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -247,7 +247,7 @@ async fn test_count_github_links_by_github_user_id(pool: Pool<Postgres>) {
     let now = chrono::Utc::now();
     let sharer_link = GithubLink {
         id: uuid::Uuid::new_v4(),
-        macro_id: MacroUserIdStr::parse_from_str("macro|sharer@user.com")
+        macro_id: RoxUserIdStr::parse_from_str("macro|sharer@user.com")
             .unwrap()
             .into_owned(),
         fusionauth_user_id: uuid::Uuid::new_v4(),
@@ -337,7 +337,7 @@ async fn reassign_grant_moves_all_sharers_without_overwriting_other_accounts_or_
     let new_owner = uuid::Uuid::from_u128(42);
     let mut sharer = original.clone();
     sharer.id = uuid::Uuid::from_u128(43);
-    sharer.macro_id = MacroUserIdStr::parse_from_str("macro|sharer@user.com")
+    sharer.macro_id = RoxUserIdStr::parse_from_str("macro|sharer@user.com")
         .unwrap()
         .into_owned();
     repo.insert_github_link(&sharer).await.unwrap();

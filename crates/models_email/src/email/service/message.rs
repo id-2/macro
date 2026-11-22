@@ -87,7 +87,9 @@ pub struct Message {
     pub labels: Vec<Label>,
     pub body_text: Option<String>,
     pub body_html_sanitized: Option<String>,
-    pub body_macro: Option<String>,
+    /// Accepted from payloads written under the former Macro name.
+    #[serde(alias = "body_macro")]
+    pub body_rox: Option<String>,
     pub attachments: Vec<Attachment>,
     /// Uploaded file attachments for the message, if it is a draft
     pub attachments_draft: Vec<AttachmentDraft>,
@@ -308,7 +310,9 @@ pub struct MessageToSend {
     pub bcc: Option<Vec<ContactInfo>>,
     pub body_text: Option<String>,
     pub body_html: Option<String>,
-    pub body_macro: Option<String>,
+    /// Accepted from payloads written under the former Macro name.
+    #[serde(alias = "body_macro")]
+    pub body_rox: Option<String>,
     pub attachments: Option<Vec<AttachmentToSend>>,
     pub headers_json: Option<JsonValue>,
     pub send_time: Option<DateTime<Utc>>,

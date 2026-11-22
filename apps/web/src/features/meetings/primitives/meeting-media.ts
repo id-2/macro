@@ -4,7 +4,7 @@ import {
 } from '@channel/Call/call-media-telemetry';
 import type { BackgroundEffect } from '@core/media/background-effect';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { createSignal, onCleanup } from 'solid-js';
 import type {
   MeetingLocalTracks,

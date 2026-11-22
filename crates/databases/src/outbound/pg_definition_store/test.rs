@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::shared::PropertyOwner;
 use sqlx::PgPool;
@@ -12,7 +12,7 @@ use crate::domain::models::Viewer;
 
 fn viewer_for_tests() -> Viewer {
     Viewer {
-        user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(
+        user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(
             "macro|definitions-test@rox.one",
         )
         .expect("valid user id"),
@@ -23,7 +23,7 @@ fn viewer_for_tests() -> Viewer {
 const USER: &str = "macro|databases-defs@rox.one";
 
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let macro_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
         macro_user_id,
@@ -45,7 +45,7 @@ async fn insert_user(pool: &PgPool, id: &str) {
 /// A core database resource for database-scoped definitions.
 async fn insert_database(pool: &PgPool) -> DatabaseId {
     insert_user(pool, USER).await;
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO databases (id) VALUES ($1)", id,)
         .execute(pool)
         .await
@@ -59,7 +59,7 @@ async fn insert_option(
     string_value: Option<&str>,
     number_value: Option<f64>,
 ) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO property_options (id, property_definition_id, display_order, string_value, number_value)
@@ -153,7 +153,7 @@ async fn an_existing_definition_of_the_database_is_bindable(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn an_unknown_definition_is_not_bindable(pool: PgPool) {
     let database_id = insert_database(&pool).await;
-    let missing = macro_uuid::generate_uuid_v7();
+    let missing = rox_uuid::generate_uuid_v7();
 
     let bindable = store(&pool)
         .bindable_definition(database_id, &viewer_for_tests(), missing)
@@ -190,7 +190,7 @@ async fn definitions_attaches_options_and_ignores_unknown_ids(pool: PgPool) {
     insert_option(&pool, select_id, Some("Draft"), None).await;
     insert_option(&pool, select_id, Some("Sent"), None).await;
 
-    let unknown = macro_uuid::generate_uuid_v7();
+    let unknown = rox_uuid::generate_uuid_v7();
     let definitions = store
         .definitions(&[select_id, plain_id, unknown])
         .await

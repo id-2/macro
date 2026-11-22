@@ -12,7 +12,7 @@ threads, pins, recents, notifications, folders, activity.
   owns multiplex routing and cancellation. Sync-service still owns document state
   and validates scoped tokens. DSS shutdown drains these upgraded sockets.
   This binary WebSocket protocol is intentionally outside the REST OpenAPI/SDK surface.
-- `src/api/middleware/crm_access.rs` adds the optional `x-macro-crm-access` retirement hint only for `x-macro-crm-access-signal: 1`; other requests skip signal authentication and lookup. A per-instance 10,000-user LRU coalesces each resident user's lookups and memoizes results/failures/cancellations for three non-sliding seconds from lookup start; admission omits the hint if it would evict an active lookup. The primary read runs concurrently with the handler (200 ms lookup-future budget, 250 ms total signal budget after authentication extraction); failed or expired hints are omitted. This cache never authorizes a record: domain receipts and `GET /crm/member-access` remain fresh. Clients treat a missing hint as unknown and verify changed hints through current authority before changing cache policy.
+- `src/api/middleware/crm_access.rs` adds the optional retirement hint under `x-rox-crm-access` (and `x-macro-crm-access` for older clients) only for `x-rox-crm-access-signal: 1` (the earlier `x-macro-crm-access-signal` is still accepted); other requests skip signal authentication and lookup. A per-instance 10,000-user LRU coalesces each resident user's lookups and memoizes results/failures/cancellations for three non-sliding seconds from lookup start; admission omits the hint if it would evict an active lookup. The primary read runs concurrently with the handler (200 ms lookup-future budget, 250 ms total signal budget after authentication extraction); failed or expired hints are omitted. This cache never authorizes a record: domain receipts and `GET /crm/member-access` remain fresh. Clients treat a missing hint as unknown and verify changed hints through current authority before changing cache policy.
 - `src/api.rs`: route module list — `documents`, `items`, `entity`,
   `folders_query`, `graphql_soup`, `threads`, `annotations`, `history`,
   `pins`, `recents`, `notification`, `instructions`, `internal`.
@@ -169,7 +169,7 @@ threads, pins, recents, notifications, folders, activity.
 
 - Rules: `.agents/rules/rust/db.md`, `.agents/rules/observability.md`
 
-- Negotiate Mail cache profiles through `x-macro-mail-cache-profile` (CORS-enabled HTTP) and `mailCacheProfile` (WebSocket connection init); preserve authenticated connection data and default unknown capabilities to v2.
+- Negotiate Mail cache profiles through `x-rox-mail-cache-profile` (CORS-enabled HTTP) and `mailCacheProfile` (WebSocket connection init); preserve authenticated connection data and default unknown capabilities to v2.
 
 - The HTTP boundary validates agent correlation; activity consumption restores Kafka envelope attribution before materialization.
 

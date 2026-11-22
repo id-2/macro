@@ -35,10 +35,29 @@ async fn unrelated_requests_without_opt_in_make_no_crm_lookups() {
         assert_eq!(response.status(), StatusCode::ACCEPTED);
         assert_eq!(response.headers().contains_key(HEADER), opt_in == Some("1"));
         assert_eq!(
+            response.headers().contains_key(LEGACY_HEADER),
+            opt_in == Some("1")
+        );
+        assert_eq!(
             lookups.load(Ordering::SeqCst),
             usize::from(opt_in == Some("1"))
         );
     }
+    // A client that predates the rename still opts in under the old name and
+    // finds the hint under both names.
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/document")
+                .header(LEGACY_REQUEST_HEADER, "1")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.headers()[HEADER], "none");
+    assert_eq!(response.headers()[LEGACY_HEADER], "none");
+    assert_eq!(lookups.load(Ordering::SeqCst), 2);
 }
 
 #[tokio::test]

@@ -1,14 +1,14 @@
 use anyhow::Context;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use serde::Serialize;
 use sns_client::{APNSPushNotification, Alert, AlertDictionary, Aps, MessageAttributes, SnsTarget};
 
 /// Sends a push notification to the provided ENDPOINT_ARN environment variable
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
 
     let sns_client = sns_client::SNS::new(aws_sdk_sns::Client::new(&aws_config));
 

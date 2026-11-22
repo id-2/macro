@@ -3,7 +3,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::BotScope;
+use rox_authorization::BotScope;
 
 use super::*;
 use crate::{

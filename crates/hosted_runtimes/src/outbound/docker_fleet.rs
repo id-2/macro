@@ -21,7 +21,7 @@ use std::path::{Path, PathBuf};
 use std::process::Stdio;
 
 use chrono::{DateTime, Utc};
-use macro_env::Environment;
+use rox_env::Environment;
 
 use crate::domain::enrollment::{Enrollment, EnrollmentGeneration, EnrollmentIssueError};
 use crate::domain::ids::{ComputerId, PairingId};

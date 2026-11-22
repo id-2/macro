@@ -1,6 +1,6 @@
 use super::create_backfill_job;
 use crate::backfill::job::get::get_active_backfill_job;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 

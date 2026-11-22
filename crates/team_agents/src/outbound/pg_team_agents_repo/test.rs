@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 
@@ -34,19 +34,19 @@ async fn insert_team(pool: &PgPool) {
 
 fn sam() -> NewAgentAccount {
     NewAgentAccount {
-        user_id: MacroUserIdStr::parse_from_str("macro|sam-rivera-abc123@agents.macro.invalid")
+        user_id: RoxUserIdStr::parse_from_str("macro|sam-rivera-abc123@agents.macro.invalid")
             .unwrap()
             .into_owned(),
         email: "sam-rivera-abc123@agents.macro.invalid".to_owned(),
         team_id: TEAM,
-        created_by: MacroUserIdStr::parse_from_str("macro|admin@example.com")
+        created_by: RoxUserIdStr::parse_from_str("macro|admin@example.com")
             .unwrap()
             .into_owned(),
         name: "Sam Rivera".to_owned(),
         avatar_url: None,
         persona_seed: PersonaSeed {
             creator_id: Some(
-                MacroUserIdStr::parse_from_str("macro|admin@example.com")
+                RoxUserIdStr::parse_from_str("macro|admin@example.com")
                     .unwrap()
                     .into_owned(),
             ),
@@ -146,7 +146,7 @@ async fn admission_facts_read_the_row_the_agent_flag_membership_and_creator(pool
             .created_by_is_agent
     );
 
-    let human = MacroUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
+    let human = RoxUserIdStr::parse_from_str("macro|admin@example.com").unwrap();
     assert_eq!(repo.account_facts(&human).await.unwrap(), None);
 }
 

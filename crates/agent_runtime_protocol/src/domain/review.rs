@@ -8,7 +8,7 @@
 //! and its new revision and nothing else; readers fetch the record.
 
 use agent_client_protocol::{JsonRpcMessage as _, JsonRpcNotification, RawJsonRpcMessage};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use specta::Type;
 

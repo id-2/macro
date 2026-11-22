@@ -3,7 +3,7 @@
 A bot is a Rox account for a program, such as a release job or a webhook
 relay. It posts to channels under its own name. This guide creates one in the
 app, then uses it from TypeScript with
-[`@macro-inc/sdk`](https://sdk.rox.one).
+[`@rox-one/sdk`](https://sdk.rox.one).
 
 ## 1. Create the bot
 
@@ -30,7 +30,7 @@ A bot you create is personal, so it posts as itself on your behalf:
 `requestedAs` names you, the owner, and the bot uses your access.
 
 ```ts
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 
 const bot = new Macro({
   auth: { type: 'bot', token: process.env.MACRO_BOT_TOKEN! },
@@ -51,7 +51,7 @@ Bots can't search: search rejects bot tokens. Search with an API key from
 **Settings → Developer → API Keys** instead. It acts as you.
 
 ```ts
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 
 const macro = new Macro({ token: process.env.MACRO_API_KEY! });
 
@@ -77,7 +77,8 @@ const [webhook] = await bot.webhooks();
 ```
 
 `secret` is shown only once. POST `{ "content": "..." }` to `webhook.url` with
-the token in `x-macro-bot-token` and `x-macro-bot-scope: user`. Add
+the token in `x-rox-bot-token` and `x-rox-bot-scope: user` (the older
+`x-macro-*` names are still accepted). Add
 `"notification_policy": "Silent"` to post without notifying anyone; the SDK's
 `channel.send(text, { silent: true })` does the same on any credential.
 
@@ -103,4 +104,4 @@ the token in `x-macro-bot-token` and `x-macro-bot-scope: user`. Add
   [`goalert-bot`](../../services/bots/goalert-bot/README.md) (threads, edits,
   acting as a user).
 - Server code: [`crates/bots`](../../crates/bots/AGENTS.md). Who a bot may act
-  as is decided in `crates/macro_authorization/src/domain/bot_authorizer.rs`.
+  as is decided in `crates/rox_authorization/src/domain/bot_authorizer.rs`.

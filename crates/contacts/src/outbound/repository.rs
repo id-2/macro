@@ -6,7 +6,7 @@ mod test;
 use crate::domain::ports::{
     ContactsBackfillOutboxMessage, ContactsBackfillOutboxRepo, ContactsRepository,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sqlx::PgPool;
 use sqlx::types::Uuid;
@@ -28,8 +28,8 @@ impl DbContactsRepository {
 impl ContactsRepository for DbContactsRepository {
     async fn get_contacts(
         &self,
-        user_id: MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+        user_id: RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         // Each pair is stored once with user1 < user2, so the branches are
         // disjoint and neither repeats a contact.
         let rows = sqlx::query!(
@@ -46,13 +46,13 @@ impl ContactsRepository for DbContactsRepository {
         Ok(rows
             .into_iter()
             .filter_map(|r| r.contact)
-            .filter_map(|s| MacroUserIdStr::try_from(s).ok())
+            .filter_map(|s| RoxUserIdStr::try_from(s).ok())
             .collect())
     }
 
     async fn create_connections(
         &self,
-        connections: Vec<(MacroUserIdStr<'_>, MacroUserIdStr<'_>)>,
+        connections: Vec<(RoxUserIdStr<'_>, RoxUserIdStr<'_>)>,
     ) -> Result<(), Report> {
         // Contacts are undirected: discard self-edges and canonicalize endpoint
         // order so A-B and B-A deduplicate before reaching PostgreSQL.
@@ -119,7 +119,7 @@ impl ContactsBackfillOutboxRepo for DbContactsRepository {
                 let user_ids: Vec<String> = serde_json::from_value(r.user_ids)?;
                 let channel_participants = user_ids
                     .into_iter()
-                    .filter_map(|id| MacroUserIdStr::try_from(id).ok())
+                    .filter_map(|id| RoxUserIdStr::try_from(id).ok())
                     .collect();
                 Ok(ContactsBackfillOutboxMessage {
                     id: r.id as u64,

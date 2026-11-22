@@ -1,4 +1,4 @@
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 use serde_json::json;
 
 use super::*;
@@ -7,8 +7,8 @@ fn user(id: &str) -> ChannelSender<'static> {
     ChannelSender::try_from(id.to_string()).expect("valid user principal")
 }
 
-fn user_id(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user_id(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 #[test]
@@ -91,7 +91,7 @@ fn created_event_wire_shape_includes_on_behalf_of() {
 #[test]
 fn decode_round_trips() {
     let channel_id = Uuid::new_v4();
-    let original = ChannelMacroEvent::participant_removed(ChannelParticipantRemovedMetadata {
+    let original = ChannelRoxEvent::participant_removed(ChannelParticipantRemovedMetadata {
         channel_id,
         channel_type: ChannelType::Private,
         removed_by: user_id("macro|admin@example.com"),
@@ -99,7 +99,7 @@ fn decode_round_trips() {
     });
 
     let payload = serde_json::to_vec(original.event()).expect("serializable");
-    let decoded = ChannelMacroEvent::decode(original.key(), &payload).expect("decodable payload");
+    let decoded = ChannelRoxEvent::decode(original.key(), &payload).expect("decodable payload");
 
     assert_eq!(decoded.key(), channel_id.to_string());
     assert_eq!(decoded.event(), original.event());
@@ -108,7 +108,7 @@ fn decode_round_trips() {
 #[test]
 fn events_are_keyed_by_channel_id() {
     let channel_id = Uuid::new_v4();
-    let event = ChannelMacroEvent::deleted(ChannelDeletedMetadata {
+    let event = ChannelRoxEvent::deleted(ChannelDeletedMetadata {
         channel_id,
         actor: user("macro|owner@example.com"),
     });
@@ -121,14 +121,14 @@ fn event_type_strings_follow_dot_convention() {
 
     let cases = vec![
         (
-            ChannelMacroEvent::picture_changed(ChannelPictureChangedMetadata {
+            ChannelRoxEvent::picture_changed(ChannelPictureChangedMetadata {
                 channel_id,
                 actor: user_id("macro|owner@example.com"),
             }),
             "channel.picture_changed",
         ),
         (
-            ChannelMacroEvent::updated(ChannelUpdatedMetadata {
+            ChannelRoxEvent::updated(ChannelUpdatedMetadata {
                 channel_id,
                 actor: user_id("macro|owner@example.com"),
                 previous_name: None,
@@ -137,7 +137,7 @@ fn event_type_strings_follow_dot_convention() {
             "channel.updated",
         ),
         (
-            ChannelMacroEvent::participant_added(ChannelParticipantAddedMetadata {
+            ChannelRoxEvent::participant_added(ChannelParticipantAddedMetadata {
                 channel_id,
                 channel_type: ChannelType::Team,
                 added_by: user("macro|owner@example.com"),

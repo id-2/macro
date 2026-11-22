@@ -13,7 +13,7 @@ import type {
   Op,
 } from '@core/psd-engine/types';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createSignal } from 'solid-js';
 import {
   defaultAdjustment,

@@ -9,24 +9,24 @@ export function localDevServer(
   const hmr: ServerOptions['hmr'] = env.TAURI_DEV_HOST
     ? { host: env.TAURI_DEV_HOST, protocol: 'ws' }
     : undefined;
-  const target = env.MACRO_LOCAL_BACKEND_PROXY;
+  const target = env.ROX_LOCAL_BACKEND_PROXY;
   if (!target) return { hmr };
 
-  const routes = env.MACRO_LOCAL_BACKEND_ROUTES?.split(',');
+  const routes = env.ROX_LOCAL_BACKEND_ROUTES?.split(',');
   if (
     !routes?.length ||
     routes.some((route) => !/^\/[a-z0-9-]+$/.test(route))
   ) {
     throw new Error(
-      'MACRO_LOCAL_BACKEND_ROUTES must list backend path prefixes'
+      'ROX_LOCAL_BACKEND_ROUTES must list backend path prefixes'
     );
   }
 
   return {
     hmr,
     // The launcher calls hostname; localhost and IPs remain Vite defaults.
-    allowedHosts: env.MACRO_LOCAL_HOSTNAME
-      ? [env.MACRO_LOCAL_HOSTNAME.toLowerCase()]
+    allowedHosts: env.ROX_LOCAL_HOSTNAME
+      ? [env.ROX_LOCAL_HOSTNAME.toLowerCase()]
       : [],
     proxy: Object.fromEntries(
       routes.map((route) => [

@@ -7,7 +7,7 @@
 use github::domain::models::GithubError;
 use github::domain::ports::{GithubSyncClient, GithubSyncRepo};
 use github::domain::service::InstallationTokenService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::error::{HarnessError, Result};
 use crate::domain::ports::RepositoryBranches;
@@ -37,7 +37,7 @@ where
 {
     async fn for_repository(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         owner: &str,
         name: &str,
     ) -> Result<Vec<String>> {

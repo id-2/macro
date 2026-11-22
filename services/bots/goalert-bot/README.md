@@ -14,9 +14,9 @@ GoAlert webhook ──POST──> /goalert/{WEBHOOK_SECRET}
                               │ parse (Alert | AlertStatus | bundles | …)
                               │ KV ALERT_MESSAGES: alert:<AlertID> → message
                               ▼
-         @macro-inc/sdk → channel.send / message.reply / react / edit
-         headers: x-macro-bot-token: BOT_TOKEN, x-macro-bot-scope: user,
-                  x-macro-bot-for-macro-user-id: ACTING_USER_ID
+         @rox-one/sdk → channel.send / message.reply / react / edit
+         headers: x-rox-bot-token: BOT_TOKEN, x-rox-bot-scope: user,
+                  x-rox-bot-for-rox-user-id: ACTING_USER_ID
 ```
 
 | GoAlert payload | Channel effect |
@@ -65,7 +65,7 @@ team-owned bot means dropping `ACTING_USER_ID` and `requestedAs` in
 ## Tracing
 
 `src/worker.ts` wraps the worker in otel-cf-workers' `instrument()` through
-`@macro-inc/observability/worker`, configured like `services/ai-editing-worker`:
+`@rox-one/observability/worker`, configured like `services/ai-editing-worker`:
 spans go to `OTEL_EXPORTER_OTLP_ENDPOINT` (the prod OTLP proxy), with
 `DD_API_KEY` as `dd-api-key` when set. Each webhook is one
 `goalert_bot.webhook` span with `goalert.payload_type`, `goalert.alert_id`,
@@ -96,7 +96,7 @@ notification) at
 
 | Variable         | Required | Default | Description                                               |
 | ---------------- | -------- | ------- | --------------------------------------------------------- |
-| `BOT_TOKEN`      | yes      |         | Bot API key (`mbot_...`, sent as `x-macro-bot-token`)      |
+| `BOT_TOKEN`      | yes      |         | Bot API key (`mbot_...`, sent as `x-rox-bot-token`)      |
 | `CHANNEL_ID`     | yes      |         | Channel UUID to post to (Rox Alerts)                    |
 | `ACTING_USER_ID` | yes      |         | Secret: the bot owner's user id (`macro\|<email>`)         |
 | `WEBHOOK_SECRET` | yes      |         | Secret path segment for the webhook URL                   |

@@ -64,7 +64,7 @@ impl Endpoints {
             proxy_url: proxy::url(instance),
             frontend_url: frontend::url(instance),
             postgres_url: format!(
-                "postgres://user:password@localhost:{}/macrodb",
+                "postgres://user:password@localhost:{}/roxdb",
                 instance.port(Port::Postgres)
             ),
             fusionauth_url: format!("http://localhost:{}", instance.port(Port::FusionAuth)),
@@ -113,7 +113,7 @@ pub fn run(args: &LocalE2eArgs) -> Result<()> {
     let instance_name = args
         .instance
         .clone()
-        .or_else(|| macro_env_var::maybe_read_env("LOCAL_E2E_INSTANCE"))
+        .or_else(|| rox_env_var::maybe_read_env("LOCAL_E2E_INSTANCE"))
         .unwrap_or_else(|| DEFAULT_INSTANCE.to_string());
     let up_args = stack::UpArgs {
         run: RunArgs {

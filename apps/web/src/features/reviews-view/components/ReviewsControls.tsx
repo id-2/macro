@@ -6,12 +6,9 @@ import {
   MobileFilterDrawer,
   useViewControlHotkeys,
 } from '@app/components/view-shell';
+import { type TranslationKey, t } from '@app/lib/i18n';
 import { PrOriginIcon, PrPriorityIcon } from '@block-pr/component/PrLinks';
-import {
-  PR_PRIORITY_IDS,
-  PR_PRIORITY_LABELS,
-  type PrLinkKind,
-} from '@block-pr/data/pr-links';
+import { PR_PRIORITY_IDS, type PrLinkKind } from '@block-pr/data/pr-links';
 import { PR_ORIGIN_LABELS, PR_ORIGIN_TOOLS } from '@block-pr/data/pr-origin';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
 import { MobileDrawer } from '@components/app/mobile/MobileDrawer';
@@ -52,29 +49,51 @@ export type ReviewsControlProps = {
 };
 
 const SORT_OPTIONS: ListControlOption<ReviewsSortId>[] = [
-  { id: 'priority', label: 'Priority' },
-  { id: 'recently_updated', label: 'Recently updated' },
-  { id: 'least_recently_updated', label: 'Least recently updated' },
-  { id: 'newest', label: 'Newest' },
-  { id: 'oldest', label: 'Oldest' },
+  { id: 'priority', get label() { return t('reviews.sortPriority'); } },
+  {
+    id: 'recently_updated',
+    get label() { return t('reviews.sortRecentlyUpdated'); },
+  },
+  {
+    id: 'least_recently_updated',
+    get label() { return t('reviews.sortLeastRecentlyUpdated'); },
+  },
+  { id: 'newest', get label() { return t('reviews.sortNewest'); } },
+  { id: 'oldest', get label() { return t('reviews.sortOldest'); } },
 ];
 
 const STATUS_OPTIONS: ListControlOption<ReviewsStatusFilterId>[] = [
-  { id: 'open', label: 'Open' },
-  { id: 'closed', label: 'Closed' },
-  { id: 'merged', label: 'Merged' },
+  { id: 'open', get label() { return t('reviews.statusOpen'); } },
+  { id: 'closed', get label() { return t('reviews.statusClosed'); } },
+  { id: 'merged', get label() { return t('reviews.statusMerged'); } },
 ];
 
 const REVIEW_OPTIONS: ListControlOption<ReviewsReviewFilterId>[] = [
-  { id: 'reviewed_by_me', label: 'Reviewed by you' },
-  { id: 'not_reviewed_by_me', label: 'Not reviewed by you' },
-  { id: 'awaiting_my_review', label: 'Awaiting review from you' },
+  { id: 'reviewed_by_me', get label() { return t('reviews.reviewedByMe'); } },
+  {
+    id: 'not_reviewed_by_me',
+    get label() { return t('reviews.notReviewedByMe'); },
+  },
+  {
+    id: 'awaiting_my_review',
+    get label() { return t('reviews.awaitingMyReview'); },
+  },
 ];
+
+const PRIORITY_LABELS: Record<string, TranslationKey> = {
+  urgent: 'reviews.priorityUrgent',
+  high: 'reviews.priorityHigh',
+  medium: 'reviews.priorityMedium',
+  low: 'reviews.priorityLow',
+  none: 'reviews.priorityNone',
+};
 
 const PRIORITY_OPTIONS: ListControlOption<string>[] = PR_PRIORITY_IDS.map(
   (id) => ({
     id,
-    label: PR_PRIORITY_LABELS[id],
+    get label() {
+      return t(PRIORITY_LABELS[id]);
+    },
     icon: () => <PrPriorityIcon priority={id} />,
   })
 );
@@ -82,17 +101,19 @@ const PRIORITY_OPTIONS: ListControlOption<string>[] = PR_PRIORITY_IDS.map(
 const ORIGIN_OPTIONS: ListControlOption<string>[] = [
   ...PR_ORIGIN_TOOLS.map((tool) => ({
     id: tool,
-    label: PR_ORIGIN_LABELS[tool],
+    get label() {
+      return PR_ORIGIN_LABELS[tool];
+    },
     icon: () => <PrOriginIcon tool={tool} class="size-4" />,
   })),
-  { id: UNKNOWN_ORIGIN, label: 'Unknown' },
+  { id: UNKNOWN_ORIGIN, get label() { return t('reviews.unknownOrigin'); } },
 ];
 
 const LINKED_OPTIONS: ListControlOption<string>[] = [
-  { id: 'agent', label: 'An agent session' },
-  { id: 'ticket', label: 'A ticket' },
-  { id: 'customer', label: 'A customer' },
-  { id: 'channel', label: 'A channel' },
+  { id: 'agent', get label() { return t('reviews.linkAgentSession'); } },
+  { id: 'ticket', get label() { return t('reviews.linkTicket'); } },
+  { id: 'customer', get label() { return t('reviews.linkCustomer'); } },
+  { id: 'channel', get label() { return t('reviews.linkChannel'); } },
 ] satisfies ListControlOption<PrLinkKind>[];
 
 function filterGroups(
@@ -101,36 +122,78 @@ function filterGroups(
   return [
     ...(props.hideStatus
       ? []
-      : [{ id: 'status' as const, label: 'Status', options: STATUS_OPTIONS }]),
-    { id: 'priority', label: 'Priority', options: PRIORITY_OPTIONS },
-    { id: 'linked', label: 'Linked to', options: LINKED_OPTIONS },
-    { id: 'origin', label: 'Started from', options: ORIGIN_OPTIONS },
+      : [
+          {
+            id: 'status' as const,
+            get label() {
+              return t('reviews.filterStatus');
+            },
+            options: STATUS_OPTIONS,
+          },
+        ]),
+    {
+      id: 'priority',
+      get label() {
+        return t('reviews.filterPriority');
+      },
+      options: PRIORITY_OPTIONS,
+    },
+    {
+      id: 'linked',
+      get label() {
+        return t('reviews.filterLinked');
+      },
+      options: LINKED_OPTIONS,
+    },
+    {
+      id: 'origin',
+      get label() {
+        return t('reviews.filterStartedFrom');
+      },
+      options: ORIGIN_OPTIONS,
+    },
     {
       id: 'repository',
-      label: 'Repository',
+      get label() {
+        return t('reviews.filterRepository');
+      },
       options: props.repositories,
-      searchPlaceholder: 'Search repositories',
+      searchPlaceholder: t('reviews.searchRepositories'),
     },
     {
       id: 'author',
-      label: 'Author',
+      get label() {
+        return t('reviews.filterAuthor');
+      },
       options: props.authors,
-      searchPlaceholder: 'Search authors',
+      searchPlaceholder: t('reviews.searchAuthors'),
     },
     {
       id: 'assignee',
-      label: 'Assignee',
+      get label() {
+        return t('reviews.filterAssignee');
+      },
       options: props.assignees,
-      searchPlaceholder: 'Search assignees',
+      searchPlaceholder: t('reviews.searchAssignees'),
     },
     {
       id: 'label',
-      label: 'Label',
+      get label() {
+        return t('reviews.filterLabel');
+      },
       options: props.labels,
-      searchPlaceholder: 'Search labels',
+      searchPlaceholder: t('reviews.searchLabels'),
     },
     ...(props.hasGithubIdentity
-      ? [{ id: 'review' as const, label: 'Reviews', options: REVIEW_OPTIONS }]
+      ? [
+          {
+            id: 'review' as const,
+            get label() {
+              return t('reviews.filterReviews');
+            },
+            options: REVIEW_OPTIONS,
+          },
+        ]
       : []),
   ];
 }
@@ -168,7 +231,7 @@ export function ReviewsControls(
     scopeId: panel.splitHotkeyScope,
     enabled: panel.isPanelActive,
     filter: {
-      description: 'Filter pull requests',
+      description: t('reviews.filterPullRequests'),
       run: () => {
         if (!filterTrigger) return false;
         setOpenMenu('filters');
@@ -176,7 +239,7 @@ export function ReviewsControls(
       },
     },
     sort: {
-      description: 'Sort pull requests',
+      description: t('reviews.sortPullRequests'),
       run: () => {
         if (!sortTrigger) return false;
         setOpenMenu('sort');
@@ -189,11 +252,11 @@ export function ReviewsControls(
 
   return (
     <>
-      <HeaderActionGroup label="Review filters" size="md">
+      <HeaderActionGroup label={t('reviews.reviewFilters')} size="md">
         <ListFilterDropdown
           grouped
           size={activeCount() ? 'md' : 'icon-md'}
-          label="Filter pull requests"
+          label={t('reviews.filterPullRequests')}
           activeCount={activeCount()}
           groups={filterGroups(props)}
           open={openMenu() === 'filters'}
@@ -205,10 +268,10 @@ export function ReviewsControls(
           onClear={props.onClearFilters}
         />
       </HeaderActionGroup>
-      <HeaderActionGroup label="Review layout" size="md">
+      <HeaderActionGroup label={t('reviews.reviewLayout')} size="md">
         <ButtonGroup.Button
-          aria-label="List"
-          tooltip="List"
+          aria-label={t('reviews.layoutList')}
+          tooltip={t('reviews.layoutList')}
           variant="ghost"
           size="icon-md"
           aria-pressed={props.layout === 'list'}
@@ -217,8 +280,8 @@ export function ReviewsControls(
           <ListIcon class="size-4" />
         </ButtonGroup.Button>
         <ButtonGroup.Button
-          aria-label="Board"
-          tooltip="Board"
+          aria-label={t('reviews.layoutBoard')}
+          tooltip={t('reviews.layoutBoard')}
           variant="ghost"
           size="icon-md"
           aria-pressed={props.layout === 'board'}
@@ -227,11 +290,11 @@ export function ReviewsControls(
           <BoardIcon class="size-4" />
         </ButtonGroup.Button>
       </HeaderActionGroup>
-      <HeaderActionGroup label="Review view options" size="md">
+      <HeaderActionGroup label={t('reviews.reviewViewOptions')} size="md">
         <ListSortDropdown
           grouped
           size="icon-md"
-          label="Sort pull requests"
+          label={t('reviews.sortPullRequests')}
           value={props.sort}
           options={SORT_OPTIONS}
           open={openMenu() === 'sort'}
@@ -250,13 +313,13 @@ export function ReviewsFilterDrawer(props: ReviewsControlProps) {
 
   return (
     <MobileFilterDrawer
-      triggerLabel="Open pull request filters"
-      label="Pull request list controls"
+      triggerLabel={t('reviews.openPullRequestFilters')}
+      label={t('reviews.pullRequestListControls')}
       activeCount={activeCount()}
       onClear={props.onClearFilters}
     >
       <MobileDrawer.Label id="reviews-sort-label" class="pt-4">
-        Sort
+        {t('viewMenus.sort')}
       </MobileDrawer.Label>
       <MobileDrawer.Section
         role="radiogroup"
@@ -274,7 +337,7 @@ export function ReviewsFilterDrawer(props: ReviewsControlProps) {
           )}
         </For>
       </MobileDrawer.Section>
-      <MobileDrawer.Label class="pt-4">Filters</MobileDrawer.Label>
+      <MobileDrawer.Label class="pt-4">{t('viewMenus.filters')}</MobileDrawer.Label>
       <Accordion multiple collapsible defaultValue={['priority']}>
         <div class="flex flex-col gap-3">
           <For each={groups()}>

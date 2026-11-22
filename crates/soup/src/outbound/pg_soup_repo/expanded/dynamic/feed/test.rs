@@ -25,8 +25,8 @@ use item_filters::{
         properties::{EntityRefId, PropertiesLiteral, PropertyEntityType, PropertyMatchValue},
     },
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_owner::Owner;
 use models_pagination::{Cursor, Identify, Query, SimpleSortMethod, SortOn};
 use models_soup::item::SoupItem;
@@ -57,7 +57,7 @@ const SORTS: [SimpleSortMethod; 3] = [
 )]
 async fn source_items_rollout_defaults_to_existing_records(pool: PgPool) -> anyhow::Result<()> {
     let request = || SimpleSortRequest {
-        user_id: MacroUserIdStr::parse_from_str(USER).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER).unwrap(),
         limit: PAGE,
         cursor: SimpleSortQuery::ItemsFilter(Query::Sort(
             SimpleSortMethod::UpdatedAt,
@@ -469,7 +469,7 @@ async fn walk(
     exclude_frecency: bool,
     item_source: ItemSource,
 ) -> anyhow::Result<Walk> {
-    let user_id = MacroUserIdStr::parse_from_str(USER).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(USER).unwrap();
     let mut query = Query::Sort(sort, filter.clone());
     let mut walk = Walk {
         labels: Vec::new(),
@@ -842,7 +842,7 @@ async fn non_utc_sessions_read_the_item_tables(
         expanded_dynamic_cursor_soup_hydrated(
             &pool,
             ExpandedDynamicCursorArgs {
-                user_id: MacroUserIdStr::parse_from_str(USER).unwrap(),
+                user_id: RoxUserIdStr::parse_from_str(USER).unwrap(),
                 limit: 1,
                 cursor: Query::Sort(SimpleSortMethod::UpdatedAt.into(), filter.clone()),
                 exclude_frecency: false,
@@ -1168,7 +1168,7 @@ fn selective_filters_read_the_item_tables() {
 )]
 async fn a_revoke_after_maintenance_stops_hides_the_item(pool: PgPool) -> anyhow::Result<()> {
     let request = || SimpleSortRequest {
-        user_id: MacroUserIdStr::parse_from_str(USER).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(USER).unwrap(),
         limit: 100,
         cursor: SimpleSortQuery::ItemsFilter(Query::Sort(
             SimpleSortMethod::UpdatedAt,

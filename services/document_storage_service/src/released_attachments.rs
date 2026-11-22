@@ -1,6 +1,6 @@
 //! Moves email attachments whose mail is gone to the Trash.
 //!
-//! MacroDB records a document in `released_email_attachment_documents` when a
+//! RoxDB records a document in `released_email_attachment_documents` when a
 //! statement removes its last email link, and notifies
 //! [`RELEASED_CHANNEL`]. This task drains that queue on each notification, and
 //! on a sweep that covers notifications sent while it was not listening.
@@ -8,7 +8,7 @@
 use documents_hex::domain::released_attachments::{
     ReleasedAttachmentRepo, ReleasedAttachmentService,
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use sqlx::PgPool;
 use std::time::Duration;
 use tokio::time::MissedTickBehavior;
@@ -26,7 +26,7 @@ pub(crate) async fn run<R, B>(
     cancellation: CancellationToken,
 ) where
     R: ReleasedAttachmentRepo,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     let Some(mut listener) = listen(&pool, &cancellation).await else {
         return;

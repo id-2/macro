@@ -1,6 +1,7 @@
 import { ViewSidebar } from '@app/components/view-shell';
 import { MobileListLayout } from '@app/components/view-shell/MobileListLayout';
 import { SidebarCreateHeader } from '@app/components/view-shell/SidebarCreateButton';
+import { t } from '@app/lib/i18n';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { tourTarget } from '@ui/components/Tour';
 import { createSignal, type JSX, type ParentProps, Show } from 'solid-js';
@@ -18,11 +19,11 @@ function DesktopHomeHeader(props: { onNewChat: () => void }) {
   const searchOpen = () => searchOpened() || state.search.trim().length > 0;
   return (
     <SidebarCreateHeader
-      title="Home"
-      label="New chat"
+      title={t('nav.home')}
+      label={t('home.newChat')}
       onCreate={props.onNewChat}
       actions={<HomeFilterDropdown />}
-      searchLabel="Search Home"
+      searchLabel={`${t('nav.search')} ${t('nav.home')}`}
       searchOpen={searchOpen()}
       onSearchOpenChange={(open) => {
         setSearchOpened(open);
@@ -30,7 +31,7 @@ function DesktopHomeHeader(props: { onNewChat: () => void }) {
       }}
       search={() => (
         <ViewSidebar.Search
-          label="Search Home"
+          label={`${t('nav.search')} ${t('nav.home')}`}
           value={state.search}
           onValueChange={(search) => setState('search', search)}
           focusResults={() => {

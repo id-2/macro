@@ -50,8 +50,8 @@ const PUBLIC: &str = include_str!(
 );
 
 fn agent_token(scope: Option<&str>) -> String {
-    macro_auth::macro_api_token::encode_macro_api_token(
-        macro_auth::macro_api_token::EncodeMacroApiTokenArgs {
+    rox_auth::macro_api_token::encode_macro_api_token(
+        rox_auth::macro_api_token::EncodeRoxApiTokenArgs {
             fusionauth_id: "fixture".into(),
             macro_user_id: "macro|owner@example.com".into(),
             organization_id: None,
@@ -86,7 +86,7 @@ async fn a_scoped_code_mode_credential_is_refused() {
 
     let registry = Arc::new(FakeClientRegistry::default());
     let auth = super::BearerAuth {
-        jwt_args: macro_auth::middleware::decode_jwt::JwtValidationArgs::testing_macro_token(
+        jwt_args: rox_auth::middleware::decode_jwt::JwtValidationArgs::testing_macro_token(
             "fixture", PUBLIC,
         ),
         clients: AccessTokenClients::new(

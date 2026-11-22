@@ -2,6 +2,7 @@ import { ROUTER_BASE_CONCAT } from '@app/constants/routerBase';
 import { teamInviteLinkUrl } from '@app/features/settings/TeamInviteLinkSection';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import { toast } from '@core/component/Toast/Toast';
+import { LOCAL_ONLY } from '@core/constant/featureFlags';
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { deriveIsAuthenticated } from '@core/context/user';
 import { useAddInboxFlow, useEmailLinks } from '@core/email-link';
@@ -11,7 +12,7 @@ import { writeClipboardData } from '@core/util/dataTransfer';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { platformFetch } from '@core/util/platformFetch';
 import { getWebOrigin } from '@core/util/webOrigin';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   useAiBillingPlansQuery,
   useCreateBillingPortalMutation,
@@ -216,11 +217,15 @@ export function createAppOnboardingContext(): OnboardingContext {
         }
       );
       if (!claimed.ok) throw new Error(await claimed.text());
-      const initialized = await initEmailLink();
-      if (initialized.isErr())
-        throw new Error(
-          'Your handle was claimed, but Rox mail could not be initialized.'
-        );
+      // A local instance has no mail provider, so provisioning the Rox mailbox
+      // cannot succeed there; claiming the handle alone completes the step.
+      if (!LOCAL_ONLY) {
+        const initialized = await initEmailLink();
+        if (initialized.isErr())
+          throw new Error(
+            'Имя занято, но почтовый ящик Rox создать не удалось. Попробуйте ещё раз позже.'
+          );
+      }
       await Promise.all([invalidateEmailLinks(), userInfo.refetch()]);
     },
 

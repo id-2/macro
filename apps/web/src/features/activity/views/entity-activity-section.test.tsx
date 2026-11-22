@@ -1,7 +1,8 @@
 import type { ActivityEventFieldsFragment } from '@service-storage/graphql/generated/graphql';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import type { JSX } from 'solid-js';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { ActivityContextProvider } from '../context/activity-context';
 import {
   createdEvent,
@@ -13,6 +14,8 @@ import {
 import { createMockActivityContext } from '../tests/mock-context';
 import { soupPage } from '../tests/wire';
 import { EntityActivitySection } from './entity-activity-section';
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 // The section registers with the side panel accordion, which needs the
 // panel layout; here only the section body is under test.

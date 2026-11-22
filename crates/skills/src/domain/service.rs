@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::model::{SkillContent, SkillError, SkillMatchType, SkillSummary};
 use crate::domain::ports::{SkillLister, SkillReader, SkillSearcher, SkillService};
@@ -91,7 +91,7 @@ impl<S: SkillSearcher, L: SkillLister, R: SkillReader> SkillService for SkillSer
     #[tracing::instrument(skip(self), err)]
     async fn read_skill(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         document_id: uuid::Uuid,
     ) -> Result<SkillContent, SkillError> {
         if let Some(skill) = system_skills::system_skill(document_id) {
@@ -120,7 +120,7 @@ impl<S: SkillSearcher, L: SkillLister, R: SkillReader> SkillService for SkillSer
     #[tracing::instrument(skip(self), err)]
     async fn search_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         query: &str,
         match_type: SkillMatchType,
     ) -> Result<Vec<SkillSummary>, SkillError> {
@@ -151,7 +151,7 @@ impl<S: SkillSearcher, L: SkillLister, R: SkillReader> SkillService for SkillSer
     #[tracing::instrument(skip(self), err)]
     async fn list_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         let mut skills = self.lister.list_skills(user_id, LIST_LIMIT).await?;
         self.describe(&mut skills).await?;
@@ -168,7 +168,7 @@ impl<S: SkillSearcher, L: SkillLister, R: SkillReader> SkillService for SkillSer
     #[tracing::instrument(skip(self), err)]
     async fn list_routable_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         let mut skills = self.lister.list_skills(user_id, ROUTABLE_LIMIT).await?;
         self.describe(&mut skills).await?;

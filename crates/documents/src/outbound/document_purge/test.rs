@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
 use model_owner::Owner;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -24,7 +24,7 @@ struct CapturingQueue {
 
 impl DocumentPurgeQueue for Arc<CapturingQueue> {
     async fn enqueue(&self, document_id: String, owner: Owner) -> Result<(), DocumentError> {
-        let stored = macro_db_client::document::get_deleted_document_info(&self.pool, &document_id)
+        let stored = rox_db_client::document::get_deleted_document_info(&self.pool, &document_id)
             .await
             .unwrap();
         assert_eq!(stored.owner, owner);
@@ -40,7 +40,7 @@ struct RecordingPartReferences {
 
 impl DocxPartReferences for Arc<RecordingPartReferences> {
     async fn release(&self, mut shas: Vec<String>) -> Result<(), DocumentError> {
-        let deleted = macro_db_client::document::get_deleted_document_info(&self.pool, DOCX).await;
+        let deleted = rox_db_client::document::get_deleted_document_info(&self.pool, DOCX).await;
         assert!(matches!(deleted, Err(sqlx::Error::RowNotFound)));
         shas.sort();
         self.released.lock().unwrap().push(shas);
@@ -55,7 +55,7 @@ struct Fixture {
         LegacyDocumentPurgeRepository,
         Arc<CapturingQueue>,
         Arc<RecordingPartReferences>,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     >,
 }
 
@@ -72,7 +72,7 @@ fn fixture(pool: &PgPool) -> Fixture {
         LegacyDocumentPurgeRepository::new(pool.clone()),
         queue.clone(),
         part_references.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     );
     Fixture {
         queue,
@@ -142,7 +142,7 @@ async fn releases_each_docx_part_reference_once_the_rows_are_gone(pool: PgPool) 
         ]]
     );
     assert!(
-        macro_db_client::document::get_bom_parts(&pool, DOCX)
+        rox_db_client::document::get_bom_parts(&pool, DOCX)
             .await
             .unwrap()
             .is_empty()

@@ -3,6 +3,7 @@ import { openAddInboxDialog } from '@app/features/inbox/AddInboxDialog';
 import { AdminConsentRequiredDialog } from '@app/features/inbox/AdminConsentRequiredDialog';
 import { ShareInboxConflictDialog } from '@app/features/inbox/ShareInboxConflictDialog';
 import { onboardingPathWithStep } from '@app/features/onboarding/core/next-target';
+import { readSavedStep } from '@app/features/onboarding/primitives/flow-storage';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import type { AppEvents } from '@app/lib/analytics/app-events';
 import { t } from '@app/lib/i18n';
@@ -30,8 +31,8 @@ import { whenSettled } from '@core/util/whenSettled';
 import ArrowCounterClockwise from '@icon/system/regular/arrow-counter-clockwise.svg?component-solid';
 import EnvelopeIcon from '@icon/system/regular/envelope.svg';
 import SpinnerIcon from '@icon/system/regular/spinner-gap.svg';
-import { Telemetry } from '@macro-inc/observability';
-import { fetchEmailConnectionProviders } from '@queries/auth/outlook-link';
+import { Telemetry } from '@rox-one/observability';
+import { fetchOutlookAdminConsentUrl } from '@queries/auth/outlook-link';
 import {
   invalidateAllAfterLogin,
   useUserInfoQuery,
@@ -342,14 +343,17 @@ function EmailLinkCallbackHandler(props: Pick<EmailAuthParams, 'successPath'>) {
   // split doesn't exist and the toast is the confirmation.
   const navigateAfterLink = () => {
     if (disposed) return;
-    // A first-run user connected this inbox from the onboarding flow:
-    // return straight to it. Landing in mail settings would mount the app
-    // shell mid-onboarding just for NewOnboardingRedirect to bounce back.
+    // This inbox was connected from inside the onboarding flow: return
+    // straight to it. Landing in mail settings would drop a half-finished
+    // flow, and onboarding is a page someone opened rather than a gate, so
+    // the saved step is what says the flow is still open.
+    const userId = userInfoQuery.data?.userId;
     if (
       !isMobile() &&
       !isNativeMobilePlatform() &&
-      userInfoQuery.data?.tutorialComplete === false &&
-      !userInfoQuery.data.isAgent
+      !userInfoQuery.data?.isAgent &&
+      userId !== undefined &&
+      readSavedStep(userId) !== undefined
     ) {
       navigate(onboardingPathWithStep(searchParams.step), { replace: true });
       return;
@@ -458,12 +462,8 @@ function EmailLinkCallbackHandler(props: Pick<EmailAuthParams, 'successPath'>) {
   // Microsoft client id. The dialog stays open while it loads; a failure
   // leaves the copy action disabled with an explanation.
   const loadAdminConsentUrl = async () => {
-    const providers = await fetchEmailConnectionProviders();
-    setAdminConsent((current) =>
-      current
-        ? { ...current, url: providers.outlook_admin_consent_url ?? undefined }
-        : current
-    );
+    const url = await fetchOutlookAdminConsentUrl();
+    setAdminConsent((current) => (current ? { ...current, url } : current));
   };
 
   // Completing consent does not depend on the old inbox list loading first.

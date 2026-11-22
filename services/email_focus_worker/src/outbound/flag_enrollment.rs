@@ -4,7 +4,7 @@
 
 use email::domain::focus::FocusEnrollment;
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 #[cfg(test)]
@@ -29,7 +29,7 @@ impl<F> FlagEnrollment<F> {
 impl<F: FeatureFlags + 'static> FocusEnrollment for FlagEnrollment<F> {
     /// A failed read is an error, never "not enrolled": the caller decides.
     #[tracing::instrument(name = "email_focus.enrollment", skip_all, fields(enrolled = tracing::field::Empty), err)]
-    async fn is_enrolled(&self, owner: &MacroUserIdStr<'static>) -> Result<bool, Report> {
+    async fn is_enrolled(&self, owner: &RoxUserIdStr<'static>) -> Result<bool, Report> {
         let enrolled = self.flags.load(owner).await?.is_enabled(EMAIL_FOCUS_FLAG);
         tracing::Span::current().record("enrolled", enrolled);
         Ok(enrolled)

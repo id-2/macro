@@ -1,7 +1,7 @@
 //! Text written from the model: glyphs the file placed (in the file's
 //! fonts), and edited text, written as outlines (so every application shows
 //! it as laid out here) with an invisible copy of its characters (for
-//! search and copying) inside `/MacroText` marked content that reads back
+//! search and copying) inside `/RoxText` marked content that reads back
 //! as editable text.
 
 use super::objects::Objects;

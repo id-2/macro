@@ -28,7 +28,7 @@ pub struct S3RecordingStorage {
 impl S3RecordingStorage {
     /// Build using the shared AWS config, egress bucket, and CloudFront signer.
     pub async fn new(bucket: String, cloudfront_config: RecordingCloudFrontConfig) -> Self {
-        let client = macro_aws_config::s3_client().await;
+        let client = rox_aws_config::s3_client().await;
         Self {
             client,
             bucket,
@@ -49,7 +49,7 @@ impl S3RecordingStorage {
             .presigned(presigning_config)
             .await?;
 
-        Ok(macro_aws_config::transform_aws_url(presigned.uri()))
+        Ok(rox_aws_config::transform_aws_url(presigned.uri()))
     }
 
     fn presign_get_url(&self, object_key: &str) -> anyhow::Result<String> {
@@ -155,7 +155,7 @@ impl RecordingStorage for S3RecordingStorage {
 
     async fn presign_recording_url(&self, recording_key: &str) -> anyhow::Result<String> {
         let object_key = recording_object_key(recording_key);
-        if macro_aws_config::is_local_aws() {
+        if rox_aws_config::is_local_aws() {
             self.presign_s3_url(&object_key).await
         } else {
             self.presign_get_url(&object_key)
@@ -164,7 +164,7 @@ impl RecordingStorage for S3RecordingStorage {
 
     async fn presign_recording_preview_url(&self, preview_key: &str) -> anyhow::Result<String> {
         let object_key = preview_object_key(preview_key);
-        if macro_aws_config::is_local_aws() {
+        if rox_aws_config::is_local_aws() {
             self.presign_s3_url(object_key).await
         } else {
             self.presign_get_url(object_key)

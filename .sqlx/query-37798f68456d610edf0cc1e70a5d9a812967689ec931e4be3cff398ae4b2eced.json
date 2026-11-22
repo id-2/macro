@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        WITH taken AS (\n            SELECT provider_id, row_number() OVER (ORDER BY provider_id) AS n\n            FROM email_message_reconciliation WHERE link_id = $1\n        )\n        UPDATE email_message_reconciliation q SET available_at = CASE taken.n\n            WHEN 1 THEN 'infinity'::timestamptz ELSE now() + interval '30 minutes' END\n        FROM taken WHERE q.link_id = $1 AND q.provider_id = taken.provider_id AND taken.n <= 2\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "37798f68456d610edf0cc1e70a5d9a812967689ec931e4be3cff398ae4b2eced"
+}

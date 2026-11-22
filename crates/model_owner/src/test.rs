@@ -107,8 +107,8 @@ fn owner_type_lowercase_round_trips() {
 #[test]
 fn is_user_matches_only_that_user() {
     let owner = Owner::from_principal_str("macro|hutch@rox.one").unwrap();
-    let same = MacroUserIdStr::parse_from_str("macro|hutch@rox.one").unwrap();
-    let other = MacroUserIdStr::parse_from_str("macro|other@rox.one").unwrap();
+    let same = RoxUserIdStr::parse_from_str("macro|hutch@rox.one").unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@rox.one").unwrap();
 
     assert!(owner.is_user(&same));
     assert!(!owner.is_user(&other));
@@ -121,7 +121,7 @@ fn is_user_matches_only_that_user() {
 
 #[test]
 fn as_user_is_only_the_user_kind() {
-    let user = MacroUserIdStr::parse_from_str("macro|hutch@rox.one").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|hutch@rox.one").unwrap();
 
     assert_eq!(Owner::User(user.clone()).as_user(), Some(&user));
     assert_eq!(
@@ -171,4 +171,13 @@ fn from_principal_str_classifies_by_prefix() {
             .owner_type(),
         OwnerType::Team
     );
+}
+
+#[test]
+fn from_principal_str_accepts_both_user_prefixes() {
+    for principal in ["macro|hutch@rox.one", "rox|hutch@rox.one"] {
+        let owner = Owner::from_principal_str(principal).unwrap();
+        assert_eq!(owner.owner_type(), OwnerType::User);
+        assert_eq!(owner.principal_id(), principal);
+    }
 }

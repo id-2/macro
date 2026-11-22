@@ -9,8 +9,8 @@ import { $dfs } from '@lexical/utils';
 import {
   $isDocumentMentionNode,
   DocumentMentionNode,
-} from '@macro-inc/lexical-core';
-import { setDecorator } from '@macro-inc/lexical-core/decoratorRegistry';
+} from '@rox-one/lexical-core';
+import { setDecorator } from '@rox-one/lexical-core/decoratorRegistry';
 import { agentSessionKeys } from '@queries/agent-session/keys';
 import { authKeys } from '@queries/auth/keys';
 import type { UserInfoData } from '@queries/auth/user-info';

@@ -4,7 +4,7 @@ use std::pin::Pin;
 
 use agent_runtime_protocol::domain::action::AgentActionId;
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -53,7 +53,7 @@ pub trait CodingAgentDirectory: Send + Sync + 'static {
     /// Enumerate only personas the caller may start, including supported system personas.
     fn candidates(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<CodingAgentCandidate>, CodingAgentError>> + Send;
 }
 
@@ -61,7 +61,7 @@ pub trait CodingAgentDirectory: Send + Sync + 'static {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DispatchCodingAgentRequest {
     /// Verified tool caller; never supplied as an AI tool argument.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Persona selected from the discovery result.
     pub agent_id: Uuid,
     /// Self-contained task and repository context for the coding agent.
@@ -119,12 +119,12 @@ pub trait CodingAgentService: Send + Sync + 'static {
     /// List the caller's pending coding-session updates.
     fn list_updates(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<AgentUpdates, CodingAgentError>> + Send + '_>>;
     /// List the caller's configured, available coding personas.
     fn list(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<CodingAgent>, CodingAgentError>> + Send + '_>>;
 
     /// Start a session with any available coding or chat persona the caller may use.
@@ -169,13 +169,13 @@ where
 {
     fn list_updates(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<AgentUpdates, CodingAgentError>> + Send + '_>> {
         Box::pin(list_updates(&self.updates, user_id))
     }
     fn list(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<CodingAgent>, CodingAgentError>> + Send + '_>> {
         Box::pin(async move {
             Ok(self

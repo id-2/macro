@@ -61,7 +61,7 @@ impl Planner {
                 }
                 let options = self.new_options(place, target.data_type, options, &[], true)?;
                 let created = NewDefinition {
-                    id: macro_uuid::generate_uuid_v7(),
+                    id: rox_uuid::generate_uuid_v7(),
                     name,
                     data_type: target.data_type,
                     is_multi_select: target.is_multi_select,
@@ -454,7 +454,7 @@ impl Planner {
             .map(|(id, value)| (catalog::option_display(value), *id))
             .collect();
         let definition = NewDefinition {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             name: column.definition.definition.display_name.clone(),
             data_type: target.data_type,
             is_multi_select: target.is_multi_select,
@@ -897,7 +897,7 @@ fn check_formula(
 /// type its formula yields, never holding a value.
 fn derived_definition(name: String, result: FormulaType) -> NewDefinition {
     NewDefinition {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         name,
         data_type: derived_data_type(result),
         is_multi_select: false,

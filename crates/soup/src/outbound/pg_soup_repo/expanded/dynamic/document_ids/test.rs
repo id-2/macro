@@ -11,8 +11,8 @@ use item_filters::ast::{
     EntityFilterAst, calendar_event::CalendarEventLiteral, chat::ChatLiteral,
     document::DocumentLiteral, project::ProjectLiteral,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::{GroupByField, GroupingConfig};
 use models_pagination::{CursorWithValAndFilter, Identify, Query, SimpleSortMethod, SortOn};
 use models_soup::item::SoupItem;
@@ -91,8 +91,8 @@ fn status(entity_type: Option<&str>) -> GroupByField {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
 }
 
 #[test]

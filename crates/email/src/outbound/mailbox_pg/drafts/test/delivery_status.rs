@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::send_attempt::{EmailSendRepo, SendAttempt, SendAttemptStatus};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 async fn claim(sync: &PgMailboxSync) -> DraftLease {
     sync.claim_draft(
@@ -12,8 +12,8 @@ async fn claim(sync: &PgMailboxSync) -> DraftLease {
     .unwrap()
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(ACTOR).unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(ACTOR).unwrap()
 }
 
 async fn submitted_send(db: &PgPool) -> (PgMailboxSync, EmailPgRepo, DraftLease, Uuid) {

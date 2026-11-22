@@ -5,7 +5,7 @@ use std::pin::Pin;
 use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use futures::Stream;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 pub use agent_credentials::{RepoToken, RepoTokenHash};
@@ -14,7 +14,7 @@ pub use agent_credentials::{RepoToken, RepoTokenHash};
 #[derive(Debug, Clone)]
 pub struct AgentRepo {
     /// The agent's Rox user; also the repo's identity.
-    pub agent_user_id: MacroUserIdStr<'static>,
+    pub agent_user_id: RoxUserIdStr<'static>,
     /// The team whose admins may read the repo.
     pub team_id: Uuid,
     /// Hash of the repo token.
@@ -31,7 +31,7 @@ pub struct AgentRepo {
 #[derive(Debug, Clone)]
 pub struct CreatedRepo {
     /// The agent's Rox user.
-    pub agent_user_id: MacroUserIdStr<'static>,
+    pub agent_user_id: RoxUserIdStr<'static>,
     /// The new token; this is the only time it is readable.
     pub token: RepoToken,
 }
@@ -42,7 +42,7 @@ pub enum GitCredential {
     /// A repo token (HTTP Basic password).
     RepoToken(RepoToken),
     /// A Rox user authenticated by session, JWT, or API key.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
 }
 
 /// What a request does to the repo.
@@ -120,14 +120,14 @@ pub struct GitResponse {
 /// Only the domain service constructs it; backends take it as proof.
 #[derive(Debug, Clone)]
 pub struct AuthorizedRepo {
-    agent_user_id: MacroUserIdStr<'static>,
+    agent_user_id: RoxUserIdStr<'static>,
     access: GitAccess,
     max_input_size: Option<u64>,
 }
 
 impl AuthorizedRepo {
     pub(crate) fn new(
-        agent_user_id: MacroUserIdStr<'static>,
+        agent_user_id: RoxUserIdStr<'static>,
         access: GitAccess,
         max_input_size: Option<u64>,
     ) -> Self {
@@ -139,7 +139,7 @@ impl AuthorizedRepo {
     }
 
     /// The repo.
-    pub fn agent_user_id(&self) -> &MacroUserIdStr<'static> {
+    pub fn agent_user_id(&self) -> &RoxUserIdStr<'static> {
         &self.agent_user_id
     }
 

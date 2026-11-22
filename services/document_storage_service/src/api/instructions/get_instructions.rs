@@ -3,8 +3,8 @@ use crate::{
     model::response::instructions::GetInstructionsDocumentResponse,
 };
 use axum::{Json, extract::State, http::StatusCode, response::IntoResponse};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::cowlike::CowLike;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::cowlike::CowLike;
 use model::response::{GenericErrorResponse, GenericResponse};
 
 /// Gets the instructions document for the current user
@@ -21,9 +21,9 @@ use model::response::{GenericErrorResponse, GenericResponse};
 #[tracing::instrument(skip(ctx, user_context), fields(user_id=%user_context.authorization.user.macro_user_id))]
 pub async fn get_instructions_handler(
     State(ctx): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> impl IntoResponse {
-    match macro_db_client::instructions::get::get_instructions_document(
+    match rox_db_client::instructions::get::get_instructions_document(
         &ctx.db,
         user_context.authorization.user.macro_user_id.copied(),
     )

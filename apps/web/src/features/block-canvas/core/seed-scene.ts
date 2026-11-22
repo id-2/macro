@@ -1,4 +1,4 @@
-import { createScene, translation } from '@macro-inc/graphics';
+import { createScene, translation } from '@rox-one/graphics';
 import { initialAppearance } from './defaults';
 
 export { initialAppearance } from './defaults';

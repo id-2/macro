@@ -3,7 +3,7 @@ use crate::domain::models::{
 };
 use calendar_events::domain::models::GoogleScopeSet;
 use chrono::{DateTime, Utc};
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -13,7 +13,7 @@ use super::db_types::{DbLink, DbUserProvider};
 pub(super) async fn link_by_fusionauth_and_macro_id(
     pool: &PgPool,
     fusionauth_user_id: &str,
-    macro_id: MacroUserIdStr<'_>,
+    macro_id: RoxUserIdStr<'_>,
     provider: UserProvider,
 ) -> Result<Option<Link>, sqlx::Error> {
     let provider: DbUserProvider = match provider {
@@ -83,7 +83,7 @@ pub(super) async fn link_by_fusionauth_email_provider(
 pub(super) async fn owned_link_for_thread(
     pool: &PgPool,
     thread_id: Uuid,
-    macro_id: MacroUserIdStr<'_>,
+    macro_id: RoxUserIdStr<'_>,
 ) -> Result<Option<Link>, sqlx::Error> {
     let db_link: Option<DbLink> = sqlx::query_as!(
         DbLink,
@@ -116,7 +116,7 @@ pub(super) async fn owned_link_for_thread(
 #[tracing::instrument(err, skip(pool, macro_id))]
 pub(super) async fn inboxes_for_macro_id(
     pool: &PgPool,
-    macro_id: MacroUserIdStr<'_>,
+    macro_id: RoxUserIdStr<'_>,
 ) -> Result<Vec<Link>, sqlx::Error> {
     let db_links: Vec<DbLink> = sqlx::query_as!(
         DbLink,
@@ -211,10 +211,10 @@ struct DbInboxDetailsRow {
 
 impl DbInboxDetailsRow {
     /// Convert the database projection into domain-owned persisted facts.
-    fn try_into_model(self) -> Result<EmailInboxDetails, macro_user_id::error::ParseErr> {
+    fn try_into_model(self) -> Result<EmailInboxDetails, rox_user_id::error::ParseErr> {
         Ok(EmailInboxDetails {
             id: self.id,
-            macro_id: MacroUserIdStr::try_from(self.macro_id)?,
+            macro_id: RoxUserIdStr::try_from(self.macro_id)?,
             email_address: EmailStr::try_from(self.email_address)?,
             photo_url: self.photo_url,
             provider: match self.provider {
@@ -251,7 +251,7 @@ impl DbInboxDetailsRow {
 #[tracing::instrument(err, skip(pool, macro_id))]
 pub(super) async fn inbox_details_for_macro_id(
     pool: &PgPool,
-    macro_id: &MacroUserIdStr<'_>,
+    macro_id: &RoxUserIdStr<'_>,
 ) -> Result<Vec<EmailInboxDetails>, sqlx::Error> {
     let rows = sqlx::query_as!(
         DbInboxDetailsRow,

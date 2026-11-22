@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { CrmCompanyEntity, EntityData } from '@entity';
 import type { CrmWorkspace } from '../context/workspace-context';
 export function createCrmExportLoader(
@@ -23,13 +24,13 @@ export function createCrmExportLoader(
       };
     while (source.isFetching()) await wait();
     if (source.error())
-      throw new Error('Could not load this view. Please retry.');
+      throw new Error(t('crm.exportLoadViewFailed'));
     while (source.hasNextPage()) {
       signal.throwIfAborted();
       await source.fetchNextPage();
       await wait();
       if (source.error())
-        throw new Error('Could not load the entire view. Please retry.');
+        throw new Error(t('crm.exportLoadAllFailed'));
       progress(source.data().length);
     }
     signal.throwIfAborted();

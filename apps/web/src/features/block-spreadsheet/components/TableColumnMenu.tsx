@@ -9,9 +9,9 @@ import {
   TABLE_COLUMN_TYPES,
   type TableColumnFilter,
   type TableColumnType,
-} from '@macro-inc/spreadsheet/sheet-tables';
-import { TABLE_COLUMN_TYPE_LABELS } from '@macro-inc/spreadsheet/table-columns';
-import { filterSummary } from '@macro-inc/spreadsheet/table-filters';
+} from '@rox-one/spreadsheet/sheet-tables';
+import { TABLE_COLUMN_TYPE_LABELS } from '@rox-one/spreadsheet/table-columns';
+import { filterSummary } from '@rox-one/spreadsheet/table-filters';
 import ArrowLineLeft from '@phosphor/arrow-line-left.svg';
 import ArrowLineRight from '@phosphor/arrow-line-right.svg';
 import FunnelFill from '@phosphor-fill/funnel-simple-fill.svg';

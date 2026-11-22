@@ -172,7 +172,7 @@ fn values() -> serde_json::Value {
 
 // Run the real environment loader in a child process so these complete, dummy
 // deployment configurations cannot race any other test's environment.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 struct FleetProbe {
     fleet_probe: Option<bool>,
@@ -180,7 +180,7 @@ struct FleetProbe {
 
 #[test]
 fn fleet_loader_process() {
-    let probe: FleetProbe = macro_config::load().unwrap();
+    let probe: FleetProbe = rox_config::load().unwrap();
     if probe.fleet_probe != Some(true) {
         return;
     }

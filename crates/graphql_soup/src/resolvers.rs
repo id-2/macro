@@ -9,13 +9,13 @@ use email::{
 };
 use entity_access::{
     domain::{models::MemberTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::OptionalMacroUserTeamExtractorV2,
+    inbound::axum_extractors::OptionalRoxUserTeamExtractorV2,
 };
 use futures::Stream;
 use graphql_common::{extract_part, require_authorized_user};
 use graphql_email::EmailThreadMutationOutput;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_pagination::TypeEraseCursor;
 use soup::domain::{
@@ -42,8 +42,8 @@ pub async fn resolve_soup_updates<R, Auth, St, Edges>(
 >
 where
     R: SoupRealtimeSubscriptionService,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     St: Clone + Send + Sync + 'static,
     Edges: SoupEntityEdges,
 {
@@ -88,8 +88,8 @@ pub async fn resolve_grouped_soup<S, Auth, St, Edges>(
 ) -> async_graphql::Result<GroupedSoup<Edges>>
 where
     S: SoupService,
-    Auth: MacroAuthorizationService,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    Auth: RoxAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     St: Clone + Send + Sync + 'static,
     Edges: SoupEntityEdges,
 {
@@ -139,7 +139,7 @@ where
 )]
 pub async fn resolve_soup_email_thread<Edges>(
     ctx: &Context<'_>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     thread_id: uuid::Uuid,
 ) -> async_graphql::Result<Option<GraphqlSoupEmailThread<Edges>>>
 where
@@ -163,7 +163,7 @@ where
 /// item loader. Missing or inaccessible threads are left out.
 pub async fn resolve_soup_email_threads<Edges>(
     ctx: &Context<'_>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     thread_ids: Vec<uuid::Uuid>,
 ) -> async_graphql::Result<Vec<GraphqlSoupEmailThread<Edges>>>
 where
@@ -198,7 +198,7 @@ where
 /// [`AgentSessionEntityLoader`].
 pub async fn resolve_soup_agent_session<Edges>(
     ctx: &Context<'_>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     session_id: uuid::Uuid,
 ) -> async_graphql::Result<Option<GraphqlSoupAgentSession<Edges>>>
 where
@@ -212,7 +212,7 @@ where
 /// which outlives its request context.
 pub async fn load_soup_agent_session<Edges>(
     loader: &AgentSessionEntityLoader,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     session_id: uuid::Uuid,
 ) -> async_graphql::Result<Option<GraphqlSoupAgentSession<Edges>>>
 where
@@ -236,7 +236,7 @@ where
 /// Reads the primary: see [`PrimarySoupItemLoader`].
 pub async fn resolve_soup_entity<Edges>(
     ctx: &Context<'_>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     entity: model_entity::Entity<'static>,
 ) -> async_graphql::Result<Option<GraphqlSoupEntity<Edges>>>
 where
@@ -258,7 +258,7 @@ where
 
     fn load_email_thread<'ctx>(
         ctx: &'ctx Context<'_>,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: uuid::Uuid,
     ) -> Pin<Box<dyn Future<Output = async_graphql::Result<Option<Self::Thread>>> + Send + 'ctx>>
     {
@@ -288,11 +288,11 @@ where
     S: SoupService,
     E: EmailService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
     EmailRouterState<E>: FromRef<St>,
     Arc<EAS>: FromRef<St>,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     Edges: SoupEntityEdges,
 {
     let macro_user_id = require_authorized_user::<Auth, St>(ctx).await?;
@@ -304,7 +304,7 @@ where
     // Always forward the optional team receipt: Soup uses it for all
     // team-scoped foreign entities, not only CRM-scoped filters.
     let Cached(team) = extract_part::<
-        Cached<OptionalMacroUserTeamExtractorV2<MemberTeamRole, EAS, Auth>>,
+        Cached<OptionalRoxUserTeamExtractorV2<MemberTeamRole, EAS, Auth>>,
         St,
     >(ctx)
     .await?;

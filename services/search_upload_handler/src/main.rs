@@ -3,9 +3,9 @@ use aws_lambda_events::eventbridge::EventBridgeEvent;
 use document_storage_service_client::DocumentStorageServiceClient;
 use handler::handler;
 use lambda_runtime::{Error, LambdaEvent, run, service_fn, tracing};
-use macro_entrypoint::MacroEntrypoint;
-use macro_env_var::env_vars;
-use macro_service_urls::DocumentStorageServiceUrl;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env_var::env_vars;
+use rox_service_urls::DocumentStorageServiceUrl;
 
 mod handler;
 
@@ -15,7 +15,7 @@ env_vars! {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     tracing::trace!("initiating lambda");
 

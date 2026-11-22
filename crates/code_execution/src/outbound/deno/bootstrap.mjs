@@ -1,4 +1,4 @@
-import { Macro, gateRequests, observeRequests, sendVerbHeaders } from "@macro-inc/sdk";
+import { Macro, gateRequests, observeRequests, sendVerbHeaders } from "@rox-one/sdk";
 
 // Trusted bootstrap: credentials arrive once on stdin, then user code is imported
 // dynamically so module reads are checked against the scratch-only read grant.
@@ -152,7 +152,8 @@ try {
       }
       // Marks the request as a program's, not a person's in the app, so an API
       // can ask it to confirm what a person would have chosen by opening it.
-      request.headers.set("x-macro-code-execution", "1");
+      // Forwarders and older services also accept the pre-rename name.
+      request.headers.set("x-rox-code-execution", "1");
       // A dry run's backstop: a request to an SDK origin that didn't come
       // through the gate is sent only if a read matches its route.
       if (dryRun && request.method !== "GET" && request.method !== "HEAD") {

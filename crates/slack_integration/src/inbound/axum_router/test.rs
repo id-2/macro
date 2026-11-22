@@ -8,10 +8,10 @@ use entity_access::domain::models::{
     AccessError, AccessLevel, AdminTeamRole, BotAccessScope, BotId, CallChannelInfo,
     EntityAccessReceipt, EntityPermission, EntityType, RequiredPermission, TeamRole, UserTeamInfo,
 };
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
-use macro_user_id::{
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_user::UserContext;
 use rootcause::Report;
@@ -28,10 +28,10 @@ const USER: &str = "macro|admin@example.com";
 
 #[derive(Clone)]
 struct Auth;
-impl MacroAuthorizationService for Auth {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for Auth {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(MacroAuthorizationError::InvalidCredentials.into());
+            return Err(RoxAuthorizationError::InvalidCredentials.into());
         }
         Ok(UserContext {
             user_id: USER.into(),
@@ -44,17 +44,17 @@ impl MacroAuthorizationService for Auth {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
     async fn authorize_internal(
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(MacroAuthorizationError::InvalidCredentials.into())
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(RoxAuthorizationError::InvalidCredentials.into())
     }
 }
 
@@ -63,7 +63,7 @@ struct Access(TeamRole);
 impl EntityAccessService for Access {
     async fn get_user_team(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(Some(UserTeamInfo {
             team_id: TEAM.parse().unwrap(),
@@ -72,7 +72,7 @@ impl EntityAccessService for Access {
     }
     async fn generate_entity_access_receipt<P: RequiredPermission>(
         &self,
-        _: &MacroUserId<Lowercase<'_>>,
+        _: &RoxUserId<Lowercase<'_>>,
         _: Option<i64>,
         _: &str,
         _: EntityType,
@@ -90,7 +90,7 @@ impl EntityAccessService for Access {
     }
     async fn get_access_level(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -98,7 +98,7 @@ impl EntityAccessService for Access {
     }
     async fn check_access(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: AccessLevel,
@@ -115,7 +115,7 @@ impl EntityAccessService for Access {
     }
     async fn get_entity_permission(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
         _: Option<i64>,
@@ -124,7 +124,7 @@ impl EntityAccessService for Access {
     }
     async fn get_crm_entity_permission_with_team(
         &self,
-        _: Option<&MacroUserId<Lowercase<'_>>>,
+        _: Option<&RoxUserId<Lowercase<'_>>>,
         _: &str,
         _: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -134,7 +134,7 @@ impl EntityAccessService for Access {
         &self,
         _: &str,
         _: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unreachable!()
     }
     async fn get_call_channel(&self, _: &Uuid) -> Result<Option<CallChannelInfo>, AccessError> {
@@ -256,7 +256,7 @@ fn router(role: TeamRole) -> (Router, Arc<Service>) {
         slack_router(SlackRouterState {
             service: service.clone(),
             entity_access_service: Arc::new(Access(role)),
-            authorization_state: MacroAuthorizationState::new(Arc::new(Auth)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(Auth)),
         }),
     );
     (router, service)

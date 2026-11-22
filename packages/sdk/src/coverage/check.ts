@@ -17,8 +17,8 @@ import * as skipped from './skipped';
 
 const ROOT = join(import.meta.dir, '..', '..');
 
-// How each service is reached from MacroClient (client.storage, client.email,
-// ...). A service that is not wired into MacroClient cannot be wrapped.
+// How each service is reached from RoxClient (client.storage, client.email,
+// ...). A service that is not wired into RoxClient cannot be wrapped.
 const ACCESSORS: Partial<Record<(typeof services)[number], string>> = {
   'agent-harness': 'agentHarness',
   'scheduled-action': 'scheduledAction',

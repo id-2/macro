@@ -19,7 +19,7 @@ use crate::domain::{
     },
     ports::{
         ClientRegistrationStore, EmailCodeError, EmailCodeProvider, EmailCodeRequestFuture,
-        EmailCodeTokensFuture, GrantRevokedFuture, MacroApiTokenMinter, MintedAccessToken,
+        EmailCodeTokensFuture, GrantRevokedFuture, RoxApiTokenMinter, MintedAccessToken,
         MintedAccessTokenFuture, OAuthProvider, RefreshTokenBindingFuture,
         RefreshTokenBindingStore, RegisteredClientFuture, StoreWriteFuture, UpstreamGrantError,
         UpstreamRevocationFuture, UpstreamTokensFuture,
@@ -69,9 +69,9 @@ pub const MINTED_LIFETIME_CAP_SECONDS: u64 = 900;
 
 /// Minter that spells out what it signed, standing in for the harness's Rox
 /// API token signer, and caps lifetimes as it does.
-pub struct FakeMacroApiTokens;
+pub struct FakeRoxApiTokens;
 
-impl MacroApiTokenMinter for FakeMacroApiTokens {
+impl RoxApiTokenMinter for FakeRoxApiTokens {
     fn mint<'a>(
         &'a self,
         upstream: &'a AccessToken,
@@ -493,7 +493,7 @@ impl Harness {
             oauth_provider: Arc::clone(&provider) as Arc<dyn OAuthProvider>,
             email_codes: Arc::clone(&email_codes) as Arc<dyn EmailCodeProvider>,
             resources: McpResources::new(HARNESS_RESOURCE.to_owned(), CHATGPT_RESOURCE.to_owned()),
-            macro_api_tokens: Arc::new(FakeMacroApiTokens),
+            macro_api_tokens: Arc::new(FakeRoxApiTokens),
         });
 
         Self {

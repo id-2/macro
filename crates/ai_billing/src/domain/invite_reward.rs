@@ -9,8 +9,8 @@
 
 use std::num::NonZeroU32;
 
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::Result;
 use super::credit_grant::{CreditGrant, CreditGrantRepo};
@@ -32,7 +32,7 @@ const REWARD_ID_NAMESPACE: Uuid = Uuid::from_u128(0x6169_2d72_6577_6172_642d_6d6
 #[derive(Debug, Clone)]
 pub struct InviteReward {
     /// Who earns the reward: the inviter, link creator, or referrer.
-    pub beneficiary: MacroUserIdStr<'static>,
+    pub beneficiary: RoxUserIdStr<'static>,
     /// A stable key for the event that earned it, e.g. `team-invite:<id>`.
     pub event_key: String,
     /// Why it was granted; stored on the ledger entry.
@@ -62,7 +62,7 @@ pub trait FreeAllowanceBonusRepo: Send + Sync + 'static {
     /// Book a bonus for `user`. Returns `false` when `id` was already booked.
     fn record_free_allowance_bonus(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         cost_cents: i64,
         note: &str,

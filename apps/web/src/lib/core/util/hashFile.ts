@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { match } from 'ts-pattern';
 import type { HashWorkerResponse } from '../../workers/file-hash/hash-worker';
 import HashWorker from '../../workers/file-hash/hash-worker?worker';

@@ -1,7 +1,7 @@
 import {
   type AgentContextPrompt,
   composeAgentContextPrompt,
-} from '@macro-inc/lexical-core/utils/agent-context';
+} from '@rox-one/lexical-core/utils/agent-context';
 import { describe, expect, it } from 'vitest';
 import { agentContextText, promptOrigin } from './prompt-origin';
 

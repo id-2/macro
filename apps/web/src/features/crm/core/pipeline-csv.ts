@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { CellWrite } from '@core/database-sql/generated/types';
 import { emailToMacroId, isMacroId, macroIdToEmail } from '@core/user/macroId';
 import { err, ok, type Result } from 'neverthrow';
@@ -52,8 +53,8 @@ export function pipelineRecordHeaders(
   recordType: PipelineRecordType
 ): [name: string, key: string] {
   return recordType === 'company'
-    ? ['Company', 'Domain']
-    : ['Contact', 'Email'];
+    ? [t('crm.company'), t('crm.domain')]
+    : [t('crm.contact'), t('crm.email')];
 }
 
 const NAME_HEADERS = {
@@ -280,17 +281,16 @@ export function pipelineImportMessage(failure: PipelineImportFailure): string {
   return match(failure)
     .with(
       { kind: 'no-record-column', recordType: 'company' },
-      () => 'Include a Domain column, with domains like acme.com.'
+      () => t('crm.includeDomainColumn')
     )
     .with(
       { kind: 'no-record-column', recordType: 'contact' },
-      () => 'Include an Email column, with addresses like jane@acme.com.'
+      () => t('crm.includeEmailColumn')
     )
-    .with({ kind: 'no-rows' }, () => 'No rows name a company or contact.')
+    .with({ kind: 'no-rows' }, () => t('crm.noRowsNamed'))
     .with(
       { kind: 'invalid-system-values' },
-      () =>
-        'Rows contain unsupported Outcome or currency values. Use the options shown in the pipeline.'
+      () => t('crm.unsupportedSystemValues')
     )
     .exhaustive();
 }

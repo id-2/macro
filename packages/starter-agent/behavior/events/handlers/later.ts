@@ -1,4 +1,4 @@
-import { behavior } from '@macro-inc/muppet/core/behavior';
+import { behavior } from '@rox-one/muppet/core/behavior';
 import { rescueTask, threadOf } from '../../capabilities/chat/prompt.ts';
 import type { LaterContext } from '../../capabilities/later/index.ts';
 import type { chatSources } from '../sources/chat.ts';

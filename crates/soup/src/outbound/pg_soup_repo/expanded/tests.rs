@@ -19,8 +19,8 @@ use item_filters::{
         project::ProjectLiteral,
     },
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use models_pagination::Identify;
 use models_pagination::{Frecency, PaginateOn, Query, SimpleSortMethod};
@@ -38,7 +38,7 @@ use uuid::Uuid;
 /// against the replacement.
 async fn expanded_generic_cursor_soup(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     limit: u16,
     cursor: Query<Uuid, SimpleSortMethod, ()>,
 ) -> Result<Vec<SoupItem<()>>, sqlx::Error> {
@@ -58,7 +58,7 @@ async fn expanded_generic_cursor_soup(
 
 async fn no_frecency_expanded_generic_soup(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     limit: u16,
     cursor: Query<Uuid, SimpleSortMethod, Frecency>,
 ) -> Result<Vec<SoupItem<()>>, sqlx::Error> {
@@ -108,7 +108,7 @@ macro_rules! unwrap_enum {
     migrator = "MACRO_DB_MIGRATIONS"
 )]
 async fn test_viewed_at_orders_nulls_last(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -208,7 +208,7 @@ async fn test_viewed_at_orders_nulls_last(pool: Pool<Postgres>) -> anyhow::Resul
     )
 )]
 async fn test_get_user_items_expanded_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let result = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -279,7 +279,7 @@ async fn test_get_user_items_expanded_cursor(pool: Pool<Postgres>) -> anyhow::Re
     )
 )]
 async fn test_expanded_generic_sorting_methods(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // --- Helper to extract IDs for easy comparison ---
     let get_item_ids =
@@ -391,7 +391,7 @@ async fn test_expanded_generic_sorting_methods(pool: Pool<Postgres>) -> anyhow::
     )
 )]
 async fn test_expanded_soup_by_ids(pool: Pool<Postgres>) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Request specific items, including some we have implicit access to through projects
     let entities = [
@@ -448,7 +448,7 @@ async fn test_expanded_soup_by_ids(pool: Pool<Postgres>) {
     )
 )]
 async fn it_should_be_empty(pool: Pool<Postgres>) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     // Test with non-existent items
     let non_existent_entities = [
         EntityType::Document.with_entity_str("00000000-0000-0000-0000-000000000000"), // non-existent-doc
@@ -491,7 +491,7 @@ async fn it_should_be_empty(pool: Pool<Postgres>) {
 async fn test_no_frecency_expanded_filters_out_frecency_items(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Test with UpdatedAt sort - should return only items without frecency
     let items = no_frecency_expanded_generic_soup(
@@ -555,7 +555,7 @@ async fn test_no_frecency_expanded_filters_out_frecency_items(
     )
 )]
 async fn test_no_frecency_expanded_sorting_methods(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let get_item_ids =
         |items: &[SoupItem]| -> Vec<Uuid> { items.iter().map(|item| item.id()).collect() };
@@ -653,7 +653,7 @@ async fn test_no_frecency_expanded_sorting_methods(pool: Pool<Postgres>) -> anyh
     )
 )]
 async fn test_no_frecency_expanded_cursor_pagination(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Get first page with limit of 2
     let result = no_frecency_expanded_generic_soup(
@@ -750,7 +750,7 @@ async fn test_no_frecency_expanded_cursor_pagination(pool: Pool<Postgres>) -> an
     migrator = "MACRO_DB_MIGRATIONS"
 )]
 async fn empty_ast_returns_same_as_static_query(db: PgPool) {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let ast_res = expanded_dynamic_cursor_soup(
         &db,
         ExpandedDynamicCursorArgs {
@@ -797,7 +797,7 @@ async fn empty_ast_returns_same_as_static_query(db: PgPool) {
 async fn test_filter_by_document_file_type(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for only PDF documents
     let entity_filters = EntityFilters {
@@ -869,7 +869,7 @@ async fn test_filter_by_document_file_type(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_by_document_ids(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for specific document IDs
     let entity_filters = EntityFilters {
@@ -949,7 +949,7 @@ async fn test_filter_by_document_ids(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_documents_by_project_id(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter documents in project-A only
     let entity_filters = EntityFilters {
@@ -1021,7 +1021,7 @@ async fn test_filter_documents_by_project_id(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_chats_by_project_id(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter chats in project-B
     let entity_filters = EntityFilters {
@@ -1093,7 +1093,7 @@ async fn test_filter_chats_by_project_id(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_by_chat_ids(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for specific chat IDs
     let entity_filters = EntityFilters {
@@ -1176,7 +1176,7 @@ async fn test_filter_by_chat_ids(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_by_project_ids(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for specific project IDs
     let entity_filters = EntityFilters {
@@ -1259,7 +1259,7 @@ async fn test_filter_by_project_ids(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_by_project_ids_include_root(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let entity_filters = EntityFilters {
         project_filters: ProjectFilters {
@@ -1321,7 +1321,7 @@ async fn test_filter_by_project_ids_include_root(db: PgPool) -> anyhow::Result<(
     migrator = "MACRO_DB_MIGRATIONS"
 )]
 async fn test_negated_project_id_filter_includes_root_projects(db: PgPool) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Mirror the folders-view request: docs and chats excluded via nil-id
     // literals, projects included via a negated nil parent-id literal.
@@ -1382,7 +1382,7 @@ async fn test_negated_project_id_filter_includes_root_projects(db: PgPool) -> an
 async fn test_combined_entity_filters(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, DocumentFilters, EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for:
     // - Documents in project-A OR project-B
@@ -1479,7 +1479,7 @@ async fn test_combined_entity_filters(db: PgPool) -> anyhow::Result<()> {
 async fn test_multiple_filter_criteria_documents(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for documents: specific IDs AND in specific projects AND specific file type
     // This uses AND logic across different filter criteria
@@ -1566,7 +1566,7 @@ async fn test_multiple_filter_criteria_documents(db: PgPool) -> anyhow::Result<(
 async fn test_filters_respect_access_control(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Try to request doc-isolated (which user doesn't have access to)
     let entity_filters = EntityFilters {
@@ -1631,7 +1631,7 @@ async fn test_filters_respect_access_control(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_by_owner(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter documents by owner
     let entity_filters = EntityFilters {
@@ -1698,7 +1698,7 @@ async fn test_filter_by_owner(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_non_existent_items(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for non-existent chat IDs
     let entity_filters = EntityFilters {
@@ -1760,7 +1760,7 @@ async fn test_filter_non_existent_items(db: PgPool) -> anyhow::Result<()> {
 async fn test_cursor_pagination_with_document_filter(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for only PDF documents
     let entity_filters = EntityFilters {
@@ -1877,7 +1877,7 @@ async fn test_cursor_pagination_with_document_filter(db: PgPool) -> anyhow::Resu
 async fn test_cursor_pagination_with_combined_filters(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for documents in specific projects AND specific chats
     let entity_filters = EntityFilters {
@@ -1979,7 +1979,7 @@ async fn test_cursor_pagination_with_combined_filters(db: PgPool) -> anyhow::Res
 async fn test_cursor_pagination_filter_consistency(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for documents by specific IDs
     let entity_filters = EntityFilters {
@@ -2084,7 +2084,7 @@ async fn test_cursor_pagination_filter_consistency(db: PgPool) -> anyhow::Result
 async fn test_cursor_pagination_with_single_item_filter(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for a single chat ID
     let entity_filters = EntityFilters {
@@ -2180,7 +2180,7 @@ async fn test_dynamic_query_with_ast_and_frecency_exclusion(
 ) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, DocumentFilters, EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Create an AST filter that only returns specific document IDs
     // We'll filter for two docs without frecency and one with frecency
@@ -2323,7 +2323,7 @@ async fn test_dynamic_query_with_ast_and_frecency_exclusion(
 async fn test_filter_documents_by_importance(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // importance=true: non-tasks + tasks assigned to user
     {
@@ -2450,7 +2450,7 @@ async fn test_filter_documents_by_importance(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_chats_by_importance(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{ChatFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // importance=true: no-op, should return all chats
     {
@@ -2550,7 +2550,7 @@ async fn test_filter_chats_by_importance(db: PgPool) -> anyhow::Result<()> {
 async fn test_filter_projects_by_importance(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{EntityFilters, ProjectFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // importance=true: no-op, should return all projects
     {
@@ -2654,7 +2654,7 @@ async fn test_filter_projects_by_importance(db: PgPool) -> anyhow::Result<()> {
 async fn test_bulk_populate_properties_enriches_raw_soup_items(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let items = expanded_dynamic_cursor_soup(
         &pool,
@@ -2767,7 +2767,7 @@ fn uuid(s: &str) -> Uuid {
     )
 )]
 async fn test_exhaustive_deleted_items_excluded(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2802,7 +2802,7 @@ async fn test_exhaustive_deleted_items_excluded(pool: Pool<Postgres>) -> anyhow:
 async fn test_exhaustive_access_control_excludes_isolated(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2838,7 +2838,7 @@ async fn test_exhaustive_access_control_excludes_isolated(
     )
 )]
 async fn test_exhaustive_user_isolation(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-2@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-2@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2872,7 +2872,7 @@ async fn test_exhaustive_user_isolation(pool: Pool<Postgres>) -> anyhow::Result<
     )
 )]
 async fn test_exhaustive_deep_hierarchy_access(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2931,7 +2931,7 @@ async fn test_exhaustive_deep_hierarchy_access(pool: Pool<Postgres>) -> anyhow::
 async fn test_exhaustive_task_completion_status(pool: Pool<Postgres>) -> anyhow::Result<()> {
     use models_soup::document::SoupDocumentSubType;
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -2996,7 +2996,7 @@ async fn test_exhaustive_task_completion_status(pool: Pool<Postgres>) -> anyhow:
     )
 )]
 async fn test_exhaustive_sort_updated_at(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3052,7 +3052,7 @@ async fn test_exhaustive_sort_updated_at(pool: Pool<Postgres>) -> anyhow::Result
     )
 )]
 async fn test_exhaustive_sort_created_at(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3110,7 +3110,7 @@ async fn test_exhaustive_sort_created_at(pool: Pool<Postgres>) -> anyhow::Result
     )
 )]
 async fn test_exhaustive_sort_viewed_at(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3170,7 +3170,7 @@ async fn test_exhaustive_sort_viewed_at(pool: Pool<Postgres>) -> anyhow::Result<
     )
 )]
 async fn test_exhaustive_sort_viewed_updated(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3242,7 +3242,7 @@ async fn test_exhaustive_sort_viewed_updated(pool: Pool<Postgres>) -> anyhow::Re
     )
 )]
 async fn test_exhaustive_paginate_one_at_a_time(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let sort = SimpleSortMethod::UpdatedAt;
 
     let mut all_ids: Vec<Uuid> = Vec::new();
@@ -3306,7 +3306,7 @@ async fn test_exhaustive_paginate_one_at_a_time(pool: Pool<Postgres>) -> anyhow:
     )
 )]
 async fn test_exhaustive_paginate_all_sort_methods(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let page_size: u16 = 3;
 
     for sort in [
@@ -3376,7 +3376,7 @@ async fn test_exhaustive_paginate_all_sort_methods(pool: Pool<Postgres>) -> anyh
     )
 )]
 async fn test_exhaustive_limit_larger_than_total(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3405,7 +3405,7 @@ async fn test_exhaustive_limit_larger_than_total(pool: Pool<Postgres>) -> anyhow
 async fn test_exhaustive_standalone_items_have_no_project(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3444,7 +3444,7 @@ async fn test_exhaustive_standalone_items_have_no_project(
     )
 )]
 async fn test_exhaustive_hierarchy_project_ids(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3489,7 +3489,7 @@ async fn test_exhaustive_hierarchy_project_ids(pool: Pool<Postgres>) -> anyhow::
     )
 )]
 async fn test_exhaustive_viewed_at_values(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3545,7 +3545,7 @@ async fn test_exhaustive_viewed_at_values(pool: Pool<Postgres>) -> anyhow::Resul
     )
 )]
 async fn test_exhaustive_document_fields(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3582,7 +3582,7 @@ async fn test_exhaustive_document_fields(pool: Pool<Postgres>) -> anyhow::Result
     )
 )]
 async fn test_exhaustive_entity_type_counts(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_generic_cursor_soup(
         &pool,
         user_id.copied(),
@@ -3646,7 +3646,7 @@ async fn dyn_fetch(
     filters: EntityFilterAst,
     exclude_frecency: bool,
 ) -> Result<Vec<SoupItem>, sqlx::Error> {
-    let user_id = MacroUserIdStr::parse_from_str(user).unwrap();
+    let user_id = RoxUserIdStr::parse_from_str(user).unwrap();
     expanded_dynamic_cursor_soup(
         db,
         ExpandedDynamicCursorArgs {
@@ -4493,7 +4493,7 @@ async fn test_dyn_document_fields(db: PgPool) -> anyhow::Result<()> {
     )
 )]
 async fn test_dyn_paginate_one_at_a_time(db: PgPool) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let sort = SimpleSortMethod::UpdatedAt;
     let filters = EntityFilterAst::mock_empty();
 
@@ -4572,7 +4572,7 @@ async fn test_dyn_paginate_one_at_a_time(db: PgPool) -> anyhow::Result<()> {
 async fn test_dyn_paginate_with_filters(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let sort = SimpleSortMethod::CreatedAt;
     let page_size: u16 = 3;
 
@@ -5283,7 +5283,7 @@ async fn test_property_filter_scoped_entity_type(db: Pool<Postgres>) -> anyhow::
 async fn test_dyn_filter_by_document_sub_type_task(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let entity_filters = EntityFilters {
         document_filters: DocumentFilters {
@@ -5348,7 +5348,7 @@ async fn test_dyn_filter_by_document_sub_type_task(db: PgPool) -> anyhow::Result
 async fn test_dyn_filter_by_sub_type_and_file_type(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Filter for task documents that are also PDFs
     let entity_filters = EntityFilters {
@@ -5405,7 +5405,7 @@ async fn document_ids_for_phase0_membership_filter(
     let filters: EntityFilterAst = serde_json::from_value(serde_json::json!({
         "df": document_filter
     }))?;
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_dynamic_cursor_soup(
         db,
         ExpandedDynamicCursorArgs {
@@ -5546,7 +5546,7 @@ async fn production_documents_presets_have_authoritative_membership(
 async fn projection_hydration_carries_viewer_relative_facts_from_flat_and_by_id_rows(
     db: PgPool,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let flat = expanded_dynamic_cursor_soup_with_projection(
         &db,
         ExpandedDynamicCursorArgs {
@@ -5693,7 +5693,7 @@ async fn projection_status_extraction_treats_non_array_values_as_empty(
     .execute(&db)
     .await?;
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let flat = expanded_dynamic_cursor_soup_with_projection(
         &db,
         ExpandedDynamicCursorArgs {
@@ -5744,7 +5744,7 @@ async fn projection_status_extraction_treats_non_array_values_as_empty(
 async fn test_dyn_filter_is_email_attachment_true(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let entity_filters = EntityFilters {
         document_filters: DocumentFilters {
@@ -5814,7 +5814,7 @@ async fn test_dyn_filter_is_email_attachment_true(db: PgPool) -> anyhow::Result<
 async fn test_dyn_filter_is_email_attachment_false(db: PgPool) -> anyhow::Result<()> {
     use item_filters::{DocumentFilters, EntityFilters};
 
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     let entity_filters = EntityFilters {
         document_filters: DocumentFilters {
@@ -5875,7 +5875,7 @@ async fn test_dyn_filter_is_email_attachment_false(db: PgPool) -> anyhow::Result
     migrator = "MACRO_DB_MIGRATIONS"
 )]
 async fn test_dyn_filter_by_not_document_sub_type_task(db: PgPool) -> anyhow::Result<()> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
 
     // Construct an AST with NOT(sub_type = task) via JSON deserialization
     // This tests the fix for NULL handling: NOT (dt.sub_type IS NOT NULL AND dt.sub_type = 'task')
@@ -5980,7 +5980,7 @@ async fn run_and_count(
     db: &PgPool,
     ast: EntityFilterAst,
 ) -> anyhow::Result<(Vec<SoupItem>, usize, usize, usize)> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_dynamic_cursor_soup(
         db,
         ExpandedDynamicCursorArgs {
@@ -6660,7 +6660,7 @@ async fn run_notification_filter(
     db: &PgPool,
     ast: EntityFilterAst,
 ) -> anyhow::Result<HashSet<Uuid>> {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap();
     let items = expanded_dynamic_cursor_soup(
         db,
         ExpandedDynamicCursorArgs {
@@ -7054,7 +7054,7 @@ async fn crm_document_literals_match_attachments_and_associations(
         email::Email,
         properties::{EntityRefId, PropertiesLiteral, PropertyMatchValue},
     };
-    use macro_user_id::email::EmailStr;
+    use rox_user_id::email::EmailStr;
 
     let company = Uuid::now_v7();
     seed_crm_document_associations(&db, company).await?;

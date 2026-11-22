@@ -62,7 +62,7 @@ fn request(mcp_tools: Option<RemoteMcpToolSet>) -> TurnRequest {
         purpose: TurnPurpose::Conversation,
         session_id: AgentSessionId::new(),
         awaiting: Arc::new(AwaitingUser::default()),
-        owner: Owner::User(MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()),
+        owner: Owner::User(RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()),
         model: "unused".into(),
         reasoning_effort: Default::default(),
         speed: Default::default(),
@@ -154,7 +154,7 @@ async fn unseen_turns_get_only_code_mode() {
     let refused = AiToolSet::<()>::dispatch_tool_call(
         &set,
         (),
-        RequestContext::new(MacroUserIdStr::try_from_email("owner@example.com").unwrap()),
+        RequestContext::new(RoxUserIdStr::try_from_email("owner@example.com").unwrap()),
         "mcp__macro_internal__PresentReview",
         &serde_json::json!({}),
     )

@@ -1,6 +1,6 @@
 import { UserCardTrigger } from '@core/component/UserCardTrigger';
 import { getDisplayNameParts, macroIdToEmail, tryMacroId } from '@core/user';
-import type { UserMentionDecoratorProps } from '@macro-inc/lexical-core';
+import type { UserMentionDecoratorProps } from '@rox-one/lexical-core';
 import { useBotProfile } from '@queries/bots/profiles';
 import { queryReadyGate } from '@queries/gate';
 import { cn } from '@ui';

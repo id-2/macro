@@ -2,42 +2,42 @@ use super::*;
 use models_properties::service::property_change_source::{GithubAccount, PropertyChangeSource};
 
 // ---------------------------------------------------------------------------
-// MacroTaskId::from_short_uuid
+// RoxTaskId::from_short_uuid
 // ---------------------------------------------------------------------------
 
 #[test]
 fn from_short_uuid_valid() {
-    let task_id = MacroTaskId::from_short_uuid("2BuyvtY3ae").unwrap();
+    let task_id = RoxTaskId::from_short_uuid("2BuyvtY3ae").unwrap();
     assert_eq!(task_id.short_uuid, "2BuyvtY3ae");
 }
 
 #[test]
 fn from_short_uuid_rejects_empty() {
-    assert!(MacroTaskId::from_short_uuid("").is_none());
+    assert!(RoxTaskId::from_short_uuid("").is_none());
 }
 
 #[test]
 fn from_short_uuid_rejects_invalid_chars() {
     // 'O', 'I', 'l', '0' are not in Flickr base58
-    assert!(MacroTaskId::from_short_uuid("OOOOO").is_none());
-    assert!(MacroTaskId::from_short_uuid("IIIlll").is_none());
-    assert!(MacroTaskId::from_short_uuid("000abc").is_none());
+    assert!(RoxTaskId::from_short_uuid("OOOOO").is_none());
+    assert!(RoxTaskId::from_short_uuid("IIIlll").is_none());
+    assert!(RoxTaskId::from_short_uuid("000abc").is_none());
 }
 
 #[test]
 fn from_short_uuid_rejects_too_long() {
     let long = "a".repeat(25);
-    assert!(MacroTaskId::from_short_uuid(&long).is_none());
+    assert!(RoxTaskId::from_short_uuid(&long).is_none());
 }
 
 // ---------------------------------------------------------------------------
-// MacroTaskId::from_uuid / to_uuid roundtrip
+// RoxTaskId::from_uuid / to_uuid roundtrip
 // ---------------------------------------------------------------------------
 
 #[test]
 fn roundtrip_uuid_conversion() {
     let uuid = uuid::Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap();
-    let task_id = MacroTaskId::from_uuid(&uuid);
+    let task_id = RoxTaskId::from_uuid(&uuid);
     assert_eq!(task_id.short_uuid, "2BuyvtY3aeEvHx4uG8iD51");
 
     let recovered = task_id.to_uuid().unwrap();
@@ -46,18 +46,18 @@ fn roundtrip_uuid_conversion() {
 
 #[test]
 fn to_task_id_string() {
-    let task_id = MacroTaskId::from_short_uuid("2BuyvtY3ae").unwrap();
+    let task_id = RoxTaskId::from_short_uuid("2BuyvtY3ae").unwrap();
     assert_eq!(task_id.to_task_id_string(), "MACRO-2BuyvtY3ae");
 }
 
 #[test]
 fn display_impl() {
-    let task_id = MacroTaskId::from_short_uuid("abc123").unwrap();
+    let task_id = RoxTaskId::from_short_uuid("abc123").unwrap();
     assert_eq!(format!("{task_id}"), "MACRO-abc123");
 }
 
 // ---------------------------------------------------------------------------
-// MacroTaskId::extract_from_text
+// RoxTaskId::extract_from_text
 // ---------------------------------------------------------------------------
 
 const SHORT_UUID_A: &str = "2BuyvtY3aeEvHx4uG8iD51";
@@ -69,7 +69,7 @@ fn extract_case_insensitive() {
     let text = format!(
         "fixes MACRO-{SHORT_UUID_A} and also macro-{SHORT_UUID_B} and Macro-{SHORT_UUID_C}"
     );
-    let ids = MacroTaskId::extract_from_text(&text);
+    let ids = RoxTaskId::extract_from_text(&text);
     assert_eq!(ids.len(), 3);
     assert_eq!(ids[0].short_uuid, SHORT_UUID_A);
     assert_eq!(ids[1].short_uuid, SHORT_UUID_B);
@@ -79,7 +79,7 @@ fn extract_case_insensitive() {
 #[test]
 fn extract_deduplicates() {
     let text = format!("MACRO-{SHORT_UUID_A} and macro-{SHORT_UUID_A} again MACRO-{SHORT_UUID_A}");
-    let ids = MacroTaskId::extract_from_text(&text);
+    let ids = RoxTaskId::extract_from_text(&text);
     // Same short UUID captured, only first occurrence kept
     assert_eq!(ids.len(), 1);
     assert_eq!(ids[0].short_uuid, SHORT_UUID_A);
@@ -88,28 +88,28 @@ fn extract_deduplicates() {
 #[test]
 fn extract_keeps_uuid_v7_task_ids() {
     let uuid = uuid::Uuid::parse_str("01a121dc-e36b-7d71-b4f1-d1d55b70820c").unwrap();
-    let task_id = MacroTaskId::from_uuid(&uuid);
-    let ids = MacroTaskId::extract_from_text(&format!("closes {task_id}"));
+    let task_id = RoxTaskId::from_uuid(&uuid);
+    let ids = RoxTaskId::extract_from_text(&format!("closes {task_id}"));
     assert_eq!(ids, [task_id]);
 }
 
 #[test]
 fn extract_ignores_short_ids_that_are_not_uuids() {
     // Each decodes to a small integer such as 00000000-0000-0000-0000-000166f86534.
-    let ids = MacroTaskId::extract_from_text("fixes MACRO-abc123 and macro-2BuyvtY3ae");
+    let ids = RoxTaskId::extract_from_text("fixes MACRO-abc123 and macro-2BuyvtY3ae");
     assert!(ids.is_empty());
 }
 
 #[test]
 fn extract_ignores_macro_inc_org_in_github_urls() {
     let text = "See https://github.com/macro-inc/macro/pull/7882 for context";
-    assert!(MacroTaskId::extract_from_text(text).is_empty());
+    assert!(RoxTaskId::extract_from_text(text).is_empty());
 }
 
 #[test]
 fn extract_ignores_team_task_numbers() {
     let text = "synoet/macro-3692-on-main";
-    assert!(MacroTaskId::extract_from_text(text).is_empty());
+    assert!(RoxTaskId::extract_from_text(text).is_empty());
     assert_eq!(
         TeamTaskReference::extract_from_text(text),
         vec![TeamTaskReference::new("macro", 3692).unwrap()]
@@ -119,7 +119,7 @@ fn extract_ignores_team_task_numbers() {
 #[test]
 fn extract_no_match() {
     let text = "no task ids here, just MACR-123 or MACRO- or MACRO";
-    let ids = MacroTaskId::extract_from_text(text);
+    let ids = RoxTaskId::extract_from_text(text);
     assert!(ids.is_empty());
 }
 
@@ -128,14 +128,14 @@ fn extract_ignores_invalid_base58_chars() {
     // '0', 'O', 'I', 'l' are not in Flickr base58
     // "MACRO-000abc" -> regex captures "000abc" but from_short_uuid rejects it
     let text = "MACRO-000abc";
-    let ids = MacroTaskId::extract_from_text(text);
+    let ids = RoxTaskId::extract_from_text(text);
     assert!(ids.is_empty());
 }
 
 #[test]
 fn extract_from_branch_name() {
     let text = format!("feature/macro-{SHORT_UUID_A}");
-    let ids = MacroTaskId::extract_from_text(&text);
+    let ids = RoxTaskId::extract_from_text(&text);
     assert_eq!(ids.len(), 1);
     assert_eq!(ids[0].short_uuid, SHORT_UUID_A);
 }
@@ -143,7 +143,7 @@ fn extract_from_branch_name() {
 #[test]
 fn extract_multiple_in_sentence() {
     let text = format!("closes MACRO-{SHORT_UUID_A} and MACRO-{SHORT_UUID_B}");
-    let ids = MacroTaskId::extract_from_text(&text);
+    let ids = RoxTaskId::extract_from_text(&text);
     assert_eq!(ids.len(), 2);
     assert_eq!(ids[0].short_uuid, SHORT_UUID_A);
     assert_eq!(ids[1].short_uuid, SHORT_UUID_B);
@@ -611,7 +611,7 @@ fn github_mentions_does_not_capture_trailing_hyphen() {
 
 #[test]
 fn pull_request_task_reference_prefers_the_team_reference() {
-    let task = MacroTaskId::from_short_uuid("2BuyvtY3ae").unwrap();
+    let task = RoxTaskId::from_short_uuid("2BuyvtY3ae").unwrap();
     let team = TeamTaskReference::new("ENG_CORE", 42).unwrap();
     let reference = pull_request_task_reference(&task, Some(&team));
     assert_eq!(reference, "ENG_CORE-42");
@@ -620,7 +620,7 @@ fn pull_request_task_reference_prefers_the_team_reference() {
 
 #[test]
 fn pull_request_task_reference_falls_back_to_the_macro_id() {
-    let task = MacroTaskId::from_short_uuid(SHORT_UUID_A).unwrap();
+    let task = RoxTaskId::from_short_uuid(SHORT_UUID_A).unwrap();
     assert_eq!(
         pull_request_task_reference(&task, None),
         format!("MACRO-{SHORT_UUID_A}")
@@ -629,7 +629,7 @@ fn pull_request_task_reference_falls_back_to_the_macro_id() {
     let unreadable = TeamTaskReference::new("A_VERY_LONG_TEAM_SLUG_NAME", 7).unwrap();
     let reference = pull_request_task_reference(&task, Some(&unreadable));
     assert_eq!(reference, format!("MACRO-{SHORT_UUID_A}"));
-    assert_eq!(MacroTaskId::extract_from_text(&reference), [task]);
+    assert_eq!(RoxTaskId::extract_from_text(&reference), [task]);
 }
 
 #[test]

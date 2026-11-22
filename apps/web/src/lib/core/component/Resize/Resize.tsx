@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { createElementSize } from '@solid-primitives/resize-observer';
 import { cn } from '@ui/utils/classname';
 import {
@@ -585,7 +586,11 @@ export function Gutter(props: GutterProps) {
       aria-orientation={horizontal() ? 'vertical' : 'horizontal'}
       aria-hidden={!props.resizable}
       tabIndex={props.resizable ? 0 : undefined}
-      aria-label={props.resizable ? `resize at ${props.index}` : undefined}
+      aria-label={
+        props.resizable
+          ? t('common.resizeAt', { index: props.index })
+          : undefined
+      }
       style={{
         position: 'absolute',
         // Inline, so a gutter inside a pass-through box still takes the drag.

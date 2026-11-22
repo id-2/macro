@@ -12,8 +12,8 @@ use serde_json::json;
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
-pub fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|routine-owner@rox.one").unwrap()
+pub fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|routine-owner@rox.one").unwrap()
 }
 
 pub fn incoming() -> IncomingEvent {
@@ -56,7 +56,7 @@ pub fn pending(configuration: &EventActionConfiguration) -> PendingEventRun {
     }
 }
 
-pub fn capability(owner: MacroUserIdStr<'static>, event: &EventReference) -> EventAccessCapability {
+pub fn capability(owner: RoxUserIdStr<'static>, event: &EventReference) -> EventAccessCapability {
     match event.source() {
         EventSource::Github(delivery) => {
             return EventAccessCapability::GithubInstallation {
@@ -128,12 +128,12 @@ pub struct Access {
     pub denied: Mutex<bool>,
     pub unavailable: Mutex<bool>,
     pub override_receipt: Mutex<Option<EventAccessCapability>>,
-    pub calls: Mutex<Vec<MacroUserIdStr<'static>>>,
+    pub calls: Mutex<Vec<RoxUserIdStr<'static>>>,
 }
 impl CurrentOwnerAccess for Access {
     async fn authorize(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         event: &EventReference,
     ) -> Result<Option<EventAccessCapability>, Report> {
         self.calls.lock().unwrap().push(owner.clone());
@@ -444,7 +444,7 @@ pub struct Conditions {
 impl EventConditionCheck for Conditions {
     async fn check(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
         conditions: &[jev::domain::YesNoQuestion],
     ) -> Result<ConditionVerdict, ConditionError> {
@@ -476,7 +476,7 @@ pub struct Rollout(pub Option<bool>);
 pub const ROLLED_OUT: Rollout = Rollout(Some(true));
 
 impl crate::domain::event_rollout::EventRoutineRollout for Rollout {
-    async fn enabled_for(&self, _user: &MacroUserIdStr<'_>) -> Result<bool, Report> {
+    async fn enabled_for(&self, _user: &RoxUserIdStr<'_>) -> Result<bool, Report> {
         self.0
             .ok_or_else(|| rootcause::report!("flags unavailable"))
     }

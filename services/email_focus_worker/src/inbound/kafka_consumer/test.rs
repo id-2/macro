@@ -2,12 +2,12 @@ use chrono::Utc;
 use email::domain::events::{
     EmailEventOrigin, MessageReceivedMetadata, MessageSentMetadata, ThreadReadMetadata,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@acme.example").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@acme.example").unwrap()
 }
 
 fn received(thread_id: Uuid, is_spam_or_trash: bool) -> EmailTopicEvent {

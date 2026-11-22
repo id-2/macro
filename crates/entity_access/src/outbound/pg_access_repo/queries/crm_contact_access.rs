@@ -5,7 +5,7 @@ mod test;
 
 use crate::domain::models::{AccessLevel, CrmEntityAccess, TeamRole};
 use crate::outbound::pg_access_repo::queries::crm_company_access::team_role_to_access_level;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -22,7 +22,7 @@ use uuid::Uuid;
 pub async fn get_crm_contact_access(
     pool: &PgPool,
     contact_id: &Uuid,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Option<CrmEntityAccess>, sqlx::Error> {
     let row = sqlx::query!(
         r#"

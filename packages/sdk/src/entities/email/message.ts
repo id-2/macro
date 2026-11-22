@@ -13,9 +13,9 @@ import type {
   TransferDraftResponse,
 } from '../../../generated/email/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Document } from '../documents/document';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { EmailAttachment } from './attachment';
 import type { Label } from './label';
 import { Link } from './link';
@@ -55,12 +55,12 @@ type AttachmentRecord = ThreadMessages[number]['attachments'][number];
 // records are kept, for the most recent threads.
 const MAX_REMEMBERED_THREADS = 50;
 const rememberedThreads = new WeakMap<
-  MacroClient,
+  RoxClient,
   Map<string, Promise<Map<string, AttachmentRecord[]> | undefined>>
 >();
 
 async function readThreadMessages(
-  client: MacroClient,
+  client: RoxClient,
   threadId: string,
 ): Promise<ThreadMessages> {
   const { thread } = unwrap(
@@ -91,7 +91,7 @@ async function sentAttachments(
 }
 
 async function messageAttachments(
-  client: MacroClient,
+  client: RoxClient,
   threadId: string,
   messageId: string,
 ): Promise<AttachmentRecord[] | undefined> {
@@ -207,7 +207,7 @@ export interface SentEmail {
  * A message in an email thread. A thin handle keyed by message id; the
  * record loads lazily on first field access.
  */
-export class EmailMessage extends MacroEntity<EmailMessageData> {
+export class EmailMessage extends RoxEntity<EmailMessageData> {
   protected async fetch(): Promise<EmailMessageData> {
     return unwrap(
       await this.client.email.getMessage({ path: { id: this.id } }),
@@ -215,12 +215,12 @@ export class EmailMessage extends MacroEntity<EmailMessageData> {
   }
 
   /** A handle to a message by id. Fields load on first access. */
-  static byId(client: MacroClient, id: string): EmailMessage {
+  static byId(client: RoxClient, id: string): EmailMessage {
     return new EmailMessage(client, id);
   }
 
   /** Build a message from an already-fetched record (pre-seeded, no fetch). */
-  static from(client: MacroClient, data: EmailMessageData): EmailMessage {
+  static from(client: RoxClient, data: EmailMessageData): EmailMessage {
     return new EmailMessage(client, data.db_id, data);
   }
 
@@ -230,7 +230,7 @@ export class EmailMessage extends MacroEntity<EmailMessageData> {
    * Returns a handle when the API reports the created message's id.
    */
   static async send(
-    client: MacroClient,
+    client: RoxClient,
     opts: SendEmailOptions,
   ): Promise<EmailMessage | undefined> {
     const { message } = unwrap(
@@ -252,7 +252,7 @@ export class EmailMessage extends MacroEntity<EmailMessageData> {
 
   /** Send an email the user approved in conversation, quoting their approval; see `EmailNamespace.sendConfirmed`. */
   static async sendConfirmed(
-    client: MacroClient,
+    client: RoxClient,
     opts: ConfirmedEmailOptions,
   ): Promise<SentEmail> {
     const email: SendEmail = {
@@ -273,7 +273,7 @@ export class EmailMessage extends MacroEntity<EmailMessageData> {
 
   /** @internal Run the SendConfirmedEmail tool with a SendEmail draft and its approval. */
   private static async sendReviewedDraft(
-    client: MacroClient,
+    client: RoxClient,
     email: SendEmail,
     userConfirmation: string,
   ): Promise<SentEmail> {

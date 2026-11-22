@@ -1,6 +1,6 @@
 use std::{future::Future, pin::Pin, sync::Arc};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use scheduled_action::domain::{models::ScheduledAction, ports::ScheduledActionReadService};
 
@@ -8,7 +8,7 @@ pub(crate) type ListFuture<'a> =
     Pin<Box<dyn Future<Output = Result<Vec<ScheduledAction>, Report>> + Send + 'a>>;
 
 pub(crate) trait ScheduledActionReader: Send + Sync {
-    fn list_accessible(&self, user_id: MacroUserIdStr<'static>) -> ListFuture<'_>;
+    fn list_accessible(&self, user_id: RoxUserIdStr<'static>) -> ListFuture<'_>;
 }
 
 /// Type-erased routine reader stored in GraphQL request data.
@@ -27,7 +27,7 @@ struct ReadServiceAdapter<S> {
 }
 
 impl<S: ScheduledActionReadService> ScheduledActionReader for ReadServiceAdapter<S> {
-    fn list_accessible(&self, user_id: MacroUserIdStr<'static>) -> ListFuture<'_> {
+    fn list_accessible(&self, user_id: RoxUserIdStr<'static>) -> ListFuture<'_> {
         let service = Arc::clone(&self.service);
         Box::pin(async move { service.list_accessible(user_id).await })
     }

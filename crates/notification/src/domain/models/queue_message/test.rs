@@ -67,7 +67,7 @@ fn test_ingress_queue_message_round_trip() {
     }
 
     let recipient =
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("user@example.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("user@example.com").unwrap();
 
     let request = SendNotificationRequestBuilder {
         notification_entity: EntityType::Document.with_entity_str("doc_1"),

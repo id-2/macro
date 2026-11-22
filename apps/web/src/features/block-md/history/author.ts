@@ -2,7 +2,7 @@ import {
   isBotPrincipalId,
   MACRO_AGENT_BOT_ID,
 } from '@core/constant/macroAgent';
-import { isAiPeer } from '@macro-inc/collaboration/collab/ai-peer';
+import { isAiPeer } from '@rox-one/collaboration/collab/ai-peer';
 import { usePropertyUserDisplay } from '@property/hooks/usePropertyUserDisplay';
 import type { Accessor } from 'solid-js';
 import { AI_AUTHOR_PREFIX, aiAuthorOnBehalfOf, userLabel } from './utils';

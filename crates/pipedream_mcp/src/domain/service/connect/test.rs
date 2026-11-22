@@ -1,11 +1,11 @@
 use super::*;
 use crate::domain::models::{ConnectToken, ConnectorOverlay, PipedreamAccount};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use std::collections::HashMap;
 use std::sync::Mutex;
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
 #[derive(Default)]
@@ -26,7 +26,7 @@ impl ConnectionStore for FakeStore {
 
     async fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> Result<Option<PipedreamConnection>, Self::Err> {
         Ok(self
@@ -39,7 +39,7 @@ impl ConnectionStore for FakeStore {
 
     async fn delete(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> Result<(), Self::Err> {
         self.records
@@ -51,7 +51,7 @@ impl ConnectionStore for FakeStore {
 
     async fn list(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<PipedreamConnection>, Self::Err> {
         Ok(self
             .records
@@ -97,8 +97,8 @@ impl FakePipedream {
     }
 }
 
-impl MacroConnect for FakePipedream {
-    async fn connect_only(&self, _user_id: &MacroUserIdStr<'static>) -> bool {
+impl RoxConnect for FakePipedream {
+    async fn connect_only(&self, _user_id: &RoxUserIdStr<'static>) -> bool {
         true
     }
 
@@ -108,7 +108,7 @@ impl MacroConnect for FakePipedream {
 
     async fn create_connect_session(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app: &ConnectApp,
     ) -> anyhow::Result<String> {
         Ok(format!(
@@ -119,7 +119,7 @@ impl MacroConnect for FakePipedream {
 
     async fn is_connected(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_id: &str,
     ) -> anyhow::Result<bool> {
         Ok(self
@@ -131,7 +131,7 @@ impl MacroConnect for FakePipedream {
 
     async fn delete_connection(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_id: &str,
     ) -> anyhow::Result<()> {
         self.connect_deleted

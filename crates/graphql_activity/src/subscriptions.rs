@@ -11,14 +11,14 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use graphql_common::require_authenticated_user;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{marker::PhantomData, sync::Arc};
 use tokio_stream::Stream;
 
 /// Check retained activity through the current entity permission service.
 pub async fn record_visible<A: EntityAccessService>(
     access: &A,
-    viewer: &MacroUserIdStr<'_>,
+    viewer: &RoxUserIdStr<'_>,
     record: &activity::ActivityRecord,
 ) -> async_graphql::Result<bool> {
     if !activity::domain::visible_reads::requires_current_visibility(record.entity_type) {

@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "ALTER TABLE team_user DROP CONSTRAINT team_user_user_id_unique",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "256d0b290a5649a1b4907a3937d6cf2a78fbefc1a8d680a1624168288626f4bd"
+}

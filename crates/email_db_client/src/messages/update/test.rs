@@ -2,7 +2,7 @@ use super::{mark_message_as_sent, set_flags_from_labels};
 use crate::messages::get::fetch_messages_metadata;
 use crate::threads::get::get_thread_by_id_and_link_id;
 use crate::threads::update::update_thread_metadata;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_email::service::message::Message;
 use sqlx::{PgConnection, PgPool, types::Uuid};
 

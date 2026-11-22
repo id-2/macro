@@ -21,7 +21,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     if !ctx.features.contacts_sync {
         return Ok(());
@@ -58,13 +58,13 @@ where
 
 /// Parse contact identities, skipping malformed addresses without logging their values.
 pub fn build_contact_connections<'a>(
-    _owner: &MacroUserIdStr<'static>,
+    _owner: &RoxUserIdStr<'static>,
     link_id: Uuid,
     emails: impl IntoIterator<Item = &'a str>,
-) -> Vec<MacroUserIdStr<'static>> {
+) -> Vec<RoxUserIdStr<'static>> {
     emails
         .into_iter()
-        .filter_map(|email| match MacroUserIdStr::try_from_email(email) {
+        .filter_map(|email| match RoxUserIdStr::try_from_email(email) {
             Ok(contact) => Some(contact),
             // The parse error echoes the address, so it stays out of the log.
             Err(_) => {
@@ -90,7 +90,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     enqueue_crm_contacts(link_id, self_email, contacts, is_sent, |message| async {
         ctx.queue

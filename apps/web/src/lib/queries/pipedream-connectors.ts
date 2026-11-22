@@ -9,7 +9,7 @@ import { assignOauthUrl, reserveOauthPopup } from '@core/pipedream/oauth-popup';
 import { pipedreamSlugsMatch } from '@core/pipedream/slugs';
 import { isTauri } from '@core/util/platform';
 import { ThrownResultError, throwOnErr } from '@core/util/result';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { authKeys } from '@queries/auth/keys';
 import type { UserInfoData } from '@queries/auth/user-info';
 import { queryClient } from '@queries/client';

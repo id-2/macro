@@ -1,6 +1,7 @@
 import CorvuCalendar, {
   type RootSingleProps as CorvuCalendarRootSingleProps,
 } from '@corvu/calendar';
+import { formatLocale } from '@app/lib/i18n';
 import ArrowDownIcon from '@icon/system/regular/arrow-down.svg';
 import ArrowUpIcon from '@icon/system/regular/arrow-up.svg';
 import CaretDownIcon from '@icon/system/regular/caret-down.svg';
@@ -21,12 +22,22 @@ import { cn } from '../utils/classname';
 import { Button } from './Button';
 import { Dropdown } from './Dropdown';
 
-const formatWeekdayLong = new Intl.DateTimeFormat(undefined, {
-  weekday: 'long',
-}).format;
-const formatWeekdayNarrow = new Intl.DateTimeFormat(undefined, {
-  weekday: 'narrow',
-}).format;
+const weekdayFormatters = new Map<string, Intl.DateTimeFormat>();
+
+function weekdayFormatter(width: 'long' | 'narrow'): Intl.DateTimeFormat {
+  const locale = formatLocale();
+  const key = `${locale}|${width}`;
+  let formatter = weekdayFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, { weekday: width });
+    weekdayFormatters.set(key, formatter);
+  }
+  return formatter;
+}
+
+const formatWeekdayLong = (date: Date) => weekdayFormatter('long').format(date);
+const formatWeekdayNarrow = (date: Date) =>
+  weekdayFormatter('narrow').format(date);
 
 type HighlightedRange = { start: Date; end: Date };
 
@@ -174,10 +185,12 @@ const MONTH_RANGE_YEARS = 100;
 const MONTH_OPTION_HEIGHT = 32;
 const DRAWER_MONTH_OPTION_HEIGHT = 44;
 
-export const formatCalendarMonth = new Intl.DateTimeFormat(undefined, {
-  month: 'long',
-  year: 'numeric',
-}).format;
+export function formatCalendarMonth(date: Date): string {
+  return new Intl.DateTimeFormat(formatLocale(), {
+    month: 'long',
+    year: 'numeric',
+  }).format(date);
+}
 
 type MonthOption = {
   date: Date;

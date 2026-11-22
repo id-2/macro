@@ -8,7 +8,7 @@ use std::pin::Pin;
 
 use document_sub_type::DocumentSubType;
 use entity_access::domain::models::EntityType as AccessEntityType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::document_metadata::DocumentMetadata;
 use models_properties::service::entity_property::EntityProperty;
 use models_properties::service::entity_property_with_definition::EntityPropertyWithDefinition;
@@ -53,7 +53,7 @@ pub trait PropertiesRepo: Send + Sync + 'static {
     fn get_property_definition_with_owner<'a>(
         &self,
         property_definition_id: Uuid,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         team_id: Option<Uuid>,
     ) -> impl Future<Output = Result<Option<PropertyDefinition>, Self::Err>> + Send;
 
@@ -65,7 +65,7 @@ pub trait PropertiesRepo: Send + Sync + 'static {
     fn list_property_definitions<'a>(
         &self,
         team_id: Option<Uuid>,
-        user_id: Option<&'a MacroUserIdStr<'a>>,
+        user_id: Option<&'a RoxUserIdStr<'a>>,
         include_system: bool,
     ) -> impl Future<Output = Result<Vec<PropertyDefinition>, Self::Err>> + Send;
 
@@ -77,7 +77,7 @@ pub trait PropertiesRepo: Send + Sync + 'static {
     fn list_property_definitions_with_options<'a>(
         &self,
         team_id: Option<Uuid>,
-        user_id: Option<&'a MacroUserIdStr<'a>>,
+        user_id: Option<&'a RoxUserIdStr<'a>>,
         include_system: bool,
     ) -> impl Future<Output = Result<Vec<PropertyDefinitionWithOptions>, Self::Err>> + Send;
 
@@ -155,7 +155,7 @@ pub trait PropertiesRepo: Send + Sync + 'static {
     fn get_visible_property_options_batch<'a>(
         &self,
         property_definition_ids: &[Uuid],
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         team_id: Option<Uuid>,
     ) -> impl Future<Output = Result<HashMap<Uuid, Vec<PropertyOption>>, Self::Err>> + Send;
 
@@ -391,7 +391,7 @@ pub trait PropertiesRepo: Send + Sync + 'static {
         &self,
         entity_refs: Vec<EntityReference>,
         property_ids: Vec<Uuid>,
-        tag_viewer_user_id: Option<&'a MacroUserIdStr<'a>>,
+        tag_viewer_user_id: Option<&'a RoxUserIdStr<'a>>,
     ) -> impl Future<
         Output = Result<HashMap<EntityPropertiesKey, Vec<EntityPropertyWithDefinition>>, Self::Err>,
     > + Send;
@@ -475,7 +475,7 @@ pub trait PermissionService: Send + Sync + 'static {
     #[allow(clippy::needless_lifetimes)]
     fn mint_view_receipt<'a>(
         &self,
-        user_id: Option<&'a MacroUserIdStr<'a>>,
+        user_id: Option<&'a RoxUserIdStr<'a>>,
         entity_id: &str,
         entity_type: AccessEntityType,
     ) -> impl Future<Output = Result<ViewReceipt, Self::Err>> + Send;
@@ -486,7 +486,7 @@ pub trait PermissionService: Send + Sync + 'static {
     #[allow(clippy::needless_lifetimes)]
     fn mint_edit_receipt<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         entity_id: &str,
         entity_type: AccessEntityType,
     ) -> impl Future<Output = Result<EditReceipt, Self::Err>> + Send;
@@ -495,7 +495,7 @@ pub trait PermissionService: Send + Sync + 'static {
     /// This is used when task assignees are updated to ensure they can edit the task.
     fn grant_permissions_to_task<'a>(
         &self,
-        user_ids: &[MacroUserIdStr<'a>],
+        user_ids: &[RoxUserIdStr<'a>],
         task_id: &str,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 }
@@ -525,6 +525,6 @@ pub trait InitiativeAssigneeService: std::fmt::Debug + Send + Sync + 'static {
     fn grant_assignees<'a>(
         &'a self,
         access: &'a EditReceipt,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> Pin<Box<dyn Future<Output = Result<(), super::error::PropertiesErr>> + Send + 'a>>;
 }

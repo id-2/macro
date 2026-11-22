@@ -5,7 +5,7 @@
  * what was decided and why. All of it through ports, so a test can run a
  * tick against fakes.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import {
   arbitrate,
   type Decided,

@@ -7,8 +7,8 @@ use lambda_runtime::{
     Error, LambdaEvent, run, service_fn,
     tracing::{self},
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_env_var::env_vars;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env_var::env_vars;
 use models_bulk_upload::UploadFolderStatus;
 use serde::{Deserialize, Serialize};
 
@@ -92,15 +92,15 @@ env_vars! {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     tracing::info!("initiating lambda");
 
     let dynamo_table_name = DynamodbTable::new().context("DYNAMODB_TABLE must be set")?;
-    let upload_extract_queue = macro_queues::UploadExtractorQueue::new();
+    let upload_extract_queue = rox_queues::UploadExtractorQueue::new();
 
     tracing::trace!("initialized env vars");
 
-    let config = macro_aws_config::get_macro_aws_config().await;
+    let config = rox_aws_config::get_macro_aws_config().await;
     let dynamodb_client = DynamodbClient::new(&config, Some(dynamo_table_name.to_string()));
 
     tracing::trace!("initialized dynamodb client");

@@ -1,7 +1,7 @@
 use super::*;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 #[test]

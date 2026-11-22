@@ -10,7 +10,7 @@ use crate::outbound::{
     companies_repo::CompaniesRepositoryImpl, no_op_resolver::NoOpCompanyMetadataResolver,
 };
 use entity_access::domain::models::{EditAccessLevel, TeamRole};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

@@ -1,8 +1,8 @@
 //! Append-only Postgres financial evidence, separate from the mutable analytics adapter.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, types::Json};
 
@@ -388,7 +388,7 @@ impl RequestData {
         Ok(BeginInvocation {
             run_id: self.run_id.try_into()?,
             invocation_id: self.invocation_id.try_into()?,
-            user: MacroUserIdStr::try_from(self.user_id).map_err(|error| {
+            user: RoxUserIdStr::try_from(self.user_id).map_err(|error| {
                 FinancialError::Infrastructure(rootcause::report!(error).into_dynamic())
             })?,
             feature: self.feature,

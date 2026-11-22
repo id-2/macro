@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::Correlation;
 use async_trait::async_trait;
 use axum::http::Request;
-use macro_auth::macro_api_token::{EncodeMacroApiTokenArgs, encode_macro_api_token};
+use rox_auth::macro_api_token::{EncodeRoxApiTokenArgs, encode_macro_api_token};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 const PRIVATE: &str = include_str!(
@@ -45,7 +45,7 @@ fn mint(
     routine: Option<Uuid>,
     scope: Option<&str>,
 ) -> String {
-    encode_macro_api_token(EncodeMacroApiTokenArgs {
+    encode_macro_api_token(EncodeRoxApiTokenArgs {
         fusionauth_id: "fixture".into(),
         macro_user_id: "macro|owner@example.com".into(),
         organization_id: None,
@@ -463,7 +463,7 @@ async fn a_service_without_a_database_enforces_the_signed_scope() {
 }
 
 /// The scope check reads the request's credentials as authentication does,
-/// through `macro_auth::credential`, and holds the request to every scope
+/// through `rox_auth::credential`, and holds the request to every scope
 /// any verified token in it signs: a scoped token in the ambient cookie
 /// scopes the request whatever else it carries, however the query spells
 /// its key. Tokens of different users are refused.
@@ -492,7 +492,7 @@ async fn a_scoped_token_in_the_cookie_scopes_the_request_whatever_else_it_carrie
         None,
         None,
     );
-    let someone_else = encode_macro_api_token(EncodeMacroApiTokenArgs {
+    let someone_else = encode_macro_api_token(EncodeRoxApiTokenArgs {
         fusionauth_id: "fixture".into(),
         macro_user_id: "macro|someone@example.com".into(),
         organization_id: None,
@@ -507,7 +507,7 @@ async fn a_scoped_token_in_the_cookie_scopes_the_request_whatever_else_it_carrie
         agent_scope: None,
     })
     .unwrap();
-    let cookie_name = macro_auth::credential::access_token_cookie_name();
+    let cookie_name = rox_auth::credential::access_token_cookie_name();
     let scoped_cookie = format!("{cookie_name}={scoped}");
     let cases: Vec<(String, Option<String>, Option<String>, StatusCode)> = vec![
         (
@@ -608,7 +608,7 @@ async fn a_scoped_token_in_the_cookie_scopes_the_request_whatever_else_it_carrie
     }
 }
 
-/// `propagate` alone, on a route that reads no `MacroAuthorization`, refuses
+/// `propagate` alone, on a route that reads no `RoxAuthorization`, refuses
 /// tokens of different users before the handler runs, in any pairing of
 /// bearer, query parameter and cookie; one user's tokens pass.
 #[tokio::test]
@@ -635,7 +635,7 @@ async fn propagate_refuses_tokens_of_different_users() {
         )
         .layer(axum::middleware::from_fn_with_state(state, propagate));
     let owner = token(None, None);
-    let someone_else = encode_macro_api_token(EncodeMacroApiTokenArgs {
+    let someone_else = encode_macro_api_token(EncodeRoxApiTokenArgs {
         fusionauth_id: "fixture".into(),
         macro_user_id: "macro|someone@example.com".into(),
         organization_id: None,
@@ -653,7 +653,7 @@ async fn propagate_refuses_tokens_of_different_users() {
     let cookie = |token: &str| {
         format!(
             "{}={token}",
-            macro_auth::credential::access_token_cookie_name()
+            rox_auth::credential::access_token_cookie_name()
         )
     };
     type Case<'a> = (String, Vec<(&'a str, String)>, StatusCode);
@@ -814,4 +814,36 @@ async fn ordinary_agents_reach_policy_put_while_restricted_agents_do_not() {
             "{scope:?}",
         );
     }
+}
+
+/// The display verb is read under its current name first and its earlier
+/// name when a client predates the rename.
+#[test]
+fn the_sdk_verb_prefers_the_current_header_and_reads_the_old_one() {
+    let verb = |pairs: &[(&str, &str)]| {
+        let mut builder = Request::builder().uri("/");
+        for (name, value) in pairs {
+            builder = builder.header(*name, *value);
+        }
+        let (parts, _) = builder.body(()).unwrap().into_parts();
+        sdk_verb(&parts)
+    };
+
+    assert_eq!(
+        verb(&[(SDK_VERB_HEADER, "created")]),
+        Some(crate::AgentVerb::Created)
+    );
+    assert_eq!(
+        verb(&[(LEGACY_SDK_VERB_HEADER, "edited")]),
+        Some(crate::AgentVerb::Edited)
+    );
+    assert_eq!(
+        verb(&[
+            (SDK_VERB_HEADER, "created"),
+            (LEGACY_SDK_VERB_HEADER, "edited")
+        ]),
+        Some(crate::AgentVerb::Created),
+        "the current name wins when both are present"
+    );
+    assert_eq!(verb(&[]), None);
 }

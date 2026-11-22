@@ -749,7 +749,7 @@ describe('draft queue recovery', () => {
   });
   it('reports a rejected discard without draft content', async () => {
     // The module registry is reset per test; spy on the runtime's instance.
-    const { Telemetry } = await import('@macro-inc/observability');
+    const { Telemetry } = await import('@rox-one/observability');
     const warn = vi.spyOn(Telemetry, 'warn').mockImplementation(() => {});
     const draft = await runtime.saveLocalDraft(input('Private subject'));
     const deleting = await runtime.beginDraftAttempt(draft, 'delete');

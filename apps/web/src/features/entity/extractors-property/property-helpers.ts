@@ -2,6 +2,7 @@ import {
   NUMBER_DECIMAL_PLACES,
   PROPERTY_OPTION_IDS,
   SYSTEM_PROPERTY_IDS,
+  systemPropertyDisplayName,
 } from '@property/constants';
 import type { Property, PropertyOption, ValueType } from '@property/types';
 import type { SoupProperty } from '@service-storage/generated/schemas/soupProperty';
@@ -160,7 +161,10 @@ export function soupPropertyToProperty(soupProperty: SoupProperty): Property {
   const baseProperty = {
     propertyId: soupProperty.id,
     propertyDefinitionId: definition.id,
-    displayName: definition.display_name,
+    displayName: systemPropertyDisplayName(
+      definition.id,
+      definition.display_name
+    ),
     isMultiSelect: definition.is_multi_select,
     isMetadata: definition.is_metadata,
     isSystemProperty: definition.is_system,

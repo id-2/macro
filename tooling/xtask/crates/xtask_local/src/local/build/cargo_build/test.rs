@@ -16,7 +16,6 @@ fn build_args_pass_local_features_package_qualified() {
         );
     }
     assert!(features.contains("authentication_service/no_rate_limit"));
-    assert!(features.contains("authentication_service/return_passwordless_code"));
     assert!(features.contains("search_processing_service/no_pdf"));
 }
 

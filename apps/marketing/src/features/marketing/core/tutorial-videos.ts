@@ -82,7 +82,7 @@ export const TUTORIAL_VIDEOS = {
   },
   'teams-admin': {
     feature: 'Teams & Admin',
-    title: 'Learn how to use Macro Teams & Admin',
+    title: 'Learn how to use Rox Teams & Admin',
     length: '3:40',
     captions: true,
   },

@@ -13,7 +13,7 @@ impl InboxAccessRepository for super::inbox_catalog::PgInboxCatalog {
     }
 
     async fn delegated(&self, caller: &str, owner: &str, link: Uuid) -> Result<bool, Self::Err> {
-        Ok(macro_db_client::macro_user_links::edge_exists(&self.0, caller, owner, link).await?)
+        Ok(rox_db_client::macro_user_links::edge_exists(&self.0, caller, owner, link).await?)
     }
 
     async fn accessible_inboxes(&self, caller: &str) -> Result<Vec<Link>, Self::Err> {

@@ -4,7 +4,7 @@ use serde_json::Value as JsonValue;
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 
 use crate::domain::models::{ContactInfo, CreateDraftInput, CreatedDraft, EmailErr};
 
@@ -81,8 +81,10 @@ pub struct ApiDraftInput {
     pub body_text: Option<String>,
     /// HTML body (base64 URL_SAFE_NO_PAD encoded). Sanitized before storage.
     pub body_html: Option<String>,
-    /// Rox body format.
-    pub body_macro: Option<String>,
+    /// Rox body format. Payloads written under the former Macro name are read
+    /// through the `body_macro` alias.
+    #[serde(alias = "body_macro")]
+    pub body_rox: Option<String>,
     /// Headers JSON.
     pub headers_json: Option<JsonValue>,
     /// Per-message override for whether to include the signature on send:
@@ -130,8 +132,10 @@ pub struct ApiDraftOutput {
     pub body_text: Option<String>,
     /// HTML body (decoded).
     pub body_html: Option<String>,
-    /// Rox body.
-    pub body_macro: Option<String>,
+    /// Rox body. Payloads written under the former Macro name are read
+    /// through the `body_macro` alias.
+    #[serde(alias = "body_macro")]
+    pub body_rox: Option<String>,
     /// Headers JSON.
     pub headers_json: Option<JsonValue>,
     /// Send time.
@@ -200,7 +204,7 @@ impl CreateDraftRequest {
                 .collect(),
             body_text: draft.body_text,
             body_html: draft.body_html,
-            body_macro: draft.body_macro,
+            body_rox: draft.body_rox,
             headers_json: draft.headers_json,
             send_time: self.send_time,
             include_signature: draft.include_signature,
@@ -236,9 +240,38 @@ impl From<CreatedDraft> for ApiDraftOutput {
             bcc: if bcc.is_empty() { None } else { Some(bcc) },
             body_text: d.body_text,
             body_html: d.body_html,
-            body_macro: d.body_macro,
+            body_rox: d.body_rox,
             headers_json: d.headers_json,
             send_time: d.send_time,
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn draft_input(value: serde_json::Value) -> ApiDraftInput {
+        serde_json::from_value(value).expect("draft input decodes")
+    }
+
+    #[test]
+    fn reads_the_former_body_field_name() {
+        let input = draft_input(serde_json::json!({
+            "subject": "Subject",
+            "body_macro": "{\"editor\":\"legacy\"}",
+        }));
+
+        assert_eq!(input.body_rox.as_deref(), Some("{\"editor\":\"legacy\"}"));
+    }
+
+    #[test]
+    fn reads_the_rox_body_field_name() {
+        let input = draft_input(serde_json::json!({
+            "subject": "Subject",
+            "body_rox": "{\"editor\":\"current\"}",
+        }));
+
+        assert_eq!(input.body_rox.as_deref(), Some("{\"editor\":\"current\"}"));
     }
 }

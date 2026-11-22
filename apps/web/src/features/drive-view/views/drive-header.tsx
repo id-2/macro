@@ -2,6 +2,7 @@ import {
   ListSortDropdown,
   useViewControlHotkeys,
 } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import {
   ListHeader,
   ListHeaderSearch,
@@ -33,7 +34,7 @@ export function DriveHeader() {
     scopeId: panel.splitHotkeyScope,
     enabled: () => panel.isPanelActive() && !isTouchDevice(),
     search: {
-      description: 'Search Drive',
+      description: t('drive.searchDrive'),
 
       condition: () => !state.projectId(),
 
@@ -48,21 +49,21 @@ export function DriveHeader() {
   return (
     <Show when={!isTouchDevice()}>
       <ListHeader
-        title={<DriveBreadcrumbsOutlet aria-label="Drive location" />}
+        title={<DriveBreadcrumbsOutlet aria-label={t('drive.driveLocation')} />}
       >
         <Show when={state.value().location.kind === 'tab'}>
-          <HeaderActionGroup label="File filters" size="md">
+          <HeaderActionGroup label={t('drive.fileFilters')} size="md">
             <Suspense>
               <DriveFilterMenu grouped size="icon-md" />
             </Suspense>
           </HeaderActionGroup>
         </Show>
         <Show when={!isRecent()}>
-          <HeaderActionGroup label="File view options" size="md">
+          <HeaderActionGroup label={t('drive.fileViewOptions')} size="md">
             <ListSortDropdown
               grouped
               size="icon-md"
-              label="Sort files"
+              label={t('drive.sortFiles')}
               value={state.value().sort}
               onChange={state.setSort}
               options={DRIVE_SORT_OPTIONS}
@@ -72,8 +73,8 @@ export function DriveHeader() {
         <DriveCreateMenu presentation="toolbar" />
         <Show when={!state.projectId()}>
           <ListHeaderSearch
-            label="Search Drive"
-            placeholder="Search files"
+            label={t('drive.searchDrive')}
+            placeholder={t('drive.searchFiles')}
             value={state.value().search}
             focusResults={() => panel.panelRef()?.focus()}
             onValueChange={state.setSearch}

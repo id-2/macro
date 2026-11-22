@@ -11,7 +11,7 @@ import {
   CommentNode,
   peerIdPlugin,
   stripDraftCommentMarks,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $createTextNode,

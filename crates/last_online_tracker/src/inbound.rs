@@ -1,4 +1,4 @@
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::task::JoinHandle;
 
 use crate::domain::{
@@ -7,14 +7,14 @@ use crate::domain::{
 };
 
 pub struct LastOnlineWorker {
-    tx: tokio::sync::mpsc::Sender<MacroUserIdStr<'static>>,
+    tx: tokio::sync::mpsc::Sender<RoxUserIdStr<'static>>,
     #[expect(dead_code)]
     handle: JoinHandle<()>,
 }
 
 pub struct RecordOnDrop {
-    val: MacroUserIdStr<'static>,
-    tx: tokio::sync::mpsc::Sender<MacroUserIdStr<'static>>,
+    val: RoxUserIdStr<'static>,
+    tx: tokio::sync::mpsc::Sender<RoxUserIdStr<'static>>,
 }
 
 impl Drop for RecordOnDrop {
@@ -40,7 +40,7 @@ impl LastOnlineWorker {
     }
 
     /// Returns a guard which records the users online time during creation and also during drop.
-    pub fn new_guard(&self, user: MacroUserIdStr<'static>) -> RecordOnDrop {
+    pub fn new_guard(&self, user: RoxUserIdStr<'static>) -> RecordOnDrop {
         let tx = self.tx.clone();
         if let Err(e) = tx.try_send(user.clone()) {
             tracing::error!("{e:?}");
@@ -53,7 +53,7 @@ impl LastOnlineWorker {
     ///
     /// Use this to refresh the last-online timestamp during long-lived connections
     /// (e.g. on each WebSocket ping/pong) so the user is not falsely reported as offline.
-    pub fn record_online(&self, user: MacroUserIdStr<'static>) {
+    pub fn record_online(&self, user: RoxUserIdStr<'static>) {
         if let Err(e) = self.tx.try_send(user) {
             tracing::error!("{e:?}");
         }

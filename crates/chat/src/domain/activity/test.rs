@@ -1,24 +1,24 @@
 use ::activity::Action;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use uuid::Uuid;
 
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 
 use super::*;
 use crate::domain::events::{
     ChatCreatedMetadata, ChatMessageSentMetadata, ChatPermanentlyDeletedMetadata,
 };
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn envelope(event: ChatTopicEvent) -> Event<ChatTopicEvent> {
     Event::with_event_id(Uuid::now_v7(), event)
 }
 
-fn message(role: ChatMessageRole, actor: Option<MacroUserIdStr<'static>>) -> ChatTopicEvent {
+fn message(role: ChatMessageRole, actor: Option<RoxUserIdStr<'static>>) -> ChatTopicEvent {
     ChatTopicEvent::MessageSent(ChatMessageSentMetadata {
         chat_id: "chat-1".to_string(),
         message_id: "msg-1".to_string(),

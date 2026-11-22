@@ -4,7 +4,7 @@
 use std::{collections::HashSet, future::Future};
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::{models::*, ports::PortResult};
@@ -33,7 +33,7 @@ pub struct TargetFacts {
     /// Actual persisted visibility/team.
     pub kind: TargetKind,
     /// Complete membership (including leavers) for a DM; empty for other kinds.
-    pub dm_members: HashSet<MacroUserIdStr<'static>>,
+    pub dm_members: HashSet<RoxUserIdStr<'static>>,
 }
 
 /// Requester's current active authority on a reused channel.
@@ -85,12 +85,12 @@ pub struct TargetPlan {
     /// Import namespace.
     pub team_id: TeamId,
     /// Original requester (not necessarily a participant in a DM).
-    pub requested_by: MacroUserIdStr<'static>,
+    pub requested_by: RoxUserIdStr<'static>,
     /// Owner on creation only. For DMs this is one of the exact pair.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Full deduplicated raw-email membership; includes the requesting owner
     /// only on new non-DMs. Reuse does not add an owner absent from source members.
-    pub members: HashSet<MacroUserIdStr<'static>>,
+    pub members: HashSet<RoxUserIdStr<'static>>,
     /// Name on creation only; group DMs use source member display names.
     pub name: String,
     /// Historical creation time on creation only.
@@ -103,7 +103,7 @@ pub trait ImportTargets: Send + Sync + 'static {
     /// Read an exact pair without modifying participants or creating a channel.
     fn find_dm(
         &self,
-        pair: &[MacroUserIdStr<'static>; 2],
+        pair: &[RoxUserIdStr<'static>; 2],
     ) -> impl Future<Output = PortResult<Option<TargetFacts>>> + Send;
 
     /// Read actual type/team/membership for a reserved identity.

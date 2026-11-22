@@ -46,7 +46,7 @@ async fn personal_personas_are_private_and_webhook_bots_are_not_personas(
 async fn team_members_can_dm_and_revocation_takes_effect_immediately(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -137,7 +137,7 @@ pub(super) async fn insert_direct_conversation(
 /// them may post into the conversation one member has with the persona.
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn persona_tokens_cannot_post_into_a_direct_conversation(pool: PgPool) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -185,7 +185,7 @@ async fn persona_tokens_cannot_post_into_a_direct_conversation(pool: PgPool) -> 
 async fn persona_bot_tokens_cannot_post_into_a_direct_conversation(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -239,7 +239,7 @@ async fn persona_bot_tokens_cannot_post_into_a_direct_conversation(
 async fn editing_a_team_persona_leaves_its_direct_conversations_alone(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let service = service(&pool);
@@ -332,7 +332,7 @@ async fn editing_a_team_persona_leaves_its_direct_conversations_alone(
 async fn a_direct_conversation_does_not_share_a_selected_persona(
     pool: PgPool,
 ) -> anyhow::Result<()> {
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     insert_team_user(&pool, team_id, TEAM_ADMIN, "admin").await?;
     insert_team_user(&pool, team_id, TEAM_MEMBER, "member").await?;
     let channel_id = Uuid::new_v4();

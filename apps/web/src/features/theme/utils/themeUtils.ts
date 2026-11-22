@@ -1,5 +1,5 @@
 import { toast } from '@core/component/Toast/Toast';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { batch, createEffect, on } from 'solid-js';
 import { DEFAULT_DARK_THEME, DEFAULT_LIGHT_THEME } from '../constants';
 import {
@@ -256,18 +256,33 @@ export function systemThemeEffect(): void {
   );
 }
 
-/** Only committed colors affect browser/notification icons and first paint. */
 function syncCommittedColors(): void {
   const colors = resolvedThemeColors();
+  const page = formatOklch(colors.page);
+  const panel = formatOklch(colors.panel);
+  const ink = formatOklch(colors.ink);
   // index.html reads these before any JS loads to paint the boot shell.
   setHtmlColor({
-    color: formatOklch(colors.page),
-    panel: formatOklch(colors.panel),
-    ink: formatOklch(colors.ink),
+    color: page,
+    panel,
+    ink,
     muted: formatOklch(colors['ink-muted']),
     input: formatOklch(colors.input),
   });
   setCommittedThemeAccent(formatOklch(colors.accent));
+  if (typeof document === 'undefined') {
+    return;
+  }
+  // The boot shell already painted from the previous save. Recolor it now so
+  // the first frame after the bundle starts is this theme, not the old dark one.
+  document.body?.style.setProperty('background-color', page);
+  const shell = document.getElementById('boot-shell');
+  if (!shell) {
+    return;
+  }
+  shell.style.setProperty('--bs-page', page);
+  shell.style.setProperty('--bs-panel', panel);
+  shell.style.setProperty('--bs-ink', ink);
 }
 
 export function saveTheme(name: string): void {
@@ -372,4 +387,10 @@ export function ensureMinimalThemeContrast() {
       'Tried to load a theme with low contrast, applying a readable theme.'
     );
   }
+}
+
+// Paint before Solid's first render. Root applies again on mount; doing it
+// here covers the wait before that mount, including a saved Rox default.
+if (typeof document !== 'undefined' && document.documentElement) {
+  applyTheme(resolveActiveThemeId());
 }

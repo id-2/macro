@@ -4,7 +4,7 @@ use crate::domain::{
     ports::{MessageChange, MessageEvent, MessageEventPublisher},
 };
 use chrono::Utc;
-use macro_event_broker::{EventBrokerError, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEventBroker};
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Default)]
@@ -12,8 +12,8 @@ struct RecordingBroker {
     published: Arc<Mutex<Vec<(String, String, serde_json::Value)>>>,
 }
 
-impl MacroEventBroker for RecordingBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

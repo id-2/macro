@@ -3,9 +3,9 @@
  * next to this file. Everything here stays on this machine: nothing these
  * return goes in notes, tasks, issues, PRs, commits, or Rox docs.
  */
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { module } from '@macro-inc/muppet/core/capability';
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { module } from '@rox-one/muppet/core/capability';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import { card } from './card.ts';
 import type { PeopleContext } from './context.ts';

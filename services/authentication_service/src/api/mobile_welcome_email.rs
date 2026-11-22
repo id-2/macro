@@ -141,7 +141,7 @@ pub async fn handler(
 
     // Check if the email is blocked
     let blocked_emails =
-        macro_db_client::blocked_email::get_blocked_emails(&ctx.db, &[&lowercase_email]).await?;
+        rox_db_client::blocked_email::get_blocked_emails(&ctx.db, &[&lowercase_email]).await?;
 
     if !blocked_emails.is_empty() {
         return Err(SendMobileWelcomeEmailError::EmailBlocked);
@@ -313,7 +313,7 @@ fn desktop_email_html(url: &str) -> String {
             <tr>
               <td bgcolor="#ffffff" style="padding:36px 40px 40px;border:1px solid #e7e7e5;border-radius:12px;">
                 <a href="https://rox.one" style="text-decoration:none;">
-                  <img src="https://rox.one/app/macro-email-icon.png" width="48" height="48" alt="Rox" style="display:block;border:0;" />
+                  <img src="https://rox.one/app/rox-email-icon.png" width="48" height="48" alt="Rox" style="display:block;border:0;" />
                 </a>
                 <h1 style="margin:36px 0 16px;font-size:28px;line-height:36px;font-weight:600;letter-spacing:-0.5px;color:#222222;">{DESKTOP_EMAIL_SUBJECT}</h1>
                 <p style="margin:0 0 20px;font-size:16px;line-height:26px;color:#525252;">Rox is a better experience on desktop. Open this link to finish signing up — it only takes a minute.</p>

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) FROM email_sync_streams WHERE link_id = $1 AND kind = 'mail_folder' AND NOT attachments_rechecked",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "count",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "ceb4aff2f480c017208d94a32974e5776609954033573f17dbd0f7816e6fb091"
+}

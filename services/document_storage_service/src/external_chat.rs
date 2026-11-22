@@ -24,7 +24,7 @@ use external_chat::{
     outbound::pg::PgExternalChatRepository,
     signals::{self, Change, ChangeSignal, trace_context},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use notification::domain::{models::SendNotificationRequestBuilder, service::NotificationIngress};
 use sqlx::PgPool;
@@ -54,7 +54,7 @@ pub(crate) struct Dependencies {
     pub pool: PgPool,
     pub redis: redis::Client,
     pub access: Arc<EntityAccessService>,
-    pub authorization: macro_authorization::MacroAuthorizationState<AuthorizationService>,
+    pub authorization: rox_authorization::RoxAuthorizationState<AuthorizationService>,
     pub notifications: Arc<NotificationIngressType>,
     pub connection_gateway: Arc<ConnectionGatewayClient>,
     pub tracker: TaskTracker,
@@ -426,12 +426,12 @@ impl ChatPublisher for DssChatPublisher {
         // Link viewers become known when they read the group. Recheck their
         // current permission so a revoked link never keeps notifying them.
         for viewer in self.audience.link_viewers(effect.chat_id).await? {
-            viewers.push(MacroUserIdStr::try_from(viewer).map_err(unavailable)?);
+            viewers.push(RoxUserIdStr::try_from(viewer).map_err(unavailable)?);
         }
         let recipient_ids = viewers
             .into_iter()
             .filter(|u| effect.associated_user.as_deref() != Some(u.as_ref()))
-            .map(|u| MacroUserIdStr::try_from(u.to_string()).map_err(unavailable))
+            .map(|u| RoxUserIdStr::try_from(u.to_string()).map_err(unavailable))
             .collect::<ExternalChatResult<HashSet<_>>>()?;
         if recipient_ids.is_empty() {
             return Ok(());
@@ -532,7 +532,7 @@ struct SendRequestLimiter<R>(R);
 #[async_trait]
 impl<R: rate_limit::RateLimitService> SendRateLimiter for SendRequestLimiter<R> {
     #[tracing::instrument(name = "external_chat.send_rate_limit", skip_all, err)]
-    async fn check(&self, user: &MacroUserIdStr<'_>) -> ExternalChatResult<()> {
+    async fn check(&self, user: &RoxUserIdStr<'_>) -> ExternalChatResult<()> {
         let key = rate_limit::RateLimitKey::builder(&"whatsapp-linked-send")
             .append(&user.as_ref())
             .finish();

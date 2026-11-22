@@ -90,7 +90,7 @@ async fn invalid_share_requests_are_rejected_before_persistence() {
     let seeded = seeded().await;
     let (world, svc, database_id) = (seeded.world, seeded.service, seeded.database_id);
     let valid = UpdateChannelSharePermission {
-        channel_id: macro_uuid::generate_uuid_v7().to_string(),
+        channel_id: rox_uuid::generate_uuid_v7().to_string(),
         operation: UpdateOperation::Add,
         access_level: Some(models_permissions::share_permission::access_level::AccessLevel::View),
     };

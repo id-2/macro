@@ -1,6 +1,7 @@
 # The agent teammate's runtime: the starter agent's packages, installed from
-# its own bun.lock, with @macro-inc/muppet and @macro-inc/observability
-# (TypeScript source) and @macro-inc/sdk (built) placed beside them. An agent's repository is the
+# its own bun.lock, with @rox-one/muppet and @rox-one/observability
+# (TypeScript source) and @rox-one/sdk (built) placed beside them; the old
+# @macro-inc names remain as symlinks. An agent's repository is the
 # rendered starter agent; the launcher links this node_modules into it.
 { pkgs }:
 let
@@ -92,10 +93,16 @@ pkgs.stdenvNoCC.mkDerivation {
     mkdir -p $out
     cp -r ${thirdParty}/node_modules $out/node_modules
     chmod -R u+w $out/node_modules
-    mkdir -p $out/node_modules/@macro-inc/sdk
-    cp -r package.json dist $out/node_modules/@macro-inc/sdk/
-    cp -r ${muppetSource} $out/node_modules/@macro-inc/muppet
-    cp -r ${observabilitySource} $out/node_modules/@macro-inc/observability
+    # The packages are @rox-one/*; older agent repositories still import
+    # @macro-inc/*, so those names stay as symlinks to the same directories.
+    mkdir -p $out/node_modules/@rox-one/sdk
+    cp -r package.json dist $out/node_modules/@rox-one/sdk/
+    cp -r ${muppetSource} $out/node_modules/@rox-one/muppet
+    cp -r ${observabilitySource} $out/node_modules/@rox-one/observability
+    mkdir -p $out/node_modules/@macro-inc
+    ln -s ../@rox-one/sdk $out/node_modules/@macro-inc/sdk
+    ln -s ../@rox-one/muppet $out/node_modules/@macro-inc/muppet
+    ln -s ../@rox-one/observability $out/node_modules/@macro-inc/observability
     cp ${lockSource}/bun.lock $out/bun.lock
     runHook postInstall
   '';

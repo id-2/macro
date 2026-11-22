@@ -2,7 +2,7 @@
 
 use crate::domain::models::email_notification_digest::ports::LastOnlineChecker;
 use last_online_tracker::domain::{ports::LastOnlineRepo, services::LastOnlineService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::time::Duration;
 
@@ -27,7 +27,7 @@ where
     T: last_online_tracker::domain::ports::SystemTime,
     R: LastOnlineRepo,
 {
-    async fn last_online_checker<'a>(&self, user: MacroUserIdStr<'a>) -> Result<Duration, Report> {
+    async fn last_online_checker<'a>(&self, user: RoxUserIdStr<'a>) -> Result<Duration, Report> {
         let duration = self.service.time_since_last_online(user).await?;
         Ok(duration.unwrap_or(Duration::MAX))
     }

@@ -1,7 +1,7 @@
 use axum::{Json, extract::State};
 use cursor_cloud_agents::api::{ApiKey, CursorClient, CursorConfig};
 use cursor_cloud_agents::domain::ports::CursorAgents;
-use macro_authorization::{MacroAuthorizationExtractor, UserOnly};
+use rox_authorization::{RoxAuthorizationExtractor, UserOnly};
 use utoipa::ToSchema;
 
 use super::CursorApiKeyError;
@@ -55,7 +55,7 @@ pub struct CursorModelsResponse {
 #[tracing::instrument(skip(ctx, user_context), err, fields(user_id = %user_context.authorization.macro_user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOnly>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOnly>,
 ) -> Result<Json<CursorModelsResponse>, CursorApiKeyError> {
     let user_id = &user_context.authorization.macro_user_id;
 

@@ -32,14 +32,14 @@ use gtm_invite::{
     domain::service::GtmInviteServiceImpl, outbound::pg_gtm_invite_repo::PgGtmInviteRepo,
 };
 use loops_client::LoopsClient;
-use macro_auth::{InternalApiKey, middleware::decode_jwt::JwtValidationArgs};
-use macro_authorization::{
-    MacroAuthJwtValidator, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_auth::{InternalApiKey, middleware::decode_jwt::JwtValidationArgs};
+use rox_authorization::{
+    RoxAuthJwtValidator, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
-use macro_cache_client::MacroCache;
-use macro_env::Environment;
-use macro_env_var::env_var;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_cache_client::RoxCache;
+use rox_env::Environment;
+use rox_env_var::env_var;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use native_app_service::{domain::service::NativeAppServiceImpl, outbound::DefaultBundleFetcher};
 use notification::outbound::queue::SqsQueue;
 use notification::{
@@ -71,7 +71,7 @@ use cursor_api_key::cipher::CursorApiKeyCipher;
 
 pub(crate) type NotificationIngressType = SqsNotificationIngress<SqsQueue>;
 pub(crate) type AuthenticationEventBroker =
-    MacroEventBrokerService<KafkaEventPublisher, TaskTracker>;
+    RoxEventBrokerService<KafkaEventPublisher, TaskTracker>;
 
 pub(crate) type ChannelServiceType = ChannelServiceImpl<
     PgChannelsRepo,
@@ -143,6 +143,12 @@ pub(crate) type TeamsServiceType = teams::domain::team_service::TeamServiceImpl<
         entity_registry::EntityRegistryServiceImpl<entity_registry::PgEntityRegistryRepository>,
     >,
 >;
+
+/// Whether `POST /login/passwordless` may return the sign-in code. A newtype
+/// because `ApiContext` already derives `FromRef` for the one plain `bool` it
+/// can hold.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct PasswordlessReturnCode(pub bool);
 
 pub(crate) type RateLimiter = RateLimitServiceImpl<RedisRateLimitAdapter<redis::Client>>;
 
@@ -227,7 +233,7 @@ pub(crate) type FavoritesServiceType = favorites::domain::service::FavoritesServ
     favorites::outbound::pg_favorites_repo::PgFavoritesRepo,
 >;
 
-pub(crate) type AuthorizationService = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+pub(crate) type AuthorizationService = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 
 pub(crate) type AgentApiKeysType = agent_api_keys::domain::AgentKeyService<
     agent_api_keys::outbound::PgAgentKeyRepo,
@@ -265,7 +271,7 @@ pub(crate) struct ApiContext {
     pub bots: Arc<BotsServiceType>,
     /// Owner-bound Codex OAuth lifecycle and cloud target settings.
     pub codex_connection: Option<Arc<dyn codex_connection::domain::ConnectionService>>,
-    pub macro_cache_client: Arc<MacroCache>,
+    pub macro_cache_client: Arc<RoxCache>,
     pub stripe_client: Arc<stripe::Client>,
     pub subscription_status: Arc<SubscriptionStatusServiceType>,
     pub subscription_plan:
@@ -293,8 +299,8 @@ pub(crate) struct ApiContext {
     pub environment: Environment,
     pub signup_policy: Arc<SignupPolicy>,
     pub jwt_args: JwtValidationArgs,
-    pub authorization_state: MacroAuthorizationState<AuthorizationService>,
-    pub token_context: MacroApiTokenContext,
+    pub authorization_state: RoxAuthorizationState<AuthorizationService>,
+    pub token_context: RoxApiTokenContext,
     pub internal_api_key: InternalApiKey,
     pub stripe_webhook_secret: LocalOrRemoteSecret<StripeWebhookSecretKey>,
     pub user_roles_and_permissions_service: Arc<UserRolesAndPermissionsServiceImpl<RoxDB>>, // Note: since FromRef doesn't support generics we have to specify the concrete types here
@@ -330,6 +336,9 @@ pub(crate) struct ApiContext {
     pub ai_payment_gateway: Arc<ai_billing::outbound::StripePaymentGateway>,
     /// Whether Gmail link consent requests the Google Calendar scope.
     pub calendar_scope_enabled: bool,
+    /// Return the sign-in code in the passwordless start response. Only a
+    /// stack that cannot read its email turns this on.
+    pub passwordless_return_code: PasswordlessReturnCode,
     /// Google's OAuth authorization endpoint, where a Gmail link sends the browser.
     pub google_authorization_url: url::Url,
     /// Signs and verifies the `state` on account-link OAuth round trips.
@@ -356,7 +365,7 @@ env_var! {
 }
 
 #[derive(Clone)]
-pub struct MacroApiTokenContext {
+pub struct RoxApiTokenContext {
     /// The issuer of the macro-api-token
     pub issuer: MacroApiTokenIssuer,
     /// The macro api token private key used to sign macro-api tokens

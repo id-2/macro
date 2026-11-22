@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_threads SET is_read = NOT is_read, updated_at = now() WHERE id = ANY($1)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "UuidArray"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6d863445697153dc5b21513669fb07f10c1aea4fa7a57f4d42529d99ef840fbc"
+}

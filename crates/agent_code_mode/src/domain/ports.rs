@@ -4,7 +4,7 @@ use super::{
 use agent_session::domain::model::AgentSessionId;
 use async_trait::async_trait;
 use code_execution::domain::RunEnvironment;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio_util::sync::CancellationToken;
 
 /// Current session turn, read from shared state on every replica.
@@ -14,7 +14,7 @@ pub trait ExecutionTurns: Send + Sync + 'static {
     async fn active(
         &self,
         session: AgentSessionId,
-    ) -> Result<Option<macro_uuid::Uuid>, CodeModeError>;
+    ) -> Result<Option<rox_uuid::Uuid>, CodeModeError>;
 }
 
 /// Authorize a run and mint a short-lived user credential before starting Deno.
@@ -35,7 +35,7 @@ pub struct IssuedRun {
     /// What the program runs with.
     pub environment: RunEnvironment,
     /// The account the credential was minted for.
-    pub acting_user: MacroUserIdStr<'static>,
+    pub acting_user: RoxUserIdStr<'static>,
 }
 
 /// Durable code execution records, always scoped by the owning session.
@@ -70,6 +70,6 @@ pub trait ModelImages: Send + Sync + 'static {
     async fn load_png(
         &self,
         file: &StaticFileId,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> anyhow::Result<ModelImage>;
 }

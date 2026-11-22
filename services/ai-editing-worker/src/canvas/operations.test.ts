@@ -3,15 +3,15 @@ import {
   resolveConnector,
   sortKeysBetween,
   worldMatrix,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import {
   createLoroGraphicsBackend,
   createLoroSeed,
-} from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics/loro';
 import {
   richTextPlainText,
   validCanvasText,
-} from '@macro-inc/lexical-core/canvas-text';
+} from '@rox-one/lexical-core/canvas-text';
 import { getQuickJS } from 'quickjs-emscripten';
 import { describe, expect, it } from 'vitest';
 import { prepareCanvasEdit } from './operations';

@@ -33,6 +33,32 @@ import {
 
 /** Disabled field shown to non-owners, with a tooltip explaining why it's locked.
  *  The muted look comes from `settings-input`'s `:disabled` styling. */
+function linkShareScopeLabel(scope: LinkShareScope): string {
+  switch (scope) {
+    case 'PUBLIC':
+      return 'Все, у кого есть ссылка';
+    case 'TEAM':
+      return 'Участники команды по ссылке';
+    default:
+      return 'Только у кого есть доступ';
+  }
+}
+
+function slugErrorText(error: string | undefined): string | undefined {
+  if (!error) return undefined;
+  if (error === 'team slug cannot be empty') {
+    return 'Код команды не может быть пустым';
+  }
+  if (error.startsWith('team slug cannot be longer than ')) {
+    const limit = error.match(/\d+/)?.[0] ?? '20';
+    return `Код команды не может быть длиннее ${limit} символов`;
+  }
+  if (error.includes('may only contain')) {
+    return 'Код команды может содержать только латинские буквы, пробелы, дефисы и подчёркивания';
+  }
+  return error;
+}
+
 function ReadOnlyField(props: { value: string; tooltip: string }) {
   return (
     <Tooltip label={props.tooltip} placement="top">
@@ -55,7 +81,7 @@ function SaveCancelButtons(props: {
 }) {
   return (
     <div class="flex items-center gap-1 shrink-0">
-      <Tooltip label="Save">
+      <Tooltip label="Сохранить">
         <Button
           variant="primary"
           size="icon-sm"
@@ -67,7 +93,7 @@ function SaveCancelButtons(props: {
           </Show>
         </Button>
       </Tooltip>
-      <Tooltip label="Cancel">
+      <Tooltip label="Отмена">
         <Button
           variant="ghost"
           size="icon-sm"
@@ -102,7 +128,7 @@ export function TeamGeneral(props: { team: TeamSummary }) {
     undefined
   );
 
-  const deleteConfirmationPhrase = () => `Delete ${props.team.name}`;
+  const deleteConfirmationPhrase = () => `Удалить ${props.team.name}`;
   const canDeleteTeam = () =>
     deleteConfirmation() === deleteConfirmationPhrase();
 
@@ -219,10 +245,10 @@ export function TeamGeneral(props: { team: TeamSummary }) {
     );
     try {
       await navigator.clipboard.writeText(targetUrl);
-      toast.success('GitHub autolink URL copied');
+      toast.success('Адрес автоссылки GitHub скопирован');
     } catch (error) {
       console.error('Failed to copy GitHub autolink URL', error);
-      toast.failure('Failed to copy GitHub autolink URL');
+      toast.failure('Не удалось скопировать адрес автоссылки GitHub');
     }
   };
 
@@ -250,7 +276,7 @@ export function TeamGeneral(props: { team: TeamSummary }) {
   return (
     <>
       <SettingsPage
-        title="Team"
+        title="Команда"
         actions={
           <Show when={isOwner()}>
             <Button
@@ -259,16 +285,16 @@ export function TeamGeneral(props: { team: TeamSummary }) {
               onClick={() => setShowDeleteTeamModal(true)}
             >
               <TrashIcon class="size-4" />
-              Delete Team
+              Удалить команду
             </Button>
           </Show>
         }
       >
-        <SettingsSection title="General">
+        <SettingsSection title="Общие">
           <SettingsCard>
             <SettingsRow
-              label="Name"
-              description="What your team is called — shown in invitations and billing."
+              label="Название"
+              description="Как называется команда — видно в приглашениях и в оплате."
               hideDescriptionOnMobile
             >
               <Show
@@ -276,7 +302,7 @@ export function TeamGeneral(props: { team: TeamSummary }) {
                 fallback={
                   <ReadOnlyField
                     value={props.team.name}
-                    tooltip="Only the team owner can change the team name."
+                    tooltip="Название команды может менять только владелец."
                   />
                 }
               >
@@ -295,7 +321,7 @@ export function TeamGeneral(props: { team: TeamSummary }) {
                         e.currentTarget.blur();
                       }
                     }}
-                    placeholder="Enter team name"
+                    placeholder="Введите название команды"
                     class="settings-input w-56 mobile:w-32"
                   />
                   <Show when={hasTeamNameChanged()}>
@@ -314,8 +340,8 @@ export function TeamGeneral(props: { team: TeamSummary }) {
             </SettingsRow>
 
             <SettingsRow
-              label="Slug"
-              description="Short code in task references like ENG-42 (GitHub, branch names)."
+              label="Код"
+              description="Короткий код в ссылках на задачи, например ENG-42 (GitHub и имена веток)."
               hideDescriptionOnMobile
             >
               <Show
@@ -323,7 +349,7 @@ export function TeamGeneral(props: { team: TeamSummary }) {
                 fallback={
                   <ReadOnlyField
                     value={props.team.slug}
-                    tooltip="Only the team owner can change the team slug."
+                    tooltip="Код команды может менять только владелец."
                   />
                 }
               >
@@ -343,18 +369,18 @@ export function TeamGeneral(props: { team: TeamSummary }) {
                           e.currentTarget.blur();
                         }
                       }}
-                      placeholder="Enter team slug"
+                      placeholder="Введите код команды"
                       class="settings-input w-56 mobile:w-32"
                       aria-invalid={!!teamSlugError()}
                     />
                     <Show when={teamSlugError()}>
                       <p class="text-xs text-failure-ink text-right">
-                        {teamSlugError()}
+                        {slugErrorText(teamSlugError())}
                       </p>
                     </Show>
                     <Show when={normalizedTeamSlugPreview()}>
                       <p class="text-xs text-ink-muted text-right">
-                        Will save as {normalizedTeamSlugPreview()}
+                        Будет сохранено как {normalizedTeamSlugPreview()}
                       </p>
                     </Show>
                   </div>
@@ -371,11 +397,11 @@ export function TeamGeneral(props: { team: TeamSummary }) {
             </SettingsRow>
 
             <SettingsRow
-              label="GitHub autolink"
+              label="Автоссылка GitHub"
               description={
                 <>
-                  Use <code>{props.team.slug}-</code> as the reference prefix in
-                  GitHub, then paste this target URL.
+                  В GitHub укажите префикс <code>{props.team.slug}-</code>, затем
+                  вставьте этот адрес.
                 </>
               }
               hideDescriptionOnMobile
@@ -386,23 +412,24 @@ export function TeamGeneral(props: { team: TeamSummary }) {
                 onClick={handleCopyGithubAutolinkUrl}
               >
                 <CopyIcon class="size-4" />
-                Copy target URL
+                Копировать адрес
               </Button>
             </SettingsRow>
 
             <Show when={isAdminOrOwner()}>
               <SettingsRow
-                label="Default link sharing"
-                description="The link-sharing scope newly shared items start with. None means link sharing starts off."
+                label="Доступ по ссылке по умолчанию"
+                description="Область доступа по ссылке для новых общих элементов. «Только у кого есть доступ» — доступ по ссылке выключен."
                 hideDescriptionOnMobile
               >
                 <Tabs
                   touch="segmented"
-                  aria-label="Default link sharing scope"
+                  aria-label="Область доступа по ссылке по умолчанию"
                   size="sm"
                   value={defaultLinkShare()}
                   options={LINK_SHARE_SCOPE_OPTIONS.map((option) => ({
                     ...option,
+                    label: linkShareScopeLabel(option.value),
                     disabled:
                       patchTeamMutation.isPending || teamQuery.isLoading,
                   }))}
@@ -424,21 +451,21 @@ export function TeamGeneral(props: { team: TeamSummary }) {
               <XIcon class="size-3.5 touch:size-6 shrink-0 pointer-events-none" />
             </Dialog.CloseButton>
             <Dialog.Title as="span" class="text-sm font-medium p-0 m-0">
-              Delete Team
+              Удалить команду
             </Dialog.Title>
           </Panel.Header>
           <Panel.Body class="p-3 flex flex-col gap-3">
             <p>
-              Are you sure you want to delete{' '}
-              <span class="font-medium">{props.team.name}</span>? This action
-              cannot be undone and all team members will lose access.
+              Вы уверены, что хотите удалить{' '}
+              <span class="font-medium">{props.team.name}</span>? Это действие
+              нельзя отменить, и все участники потеряют доступ.
             </p>
             <p class="text-sm text-ink-muted">
-              Type{' '}
+              Введите{' '}
               <span class="font-medium text-ink">
                 {deleteConfirmationPhrase()}
-              </span>{' '}
-              to confirm.
+              </span>
+              , чтобы подтвердить.
             </p>
             <input
               type="text"
@@ -453,7 +480,7 @@ export function TeamGeneral(props: { team: TeamSummary }) {
                 disabled={deleteTeamMutation.isPending}
                 onClick={() => handleDeleteTeamModalClose(false)}
               >
-                Cancel
+                Отмена
               </Button>
               <Button
                 variant="secondary"
@@ -462,7 +489,7 @@ export function TeamGeneral(props: { team: TeamSummary }) {
               >
                 <Show
                   when={deleteTeamMutation.isPending}
-                  fallback="Delete Team"
+                  fallback="Удалить команду"
                 >
                   <SpinnerIcon class="size-4 animate-spin" />
                 </Show>

@@ -4238,7 +4238,7 @@
             "type": ["string", "null"],
             "description": "HTML body (base64 URL_SAFE_NO_PAD encoded). Sanitized before storage."
           },
-          "body_macro": {
+          "body_rox": {
             "type": ["string", "null"],
             "description": "Rox body format."
           },
@@ -4329,7 +4329,7 @@
             "type": ["string", "null"],
             "description": "HTML body (decoded)."
           },
-          "body_macro": {
+          "body_rox": {
             "type": ["string", "null"],
             "description": "Rox body."
           },
@@ -4531,7 +4531,7 @@
           "body_html_sanitized": {
             "type": ["string", "null"]
           },
-          "body_macro": {
+          "body_rox": {
             "type": ["string", "null"]
           },
           "body_replyless": {
@@ -5427,7 +5427,7 @@
           },
           "isSnapshot": {
             "type": "boolean",
-            "description": "Whether this is a snapshot of a meeting shared with the owner, which\nMacro added to their calendar as a private copy: the meeting's changes\nnever reach it, and nothing done to it reaches the meeting."
+            "description": "Whether this is a snapshot of a meeting shared with the owner, which\nRox added to their calendar as a private copy: the meeting's changes\nnever reach it, and nothing done to it reaches the meeting."
           },
           "location": {
             "type": ["string", "null"],
@@ -6887,7 +6887,7 @@
           "body_html_sanitized": {
             "type": ["string", "null"]
           },
-          "body_macro": {
+          "body_rox": {
             "type": ["string", "null"]
           },
           "body_text": {

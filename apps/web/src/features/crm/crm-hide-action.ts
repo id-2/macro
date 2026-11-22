@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import type { EntityData } from '@entity';
 import { confirmDialog } from '@ui';
@@ -26,11 +27,15 @@ export const makeHideCompanyAction = (options: MakeHideCompanyOptions) => {
     pending = true;
     try {
       const confirmed = await confirmDialog({
-        title: entity.hidden ? 'Restore company?' : 'Archive company?',
-        confirmLabel: entity.hidden ? 'Restore' : 'Archive',
+        title: entity.hidden
+          ? t('crm.restoreCompanyTitle')
+          : t('crm.archiveCompanyTitle'),
+        confirmLabel: entity.hidden
+          ? t('viewMenus.crmRestore')
+          : t('viewMenus.crmArchive'),
         body: entity.hidden
-          ? 'Restore this company for your team and all of its people, including people archived individually. Email syncing stays off until enabled separately.'
-          : 'Archive this company and all of its people for your team. Records and history are kept and can be restored later. Team email syncing will be turned off.',
+          ? t('crm.restoreCompanyBody')
+          : t('crm.archiveCompanyBody'),
       });
       if (!confirmed || !options.canManage()) return;
 
@@ -45,12 +50,12 @@ export const makeHideCompanyAction = (options: MakeHideCompanyOptions) => {
         await setHidden(entity.id, !hidden);
         soup.selection.clear();
         if (nextRow) soup.focus.set(nextRow.id);
-        toast.success(hidden ? 'Company restored' : 'Company archived');
+        toast.success(
+          hidden ? t('crm.companyRestored') : t('crm.companyArchived')
+        );
       } catch {
         toast.failure(
-          hidden
-            ? 'Could not restore. Try again.'
-            : 'Could not archive. Try again.'
+          hidden ? t('crm.couldNotRestore') : t('crm.couldNotArchive')
         );
       }
 

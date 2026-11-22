@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_settings SET read_receipts_enabled = FALSE WHERE link_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ee1de5e68372ae7b29eaacef5c29136240381e4ff537547912eb08d84aa40af4"
+}

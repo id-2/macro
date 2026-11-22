@@ -4,8 +4,8 @@ import {
   type GraphicsEditor,
   multiply,
   worldMatrix,
-} from '@macro-inc/graphics';
-import { textLayoutStyle } from '@macro-inc/graphics/browser';
+} from '@rox-one/graphics';
+import { textLayoutStyle } from '@rox-one/graphics/browser';
 import type { SerializedEditorState } from 'lexical';
 import { onCleanup } from 'solid-js';
 import type { CanvasTextState } from '../primitives/create-text-state';

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT count(*) AS \"stored!\" FROM email_messages WHERE link_id = $1 AND provider_id = 'invite'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "stored!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "7ff3d5d5ba0fe3720b9bf083891ce1f0b17cd680b701c6f3269f2a2f26aefbea"
+}

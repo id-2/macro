@@ -399,7 +399,7 @@ A `--no-doppler` stack supplies deterministic stubs for required configuration. 
 | Stripe billing | `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID` | Checkout and subscription endpoints fail. Signup skips Stripe and leaves profile billing unset, so free-team creation works. Only the required legacy account field stores a local placeholder. |
 | CloudFront signed URLs | `DOCUMENT_STORAGE_SERVICE_CLOUDFRONT_DISTRIBUTION_URL`, `DOCUMENT_STORAGE_SERVICE_CLOUDFRONT_SIGNER_PUBLIC_KEY_ID`, `DOCUMENT_STORAGE_SERVICE_CLOUDFRONT_SIGNER_PRIVATE_KEY` | Document download URLs are unsigned (fine against local S3) |
 
-The other stubbed keys (`REDIS_HOST`, `MACRO_DB_URL`, `INTERNAL_API_KEY`, `AUTHENTICATION_SERVICE_SECRET_KEY`, `ACCOUNT_LINK_STATE_SECRET`, `OPENSEARCH_USERNAME`, `OPENSEARCH_PASSWORD`) are internal plumbing with correct local values — you never need to override them.
+The other stubbed keys (`REDIS_HOST`, `ROX_DB_URL`, `INTERNAL_API_KEY`, `AUTHENTICATION_SERVICE_SECRET_KEY`, `ACCOUNT_LINK_STATE_SECRET`, `OPENSEARCH_USERNAME`, `OPENSEARCH_PASSWORD`) are internal plumbing with correct local values — you never need to override them.
 
 To turn on an integration, create a `local.env` with the real values. Then pass it
 to `run_local`:
@@ -878,7 +878,7 @@ The Rust services are built on the host with one `cargo build` in the Nix shell,
 
 A Nix garbage collection can delete libraries a running stack's binaries use; rebuild with `r` or `just stack update` if a service then fails to start.
 
-A new worktree's first build reuses the registry dependencies another worktree on the machine already compiled. After a build, those dependencies are copied to `~/.cache/macro/local-deps/<key>` (override with `MACRO_LOCAL_DEP_CACHE_DIR`). The key covers `Cargo.lock`, the toolchain, the build arguments and the compiler flags. A build into a `target/` that has none of those dependencies yet, as in a new worktree, copies the matching entry in first and compiles little more than the workspace crates. A `target/` that already built some of them is left alone, since crates built in different worktrees can't be mixed. xtask builds itself into `target/xtask` so that it doesn't count. Cargo still checks every copied unit, so a stale one is rebuilt rather than used. The three most recently used entries are kept, at about 7 GB each. Delete the directory to drop them.
+A new worktree's first build reuses the registry dependencies another worktree on the machine already compiled. After a build, those dependencies are copied to `~/.cache/macro/local-deps/<key>` (override with `ROX_LOCAL_DEP_CACHE_DIR`). The key covers `Cargo.lock`, the toolchain, the build arguments and the compiler flags. A build into a `target/` that has none of those dependencies yet, as in a new worktree, copies the matching entry in first and compiles little more than the workspace crates. A `target/` that already built some of them is left alone, since crates built in different worktrees can't be mixed. xtask builds itself into `target/xtask` so that it doesn't count. Cargo still checks every copied unit, so a stale one is rebuilt rather than used. The three most recently used entries are kept, at about 7 GB each. Delete the directory to drop them.
 
 Press `r`, or run `just run_local rebuild`, to rebuild the binaries. Only services
 whose binary is newer than their container restart, so a build that failed partway
@@ -950,7 +950,7 @@ only localhost. `run_local rebuild` reuses the recorded file; pass it again to
 - Waits for the FusionAuth kickstart
 - Creates the search indices
 
-It saves these volumes as an init snapshot, and clean starts restore it. A detached start over existing volumes keeps them and doesn't use a snapshot. The snapshot is content-addressed and stored in `~/.cache/macro-local/stack-snapshots`, shared by every worktree and instance on the machine (`MACRO_STACK_SNAPSHOT_DIR` overrides it). Later runs restore the snapshot and skip the initialization. The key covers the migrations, compose files, search mappings and the FusionAuth kickstart, but not the instance's ports: each start writes its own redirect URLs into FusionAuth instead. An input change causes a cache miss and a normal full init — the key *is* the definition of clean state, so the full-delete/full-create guarantee is unchanged. Snapshots unused for 14 days are deleted when a new one is saved.
+It saves these volumes as an init snapshot, and clean starts restore it. A detached start over existing volumes keeps them and doesn't use a snapshot. The snapshot is content-addressed and stored in `~/.cache/macro-local/stack-snapshots`, shared by every worktree and instance on the machine (`ROX_STACK_SNAPSHOT_DIR` overrides it). Later runs restore the snapshot and skip the initialization. The key covers the migrations, compose files, search mappings and the FusionAuth kickstart, but not the instance's ports: each start writes its own redirect URLs into FusionAuth instead. An input change causes a cache miss and a normal full init — the key *is* the definition of clean state, so the full-delete/full-create guarantee is unchanged. Snapshots unused for 14 days are deleted when a new one is saved.
 
 Useful commands:
 
@@ -998,11 +998,11 @@ just reset_local --instance agent-a
 ### Finding out where a bring-up spent its time
 
 Every run prints its slowest stages before the summary. To compare runs, point
-`MACRO_LOCAL_TIMINGS` at a file — each run appends one JSON line of every stage
+`ROX_LOCAL_TIMINGS` at a file — each run appends one JSON line of every stage
 and its duration:
 
 ```bash
-MACRO_LOCAL_TIMINGS=/tmp/run-local-timings.jsonl just run_local
+ROX_LOCAL_TIMINGS=/tmp/run-local-timings.jsonl just run_local
 ```
 
 For the default instance, omit `--instance`.
@@ -1014,7 +1014,7 @@ send their timings to Loki and Tempo, as CI does, for the `Rox run_local`
 dashboard. This is on by default. To turn it off, either:
 
 ```bash
-export MACRO_LOCAL_TELEMETRY=off          # this shell, or put it in your profile
+export ROX_LOCAL_TELEMETRY=off          # this shell, or put it in your profile
 ```
 
 ```toml
@@ -1022,7 +1022,7 @@ export MACRO_LOCAL_TELEMETRY=off          # this shell, or put it in your profil
 enabled = false
 ```
 
-It is also off when `CI` is set (`MACRO_LOCAL_TELEMETRY=on` overrides that).
+It is also off when `CI` is set (`ROX_LOCAL_TELEMETRY=on` overrides that).
 Opted out, nothing is written or sent, and the next `--traces lgtm` bring-up
 stops sending [your stacks' telemetry](#your-stacks-telemetry-in-grafana-opt-in).
 
@@ -1111,7 +1111,7 @@ is tagged `host.name` = the machine name, `deployment.environment` = `local`
 second.
 
 **Turning it off.** Delete the line, set `services = false`, or turn local
-telemetry off (`MACRO_LOCAL_TELEMETRY=off`, `CI`): the next bring-up with
+telemetry off (`ROX_LOCAL_TELEMETRY=off`, `CI`): the next bring-up with
 `--traces lgtm` removes the forwarder, recreates the collector without the copy, and then removes the
 forwarder's copy of the token, which is kept mode 0600 in
 `~/.local/state/macro/local-telemetry/forwarder/` and mounted read-only. A

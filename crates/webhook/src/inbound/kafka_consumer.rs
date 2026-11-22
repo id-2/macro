@@ -1,7 +1,7 @@
 //! Kafka consumer that feeds broker events into webhook ingestion.
 //!
-//! Subscribes to [`DocumentMacroEvent`], [`ChannelMacroEvent`], and
-//! [`WebhookMacroEvent`] topics and hands every decoded event envelope to a
+//! Subscribes to [`DocumentRoxEvent`], [`ChannelRoxEvent`], and
+//! [`WebhookRoxEvent`] topics and hands every decoded event envelope to a
 //! [`WebhookEventIngestionService`].
 //!
 //! Delivery is at-least-once: an event's offset is committed only after the
@@ -12,7 +12,7 @@
 //! error *without* committing, so the supervising restart loop redelivers the
 //! event and retries durably. Undecodable messages are logged and skipped
 //! rather than wedging the partition. The transport mirrors
-//! [`macro_event_broker::KafkaEventPublisher`]: plaintext for
+//! [`rox_event_broker::KafkaEventPublisher`]: plaintext for
 //! `ENVIRONMENT=local`, TLS + SASL/OAUTHBEARER with MSK IAM otherwise.
 //!
 //! For local testing, run with `RUST_LOG=webhook=trace` to see every received
@@ -22,11 +22,11 @@
 mod test;
 
 use crate::domain::ingestion::{WebhookEventIngestionError, WebhookEventIngestionService};
-use crate::topics::DeclaredMacroEvent;
+use crate::topics::DeclaredRoxEvent;
 use anyhow::Context as _;
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message};
@@ -46,8 +46,8 @@ impl GroupName for WebhookEventIngestionConsumerGroup {
 }
 
 type WebhookKafkaAdapter =
-    KafkaConsumerAdapter<WebhookEventIngestionConsumerGroup, DeclaredMacroEvent>;
-type WebhookKafkaConsumer = MacroEventConsumerService<DeclaredMacroEvent, WebhookKafkaAdapter>;
+    KafkaConsumerAdapter<WebhookEventIngestionConsumerGroup, DeclaredRoxEvent>;
+type WebhookKafkaConsumer = RoxEventConsumerService<DeclaredRoxEvent, WebhookKafkaAdapter>;
 
 /// Maximum in-process ingestion attempts per event before the consumer bails
 /// out and lets a restart redeliver from the last committed offset.
@@ -90,7 +90,7 @@ fn commit_logged(consumer: &WebhookKafkaConsumer, message: &BorrowedMessage<'_>)
 /// the caller must exit without committing so the event is redelivered.
 async fn ingest_with_retry<S: WebhookEventIngestionService>(
     service: &S,
-    event: &DeclaredMacroEvent,
+    event: &DeclaredRoxEvent,
     partition: i32,
     offset: i64,
 ) -> anyhow::Result<()> {
@@ -102,37 +102,37 @@ async fn ingest_with_retry<S: WebhookEventIngestionService>(
             async move {
                 tracing::trace!(partition, offset, attempt, "ingesting broker event");
                 let result = match event {
-                    DeclaredMacroEvent::DocumentMacroEvent(event) => {
+                    DeclaredRoxEvent::DocumentRoxEvent(event) => {
                         service.ingest_document_event(event.event().clone()).await
                     }
-                    DeclaredMacroEvent::ChannelMacroEvent(event) => {
+                    DeclaredRoxEvent::ChannelRoxEvent(event) => {
                         service.ingest_channel_event(event.event().clone()).await
                     }
-                    DeclaredMacroEvent::CallNotificationMacroEvent(event) => {
+                    DeclaredRoxEvent::CallNotificationRoxEvent(event) => {
                         service
                             .ingest_call_notification_event(event.event().clone())
                             .await
                     }
-                    DeclaredMacroEvent::MessageMacroEvent(event) => {
+                    DeclaredRoxEvent::MessageRoxEvent(event) => {
                         service.ingest_message_event(event.event().clone()).await
                     }
-                    DeclaredMacroEvent::WebhookMacroEvent(event) => {
+                    DeclaredRoxEvent::WebhookRoxEvent(event) => {
                         service.ingest_webhook_event(event.event().clone()).await
                     }
-                    DeclaredMacroEvent::AgentSessionMacroEvent(event) => {
+                    DeclaredRoxEvent::AgentSessionRoxEvent(event) => {
                         service
                             .ingest_agent_trigger_event(event.event().clone())
                             .await
                     }
-                    DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) => {
+                    DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) => {
                         service
                             .ingest_agent_session_lifecycle_event(event.event().clone())
                             .await
                     }
-                    DeclaredMacroEvent::UserMacroEvent(event) => {
+                    DeclaredRoxEvent::UserRoxEvent(event) => {
                         service.ingest_user_event(event.event().clone()).await
                     }
-                    DeclaredMacroEvent::PasswordMacroEvent(event) => {
+                    DeclaredRoxEvent::PasswordRoxEvent(event) => {
                         service.ingest_password_event(event.event().clone()).await
                     }
                 };
@@ -185,7 +185,7 @@ async fn ingest_with_retry<S: WebhookEventIngestionService>(
 /// Run the webhook event consumer until `shutdown` resolves.
 ///
 /// Connects to `brokers` and subscribes to the topics declared by
-/// [`DocumentMacroEvent`], [`ChannelMacroEvent`], and [`WebhookMacroEvent`]
+/// [`DocumentRoxEvent`], [`ChannelRoxEvent`], and [`WebhookRoxEvent`]
 /// under the `webhook-event-ingestion` consumer group. Every decoded event is fed to
 /// `service`, committing each offset only
 /// after ingestion succeeds (see `ingest_with_retry` for the retry policy).
@@ -204,13 +204,13 @@ where
 {
     let consumer = KafkaEventConsumer::<WebhookEventIngestionConsumerGroup>::from_env(brokers)?;
     let consumer = KafkaConsumerAdapter::<WebhookEventIngestionConsumerGroup, ()>::new(consumer)
-        .subscribe::<DeclaredMacroEvent>()
+        .subscribe::<DeclaredRoxEvent>()
         .map_err(|error| {
             anyhow::anyhow!("failed to subscribe to webhook event topics: {error:?}")
         })?;
     let consumer = WebhookKafkaConsumer::new(consumer);
     tracing::info!(
-        topics = ?DeclaredMacroEvent::topics(),
+        topics = ?DeclaredRoxEvent::topics(),
         group = WebhookEventIngestionConsumerGroup::GROUP_NAME,
         "webhook event consumer listening"
     );

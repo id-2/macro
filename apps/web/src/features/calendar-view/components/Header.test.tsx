@@ -73,7 +73,7 @@ vi.mock('@app/features/scheduling/calendar-actions', () => ({
   CalendarSchedulingActions: () => <button>Booking links</button>,
 }));
 vi.mock('./CalendarSearch', () => ({
-  CalendarSearch: () => <button>Search events</button>,
+  CalendarSearch: () => <button>Искать события</button>,
 }));
 vi.mock('./CalendarCreateItems', () => ({
   CalendarCreateEventItem: () => null,
@@ -113,7 +113,7 @@ describe('calendar headers', () => {
         screen.getByRole('heading', { name: 'October 2026' })
       ).toBeTruthy();
       expect(
-        screen.getByRole('button', { name: 'Search events' })
+        screen.getByRole('button', { name: 'Искать события' })
       ).toBeTruthy();
       expect(
         screen.getByRole('button', { name: 'New event or call' })

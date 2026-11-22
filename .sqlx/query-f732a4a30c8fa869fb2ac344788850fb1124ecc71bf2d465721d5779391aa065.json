@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT c.email_address, r.recipient_type::text AS \"recipient_type!\", r.xmin::text AS \"xmin!\"\n        FROM email_message_recipients r\n        JOIN email_contacts c ON c.id = r.contact_id\n        WHERE r.message_id = $1\n        ORDER BY c.email_address, r.recipient_type\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "email_address",
+        "type_info": "Varchar"
+      },
+      {
+        "ordinal": 1,
+        "name": "recipient_type!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "xmin!",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "f732a4a30c8fa869fb2ac344788850fb1124ecc71bf2d465721d5779391aa065"
+}

@@ -6,7 +6,7 @@ use axum::{
     http::StatusCode,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService};
 use model::document::FileType;
 use serde::Deserialize;
 
@@ -27,10 +27,10 @@ pub struct ContentUploadedRequest {
 pub async fn content_uploaded_handler<
     T: DocumentContentEventService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    _internal_authorization: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Path(Params { document_id }): Path<Params>,
     Json(request): Json<ContentUploadedRequest>,
 ) -> Result<StatusCode, DocumentError> {

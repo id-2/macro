@@ -18,8 +18,8 @@ fn loader(server: &MockServer) -> PostHogFeatureFlags {
     .unwrap()
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|alice+flags@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|alice+flags@example.com").unwrap()
 }
 
 fn healthy(flags: Value) -> Value {
@@ -30,7 +30,7 @@ fn healthy(flags: Value) -> Value {
 async fn loads_once_per_user_and_reads_a_stable_snapshot() {
     let server = MockServer::start().await;
     let alice = user();
-    let bob = MacroUserIdStr::parse_from_str("macro|bob@example.com").unwrap();
+    let bob = RoxUserIdStr::parse_from_str("macro|bob@example.com").unwrap();
     Mock::given(method("POST"))
         .and(path("/flags/"))
         .and(query_param("v", "2"))

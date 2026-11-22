@@ -1,21 +1,50 @@
 //! Models the in-memory Rox agent advertises over ACP.
 
-use std::sync::OnceLock;
+use std::sync::LazyLock;
 
+use agent::provider_keys::model_is_callable;
 use chat::domain::models::CHAT_MODELS;
 
 /// Picker entry that lets Rox choose the model. Turns run on
-/// [`AUTO_TARGET`]; [`resolve`] maps it before routing.
+/// [`auto_target`]; [`resolve`] maps it before routing.
 pub const AUTO_MODEL: &str = "auto";
 
-/// The model an [`AUTO_MODEL`] turn runs on.
-const AUTO_TARGET: &str = "google/gemini-3.8-flash";
+/// Models an [`AUTO_MODEL`] turn may run on, best first: the historic default
+/// first, so a deployment with every key real keeps the model it had.
+const AUTO_TARGETS: &[&str] = &[
+    "google/gemini-3.8-flash",
+    "groq/gpt-oss-120b",
+    "openai/gpt-5-mini",
+    "anthropic/claude-haiku-4-5",
+];
+
+/// The model an [`AUTO_MODEL`] turn runs on: the first candidate this
+/// deployment can call, so Auto never runs on a placeholder key.
+#[must_use]
+pub fn auto_target() -> &'static str {
+    AUTO_TARGETS
+        .iter()
+        .copied()
+        .find(|model| model_is_callable(model))
+        .unwrap_or(AUTO_TARGETS[0])
+}
 
 /// The routable id a turn runs on: [`AUTO_MODEL`] becomes its target, every
 /// other id is already routable.
 #[must_use]
 pub fn resolve(id: &str) -> &str {
-    if id == AUTO_MODEL { AUTO_TARGET } else { id }
+    if id == AUTO_MODEL { auto_target() } else { id }
+}
+
+/// The model a session runs on by default: `configured` while this
+/// deployment can call it, else [`auto_target`], which is always callable.
+#[must_use]
+pub fn default_model<'a>(configured: &'a str) -> &'a str {
+    if model_is_callable(configured) {
+        configured
+    } else {
+        auto_target()
+    }
 }
 
 /// Models the in-memory agent offers beyond the closed chat catalog, paired
@@ -52,23 +81,28 @@ pub fn display_name(id: &str) -> &str {
         .unwrap_or(id)
 }
 
-/// Auto, then the closed chat models, then the routed extras, in picker order.
+/// Auto, then the closed chat models, then the routed extras, in picker order,
+/// without any model whose provider key is only a placeholder.
+///
+/// The catalog is read once per process: environment keys do not change while
+/// a deployment runs, and the picker, session config, and turn routing must
+/// all agree on the same list.
 #[must_use]
 pub fn advertised_models() -> &'static [&'static str] {
-    static MODELS: OnceLock<Vec<&'static str>> = OnceLock::new();
-    MODELS
-        .get_or_init(|| {
-            let mut models = Vec::with_capacity(CHAT_MODELS.len() + ROUTED_MODELS.len());
-            models.push(AUTO_MODEL);
-            models.extend_from_slice(CHAT_MODELS);
-            for (model, _) in ROUTED_MODELS {
-                if !models.contains(model) {
-                    models.push(model);
-                }
+    static MODELS: LazyLock<Vec<&'static str>> = LazyLock::new(|| {
+        let mut models = Vec::with_capacity(CHAT_MODELS.len() + ROUTED_MODELS.len());
+        models.push(AUTO_MODEL);
+        for model in CHAT_MODELS
+            .iter()
+            .chain(ROUTED_MODELS.iter().map(|(model, _)| model))
+        {
+            if *model != AUTO_MODEL && model_is_callable(model) && !models.contains(model) {
+                models.push(model);
             }
-            models
-        })
-        .as_slice()
+        }
+        models
+    });
+    MODELS.as_slice()
 }
 
 /// Image input support for the models in Rox's catalog.

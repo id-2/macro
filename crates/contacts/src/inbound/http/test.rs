@@ -4,9 +4,9 @@ use axum::{
     http::{Request, header},
 };
 use http_body_util::BodyExt;
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalAuthConfig, JwtValidator,
-    MacroAuthorizationError, MacroAuthorizationServiceImpl, ValidatedIdentity,
+    RoxAuthorizationError, RoxAuthorizationServiceImpl, ValidatedIdentity,
 };
 use rate_limit::{
     RateLimitConfig, RateLimitExceeded, RateLimitKey, RateLimitResult, RateLimitServiceImpl,
@@ -30,8 +30,8 @@ struct MockService;
 impl ContactsService for MockService {
     async fn query_contacts(
         &self,
-        user_id: MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+        user_id: RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         if user_id.as_ref() != FOUND_USER_ID {
             return Ok(Vec::new());
         }
@@ -42,7 +42,7 @@ impl ContactsService for MockService {
             "macro|contact3@test.com",
         ]
         .into_iter()
-        .map(|user_id| MacroUserIdStr::try_from(user_id.to_string()).unwrap())
+        .map(|user_id| RoxUserIdStr::try_from(user_id.to_string()).unwrap())
         .collect())
     }
 
@@ -55,7 +55,7 @@ impl ContactsService for MockService {
 impl PeopleSearchService for MockService {
     async fn search_people(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         query: &PeopleSearchQuery,
         limit: PeopleSearchLimit,
     ) -> Result<Vec<PersonMatch>, Report> {
@@ -65,7 +65,7 @@ impl PeopleSearchService for MockService {
         Ok((0..limit.get())
             .map(|index| {
                 let user_id =
-                    MacroUserIdStr::try_from(format!("macro|person{index}@example.com")).unwrap();
+                    RoxUserIdStr::try_from(format!("macro|person{index}@example.com")).unwrap();
                 PersonMatch {
                     contact: crate::domain::models::contact::Contact {
                         id: crate::domain::models::contact::ContactId::for_viewer(
@@ -97,18 +97,18 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.validation_count.fetch_add(1, Ordering::SeqCst);
 
         let user_id = match jwt {
             "found" => FOUND_USER_ID,
             "not-found" => NOT_FOUND_USER_ID,
             "sender" => SENDER_USER_ID,
-            _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         };
 
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -157,19 +157,19 @@ fn rate_limiter(should_exceed: bool) -> RateLimitServiceImpl<MockRateLimitPort> 
 
 fn build_test_router(should_exceed: bool) -> (Router, FakeJwtValidator) {
     let validator = FakeJwtValidator::default();
-    let authorization_service = MacroAuthorizationServiceImpl::new(
+    let authorization_service = RoxAuthorizationServiceImpl::new(
         validator.clone(),
         InternalAuthConfig {
             api_key: VALID_INTERNAL_KEY.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
     let state = ContactsRouterState {
         contacts_service: Arc::new(MockService),
         rate_limit_service: rate_limiter(should_exceed),
-        authorization_state: MacroAuthorizationState::new(Arc::new(authorization_service)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(authorization_service)),
     };
 
     (contacts_router::<_, _, _, ()>(state), validator)

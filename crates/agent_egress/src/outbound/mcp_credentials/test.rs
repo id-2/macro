@@ -6,8 +6,8 @@ use pipedream_mcp::outbound::api::McpUpstreamCall;
 use std::sync::Mutex;
 use url::Url;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
 }
 
 fn connection(app_slug: &str, enabled: bool) -> PipedreamConnection {
@@ -32,7 +32,7 @@ impl ConnectionStore for FixedConnections {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _app_slug: &str,
     ) -> Result<Option<PipedreamConnection>, Self::Err> {
         unreachable!("resolution lists, never loads one")
@@ -40,7 +40,7 @@ impl ConnectionStore for FixedConnections {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _app_slug: &str,
     ) -> Result<(), Self::Err> {
         unreachable!("resolution never deletes")
@@ -48,7 +48,7 @@ impl ConnectionStore for FixedConnections {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<PipedreamConnection>, Self::Err> {
         Ok(self.0.clone())
     }

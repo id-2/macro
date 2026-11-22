@@ -9,6 +9,7 @@ import {
 } from '@channel/Input';
 import { FloatRegionOrInline } from '@components/app/mobile/float-regions/FloatRegion';
 import { SpeedSelector } from '@core/component/AI/component/input/SpeedSelector';
+import { Model } from '@core/component/AI/constant/model';
 import { catalogModelLabel } from '@core/component/AI/constant/model-label';
 import { nativeSpeeds, resolveSpeed } from '@core/component/AI/constant/speed';
 import {
@@ -52,7 +53,6 @@ import { ChatComposer } from '../components/ChatComposer';
 import { type AgentKind, kindForMode } from '../core/agent-kind';
 import {
   type AgentsMode,
-  agentsModeLabel,
   type ComposerMode,
 } from '../core/mode';
 import { defaultBranchFor, sameRepository } from '../core/repository';
@@ -205,9 +205,14 @@ export function NewChatPage(props: {
       (agent.id === MACRO_PERSONA_ID
         ? preferredInmem.model()
         : agent.defaultModel);
-    return selectedCatalog.models().some((option) => option.id === preferred)
-      ? preferred
-      : selectedCatalog.currentModel();
+    if (
+      preferred &&
+      preferred !== Model.gemini38Flash &&
+      selectedCatalog.models().some((option) => option.id === preferred)
+    ) {
+      return preferred;
+    }
+    return Model.roxR1Max;
   };
   const capabilityTarget = () => {
     const agent = selected();
@@ -523,19 +528,19 @@ export function NewChatPage(props: {
   const modeSwitch = () => (
     <div ref={tourTarget(AGENTS_TOUR.modeSwitch)} class="shrink-0">
       <Tabs
-        aria-label="Conversation mode"
+        aria-label={t('agentChat.conversationMode')}
         options={[
           ...(ownMode.autoAvailable()
             ? [
                 {
                   value: 'auto' as const,
-                  label: agentsModeLabel('auto'),
+                  label: 'Авто',
                   icon: AutoIcon,
                 },
               ]
             : []),
-          { value: 'chat', label: agentsModeLabel('chat'), icon: ChatIcon },
-          { value: 'code', label: agentsModeLabel('code'), icon: CodeIcon },
+          { value: 'chat', label: 'Чат', icon: ChatIcon },
+          { value: 'code', label: 'Код', icon: CodeIcon },
         ]}
         variant="track"
         fullWidth
@@ -616,7 +621,7 @@ export function NewChatPage(props: {
         </div>
       }
       drawerOpen
-      placeholder={coding() ? 'Describe what you want to build' : undefined}
+      placeholder={coding() ? 'Опишите, что нужно собрать' : undefined}
       onSend={send}
       modelName={catalogModelLabel(
         composerModelOverride(),
@@ -637,7 +642,11 @@ export function NewChatPage(props: {
 
   return (
     <Show when={!props.compact} fallback={composer()}>
-      <section class="page newchat" data-active aria-label="New conversation">
+      <section
+        class="page newchat"
+        data-active
+        aria-label={t('agentChat.newConversation')}
+      >
         <div ref={tourTarget(AGENTS_TOUR.composer)} class="col">
           <div class="greeting">
             <ComposerGreeting wireframe={coding()}>
@@ -645,8 +654,8 @@ export function NewChatPage(props: {
                 {(currentMode) => (
                   <span class="greeting-text">
                     {currentMode === 'code'
-                      ? 'What should we build?'
-                      : 'What should we work on?'}
+                      ? 'Что соберём?'
+                      : t('agentControls.workOn')}
                   </span>
                 )}
               </Show>

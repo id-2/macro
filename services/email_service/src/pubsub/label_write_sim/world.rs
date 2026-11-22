@@ -19,8 +19,8 @@ use email::domain::service::EmailServiceImpl;
 use email::outbound::EmailPgRepo;
 use frecency::domain::services::FrecencyQueryServiceImpl;
 use frecency::outbound::postgres::FrecencyPgStorage;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::service::cache::TokenCacheKey;
 use sqlx::PgPool;
 use std::collections::{BTreeMap, BTreeSet};
@@ -67,7 +67,7 @@ pub type EmailSvc = EmailServiceImpl<
     entity_access_management::domain::service::EntityAccessManagementServiceImpl<
         entity_access_management::outbound::PgRepository,
     >,
-    MacroEventBrokerService<KafkaEventPublisher, TaskTracker>,
+    RoxEventBrokerService<KafkaEventPublisher, TaskTracker>,
 >;
 
 pub struct Queues {
@@ -130,8 +130,8 @@ where
     }
 }
 
-pub fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("sim@example.com").unwrap()
+pub fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("sim@example.com").unwrap()
 }
 
 pub fn link_uuid(shard: u32) -> Uuid {
@@ -249,7 +249,7 @@ impl World {
                 retry_worker,
             )
         };
-        let broker = MacroEventBrokerService::new(
+        let broker = RoxEventBrokerService::new(
             KafkaEventPublisher::new("127.0.0.1:9092").expect("kafka publisher"),
             TaskTracker::new(),
         );

@@ -148,7 +148,7 @@ impl StreamPosition {
 
 /// When the UUIDv7 `id` was minted.
 fn minted_at(id: &str) -> Option<SystemTime> {
-    let timestamp = macro_uuid::Uuid::parse_str(id).ok()?.get_timestamp()?;
+    let timestamp = rox_uuid::Uuid::parse_str(id).ok()?.get_timestamp()?;
     let (seconds, nanos) = timestamp.to_unix();
     Some(UNIX_EPOCH + Duration::new(seconds, nanos))
 }

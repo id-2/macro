@@ -1,4 +1,4 @@
-//! Macro's own sign-in emails, which an agent's program must not read: one
+//! Rox's own sign-in emails, which an agent's program must not read: one
 //! that reads the code from the user's inbox can sign in as the user.
 
 use serde_json::Value;
@@ -6,7 +6,7 @@ use serde_json::Value;
 #[cfg(test)]
 mod test;
 
-/// The addresses Macro sends sign-in mail from in each environment:
+/// The addresses Rox sends sign-in mail from in each environment:
 /// FusionAuth's `default-from-email` (passwordless codes and email
 /// verification) and the local kickstart's `MAIL_FROM`. The auth service
 /// sends its account-merge codes and verification links from the same
@@ -20,9 +20,9 @@ const SIGN_IN_SENDERS: [&str; 4] = [
 
 /// What a program reads instead of a sign-in email's subject and text.
 pub const HIDDEN_SIGN_IN_EMAIL: &str =
-    "Macro sign-in email (hidden from programs; the user can read it in Macro)";
+    "Rox sign-in email (hidden from programs; the user can read it in Rox)";
 
-/// Whether an email came from one of Macro's sign-in senders. Takes a bare
+/// Whether an email came from one of Rox's sign-in senders. Takes a bare
 /// address or a `Name <address>` mailbox.
 #[must_use]
 pub fn is_macro_sign_in_sender(sender: &str) -> bool {
@@ -36,7 +36,7 @@ pub fn is_macro_sign_in_sender(sender: &str) -> bool {
         .any(|known| known.eq_ignore_ascii_case(address))
 }
 
-/// Whether a raw RFC 5322 message is one of Macro's sign-in emails, by its
+/// Whether a raw RFC 5322 message is one of Rox's sign-in emails, by its
 /// `From` address. A message whose headers don't parse is not.
 #[must_use]
 pub fn is_macro_sign_in_eml(raw: &[u8]) -> bool {

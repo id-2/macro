@@ -5,6 +5,7 @@ import {
 } from '@app/features/next-soup/actions';
 import { DateGroupHeading } from '@app/features/next-soup/soup-view/date-group-heading';
 import { TutorialRow } from '@app/features/video-tutorials';
+import { t } from '@app/lib/i18n';
 import { useInfiniteScrollSentinel } from '@app/lib/primitives/infinite-scroll-sentinel';
 import {
   type OpenPrLink,
@@ -76,7 +77,7 @@ export type ReviewsListProps = {
 };
 
 function ReviewListElement(props: JSX.HTMLAttributes<HTMLUListElement>) {
-  return <ul {...props} aria-label="Pull requests" />;
+  return <ul {...props} aria-label={t('reviews.pullRequests')} />;
 }
 
 function ReviewRow(props: {
@@ -193,7 +194,7 @@ export function ReviewsList(props: ReviewsListProps) {
     scrollHandle,
     activation: {
       createMetadata: (intent) => ({ newSplit: intent === 'alternate' }),
-      alternateDescription: 'Open in new split',
+      alternateDescription: t('nav.openInNewSplit'),
     },
   });
   const actionState = toEntityActionListState({
@@ -273,7 +274,7 @@ export function ReviewsList(props: ReviewsListProps) {
   });
 
   return (
-    <section aria-label="Reviews" class="flex size-full min-h-0 flex-col">
+    <section aria-label={t('reviews.title')} class="flex size-full min-h-0 flex-col">
       <Suspense
         fallback={
           <div
@@ -282,7 +283,7 @@ export function ReviewsList(props: ReviewsListProps) {
           >
             <SpinnerIcon
               aria-hidden={false}
-              aria-label="Loading reviews"
+              aria-label={t('reviews.loadingReviews')}
               class="size-5 animate-spin"
             />
           </div>
@@ -301,7 +302,7 @@ export function ReviewsList(props: ReviewsListProps) {
             >
               <SpinnerIcon
                 aria-hidden={false}
-                aria-label="Loading reviews"
+                aria-label={t('reviews.loadingReviews')}
                 class="size-5 animate-spin"
               />
             </div>
@@ -311,13 +312,13 @@ export function ReviewsList(props: ReviewsListProps) {
               role="alert"
               class="flex flex-1 flex-col items-center justify-center gap-3 text-sm text-ink-muted"
             >
-              <span>Reviews couldn’t be loaded.</span>
+              <span>{t('reviews.listLoadFailed')}</span>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => fireAndForget(source.retry(), 'reviews-view')}
               >
-                Try again
+                {t('common.tryAgain')}
               </Button>
             </div>
           </Match>
@@ -325,7 +326,7 @@ export function ReviewsList(props: ReviewsListProps) {
             <div
               ref={setListElement}
               role="group"
-              aria-label="Pull requests"
+              aria-label={t('reviews.pullRequests')}
               tabIndex={0}
               class="min-h-0 flex-1 overflow-auto"
             >
@@ -357,7 +358,7 @@ export function ReviewsList(props: ReviewsListProps) {
                           role="alert"
                           class="grid min-h-32 place-items-center text-sm text-ink-muted"
                         >
-                          More pull requests couldn’t be loaded. Retry below.
+                          {t('reviews.moreLoadFailed')}
                         </div>
                       </Show>
                     }
@@ -366,7 +367,7 @@ export function ReviewsList(props: ReviewsListProps) {
                       role="status"
                       class="grid min-h-32 place-items-center text-sm text-ink-muted"
                     >
-                      Searching more pull requests…
+                      {t('reviews.searchingMore')}
                     </div>
                   </Show>
                 }
@@ -490,12 +491,12 @@ export function ReviewsList(props: ReviewsListProps) {
                       fallback={
                         source.pageError()
                           ? source.hasMore()
-                            ? 'Retry loading more'
-                            : 'Retry loading'
-                          : 'Load more'
+                            ? t('reviews.retryLoadMore')
+                            : t('reviews.retryLoading')
+                          : t('reviews.loadMore')
                       }
                     >
-                      <SpinnerIcon class="size-3 animate-spin" /> Loading…
+                      <SpinnerIcon class="size-3 animate-spin" /> {t('reviews.loading')}
                     </Show>
                   </Button>
                 </div>

@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::mailbox::settings::*;
 use email_api_client::domain::models::EmailApiError;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{label::Label, link::UserProvider};
 
 #[cfg(test)]
@@ -9,7 +9,7 @@ mod test;
 
 async fn authorized(
     tx: &mut sqlx::PgConnection,
-    actor: &MacroUserIdStr<'_>,
+    actor: &RoxUserIdStr<'_>,
     link: Uuid,
 ) -> Result<SettingsMailbox, MailboxError> {
     let row = sqlx::query!(r#"SELECT sync_generation,grant_generation,provider::text AS "provider!" FROM email_links l
@@ -56,21 +56,21 @@ async fn upsert_label(
 ) -> Result<Label, MailboxError> {
     let row = sqlx::query!(r#"INSERT INTO email_labels(id,link_id,provider_label_id,name,type)
         VALUES($1,$2,$3,$4,'User') ON CONFLICT(link_id,provider_label_id) DO UPDATE SET name=EXCLUDED.name RETURNING id,created_at"#,
-        macro_uuid::generate_uuid_v7(),label.link_id,label.provider_label_id,label.name).fetch_one(tx).await.map_err(db_error)?;
+        rox_uuid::generate_uuid_v7(),label.link_id,label.provider_label_id,label.name).fetch_one(tx).await.map_err(db_error)?;
     label.id = Some(row.id);
     label.created_at = row.created_at;
     Ok(label)
 }
 async fn changed(tx: &mut sqlx::PgConnection, mailbox: MailboxKey) -> Result<(), MailboxError> {
     sqlx::query!(r#"INSERT INTO email_projection_outbox(id,link_id,generation,payload) VALUES($1,$2,$3,'{"kind":"link_changed"}')"#,
-        macro_uuid::generate_uuid_v7(),mailbox.link_id,mailbox.sync_generation).execute(tx).await.map_err(db_error)?;
+        rox_uuid::generate_uuid_v7(),mailbox.link_id,mailbox.sync_generation).execute(tx).await.map_err(db_error)?;
     Ok(())
 }
 
 impl MailboxSettingsRepository for PgMailboxSync {
     async fn accessible(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
     ) -> Result<SettingsMailbox, MailboxError> {
         authorized(
@@ -82,7 +82,7 @@ impl MailboxSettingsRepository for PgMailboxSync {
     }
     async fn store_label(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         mailbox: SettingsMailbox,
         label: Label,
     ) -> Result<Label, MailboxError> {
@@ -102,7 +102,7 @@ impl MailboxSettingsRepository for PgMailboxSync {
     }
     async fn queue_label_creation(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         mailbox: SettingsMailbox,
         name: &str,
     ) -> Result<Label, MailboxError> {
@@ -135,7 +135,7 @@ impl MailboxSettingsRepository for PgMailboxSync {
             sqlx::query!(r#"INSERT INTO email_mailbox_settings_work(id,link_id,kind,resource_key)
                 VALUES($1,$2,'create_label',$3) ON CONFLICT(link_id,kind,resource_key)
                 DO UPDATE SET revision=email_mailbox_settings_work.revision+1,next_run_at=now(),failure=NULL"#,
-                macro_uuid::generate_uuid_v7(),mailbox.key.link_id,name).execute(&mut *tx).await.map_err(db_error)?;
+                rox_uuid::generate_uuid_v7(),mailbox.key.link_id,name).execute(&mut *tx).await.map_err(db_error)?;
             changed(&mut tx, mailbox.key).await?;
         }
         tx.commit().await.map_err(db_error)?;
@@ -162,7 +162,7 @@ impl MailboxSettingsRepository for PgMailboxSync {
     }
     async fn delete_label(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         label: Uuid,
     ) -> Result<(), MailboxError> {
@@ -179,7 +179,7 @@ impl MailboxSettingsRepository for PgMailboxSync {
         .ok_or(EmailApiError::NotFound)?;
         sqlx::query!(r#"INSERT INTO email_mailbox_settings_work(id,link_id,kind,resource_key) VALUES($1,$2,'delete_label',$3)
             ON CONFLICT(link_id,kind,resource_key) DO UPDATE SET revision=email_mailbox_settings_work.revision+1,next_run_at=now(),failure=NULL"#,
-            macro_uuid::generate_uuid_v7(),link,row.provider_label_id).execute(&mut *tx).await.map_err(db_error)?;
+            rox_uuid::generate_uuid_v7(),link,row.provider_label_id).execute(&mut *tx).await.map_err(db_error)?;
         // Invalidate delayed creation commits. Keep an active lease until it
         // expires so deletion follows any already-started provider request.
         sqlx::query!("UPDATE email_mailbox_settings_work SET revision=revision+1,completed_revision=revision+1 WHERE link_id=$1 AND kind='create_label' AND resource_key=$2 AND completed_revision<revision",link,row.provider_label_id)
@@ -195,7 +195,7 @@ impl MailboxSettingsRepository for PgMailboxSync {
     }
     async fn sender_block(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: Uuid,
         sender: &str,
         blocked: bool,

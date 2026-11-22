@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { CrmCompanyEntity } from '@entity';
 import { createMemo, createSignal, onCleanup } from 'solid-js';
 import type {
@@ -144,7 +145,7 @@ export function createCrmExport(
         setError(
           cause instanceof Error
             ? cause.message
-            : 'Could not prepare the export. Please retry.'
+            : t('crm.exportPrepareFailed')
         );
     } finally {
       if (!signal.aborted) setPending(false);

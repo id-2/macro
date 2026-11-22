@@ -2,14 +2,14 @@ use email::domain::{
     mailbox::{MailboxError, catalog::*},
     models::EmailBackfillStatus,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::backfill::BackfillJobStatus;
 
 pub struct PgInboxCatalog(pub sqlx::PgPool);
 impl InboxCatalogRepository for PgInboxCatalog {
     async fn accessible_details(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> Result<Vec<InboxCatalogFacts>, MailboxError> {
         Ok(
             email_db_client::links::get::fetch_inbox_details_for_macro_id(&self.0, actor)

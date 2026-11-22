@@ -3,8 +3,8 @@ use foreign_entity::domain::models::{
     CreateForeignEntity, ForeignEntity, ForeignEntityError, PatchForeignEntity, SourceId,
 };
 use foreign_entity::domain::ports::{ForeignEntityListQuery, ForeignEntityService};
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::cowlike::CowLike;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::cowlike::CowLike;
 use model::document::{DocumentMetadata, FileType};
 use std::sync::{Arc, Mutex};
 
@@ -71,7 +71,7 @@ fn task_document_context(document_id: &str) -> DocumentBasic {
 }
 
 fn authenticated_receipt(document_id: &str) -> EntityAccessReceipt<ViewAccessLevel> {
-    let user_id = macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -87,7 +87,7 @@ fn internal_receipt(document_id: &str) -> EntityAccessReceipt<ViewAccessLevel> {
 }
 
 fn member_team_receipt(team_id: &str, user_id: &str) -> EntityAccessReceipt<MemberTeamRole> {
-    let user_id = macro_user_id::user_id::MacroUserIdStr::parse_from_str(user_id)
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str(user_id)
         .unwrap()
         .into_owned();
 
@@ -162,7 +162,7 @@ impl TaskPropertiesPort for TestTaskPropertiesPort {
     async fn update_task_status(
         &self,
         _access: &EntityAccessReceipt<EditAccessLevel>,
-        _credited_user: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _credited_user: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
         _source: Option<&models_properties::service::property_change_source::PropertyChangeSource>,
         _status: &str,
     ) -> anyhow::Result<()> {
@@ -204,7 +204,7 @@ impl ConnectionService for TestConnectionService {
 
     async fn send_channel_message<'a>(
         &self,
-        _users: &[macro_user_id::user_id::MacroUserIdStr<'a>],
+        _users: &[rox_user_id::user_id::RoxUserIdStr<'a>],
         _message_type: &str,
         _message: serde_json::Value,
     ) -> Result<(), connection::domain::models::ConnectionError> {
@@ -374,8 +374,8 @@ impl TestEventBroker {
     }
 }
 
-impl MacroEventBroker for TestEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for TestEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -692,7 +692,7 @@ async fn get_document_by_team_slug_rejects_wrong_receipt_entity_type() {
     repo.expect_get_document_id_by_team_task_number().times(0);
     repo.expect_get_basic_document().times(0);
     let receipt = EntityAccessReceipt::<MemberTeamRole>::dangerously_assert_authenticated_user(
-        macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
             .unwrap()
             .into_owned(),
         "00000000-0000-0000-0000-000000000701",
@@ -1509,7 +1509,7 @@ async fn test_get_task_github_pull_requests_skips_malformed_keys_before_lookup()
 }
 
 fn owner_receipt(document_id: &str) -> EntityAccessReceipt<OwnerAccessLevel> {
-    let user_id = macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -1782,7 +1782,7 @@ async fn team_edit_rejects_owner_level_and_enable_without_team_before_writes() {
 }
 
 fn edit_receipt(document_id: &str) -> EntityAccessReceipt<EditAccessLevel> {
-    let user_id = macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+    let user_id = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned();
 
@@ -2135,7 +2135,7 @@ async fn copy_document_best_effort_bumps_inherited_project_and_publishes_event()
         .withf(|id| id == "project-1")
         .returning(|_| {
             Box::pin(std::future::ready(Ok(
-                macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user@user.com")
+                rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user@user.com")
                     .unwrap()
                     .into_owned(),
             )))
@@ -2362,7 +2362,7 @@ impl crate::domain::ports::mentions::DocumentMentionTrackingPort for RejectUnexp
     async fn track_document_mentions(
         &self,
         _: &str,
-        _: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
         _: &str,
     ) -> anyhow::Result<()> {
         panic!("failed repository creation must not track mentions");
@@ -2427,8 +2427,8 @@ async fn creator_forwards_explicit_consent_and_stops_after_repository_failure() 
     }
 }
 
-fn test_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user@user.com")
+fn test_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user@user.com")
         .unwrap()
         .into_owned()
 }
@@ -2792,7 +2792,7 @@ impl TaskPropertiesPort for RecordingTaskPropertiesPort {
     async fn update_task_status(
         &self,
         _access: &EntityAccessReceipt<EditAccessLevel>,
-        _credited_user: Option<&macro_user_id::user_id::MacroUserIdStr<'static>>,
+        _credited_user: Option<&rox_user_id::user_id::RoxUserIdStr<'static>>,
         _source: Option<&models_properties::service::property_change_source::PropertyChangeSource>,
         _status: &str,
     ) -> anyhow::Result<()> {

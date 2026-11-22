@@ -9,7 +9,7 @@ use std::{
 };
 
 use async_graphql::{EmptyMutation, EmptySubscription, Schema};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::entity_property_with_definition::EntityPropertyWithDefinition;
 use uuid::Uuid;
 
@@ -22,7 +22,7 @@ struct TestReader(Arc<AtomicUsize>);
 impl EntityPropertyReader for TestReader {
     async fn get_definitions(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         scope: GraphqlPropertyDefinitionScope,
         for_entity_type: Option<models_properties::EntityType>,
     ) -> Result<Vec<PropertyDefinition>, rootcause::Report> {
@@ -49,7 +49,7 @@ impl EntityPropertyReader for TestReader {
 
     async fn get_options(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         property_definition_ids: &[Uuid],
     ) -> Result<HashMap<Uuid, Vec<PropertyOption>>, rootcause::Report> {
         assert_eq!(user_id.as_ref(), "macro|viewer@rox.one");
@@ -78,7 +78,7 @@ impl EntityPropertyReader for TestReader {
 
     async fn get_properties(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _keys: &[model_entity::Entity<'static>],
     ) -> Result<
         HashMap<model_entity::Entity<'static>, Vec<EntityPropertyWithDefinition>>,
@@ -120,7 +120,7 @@ impl Query {
 fn schema(calls: Arc<AtomicUsize>) -> Schema<Query, EmptyMutation, EmptySubscription> {
     Schema::build(Query, EmptyMutation, EmptySubscription)
         .data(entity_properties_loader(
-            MacroUserIdStr::parse_from_str("macro|viewer@rox.one").expect("valid user"),
+            RoxUserIdStr::parse_from_str("macro|viewer@rox.one").expect("valid user"),
             TestReader(calls),
         ))
         .finish()
@@ -186,7 +186,7 @@ async fn invisible_definition_error_is_not_returned_as_an_empty_option_list() {
 
 #[tokio::test]
 async fn schema_only_reader_fails_closed_if_executed() {
-    let user = MacroUserIdStr::parse_from_str("macro|viewer@rox.one").expect("valid user");
+    let user = RoxUserIdStr::parse_from_str("macro|viewer@rox.one").expect("valid user");
     assert!(
         NoOpEntityPropertyReader
             .get_definitions(&user, GraphqlPropertyDefinitionScope::All, None)

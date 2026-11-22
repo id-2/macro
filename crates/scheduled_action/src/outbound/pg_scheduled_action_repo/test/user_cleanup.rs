@@ -3,15 +3,15 @@ use crate::domain::models::InProgressExecution;
 use crate::domain::ports::{ScheduledActionExecutor, ScheduledActionService};
 use crate::domain::service::ScheduledActionServiceImpl;
 use entity_access::domain::{models::AccessError, ports::ScheduledActionGrants};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use std::sync::Arc;
 
 struct UnusedGrants;
 impl ScheduledActionGrants for UnusedGrants {
     async fn accessible_scheduled_action_ids(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
-    ) -> std::result::Result<Vec<macro_uuid::Uuid>, AccessError> {
+        _user_id: &RoxUserId<Lowercase<'_>>,
+    ) -> std::result::Result<Vec<rox_uuid::Uuid>, AccessError> {
         Ok(Vec::new())
     }
 }

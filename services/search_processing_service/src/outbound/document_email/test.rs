@@ -1,7 +1,7 @@
 use super::*;
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(path = "../../../fixtures", scripts("email_attachment_documents"))
 )]
 async fn a_document_is_an_email_attachment_only_while_a_link_exists(pool: PgPool) {
@@ -26,7 +26,7 @@ async fn a_document_is_an_email_attachment_only_while_a_link_exists(pool: PgPool
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(path = "../../../fixtures", scripts("email_attachment_documents"))
 )]
 async fn pages_walk_each_linked_document_once_in_id_order(pool: PgPool) {

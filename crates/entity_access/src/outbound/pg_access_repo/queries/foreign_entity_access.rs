@@ -104,8 +104,8 @@ pub async fn list_foreign_entity_grants(
 pub async fn get_foreign_entity_users(
     pool: &PgPool,
     foreign_entity_id: &Uuid,
-) -> anyhow::Result<Vec<macro_user_id::user_id::MacroUserIdStr<'static>>> {
-    use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+) -> anyhow::Result<Vec<rox_user_id::user_id::RoxUserIdStr<'static>>> {
+    use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
     let users = sqlx::query_scalar!(
         r#"
         SELECT stored_for_id AS "user_id!" FROM foreign_entity
@@ -124,7 +124,7 @@ pub async fn get_foreign_entity_users(
     users
         .into_iter()
         .map(|user| {
-            MacroUserIdStr::parse_from_str(&user)
+            RoxUserIdStr::parse_from_str(&user)
                 .map(|id| id.into_owned())
                 .map_err(anyhow::Error::from)
         })

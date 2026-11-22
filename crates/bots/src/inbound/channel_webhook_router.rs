@@ -25,12 +25,13 @@ use entity_access::{
     },
     inbound::axum_extractors::ChannelAccessLevelExtractor,
 };
-use macro_authorization::{
+use rox_authorization::{
     AnyPrincipal, BOT_TOKEN_HEADER, BotAuthentication, BotOnly, CredentialAttribution,
-    MacroAuthorization, MacroAuthorizationExtractor, MacroAuthorizationRejection,
-    MacroAuthorizationService, MacroAuthorizationState, OptionalMacroAuthorizationExtractor,
+    LEGACY_BOT_TOKEN_HEADER,
+    RoxAuthorization, RoxAuthorizationExtractor, RoxAuthorizationRejection,
+    RoxAuthorizationService, RoxAuthorizationState, OptionalRoxAuthorizationExtractor,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MessageCommands,
     models::{MessageAttribution, PostMessage},
@@ -42,14 +43,18 @@ use std::{marker::PhantomData, sync::Arc};
 use uuid::Uuid;
 
 /// Header used to authenticate channel bot webhook requests.
-pub const CHANNEL_BOT_TOKEN_HEADER: &str = "x-macro-channel-bot-token";
+pub const CHANNEL_BOT_TOKEN_HEADER: &str = "x-rox-channel-bot-token";
+
+/// The channel bot token header clients sent before the rename. Accepted
+/// until it is retired on purpose.
+pub const LEGACY_CHANNEL_BOT_TOKEN_HEADER: &str = "x-macro-channel-bot-token";
 
 /// State for the channel bot webhook router.
 pub struct ChannelBotWebhookRouterState<BotSvc, AccessSvc, Auth> {
     bot_service: Arc<BotSvc>,
     channel_poster: Arc<dyn MessageCommands>,
     access_service: Arc<AccessSvc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<BotSvc, AccessSvc, Auth> Clone for ChannelBotWebhookRouterState<BotSvc, AccessSvc, Auth> {
@@ -73,7 +78,7 @@ where
         bot_service: BotSvc,
         channel_poster: Arc<dyn MessageCommands>,
         access_service: AccessSvc,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             bot_service: Arc::new(bot_service),
@@ -93,11 +98,16 @@ impl<BotSvc, AccessSvc, Auth> FromRef<ChannelBotWebhookRouterState<BotSvc, Acces
 }
 
 impl<BotSvc, AccessSvc, Auth> FromRef<ChannelBotWebhookRouterState<BotSvc, AccessSvc, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &ChannelBotWebhookRouterState<BotSvc, AccessSvc, Auth>) -> Self {
         state.authorization_state.clone()
     }
+}
+
+/// Whether the request carries any of `names`.
+fn any_header(headers: &HeaderMap, names: &[&'static str]) -> bool {
+    names.iter().any(|name| headers.contains_key(*name))
 }
 
 struct ChannelWebhookAuthorizationExtractor<Auth> {
@@ -107,24 +117,28 @@ struct ChannelWebhookAuthorizationExtractor<Auth> {
 
 impl<S, Auth> FromRequestParts<S> for ChannelWebhookAuthorizationExtractor<Auth>
 where
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
-    type Rejection = MacroAuthorizationRejection;
+    type Rejection = RoxAuthorizationRejection;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        if parts.headers.contains_key(BOT_TOKEN_HEADER)
-            && parts.headers.contains_key(CHANNEL_BOT_TOKEN_HEADER)
-        {
-            return Err(MacroAuthorizationRejection {
+        if any_header(
+            &parts.headers,
+            &[BOT_TOKEN_HEADER, LEGACY_BOT_TOKEN_HEADER],
+        ) && any_header(
+            &parts.headers,
+            &[CHANNEL_BOT_TOKEN_HEADER, LEGACY_CHANNEL_BOT_TOKEN_HEADER],
+        ) {
+            return Err(RoxAuthorizationRejection {
                 status: StatusCode::BAD_REQUEST,
                 message: "ambiguous credentials".into(),
             });
         }
 
         let authorization =
-            OptionalMacroAuthorizationExtractor::<Auth, BotOnly>::from_request_parts(parts, state)
+            OptionalRoxAuthorizationExtractor::<Auth, BotOnly>::from_request_parts(parts, state)
                 .await?
                 .authorization;
         Ok(Self {
@@ -148,7 +162,7 @@ pub fn channel_scoped_bot_router<BotSvc, AccessSvc, Auth, T>(
 where
     BotSvc: BotService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync,
 {
     Router::new()
@@ -166,7 +180,7 @@ pub fn channel_bot_webhook_router<BotSvc, AccessSvc, Auth, T>(
 where
     BotSvc: BotService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync,
 {
     Router::new()
@@ -179,7 +193,7 @@ where
 
 fn caller_from_receipt(
     receipt: &EntityAccessReceipt<MemberParticipantRole>,
-) -> Result<MacroUserIdStr<'static>, ChannelBotWebhookHandlerErr> {
+) -> Result<RoxUserIdStr<'static>, ChannelBotWebhookHandlerErr> {
     receipt
         .get_authenticated_user()
         .cloned()
@@ -210,7 +224,7 @@ pub async fn create_channel_scoped_bot_handler<BotSvc, AccessSvc, Auth>(
     access: ChannelAccessLevelExtractor<MemberParticipantRole, AccessSvc, Auth>,
     // The channel receipt drops the credential's attribution, which the mint
     // refusal needs.
-    authorization: MacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    authorization: RoxAuthorizationExtractor<Auth, AnyPrincipal>,
     headers: HeaderMap,
     Path(path): Path<ChannelPath>,
     Json(req): Json<CreateChannelScopedBotRequest>,
@@ -218,10 +232,10 @@ pub async fn create_channel_scoped_bot_handler<BotSvc, AccessSvc, Auth>(
 where
     BotSvc: BotService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let attribution = match &authorization.authorization {
-        MacroAuthorization::User(user) => user.attribution(),
+        RoxAuthorization::User(user) => user.attribution(),
         _ => CredentialAttribution::Person,
     };
     if super::axum_router::refuses_program_mint(attribution, &headers) {
@@ -245,8 +259,10 @@ where
     path = "/channels/{channel_id}/webhook",
     params(
         ("channel_id" = Uuid, Path, description = "Channel ID"),
-        ("x-macro-bot-token" = Option<String>, Header, description = "Preferred bot authentication token"),
-        ("x-macro-channel-bot-token" = Option<String>, Header, deprecated, description = "Legacy channel-scoped bot authentication token")
+        ("x-rox-bot-token" = Option<String>, Header, description = "Preferred bot authentication token"),
+        ("x-macro-bot-token" = Option<String>, Header, deprecated, description = "Preferred bot authentication token under its pre-rename name; still accepted"),
+        ("x-rox-channel-bot-token" = Option<String>, Header, description = "Channel-scoped bot authentication token"),
+        ("x-macro-channel-bot-token" = Option<String>, Header, deprecated, description = "Channel-scoped bot authentication token under its pre-rename name; still accepted")
     ),
     request_body = ChannelWebhookRequest,
     responses(
@@ -285,7 +301,7 @@ pub async fn post_channel_webhook_handler<BotSvc, AccessSvc, Auth>(
 where
     BotSvc: BotService,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     tracing::Span::current().record("channel_id", tracing::field::display(path.channel_id));
 
@@ -338,6 +354,7 @@ fn record_preferred_bot(bot: &BotAuthentication) {
 fn channel_bot_token(headers: &HeaderMap) -> Result<&str, ChannelBotWebhookHandlerErr> {
     let token = headers
         .get(CHANNEL_BOT_TOKEN_HEADER)
+        .or_else(|| headers.get(LEGACY_CHANNEL_BOT_TOKEN_HEADER))
         .and_then(|value| value.to_str().ok())
         .ok_or(ChannelBotWebhookHandlerErr::Bot(BotError::Unauthorized))?;
 

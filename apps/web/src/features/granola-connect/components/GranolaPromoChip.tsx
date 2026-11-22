@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { PipedreamConnectorIcon } from '@core/pipedream/ConnectorIcon';
 import ArrowRightIcon from '@icon/system/regular/arrow-right.svg';
 import SpinnerIcon from '@icon/system/regular/spinner.svg';
@@ -13,6 +14,7 @@ export function GranolaPromoChip(props: {
     <button
       type="button"
       disabled={props.connecting}
+      aria-label={t('granolaConnect.connect')}
       onClick={() => props.onConnect()}
       class="group flex w-full items-center gap-2.5 rounded-lg border border-accent/25 bg-linear-to-r from-accent/15 via-accent/5 to-success/10 px-2.5 py-2 text-left outline-none transition-colors hover:border-accent/45 hover:from-accent/20 focus-visible:border-edge-focus disabled:opacity-60"
     >
@@ -25,10 +27,10 @@ export function GranolaPromoChip(props: {
       </span>
       <span class="min-w-0 flex-1">
         <span class="block truncate text-sm font-medium text-ink">
-          Connect Granola
+          {t('granolaConnect.connect')}
         </span>
         <span class="block text-xs text-ink-muted">
-          Import meetings as calls
+          {t('granolaConnect.body')}
         </span>
       </span>
       <Show

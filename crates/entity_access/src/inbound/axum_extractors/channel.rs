@@ -20,9 +20,9 @@ use crate::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
-    OptionalMacroAuthorizationExtractor,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
+    OptionalRoxAuthorizationExtractor,
 };
 use tracing::Level;
 #[derive(Debug, serde::Deserialize)]
@@ -47,8 +47,8 @@ where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -57,7 +57,7 @@ where
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let service = <Arc<Svc>>::from_ref(state);
         let authorization =
-            OptionalMacroAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(
+            OptionalRoxAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(
                 parts, state,
             )
             .await
@@ -68,7 +68,7 @@ where
             .await
             .map_err(|_| ExtractorError::BadRequest("missing channel_id path parameter"))?;
 
-        if let Some(MacroAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
+        if let Some(RoxAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
         {
             let entity_access_receipt = generate_bot_entity_access_receipt::<T>(
                 service.as_ref(),
@@ -87,11 +87,11 @@ where
         let is_internal_access = authorization
             .authorization
             .as_ref()
-            .is_some_and(MacroAuthorization::is_internal);
+            .is_some_and(RoxAuthorization::is_internal);
         let (macro_user_id, user_context) = authorization
             .authorization
             .as_ref()
-            .and_then(MacroAuthorization::acting_user)
+            .and_then(RoxAuthorization::acting_user)
             .map(|user| (Some(user.macro_user_id.clone()), user.user_context.clone()))
             .unwrap_or_default();
 

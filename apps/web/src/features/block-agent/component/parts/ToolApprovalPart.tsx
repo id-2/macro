@@ -3,6 +3,7 @@
  * above the composer so there is only one place to answer them.
  */
 
+import { t } from '@app/lib/i18n';
 import type { MessagePart } from '@service-agent-fold/generated/types';
 import { Show } from 'solid-js';
 import { match } from 'ts-pattern';
@@ -41,7 +42,7 @@ export function ToolApprovalPart(props: {
   };
   const outcome = () =>
     match(props.part.status)
-      .with('pending', () => 'Waiting for approval')
+      .with('pending', () => t('agentChat.waitingForApproval'))
       .with('approved', () => {
         const approved = props.part.remembered ? 'Always allowed' : 'Approved';
         return by() ? `${approved} by ${by()}` : approved;

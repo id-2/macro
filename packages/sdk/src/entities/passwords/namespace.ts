@@ -1,7 +1,7 @@
 import { v7 as uuidv7 } from 'uuid';
 import type { PasswordAgentCreateSecret } from '../../../generated/storage/types.gen';
 import { type IterationOptions, iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Team } from '../teams/team';
 import { type AgentWake, PasswordItem, vaultHeaders } from './item';
 
@@ -12,7 +12,7 @@ import { type AgentWake, PasswordItem, vaultHeaders } from './item';
  * @mcp-exclude Agent vault values must reach only the agent's secrets capability, never model context.
  */
 export class PasswordNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** The team's vault as this agent sees it during one wake. */
   forAgent(team: Team, wake: AgentWake): AgentVault {
@@ -28,7 +28,7 @@ export class PasswordNamespace {
  */
 export class AgentVault {
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The team that owns the vault. */
     readonly team: Team,
     private readonly wake: AgentWake,

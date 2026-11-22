@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { DragSessionSensors } from '@app/components/drag-drop/drag-session-sensors';
 import CaretLeftIcon from '@icon/system/regular/caret-left.svg';
 import DotsSixVerticalIcon from '@icon/system/regular/dots-six-vertical.svg';
@@ -156,7 +157,7 @@ export function CustomizeDock(props: {
         <Button
           type="button"
           ref={backButton}
-          aria-label="Back to More views"
+          aria-label={t('nav.backToMoreViews')}
           variant="ghost"
           size="icon-lg"
           class="size-11"
@@ -170,7 +171,7 @@ export function CustomizeDock(props: {
         <MobileDrawer.Close
           as={Button}
           variant="ghost"
-          aria-label="Done"
+          aria-label={t('nav.done')}
           class="min-h-11 px-3 text-sm font-medium text-accent"
         >
           Done

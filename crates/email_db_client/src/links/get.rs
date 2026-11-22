@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use doppleganger::Mirror;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::db;
 use models_email::email::service::link;
 use models_email::service;
@@ -247,7 +247,7 @@ struct DbInboxDetailsRow {
 #[tracing::instrument(skip(pool, macro_id), err)]
 pub async fn fetch_inbox_details_for_macro_id(
     pool: &PgPool,
-    macro_id: &MacroUserIdStr<'_>,
+    macro_id: &RoxUserIdStr<'_>,
 ) -> anyhow::Result<Vec<InboxDetails>> {
     let macro_id: &str = macro_id.as_ref();
 
@@ -496,7 +496,7 @@ pub struct ReadableInbox {
 #[tracing::instrument(skip_all, err)]
 pub async fn fetch_readable_owned_inboxes(
     pool: &PgPool,
-    macro_id: &MacroUserIdStr<'_>,
+    macro_id: &RoxUserIdStr<'_>,
 ) -> anyhow::Result<Vec<ReadableInbox>> {
     let rows = sqlx::query!(
         r#"

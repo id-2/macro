@@ -1,8 +1,8 @@
 import type { EmailPolicyRevision } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Link } from '../email/link';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { type CrmEmailRuleSet, emailRules } from './email-rules';
 
 /** One immutable rule definition in the caller's current team's history. */
@@ -16,16 +16,16 @@ export type CrmEmailRuleDefinition = {
 };
 
 /** A saved definition; reading it never reapplies it or grants access to its targets. */
-export class CrmEmailRuleRevision extends MacroEntity<CrmEmailRuleDefinition> {
+export class CrmEmailRuleRevision extends RoxEntity<CrmEmailRuleDefinition> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     private readonly revision: number,
   ) {
     super(client, String(revision));
   }
 
   /** Construct a definition handle from its revision number. */
-  static byId(client: MacroClient, revision: number): CrmEmailRuleRevision {
+  static byId(client: RoxClient, revision: number): CrmEmailRuleRevision {
     return new CrmEmailRuleRevision(client, revision);
   }
 
@@ -36,7 +36,7 @@ export class CrmEmailRuleRevision extends MacroEntity<CrmEmailRuleDefinition> {
       }),
     );
     if (!record)
-      throw new MacroNotFoundError('Email rule revision is unavailable.');
+      throw new RoxNotFoundError('Email rule revision is unavailable.');
 
     return {
       inbox: Link.byId(this.client, record.link_id),

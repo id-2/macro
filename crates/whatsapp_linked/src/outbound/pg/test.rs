@@ -16,7 +16,7 @@ use external_chat::domain::{
     timeline::TimelineRepository,
 };
 use external_chat::outbound::pg::PgExternalChatRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::sync::Arc;
 
 mod changes;
@@ -32,7 +32,7 @@ mod timeline;
 
 const GROUP: &str = "120363000000000001@g.us";
 /// A test user's id, typed.
-fn person(user: &str) -> macro_user_id::user_id::MacroUserIdStr<'static> {
+fn person(user: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
     user.to_owned().try_into().expect("test user ids are valid")
 }
 
@@ -1089,7 +1089,7 @@ async fn messages_stamped_around_adoption_follow_the_second_granular_boundary(po
 impl SendRateLimiter for Allow {
     async fn check(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> ExternalChatResult<()> {
         Ok(())
     }
@@ -1103,7 +1103,7 @@ async fn rate_limited_send_never_creates_a_dispatchable_intent(pool: PgPool) {
     impl SendRateLimiter for Denied {
         async fn check(
             &self,
-            _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+            _: &rox_user_id::user_id::RoxUserIdStr<'_>,
         ) -> ExternalChatResult<()> {
             Err(ExternalChatError::RateLimited.into())
         }

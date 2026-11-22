@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import type {
   MessageListItem,
   MessageParent,
@@ -35,7 +35,7 @@ vi.mock('@service-storage/messages', () => ({
   entityMessagesClient: { timeline: mocks.timeline },
 }));
 vi.mock('@app/lib/analytics', () => ({ analytics: { track: vi.fn() } }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: mocks.reportError, span: mocks.trace },
 }));
 vi.mock('../subscription', () => ({ useMessageSubscription() {} }));

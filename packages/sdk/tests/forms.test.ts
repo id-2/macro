@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { DatabaseTable } from '../src/entities/databases/table';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 const host = 'https://storage.example.test';

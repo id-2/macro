@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::ports::BotRepo;
 use entity_registry::OwnerGrantPolicy;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

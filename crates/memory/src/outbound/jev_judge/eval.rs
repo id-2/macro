@@ -28,13 +28,13 @@ impl YesNoClassifier for Direct {
 }
 
 fn provider() -> SystemOneJev {
-    if let Some(key) = macro_env_var::maybe_read_env("TYPESAFE_API_KEY") {
+    if let Some(key) = rox_env_var::maybe_read_env("TYPESAFE_API_KEY") {
         return SystemOneJev::typesafe(&key).unwrap();
     }
-    let account = macro_env_var::maybe_read_env("CLOUDFLARE_ACCOUNT_ID")
+    let account = rox_env_var::maybe_read_env("CLOUDFLARE_ACCOUNT_ID")
         .expect("TYPESAFE_API_KEY or CLOUDFLARE_ACCOUNT_ID is set");
     let token =
-        macro_env_var::maybe_read_env("CLOUDFLARE_API_TOKEN").expect("CLOUDFLARE_API_TOKEN is set");
+        rox_env_var::maybe_read_env("CLOUDFLARE_API_TOKEN").expect("CLOUDFLARE_API_TOKEN is set");
     SystemOneJev::clef_flash(&account, &token).unwrap()
 }
 
@@ -298,7 +298,7 @@ fn fixtures() -> Vec<(String, MemoryKind, Expect, String)> {
 #[ignore = "calls TypeSafe's Jev or Cloudflare's Clef Flash; needs their credentials"]
 async fn judge_evaluation() {
     let judge = JevMemoryJudge::new(Direct(provider()));
-    let user = MacroUserIdStr::parse_from_str("macro|eval@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|eval@example.com").unwrap();
     let mut wrong = Vec::new();
     for (name, kind, expect, content) in fixtures() {
         let (name, kind) = (name.as_str(), &kind);

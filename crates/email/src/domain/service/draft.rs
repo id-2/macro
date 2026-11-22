@@ -9,8 +9,8 @@ use crate::domain::{
 use base64::Engine;
 use base64::engine::general_purpose::URL_SAFE_NO_PAD;
 use frecency::domain::ports::FrecencyQueryService;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::EmailServiceImpl;
@@ -28,7 +28,7 @@ where
 {
     pub(crate) async fn message_operation_status_impl(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         message_id: Uuid,
     ) -> Result<Option<crate::domain::models::mailbox_operation::MessageOperationStatus>, EmailErr>
     {
@@ -56,7 +56,7 @@ where
 
     pub(crate) async fn resolve_message_operation_impl(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         request: crate::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> Result<Uuid, EmailErr> {
         let ids: Vec<Uuid> = self
@@ -102,7 +102,7 @@ where
     #[tracing::instrument(err, skip(self, input))]
     pub(crate) async fn save_draft_for_user_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         link_id: Option<Uuid>,
         mut input: CreateDraftInput,
     ) -> Result<SavedUserDraft, EmailErr> {
@@ -243,7 +243,7 @@ where
     #[tracing::instrument(err, skip(self))]
     pub(crate) async fn delete_draft_for_user_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         draft_id: Uuid,
 
         expected_generation: i32,
@@ -437,7 +437,7 @@ where
             bcc: resolved.bcc,
             body_text: resolved.body_text,
             body_html: resolved.body_html,
-            body_macro: resolved.body_macro,
+            body_rox: resolved.body_rox,
             headers_json: resolved.headers_json,
             send_time: resolved.send_time,
         })
@@ -520,7 +520,7 @@ where
         let (thread_db_id, new_thread) = self.build_new_thread_if_needed(link_id, &input);
 
         // Resolve all IDs and build the insert-ready struct
-        let message_db_id = input.db_id.unwrap_or_else(macro_uuid::generate_uuid_v7);
+        let message_db_id = input.db_id.unwrap_or_else(rox_uuid::generate_uuid_v7);
 
         // Start the undo window only after provider validation and preparation.
         // A slow send-as lookup must not consume the user's cancellation window.
@@ -544,7 +544,7 @@ where
             bcc: input.bcc,
             body_text: input.body_text,
             body_html: input.body_html,
-            body_macro: input.body_macro,
+            body_rox: input.body_rox,
             headers_json: input.headers_json,
             send_time: input.send_time,
             actor_id: input.actor.as_ref().map(|actor| actor.as_ref().to_owned()),
@@ -753,7 +753,7 @@ where
     /// owner's inbox, so the reply always starts a thread in the caller's.
     async fn reply_target(
         &self,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
         replying_to_id: Uuid,
         accessible_link_ids: &[Uuid],
     ) -> Result<SimpleMessageInfo, EmailErr> {
@@ -846,7 +846,7 @@ where
 
         let now = chrono::Utc::now();
         let thread = ThreadRow {
-            db_id: macro_uuid::generate_uuid_v7(),
+            db_id: rox_uuid::generate_uuid_v7(),
             provider_id: None,
             link_id,
             inbox_visible: false,
@@ -923,7 +923,7 @@ fn resolve_thread_hint(existing: Option<&ThreadRow>, link_id: Uuid) -> ThreadHin
 pub(super) fn resolve_target_link<'a>(
     links: &'a [Link],
     link_id: Option<Uuid>,
-    caller: &macro_user_id::user_id::MacroUserIdStr<'_>,
+    caller: &rox_user_id::user_id::RoxUserIdStr<'_>,
 ) -> Result<&'a Link, EmailErr> {
     match link_id {
         Some(id) => links.iter().find(|link| link.id == id),

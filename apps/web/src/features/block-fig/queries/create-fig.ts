@@ -6,7 +6,7 @@ import { analytics } from '@app/lib/analytics';
 import { FigEngine } from '@core/fig-engine/client';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { contentHash } from '@core/util/hash';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { invalidateUserQuota } from '@queries/auth';
 import { postNewHistoryItem } from '@queries/history/history';
 import { setPreviewOnCreate } from '@queries/preview/preview';

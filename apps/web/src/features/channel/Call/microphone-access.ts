@@ -1,5 +1,5 @@
 import { catchToResult } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { invoke } from '@tauri-apps/api/core';
 import { z } from 'zod';
 import { callMediaErrorType } from './call-media-telemetry';

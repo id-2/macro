@@ -1,1 +1,1 @@
-export * from '@macro-inc/spreadsheet/cell-copy';
+export * from '@rox-one/spreadsheet/cell-copy';

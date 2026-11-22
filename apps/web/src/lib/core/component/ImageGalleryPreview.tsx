@@ -10,7 +10,7 @@ import ThreeDotsIcon from '@icon/system/regular/dots-three-vertical.svg';
 import DownloadIcon from '@icon/system/regular/download-simple.svg';
 import TrashIcon from '@icon/system/regular/trash.svg';
 import { Dialog } from '@kobalte/core/dialog';
-import { constrainImageDimensions } from '@macro-inc/lexical-core/utils/media';
+import { constrainImageDimensions } from '@rox-one/lexical-core/utils/media';
 import { Button, cn, Dropdown } from '@ui';
 import { type Component, createSignal, For, Show } from 'solid-js';
 import { copyImageToClipboard, downloadImage } from '../util/imageActions';

@@ -6,8 +6,8 @@ use std::time::{Duration, Instant};
 use ai_usage::{AiFeature, UsageContext};
 use base64::{Engine, engine::general_purpose::STANDARD};
 use futures::{SinkExt, StreamExt};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 use team_agents::domain::models::TeamAgentError;
 use team_agents::domain::models::VoiceModel;
@@ -85,7 +85,7 @@ impl VoiceCatalog {
         }
 
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .0
             .client
@@ -205,7 +205,7 @@ impl VoiceProvider for VoiceCatalog {
     #[tracing::instrument(name = "speech_gateway.voice_sample", skip_all, fields(voice = %model, cached = tracing::field::Empty), err)]
     async fn sample(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         team: Uuid,
         model: &VoiceModel,
     ) -> Result<Vec<u8>, TeamAgentError> {

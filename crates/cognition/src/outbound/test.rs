@@ -9,8 +9,8 @@ use wiremock::{
 const DEFAULT_MODEL: &str = "google/gemini-3.8-flash";
 const TEST_KEY: &str = "local-test-key";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|cognition-test@macro.local".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|cognition-test@macro.local".to_owned()).unwrap()
 }
 
 fn client(base: &str) -> CognitionClient {

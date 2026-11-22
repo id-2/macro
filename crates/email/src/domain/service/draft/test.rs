@@ -17,7 +17,7 @@ fn input_with_body_html(html: &str) -> CreateDraftInput {
         bcc: vec![],
         body_text: None,
         body_html: Some(URL_SAFE_NO_PAD.encode(html)),
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: None,
@@ -74,9 +74,9 @@ fn test_link(id: Uuid, owner: &str, email: &str, is_primary: bool) -> Link {
     use crate::domain::models::UserProvider;
     Link {
         id,
-        macro_id: macro_user_id::user_id::MacroUserIdStr::try_from_email(owner).unwrap(),
+        macro_id: rox_user_id::user_id::RoxUserIdStr::try_from_email(owner).unwrap(),
         fusionauth_user_id: "fa-user".to_string(),
-        email_address: macro_user_id::email::EmailStr::try_from(email.to_string()).unwrap(),
+        email_address: rox_user_id::email::EmailStr::try_from(email.to_string()).unwrap(),
         provider: UserProvider::Gmail,
         is_sync_active: true,
         is_primary,
@@ -85,8 +85,8 @@ fn test_link(id: Uuid, owner: &str, email: &str, is_primary: bool) -> Link {
     }
 }
 
-fn caller() -> macro_user_id::user_id::MacroUserIdStr<'static> {
-    macro_user_id::user_id::MacroUserIdStr::try_from_email("user@test.com").unwrap()
+fn caller() -> rox_user_id::user_id::RoxUserIdStr<'static> {
+    rox_user_id::user_id::RoxUserIdStr::try_from_email("user@test.com").unwrap()
 }
 
 #[test]

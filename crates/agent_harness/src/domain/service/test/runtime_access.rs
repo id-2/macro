@@ -109,7 +109,7 @@ async fn a_prompt_queued_before_access_was_removed_never_runs() {
     );
     assert_eq!(
         presented[0].parent,
-        MessageParent::Channel(macro_uuid::Uuid::from_u128(0xf0))
+        MessageParent::Channel(rox_uuid::Uuid::from_u128(0xf0))
     );
 }
 

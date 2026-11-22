@@ -1,7 +1,7 @@
 //! A user's time zone is their primary calendar's.
 
 use calendar_events::domain::ports::CalendarOccurrenceService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::ports::UserTimeZones;
 
@@ -18,7 +18,7 @@ impl<Calendars> PrimaryCalendarTimeZones<Calendars> {
 }
 
 impl<Calendars: CalendarOccurrenceService> UserTimeZones for PrimaryCalendarTimeZones<Calendars> {
-    async fn time_zone(&self, user: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn time_zone(&self, user: &RoxUserIdStr<'static>) -> Option<String> {
         self.calendars
             .primary_time_zone(user.as_ref())
             .await

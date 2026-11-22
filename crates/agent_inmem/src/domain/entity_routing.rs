@@ -5,7 +5,7 @@
 use std::{future::Future, pin::Pin};
 
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -18,7 +18,7 @@ pub trait EntityRoutingPolicy: Send + Sync {
     /// Whether `owner`'s code-mode turns route; unavailable flags do not.
     fn routes<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'_>,
+        owner: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = bool> + Send + 'a>>;
 }
 
@@ -28,7 +28,7 @@ pub struct NoEntityRouting;
 impl EntityRoutingPolicy for NoEntityRouting {
     fn routes<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = bool> + Send + 'a>> {
         Box::pin(async { false })
     }
@@ -49,7 +49,7 @@ impl<F: FeatureFlags> FlaggedEntityRouting<F> {
 impl<F: FeatureFlags> EntityRoutingPolicy for FlaggedEntityRouting<F> {
     fn routes<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'_>,
+        owner: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = bool> + Send + 'a>> {
         Box::pin(async move {
             self.flags

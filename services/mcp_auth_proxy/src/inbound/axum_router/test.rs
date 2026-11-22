@@ -19,7 +19,7 @@ use crate::test_support::{
     code_challenge_for, query_param,
 };
 use axum::{Router, routing::get};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
 
 const BODY_LIMIT: usize = 64 * 1024;
 
@@ -1628,28 +1628,28 @@ async fn mounted_mcp_preserves_process_readiness_and_bearer_protection() {
 
 #[derive(Clone)]
 struct KeyOwners(std::sync::Arc<std::sync::atomic::AtomicBool>);
-impl macro_authorization::UserApiKeyAuthorizationRepo for KeyOwners {
+impl rox_authorization::UserApiKeyAuthorizationRepo for KeyOwners {
     type Err = &'static str;
     async fn find_key_owner(
         &self,
         key: &str,
-    ) -> Result<Option<macro_authorization::ResolvedApiKeyUser>, Self::Err> {
+    ) -> Result<Option<rox_authorization::ResolvedApiKeyUser>, Self::Err> {
         if !["fixture-user-key", "fixture-manager-key"].contains(&key)
             || !self.0.load(std::sync::atomic::Ordering::SeqCst)
         {
             return Ok(None);
         }
-        Ok(Some(macro_authorization::ResolvedApiKeyUser {
-            macro_user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(
+        Ok(Some(rox_authorization::ResolvedApiKeyUser {
+            macro_user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(
                 "macro|agent@example.com",
             )
             .unwrap(),
             fusion_user_id: "agent-fusion".into(),
             organization_id: None,
             account_manager: (key == "fixture-manager-key").then(|| {
-                macro_authorization::AccountManagerCredential {
+                rox_authorization::AccountManagerCredential {
                     grant_id: uuid::Uuid::nil(),
-                    manager_user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(
+                    manager_user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(
                         "macro|manager@example.com",
                     )
                     .unwrap(),
@@ -1671,7 +1671,7 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
     let active = Arc::new(AtomicBool::new(true));
     let app = super::mounted_mcp_router(
         Some(Arc::new(
-            macro_authorization::UserApiKeyAuthorizerService::new(KeyOwners(active.clone())),
+            rox_authorization::UserApiKeyAuthorizerService::new(KeyOwners(active.clone())),
         )),
         Harness::new().service,
         JwtValidationArgs::new_testing(),
@@ -1680,7 +1680,7 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
             get(|request: axum::extract::Request| async move {
                 request
                     .extensions()
-                    .get::<macro_user_id::user_id::MacroUserIdStr<'static>>()
+                    .get::<rox_user_id::user_id::RoxUserIdStr<'static>>()
                     .unwrap()
                     .to_string()
             }),
@@ -1731,6 +1731,48 @@ async fn user_key_authenticates_its_owner_rejects_managed_keys_and_honors_revoca
     assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
 }
 
+/// Both the current and the pre-rename API key header authenticate; a name
+/// the proxy never read does not.
+#[tokio::test]
+async fn the_api_key_header_is_read_under_both_names_and_no_other() {
+    use std::sync::{Arc, atomic::AtomicBool};
+    let app = super::mounted_mcp_router(
+        Some(Arc::new(
+            rox_authorization::UserApiKeyAuthorizerService::new(KeyOwners(Arc::new(
+                AtomicBool::new(true),
+            ))),
+        )),
+        Harness::new().service,
+        JwtValidationArgs::new_testing(),
+        Router::new().route("/", get(|| async { "ok" })),
+    );
+    for header in ["x-rox-user-api-key", "x-macro-user-api-key"] {
+        let response = app
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri("/mcp/mcp")
+                    .header(header, "fixture-user-key")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK, "{header}");
+    }
+    let response = app
+        .oneshot(
+            Request::builder()
+                .uri("/mcp/mcp")
+                .header("x-never-an-api-key", "fixture-user-key")
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::UNAUTHORIZED);
+}
+
 #[tokio::test]
 async fn jwt_bearer_still_authenticates_its_user_with_api_key_support_enabled() {
     use std::sync::{Arc, atomic::AtomicBool};
@@ -1749,7 +1791,7 @@ async fn jwt_bearer_still_authenticates_its_user_with_api_key_support_enabled() 
     .unwrap();
     let app = super::mounted_mcp_router(
         Some(Arc::new(
-            macro_authorization::UserApiKeyAuthorizerService::new(KeyOwners(Arc::new(
+            rox_authorization::UserApiKeyAuthorizerService::new(KeyOwners(Arc::new(
                 AtomicBool::new(false),
             ))),
         )),
@@ -1760,7 +1802,7 @@ async fn jwt_bearer_still_authenticates_its_user_with_api_key_support_enabled() 
             get(|request: axum::extract::Request| async move {
                 request
                     .extensions()
-                    .get::<macro_user_id::user_id::MacroUserIdStr<'static>>()
+                    .get::<rox_user_id::user_id::RoxUserIdStr<'static>>()
                     .unwrap()
                     .to_string()
             }),
@@ -1825,7 +1867,7 @@ async fn a_program_cannot_drive_the_sign_in_broker() {
     for mut request in requests {
         let route = format!("{} {}", request.method(), request.uri().path());
         request.headers_mut().insert(
-            macro_authorization::CODE_EXECUTION_HEADER,
+            rox_authorization::CODE_EXECUTION_HEADER,
             "1".parse().unwrap(),
         );
 
@@ -1841,7 +1883,7 @@ async fn a_program_cannot_drive_the_sign_in_broker() {
 
     let mut health = Request::get("/health").body(Body::empty()).unwrap();
     health.headers_mut().insert(
-        macro_authorization::CODE_EXECUTION_HEADER,
+        rox_authorization::CODE_EXECUTION_HEADER,
         "1".parse().unwrap(),
     );
     assert_eq!(send(&flow.harness, health).await.status, StatusCode::OK);

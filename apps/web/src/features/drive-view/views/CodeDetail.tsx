@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import {
   type CodeBlockMode,
@@ -142,7 +143,7 @@ export function CodeDetail(props: {
     <FileDetailLoadGate
       documentId={props.documentId}
       entityType="code"
-      label="code document"
+      label={t('drive.entityCode')}
       load={loadCodeDocument}
     >
       {(data) => (

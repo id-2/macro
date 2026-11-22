@@ -7,6 +7,7 @@
  * github.com/sst/opencode, MIT © 2025 opencode — adapted to Rox tokens.
  */
 
+import { t } from '@app/lib/i18n';
 import { For } from 'solid-js';
 import type { AnsweredQuestion } from './types';
 
@@ -25,7 +26,9 @@ export function QuestionAnswers(props: QuestionAnswersProps) {
               {item.answers.length > 0 ? (
                 item.answers.join(', ')
               ) : (
-                <span class="text-ink-placeholder">No answer</span>
+                <span class="text-ink-placeholder">
+                  {t('agentChat.noAnswer')}
+                </span>
               )}
             </div>
           </div>

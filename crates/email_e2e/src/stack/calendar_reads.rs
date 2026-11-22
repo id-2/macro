@@ -22,10 +22,10 @@ use calendar_events::inbound::join_request_router::{
 use calendar_events::inbound::team_router::{CalendarTeamRouterState, team_calendar_router};
 use calendar_events::outbound::pg::PgCalendarRepository;
 use calendar_events::outbound::pg_team::PgCalendarTeamRepository;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer,
 };
 use rootcause::prelude::*;
 use sqlx::PgPool;
@@ -133,8 +133,8 @@ impl CalendarReads {
         team_sharing: bool,
     ) -> Result<Self, Report> {
         let authorization =
-            MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
-                MacroAuthJwtValidator::new(JwtValidationArgs::new_testing()),
+            RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
+                RoxAuthJwtValidator::new(JwtValidationArgs::new_testing()),
                 InternalAuthConfig {
                     api_key: internal_api_key.to_owned(),
                     default_user_id: None,

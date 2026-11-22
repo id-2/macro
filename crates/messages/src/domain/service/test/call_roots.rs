@@ -19,7 +19,7 @@ fn channel_access(user: &str) -> EntityAccessReceipt<MessageWrite> {
 
 /// A channel call whose root has been posted.
 fn posted_root() -> (Repo, Uuid) {
-    let call_id = macro_uuid::generate_uuid_v7();
+    let call_id = rox_uuid::generate_uuid_v7();
     let mut repo = fixture();
     repo.message.id = call_id;
     repo.message.parent = MessageParent::Channel(CHANNEL);
@@ -137,7 +137,7 @@ async fn a_stale_client_cannot_post_to_the_call_parent_of_a_channel_thread_call(
 #[tokio::test]
 async fn a_call_root_page_entry_carries_the_calls_life_and_a_deleted_record_reads_as_such() {
     let (mut repo, call_id) = posted_root();
-    let ended_call = macro_uuid::generate_uuid_v7();
+    let ended_call = rox_uuid::generate_uuid_v7();
     let ended_at = Utc::now();
     repo.call_statuses.insert(
         ended_call,

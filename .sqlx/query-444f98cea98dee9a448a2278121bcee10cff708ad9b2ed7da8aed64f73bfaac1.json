@@ -1,0 +1,41 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT position,initial_complete,reader_revision,fence FROM email_sync_streams WHERE link_id = $1 AND kind = 'mail_folder' AND scope_id = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "position",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "initial_complete",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 2,
+        "name": "reader_revision",
+        "type_info": "Int2"
+      },
+      {
+        "ordinal": 3,
+        "name": "fence",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      true,
+      false,
+      true,
+      false
+    ]
+  },
+  "hash": "444f98cea98dee9a448a2278121bcee10cff708ad9b2ed7da8aed64f73bfaac1"
+}

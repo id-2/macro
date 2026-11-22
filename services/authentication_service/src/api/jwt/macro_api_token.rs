@@ -1,12 +1,12 @@
-use crate::api::context::{AuthorizationService, MacroApiTokenContext};
+use crate::api::context::{AuthorizationService, RoxApiTokenContext};
 use axum::{
     Json,
     extract::{Query, State},
     http::{HeaderMap, StatusCode},
     response::{IntoResponse, Response},
 };
-use macro_auth::macro_api_token::EncodeMacroApiTokenArgs;
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor, is_program_run};
+use rox_auth::macro_api_token::EncodeRoxApiTokenArgs;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor, is_program_run};
 use sqlx::PgPool;
 use utoipa::ToSchema;
 
@@ -14,16 +14,16 @@ use utoipa::ToSchema;
 mod test;
 
 /// Why a program may not mint a Macro API token.
-const PROGRAM_TOKEN_REFUSAL: &str = "An agent's program cannot mint a Macro API token: it would reach you and outlive the run. Use the credential the run already has; for a lasting key, tell the user to create one in Macro's settings.";
+const PROGRAM_TOKEN_REFUSAL: &str = "An agent's program cannot mint a Rox API token: it would reach you and outlive the run. Use the credential the run already has; for a lasting key, tell the user to create one in Rox's settings.";
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, ToSchema)]
-pub struct MacroApiTokenResponse {
+pub struct RoxApiTokenResponse {
     /// The newly created macro_api_token
     pub macro_api_token: String,
 }
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]
-pub struct MacroApiTokenQuery {
+pub struct RoxApiTokenQuery {
     /// The email to generate the macro-api-token for
     pub email: Option<String>,
 }
@@ -41,7 +41,7 @@ pub struct MacroApiTokenQuery {
             ("email" = String, Query, description = "The email to generate the macro-api-token for. If not provided, we use your default profile."),
         ),
         responses(
-            (status = 200, body = MacroApiTokenResponse),
+            (status = 200, body = RoxApiTokenResponse),
             (status = 401, body=String),
             (status = 500, body=String),
         )
@@ -49,10 +49,10 @@ pub struct MacroApiTokenQuery {
 #[tracing::instrument(skip_all)]
 pub async fn handler(
     State(db): State<PgPool>,
-    State(macro_api_token_context): State<MacroApiTokenContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    State(macro_api_token_context): State<RoxApiTokenContext>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
     headers: HeaderMap,
-    Query(query): Query<MacroApiTokenQuery>,
+    Query(query): Query<RoxApiTokenQuery>,
 ) -> Result<Response, Response> {
     // A program's run credential lives about a minute; a token minted here
     // lives an hour and would reach the model, so programs keep the one they
@@ -63,26 +63,26 @@ pub async fn handler(
         return Err((StatusCode::FORBIDDEN, PROGRAM_TOKEN_REFUSAL).into_response());
     }
     let user_context = &authorization.authorization.user.user_context;
-    let email = if let Some(email) = query.email.clone() {
+    let email: std::borrow::Cow<'_, str> = if let Some(email) = query.email.as_deref() {
         // TODO: figure out if email is url_encoded by default
-        let email = urlencoding::decode(email.as_ref()).map_err(|e| {
+        urlencoding::decode(email).map_err(|e| {
             tracing::error!(error=?e, "unable to decode email");
             (StatusCode::BAD_REQUEST, "unable to decode email").into_response()
-        })?;
-
-        email.to_string()
+        })?
     } else if user_context.user_id.is_empty() {
         tracing::error!("user_id is empty");
         return Err((StatusCode::UNAUTHORIZED, "unauthorized").into_response());
     } else {
-        user_context.user_id.replace("macro|", "")
+        std::borrow::Cow::Borrowed(rox_user_id::user_id::strip_user_id_prefix(
+            &user_context.user_id,
+        ))
     };
 
     let user_profile =
-        macro_db_client::user::get::get_user_profile_by_fusionauth_user_id_and_email(
+        rox_db_client::user::get::get_user_profile_by_fusionauth_user_id_and_email(
             &db,
             &user_context.fusion_user_id,
-            &email,
+            email.as_ref(),
         )
         .await
         .map_err(|e| {
@@ -103,14 +103,14 @@ pub async fn handler(
         };
 
     let macro_api_token =
-        macro_auth::macro_api_token::encode_macro_api_token(EncodeMacroApiTokenArgs {
+        rox_auth::macro_api_token::encode_macro_api_token(EncodeRoxApiTokenArgs {
             agent_correlation_id: None,
             agent_session_id: None,
             // Programs are refused above, so these claims are empty here; they
             // are still copied so a relaxed refusal could never shed them.
             routine_id: agent_correlation::context::current_routine(),
             // No scope to keep: `AccountHolderOrInternal` refuses this route
-            // to every credential that signs one (`ScopedMacroApiJwt`).
+            // to every credential that signs one (`ScopedRoxApiJwt`).
             agent_scope: None,
             agent_id: authorization
                 .authorization
@@ -139,7 +139,7 @@ pub async fn handler(
 
     Ok((
         StatusCode::OK,
-        Json(MacroApiTokenResponse { macro_api_token }),
+        Json(RoxApiTokenResponse { macro_api_token }),
     )
         .into_response())
 }

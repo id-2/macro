@@ -25,6 +25,20 @@ const SENSITIVE_HEADERS = [
   'x-macro-signature',
   'x-macro-user-api-key',
   'x-permissions-token',
+  'x-rox-bot-token',
+  'x-rox-bot-scope',
+  'x-rox-bot-for-fusionauth-user-id',
+  'x-rox-bot-for-organization-id',
+  'x-rox-bot-for-rox-user-id',
+  'x-rox-channel-bot-token',
+  'x-rox-harness-for-rox-user-id',
+  'x-rox-harness-token',
+  'x-rox-internal-call',
+  'x-rox-mail-cache-profile',
+  'x-rox-refresh-token',
+  'x-rox-signature',
+  'x-rox-timestamp',
+  'x-rox-user-api-key',
 ] as const;
 
 const visibilityConfig = (metricName: string) => ({

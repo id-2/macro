@@ -24,11 +24,11 @@ use crate::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    AnyPrincipal, BotAuthentication, MacroAuthorization, MacroAuthorizationExtractor,
-    MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    AnyPrincipal, BotAuthentication, RoxAuthorization, RoxAuthorizationExtractor,
+    RoxAuthorizationService, RoxAuthorizationState,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Level;
 
 enum TeamAccessOutcome<T: RequiredPermission> {
@@ -58,7 +58,7 @@ impl<T: RequiredPermission> TeamAccessOutcome<T> {
 
 async fn user_team_access_outcome<T, Svc>(
     service: &Svc,
-    macro_user_id: MacroUserIdStr<'static>,
+    macro_user_id: RoxUserIdStr<'static>,
 ) -> Result<TeamAccessOutcome<T>, ExtractorError>
 where
     T: RequiredPermission,
@@ -91,12 +91,12 @@ where
 }
 
 /// The team receipt an authenticated user qualifies for, minted the way
-/// [`OptionalMacroUserTeamExtractorV2`] mints it for users. For transports
+/// [`OptionalRoxUserTeamExtractorV2`] mints it for users. For transports
 /// without request parts to extract from, such as GraphQL subscriptions,
 /// whose user was authenticated when the connection was established.
 pub async fn user_team_receipt<T, Svc>(
     service: &Svc,
-    macro_user_id: MacroUserIdStr<'static>,
+    macro_user_id: RoxUserIdStr<'static>,
 ) -> Result<Option<EntityAccessReceipt<T>>, ExtractorError>
 where
     T: RequiredPermission,
@@ -147,20 +147,20 @@ where
 
 async fn principal_team_access_outcome<T, Svc>(
     service: &Svc,
-    authorization: MacroAuthorization,
+    authorization: RoxAuthorization,
 ) -> Result<TeamAccessOutcome<T>, ExtractorError>
 where
     T: RequiredPermission,
     Svc: EntityAccessService,
 {
     match authorization {
-        MacroAuthorization::User(user) | MacroAuthorization::Internal(Some(user)) => {
+        RoxAuthorization::User(user) | RoxAuthorization::Internal(Some(user)) => {
             user_team_access_outcome::<T, Svc>(service, user.macro_user_id).await
         }
-        MacroAuthorization::Bot(authentication) => {
+        RoxAuthorization::Bot(authentication) => {
             bot_team_access_outcome::<T, Svc>(service, &authentication).await
         }
-        MacroAuthorization::Harness(_) | MacroAuthorization::Internal(None) => {
+        RoxAuthorization::Harness(_) | RoxAuthorization::Internal(None) => {
             Err(ExtractorError::UnauthorizedWithMessage("unauthorized"))
         }
     }
@@ -168,18 +168,18 @@ where
 
 /// Authorizes a principal and resolves its optional team access.
 ///
-/// The extractor uses the required [`MacroAuthorizationExtractor`], so missing,
+/// The extractor uses the required [`RoxAuthorizationExtractor`], so missing,
 /// invalid, and identity-less internal credentials are rejected. A qualifying
 /// team role produces a receipt; no membership or an insufficient role produces
 /// `None`.
 #[derive(Debug)]
-pub struct OptionalMacroUserTeamExtractorV2<T: RequiredPermission, Svc, Auth> {
+pub struct OptionalRoxUserTeamExtractorV2<T: RequiredPermission, Svc, Auth> {
     /// The entity access receipt, if the principal has qualifying team access.
     pub entity_access_receipt: Option<EntityAccessReceipt<T>>,
     _marker: PhantomData<(T, Svc, Auth)>,
 }
 
-impl<T: RequiredPermission, Svc, Auth> Clone for OptionalMacroUserTeamExtractorV2<T, Svc, Auth>
+impl<T: RequiredPermission, Svc, Auth> Clone for OptionalRoxUserTeamExtractorV2<T, Svc, Auth>
 where
     EntityAccessReceipt<T>: Clone,
 {
@@ -191,13 +191,13 @@ where
     }
 }
 
-impl<T, S, Svc, Auth> FromRequestParts<S> for OptionalMacroUserTeamExtractorV2<T, Svc, Auth>
+impl<T, S, Svc, Auth> FromRequestParts<S> for OptionalRoxUserTeamExtractorV2<T, Svc, Auth>
 where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -205,7 +205,7 @@ where
     #[tracing::instrument(err(level = Level::INFO), skip(state, parts))]
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let service = <Arc<Svc>>::from_ref(state);
-        let authorization: MacroAuthorizationExtractor<Auth, AnyPrincipal> = parts
+        let authorization: RoxAuthorizationExtractor<Auth, AnyPrincipal> = parts
             .extract_with_state(state)
             .await
             .map_err(ExtractorError::from)?;
@@ -222,24 +222,24 @@ where
 
 /// Authorizes a principal and resolves its required team access.
 ///
-/// The extractor uses [`MacroAuthorizationExtractor`] to authenticate the request.
+/// The extractor uses [`RoxAuthorizationExtractor`] to authenticate the request.
 /// It returns an [`EntityAccessReceipt`] when the principal has team access whose
 /// role satisfies `T`. A user without a team receives `"not in a team"`; a role
 /// that does not satisfy `T` receives `"you do not have a high enough role"`.
 #[derive(Debug)]
-pub struct MacroUserTeamExtractorV2<T: RequiredPermission, Svc, Auth> {
+pub struct RoxUserTeamExtractorV2<T: RequiredPermission, Svc, Auth> {
     /// The entity access receipt for the authorized principal.
     pub entity_access_receipt: EntityAccessReceipt<T>,
     _marker: PhantomData<(T, Svc, Auth)>,
 }
 
-impl<T, S, Svc, Auth> FromRequestParts<S> for MacroUserTeamExtractorV2<T, Svc, Auth>
+impl<T, S, Svc, Auth> FromRequestParts<S> for RoxUserTeamExtractorV2<T, Svc, Auth>
 where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -247,7 +247,7 @@ where
     #[tracing::instrument(err(level = Level::INFO), skip(state, parts))]
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let service = <Arc<Svc>>::from_ref(state);
-        let authorization: MacroAuthorizationExtractor<Auth, AnyPrincipal> = parts
+        let authorization: RoxAuthorizationExtractor<Auth, AnyPrincipal> = parts
             .extract_with_state(state)
             .await
             .map_err(ExtractorError::from)?;

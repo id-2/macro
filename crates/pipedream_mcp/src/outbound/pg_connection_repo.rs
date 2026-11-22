@@ -1,8 +1,8 @@
 use crate::domain::models::{
-    ConnectionProvider, ConnectorOverlay, MacroUserIdStr, PipedreamConnection,
+    ConnectionProvider, ConnectorOverlay, RoxUserIdStr, PipedreamConnection,
 };
 use crate::domain::ports::{AppConnections, ConnectionStore, ConnectorOverlays};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use sqlx::PgPool;
 
 /// Postgres-backed [`ConnectionStore`] over the `pipedream_mcp_connections` table,
@@ -53,7 +53,7 @@ impl ConnectionStore for PgConnectionRepo {
     #[tracing::instrument(skip(self), err)]
     async fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> Result<Option<PipedreamConnection>, Self::Err> {
         let row = sqlx::query!(
@@ -86,7 +86,7 @@ impl ConnectionStore for PgConnectionRepo {
     #[tracing::instrument(skip(self), err)]
     async fn delete(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> Result<(), Self::Err> {
         sqlx::query!(
@@ -102,7 +102,7 @@ impl ConnectionStore for PgConnectionRepo {
     #[tracing::instrument(skip(self), err)]
     async fn list(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<PipedreamConnection>, Self::Err> {
         let rows = sqlx::query!(
             r#"
@@ -198,7 +198,7 @@ fn to_record(
     enabled: bool,
     provider: String,
 ) -> anyhow::Result<PipedreamConnection> {
-    let user_id = MacroUserIdStr::parse_from_str(&user_id)?.into_owned();
+    let user_id = RoxUserIdStr::parse_from_str(&user_id)?.into_owned();
     Ok(PipedreamConnection {
         user_id,
         app_slug,

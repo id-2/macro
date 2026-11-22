@@ -2,7 +2,7 @@ use super::*;
 
 fn request() -> ImportTable {
     ImportTable {
-        request_id: macro_uuid::generate_uuid_v7(),
+        request_id: rox_uuid::generate_uuid_v7(),
         name: " Contacts ".into(),
         columns: vec![" Name ".into(), "Postal code".into()],
         rows: vec![vec!["Ada".into(), "00123".into()]],

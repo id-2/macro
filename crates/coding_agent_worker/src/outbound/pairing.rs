@@ -5,7 +5,8 @@
 //! control panel drives it frame by frame.
 
 use harnesses::domain::models::{
-    ClaimPairingRequest, ClaimedPairing, CreatePairingRequest, CreatedPairing,
+    ApprovePairingRequest, ClaimPairingRequest, ClaimedPairing, CreatePairingRequest,
+    CreatedPairing,
 };
 use pairing_id::PairingId;
 use reqwest::StatusCode;
@@ -75,6 +76,37 @@ impl PairingClient {
             .json()
             .await
             .context("could not read the pairing the service created")?)
+    }
+
+    /// Approve the pairing `code` as the signed-in user whose API token
+    /// `token` is. A pairing created with this client would otherwise wait
+    /// for a person to confirm the code on the web; the desktop app passes
+    /// its own session token so this machine can confirm itself.
+    pub async fn approve(&self, code: &str, token: &str) -> rootcause::Result<()> {
+        let response = self
+            .http
+            .post(format!(
+                "{}/harness-pairings/{code}/approve",
+                self.base
+            ))
+            .headers(crate::telemetry::trace_headers(
+                self.trace_parent.as_deref(),
+            ))
+            .bearer_auth(token)
+            .json(&ApprovePairingRequest {
+                allow_permission_bypass: false,
+                name: None,
+                team_id: None,
+            })
+            .send()
+            .await
+            .context("could not reach the service to approve pairing")?;
+        if !response.status().is_success() {
+            let status = response.status();
+            let message = response.text().await.unwrap_or_default();
+            rootcause::bail!("the service refused the pairing approval ({status}): {message}");
+        }
+        Ok(())
     }
 
     /// Poll the claim once.

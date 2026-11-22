@@ -515,7 +515,7 @@ jobs:
             - '.github/workspace-dep-closures.json'
           generated_workflows:
             - 'tooling/xtask/**'
-            - 'crates/macro_event_topics/**'
+            - 'crates/rox_event_topics/**'
             - '.github/workflows/**'
             - '.github/kafka-cluster-topics.json'
           node_modules_nix:

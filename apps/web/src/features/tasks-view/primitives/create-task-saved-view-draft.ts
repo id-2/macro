@@ -39,7 +39,7 @@ export type TaskSavedViewSelection =
 
 export function taskSavedViewTitle(view: TaskSavedViewSelection): string {
   if (view.kind === 'saved') return view.record.name;
-  return view.kind === 'new' ? 'New view' : 'Saved view';
+  return view.kind === 'new' ? 'Новый вид' : 'Сохранённый вид';
 }
 
 type ConfirmedTaskSavedView = TaskSavedViewRead & {
@@ -201,7 +201,7 @@ export function createTaskSavedViewDraft(options: {
     ) {
       return {
         kind: 'unavailable',
-        message: 'This saved view is unavailable or you no longer have access.',
+        message: 'Этот сохранённый вид недоступен, или у вас больше нет доступа.',
       };
     }
     const snapshot = confirmed();

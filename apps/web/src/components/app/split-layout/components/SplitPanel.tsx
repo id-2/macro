@@ -403,8 +403,8 @@ export function SplitPanel(props: SplitPanelProps) {
                               {panel().title}
                             </h3>
                             <Button
-                              aria-label="Close"
-                              tooltip="Close"
+                              aria-label={t('nav.close')}
+                              tooltip={t('nav.close')}
                               variant="ghost"
                               size="icon-sm"
                               onClick={() => panel().onClose?.()}

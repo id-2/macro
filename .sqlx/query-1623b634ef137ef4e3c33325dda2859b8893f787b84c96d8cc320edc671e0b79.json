@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM \"User\" WHERE id = 'macro|self@example.com'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "1623b634ef137ef4e3c33325dda2859b8893f787b84c96d8cc320edc671e0b79"
+}

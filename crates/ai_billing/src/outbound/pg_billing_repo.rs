@@ -22,8 +22,8 @@ use crate::domain::{
     SettlementState, plan_reload, plan_settlement,
 };
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use sqlx::PgPool;
 use std::str::FromStr;
 
@@ -85,12 +85,12 @@ async fn reload_committed_cents(
 
 async fn book_credit_reload(
     conn: &mut sqlx::PgConnection,
-    payer: &MacroUserIdStr<'_>,
+    payer: &RoxUserIdStr<'_>,
     amount_cents: i64,
     stripe_invoice_id: &str,
     kind: CreditReloadKind,
 ) -> Result<bool> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let note = match kind {
         CreditReloadKind::Automatic => "Automatic reload",
         CreditReloadKind::Purchase => "Credit purchase",
@@ -116,7 +116,7 @@ async fn book_credit_reload(
 impl BillingRepo for PgBillingRepo {
     async fn legacy_seats(
         &self,
-        _payer: &MacroUserIdStr<'_>,
+        _payer: &RoxUserIdStr<'_>,
         period: crate::domain::BillingPeriod,
         mut seats: Vec<SeatAllowance>,
     ) -> Result<Vec<SeatAllowance>> {
@@ -149,7 +149,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn record_plan_change(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         record: crate::domain::plan_change::RecordedPlanChange,
     ) -> Result<()> {
         let previous_plan = plan_name(record.change.from);
@@ -176,7 +176,7 @@ impl BillingRepo for PgBillingRepo {
         Ok(())
     }
 
-    async fn settings(&self, payer: &MacroUserIdStr<'_>) -> Result<BillingSettings> {
+    async fn settings(&self, payer: &RoxUserIdStr<'_>) -> Result<BillingSettings> {
         let row = sqlx::query!(
             r#"
             SELECT overage_enabled, overage_limit_cents, overage_suspended_at,
@@ -211,7 +211,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn credit_reload_committed_cents(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         month: BillingPeriod,
     ) -> Result<i64> {
         let mut conn = self.pool.acquire().await.map_err(storage)?;
@@ -220,7 +220,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn update_overage(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         enabled: bool,
         limit_cents: i64,
     ) -> Result<()> {
@@ -246,7 +246,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn set_period(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
     ) -> Result<()> {
@@ -274,7 +274,7 @@ impl BillingRepo for PgBillingRepo {
         Ok(())
     }
 
-    async fn suspend_overage(&self, payer: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn suspend_overage(&self, payer: &RoxUserIdStr<'_>) -> Result<()> {
         sqlx::query!(
             r#"
             INSERT INTO ai_billing_account (user_id, overage_suspended_at)
@@ -291,7 +291,7 @@ impl BillingRepo for PgBillingRepo {
         Ok(())
     }
 
-    async fn clear_overage_suspension(&self, payer: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn clear_overage_suspension(&self, payer: &RoxUserIdStr<'_>) -> Result<()> {
         sqlx::query!(
             r#"
             UPDATE ai_billing_account
@@ -306,7 +306,7 @@ impl BillingRepo for PgBillingRepo {
         Ok(())
     }
 
-    async fn free_allowance_bonus_cents(&self, user: &MacroUserIdStr<'_>) -> Result<i64> {
+    async fn free_allowance_bonus_cents(&self, user: &RoxUserIdStr<'_>) -> Result<i64> {
         sqlx::query_scalar!(
             r#"
             SELECT COALESCE(SUM(cost_cents), 0)::bigint AS "bonus!"
@@ -320,7 +320,7 @@ impl BillingRepo for PgBillingRepo {
         .map_err(storage)
     }
 
-    async fn credit_balance_cents(&self, payer: &MacroUserIdStr<'_>) -> Result<i64> {
+    async fn credit_balance_cents(&self, payer: &RoxUserIdStr<'_>) -> Result<i64> {
         let balance = sqlx::query_scalar!(
             r#"
             SELECT COALESCE(SUM(delta_cents), 0)::bigint AS "balance!"
@@ -337,7 +337,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn period_ledger(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
     ) -> Result<PeriodLedger> {
         let mut conn = self.pool.acquire().await.map_err(storage)?;
@@ -346,7 +346,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn period_allowance(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
     ) -> Result<Option<PeriodAllowance>> {
         let row = sqlx::query!(
@@ -376,7 +376,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn frozen_period_starts(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         since: DateTime<Utc>,
         before: DateTime<Utc>,
     ) -> Result<Vec<DateTime<Utc>>> {
@@ -400,7 +400,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn store_open_allowance(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period: OpenPeriodStart,
         seats: &[SeatAllowance],
         observed: SeatGeneration,
@@ -476,9 +476,9 @@ impl BillingRepo for PgBillingRepo {
 
     async fn release_open_seat(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period: OpenPeriodStart,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
     ) -> Result<()> {
         let payer = payer.as_ref();
         let mut tx = self.pool.begin().await.map_err(storage)?;
@@ -552,11 +552,11 @@ impl BillingRepo for PgBillingRepo {
 
     async fn record_credit_purchase(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         amount_cents: i64,
         stripe_reference: &str,
     ) -> Result<bool> {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let mut tx = self.pool.begin().await.map_err(storage)?;
         lock_payer(&mut tx, payer.as_ref())
             .await
@@ -581,7 +581,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn apply_settlement(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
         chargeable_customer_cents: i64,
         policy: SettlementPolicy,
@@ -661,7 +661,7 @@ impl BillingRepo for PgBillingRepo {
                 INSERT INTO ai_credit_ledger (id, user_id, kind, delta_cents, period_start, note)
                 VALUES ($1, $2, 'consumption', $3, $4, 'AI usage beyond plan allowance')
                 "#,
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 payer,
                 -plan.consume_credits_cents,
                 period_start,
@@ -738,7 +738,7 @@ impl BillingRepo for PgBillingRepo {
                 stripe_invoice_id: row.stripe_invoice_id.clone(),
             })
         } else if plan.charge_overage_cents > 0 {
-            let id = macro_uuid::generate_uuid_v7();
+            let id = rox_uuid::generate_uuid_v7();
             sqlx::query!(
                 r#"
                 INSERT INTO ai_overage_charge (id, user_id, period_start, amount_cents, status)
@@ -796,7 +796,7 @@ impl BillingRepo for PgBillingRepo {
         &self,
         stripe_invoice_id: &str,
         status: OverageChargeStatus,
-    ) -> Result<Option<MacroUserIdStr<'static>>> {
+    ) -> Result<Option<RoxUserIdStr<'static>>> {
         // `paid` is terminal and re-reporting the current status changes
         // nothing, so a late or duplicate webhook cannot un-pay a charge or
         // count twice.
@@ -815,13 +815,13 @@ impl BillingRepo for PgBillingRepo {
         .fetch_optional(&self.pool)
         .await
         .map_err(storage)?;
-        row.map(|r| MacroUserIdStr::try_from(r.user_id).map_err(invalid_payer))
+        row.map(|r| RoxUserIdStr::try_from(r.user_id).map_err(invalid_payer))
             .transpose()
     }
 
     async fn latest_charge_status(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> Result<Option<OverageChargeStatus>> {
         let status = sqlx::query_scalar!(
             r#"
@@ -847,7 +847,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn update_auto_reload(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         enabled: bool,
         overage_limit_cents: i64,
         thresholds: Option<&AutoReloadThresholds>,
@@ -899,7 +899,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn reserve_credit_reload(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
         chargeable_customer_cents: i64,
         now: DateTime<Utc>,
@@ -1038,7 +1038,7 @@ impl BillingRepo for PgBillingRepo {
             return Ok(None);
         };
 
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         sqlx::query!(
             r#"
             INSERT INTO ai_credit_reload (id, user_id, amount_cents, status)
@@ -1062,8 +1062,8 @@ impl BillingRepo for PgBillingRepo {
     #[tracing::instrument(skip(self), err)]
     async fn reserve_credit_purchase(
         &self,
-        payer: &MacroUserIdStr<'_>,
-        purchased_by: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
+        purchased_by: &RoxUserIdStr<'_>,
         amount_cents: i64,
         monthly_limit_cents: Option<i64>,
         now: DateTime<Utc>,
@@ -1139,7 +1139,7 @@ impl BillingRepo for PgBillingRepo {
             }
         }
 
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         sqlx::query!(
             r#"
             INSERT INTO ai_credit_reload (id, user_id, amount_cents, status, kind, purchased_by)
@@ -1163,7 +1163,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn declined_credit_purchases(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> Result<Vec<PendingReload>> {
         let rows = sqlx::query!(
             r#"
@@ -1231,7 +1231,7 @@ impl BillingRepo for PgBillingRepo {
 
     async fn record_credit_reload(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         amount_cents: i64,
         stripe_invoice_id: &str,
         kind: CreditReloadKind,
@@ -1275,7 +1275,7 @@ impl BillingRepo for PgBillingRepo {
         else {
             return Ok(None);
         };
-        let payer = MacroUserIdStr::try_from(payer).map_err(invalid_payer)?;
+        let payer = RoxUserIdStr::try_from(payer).map_err(invalid_payer)?;
         // Match the account-before-reload lock order used by reload reservation.
         lock_payer(&mut tx, payer.as_ref())
             .await
@@ -1307,7 +1307,7 @@ impl BillingRepo for PgBillingRepo {
             return Ok(None);
         };
         let resolved = ResolvedReload {
-            payer: MacroUserIdStr::try_from(row.user_id).map_err(invalid_payer)?,
+            payer: RoxUserIdStr::try_from(row.user_id).map_err(invalid_payer)?,
             amount_cents: row.amount_cents,
             kind: CreditReloadKind::from_str(&row.kind).map_err(|e| {
                 BillingError::Storage(anyhow::anyhow!(
@@ -1330,7 +1330,7 @@ impl BillingRepo for PgBillingRepo {
         Ok(Some(resolved))
     }
 
-    async fn suspend_auto_reload(&self, payer: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn suspend_auto_reload(&self, payer: &RoxUserIdStr<'_>) -> Result<()> {
         sqlx::query!(
             r#"
             INSERT INTO ai_billing_account (user_id, auto_reload_suspended_at)
@@ -1407,7 +1407,7 @@ fn parse_seat_allowances(
         .into_iter()
         .zip(included_cents_by_user)
         .map(|(id, included_cents)| {
-            let user = MacroUserIdStr::try_from(id).map_err(|e| {
+            let user = RoxUserIdStr::try_from(id).map_err(|e| {
                 BillingError::Storage(anyhow::anyhow!("invalid billed user id: {e}"))
             })?;
             Ok(SeatAllowance {

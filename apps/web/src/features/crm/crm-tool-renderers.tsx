@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { BaseTool } from '@core/component/AI/component/tool/BaseTool';
 import { createToolRenderer } from '@core/component/AI/component/tool/ToolRenderer';
 import { ItemPreview } from '@core/component/ItemPreview';
@@ -16,8 +17,8 @@ const listCompaniesHandler = createToolRenderer({
     const companies = () => ctx.response?.data.companies ?? [];
     const statusText = () => {
       if (!ctx.response) return undefined;
-      if (companies().length === 0) return 'No results';
-      return pluralize(companies().length, 'company', 'companies');
+      if (companies().length === 0) return t('crm.noResults');
+      return t('crm.companyCount', { count: companies().length });
     };
 
     return (
@@ -33,12 +34,12 @@ const listCompaniesHandler = createToolRenderer({
       >
         <div class="flex min-w-0 flex-1 items-center justify-between gap-3 overflow-hidden">
           <span class="min-w-0 truncate">
-            List CRM companies
+            {t('crm.toolListCompanies')}
             <Show when={ctx.tool.data.search}>
-              {(search) => <> matching "{search()}"</>}
+              {(search) => <>{' '}{t('crm.toolMatching', { search: search() })}</>}
             </Show>
             <Show when={ctx.tool.data.stage}>
-              {(stage) => <> in stage {stage()}</>}
+              {(stage) => <>{' '}{t('crm.toolInStage', { stage: stage() })}</>}
             </Show>
           </span>
           <Show when={statusText()}>
@@ -76,7 +77,7 @@ const getCompanyHandler = createToolRenderer({
       >
         <div class="flex min-w-0 flex-1 items-center justify-between gap-3 overflow-hidden">
           <span class="min-w-0 truncate">
-            Read CRM company
+            {t('crm.toolReadCompany')}
             <Show when={ctx.response?.data.name}>
               {(name) => <> {name()}</>}
             </Show>
@@ -115,7 +116,8 @@ const createCompanyHandler = createToolRenderer({
           when={ctx.response?.data.companyId}
           fallback={
             <>
-              Add CRM company <span class="text-ink">{ctx.tool.data.name}</span>
+              {t('crm.toolAddCompany')}{' '}
+              <span class="text-ink">{ctx.tool.data.name}</span>
               <Show when={ctx.tool.data.domain}>
                 {(domain) => <> ({domain()})</>}
               </Show>
@@ -124,7 +126,8 @@ const createCompanyHandler = createToolRenderer({
         >
           {(companyId) => (
             <>
-              Added CRM company <CompanyPreview companyId={companyId()} />
+              {t('crm.toolAddedCompany')}{' '}
+              <CompanyPreview companyId={companyId()} />
             </>
           )}
         </Show>
@@ -138,14 +141,15 @@ const createContactHandler = createToolRenderer({
   render: (ctx) => (
     <BaseTool icon={UserPlus} renderContext={ctx.renderContext} type="call">
       <div class="min-w-0 flex-1">
-        {ctx.response ? 'Added' : 'Add'} contact{' '}
+        {ctx.response ? t('crm.toolAddedContact') : t('crm.toolAddContact')}{' '}
         <span class="text-ink">{ctx.tool.data.name}</span>
         <Show when={ctx.tool.data.email}>{(email) => <> ({email()})</>}</Show>
         <Show when={ctx.tool.data.companyId}>
           {(companyId) => (
             <>
               {' '}
-              to <CompanyPreview companyId={companyId()} />
+              {t('crm.toolToCompany')}{' '}
+              <CompanyPreview companyId={companyId()} />
             </>
           )}
         </Show>

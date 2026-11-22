@@ -25,7 +25,7 @@ import {
   isWithNotification,
   type SearchLocation,
 } from '@entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { openSingleStackNotification } from '@notifications';
 import { markRowNotificationsSeenOnOpen } from '@notifications/mark-row-seen';
 import { type Accessor, onCleanup } from 'solid-js';

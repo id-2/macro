@@ -33,7 +33,7 @@ import {
   type PreviewBox,
   setDocumentCardPreviewComponent,
   unsetDocumentCardPreviewCache,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   type AccessiblePreviewItem,
   isAccessiblePreviewItem,

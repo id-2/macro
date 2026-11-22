@@ -16,9 +16,9 @@ describe('localDevServer', () => {
   it('routes HTTP and bare/query-string WebSockets without swallowing frontend paths', () => {
     const target = 'http://localhost:20109';
     const config = localDevServer({
-      MACRO_LOCAL_BACKEND_PROXY: target,
-      MACRO_LOCAL_HOSTNAME: 'Coworker-Dev',
-      MACRO_LOCAL_BACKEND_ROUTES:
+      ROX_LOCAL_BACKEND_PROXY: target,
+      ROX_LOCAL_HOSTNAME: 'Coworker-Dev',
+      ROX_LOCAL_BACKEND_ROUTES:
         '/auth,/connection-gateway,/websocket,/sync,/ai-editing,/i,/static-file',
     });
     const rules = Object.keys(config.proxy ?? {}).map((key) => new RegExp(key));
@@ -65,10 +65,10 @@ describe('localDevServer', () => {
     for (const routes of [undefined, '', '/', '/auth,', '/auth|/app']) {
       expect(() =>
         localDevServer({
-          MACRO_LOCAL_BACKEND_PROXY: 'http://localhost:20109',
-          MACRO_LOCAL_BACKEND_ROUTES: routes,
+          ROX_LOCAL_BACKEND_PROXY: 'http://localhost:20109',
+          ROX_LOCAL_BACKEND_ROUTES: routes,
         })
-      ).toThrow(/MACRO_LOCAL_BACKEND_ROUTES/);
+      ).toThrow(/ROX_LOCAL_BACKEND_ROUTES/);
     }
   });
 });

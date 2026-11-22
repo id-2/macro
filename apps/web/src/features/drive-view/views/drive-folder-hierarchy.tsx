@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   SearchBar,
   useViewShell,
@@ -65,7 +66,7 @@ export function DriveFolderPath() {
     <Show when={crumbs().length > 0}>
       <nav
         ref={nav}
-        aria-label="Folder path"
+        aria-label={t('drive.folderPath')}
         class="flex min-w-0 items-center gap-0.5 overflow-x-auto text-sm"
       >
         <button
@@ -73,7 +74,7 @@ export function DriveFolderPath() {
           class="flex h-11 shrink-0 items-center rounded-lg px-2 text-ink-muted outline-none not-touch:hover:text-ink focus-visible:outline-2 focus-visible:outline-accent"
           onClick={() => state.selectFolder(null)}
         >
-          Folders
+          {t('drive.folders')}
         </button>
         <For each={crumbs()}>
           {(folder, index) => {
@@ -137,8 +138,8 @@ export function DriveFolderHierarchy() {
         <div aria-hidden class="h-(--mobile-content-inset-top)" />
         <div class="shrink-0 px-(--mobile-chrome-gutter) pb-2">
           <SearchBar
-            label="Search folders"
-            placeholder="Search folders"
+            label={t('drive.searchFolders')}
+            placeholder={t('drive.searchFolders')}
             value={folderSearch()}
             onValueChange={setFolderSearch}
           />
@@ -147,7 +148,7 @@ export function DriveFolderHierarchy() {
           when={!sidebar.foldersLoading()}
           fallback={
             <p role="status" class="px-3 py-2 text-sm text-ink-extra-muted">
-              Loading folders…
+              {t('drive.loadingFolders')}
             </p>
           }
         >
@@ -155,19 +156,19 @@ export function DriveFolderHierarchy() {
             when={!sidebar.foldersError()}
             fallback={
               <div class="flex flex-col items-start gap-2 p-3 text-sm text-ink-muted">
-                Folders couldn’t be loaded.
+                {t('drive.foldersLoadFailed')}
                 <Button
                   variant="secondary"
                   onClick={() =>
                     fireAndForget(sidebar.retryFolders(), 'drive-view')
                   }
                 >
-                  Try again
+                  {t('common.tryAgain')}
                 </Button>
               </div>
             }
           >
-            <ViewSidebar.Nav aria-label="Folders">
+            <ViewSidebar.Nav aria-label={t('drive.folders')}>
               <FolderTree
                 locationMenu={DriveLocationMenu}
                 nodes={filteredTree()}
@@ -181,7 +182,9 @@ export function DriveFolderHierarchy() {
             </ViewSidebar.Nav>
             <Show when={filteredTree().length === 0}>
               <p class="px-3 py-2 text-sm text-ink-extra-muted">
-                {folderSearch() ? 'No matching folders' : 'No folders yet'}
+                {folderSearch()
+                  ? t('drive.noMatchingFolders')
+                  : t('drive.noFoldersYet')}
               </p>
             </Show>
           </Show>

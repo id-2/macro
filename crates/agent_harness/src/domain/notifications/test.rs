@@ -8,17 +8,17 @@ use agent_session::domain::model::{AgentSessionId, SessionSource};
 use bot_id::BotId;
 
 const SESSION: Uuid = Uuid::from_u128(0xA);
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 
 use super::*;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).expect("a valid email")
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).expect("a valid email")
 }
 
-fn owner() -> MacroUserIdStr<'static> {
+fn owner() -> RoxUserIdStr<'static> {
     user("owner@rox.one")
 }
 

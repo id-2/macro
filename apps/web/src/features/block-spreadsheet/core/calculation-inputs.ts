@@ -1,4 +1,4 @@
-import type { WorkbookSheetMetadata } from '@macro-inc/spreadsheet/workbook-metadata';
+import type { WorkbookSheetMetadata } from '@rox-one/spreadsheet/workbook-metadata';
 import type { SpreadsheetCell, SpreadsheetCells } from './spreadsheet-document';
 
 export type CalculationCells = Record<

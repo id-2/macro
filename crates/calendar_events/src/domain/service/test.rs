@@ -17,7 +17,7 @@ use crate::domain::{
     },
 };
 use chrono::{Duration, TimeZone, Utc};
-use macro_event_broker::NoopMacroEventBroker;
+use rox_event_broker::NoopRoxEventBroker;
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Default)]
@@ -801,7 +801,7 @@ async fn backfill_refresh_reports_source_and_calendar_ooo_changes() {
             },
             ChangedCalendarProvider { with_event },
             FakeLifecycle::claimed(),
-            NoopMacroEventBroker,
+            NoopRoxEventBroker,
             None,
         );
         let mut report = GoogleBackfillRunReport::default();
@@ -1009,7 +1009,7 @@ async fn push_unsupported_watch_is_recorded_and_the_account_completes() {
         repository,
         provider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         Some(GoogleWatchConfig {
             address: "https://gateway.example.com/calendar/notifications".to_string(),
             token: "token".to_string(),
@@ -1058,7 +1058,7 @@ async fn one_failed_calendar_is_isolated_and_the_account_completes() {
         repository,
         PartialFailureGoogleProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1113,7 +1113,7 @@ async fn every_calendar_failing_fails_the_run_for_retry() {
         repository,
         TotalFailureGoogleProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1156,7 +1156,7 @@ async fn a_reauth_signal_on_one_calendar_fails_the_run_immediately() {
         repository,
         ReauthOnColleagueCalendarProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1207,7 +1207,7 @@ async fn a_wholesale_failure_prefers_a_retryable_error() {
         repository,
         MixedTotalFailureGoogleProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1248,7 +1248,7 @@ async fn google_coordinator_owns_claim_and_completion_lifecycle() {
         FakeRepo::default(),
         FakeGoogleProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1278,13 +1278,13 @@ struct RecordingEventBroker {
     published: Arc<Mutex<Vec<(String, serde_json::Value)>>>,
 }
 
-impl macro_event_broker::MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: macro_event_broker::MacroEvent + ?Sized>(
+impl rox_event_broker::RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: rox_event_broker::RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<
-        tokio::task::JoinHandle<Result<(), macro_event_broker::EventBrokerError>>,
-        macro_event_broker::EventBrokerError,
+        tokio::task::JoinHandle<Result<(), rox_event_broker::EventBrokerError>>,
+        rox_event_broker::EventBrokerError,
     > {
         self.published.lock().unwrap().push((
             event.key().to_string(),
@@ -1367,7 +1367,7 @@ async fn retiring_a_regular_meeting_leaves_team_ooo_rows_alone() {
             },
             CancellingCalendarProvider,
             FakeLifecycle::claimed(),
-            NoopMacroEventBroker,
+            NoopRoxEventBroker,
             None,
         );
         let mut report = GoogleBackfillRunReport::default();
@@ -1405,7 +1405,7 @@ async fn a_sync_that_reads_back_what_macro_stored_reports_no_change() {
             },
             ChangedCalendarProvider { with_event: true },
             FakeLifecycle::claimed(),
-            NoopMacroEventBroker,
+            NoopRoxEventBroker,
             None,
         );
         let mut report = GoogleBackfillRunReport::default();
@@ -1559,7 +1559,7 @@ async fn freshly_synced_system_calendars_are_skipped() {
         repo,
         SystemCalendarProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1640,7 +1640,7 @@ async fn a_fresh_system_calendar_keeps_a_failing_calendar_isolated() {
         repository,
         FailingPrimaryBesideSystemCalendarProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1712,7 +1712,7 @@ async fn google_coordinator_surfaces_lease_loss_while_work_is_running() {
         FakeRepo::default(),
         HangingGoogleProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1742,7 +1742,7 @@ async fn google_coordinator_keeps_calendar_permission_health_separate_from_gmail
         FakeRepo::default(),
         ReauthGoogleProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
 
@@ -1967,7 +1967,7 @@ async fn invalid_normalized_calendar_never_commits_coverage_or_its_token() {
         repository,
         InvalidNormalizedGoogleProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
     let key = CalendarBackfillJobKey {
@@ -2014,7 +2014,7 @@ async fn failure_to_persist_calendar_quarantine_fails_the_account_run() {
         },
         PartialFailureGoogleProvider,
         lifecycle.clone(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         None,
     );
     let mut report = GoogleBackfillRunReport::default();

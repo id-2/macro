@@ -23,6 +23,42 @@ export const SYSTEM_PROPERTY_IDS = {
   PROJECT: '00000001-0000-0000-0000-000000000014',
 } as const;
 
+/**
+ * Russian names for the seeded system properties. The backend keeps its own
+ * English display names (agents address columns by them in SQL and tool
+ * calls), so the translation happens here, on the way to the screen.
+ */
+const SYSTEM_PROPERTY_NAMES_RU: Record<string, string> = {
+  [SYSTEM_PROPERTY_IDS.ASSIGNEES]: 'Исполнители',
+  [SYSTEM_PROPERTY_IDS.STATUS]: 'Статус',
+  [SYSTEM_PROPERTY_IDS.PRIORITY]: 'Приоритет',
+  [SYSTEM_PROPERTY_IDS.DUE_DATE]: 'Срок',
+  [SYSTEM_PROPERTY_IDS.PARENT_TASK]: 'Родительская задача',
+  [SYSTEM_PROPERTY_IDS.SUBTASKS]: 'Подзадачи',
+  [SYSTEM_PROPERTY_IDS.DEPENDS_ON]: 'Зависит от',
+  [SYSTEM_PROPERTY_IDS.EFFORT]: 'Трудоёмкость',
+  [SYSTEM_PROPERTY_IDS.STORY_POINTS]: 'Стори-поинты',
+  [SYSTEM_PROPERTY_IDS.RELEVANT_DOCUMENTS]: 'Связанные документы',
+  [SYSTEM_PROPERTY_IDS.SOURCE]: 'Источник',
+  [SYSTEM_PROPERTY_IDS.COMPANIES]: 'Компании',
+  [SYSTEM_PROPERTY_IDS.SENDER]: 'Отправитель',
+  [SYSTEM_PROPERTY_IDS.RECIPIENTS]: 'Получатели',
+  [SYSTEM_PROPERTY_IDS.SUBJECT]: 'Тема',
+  [SYSTEM_PROPERTY_IDS.STAGE]: 'Этап',
+  [SYSTEM_PROPERTY_IDS.COMPANY_OWNER]: 'Владелец',
+  [SYSTEM_PROPERTY_IDS.REVENUE]: 'Выручка',
+  [SYSTEM_PROPERTY_IDS.CONTACTS]: 'Контакты',
+  [SYSTEM_PROPERTY_IDS.PROJECT]: 'Проект',
+};
+
+/** The Russian label for a seeded system property, else the server's name. */
+export function systemPropertyDisplayName(
+  definitionId: string,
+  fallback: string
+): string {
+  return SYSTEM_PROPERTY_NAMES_RU[definitionId] ?? fallback;
+}
+
 /** Stable option IDs, kept independent of UI/block registries for tooling. */
 export const PROPERTY_OPTION_IDS = {
   PRIORITY: {

@@ -52,7 +52,7 @@ vi.mock('../plugins/shared', () => ({
   mapRegisterDelete: () => () => {},
 }));
 
-import { SupportedNodeTypes } from '@macro-inc/lexical-core/node-list';
+import { SupportedNodeTypes } from '@rox-one/lexical-core/node-list';
 import {
   $createParagraphNode,
   $createTextNode,

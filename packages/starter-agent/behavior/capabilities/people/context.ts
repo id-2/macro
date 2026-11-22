@@ -1,6 +1,6 @@
 import { chmod } from 'node:fs/promises';
 import { query } from '@anthropic-ai/claude-agent-sdk';
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
 import type { Base } from '../../context/index.ts';
 import type { ChatContext } from '../chat/context.ts';
 import { type PeopleClaude, sdkAsk } from './ask.ts';

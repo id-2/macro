@@ -8,7 +8,7 @@ mod test;
 
 use std::collections::HashMap;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::prelude::*;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -35,10 +35,10 @@ impl JoinAnnouncementRepository for JoinAnnouncementRepositoryImpl {
     async fn claim(
         &self,
         team_id: Uuid,
-        candidates: &[MacroUserIdStr<'static>],
+        candidates: &[RoxUserIdStr<'static>],
         team_limit: u32,
     ) -> Result<Vec<ClaimedJoinEmail>, Report<JoinAnnouncementError>> {
-        let by_email: HashMap<&str, &MacroUserIdStr<'static>> = candidates
+        let by_email: HashMap<&str, &RoxUserIdStr<'static>> = candidates
             .iter()
             .map(|candidate| (candidate.email_str(), candidate))
             .collect();
@@ -128,7 +128,7 @@ impl JoinAnnouncementRepository for JoinAnnouncementRepositoryImpl {
     async fn release(
         &self,
         team_id: Uuid,
-        recipient: &MacroUserIdStr<'_>,
+        recipient: &RoxUserIdStr<'_>,
     ) -> Result<(), Report<JoinAnnouncementError>> {
         sqlx::query!(
             "DELETE FROM team_joined_macro_email WHERE team_id = $1 AND email = $2",

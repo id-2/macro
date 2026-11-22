@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO team_user (team_id, user_id, team_role)\n        VALUES ($1, 'macro|u1@gamma.test', 'member'), ($1, 'macro|u3@gamma.test', 'member')\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b557d7f734484b98b8865646feb481764dcdad3f188f473b9258e0af9df9d1f0"
+}

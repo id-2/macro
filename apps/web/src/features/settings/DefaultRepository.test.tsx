@@ -1,6 +1,7 @@
+import { interfaceLanguageReady, setInterfaceLanguage } from '@app/lib/i18n';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { createRoot } from 'solid-js';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { createPreferredRepository } from '../agents-view/primitives/preferred-repository';
 import { DefaultRepository } from './DefaultRepository';
 import { chooseSelectOption } from './tests/select-helpers';
@@ -38,6 +39,8 @@ vi.mock('@queries/agent-repositories/repositories', () => ({
   }),
 }));
 
+beforeAll(() => setInterfaceLanguage('en'));
+
 beforeEach(() => {
   localStorage.clear();
   mocks.loading = false;
@@ -47,7 +50,10 @@ beforeEach(() => {
   ];
   vi.clearAllMocks();
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  setInterfaceLanguage('en');
+});
 
 describe('default repository settings', () => {
   it('defaults to Auto-detect and persists choices including returning to auto', () => {
@@ -108,5 +114,21 @@ describe('default repository settings', () => {
       screen.getByRole('button', { name: /^Default repository/ }).textContent
     ).toContain('removed/repo (unavailable)');
     expect(screen.getByRole('status').textContent).toContain('Auto-detect');
+  });
+
+  it('names the setting and its actions in Russian', async () => {
+    setInterfaceLanguage('ru');
+    await interfaceLanguageReady(1000);
+    mocks.repositories = [];
+    render(() => <DefaultRepository />);
+
+    expect(
+      screen.getByRole('button', { name: /^Репозиторий по умолчанию/ })
+        .textContent
+    ).toContain('Определять автоматически');
+    fireEvent.click(
+      screen.getByRole('button', { name: 'Подключить GitHub' })
+    );
+    expect(mocks.openSettings).toHaveBeenCalledWith('Connected');
   });
 });

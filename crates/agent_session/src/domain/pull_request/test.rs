@@ -10,7 +10,7 @@ impl SessionTasks for NoTasks {
     fn link_task<'a>(
         &'a self,
         _session: AgentSessionId,
-        _owner: &'a MacroUserIdStr<'static>,
+        _owner: &'a RoxUserIdStr<'static>,
         _task: &'a str,
     ) -> Pin<Box<dyn Future<Output = Result<LinkedTask, SessionTaskError>> + Send + 'a>> {
         unimplemented!("pull request tests link no tasks")
@@ -18,7 +18,7 @@ impl SessionTasks for NoTasks {
 
     fn task_pull_requests<'a>(
         &'a self,
-        _owner: &'a MacroUserIdStr<'static>,
+        _owner: &'a RoxUserIdStr<'static>,
         _task: &'a str,
     ) -> Pin<Box<dyn Future<Output = Result<TaskPullRequests, SessionTaskError>> + Send + 'a>> {
         unimplemented!("pull request tests list no tasks")
@@ -27,7 +27,7 @@ impl SessionTasks for NoTasks {
     fn link_session_pull_request<'a>(
         &'a self,
         _session: AgentSessionId,
-        _owner: &'a MacroUserIdStr<'static>,
+        _owner: &'a RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<(), SessionTaskError>> + Send + 'a>> {
         Box::pin(async { Ok(()) })
     }
@@ -68,7 +68,7 @@ async fn persists_and_publishes_once_and_rejects_another_owner() {
     let realtime = RecordingRealtime::new();
     let service = SessionPullRequestService::new(repo.clone(), realtime.clone(), Arc::new(NoTasks));
     let url = "https://github.com/org/repo/pull/123";
-    let other = MacroUserIdStr::try_from_email("other@example.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@example.com").unwrap();
     assert!(matches!(
         service
             .set_pull_request(session.id, &other, url, None)

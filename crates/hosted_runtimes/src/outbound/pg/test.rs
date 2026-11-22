@@ -7,8 +7,8 @@ mod billing_races;
 mod boot;
 
 use chrono::{Duration, TimeZone};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 use crate::domain::lifecycle::{Phase, Rejected};
@@ -71,7 +71,7 @@ fn standard(id: u128) -> NewReservation {
         funding: Funding::Stripe {
             price_id: stripe::PriceId::from_str("price_standard").unwrap(),
         },
-        created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
         extra_items: vec![],
         provision_traceparent: None,
         agent: None,
@@ -651,7 +651,7 @@ async fn deleting_the_buyer_keeps_computers_and_reservations(pool: PgPool) {
     .execute(&pool)
     .await
     .unwrap();
-    let buyer = MacroUserIdStr::try_from("macro|buyer@example.com".to_owned()).unwrap();
+    let buyer = RoxUserIdStr::try_from("macro|buyer@example.com".to_owned()).unwrap();
     let reservation = reserve(
         &repo,
         NewReservation {

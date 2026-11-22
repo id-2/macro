@@ -10,7 +10,7 @@ use entity_access::domain::models::{
     AccessError, EditAccessLevel, EntityAccessReceipt, EntityType,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::DatabaseId;
 use crate::domain::ports::CreatorAccess;
@@ -39,7 +39,7 @@ impl<EntityAccess> EntityAccessCreators<EntityAccess> {
 impl<EntityAccess: EntityAccessService> CreatorAccess for EntityAccessCreators<EntityAccess> {
     async fn edit_receipt(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         database_id: DatabaseId,
     ) -> Result<Option<EntityAccessReceipt<EditAccessLevel>>, rootcause::Report> {
         match self

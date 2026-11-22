@@ -5,9 +5,9 @@ use crate::service::signup_policy::SignupPolicy;
 use anyhow::Context;
 use database_env_vars::{DatabaseUrl, RedisUri};
 use gtm_invite::domain::models::{GtmInviteConfig, PromoCode};
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::{env_vars, maybe_env_vars};
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::{env_vars, maybe_env_vars};
 
 // BASE_URL config value. This is validated when creating the config in main.rs
 pub static BASE_URL: LazyLock<String> = LazyLock::new(|| {
@@ -55,7 +55,7 @@ maybe_env_vars! {
     /// deserializes this struct from Doppler alone — a required field it
     /// cannot see fails CI. The service still refuses to start without it;
     /// see [`Config::cursor_api_key_kms_key_id`], which also reads the
-    /// process environment because `MacroConfig` does not fall back to it
+    /// process environment because `RoxConfig` does not fall back to it
     /// when `APP_SECRETS_JSON` is present.
     pub struct CursorApiKeyKmsKeyId;
     /// Dedicated CMK for encrypted Codex OAuth envelopes, injected by infrastructure.
@@ -95,8 +95,8 @@ maybe_env_vars! {
 /// populate the Docker container
 ///
 /// See `.env.sample` in document-storage-service root for details.
-#[derive(macro_config::MacroConfig)]
-// #[macro_config::from_ref_all]
+#[derive(rox_config::RoxConfig)]
+// #[rox_config::from_ref_all]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Admit new Outlook accounts only after the deployment is ready. Reconnect is separate.
@@ -236,6 +236,12 @@ pub struct Config {
     /// calendar feature isn't using yet.
     #[macro_config_default(false)]
     pub calendar_scope_enabled: bool,
+    /// Return the one-time sign-in code in `POST /login/passwordless`'s
+    /// response. Off by default: a public stand must never hand out a session
+    /// to someone who does not hold the mailbox. Local stacks without a real
+    /// inbox set `PASSWORDLESS_RETURN_CODE=true`.
+    #[macro_config_default(false)]
+    pub passwordless_return_code: bool,
 }
 
 /// Complete Microsoft OAuth credentials used to enable Outlook account linking.
@@ -349,7 +355,7 @@ impl Config {
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let billing = ai_billing::config::load_ai_usage_billing()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
-        let mut config = macro_config::ConfigLoader::load::<Config>()
+        let mut config = rox_config::ConfigLoader::load::<Config>()
             .context("failed to load authentication service config")?;
         config.enable_ai_usage_enforcement = enforcement;
         config.enable_ai_usage_billing = billing;
@@ -365,7 +371,7 @@ impl Config {
     /// feature of the settings surface, and a service that cannot encrypt one
     /// should fail at startup rather than at the first user who tries.
     pub(crate) fn cursor_api_key_kms_key_id(&self) -> anyhow::Result<String> {
-        // `MacroConfig` will not see a Pulumi-injected process env var once
+        // `RoxConfig` will not see a Pulumi-injected process env var once
         // Doppler's `APP_SECRETS_JSON` is present. Re-read through the env-var
         // type, which does fall back to process env.
         let from_process_env = CursorApiKeyKmsKeyId::new();
@@ -538,7 +544,7 @@ fn nonblank_value(value: Option<&str>) -> Option<&str> {
 }
 
 /// Pulumi injects `CURSOR_API_KEY_KMS_KEY_ID` as a container env var, not
-/// through Doppler. ECS always has `APP_SECRETS_JSON`, and `MacroConfig` will
+/// through Doppler. ECS always has `APP_SECRETS_JSON`, and `RoxConfig` will
 /// not look at process env once that blob is present, so the field on `Config`
 /// is unset in deployed environments. `CursorApiKeyKmsKeyId::new()` still
 /// falls back to process env, which is what `process_env` is.

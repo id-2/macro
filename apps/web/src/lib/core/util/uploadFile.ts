@@ -4,7 +4,7 @@ import {
   uploadNativeStagedFileToPresignedUrl,
 } from '@core/mobile/nativeStagedUpload';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { invalidateUserQuota } from '@queries/auth';
 import { staticFileClient } from '@service-static-files/client';
 import { contentHash } from './hash';

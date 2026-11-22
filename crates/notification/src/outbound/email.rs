@@ -7,8 +7,8 @@ use aws_sdk_sesv2::types::{
     Body, Content, Destination, EmailContent as SesEmailContent, Message, MessageTag,
 };
 use hmac::Hmac;
-use macro_user_id::email::ReadEmailParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::email::ReadEmailParts;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sha2::Sha256;
 use std::fmt::Write;
@@ -223,7 +223,7 @@ fn tag_value(notification_type: &str) -> String {
 impl<E: EmailServiceOps + Send + Sync + 'static> EmailSender for EmailAdapter<E> {
     async fn send_email(
         &self,
-        recipient: MacroUserIdStr<'_>,
+        recipient: RoxUserIdStr<'_>,
         notification_type: &str,
         content: &EmailContent,
     ) -> Result<(), Report> {
@@ -276,7 +276,7 @@ impl<S> SignedUnsubscribeLinks<S> {
 impl<S: EmailSender> EmailSender for SignedUnsubscribeLinks<S> {
     async fn send_email(
         &self,
-        recipient: MacroUserIdStr<'_>,
+        recipient: RoxUserIdStr<'_>,
         notification_type: &str,
         content: &EmailContent,
     ) -> Result<(), Report> {

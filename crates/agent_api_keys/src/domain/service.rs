@@ -1,9 +1,9 @@
 #[cfg(test)]
 mod test;
 
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::models::{
     AgentKeyError, AgentKeyView, AgentOwner, KeyedAgent, ModelProvider, ProviderApiKey,
@@ -77,7 +77,7 @@ impl<Repo: AgentKeyRepo, Cipher: AgentKeyCipher, Plans: KeyPlans>
     async fn usable(
         &self,
         bot_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<StoredAgentKey>> {
         let Some(stored) = self.repo.stored(bot_id).await? else {
             return Ok(None);
@@ -93,7 +93,7 @@ impl<Repo: AgentKeyRepo, Cipher: AgentKeyCipher, Plans: KeyPlans>
 
     /// Whether `user` may spend a key `owner` holds: their own, or that of a
     /// team they are currently a member of.
-    async fn owns_key(&self, owner: &AgentOwner, user: &MacroUserIdStr<'_>) -> Result<bool> {
+    async fn owns_key(&self, owner: &AgentOwner, user: &RoxUserIdStr<'_>) -> Result<bool> {
         match owner {
             AgentOwner::User(owner) => Ok(owner.as_ref() == user.as_ref()),
             AgentOwner::Team(team_id) => self.repo.is_team_member(user, *team_id).await,
@@ -108,7 +108,7 @@ impl<Repo: AgentKeyRepo, Cipher: AgentKeyCipher, Plans: KeyPlans> AgentKeys
     async fn usable_provider(
         &self,
         bot_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<ModelProvider>> {
         Ok(self
             .usable(bot_id, user)
@@ -119,7 +119,7 @@ impl<Repo: AgentKeyRepo, Cipher: AgentKeyCipher, Plans: KeyPlans> AgentKeys
     async fn usable_key(
         &self,
         bot_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<UsableAgentKey>> {
         let Some(stored) = self.usable(bot_id, user).await? else {
             return Ok(None);

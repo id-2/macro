@@ -13,7 +13,7 @@ use jev::domain::{
     DecisionRequest, DecisionResponse, JevError, MAX_DECISION_REQUEST_BYTES,
     decisions::DecisionError,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use serde::Serialize;
 use tower_http::limit::RequestBodyLimitLayer;
 use utoipa::ToSchema;
@@ -88,7 +88,7 @@ pub(super) fn route() -> MethodRouter<ApiContext> {
 #[tracing::instrument(skip_all, err)]
 pub async fn decide(
     State(state): State<ApiContext>,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     request: Result<Json<DecisionRequest>, JsonRejection>,
 ) -> Result<Json<DecisionResponse>, DecisionErrorBody> {
     let Json(request) = request.map_err(|error| DecisionErrorBody {

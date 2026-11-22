@@ -1,7 +1,7 @@
 import { type PluralKey, t } from '@app/lib/i18n';
 import type { AnswerColumn, AnswerOption } from '@core/database-sql/answer';
 import type { Cell, EntityKind } from '@core/database-sql/generated/types';
-import { markdownToPlainText } from '@macro-inc/lexical-core/utils/parsers';
+import { markdownToPlainText } from '@rox-one/lexical-core/utils/parsers';
 import { match } from 'ts-pattern';
 import {
   timeRangeFromInstants,

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
 import {
   PdfDocument,
@@ -35,7 +36,7 @@ import { openLoginModal } from '@core/component/TopBar/LoginButton';
 import { fireAndForget } from '@core/util/fireAndForget';
 import DownloadIcon from '@icon/system/regular/download-simple.svg';
 import Printer from '@icon/system/regular/printer.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useSearchParams } from '@solidjs/router';
 import type { JSX } from 'solid-js';
 import { Show } from 'solid-js';
@@ -71,12 +72,14 @@ function PdfDetailContent(props: {
       });
     } catch (error) {
       Telemetry.error(error, { surface: 'pdf-file-actions' });
-      toast.failure('Unable to download file');
+      toast.failure(t('drive.downloadFailed'));
     }
   };
   const operations: FileOperation[] = [
     {
-      label: 'Print',
+      get label() {
+        return t('drive.print');
+      },
       icon: Printer,
       action: () => {
         fireAndForget(
@@ -90,7 +93,9 @@ function PdfDetailContent(props: {
     },
     {
       group: 'file',
-      label: 'Download',
+      get label() {
+        return t('drive.download');
+      },
       icon: DownloadIcon,
       action: () => {
         fireAndForget(download(), 'pdf-file-actions');
@@ -100,7 +105,9 @@ function PdfDetailContent(props: {
       ? [
           {
             group: 'file' as const,
-            label: 'Download DOCX',
+            get label() {
+              return t('drive.downloadDocx');
+            },
             icon: DownloadIcon,
             action: () => {
               fireAndForget(
@@ -163,14 +170,15 @@ export function PdfDetailDocument(props: {
       userAccessLevel={props.data.userAccessLevel}
     >
       <SidePanel.HeaderActions>
-        <HeaderActionGroup label="Actions">
+        <HeaderActionGroup label={t('drive.actions')}>
           <AskMacroButton
             grouped
             entity={{
               type: 'document',
               id: props.documentId,
               name:
-                props.data.documentMetadata.documentName ?? 'Unknown Filename',
+                props.data.documentMetadata.documentName ??
+                t('drive.unknownFilename'),
               fileType: 'pdf',
             }}
           />
@@ -180,7 +188,7 @@ export function PdfDetailDocument(props: {
         documentId={props.documentId}
         documentVersionId={props.data.documentMetadata.documentVersionId}
         documentName={
-          props.data.documentMetadata.documentName ?? 'Unknown Filename'
+          props.data.documentMetadata.documentName ?? t('drive.unknownFilename')
         }
         documentProxy={props.data.documentProxy}
         viewLocation={props.data.viewLocation}
@@ -208,7 +216,7 @@ export function PdfDetail(props: {
     <FileDetailLoadGate
       documentId={props.documentId}
       entityType="pdf"
-      label="PDF"
+      label={t('drive.entityPdf')}
       load={loadPdfDocument}
     >
       {(data) => (

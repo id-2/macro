@@ -3,7 +3,7 @@ import type {
   ReorderPinRequest,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { FavoritableEntity } from '../entity';
 
 export type { PinnedItem, ReorderPinRequest };
@@ -11,10 +11,10 @@ export type { PinnedItem, ReorderPinRequest };
 /**
  * The user's pins: items pinned to fixed slots in the home view.
  *
- * @routing Use when pinning or unpinning items; not favorites (`macro.favorites`).
+ * @routing Use when pinning or unpinning items; not favorites (`rox.favorites`).
  */
 export class PinsNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * The user's pinned items, with their pin indices.

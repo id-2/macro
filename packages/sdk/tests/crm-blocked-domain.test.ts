@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -26,7 +26,7 @@ test('domain blocks preserve the server mailbox explanation and status', async (
     hosts: { storage: 'https://storage.test' },
   });
   await expect(macro.crm.blockDomain('gmail.com')).rejects.toMatchObject({
-    name: 'MacroApiError',
+    name: 'RoxApiError',
     status: 400,
     message: expect.stringContaining(message),
     data: { message },

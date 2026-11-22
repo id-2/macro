@@ -5,9 +5,9 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
-use macro_middleware::tracking::ClientIp;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
+use rox_middleware::tracking::ClientIp;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::response::ErrorResponse;
 use serde_utils::urlencode::UrlEncoded;
 use url::Url;
@@ -116,7 +116,7 @@ pub async fn init_outlook_link_handler(
         reconnect_link_id,
     }): Query<InitOutlookLinkQueryParams>,
     ip_context: ClientIp,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<InitOutlookLinkResponse>, InitOutlookLinkError> {
     let service = ctx
         .microsoft_auth
@@ -150,7 +150,7 @@ pub async fn init_outlook_link_handler(
 async fn start_outlook_link(
     service: &dyn MicrosoftAuth,
     owner: uuid::Uuid,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     redirect_uri: String,
     original_url: Option<String>,
     calendar_requested: bool,
@@ -189,6 +189,11 @@ pub struct EmailConnectionProviders {
     /// Whether this user may start a new Outlook connection: the deployment
     /// switch and their `enable-outlook` flag.
     pub outlook: bool,
+    /// Whether this deployment can start a GitHub link at all: its sign-in
+    /// service has the `github` identity provider. False on a stack started
+    /// without a real GitHub OAuth app (`local-github-client` placeholders), so
+    /// the app knows the link-status read could only answer "not linked".
+    pub github: bool,
     /// Where a Microsoft 365 administrator approves Rox for their whole
     /// directory. Present when Outlook is configured and the request named an
     /// `original_url` for the administrator's browser to return to.
@@ -220,7 +225,7 @@ pub async fn email_connection_providers(
     Query(EmailConnectionProvidersQueryParams { original_url }): Query<
         EmailConnectionProvidersQueryParams,
     >,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
 ) -> Result<Json<EmailConnectionProviders>, InitOutlookLinkError> {
     if original_url
         .as_ref()
@@ -234,16 +239,36 @@ pub async fn email_connection_providers(
             &authorization.authorization.user.macro_user_id,
             original_url,
             ctx.calendar_scope_enabled,
+            github_link_available(&ctx).await,
         )
         .await,
     ))
 }
 
+/// Whether the deployment has a `github` identity provider, so a link could be
+/// started. A stack started without a real GitHub OAuth app has none (the
+/// local kickstart only creates it from real credentials), and the link-status
+/// read could then only answer "not linked"; the app skips that read.
+async fn github_link_available(ctx: &ApiContext) -> bool {
+    match ctx
+        .auth_client
+        .get_identity_provider_id_by_name("github")
+        .await
+    {
+        Ok(_) => true,
+        Err(error) => {
+            tracing::warn!(?error, "no github identity provider; a github link cannot be started");
+            false
+        }
+    }
+}
+
 async fn connection_providers(
     microsoft_auth: Option<&dyn MicrosoftAuth>,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     original_url: Option<Url>,
     calendar_scope_enabled: bool,
+    github: bool,
 ) -> EmailConnectionProviders {
     // The consent URL is an optional extra; a failure to sign it must not hide
     // which providers are available. It stays independent of the flag: an
@@ -268,6 +293,7 @@ async fn connection_providers(
     EmailConnectionProviders {
         gmail: true,
         outlook,
+        github,
         outlook_admin_consent_url,
     }
 }

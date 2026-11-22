@@ -2,7 +2,7 @@ import type { PortalScope } from '@core/component/ScopedPortal';
 import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import type { ChannelWithParticipants } from '@core/user';
 import { onElementConnect } from '@core/util/onElementConnect';
-import type { EditorType } from '@macro-inc/lexical-core';
+import type { EditorType } from '@rox-one/lexical-core';
 import type { HistoryItem } from '@queries/history/types';
 import { isIOS } from '@solid-primitives/platform';
 import { cn } from '@ui';

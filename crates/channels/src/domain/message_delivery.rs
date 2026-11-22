@@ -11,7 +11,7 @@ use super::{
 };
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     delivery::MessageRealtime,
     models::{
@@ -73,9 +73,9 @@ fn persisted(channel_id: Uuid, message: &Message) -> MutatedMessage {
 }
 
 /// The person a bot message was posted for.
-fn triggering_person(message: &Message) -> Option<MacroUserIdStr<'static>> {
+fn triggering_person(message: &Message) -> Option<RoxUserIdStr<'static>> {
     let id = message.triggered_by.clone()?;
-    MacroUserIdStr::try_from(id)
+    RoxUserIdStr::try_from(id)
         .inspect_err(|error| tracing::warn!(?error, "unparseable triggered_by"))
         .ok()
 }
@@ -98,7 +98,7 @@ async fn recheck_agent_creations<C, P>(
     permissions: P,
     bot: BotId,
     requested_at: DateTime<Utc>,
-    person: MacroUserIdStr<'static>,
+    person: RoxUserIdStr<'static>,
     channel_id: Uuid,
     mut pending: Vec<ReferencedShareItem>,
 ) where
@@ -192,7 +192,7 @@ where
     async fn share_agent_creations(
         &self,
         bot: BotId,
-        person: MacroUserIdStr<'static>,
+        person: RoxUserIdStr<'static>,
         channel_id: Uuid,
         thread: BotMessageThread,
         replied_at: DateTime<Utc>,

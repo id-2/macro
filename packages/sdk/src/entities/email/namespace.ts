@@ -5,7 +5,7 @@ import type {
 } from '../../../generated/email/types.gen';
 import type { ListEmailRemindersData } from '../../../generated/storage/types.gen';
 import { type IterationOptions, iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { SearchOpts } from '../search/options';
 import { EmailAttachment } from './attachment';
 import { type DraftOptions, draftBody, EmailDraft } from './draft';
@@ -34,7 +34,7 @@ export interface InboxOptions extends IterationOptions {
  * @agent
  * ## Email inboxes
  *
- * - A user can have more than one inbox: their primary one, others they connected, and inboxes teammates delegated to them. `macro.email.links()` lists them; most users have one.
+ * - A user can have more than one inbox: their primary one, others they connected, and inboxes teammates delegated to them. `rox.email.links()` lists them; most users have one.
  * - Searching and listing span every inbox the user can access unless you pass one. When the user means a specific mailbox ("my work inbox", "the shared inbox"), find it in `links()` and pass that link; never guess an address.
  * - Labels are per inbox: a label from one inbox does not apply to a thread in another. Change a thread's labels with labels from the inbox that owns the thread.
  *
@@ -204,7 +204,7 @@ export class EmailNamespace {
     );
   }
 
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to an email thread by id. */
   byId(id: string): EmailThread {
@@ -308,7 +308,7 @@ export class EmailNamespace {
    * Search email threads by subject and content. To find a person's emails,
    * search for their quoted email address, not their name: a name only
    * matches where that display name appears. Resolve the address first, for
-   * example with `macro.users.search(name)`.
+   * example with `rox.users.search(name)`.
    *
    * @readonly
    */

@@ -1,5 +1,5 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 /**
  * URL metadata lookup.
@@ -7,7 +7,7 @@ import type { MacroClient } from '../../utils/client';
  * @routing Use when reading a URL's preview metadata; not fetching or searching the web.
  */
 export class UnfurlNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Read title, description and preview metadata for a URL.

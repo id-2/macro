@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::model::FileChangeKind;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const OWNER: &str = "macro|changes-owner@example.com";
 
@@ -15,7 +15,7 @@ async fn seed_session(pool: &PgPool) -> AgentSessionId {
         ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username
         RETURNING id
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         email,
         email,
         format!("stripe_{email}"),
@@ -32,7 +32,7 @@ async fn seed_session(pool: &PgPool) -> AgentSessionId {
     .execute(pool)
     .await
     .expect("insert User");
-    let bot_id = macro_uuid::generate_uuid_v7();
+    let bot_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO bots (id, kind, name, handle, has_agent, owner_user_id) VALUES ($1, 'owned', 'Changes Bot', $2, true, $3)"#,
         bot_id,
@@ -249,7 +249,7 @@ async fn a_shared_pull_request_changeset_replaces_the_sessions_own_patch(pool: P
     .await
     .unwrap();
 
-    let shared = macro_uuid::generate_uuid_v7();
+    let shared = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO github_pull_request_changeset (

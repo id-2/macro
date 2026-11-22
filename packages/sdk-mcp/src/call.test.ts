@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { BookingLinkDraft } from '../../sdk/generated/calendar/types.gen';
-import { Macro } from '../../sdk/src/macro';
+import { Macro } from '../../sdk/src/rox';
 import { runOperation } from './call';
 import { catalog, handleClasses } from './generated/catalog';
 import { InputValidators } from './validate';

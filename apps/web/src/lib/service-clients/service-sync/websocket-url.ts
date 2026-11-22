@@ -1,7 +1,7 @@
 import { ENABLE_BEARER_TOKEN_AUTH } from '@core/constant/featureFlags';
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { ensureFreshSession } from '@core/util/fetchWithToken';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { getMacroApiToken } from '@service-auth/fetch';
 
 /** Resolve fresh account credentials for the dedicated DSS sync socket. */

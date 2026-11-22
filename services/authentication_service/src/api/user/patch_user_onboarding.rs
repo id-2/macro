@@ -4,8 +4,8 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::user_id::MacroUserId;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::user_id::RoxUserId;
 
 use crate::api::context::{ApiContext, AuthorizationService};
 
@@ -30,7 +30,7 @@ pub enum PatchUserOnboardingError {
     #[error("User not found")]
     UserNotFound,
     #[error("unable to parse user id")]
-    InvalidMacroUserId,
+    InvalidRoxUserId,
     #[error("Internal error")]
     InternalError(#[from] anyhow::Error),
 }
@@ -44,7 +44,7 @@ impl IntoResponse for PatchUserOnboardingError {
                     message: "user not found".into(),
                 }),
             ),
-            PatchUserOnboardingError::InvalidMacroUserId => (
+            PatchUserOnboardingError::InvalidRoxUserId => (
                 StatusCode::BAD_REQUEST,
                 Json(ErrorResponse {
                     message: "invalid user id".into(),
@@ -76,18 +76,18 @@ impl IntoResponse for PatchUserOnboardingError {
 #[tracing::instrument(skip(ctx, user_context), err, fields(user_id=user_context.authorization.user.user_context.user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(req): extract::Json<PatchUserOnboardingRequest>,
 ) -> Result<Json<EmptyResponse>, PatchUserOnboardingError> {
     let user_id =
-        MacroUserId::parse_from_str(&user_context.authorization.user.user_context.user_id)
-            .map_err(|_| PatchUserOnboardingError::InvalidMacroUserId)?
+        RoxUserId::parse_from_str(&user_context.authorization.user.user_context.user_id)
+            .map_err(|_| PatchUserOnboardingError::InvalidRoxUserId)?
             .lowercase();
 
-    macro_db_client::user::patch::patch_user_onboarding(
+    rox_db_client::user::patch::patch_user_onboarding(
         &ctx.db,
         &user_id,
-        &macro_db_client::user::patch::UserOnboarding {
+        &rox_db_client::user::patch::UserOnboarding {
             first_name: &req.first_name,
             last_name: &req.last_name,
             title: &req.title,

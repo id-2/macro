@@ -3,7 +3,6 @@ import {
   chosenEmailRowStyle,
   setEmailRowStyle,
 } from '@app/features/email-view/primitives/email-row-style';
-import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { useSettingsState } from '@core/constant/SettingsState';
 import { useSettingsTabAvailable } from '@core/constant/settingsTabsConfig';
@@ -33,18 +32,18 @@ export function EmailSettings(props: { displayOptions: boolean }) {
   const isAvailable = useSettingsTabAvailable();
   return (
     <SettingsPage
-      title="Email"
-      description="Manage your inboxes and the signature you send with each account."
+      title="Почта"
+      description="Управляйте ящиками и подписью, которую отправляете с каждого аккаунта."
     >
       <SettingsSection
-        title="Accounts"
-        description="Connect email accounts and manage their sync with Rox."
+        title="Аккаунты"
+        description="Подключайте почтовые аккаунты и управляйте их синхронизацией с Rox."
       >
-        <div class="flex flex-col gap-2" aria-label="Mail accounts">
+        <div class="flex flex-col gap-2" aria-label="Почтовые аккаунты">
           <Suspense
             fallback={
               <p role="status" class="text-sm text-ink-muted">
-                Loading accounts…
+                Загрузка аккаунтов…
               </p>
             }
           >
@@ -55,21 +54,21 @@ export function EmailSettings(props: { displayOptions: boolean }) {
       </SettingsSection>
       <Show when={props.displayOptions}>
         <SettingsSection
-          title={t('settingsEmail.displayOptions')}
+          title="Параметры отображения"
           target="Display options"
-          description={t('settingsEmail.displayOptionsDescription')}
+          description="Выберите, как выглядит список писем."
         >
           <EmailDisplayOptions />
         </SettingsSection>
       </Show>
       <SettingsSection
-        title="Signatures"
-        description="Create a signature for each email account and preview it before sending."
+        title="Подписи"
+        description="Создайте подпись для каждого почтового аккаунта и просмотрите её перед отправкой."
       >
         <Suspense
           fallback={
             <p role="status" class="text-sm text-ink-muted">
-              Loading signatures…
+              Загрузка подписей…
             </p>
           }
         >
@@ -77,13 +76,13 @@ export function EmailSettings(props: { displayOptions: boolean }) {
         </Suspense>
       </SettingsSection>
       <SettingsSection
-        title="Read receipts"
-        description="See when recipients open messages you send."
+        title="Уведомления о прочтении"
+        description="Смотрите, когда получатели открывают отправленные вами письма."
       >
         <Suspense
           fallback={
             <p role="status" class="text-sm text-ink-muted">
-              Loading accounts…
+              Загрузка аккаунтов…
             </p>
           }
         >
@@ -91,35 +90,35 @@ export function EmailSettings(props: { displayOptions: boolean }) {
         </Suspense>
       </SettingsSection>
       <Show when={isAvailable('Notifications') || isAvailable('Calendar')}>
-        <SettingsSection title="Related settings">
+        <SettingsSection title="Связанные настройки">
           <SettingsCard>
             <Show when={isAvailable('Notifications')}>
               <SettingsRow
                 stackOnNarrow
-                label="Email notifications"
-                description="Choose your email alerts and digest delivery."
+                label="Почтовые уведомления"
+                description="Выберите почтовые оповещения и доставку дайджеста."
               >
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => openSettings('Notifications')}
                 >
-                  Manage notifications
+                  Управлять уведомлениями
                 </Button>
               </SettingsRow>
             </Show>
             <Show when={isAvailable('Calendar')}>
               <SettingsRow
                 stackOnNarrow
-                label="Calendars"
-                description="Manage the calendars connected to your email accounts."
+                label="Календари"
+                description="Управляйте календарями, подключёнными к почтовым аккаунтам."
               >
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => openSettings('Calendar')}
                 >
-                  Manage calendars
+                  Управлять календарями
                 </Button>
               </SettingsRow>
             </Show>
@@ -136,14 +135,14 @@ export function EmailDisplayOptions() {
     <SettingsCard>
       {/* One card child, so the card draws no divider above the sample. */}
       <div>
-        <SettingsRow stackOnNarrow label={t('settingsEmail.rowStyle')}>
+        <SettingsRow stackOnNarrow label="Вид строки">
           <Tabs
-            aria-label={t('settingsEmail.rowStyle')}
+            aria-label="Вид строки"
             touch="segmented"
             size="sm"
             options={[
-              { value: 'minimalist', label: t('settingsEmail.minimalist') },
-              { value: 'classic', label: t('settingsEmail.classic') },
+              { value: 'minimalist', label: 'Минималистичный' },
+              { value: 'classic', label: 'Классический' },
             ]}
             value={chosenEmailRowStyle()}
             onChange={setEmailRowStyle}
@@ -153,7 +152,10 @@ export function EmailDisplayOptions() {
           rowStyle={chosenEmailRowStyle()}
           class="mx-4 mb-4"
         />
-        <p class="sr-only">{t('settingsEmail.rowStyleDescription')}</p>
+        <p class="sr-only">
+          Классический вид разделяет строки линиями, выделяет непрочитанные
+          более жирным текстом и всегда показывает флажок выбора.
+        </p>
       </div>
     </SettingsCard>
   );
@@ -168,12 +170,12 @@ function EmailSignatures() {
       when={!query.isError}
       fallback={
         <SettingsCard>
-          <SettingsRow label="Couldn't load signatures">
+          <SettingsRow label="Не удалось загрузить подписи">
             <Button
               variant="secondary"
               onClick={() => fireAndForget(query.refetch(), 'email-settings')}
             >
-              Try again
+              Повторить
             </Button>
           </SettingsRow>
         </SettingsCard>
@@ -183,7 +185,7 @@ function EmailSignatures() {
         when={!query.isPending}
         fallback={
           <p role="status" class="text-sm text-ink-muted">
-            Loading signatures…
+            Загрузка подписей…
           </p>
         }
       >
@@ -191,7 +193,7 @@ function EmailSignatures() {
           each={links()}
           fallback={
             <SettingsCard>
-              <SettingsRow label="Connect an email account above to add a signature." />
+              <SettingsRow label="Подключите почтовый аккаунт выше, чтобы добавить подпись." />
             </SettingsCard>
           }
         >
@@ -199,7 +201,7 @@ function EmailSignatures() {
             <Suspense
               fallback={
                 <p role="status" class="text-sm text-ink-muted">
-                  Loading signature…
+                  Загрузка подписи…
                 </p>
               }
             >
@@ -225,7 +227,7 @@ function EmailReadReceipts() {
       when={!query.isPending}
       fallback={
         <p role="status" class="text-sm text-ink-muted">
-          Loading accounts…
+          Загрузка аккаунтов…
         </p>
       }
     >
@@ -233,12 +235,12 @@ function EmailReadReceipts() {
         when={query.data}
         fallback={
           <SettingsCard>
-            <SettingsRow label="Couldn't load accounts">
+            <SettingsRow label="Не удалось загрузить аккаунты">
               <Button
                 variant="outline"
                 onClick={() => fireAndForget(query.refetch(), 'email-settings')}
               >
-                Try again
+                Повторить
               </Button>
             </SettingsRow>
           </SettingsCard>
@@ -248,7 +250,7 @@ function EmailReadReceipts() {
           <For
             each={links()}
             fallback={
-              <SettingsRow label="Connect an email account above to use read receipts." />
+              <SettingsRow label="Подключите почтовый аккаунт выше, чтобы включить уведомления о прочтении." />
             }
           >
             {(link) => <ReadReceiptsRow link={link} />}
@@ -265,7 +267,7 @@ function ReadReceiptsRow(props: { link: EmailLink }) {
     <SettingsRow label={props.link.email_address}>
       <ToggleSwitch
         size="md"
-        label={`Read receipts for ${props.link.email_address}`}
+        label={`Уведомления о прочтении для ${props.link.email_address}`}
         labelClass="sr-only"
         checked={props.link.settings.read_receipts_enabled ?? true}
         disabled={updateSettings.isPending}
@@ -275,7 +277,7 @@ function ReadReceiptsRow(props: { link: EmailLink }) {
               linkId: props.link.id,
               settings: { read_receipts_enabled: checked },
             },
-            { onError: () => toast.failure('Failed to update read receipts.') }
+            { onError: () => toast.failure('Не удалось обновить уведомления о прочтении.') }
           )
         }
       />

@@ -1,4 +1,4 @@
-import type { SheetChart } from '@macro-inc/spreadsheet/sheet-drawings';
+import type { SheetChart } from '@rox-one/spreadsheet/sheet-drawings';
 import { describe, expect, it } from 'vitest';
 import {
   chartFromLayout,

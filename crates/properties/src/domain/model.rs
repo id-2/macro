@@ -7,7 +7,7 @@ use entity_access::domain::models::{
     EditAccessLevel, EntityAccessAuth, EntityAccessReceipt, EntityType as AccessEntityType,
     RequiredPermission, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::entity_property::EntityProperty;
 use models_properties::service::property_definition::PropertyDefinition;
 use models_properties::service::property_option::{PropertyOption, PropertyOptionValue};
@@ -82,7 +82,7 @@ pub trait PropertyAccessReceiptExt {
     /// Canonical entity type.
     fn entity_type(&self) -> AccessEntityType;
     /// Authenticated user, if the receipt represents one.
-    fn authenticated_user(&self) -> Option<&MacroUserIdStr<'static>>;
+    fn authenticated_user(&self) -> Option<&RoxUserIdStr<'static>>;
 }
 
 impl<T: RequiredPermission> PropertyAccessReceiptExt for EntityAccessReceipt<T> {
@@ -94,7 +94,7 @@ impl<T: RequiredPermission> PropertyAccessReceiptExt for EntityAccessReceipt<T> 
         self.entity().entity_type
     }
 
-    fn authenticated_user(&self) -> Option<&MacroUserIdStr<'static>> {
+    fn authenticated_user(&self) -> Option<&RoxUserIdStr<'static>> {
         match self.auth() {
             EntityAccessAuth::Authenticated(user) => Some(user),
             EntityAccessAuth::Bot(_)
@@ -184,14 +184,14 @@ pub struct PropertyOptionInfo {
 #[derive(Debug, Clone, Copy)]
 pub enum PropertyDefinitionOwner<'a> {
     /// Owned by a single user.
-    User(&'a MacroUserIdStr<'a>),
+    User(&'a RoxUserIdStr<'a>),
     /// Owned by a team.
     Team(Uuid),
 }
 
 impl<'a> PropertyDefinitionOwner<'a> {
     /// Split into the nullable (team_id, user_id) columns the row stores.
-    pub fn into_ids(self) -> (Option<Uuid>, Option<&'a MacroUserIdStr<'a>>) {
+    pub fn into_ids(self) -> (Option<Uuid>, Option<&'a RoxUserIdStr<'a>>) {
         match self {
             PropertyDefinitionOwner::User(user_id) => (None, Some(user_id)),
             PropertyDefinitionOwner::Team(team_id) => (Some(team_id), None),
@@ -404,7 +404,7 @@ pub struct TaskAssignedNotification<'a> {
     /// The task the recipients were assigned to.
     pub task_id: Uuid,
     /// The user who assigned the task.
-    pub assigned_by: MacroUserIdStr<'a>,
+    pub assigned_by: RoxUserIdStr<'a>,
     /// The newly assigned users to notify.
-    pub recipient_ids: Vec<MacroUserIdStr<'a>>,
+    pub recipient_ids: Vec<RoxUserIdStr<'a>>,
 }

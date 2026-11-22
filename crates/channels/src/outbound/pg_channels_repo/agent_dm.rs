@@ -2,7 +2,7 @@
 //! `comms_channel_agents` rows.
 
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::{
     agent_dm::{AgentDm, AgentDmRepo, EnsuredAgentDm},
@@ -17,7 +17,7 @@ mod test;
 impl PgChannelsRepo {
     async fn ensure_agent_dm(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> anyhow::Result<EnsuredAgentDm> {
         let mut tx = self.pool.begin().await?;
@@ -38,7 +38,7 @@ impl PgChannelsRepo {
         )
         .fetch_optional(&mut *tx)
         .await?;
-        let channel_id = existing.unwrap_or_else(macro_uuid::generate_uuid_v7);
+        let channel_id = existing.unwrap_or_else(rox_uuid::generate_uuid_v7);
         if existing.is_none() {
             sqlx::query!(
                 "INSERT INTO comms_channels (id, channel_type, owner_id)
@@ -85,7 +85,7 @@ impl PgChannelsRepo {
 impl AgentDmRepo for PgChannelsRepo {
     async fn for_user(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<AgentDm>, ChannelMutationErr> {
         let rows = sqlx::query!(
             "SELECT channel_id, bot_id FROM comms_channel_agents WHERE kind = 'direct' AND user_id = $1",
@@ -105,7 +105,7 @@ impl AgentDmRepo for PgChannelsRepo {
     }
     async fn ensure(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<EnsuredAgentDm, ChannelMutationErr> {
         self.ensure_agent_dm(user_id, bot_id)

@@ -16,7 +16,7 @@ use uuid::Uuid;
 #[async_trait::async_trait]
 pub trait SelectiveEmailGate: std::fmt::Debug + Send + Sync {
     /// Missing and failed evaluations refuse new grants.
-    async fn enabled_for(&self, user: macro_user_id::user_id::MacroUserIdStr<'_>) -> bool;
+    async fn enabled_for(&self, user: rox_user_id::user_id::RoxUserIdStr<'_>) -> bool;
 }
 
 /// An observed consent state, not an authorization credential. Never refresh

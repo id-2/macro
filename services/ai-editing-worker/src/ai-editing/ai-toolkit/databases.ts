@@ -3,13 +3,13 @@ import {
   $isDatabaseQueryNode,
   type DatabaseQueryNode,
   parseDatabaseQueryJson,
-} from '@macro-inc/lexical-core/nodes/DatabaseQueryNode';
-import { $isDocumentCardNode } from '@macro-inc/lexical-core/nodes/DocumentCardNode';
+} from '@rox-one/lexical-core/nodes/DatabaseQueryNode';
+import { $isDocumentCardNode } from '@rox-one/lexical-core/nodes/DocumentCardNode';
 import {
   type DatabaseQueryData,
   isDatabaseQueryChartMode,
   parseDatabaseQueryData,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import type { LexicalNode } from 'lexical';
 import { EditError } from '../editor/errors';
 import type { DatabaseQueryView } from '../editor/ops';

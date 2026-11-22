@@ -14,8 +14,8 @@ use bots::domain::{
     ports::{AgentDmEligibility, BotError, BotRepo},
 };
 use channels::domain::channel_agents::{ChannelAgent, ChannelAgentKind, ChannelAgentRepo};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 /// Runtime policy for agent conversations, rechecked when a queued prompt
 /// dispatches.
@@ -30,7 +30,7 @@ pub trait ConversationPolicy: Send + Sync + 'static {
         &self,
         session_id: AgentSessionId,
         bot_id: BotId,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> SessionResult<bool>;
     /// Recheck the prompter and the persona, including team access changes.
     /// Returns false when this session belongs to no conversation.
@@ -38,7 +38,7 @@ pub trait ConversationPolicy: Send + Sync + 'static {
         &self,
         session_id: AgentSessionId,
         bot_id: BotId,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> SessionResult<bool>;
     /// Immutable conversation provenance, used to choose notification behavior.
     async fn is_conversation_session(&self, session_id: AgentSessionId) -> SessionResult<bool>;
@@ -94,7 +94,7 @@ pub trait AgentConversations: Send + Sync + 'static {
     /// The expected session makes double submissions and stale tabs safe.
     fn start_fresh(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         conversation: AgentConversation,
         expected: AgentSessionId,
     ) -> impl Future<Output = Result<(), ConversationError>> + Send;
@@ -103,13 +103,13 @@ pub trait AgentConversations: Send + Sync + 'static {
     /// other people's conversations have none.
     fn list(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_id: Uuid,
     ) -> impl Future<Output = Result<Vec<ConversationOverview>, ConversationError>> + Send;
     /// Explicitly retry a failed attempt in the current session under current access.
     fn retry(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         conversation: AgentConversation,
         source: Uuid,
         expected: agent_runtime_protocol::domain::action::AgentActionId,
@@ -150,7 +150,7 @@ impl<C, P, B, S> AgentConversationsService<C, P, B, S> {
 /// Whether `caller` is the person a conversation is with. Only a direct
 /// conversation has one today; a member of a shared channel has no rule yet,
 /// so nobody may prompt it or see its controls.
-fn is_with(agent: &ChannelAgent, caller: &MacroUserIdStr<'static>) -> bool {
+fn is_with(agent: &ChannelAgent, caller: &RoxUserIdStr<'static>) -> bool {
     match &agent.kind {
         ChannelAgentKind::Direct { user_id } => user_id == caller,
         ChannelAgentKind::Member => false,
@@ -177,7 +177,7 @@ impl<C: ChannelAgentRepo, P: AgentDmEligibility, B: BotRepo, S: AgentConversatio
         &self,
         session_id: AgentSessionId,
         bot_id: BotId,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> SessionResult<bool> {
         let Some(conversation) = self.sessions.conversation_for_session(session_id).await? else {
             return Ok(false);
@@ -201,7 +201,7 @@ impl<C: ChannelAgentRepo, P: AgentDmEligibility, B: BotRepo, S: AgentConversatio
         &self,
         session_id: AgentSessionId,
         bot_id: BotId,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> SessionResult<bool> {
         if !self.validate_binding(session_id, bot_id, actor).await? {
             return Ok(false);
@@ -243,7 +243,7 @@ impl<C: ChannelAgentRepo, P: AgentDmEligibility, B: BotRepo, S: AgentConversatio
     /// persona never grants access to someone else's conversation.
     async fn joined(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         conversation: AgentConversation,
     ) -> Result<ChannelAgent, ConversationError> {
         self.channels
@@ -256,7 +256,7 @@ impl<C: ChannelAgentRepo, P: AgentDmEligibility, B: BotRepo, S: AgentConversatio
 
     async fn overview(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         agent: ChannelAgent,
     ) -> Result<ConversationOverview, ConversationError> {
         let conversation = AgentConversation {
@@ -411,7 +411,7 @@ impl<C: ChannelAgentRepo, P: AgentDmEligibility, B: BotRepo, S: AgentConversatio
 {
     async fn start_fresh(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         conversation: AgentConversation,
         expected: AgentSessionId,
     ) -> Result<(), ConversationError> {
@@ -439,7 +439,7 @@ impl<C: ChannelAgentRepo, P: AgentDmEligibility, B: BotRepo, S: AgentConversatio
 
     async fn retry(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         conversation: AgentConversation,
         source: Uuid,
         expected: agent_runtime_protocol::domain::action::AgentActionId,
@@ -493,7 +493,7 @@ impl<C: ChannelAgentRepo, P: AgentDmEligibility, B: BotRepo, S: AgentConversatio
 
     async fn list(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_id: Uuid,
     ) -> Result<Vec<ConversationOverview>, ConversationError> {
         let agents = self

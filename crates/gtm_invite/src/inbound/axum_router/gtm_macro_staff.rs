@@ -7,33 +7,33 @@ use axum::{
     http::request::Parts,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationRejection, MacroAuthorizationService,
-    MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationRejection, RoxAuthorizationService,
+    RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::GtmInviteError;
 
 /// Authenticated Rox staff principal for GTM invite staff endpoints.
-pub struct GtmMacroStaffExtractor<Auth> {
+pub struct GtmRoxStaffExtractor<Auth> {
     /// The authenticated staff user's id.
-    pub macro_user_id: MacroUserIdStr<'static>,
+    pub macro_user_id: RoxUserIdStr<'static>,
     _auth: PhantomData<fn() -> Auth>,
 }
 
 /// Rejection returned when the Rox staff check fails.
 #[derive(Debug, thiserror::Error)]
-pub enum GtmMacroStaffRejection {
+pub enum GtmRoxStaffRejection {
     /// The request could not be authorized.
     #[error("authorization failed")]
-    Authorization(#[from] MacroAuthorizationRejection),
+    Authorization(#[from] RoxAuthorizationRejection),
     /// The authenticated user is not Rox staff.
     #[error("only Rox staff can manage invite links")]
     NotStaff,
 }
 
-impl IntoResponse for GtmMacroStaffRejection {
+impl IntoResponse for GtmRoxStaffRejection {
     fn into_response(self) -> Response {
         match self {
             Self::Authorization(rejection) => rejection.into_response(),
@@ -42,22 +42,22 @@ impl IntoResponse for GtmMacroStaffRejection {
     }
 }
 
-impl<S, Auth> FromRequestParts<S> for GtmMacroStaffExtractor<Auth>
+impl<S, Auth> FromRequestParts<S> for GtmRoxStaffExtractor<Auth>
 where
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
-    type Rejection = GtmMacroStaffRejection;
+    type Rejection = GtmRoxStaffRejection;
 
     #[tracing::instrument(err, skip(parts, state))]
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
         let authorization =
-            MacroAuthorizationExtractor::<Auth, UserOrInternal>::from_request_parts(parts, state)
+            RoxAuthorizationExtractor::<Auth, UserOrInternal>::from_request_parts(parts, state)
                 .await?;
         let macro_user_id = authorization.authorization.user.macro_user_id;
         if !macro_user_id.is_macro_staff() {
-            return Err(GtmMacroStaffRejection::NotStaff);
+            return Err(GtmRoxStaffRejection::NotStaff);
         }
 
         Ok(Self {

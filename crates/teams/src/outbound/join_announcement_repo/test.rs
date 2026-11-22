@@ -1,16 +1,16 @@
 use std::collections::HashSet;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 
 const TEAM1: Uuid = Uuid::from_u128(0x1111_1111_1111_1111_1111_1111_1111_1111);
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
-fn users(emails: &[&str]) -> Vec<MacroUserIdStr<'static>> {
+fn users(emails: &[&str]) -> Vec<RoxUserIdStr<'static>> {
     emails.iter().map(|email| user(email)).collect()
 }
 
@@ -121,7 +121,7 @@ async fn concurrent_claims_never_share_an_address(pool: PgPool) {
     let emails: Vec<String> = (0..50)
         .map(|i| format!("colleague{i:02}@user.com"))
         .collect();
-    let candidates: Vec<MacroUserIdStr<'static>> = emails.iter().map(|email| user(email)).collect();
+    let candidates: Vec<RoxUserIdStr<'static>> = emails.iter().map(|email| user(email)).collect();
 
     let (left, right) = tokio::join!(
         left_repo.claim(TEAM1, &candidates, 100),

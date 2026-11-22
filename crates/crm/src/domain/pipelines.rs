@@ -32,7 +32,7 @@ use entity_access::domain::{
     ports::{AccessiblePipelines, EntityAccessService},
     telemetry::span_count,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::{
     SharePermissionV2, UpdateSharePermissionRequestV2,
     channel_share_permission::{
@@ -196,7 +196,7 @@ pub struct PipelineBlueprint {
     /// Pipeline-owned display name.
     pub name: String,
     /// Initial owner.
-    pub creator: MacroUserIdStr<'static>,
+    pub creator: RoxUserIdStr<'static>,
     /// Protected company/contact reference, or a generic pipeline's Name.
     pub primary_column_id: ColumnId,
 }
@@ -331,7 +331,7 @@ pub trait PipelineService: Send + Sync + 'static {
     /// boundary: the rows are what those pipelines already show the viewer.
     fn entries(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         record_type: PipelineRecordType,
         records: &[Uuid],
     ) -> impl Future<Output = Result<Vec<PipelineEntry>, PipelineError>> + Send;
@@ -438,7 +438,7 @@ fn storage(error: impl std::error::Error + Send + Sync + 'static) -> PipelineErr
 
 fn actor<T: RequiredPermission>(
     receipt: &EntityAccessReceipt<T>,
-) -> Result<MacroUserIdStr<'static>, PipelineError> {
+) -> Result<RoxUserIdStr<'static>, PipelineError> {
     match receipt.auth() {
         EntityAccessAuth::Authenticated(user) => Ok(user.clone()),
         _ => Err(PipelineError::Invalid("An authenticated user is required")),
@@ -491,11 +491,11 @@ impl<R: PipelineRepo, D, A, S> PipelineServiceImpl<R, D, A, S> {
 /// `labels` are a tracked pipeline's stages.
 pub(crate) fn pipeline_blueprint(
     team_id: Uuid,
-    creator: MacroUserIdStr<'static>,
+    creator: RoxUserIdStr<'static>,
     input: CreatePipeline,
     labels: Vec<String>,
 ) -> PipelineBlueprint {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let primary_column_id = ColumnId::new();
     // Only a pipeline that tracks a record holds deals; a generic one is a free-form table.
     let (columns, commercial_fields) = match input.record_type {
@@ -617,7 +617,7 @@ where
     #[tracing::instrument(name = "crm.pipeline.entries", skip_all, fields(record_type = record_type.as_str(), records = span_count(records.len()), pipelines = tracing::field::Empty, entries = tracing::field::Empty), err)]
     async fn entries(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         record_type: PipelineRecordType,
         records: &[Uuid],
     ) -> Result<Vec<PipelineEntry>, PipelineError> {

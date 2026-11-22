@@ -5,7 +5,7 @@ use crate::{
     engine::HydrationScope,
     value::{CacheValue, EntityKey, Record},
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -39,7 +39,7 @@ pub struct ContactSnapshot {
     pub fence: Uuid,
     /// Canonical identities read from viewer-scoped membership records.
     #[cfg_attr(any(test, feature = "schema"), schemars(with = "Vec<String>", length(max = MAX_PEOPLE_BATCH)))]
-    pub ids: Vec<MacroUserIdStr<'static>>,
+    pub ids: Vec<RoxUserIdStr<'static>>,
     /// Last raw position when more records remain; empty pages may continue.
     pub next_cursor: Option<String>,
     /// Malformed membership is not evidence of absence or a complete sweep.
@@ -58,16 +58,16 @@ pub struct ContactReconcile {
     pub viewer: String,
     /// Exact requested IDs, bounded before deduplication.
     #[cfg_attr(any(test, feature = "schema"), schemars(with = "Vec<String>", length(max = MAX_PEOPLE_BATCH)))]
-    pub requested: Vec<MacroUserIdStr<'static>>,
+    pub requested: Vec<RoxUserIdStr<'static>>,
     /// Members returned by that lookup; must be a subset of requested.
     #[cfg_attr(any(test, feature = "schema"), schemars(with = "Vec<String>", length(max = MAX_PEOPLE_BATCH)))]
-    pub present: Vec<MacroUserIdStr<'static>>,
+    pub present: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Interpretation of one cached contact record.
 pub enum CachedMembership {
     /// A viewer-scoped server membership identity.
-    Member(MacroUserIdStr<'static>),
+    Member(RoxUserIdStr<'static>),
     /// Context stub or another viewer's record, never membership.
     NotMember,
     /// Incomplete membership cannot prove a complete verification pass.
@@ -85,7 +85,7 @@ pub fn cached_member(viewer: &str, key: &EntityKey<'_>, record: &Record) -> Cach
     if id.len() > 1024 {
         return CachedMembership::Incomplete;
     }
-    let Ok(id) = MacroUserIdStr::parse_from_str(id) else {
+    let Ok(id) = RoxUserIdStr::parse_from_str(id) else {
         return CachedMembership::Incomplete;
     };
     if super::contact_key(viewer, id.as_ref()).as_ref() != key.as_ref() {

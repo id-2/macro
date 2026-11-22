@@ -3,7 +3,7 @@ import type {
   ChannelType,
 } from '../../../generated/storage/types.gen';
 import { type IterationOptions, iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { SearchOpts } from '../search/options';
 import type { Team } from '../teams/team';
 import type { User } from '../users/user';
@@ -15,7 +15,7 @@ import { ChannelLabelsNamespace } from './labels';
 const CHANNEL_PAGE_SIZE = 100;
 
 /**
- * @routing Use when reading or sending channel and direct messages, posting a poll, reacting or managing members; not email, or WhatsApp and other external chats (`macro.externalChats`).
+ * @routing Use when reading or sending channel and direct messages, posting a poll, reacting or managing members; not email, or WhatsApp and other external chats (`rox.externalChats`).
  *
  * @agent
  * ## Polls
@@ -46,7 +46,7 @@ export class ChannelNamespace {
   /** Team-shared labels that group channels in the Chat sidebar. */
   readonly labels: ChannelLabelsNamespace;
 
-  constructor(private readonly client: MacroClient) {
+  constructor(private readonly client: RoxClient) {
     this.labels = new ChannelLabelsNamespace(client);
   }
 

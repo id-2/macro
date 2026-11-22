@@ -26,7 +26,7 @@ use crate::domain::{
 use channel_sender::ChannelSender;
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EntityAccessReceipt, MemberParticipantRole};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{CreatedAt, Query};
 use std::collections::{HashMap, HashSet};
 use uuid::Uuid;
@@ -55,7 +55,7 @@ pub trait ChannelListRepo: Send + Sync + 'static {
     /// Fetch recent activity for a user.
     fn get_channel_list_activities(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Activity>, rootcause::Report>> + Send;
 
     /// Fetch top-level channel messages for Soup thread rendering.
@@ -79,7 +79,7 @@ pub trait ChannelListUserRepo: Send + Sync + 'static {
     /// Fetch names for user ids.
     fn get_names_for_ids(
         &self,
-        names: HashSet<MacroUserIdStr<'_>>,
+        names: HashSet<RoxUserIdStr<'_>>,
     ) -> impl Future<Output = Result<Vec<UserName>, rootcause::Report>> + Send;
 }
 
@@ -95,7 +95,7 @@ pub trait ChannelListService: Send + Sync + 'static {
     /// Fetch recent activity for a user.
     fn get_activities(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Activity>, rootcause::Report>> + Send;
 
     /// Fetch top-level channel messages for Soup thread rendering.
@@ -116,7 +116,7 @@ pub trait ChannelListService: Send + Sync + 'static {
     /// Fetch names for user ids.
     fn get_names(
         &self,
-        names: HashSet<MacroUserIdStr<'_>>,
+        names: HashSet<RoxUserIdStr<'_>>,
     ) -> impl Future<Output = Result<Vec<UserName>, rootcause::Report>> + Send;
 }
 
@@ -164,7 +164,7 @@ pub trait HistoricalChannelRepo: Send + Sync + 'static {
     fn insert_historical_participants(
         &self,
         channel_id: Uuid,
-        participants: &[MacroUserIdStr<'static>],
+        participants: &[RoxUserIdStr<'static>],
         joined_at: DateTime<Utc>,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
 
@@ -241,7 +241,7 @@ pub trait ChannelRepo: Send + Sync + 'static {
     fn get_channel_metadata(
         &self,
         channel_id: Uuid,
-        viewer_user_id: MacroUserIdStr<'static>,
+        viewer_user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<ChannelMetadata, Self::Err>> + Send;
 
     /// Batch fetch channel preview rows for the requested ids, computing
@@ -257,15 +257,15 @@ pub trait ChannelRepo: Send + Sync + 'static {
     fn resolve_channel_name(
         &self,
         info: &ChannelInfo,
-        viewer_user_id: MacroUserIdStr<'static>,
+        viewer_user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<String, Self::Err>> + Send;
 
     /// Profile names (`first last`) for the given users, as the app shows
     /// them. Users without a name are absent from the map.
     fn get_user_display_names(
         &self,
-        user_ids: &[MacroUserIdStr<'static>],
-    ) -> impl Future<Output = Result<HashMap<MacroUserIdStr<'static>, String>, Self::Err>> + Send;
+        user_ids: &[RoxUserIdStr<'static>],
+    ) -> impl Future<Output = Result<HashMap<RoxUserIdStr<'static>, String>, Self::Err>> + Send;
 
     /// Check whether a user belongs to a team.
     fn user_has_team(
@@ -277,13 +277,13 @@ pub trait ChannelRepo: Send + Sync + 'static {
     /// Fetch the team a user belongs to, if any.
     fn get_user_team_id<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Option<Uuid>, Self::Err>> + Send;
 
     /// Create a channel and return its complete active participant set.
     fn create_channel<'a>(
         &self,
-        owner_id: MacroUserIdStr<'a>,
+        owner_id: RoxUserIdStr<'a>,
         org_id: Option<i64>,
         req: CreateChannelRequest,
     ) -> impl Future<Output = Result<CreatedChannel, Self::Err>> + Send;
@@ -292,7 +292,7 @@ pub trait ChannelRepo: Send + Sync + 'static {
     fn auto_join_by_team_id<'a>(
         &self,
         team_id: &Uuid,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Soft-leave a user from every active channel membership for a team.
@@ -301,13 +301,13 @@ pub trait ChannelRepo: Send + Sync + 'static {
     fn leave_by_team_id<'a>(
         &self,
         team_id: &Uuid,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Vec<Uuid>, Self::Err>> + Send;
 
     /// Roll back a team leave by restoring a user's memberships in the exact channels provided.
     fn restore_by_channel_ids<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         channel_ids: &[Uuid],
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
@@ -323,14 +323,14 @@ pub trait ChannelRepo: Send + Sync + 'static {
     /// Fetch an existing exact two-member DM, deterministically choosing the oldest.
     fn maybe_get_dm<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
-        recipient_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
+        recipient_id: RoxUserIdStr<'a>,
     ) -> impl Future<Output = Result<Option<Uuid>, Self::Err>> + Send;
 
     /// Fetch an existing private channel.
     fn maybe_get_private_channel<'a>(
         &self,
-        participants: HashSet<MacroUserIdStr<'a>>,
+        participants: HashSet<RoxUserIdStr<'a>>,
     ) -> impl Future<Output = Result<Option<Uuid>, Self::Err>> + Send;
 
     /// Patch a channel.
@@ -347,7 +347,7 @@ pub trait ChannelRepo: Send + Sync + 'static {
     /// Whether the user is an admin or owner of this exact team.
     fn user_is_team_admin<'a>(
         &self,
-        user_id: &MacroUserIdStr<'a>,
+        user_id: &RoxUserIdStr<'a>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -361,7 +361,7 @@ pub trait ChannelRepo: Send + Sync + 'static {
     fn add_participant<'a>(
         &self,
         channel_id: Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         role: super::models::ParticipantRole,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -406,7 +406,7 @@ pub trait ChannelRepo: Send + Sync + 'static {
     fn get_thread_participants(
         &self,
         thread_id: Uuid,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Self::Err>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Self::Err>> + Send;
 
     /// Upsert activity for the user in the channel.
     fn upsert_activity<'a>(
@@ -457,14 +457,14 @@ pub trait ChannelService: Send + Sync + 'static {
     /// them. Users without a name are absent from the map.
     fn get_user_display_names(
         &self,
-        user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> impl Future<Output = Result<HashMap<MacroUserIdStr<'static>, String>, ChannelMessagesErr>> + Send;
+        user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> impl Future<Output = Result<HashMap<RoxUserIdStr<'static>, String>, ChannelMessagesErr>> + Send;
 
     /// Fetch channel metadata (type + resolved display name) from the viewer's perspective.
     fn get_channel_metadata(
         &self,
         channel_id: Uuid,
-        viewer_user_id: MacroUserIdStr<'static>,
+        viewer_user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<ChannelMetadata, ChannelMessagesErr>> + Send {
         let _ = (channel_id, viewer_user_id);
         async move {
@@ -477,7 +477,7 @@ pub trait ChannelService: Send + Sync + 'static {
     /// Batch fetch channel previews for the requested ids.
     fn batch_get_channel_previews(
         &self,
-        _viewer_user_id: MacroUserIdStr<'static>,
+        _viewer_user_id: RoxUserIdStr<'static>,
         _org_id: Option<i64>,
         _channel_ids: Vec<String>,
     ) -> impl Future<Output = Result<Vec<ChannelPreview>, ChannelMessagesErr>> + Send {
@@ -521,7 +521,7 @@ pub trait ChannelService: Send + Sync + 'static {
     /// `owner`; ownership and permissions are unchanged.
     fn create_system_channel(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         req: CreateChannelRequest,
     ) -> impl Future<Output = Result<CreateChannelResponse, ChannelMutationErr>> + Send {
         self.create_channel_on_behalf(owner, bot_id::MACRO_SYSTEM_BOT_ID, req)
@@ -531,7 +531,7 @@ pub trait ChannelService: Send + Sync + 'static {
     /// acting for that owner. Ownership and permissions stay with `owner`.
     fn create_channel_on_behalf(
         &self,
-        _owner: MacroUserIdStr<'static>,
+        _owner: RoxUserIdStr<'static>,
         _actor: BotId,
         _req: CreateChannelRequest,
     ) -> impl Future<Output = Result<CreateChannelResponse, ChannelMutationErr>> + Send {
@@ -546,7 +546,7 @@ pub trait ChannelService: Send + Sync + 'static {
     fn auto_join_by_team_id(
         &self,
         _team_id: &Uuid,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), ChannelMutationErr>> + Send {
         async move {
             Err(ChannelMutationErr::NotFound(
@@ -561,7 +561,7 @@ pub trait ChannelService: Send + Sync + 'static {
     fn leave_by_team_id(
         &self,
         _team_id: &Uuid,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Uuid>, ChannelMutationErr>> + Send {
         async move {
             Err(ChannelMutationErr::NotFound(
@@ -573,7 +573,7 @@ pub trait ChannelService: Send + Sync + 'static {
     /// Roll back a team leave by restoring a user's memberships in the exact channels provided.
     fn restore_by_channel_ids(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _channel_ids: &[Uuid],
     ) -> impl Future<Output = Result<(), ChannelMutationErr>> + Send {
         async move {
@@ -629,7 +629,7 @@ pub trait ChannelService: Send + Sync + 'static {
     /// posting them in a message.
     fn share_referenced_items_with_channel(
         &self,
-        _actor: MacroUserIdStr<'static>,
+        _actor: RoxUserIdStr<'static>,
         _channel_id: Uuid,
         _items: Vec<ReferencedShareItem>,
     ) -> impl Future<Output = Result<Vec<ReferenceShareResult>, ChannelMutationErr>> + Send {
@@ -868,7 +868,7 @@ pub trait ChannelSideEffectContext: Send + Sync + 'static {
     /// Return user ids that exist in the application.
     fn get_existing_user_ids(
         &self,
-        user_ids: Vec<MacroUserIdStr<'static>>,
+        user_ids: Vec<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<HashSet<String>, Self::Err>> + Send;
 
     /// Load display metadata for mentioned documents.
@@ -886,7 +886,7 @@ pub trait ChannelSideEffectContext: Send + Sync + 'static {
     /// Load a user's profile picture URL for notification copy.
     fn get_sender_profile_picture_url(
         &self,
-        sender_id: MacroUserIdStr<'static>,
+        sender_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Option<String>> + Send;
 
     /// Load a bot's public profile for realtime payload enrichment.
@@ -945,7 +945,7 @@ pub trait ChannelContactsDispatcher: Send + Sync + 'static {
     /// Enqueue a complete contact graph update for the provided users.
     fn enqueue_contacts(
         &self,
-        users: HashSet<MacroUserIdStr<'static>>,
+        users: HashSet<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 }
 
@@ -964,7 +964,7 @@ pub trait ChannelReferenceSharePermissions: Send + Sync + 'static {
     /// and still counts as shared.
     fn update_channel_share_permissions_for_referenced_items(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         channel_id: Uuid,
         items: Vec<ReferencedShareItem>,
     ) -> impl Future<Output = Result<Vec<ReferenceShareResult>, Self::Err>> + Send;
@@ -981,7 +981,7 @@ pub trait AgentCreations: Clone + Send + Sync + 'static {
     fn request_sent_at(
         &self,
         thread_root: Uuid,
-        person: &MacroUserIdStr<'static>,
+        person: &RoxUserIdStr<'static>,
         before: DateTime<Utc>,
     ) -> impl Future<Output = Result<Option<DateTime<Utc>>, Self::Err>> + Send;
 
@@ -990,7 +990,7 @@ pub trait AgentCreations: Clone + Send + Sync + 'static {
     fn channel_request_sent_at(
         &self,
         channel_id: Uuid,
-        person: &MacroUserIdStr<'static>,
+        person: &RoxUserIdStr<'static>,
         before: DateTime<Utc>,
     ) -> impl Future<Output = Result<Option<DateTime<Utc>>, Self::Err>> + Send;
 
@@ -998,7 +998,7 @@ pub trait AgentCreations: Clone + Send + Sync + 'static {
     fn created_since(
         &self,
         bot: BotId,
-        person: &MacroUserIdStr<'static>,
+        person: &RoxUserIdStr<'static>,
         since: DateTime<Utc>,
         items: Vec<ReferencedShareItem>,
     ) -> impl Future<Output = Result<Vec<ReferencedShareItem>, Self::Err>> + Send;

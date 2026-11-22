@@ -50,7 +50,7 @@ impl Notification for InitiativeDiscussionMetadata {
 impl NotificationTitle for InitiativeDiscussionMetadata {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let sender = comment_sender_label(sender_id, self.sender_display_name.as_deref());
         let action = match self.reason {
@@ -63,7 +63,7 @@ impl NotificationTitle for InitiativeDiscussionMetadata {
         Ok(format!("{sender} {action} {}", self.project_name))
     }
 
-    fn format_body(&self, _: Option<MacroUserIdStr<'_>>) -> Result<String, rootcause::Report> {
+    fn format_body(&self, _: Option<RoxUserIdStr<'_>>) -> Result<String, rootcause::Report> {
         parse_message_plain_text(&self.text)
     }
 }
@@ -77,7 +77,7 @@ impl NotificationExtIos for InitiativeDiscussionMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {

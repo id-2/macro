@@ -5,7 +5,7 @@ use crate::domain::message_labels::state::{
 };
 use anyhow::Result;
 use email_db_client::labels::pending_writes::pending_provider_label_ids;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 const LINK: Uuid = Uuid::from_u128(0x801);

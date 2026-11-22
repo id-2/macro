@@ -46,7 +46,7 @@ pub(super) const MINIO_ROOT_USER: &str = "ANOTREAL";
 pub(super) const MINIO_ROOT_PASSWORD: &str = "notrealrnrELgWzOk3IfjzDKtFBhDby";
 pub const MAILPIT_IMAGE: &str = "axllent/mailpit:v1.20";
 pub const CADDY_IMAGE: &str = "caddy:2-alpine";
-const SDK_WEBHOOK_RELAY_IMAGE: &str = "macro-sdk-webhook-relay";
+const SDK_WEBHOOK_RELAY_IMAGE: &str = "rox-sdk-webhook-relay";
 
 /// Base-compose services that bind fixed host ports but aren't in our inventory
 /// (reached via the proxy / container network, not the host). For named
@@ -255,7 +255,9 @@ pub fn generate(
                     .map(|s| s.to_string())
                     .collect(),
                 )),
-                env_file: Some(dct::StringOrList::Simple("${MACRO_ENV_FILE}".to_string())),
+                env_file: Some(dct::StringOrList::Simple(
+                    "${ROX_ENV_FILE:-${MACRO_ENV_FILE}}".to_string(),
+                )),
                 networks: net_aliases(&[("services", &["gmail-forwarder"])]),
                 ..Default::default()
             }),
@@ -954,17 +956,17 @@ pub fn content_tagged_images() -> [ContentTaggedImage; 3] {
     [
         ContentTaggedImage {
             service: "search",
-            repository: "macro-local-opensearch",
+            repository: "rox-local-opensearch",
             inputs: || Ok(vec!["infra/local/opensearch".to_string()]),
         },
         ContentTaggedImage {
             service: "sync_service",
-            repository: "macro-local-sync-service",
+            repository: "rox-local-sync-service",
             inputs: sync_service_inputs,
         },
         ContentTaggedImage {
             service: "lexical_service",
-            repository: "macro-local-lexical-service",
+            repository: "rox-local-lexical-service",
             inputs: lexical_service_inputs,
         },
     ]
@@ -1096,7 +1098,7 @@ pub fn docker_compose(
     }
     cmd.arg("--env-file").arg(generated_env);
     cmd.env("COMPOSE_PROJECT_NAME", instance.project_name());
-    cmd.env("MACRO_ENV_FILE", generated_env);
+    cmd.env("ROX_ENV_FILE", generated_env);
     // Compose gives the shell precedence over --env-file. This key is owned
     // by the resolved run policy, so inherit it only from that generated file.
     cmd.env_remove("SYNC_SERVICE_OTEL_EXPORTER_OTLP_ENDPOINT");

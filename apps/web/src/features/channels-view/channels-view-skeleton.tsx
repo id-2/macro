@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ViewSkeleton } from '@app/components/view-shell/ViewSkeleton';
 import { For } from 'solid-js';
 
@@ -5,7 +6,7 @@ import { For } from 'solid-js';
 export function ChannelsViewSkeleton() {
   return (
     <ViewSkeleton.Root asidePreferenceKey="channels">
-      <ViewSkeleton.Sidebar title="Chat" createLabel="New" search>
+      <ViewSkeleton.Sidebar title={t('nav.chat')} createLabel="New" search>
         <div class="flex gap-1.5 px-(--sidebar-gutter) pt-2 touch:hidden">
           <For each={['All', 'Recent', 'Threads']}>
             {(tab) => <ViewSkeleton.Control control={tab} class="flex-1" />}
@@ -13,7 +14,7 @@ export function ChannelsViewSkeleton() {
         </div>
         <ViewSkeleton.Rows label="Loading Chat" class="mt-3" />
       </ViewSkeleton.Sidebar>
-      <ViewSkeleton.Main title="Chat">
+      <ViewSkeleton.Main title={t('nav.chat')}>
         <div class="flex flex-1 items-center justify-center text-ink-muted text-sm">
           Select a conversation
         </div>

@@ -1,5 +1,6 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import { createSignal, onCleanup } from 'solid-js';
 import type {
   CreateRecorder,
@@ -227,7 +228,7 @@ export function createRecordedDictation(options: {
     disabled: () => phase() !== 'idle',
     label: () =>
       options.supported
-        ? 'Start dictation'
-        : 'Dictation is unavailable in this browser',
+        ? t('agentChat.startDictation')
+        : t('agentChat.dictationUnavailable'),
   };
 }

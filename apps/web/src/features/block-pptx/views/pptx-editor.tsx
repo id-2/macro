@@ -38,7 +38,7 @@ import SquaresFour from '@icon/system/regular/squares-four.svg';
 import Trash from '@icon/system/regular/trash.svg';
 import WarningIcon from '@icon/system/regular/warning.svg';
 import { ContextMenu } from '@kobalte/core/context-menu';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { Button } from '@ui/components/Button';
 import {
   createEffect,

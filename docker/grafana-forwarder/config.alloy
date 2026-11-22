@@ -88,7 +88,7 @@ otelcol.processor.transform "forwarder" {
   trace_statements {
     context = "resource"
     statements = [
-      `set(attributes["host.name"], "` + sys.env("MACRO_MACHINE_NAME") + `")`,
+      `set(attributes["host.name"], "` + sys.env("ROX_MACHINE_NAME") + `")`,
       `set(attributes["deployment.environment.name"], "local")`,
       `set(attributes["deployment.environment"], "local")`,
     ]
@@ -96,7 +96,7 @@ otelcol.processor.transform "forwarder" {
   log_statements {
     context = "resource"
     statements = [
-      `set(attributes["host.name"], "` + sys.env("MACRO_MACHINE_NAME") + `")`,
+      `set(attributes["host.name"], "` + sys.env("ROX_MACHINE_NAME") + `")`,
       `set(attributes["deployment.environment.name"], "local")`,
       `set(attributes["deployment.environment"], "local")`,
     ]
@@ -104,7 +104,7 @@ otelcol.processor.transform "forwarder" {
   metric_statements {
     context = "resource"
     statements = [
-      `set(attributes["host.name"], "` + sys.env("MACRO_MACHINE_NAME") + `")`,
+      `set(attributes["host.name"], "` + sys.env("ROX_MACHINE_NAME") + `")`,
       `set(attributes["deployment.environment.name"], "local")`,
       `set(attributes["deployment.environment"], "local")`,
     ]
@@ -116,7 +116,7 @@ otelcol.processor.transform "forwarder" {
     context = "datapoint"
     statements = [
       `set(attributes["deployment.environment"], "local")`,
-      `set(attributes["host.name"], "` + sys.env("MACRO_MACHINE_NAME") + `")`,
+      `set(attributes["host.name"], "` + sys.env("ROX_MACHINE_NAME") + `")`,
       `set(attributes["macro.local.instance"], resource.attributes["macro.local.instance"]) where resource.attributes["macro.local.instance"] != nil`,
     ]
   }
@@ -145,7 +145,7 @@ otelcol.auth.bearer "grafana" {
 
 otelcol.exporter.otlphttp "grafana" {
   client {
-    endpoint = sys.env("MACRO_FORWARD_ENDPOINT")
+    endpoint = sys.env("ROX_FORWARD_ENDPOINT")
     auth = otelcol.auth.bearer.grafana.handler
     timeout = "10s"
   }

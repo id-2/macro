@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import CalendarIcon from '@icon/system/regular/calendar-blank.svg';
 import CaretDownIcon from '@icon/system/regular/caret-down.svg';
 import ChatIcon from '@icon/system/regular/chat-circle.svg';
@@ -128,7 +129,7 @@ export function RoutineSuggestionRow(props: {
       </div>
       <Show when={props.failed}>
         <p role="alert" class="px-3 pb-3 pl-14 text-xs text-failure">
-          Couldn’t turn this on. Try again, or leave it off.
+          {t('onboarding.routineTurnOnFailed')}
         </p>
       </Show>
       <CollapseTransition open={props.expanded}>
@@ -145,7 +146,7 @@ export function RoutineSuggestionRow(props: {
           </TextField>
           <ToggleSwitch
             size="sm"
-            label="Show each run in Home"
+            label={t('onboarding.showEachRunInHome')}
             labelClass="text-xs text-ink-muted"
             checked={props.edits.notify}
             disabled={props.locked}
@@ -177,7 +178,11 @@ export function SuggestionToggle(props: {
     >
       <ToggleSwitch
         size="md"
-        label={<span class="sr-only">Turn on {props.name}</span>}
+        label={
+              <span class="sr-only">
+                {t('onboarding.turnOnNamed', { name: props.name })}
+              </span>
+            }
         checked={props.on}
         disabled={props.disabled}
         onChange={props.onChange}

@@ -6,9 +6,9 @@ use strum::{EnumIter, IntoEnumIterator};
 #[cfg(test)]
 mod test;
 
-/// The default instance's name. It binds the fixed ports, the discriminants of
-/// [`Port`], rather than a window.
-pub const DEFAULT_INSTANCE: &str = "macro";
+/// The default instance's name. It owns the plain `rox` Compose project and
+/// binds the fixed ports, the discriminants of [`Port`], rather than a window.
+pub const DEFAULT_INSTANCE: &str = "rox";
 
 /// Start of the named-instance port windows. The whole range stays below
 /// Linux's default ephemeral range (32768-60999), otherwise an ordinary
@@ -30,7 +30,7 @@ pub const NETWORK_BLOCK_SIZE: usize = 64;
 pub(crate) const SUBNET_BLOCKS: u32 = 256;
 
 /// Every host port a local stack binds. The discriminant IS the port the
-/// default `macro` instance binds (matching the values hardcoded in the compose
+/// default `rox` instance binds (matching the values hardcoded in the compose
 /// files); a named instance binds `port_base + offset`, where `offset` is the
 /// variant's position in declaration order. Adding a port is a single line,
 /// appended: `NewThing = 8099,`. Offsets stay below [`WINDOW_WIDTH`], so named
@@ -129,7 +129,7 @@ pub enum Port {
 }
 
 impl Port {
-    /// The port the default `macro` instance binds — the variant's discriminant.
+    /// The port the default `rox` instance binds — the variant's discriminant.
     pub const fn fixed(self) -> u16 {
         self as u16
     }

@@ -6,8 +6,8 @@ use axum::{
     response::IntoResponse,
 };
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{OptionalMacroAuthorizationExtractor, UserOrInternalService};
-use macro_db_client::document::get_document_process_content_from_job_id;
+use rox_authorization::{OptionalRoxAuthorizationExtractor, UserOrInternalService};
+use rox_db_client::document::get_document_process_content_from_job_id;
 use model::response::GenericErrorResponse;
 use model::response::GenericResponse;
 use models_permissions::share_permission::access_level::ViewAccessLevel;
@@ -39,7 +39,7 @@ pub struct Params {
 pub async fn job_processing_result_handler(
     _access: DocumentAccessExtractor<ViewAccessLevel, EntityAccessService, AuthorizationService>,
     State(db): State<PgPool>,
-    user: OptionalMacroAuthorizationExtractor<AuthorizationService, UserOrInternalService>,
+    user: OptionalRoxAuthorizationExtractor<AuthorizationService, UserOrInternalService>,
     Path(Params {
         document_id,
         job_id,

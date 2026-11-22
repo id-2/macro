@@ -93,9 +93,9 @@ export function TasksFilterDrawer(props: { inline?: boolean }) {
         open={open()}
         onOpenChange={setOpen}
         onContentPresentChange={afterClose}
-        triggerLabel="Open task filters"
+        triggerLabel="Открыть фильтры задач"
         inline={props.inline}
-        label="Task list controls"
+        label="Управление списком задач"
         activeCount={filters.activeCount()}
         onClear={filters.clear}
         contentOverlay={() => (
@@ -109,7 +109,7 @@ export function TasksFilterDrawer(props: { inline?: boolean }) {
       >
         <Show when={!state.search.trim()}>
           <MobileDrawer.Label id="task-sort-label" class="pt-4">
-            Sort
+            Сортировка
           </MobileDrawer.Label>
           <MobileDrawer.Section
             role="radiogroup"
@@ -134,7 +134,7 @@ export function TasksFilterDrawer(props: { inline?: boolean }) {
         </Show>
 
         <MobileDrawer.Label id="task-group-label" class="pt-4">
-          Group
+          Группировка
         </MobileDrawer.Label>
         <MobileDrawer.Section
           role="radiogroup"
@@ -157,7 +157,7 @@ export function TasksFilterDrawer(props: { inline?: boolean }) {
           </For>
         </MobileDrawer.Section>
 
-        <MobileDrawer.Label class="pt-4">Filters</MobileDrawer.Label>
+        <MobileDrawer.Label class="pt-4">Фильтры</MobileDrawer.Label>
         <Accordion
           multiple
           collapsible

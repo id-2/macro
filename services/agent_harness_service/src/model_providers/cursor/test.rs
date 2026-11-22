@@ -14,7 +14,7 @@ struct TestCursorKeys;
 impl CursorApiKeys for TestCursorKeys {
     async fn resolve(
         &self,
-        _owner: &MacroUserIdStr<'_>,
+        _owner: &RoxUserIdStr<'_>,
     ) -> agent_harness::domain::error::Result<ResolvedCursorConfig> {
         Ok(ResolvedCursorConfig {
             key: CursorApiKey::parse("crsr_test").unwrap(),
@@ -30,7 +30,7 @@ struct ThoughtfulUltraKeys;
 impl CursorApiKeys for ThoughtfulUltraKeys {
     async fn resolve(
         &self,
-        _owner: &MacroUserIdStr<'_>,
+        _owner: &RoxUserIdStr<'_>,
     ) -> agent_harness::domain::error::Result<ResolvedCursorConfig> {
         Ok(ResolvedCursorConfig {
             key: CursorApiKey::parse("crsr_test").unwrap(),
@@ -45,7 +45,7 @@ struct NoCursorKey;
 impl CursorApiKeys for NoCursorKey {
     async fn resolve(
         &self,
-        _owner: &MacroUserIdStr<'_>,
+        _owner: &RoxUserIdStr<'_>,
     ) -> agent_harness::domain::error::Result<ResolvedCursorConfig> {
         Err(HarnessError::CursorNotConnected)
     }
@@ -86,7 +86,7 @@ async fn probe_lists_models_without_creating_an_agent() {
     let provider = CursorModels::new(TestCursorKeys, format!("http://{address}"));
 
     let RawModelProbe::Options(options) = provider
-        .probe(&MacroUserIdStr::try_from_email("models@example.com").unwrap())
+        .probe(&RoxUserIdStr::try_from_email("models@example.com").unwrap())
         .await
         .unwrap()
     else {
@@ -112,7 +112,7 @@ async fn capabilities_use_the_selected_model_instead_of_the_account_default() {
     let address = listener.local_addr().unwrap();
     let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
     let provider = CursorModels::new(TestCursorKeys, format!("http://{address}"));
-    let caller = MacroUserIdStr::try_from_email("models@example.com").unwrap();
+    let caller = RoxUserIdStr::try_from_email("models@example.com").unwrap();
     let RawCapabilityProbe::Options(options) =
         CapabilityProbe::probe(&provider, &caller, Some("thoughtful"))
             .await
@@ -144,7 +144,7 @@ async fn capabilities_report_the_default_effort_for_the_default_model() {
     let address = listener.local_addr().unwrap();
     let server = tokio::spawn(async move { axum::serve(listener, app).await.unwrap() });
     let provider = CursorModels::new(ThoughtfulUltraKeys, format!("http://{address}"));
-    let caller = MacroUserIdStr::try_from_email("models@example.com").unwrap();
+    let caller = RoxUserIdStr::try_from_email("models@example.com").unwrap();
 
     let RawCapabilityProbe::Options(options) = CapabilityProbe::probe(&provider, &caller, None)
         .await
@@ -183,7 +183,7 @@ async fn capabilities_report_the_default_effort_for_the_default_model() {
 async fn a_caller_without_a_cursor_key_is_not_connected_rather_than_a_provider_failure() {
     use agent_harness::domain::capability_discovery::CapabilityProbe;
     let provider = CursorModels::new(NoCursorKey, "http://127.0.0.1:9".to_owned());
-    let caller = MacroUserIdStr::try_from_email("models@example.com").unwrap();
+    let caller = RoxUserIdStr::try_from_email("models@example.com").unwrap();
 
     assert!(matches!(
         CapabilityProbe::probe(&provider, &caller, None).await,
@@ -222,7 +222,7 @@ async fn a_key_cursor_refuses_is_a_rejected_credential_for_both_probes() {
     use agent_harness::domain::capability_discovery::CapabilityProbe;
     let (base_url, server) = refusing_cursor_api(403, TEAM_SERVICE_TOKEN_BODY).await;
     let provider = CursorModels::new(TestCursorKeys, base_url);
-    let caller = MacroUserIdStr::try_from_email("models@example.com").unwrap();
+    let caller = RoxUserIdStr::try_from_email("models@example.com").unwrap();
 
     match CursorModelProbe::probe(&provider, &caller).await {
         Err(ModelProbeError::CredentialRejected(message)) => {
@@ -244,7 +244,7 @@ async fn a_cursor_outage_is_still_a_provider_failure() {
     use agent_harness::domain::capability_discovery::CapabilityProbe;
     let (base_url, server) = refusing_cursor_api(503, r#"{"error":"down"}"#).await;
     let provider = CursorModels::new(TestCursorKeys, base_url);
-    let caller = MacroUserIdStr::try_from_email("models@example.com").unwrap();
+    let caller = RoxUserIdStr::try_from_email("models@example.com").unwrap();
 
     assert!(matches!(
         CursorModelProbe::probe(&provider, &caller).await,

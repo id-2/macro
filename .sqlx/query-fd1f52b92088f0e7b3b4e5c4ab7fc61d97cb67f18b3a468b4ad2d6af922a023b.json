@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE crm_companies SET hidden = TRUE WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "fd1f52b92088f0e7b3b4e5c4ab7fc61d97cb67f18b3a468b4ad2d6af922a023b"
+}

@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO email_messages (id, thread_id, link_id, is_draft, is_sent, from_contact_id,\n                                    internal_date_ts, sent_at, subject)\n        VALUES ('00000000-0000-0000-0000-0000000e0624', $1, $3, false, false, NULL,\n                '2025-01-12 10:00:00 +00:00', '2025-01-12 10:00:00 +00:00', 'No contact'),\n               ('00000000-0000-0000-0000-0000000e0625', $2, $3, false, false, $4,\n                '2025-01-12 11:00:00 +00:00', '2025-01-12 11:00:00 +00:00', 'Deleted contact')\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "0e88244bb652779436992e2f2fae2c63d6b1c9f3c4179f206879a049d4c5f899"
+}

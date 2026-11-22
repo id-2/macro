@@ -4592,7 +4592,7 @@ async fn a_prompt_gives_up_on_the_turn_gate_after_the_busy_budget() {
     .await
     .expect("the wait is bounded");
     assert!(
-        matches!(&outcome, Err(SessionError::Rejected(refusal)) if refusal.message.contains("started outside Macro")),
+        matches!(&outcome, Err(SessionError::Rejected(refusal)) if refusal.message.contains("started outside Rox")),
         "the prompt is refused in the person's terms, got {outcome:?}"
     );
     assert!(

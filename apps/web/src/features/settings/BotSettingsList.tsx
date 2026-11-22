@@ -13,15 +13,18 @@ function BotSettingsRow(props: { bot: Bot; onOpen: (botId: string) => void }) {
   const channelsQuery = useBotChannelsQuery(() => props.bot.id);
   const channels = () => channelsQuery.data ?? [];
   const ownerLabel = () =>
-    props.bot.owner?.type === 'team' ? 'Team' : 'Personal';
+    props.bot.owner?.type === 'team' ? 'Команда' : 'Личный';
 
   const channelSummary = () => {
-    if (channelsQuery.isLoading) return 'Loading channels…';
-    if (channels().length === 0) return 'Not in any channels yet';
+    if (channelsQuery.isLoading) return 'Загрузка каналов…';
+    if (channels().length === 0) return 'Пока не состоит ни в одном канале';
     if (channels().length === 1) {
-      return `In ${channels()[0]?.name ?? '1 channel'}`;
+      const name = channels()[0]?.name;
+      return name ? `В канале ${name}` : 'В 1 канале';
     }
-    return `In ${channels().length} channels`;
+    const count = channels().length;
+    const form = count % 10 === 1 && count % 100 !== 11 ? 'канале' : 'каналах';
+    return `В ${count} ${form}`;
   };
 
   return (
@@ -65,18 +68,18 @@ export function BotSettingsList(props: {
 }) {
   return (
     <SettingsPage
-      title="Bots"
-      description="A bot is an account your program uses to read and send channel messages. Create a bot, add it to channels, then use its token with the Rox SDK to control it."
+      title="Боты"
+      description="Бот — это учётная запись, через которую программа читает и отправляет сообщения в каналах. Создайте бота, добавьте его в каналы и управляйте им токеном через Rox SDK."
       actions={
         <Button variant="primary" size="sm" onClick={props.onCreate}>
           <PlusIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-          Create bot
+          Создать бота
         </Button>
       }
     >
       <SettingsSection
-        title="Your bots"
-        description="Manage your bots, their channels, and access tokens."
+        title="Ваши боты"
+        description="Управляйте ботами, их каналами и токенами доступа."
       >
         <SettingsCard>
           <Show
@@ -95,11 +98,11 @@ export function BotSettingsList(props: {
                     <BotIcon class="size-6" />
                   </div>
                   <div class="mt-3 text-sm font-medium text-ink">
-                    Create your first bot
+                    Создайте первого бота
                   </div>
                   <div class="mt-1 max-w-80 text-xs text-ink-muted">
-                    Give your program a name and profile in Rox. We’ll
-                    generate a token when you create the bot.
+                    Дайте программе имя и профиль в Rox. Токен появится,
+                    когда вы создадите бота.
                   </div>
                   <Button
                     class="mt-4"
@@ -108,7 +111,7 @@ export function BotSettingsList(props: {
                     onClick={props.onCreate}
                   >
                     <PlusIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-                    Create bot
+                    Создать бота
                   </Button>
                 </div>
               }

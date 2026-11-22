@@ -13,8 +13,8 @@ use entity_access::domain::models::{
     Entity, EntityAccessReceipt, EntityPermission, EntityType, MemberParticipantRole,
     ParticipantRole,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker, NoopMacroEventBroker};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker, NoopRoxEventBroker};
 use serde_json::{Value, json};
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
@@ -29,8 +29,8 @@ const TEAM_MEMBER: &str = "macro|bot-team-member@example.com";
 const TEAM_ADMIN: &str = "macro|bot-team-admin@example.com";
 const TEAM_OWNER: &str = "macro|bot-team-owner@example.com";
 const TEAM_OTHER: &str = "macro|bot-team-other@example.com";
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid macro user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid macro user id")
 }
 
 fn channel_member_receipt(
@@ -112,10 +112,10 @@ fn update_agent_req(handle: &str, channel_scope: AgentChannelScope) -> UpdateAge
     }
 }
 
-fn service(pool: &PgPool) -> BotServiceImpl<PgBotsRepo, NoopMacroEventBroker, TeamAgentHarnesses> {
+fn service(pool: &PgPool) -> BotServiceImpl<PgBotsRepo, NoopRoxEventBroker, TeamAgentHarnesses> {
     BotServiceImpl::new(
         PgBotsRepo::new(pool.clone()),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         TeamAgentHarnesses::default(),
     )
 }
@@ -159,8 +159,8 @@ impl RecordingEventBroker {
     }
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -2211,7 +2211,7 @@ async fn no_agent_is_bound_to_an_agent_teammates_computer(pool: PgPool) -> anyho
     let own_machine = insert_harness(&pool, Some(USER_OWNER), None).await?;
     let service = BotServiceImpl::new(
         PgBotsRepo::new(pool.clone()),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         TeamAgentHarnesses(vec![agent_computer]),
     );
 

@@ -107,7 +107,7 @@ export function CompanySelect(props: {
           type="button"
           // Kobalte's default name is "Show suggestions".
           aria-label={
-            props.value ? `Company: ${props.value.name}` : 'Choose a company'
+            props.value ? `Компания: ${props.value.name}` : 'Выберите компанию'
           }
           class={badgeTriggerClasses({
             variant: 'outline',
@@ -120,7 +120,7 @@ export function CompanySelect(props: {
             when={props.value}
             fallback={
               <span class="truncate text-ink-extra-muted">
-                {props.loading ? 'Loading companies…' : 'Choose a company'}
+                {props.loading ? 'Загрузка компаний…' : 'Выберите компанию'}
               </span>
             }
           >
@@ -151,7 +151,7 @@ export function CompanySelect(props: {
               <SearchIcon class="size-3.5 shrink-0 text-ink-muted" />
               <Combobox.Input
                 class="min-w-0 flex-1 bg-transparent text-sm caret-accent outline-none placeholder:text-ink-placeholder"
-                placeholder="Search companies..."
+                placeholder="Поиск компаний..."
               />
             </div>
             {/* Pressing an option must not move focus to the dialog, which
@@ -162,10 +162,10 @@ export function CompanySelect(props: {
                 fallback={
                   <div class="px-2 py-3 text-center text-xs text-ink-muted">
                     {props.loading
-                      ? 'Loading companies…'
+                      ? 'Загрузка компаний…'
                       : search().trim()
-                        ? `No companies match "${search().trim()}"`
-                        : 'No companies yet'}
+                        ? `Нет компаний по запросу «${search().trim()}»`
+                        : 'Компаний пока нет'}
                   </div>
                 }
               >

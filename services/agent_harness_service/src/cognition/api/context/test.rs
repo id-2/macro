@@ -28,7 +28,7 @@ impl TestAdmission {
 impl ai_billing::AiAdmissionService for TestAdmission {
     fn admit<'a>(
         &'a self,
-        user: &'a macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &'a rox_user_id::user_id::RoxUserIdStr<'_>,
         feature: ai_usage::AiFeature,
     ) -> ai_billing::domain::admission::AdmissionFuture<'a> {
         self.calls.lock().unwrap().push((user.to_string(), feature));
@@ -335,8 +335,8 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
     );
     // Producer creation is lazy: nothing connects to Kafka unless an event
     // is published, so a dummy broker address is safe for tests.
-    let macro_event_broker = macro_event_broker::MacroEventBrokerService::new(
-        macro_event_broker::KafkaEventPublisher::new("localhost:9092")
+    let macro_event_broker = rox_event_broker::RoxEventBrokerService::new(
+        rox_event_broker::KafkaEventPublisher::new("localhost:9092")
             .expect("kafka producer config is valid"),
         TaskTracker::new(),
     );
@@ -479,10 +479,10 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
 
     let calendar_tool_context = ai_tools::build_calendar_tool_context(
         pool.clone(),
-        macro_service_urls::ServiceUrl::owned("http://localhost:0").into(),
+        rox_service_urls::ServiceUrl::owned("http://localhost:0").into(),
         "test-internal-api-key".to_string(),
         call_tool_context.service.clone(),
-        macro_service_urls::AppServiceUrl::local(),
+        rox_service_urls::AppServiceUrl::local(),
         true,
     );
     let forms_tool_context = ai_tools::build_forms_tool_context(
@@ -527,20 +527,20 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
         email_tool_context: email_tool_context.clone(),
         call_tool_context: call_tool_context.clone(),
         booking_management_tool_context: ai_tools::build_booking_management_tool_context(
-            macro_service_urls::ServiceUrl::owned("http://localhost:0").into(),
+            rox_service_urls::ServiceUrl::owned("http://localhost:0").into(),
             "test-internal-api-key".to_string(),
-            macro_env::Environment::Local,
+            rox_env::Environment::Local,
         ),
         booking_link_tool_context: ai_tools::build_booking_link_tool_context(
             pool.clone(),
-            macro_env::Environment::Local,
+            rox_env::Environment::Local,
         ),
         calendar_tool_context: ai_tools::build_calendar_tool_context(
             pool.clone(),
-            macro_service_urls::ServiceUrl::owned("http://localhost:0").into(),
+            rox_service_urls::ServiceUrl::owned("http://localhost:0").into(),
             "test-internal-api-key".to_string(),
             call_tool_context.service.clone(),
-            macro_service_urls::AppServiceUrl::local(),
+            rox_service_urls::AppServiceUrl::local(),
             true,
         ),
         team_calendar_tool_context: ai_tools::build_team_calendar_tool_context(pool.clone(), true),
@@ -570,7 +570,7 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
             entity_access_service.clone(),
         ),
         coding_agent_tool_context: ai_tools::build_coding_agent_tool_context(
-            macro_service_urls::ServiceUrl::owned("http://localhost:0").into(),
+            rox_service_urls::ServiceUrl::owned("http://localhost:0").into(),
             "test-internal-api-key".to_string(),
         )
         .expect("valid test coding agent context"),
@@ -677,16 +677,16 @@ pub async fn test_api_context(pool: sqlx::Pool<sqlx::Postgres>) -> std::sync::Ar
     );
 
     let authorization_state =
-        MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
-            MacroAuthJwtValidator::new(
-                macro_auth::middleware::decode_jwt::JwtValidationArgs::new_testing(),
+        RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
+            RoxAuthJwtValidator::new(
+                rox_auth::middleware::decode_jwt::JwtValidationArgs::new_testing(),
             ),
-            macro_authorization::InternalAuthConfig {
+            rox_authorization::InternalAuthConfig {
                 api_key: "testing".to_string(),
                 default_user_id: None,
             },
-            macro_authorization::NoBotAuthorizer,
-            macro_authorization::NoUserApiKeyAuthorizer,
+            rox_authorization::NoBotAuthorizer,
+            rox_authorization::NoUserApiKeyAuthorizer,
         )));
 
     let user_permissions_service = Arc::new(

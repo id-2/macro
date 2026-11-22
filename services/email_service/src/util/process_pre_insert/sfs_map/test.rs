@@ -3,7 +3,7 @@ use axum::Json;
 use axum::Router;
 use axum::routing::put;
 use bytes::Bytes;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 use static_file_service_client::StaticFileServiceClient;

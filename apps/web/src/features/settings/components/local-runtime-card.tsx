@@ -1,4 +1,5 @@
 import { LocalRuntimeSetup } from '@app/features/local-runtime/local-runtime-setup';
+import { localRuntimeDeployment } from '@app/features/local-runtime/queries/setup-capabilities';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isDesktopPlatform } from '@core/util/platform';
@@ -13,7 +14,7 @@ import {
   roxdStop,
   roxdSupport,
   onRoxdStatus,
-} from '@macro/tauri/roxd';
+} from '@rox/tauri/roxd';
 import { useAgentsQuery } from '@queries/agents/agents';
 import type { UnlistenFn } from '@tauri-apps/api/event';
 import { Button } from '@ui';
@@ -104,9 +105,9 @@ export function LocalRuntimeCard() {
     if (busy()) return;
     setBusy(true);
     try {
-      await roxdStart({});
+      await roxdStart({ ...localRuntimeDeployment() });
     } catch (error) {
-      toast.failure(errorMessage(error, 'Could not start this computer'));
+      toast.failure(errorMessage(error, 'Не удалось запустить этот компьютер'));
     } finally {
       setBusy(false);
     }
@@ -118,7 +119,7 @@ export function LocalRuntimeCard() {
     try {
       await roxdStop();
     } catch (error) {
-      toast.failure(errorMessage(error, 'Could not stop this computer'));
+      toast.failure(errorMessage(error, 'Не удалось остановить этот компьютер'));
     } finally {
       setBusy(false);
     }
@@ -133,7 +134,9 @@ export function LocalRuntimeCard() {
   return (
     <Show when={support()?.supported}>
       <div>
-        <h2 class="mb-3 px-6 text-sm font-semibold text-ink">This computer</h2>
+        <h2 class="mb-3 px-6 text-sm font-semibold text-ink">
+          Этот компьютер
+        </h2>
         <SettingsCard inset="wide">
           <MachineSection>
             <HarnessIcon>
@@ -143,7 +146,7 @@ export function LocalRuntimeCard() {
               <div class="flex min-h-5 items-center justify-between gap-3">
                 <div class="flex min-w-0 items-center gap-2">
                   <h2 class="min-w-0 text-sm/5 font-medium text-ink">
-                    Run agents on this computer
+                    Запустить агентов на этом компьютере
                   </h2>
                   <StatusDot
                     state={
@@ -155,10 +158,10 @@ export function LocalRuntimeCard() {
                     }
                     label={
                       phase() === 'running'
-                        ? 'Running'
+                        ? 'Работает'
                         : phase() === 'error'
-                          ? 'Error'
-                          : 'Not running'
+                          ? 'Ошибка'
+                          : 'Не запущено'
                     }
                   />
                 </div>
@@ -170,14 +173,14 @@ export function LocalRuntimeCard() {
                     disabled={busy()}
                     onClick={() => fireAndForget(stop(), 'local-runtime-card')}
                   >
-                    Stop
+                    Остановить
                   </Button>
                 </Show>
               </div>
               <p class="mt-1 text-sm text-ink-muted">
-                Rox runs agents you already have installed — Claude Code,
-                Codex, and more — right here on your machine, using your own
-                subscriptions and your local files.
+                Rox запускает агентов, которые уже установлены у вас: Claude
+                Code, Codex и другие — прямо здесь, с вашими подписками и
+                локальными файлами.
               </p>
 
               <Switch>
@@ -200,12 +203,12 @@ export function LocalRuntimeCard() {
                     <SpinnerIcon class="size-4 animate-spin" />
                     <Switch>
                       <Match when={phase() === 'installing-adapter'}>
-                        Installing the agent adapter…
+                        Устанавливаем адаптер агента…
                       </Match>
                       <Match when={phase() === 'pairing'}>
-                        Connecting this computer to your account…
+                        Подключаем этот компьютер к вашей учётной записи…
                       </Match>
-                      <Match when>Starting…</Match>
+                      <Match when>Запускаем…</Match>
                     </Switch>
                   </div>
                 </Match>
@@ -217,9 +220,9 @@ export function LocalRuntimeCard() {
                       <div class="mt-4 flex flex-wrap items-center gap-3">
                         <p class="text-sm text-ink-muted">
                           <span class="font-medium text-ink">
-                            {snapshot()?.agentName ?? 'Your agent'}
+                            {snapshot()?.agentName ?? 'Ваш агент'}
                           </span>{' '}
-                          is connected, but no Rox agent runs on it yet.
+                          подключён, но агент Rox на нём ещё не создан.
                         </p>
                         <Button
                           type="button"
@@ -227,27 +230,28 @@ export function LocalRuntimeCard() {
                           size="sm"
                           onClick={() => setSetup({ running: snapshot() })}
                         >
-                          Create agent
+                          Создать агента
                         </Button>
                       </div>
                     }
                   >
                     {(agent) => (
-                      <p class="mt-4 text-sm text-ink-muted">
-                        <span class="font-medium text-ink">
-                          @{agent().bot.handle}
-                        </span>{' '}
-                        is ready
+                      <>
+                        <p class="mt-4 text-sm text-ink-muted">
+                          <span class="font-medium text-ink">
+                            @{agent().bot.handle}
+                          </span>{' '}
+                          готов. Пока вы им пользуетесь, держите Rox открытым.
+                        </p>
                         <Show when={snapshot()?.workspace}>
                           {(dir) => (
-                            <>
-                              {' '}
-                              in <span class="font-mono text-xs">{dir()}</span>
-                            </>
+                            <p class="mt-1 text-xs text-ink-extra-muted">
+                              Сеансы выполняются в{' '}
+                              <span class="font-mono text-xs">{dir()}</span>.
+                            </p>
                           )}
                         </Show>
-                        . Keep the app open while you use it.
-                      </p>
+                      </>
                     )}
                   </Show>
                 </Match>
@@ -256,7 +260,7 @@ export function LocalRuntimeCard() {
                   <div class="mt-4 flex flex-wrap items-center gap-3">
                     <p class="text-sm text-failure">
                       {snapshot()?.lastError ??
-                        'This computer stopped running agents.'}
+                        'Этот компьютер перестал запускать агентов.'}
                     </p>
                     <Button
                       type="button"
@@ -269,7 +273,7 @@ export function LocalRuntimeCard() {
                           : setSetup({})
                       }
                     >
-                      Try again
+                      Повторить
                     </Button>
                   </div>
                 </Match>
@@ -277,7 +281,7 @@ export function LocalRuntimeCard() {
                 <Match when={configured()}>
                   <div class="mt-4 flex flex-wrap items-center gap-3">
                     <p class="text-sm text-ink-muted">
-                      This computer is set up but not running.
+                      Компьютер настроен, но сейчас не работает.
                     </p>
                     <Button
                       type="button"
@@ -288,7 +292,7 @@ export function LocalRuntimeCard() {
                         fireAndForget(startExisting(), 'local-runtime-card')
                       }
                     >
-                      {busy() ? 'Starting…' : 'Start'}
+                      {busy() ? 'Запускаем…' : 'Запустить'}
                     </Button>
                   </div>
                 </Match>
@@ -301,7 +305,7 @@ export function LocalRuntimeCard() {
                       size="sm"
                       onClick={() => setSetup({})}
                     >
-                      Set up
+                      Настроить
                     </Button>
                   </div>
                 </Match>

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO email_message_reconciliation(link_id,generation,provider_id,is_import,available_at) VALUES\n            ($1,1,'live-later',false,now() + interval '1 hour'),\n            ($1,1,'import-due',true,now() - interval '2 minutes'),\n            ($1,1,'live-due',false,now() - interval '1 minute')\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "921b1f820473c71d206f94492f984a9b009c5fa444d63f5e37c9534ad2cfe23a"
+}

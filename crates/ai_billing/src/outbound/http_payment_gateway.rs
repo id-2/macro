@@ -10,7 +10,7 @@ use crate::domain::{
     InvoiceVoid, OverageChargeRequest, PaymentGateway, Result, SubscriptionScope,
 };
 use authentication_service_client::AuthServiceClient;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use std::sync::Arc;
 use std::time::Duration;
 

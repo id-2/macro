@@ -5,7 +5,7 @@ use axum::{
     response::{Html, IntoResponse, Redirect, Response},
 };
 use github::domain::{models::GithubError, ports::GithubLinkService};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserId};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserId};
 use model::response::ErrorResponse;
 use tower_cookies::Cookies;
 
@@ -91,12 +91,12 @@ async fn link_user(
     code: &str,
 ) -> Result<(), GithubLinkError> {
     let fusionauth_user_id =
-        macro_db_client::in_progress_user_link::get_macro_user_id_by_link_id(&ctx.db, link_id)
+        rox_db_client::in_progress_user_link::get_macro_user_id_by_link_id(&ctx.db, link_id)
             .await?;
 
     // SAFETY: we don't support multi-profile at this time but we do need to support the method for
     // fetching
-    let macro_user_id = macro_db_client::user::get::get_user_profiles_by_fusionauth_user_id(
+    let macro_user_id = rox_db_client::user::get::get_user_profiles_by_fusionauth_user_id(
         &ctx.db,
         &fusionauth_user_id.to_string(),
     )
@@ -104,7 +104,7 @@ async fn link_user(
 
     let macro_user_id = macro_user_id.first().context("expected user profile")?;
 
-    let macro_user_id = MacroUserId::parse_from_str(macro_user_id)
+    let macro_user_id = RoxUserId::parse_from_str(macro_user_id)
         .map(|id| id.into_owned().lowercase())
         .context("valid macro user id")?;
 

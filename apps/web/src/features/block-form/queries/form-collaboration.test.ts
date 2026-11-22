@@ -1,11 +1,11 @@
-import { noopChatter } from '@macro-inc/collaboration/collab/chatter';
-import type { SnapshotStore } from '@macro-inc/collaboration/collab/snapshot-store';
+import { noopChatter } from '@rox-one/collaboration/collab/chatter';
+import type { SnapshotStore } from '@rox-one/collaboration/collab/snapshot-store';
 import {
   type LiveSyncSource,
   type SyncSourceEvent,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
-import { InMemoryWALStore } from '@macro-inc/collaboration/collab/wal';
+} from '@rox-one/collaboration/collab/source';
+import { InMemoryWALStore } from '@rox-one/collaboration/collab/wal';
 import { EphemeralStore, LoroDoc } from 'loro-crdt';
 import { okAsync } from 'neverthrow';
 import {

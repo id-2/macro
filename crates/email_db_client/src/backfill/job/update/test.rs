@@ -4,7 +4,7 @@ use super::{
     finalize_initialization, mark_completion_effects_complete, release_completion_effects,
     release_init_lease, renew_completion_effects, renew_init_lease,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{PgPool, types::Uuid};
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]

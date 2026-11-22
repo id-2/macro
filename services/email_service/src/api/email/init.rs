@@ -11,7 +11,7 @@ use email::domain::mailbox::connection::{
 };
 use email::domain::mailbox::initialization::InitializationError;
 use email_api_client::domain::models::EmailApiError;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use thiserror::Error;
 use utoipa::ToSchema;
@@ -65,7 +65,7 @@ enum InitErrorKind {
     BadRequest(String),
 
     #[error("Invalid input")]
-    Parse(#[from] macro_user_id::error::ParseErr),
+    Parse(#[from] rox_user_id::error::ParseErr),
 
     #[error("Inbox is already connected by another user")]
     SharedInboxConflict {
@@ -288,7 +288,7 @@ pub struct InitParams {
 pub(crate) async fn handler(
     State(ctx): State<ApiContext>,
     query: Query<InitParams>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, InitError> {
     // Axiom: a completed admin disable refuses every new init path before mailbox work begins.
     ctx.member_access

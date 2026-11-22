@@ -292,7 +292,7 @@ impl SessionScope {
     /// nothing makes any but the ones that reach someone else. `path` may
     /// carry one service prefix before the SDK's path. Credentials are not
     /// decided here: a scoped
-    /// credential is a `ScopedMacroApiJwt`, which `AccountHolderOrInternal`
+    /// credential is a `ScopedRoxApiJwt`, which `AccountHolderOrInternal`
     /// refuses on every route that issues one.
     pub fn allows(self, method: &str, path: &str) -> bool {
         if listed(ANY_WRITE, method, path) {

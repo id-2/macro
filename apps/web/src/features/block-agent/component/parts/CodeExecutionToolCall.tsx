@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type {
   ExecutionActivity,
   ExecutionRecord,
@@ -39,7 +40,7 @@ export function CodeExecutionToolCall(props: {
     >
       <Show when={activity().length === 0 && calls().length === 0 && ended()}>
         <ToolCard
-          title="Workspace activity"
+          title={t('agentChat.activity')}
           status={props.common.status}
           muted={props.common.muted}
           trailing={props.common.trailing}
@@ -123,7 +124,7 @@ function RecordedCall(props: {
     muted: props.call.status !== 'completed',
     stopped: false,
     trailing: props.call.outputOmitted
-      ? 'Result omitted'
+      ? t('agentChat.resultOmitted')
       : props.call.status === 'unknown' || props.call.status === 'running'
         ? 'Outcome unknown'
         : undefined,

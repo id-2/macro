@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { DisclosureCaret, TextShimmer } from '@app/features/block-agent/ui';
 import { CollapseTransition } from '@ui/components/CollapseTransition';
 import { createSignal, createUniqueId, Show } from 'solid-js';
@@ -27,11 +28,14 @@ export function ActivitySummary(props: { rows: readonly ActivityRowView[] }) {
         >
           <span>
             <TextShimmer
-              text={`Used ${count()} ${count() === 1 ? 'tool' : 'tools'}`}
+              text={t('agentChat.usedTools', { count: count() })}
               active={running()}
             />
             <Show when={failed() > 0}>
-              <span class="text-failure">{` · ${failed()} failed`}</span>
+              <span class="text-failure">
+                {' · '}
+                {t('agentChat.failedCount', { count: failed() })}
+              </span>
             </Show>
           </span>
           <DisclosureCaret open={open()} />

@@ -1,7 +1,7 @@
 import {
   $isDocumentCardNode,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { $getRoot, createEditor } from 'lexical';
 import { describe, expect, it, vi } from 'vitest';
 import { postFormCard } from './form-composer-actions';

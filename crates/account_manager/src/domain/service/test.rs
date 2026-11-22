@@ -1,14 +1,14 @@
 use std::sync::{Arc, Mutex};
 
 use chrono::{DateTime, Duration, Utc};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use uuid::Uuid;
 
 use super::*;
 use crate::domain::ports::OpenedRequest;
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -32,7 +32,7 @@ impl FakeRepo {
 impl AccountManagerRepo for FakeRepo {
     type Err = FakeError;
 
-    async fn is_agent(&self, user: &MacroUserIdStr<'_>) -> Result<Option<bool>, FakeError> {
+    async fn is_agent(&self, user: &RoxUserIdStr<'_>) -> Result<Option<bool>, FakeError> {
         Ok(match user.as_ref() {
             "macro|agent@example.com" | "macro|agent2@example.com" => Some(true),
             "macro|person@example.com" | "macro|person2@example.com" => Some(false),
@@ -43,8 +43,8 @@ impl AccountManagerRepo for FakeRepo {
     async fn open_request(
         &self,
         id: Uuid,
-        managed: &MacroUserIdStr<'_>,
-        manager: &MacroUserIdStr<'_>,
+        managed: &RoxUserIdStr<'_>,
+        manager: &RoxUserIdStr<'_>,
         requested_by: AccountManagerRole,
         expires_at: DateTime<Utc>,
     ) -> Result<OpenedRequest, FakeError> {
@@ -63,10 +63,10 @@ impl AccountManagerRepo for FakeRepo {
 
         let grant = AccountManagerGrant {
             id,
-            managed_user_id: MacroUserIdStr::parse_from_str(managed.as_ref())
+            managed_user_id: RoxUserIdStr::parse_from_str(managed.as_ref())
                 .unwrap()
                 .into_owned(),
-            manager_user_id: MacroUserIdStr::parse_from_str(manager.as_ref())
+            manager_user_id: RoxUserIdStr::parse_from_str(manager.as_ref())
                 .unwrap()
                 .into_owned(),
             requested_by,
@@ -90,7 +90,7 @@ impl AccountManagerRepo for FakeRepo {
 
     async fn list_for_managed(
         &self,
-        managed: &MacroUserIdStr<'_>,
+        managed: &RoxUserIdStr<'_>,
     ) -> Result<Vec<AccountManagerGrant>, FakeError> {
         let grants = self.grants.lock().unwrap();
         Ok(grants
@@ -182,8 +182,8 @@ struct FakeDelivery {
 impl FakeDelivery {
     fn record(
         &self,
-        sender: &MacroUserIdStr<'_>,
-        recipient: &MacroUserIdStr<'_>,
+        sender: &RoxUserIdStr<'_>,
+        recipient: &RoxUserIdStr<'_>,
         kind: &'static str,
     ) -> Result<(), rootcause::Report> {
         if *self.fail.lock().unwrap() {
@@ -201,8 +201,8 @@ impl FakeDelivery {
 impl AccountManagerDelivery for FakeDelivery {
     async fn deliver_request(
         &self,
-        sender: &MacroUserIdStr<'static>,
-        recipient: &MacroUserIdStr<'static>,
+        sender: &RoxUserIdStr<'static>,
+        recipient: &RoxUserIdStr<'static>,
         _grant_id: Uuid,
     ) -> Result<(), rootcause::Report> {
         self.record(sender, recipient, "request")
@@ -210,8 +210,8 @@ impl AccountManagerDelivery for FakeDelivery {
 
     async fn deliver_approval(
         &self,
-        sender: &MacroUserIdStr<'static>,
-        recipient: &MacroUserIdStr<'static>,
+        sender: &RoxUserIdStr<'static>,
+        recipient: &RoxUserIdStr<'static>,
         _grant_id: Uuid,
     ) -> Result<(), rootcause::Report> {
         self.record(sender, recipient, "approval")

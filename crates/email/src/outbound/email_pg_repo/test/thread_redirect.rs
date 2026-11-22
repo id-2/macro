@@ -50,7 +50,7 @@ async fn thread_redirect_requires_independent_inbox_access(
 ) -> anyhow::Result<()> {
     alias(&pool, canonical()).await?;
     let service = super::thread_unread::service(pool.clone());
-    let owner = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let owner = RoxUserIdStr::try_from_email("user1@test.com")?;
     assert_eq!(
         service
             .resolve_thread_read_id_impl(owner.clone(), source())
@@ -69,7 +69,7 @@ async fn thread_redirect_requires_independent_inbox_access(
     assert!(!fetched.messages.is_empty());
     // A share to the retained source does not grant the target's other mail.
     for auth in [
-        EntityAccessAuth::Authenticated(MacroUserIdStr::try_from_email("stranger@test.com")?),
+        EntityAccessAuth::Authenticated(RoxUserIdStr::try_from_email("stranger@test.com")?),
         EntityAccessAuth::Unauthenticated,
     ] {
         let fetched = service
@@ -94,7 +94,7 @@ async fn thread_redirect_requires_independent_inbox_access(
 )]
 async fn thread_redirect_never_crosses_inboxes(pool: Pool<Postgres>) -> anyhow::Result<()> {
     alias(&pool, uuid::uuid!("cccccccc-0000-0000-0000-0000000000c4")).await?;
-    let actor = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let actor = RoxUserIdStr::try_from_email("user1@test.com")?;
     assert_eq!(
         super::thread_unread::service(pool)
             .resolve_thread_read_id_impl(actor, source())
@@ -120,7 +120,7 @@ async fn thread_redirect_checks_global_emptiness_not_the_requested_page(
     .execute(&pool)
     .await?;
     let service = super::thread_unread::service(pool);
-    let actor = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let actor = RoxUserIdStr::try_from_email("user1@test.com")?;
     assert_eq!(
         service
             .resolve_thread_read_id_impl(actor.clone(), canonical())

@@ -1,7 +1,7 @@
 use agent::AgentError;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -48,15 +48,15 @@ pub trait MemoryRepo: Send + Sync + 'static {
     fn save_memory(
         &self,
         memory: &Memory,
-        user: MacroUserIdStr,
+        user: RoxUserIdStr,
     ) -> impl Future<Output = Result<Uuid>> + Send;
     fn get_latest_memory(
         &self,
-        user: MacroUserIdStr,
+        user: RoxUserIdStr,
     ) -> impl Future<Output = Result<Option<MemoryRecord>>> + Send;
     fn get_memory_by_id(
         &self,
-        user: MacroUserIdStr,
+        user: RoxUserIdStr,
         id: Uuid,
     ) -> impl Future<Output = Result<Memory>> + Send;
 }
@@ -64,19 +64,19 @@ pub trait MemoryRepo: Send + Sync + 'static {
 pub trait MemoryService: Send + Sync + 'static {
     fn get_memory(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<Memory>>> + Send;
 
     /// Private explicit memory, always read as the authenticated caller.
     fn explicit(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<ExplicitMemory>> + Send;
 
     /// Apply one explicit edit at the caller's current revision.
     fn update_memory(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         revision: i64,
         edit: &MemoryEdit,
     ) -> impl Future<Output = Result<ExplicitMemory>> + Send;
@@ -84,8 +84,8 @@ pub trait MemoryService: Send + Sync + 'static {
     /// Professional activity of the caller or a current teammate, inclusive dates.
     fn get_user_activity(
         &self,
-        caller: MacroUserIdStr<'static>,
-        user: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         start: NaiveDate,
         end: NaiveDate,
     ) -> impl Future<Output = Result<Vec<Activity>>> + Send;
@@ -106,7 +106,7 @@ pub struct MemorySnapshot {
 
 /// Persistent component storage. Every write is atomic and safe to retry.
 pub trait ComposedMemoryRepo: MemoryRepo {
-    fn enroll(&self, user: &MacroUserIdStr<'_>) -> impl Future<Output = Result<()>> + Send;
+    fn enroll(&self, user: &RoxUserIdStr<'_>) -> impl Future<Output = Result<()>> + Send;
     fn claim_refresh(
         &self,
         yesterday: NaiveDate,
@@ -121,40 +121,40 @@ pub trait ComposedMemoryRepo: MemoryRepo {
     /// Reviewed pieces of `date`'s generation that a failed attempt left behind.
     fn staged(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         date: NaiveDate,
     ) -> impl Future<Output = Result<StagedPieces>> + Send;
     /// Keep one reviewed piece of `date`'s generation until it is committed.
     fn stage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         date: NaiveDate,
         piece: &Piece,
     ) -> impl Future<Output = Result<()>> + Send;
     fn latest_activity(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<Activity>>> + Send;
     fn explicit(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<ExplicitMemory>> + Send;
     fn save_explicit(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         expected: i64,
         content: &str,
     ) -> impl Future<Output = Result<ExplicitMemory>> + Send;
     fn snapshot(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         since: NaiveDate,
     ) -> impl Future<Output = Result<MemorySnapshot>> + Send;
     /// Commit `date` and drop its staged pieces. A `None` profile keeps the
     /// current one; empty `activity` moves past the day without a report.
     fn save_generation(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         expected: i64,
         date: NaiveDate,
         profile: Option<&str>,
@@ -167,7 +167,7 @@ pub trait ComposedMemoryRepo: MemoryRepo {
     ) -> impl Future<Output = Result<Vec<(String, String)>>> + Send;
     fn activity(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         start: NaiveDate,
         end: NaiveDate,
     ) -> impl Future<Output = Result<Vec<Activity>>> + Send;
@@ -177,7 +177,7 @@ pub trait ComposedMemoryRepo: MemoryRepo {
 /// Object-safe because hosts inject their configured team service.
 #[async_trait::async_trait]
 pub trait MemoryTeams: Send + Sync {
-    async fn members(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<(Uuid, Vec<String>)>>;
+    async fn members(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<(Uuid, Vec<String>)>>;
 }
 
 /// Whether the user did anything on a UTC day that a daily report could
@@ -185,17 +185,17 @@ pub trait MemoryTeams: Send + Sync {
 /// Object-safe because hosts inject their configured activity store.
 #[async_trait::async_trait]
 pub trait MemoryActivity: Send + Sync {
-    async fn acted_on(&self, user: &MacroUserIdStr<'_>, date: NaiveDate) -> Result<bool>;
+    async fn acted_on(&self, user: &RoxUserIdStr<'_>, date: NaiveDate) -> Result<bool>;
 }
 
 /// Model calls live in an outbound adapter. Research is limited to read tools.
 /// Object-safe so the service is independent of a host's tool context type.
 #[async_trait::async_trait]
 pub trait MemoryGenerator: Send + Sync {
-    async fn research(&self, user: MacroUserIdStr<'static>, instructions: &str) -> Result<String>;
+    async fn research(&self, user: RoxUserIdStr<'static>, instructions: &str) -> Result<String>;
     async fn summarize(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         instructions: &str,
         sources: &str,
     ) -> Result<String>;
@@ -208,7 +208,7 @@ pub trait MemoryGenerator: Send + Sync {
 pub trait MemoryJudge: Send + Sync {
     async fn review(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         kind: MemoryKind,
         content: &str,
     ) -> Result<()>;
@@ -217,7 +217,7 @@ pub trait MemoryJudge: Send + Sync {
 /// A bounded lease prevents replicas from generating the same user's day.
 #[derive(Debug)]
 pub struct RefreshClaim {
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     pub date: NaiveDate,
     pub token: Uuid,
     /// Which claim of `date` this is, starting at 1.

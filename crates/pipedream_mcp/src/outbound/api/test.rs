@@ -1,5 +1,5 @@
 use super::{AppResponse, PipedreamClient, PipedreamConfig, connectable_catalog_entry};
-use crate::domain::models::{MacroUserIdStr, PipedreamConnection};
+use crate::domain::models::{RoxUserIdStr, PipedreamConnection};
 use crate::domain::ports::{ConnectedAppProxy, PipedreamConnect};
 use http::{HeaderMap, HeaderValue, Method, StatusCode};
 use std::time::Duration;
@@ -90,7 +90,7 @@ async fn the_proxy_addresses_the_upstream_url_for_the_connected_account() {
     })
     .unwrap();
     let connection = PipedreamConnection {
-        user_id: MacroUserIdStr::try_from_email("caller@example.com").unwrap(),
+        user_id: RoxUserIdStr::try_from_email("caller@example.com").unwrap(),
         app_slug: "notion".into(),
         server_name: "Notion".into(),
         account_id: "apn_notion".into(),

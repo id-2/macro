@@ -12,8 +12,8 @@ mod test;
 use std::{num::NonZeroUsize, sync::Arc, time::Duration};
 
 use broadcast::{BroadcastManager, GlobalSpawner};
-use macro_user_id::cowlike::CowLike as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike as _;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::prelude::{Report, ResultExt as _};
 use tokio_retry::{Retry, strategy::ExponentialBackoff};
 
@@ -104,11 +104,11 @@ impl ActivitySubscription {
 /// Provides user-scoped subscriptions to realtime activity updates.
 pub trait ActivitySubscriptionService: Send + Sync + 'static {
     /// Subscribes to activity updates addressed to `user_id`.
-    fn subscribe(&self, user_id: MacroUserIdStr<'static>) -> ActivitySubscription;
+    fn subscribe(&self, user_id: RoxUserIdStr<'static>) -> ActivitySubscription;
 }
 
 impl<S: ActivitySubscriptionService> ActivitySubscriptionService for Arc<S> {
-    fn subscribe(&self, user_id: MacroUserIdStr<'static>) -> ActivitySubscription {
+    fn subscribe(&self, user_id: RoxUserIdStr<'static>) -> ActivitySubscription {
         self.as_ref().subscribe(user_id)
     }
 }
@@ -118,7 +118,7 @@ impl<S: ActivitySubscriptionService> ActivitySubscriptionService for Arc<S> {
 pub struct NoOpActivitySubscriptionService;
 
 impl ActivitySubscriptionService for NoOpActivitySubscriptionService {
-    fn subscribe(&self, _user_id: MacroUserIdStr<'static>) -> ActivitySubscription {
+    fn subscribe(&self, _user_id: RoxUserIdStr<'static>) -> ActivitySubscription {
         let (_sender, receiver) = tokio::sync::mpsc::channel(1);
         let (exit_reason_sender, exit_reason) = tokio::sync::oneshot::channel();
         let _ = exit_reason_sender.send(ActivitySubscriptionExit::Closed);
@@ -137,7 +137,7 @@ pub struct ActivityRealtimeConsumerService<C> {
     consumer: C,
     invalidations: tokio::sync::watch::Sender<()>,
     broadcasts:
-        BroadcastManager<GlobalSpawner, MacroUserIdStr<'static>, ActivitySubscriptionUpdate>,
+        BroadcastManager<GlobalSpawner, RoxUserIdStr<'static>, ActivitySubscriptionUpdate>,
     session_updates: tokio::sync::broadcast::Sender<Arc<ActivityRecord>>,
 }
 
@@ -164,7 +164,7 @@ impl<C: ActivityTopicEventConsumer> ActivityRealtimeConsumerService<C> {
     /// The returned subscription reports if its buffer fills, so a slow
     /// subscriber cannot delay the shared consumer or other subscribers.
     #[must_use]
-    pub fn subscribe(&self, user_id: MacroUserIdStr<'static>) -> ActivitySubscription {
+    pub fn subscribe(&self, user_id: RoxUserIdStr<'static>) -> ActivitySubscription {
         let (receiver, broadcast_exit_reason) = self
             .broadcasts
             .subscribe(user_id, SUBSCRIBER_BUFFER_CAPACITY)
@@ -219,7 +219,7 @@ impl<C: ActivityTopicEventConsumer> ActivityRealtimeConsumerService<C> {
                 self.invalidations.send_replace(());
                 continue;
             };
-            let Ok(recipient) = MacroUserIdStr::parse_from_str(&recipient_id) else {
+            let Ok(recipient) = RoxUserIdStr::parse_from_str(&recipient_id) else {
                 continue;
             };
             let recipient = recipient.into_owned();
@@ -244,7 +244,7 @@ impl<C: ActivityTopicEventConsumer> ActivityRealtimeConsumerService<C> {
 impl<C: ActivityTopicEventConsumer> ActivitySubscriptionService
     for ActivityRealtimeConsumerService<C>
 {
-    fn subscribe(&self, user_id: MacroUserIdStr<'static>) -> ActivitySubscription {
+    fn subscribe(&self, user_id: RoxUserIdStr<'static>) -> ActivitySubscription {
         ActivityRealtimeConsumerService::subscribe(self, user_id)
     }
 }

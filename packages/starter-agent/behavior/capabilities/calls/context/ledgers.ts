@@ -7,7 +7,7 @@ import { dlopen, FFIType } from 'bun:ffi';
 import { closeSync, mkdirSync, openSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname } from 'node:path';
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import { jsonLine, parseLines } from '../../../context/disk.ts';
 import type { Base } from '../../../context/index.ts';
 import type { Shell } from '../../../context/shell.ts';

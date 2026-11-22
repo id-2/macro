@@ -6,7 +6,7 @@ import type {
   ImportStatus,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
 import { Database } from '../databases/database';
 import { Document } from '../documents/document';
@@ -33,12 +33,12 @@ export type ImportedItem =
  */
 export class ImportEntry {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     private readonly record: ImportEntryRecord,
   ) {}
 
   /** Wrap a ledger row from an import response. */
-  static from(client: MacroClient, record: ImportEntryRecord): ImportEntry {
+  static from(client: RoxClient, record: ImportEntryRecord): ImportEntry {
     return new ImportEntry(client, record);
   }
 

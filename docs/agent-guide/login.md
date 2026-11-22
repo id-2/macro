@@ -6,14 +6,17 @@
 2. Click the button named `Continue with email` in the a11y tree. (One click sometimes only
    focuses it — if no form appears in the next snapshot, click again.)
 3. `fill` the textbox labeled `you@company.com` with the email, click `Continue`.
-4. On the local stack the auth service is built with `return_passwordless_code`: the login
-   response carries the one-time code and the frontend auto-verifies it, so you are logged in
-   immediately — no code entry step ever appears. A code email is still sent and visible in
-   Mailpit. Against a real deployment, expect a code-entry step instead: fetch the code from
-   the user's inbox (locally: Mailpit). The sixth digit submits the code. A rejected code
-   clears the boxes and refocuses them for retyping. The auth service allows five code
-   checks a minute per address; past that the step shows "Too many attempts. Wait a minute,
-   then try again." and keeps the code. Requesting a new code does not lift that wait.
+4. The next screen asks for the six-digit code sent to that address. Read it in the user's inbox —
+   locally, Mailpit lists it with subject `Your Rox login code` and snippet
+   `Your Rox login code: NNNNNN`. The sixth digit submits the code. A rejected code clears the
+   boxes and refocuses them for retyping. The auth service allows five code checks a minute per
+   address; past that the step shows "Too many attempts. Wait a minute, then try again." and
+   keeps the code. Requesting a new code does not lift that wait.
+   The login response never carries the code: returning it would let anyone who types a known
+   address take that person's session without the mailbox. A developer who cannot read Mailpit
+   opts in explicitly, with `PASSWORDLESS_RETURN_CODE=true` on the auth service and
+   `VITE_PASSWORDLESS_AUTO_CODE=true` in the web build; then the page verifies the returned code by
+   itself. Both are off by default, including on the public stand.
 5. First login auto-creates the user, seeds onboarding content (a "Rox Support x <name>"
    channel, a "Rox how to guide" doc favorite, three sample tasks), and lands on
    `/app/home`. The starter documents share a personal `docs` tag; the

@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT 1 / $1::int AS \"quotient\"",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "quotient",
+        "type_info": "Int4"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Int4"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "cfbb5cf44e8f1fc831a443a019ff8adee151d0a35069f7eb7d99f86eabc4f7dc"
+}

@@ -14,6 +14,11 @@ export interface EmailConnectionProviders {
   /** Whether this user may start a new Outlook connection: the deployment
 switch and their `enable-outlook` flag. */
   outlook: boolean;
+  /** Whether this deployment can start a GitHub link at all: its sign-in
+service has the `github` identity provider. False on a stack started
+without a real GitHub OAuth app (`local-github-client` placeholders), so
+the app knows the link-status read could only answer "not linked". */
+  github: boolean;
   /** Where a Microsoft 365 administrator approves Rox for their whole
 directory. Present when Outlook is configured and the request named an
 `original_url` for the administrator's browser to return to. */

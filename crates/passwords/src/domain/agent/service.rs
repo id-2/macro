@@ -17,7 +17,7 @@ use crate::domain::{
     service::PasswordService,
 };
 use chrono::{DateTime, TimeDelta, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{future::Future, sync::Arc};
 use uuid::Uuid;
 
@@ -62,7 +62,7 @@ pub struct AgentVaultService {
 /// An authenticated agent call before admission.
 pub struct AgentCall {
     /// The API key's user.
-    pub key_user: MacroUserIdStr<'static>,
+    pub key_user: RoxUserIdStr<'static>,
     /// Path team.
     pub team: TeamId,
     /// Raw `X-Macro-Agent-Session-Id` header, when present.
@@ -153,7 +153,7 @@ impl AgentVaultService {
 
     async fn directory_admits(
         &self,
-        key_user: &MacroUserIdStr<'_>,
+        key_user: &RoxUserIdStr<'_>,
         team: TeamId,
     ) -> Result<(), AgentError> {
         let agent = self

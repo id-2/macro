@@ -4,7 +4,7 @@
 
 use super::*;
 use crate::domain::models::UserProvider;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::pubsub::DeletionReason;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -27,7 +27,7 @@ pub enum InboxLifecycleError {
 }
 #[derive(Clone)]
 pub struct InboxActor {
-    pub macro_id: MacroUserIdStr<'static>,
+    pub macro_id: RoxUserIdStr<'static>,
     pub credential_owner: String,
 }
 
@@ -260,7 +260,7 @@ impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> InboxLifecycleServic
             return self.repo.ready_for_delete(link).await;
         }
         let actor = InboxActor {
-            macro_id: MacroUserIdStr::try_from(snapshot.owner.clone())
+            macro_id: RoxUserIdStr::try_from(snapshot.owner.clone())
                 .map_err(|_| InboxLifecycleError::Unavailable)?,
             credential_owner: snapshot.credential_owner.clone(),
         };
@@ -272,7 +272,7 @@ impl<R: InboxLifecycleRepository, E: InboxLifecycleEffects> InboxLifecycleServic
     pub async fn publish_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repo
-            .claim_effect(macro_uuid::generate_uuid_v7())
+            .claim_effect(rox_uuid::generate_uuid_v7())
             .await?
         else {
             return Ok(false);

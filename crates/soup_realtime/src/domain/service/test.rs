@@ -3,7 +3,7 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 
 use super::*;
@@ -14,7 +14,7 @@ const DOCUMENT_ID: &str = "00000000-0000-0000-0000-000000000001";
 const OTHER_DOCUMENT_ID: &str = "00000000-0000-0000-0000-000000000002";
 
 struct FakeAccessExpander {
-    users: Vec<MacroUserIdStr<'static>>,
+    users: Vec<RoxUserIdStr<'static>>,
     fail: bool,
     calls: Arc<AtomicUsize>,
     entities: Arc<Mutex<Vec<Entity<'static>>>>,
@@ -43,7 +43,7 @@ impl UserAccessExpander for FakeAccessExpander {
 
 /// Resolves each entity to its own users, as entities with mixed access do.
 struct PerEntityAccessExpander {
-    users_by_entity: HashMap<Entity<'static>, Vec<MacroUserIdStr<'static>>>,
+    users_by_entity: HashMap<Entity<'static>, Vec<RoxUserIdStr<'static>>>,
     calls: Arc<AtomicUsize>,
 }
 
@@ -242,8 +242,8 @@ async fn wait_until(mut condition: impl FnMut() -> bool) {
     .expect("background worker completes");
 }
 
-fn user(local: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user id")
+fn user(local: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user id")
 }
 
 fn document(id: &str) -> Entity<'static> {
@@ -255,7 +255,7 @@ fn updated_document() -> Patch<Entity<'static>> {
 }
 
 fn harness(
-    users: Vec<MacroUserIdStr<'static>>,
+    users: Vec<RoxUserIdStr<'static>>,
     access_fails: bool,
     fail_users: HashSet<String>,
 ) -> Harness {

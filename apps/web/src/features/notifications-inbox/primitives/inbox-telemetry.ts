@@ -1,4 +1,4 @@
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import type { NotificationInboxRow } from '../context/notifications-inbox-context';
 import type { InboxClear } from '../core/inbox-filters';
 

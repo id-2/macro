@@ -28,11 +28,11 @@ function PersonalEmailsRow() {
   const excluded = () => settings.config().excludePersonalEmails ?? true;
   return (
     <SettingsRow
-      label="Keep personal emails out"
+      label="Не добавлять личную почту"
       description={
         isTeamAdmin()
-          ? 'Leave out people who email from gmail.com, outlook.com, and other personal providers. When off, they are added as people without a company.'
-          : 'Leave out people who email from gmail.com, outlook.com, and other personal providers. Only team admins can change this.'
+          ? 'Не добавлять людей, которые пишут с gmail.com, outlook.com и других личных служб. Если выключить, они появятся как люди без компании.'
+          : 'Не добавлять людей, которые пишут с gmail.com, outlook.com и других личных служб. Изменить это могут только администраторы команды.'
       }
     >
       <Show when={settings.update.isPending}>
@@ -40,7 +40,7 @@ function PersonalEmailsRow() {
       </Show>
       <ToggleSwitch
         size="md"
-        label="Keep personal emails out"
+        label="Не добавлять личную почту"
         labelClass="sr-only"
         checked={excluded()}
         disabled={
@@ -141,8 +141,8 @@ function BlockedDomainsRows() {
         onError: () =>
           feedback.failure(
             isBlocked
-              ? `Could not block ${value}. Try again.`
-              : `Could not unblock ${value}. Try again.`
+              ? `Не удалось заблокировать ${value}. Попробуйте снова.`
+              : `Не удалось разблокировать ${value}. Попробуйте снова.`
           ),
       }
     );
@@ -155,14 +155,14 @@ function BlockedDomainsRows() {
   return (
     <>
       <SettingsRow
-        label="Blocked domains"
-        description="These team exclusions stop email contributions and hide matching CRM email threads. Companies, people, and their archive state stay unchanged."
+        label="Заблокированные домены"
+        description="Эти исключения команды останавливают почтовые вклады и скрывают совпадающие переписки CRM. Компании, люди и состояние архива не меняются."
         stackOnNarrow
       />
       <Switch>
         <Match when={blocked.isError()}>
           <div class="px-4 py-3 text-sm text-ink-muted">
-            Blocked domains could not be loaded. Reload to try again.
+            Не удалось загрузить заблокированные домены. Обновите страницу и попробуйте снова.
           </div>
         </Match>
         <Match when={blocked.isPending()}>
@@ -174,7 +174,7 @@ function BlockedDomainsRows() {
           <Show when={failedDomains().length > 0}>
             <div class="space-y-2 px-4 py-3">
               <p role="alert" class="break-words text-sm text-failure">
-                Could not block {failedDomains().join(', ')}.
+                Не удалось заблокировать {failedDomains().join(', ')}.
               </p>
               <Button
                 variant="outline"
@@ -182,7 +182,7 @@ function BlockedDomainsRows() {
                 disabled={pending()}
                 onClick={() => blockCompanyDomains(failedDomains())}
               >
-                Retry failed domains
+                Повторить неудачные домены
               </Button>
             </div>
           </Show>
@@ -190,7 +190,7 @@ function BlockedDomainsRows() {
             each={blocked.domains()}
             fallback={
               <div class="px-4 py-3 text-sm text-ink-muted">
-                No blocked domains.
+                Нет заблокированных доменов.
               </div>
             }
           >
@@ -201,11 +201,11 @@ function BlockedDomainsRows() {
                   {entry}
                 </span>
                 <Show when={isTeamAdmin()}>
-                  <Tooltip label="Unblock">
+                  <Tooltip label="Разблокировать">
                     <Button
                       variant="ghost"
                       size="icon-sm"
-                      aria-label={`Unblock ${entry}`}
+                      aria-label={`Разблокировать ${entry}`}
                       disabled={pending()}
                       onClick={() => setBlocked(entry, false)}
                     >
@@ -221,8 +221,8 @@ function BlockedDomainsRows() {
               <input
                 type="text"
                 value={draft()}
-                aria-label="Domain to block"
-                placeholder="Block a domain, like acme.com"
+                aria-label="Домен для блокировки"
+                placeholder="Заблокировать домен, например acme.com"
                 autocomplete="off"
                 spellcheck={false}
                 disabled={pending()}
@@ -239,7 +239,7 @@ function BlockedDomainsRows() {
                 disabled={!isCompanyDomain(domain()) || pending()}
                 onClick={addDraft}
               >
-                Block
+                Заблокировать
               </Button>
               <BlockCompanySelect
                 onBlock={blockCompanyDomains}
@@ -247,7 +247,7 @@ function BlockedDomainsRows() {
               />
               <Show when={companyBlockPending()}>
                 <span role="status" class="text-sm text-ink-muted">
-                  Blocking domains…
+                  Блокировка доменов…
                 </span>
               </Show>
             </div>
@@ -261,7 +261,7 @@ function BlockedDomainsRows() {
 /** Team controls over what email sync brings into the CRM. */
 export function EmailSyncSection() {
   return (
-    <SettingsSection title="Email sync">
+    <SettingsSection title="Синхронизация почты">
       <SettingsCard>
         <PersonalEmailsRow />
         <BlockedDomainsRows />

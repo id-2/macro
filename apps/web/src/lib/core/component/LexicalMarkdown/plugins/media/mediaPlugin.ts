@@ -21,8 +21,8 @@ import {
   ImageNode,
   type MediaType,
   VideoNode,
-} from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import { fetchBinaryDocumentData } from '@queries/storage/binary-document';
 import { fileExtension } from '@service-storage/util/filename';
 import {

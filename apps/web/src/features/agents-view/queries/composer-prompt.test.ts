@@ -1,4 +1,4 @@
-import { buildMentionMarkdownString } from '@macro-inc/lexical-core/utils/mentions';
+import { buildMentionMarkdownString } from '@rox-one/lexical-core/utils/mentions';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { buildAgentPrompt } from './composer-prompt';
 

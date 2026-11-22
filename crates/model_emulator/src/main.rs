@@ -4,8 +4,8 @@
 use std::net::SocketAddr;
 
 use clap::Parser;
-use macro_entrypoint::MacroEntrypoint;
-use macro_env::Environment;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env::Environment;
 use model_emulator::{ModelEmulator, StartError};
 
 /// A scripted stand-in for the Gemini GenerateContent API the assistant's
@@ -27,7 +27,7 @@ enum RunError {
 
 #[tokio::main]
 async fn main() -> Result<(), RunError> {
-    let _telemetry = MacroEntrypoint::new(Environment::Local).init();
+    let _telemetry = RoxEntrypoint::new(Environment::Local).init();
     let args = Args::parse();
 
     let emulator = ModelEmulator::start_on(args.listen).await?;

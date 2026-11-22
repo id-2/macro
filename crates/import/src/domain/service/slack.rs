@@ -6,7 +6,7 @@ use crate::domain::{
     },
     ports::{CanonicalImportRepo, EntityCreator},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 #[cfg(test)]
@@ -15,7 +15,7 @@ mod test;
 pub(super) async fn ensure_channel(
     repo: &impl CanonicalImportRepo,
     creator: &impl EntityCreator,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     row: &ImportEntity,
     team_id: Uuid,
     participant_emails: &[String],

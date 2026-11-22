@@ -9,16 +9,16 @@ import {
 import { useHotkeyDOMScope } from '@core/hotkey/hotkeys';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { fireAndForget } from '@core/util/fireAndForget';
-import type { GraphicsEditor, TextMeasurer } from '@macro-inc/graphics';
+import type { GraphicsEditor, TextMeasurer } from '@rox-one/graphics';
 import {
   createGraphicsEditor,
   createGraphicsEditorFromBackend,
   screenToWorld,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import {
   createLoroGraphicsBackendFromDoc,
   type GraphicsPresence,
-} from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics/loro';
 import { fetchDocumentMetadata } from '@queries/storage/document-metadata';
 import type { LoroDoc } from 'loro-crdt';
 import { createSignal, onCleanup, Show } from 'solid-js';

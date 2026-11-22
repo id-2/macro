@@ -1,5 +1,5 @@
 use chrono::{Duration, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::{
@@ -28,20 +28,20 @@ fn service(repo: MockGtmInviteRepo) -> GtmInviteServiceImpl<MockGtmInviteRepo> {
     }
 }
 
-fn staff() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("valentina@rox.one").unwrap()
+fn staff() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("valentina@rox.one").unwrap()
 }
 
-fn outsider() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("mallory@example.com").unwrap()
+fn outsider() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("mallory@example.com").unwrap()
 }
 
-fn prospect() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("prospect@startup.io").unwrap()
+fn prospect() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("prospect@startup.io").unwrap()
 }
 
-fn other_prospect() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("someone-else@startup.io").unwrap()
+fn other_prospect() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("someone-else@startup.io").unwrap()
 }
 
 fn create_request() -> CreateInviteLink {
@@ -71,7 +71,7 @@ fn active_link() -> InviteLink {
     }
 }
 
-fn redeemed_by(link: InviteLink, user: MacroUserIdStr<'static>) -> InviteLink {
+fn redeemed_by(link: InviteLink, user: RoxUserIdStr<'static>) -> InviteLink {
     InviteLink {
         redemption: Some(InviteRedemption {
             user_id: user,

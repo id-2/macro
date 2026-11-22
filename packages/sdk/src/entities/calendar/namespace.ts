@@ -22,7 +22,7 @@ import type {
   ListTeamOutOfOfficeData,
 } from '../../../generated/storage/types.gen';
 import { type IterationOptions, iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Link } from '../email/link';
 import { User } from '../users/user';
 import { BookingNamespace } from './booking-namespace';
@@ -116,10 +116,10 @@ export type CalendarEventRole = 'organizer' | 'guest';
  * @agent
  * ## Booking links
  *
- * - Booking links live under `macro.calendar.booking`. They are reusable booking pages, not
+ * - Booking links live under `rox.calendar.booking`. They are reusable booking pages, not
  *   calendar meetings; the meetings guests book through them are `Booking`s.
  * - Booking links use conversational confirmation in every surface. First list
- *   `macro.calendar.booking.links()` to find existing links and reusable availability. Resolve
+ *   `rox.calendar.booking.links()` to find existing links and reusable availability. Resolve
  *   teams and hosts from what it returns; never ask for IDs, revisions or JSON. Default to
  *   personal ownership unless a team is requested. Explain the complete proposal in readable
  *   prose: ownership and named hosts, who attends, meeting name and description, duration,
@@ -306,7 +306,7 @@ export class CalendarNamespace {
   /** Booking links, their settings, booked meetings and booking statistics. */
   readonly booking: BookingNamespace;
 
-  constructor(private readonly client: MacroClient) {
+  constructor(private readonly client: RoxClient) {
     this.booking = new BookingNamespace(client);
   }
 
@@ -486,7 +486,7 @@ function toCreateBody(options: CreateEventOptions): CreateCalendarEventRequest {
 
 /** The calendars the caller can see, by calendar id. */
 async function visibleCalendars(
-  client: MacroClient,
+  client: RoxClient,
 ): Promise<Map<string, VisibleCalendar>> {
   const { calendars } = unwrap(await client.calendar.listCalendars());
   return new Map(calendars.map((calendar) => [calendar.id, calendar]));

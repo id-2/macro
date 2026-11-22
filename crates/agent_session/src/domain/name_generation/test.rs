@@ -7,7 +7,7 @@ struct Admission(Result<(), AiAdmissionError>);
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        user: &'a macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &'a rox_user_id::user_id::RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         assert_eq!(
@@ -177,7 +177,7 @@ async fn non_user_owner_keeps_its_name_without_substituting_a_system_user() {
     impl AiAdmissionService for NoAdmission {
         fn admit<'a>(
             &'a self,
-            _: &'a macro_user_id::user_id::MacroUserIdStr<'_>,
+            _: &'a rox_user_id::user_id::RoxUserIdStr<'_>,
             _: AiFeature,
         ) -> AdmissionFuture<'a> {
             panic!("a missing user must not be replaced with a billing identity");

@@ -5,8 +5,8 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{AccountHolderOrInternal, MacroAuthorizationExtractor};
-use macro_middleware::tracking::ClientIp;
+use rox_authorization::{AccountHolderOrInternal, RoxAuthorizationExtractor};
+use rox_middleware::tracking::ClientIp;
 use utoipa::ToSchema;
 
 use crate::{
@@ -43,7 +43,7 @@ static MERGE_REQUEST_TEMPLATE: &str = include_str!("./_merge_request_template.ht
 #[tracing::instrument(skip(ctx, authorization, ip_context,req), fields(client_ip=%ip_context, email=%req.email, fusion_user_id=%authorization.authorization.user.user_context.fusion_user_id), err(Debug))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, AccountHolderOrInternal>,
     ip_context: ClientIp,
     extract::Json(mut req): extract::Json<CreateAccountMergeRequest>,
 ) -> Result<Response, Response> {
@@ -98,7 +98,7 @@ pub async fn handler(
 
     // get the user's macro_user_id through their email
     let to_merge_macro_user_id =
-        macro_db_client::user::get::get_user_macro_id_by_email(&ctx.db, &req.email)
+        rox_db_client::user::get::get_user_macro_id_by_email(&ctx.db, &req.email)
             .await
             .map_err(|e| {
                 tracing::error!(error=?e, "failed to get user macro id");
@@ -112,7 +112,7 @@ pub async fn handler(
             })?;
 
     // Generate merge request and get code
-    let code = macro_db_client::account_merge_request::create_account_merge_request(
+    let code = rox_db_client::account_merge_request::create_account_merge_request(
         &ctx.db,
         &user_context.fusion_user_id,
         &to_merge_macro_user_id,
@@ -129,7 +129,7 @@ pub async fn handler(
             .into_response()
     })?;
 
-    let user_profile = macro_db_client::user::get::get_user_profile(&ctx.db, &user_context.user_id)
+    let user_profile = rox_db_client::user::get::get_user_profile(&ctx.db, &user_context.user_id)
         .await
         .map_err(|e| {
             tracing::error!(error=?e, "failed to get user profile");

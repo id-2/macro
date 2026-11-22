@@ -1,6 +1,6 @@
 use chrono::{Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -12,7 +12,7 @@ fn update(status: SystemStatus, minutes_ago: i64) -> StatusUpdate {
     StatusUpdate {
         id: Uuid::now_v7(),
         status,
-        user_id: MacroUserIdStr::parse_from_str("macro|oncall@rox.one").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|oncall@rox.one").unwrap(),
         created_at: Utc::now() - Duration::minutes(minutes_ago),
     }
 }

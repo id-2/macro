@@ -1,11 +1,13 @@
 import { cleanup, render } from '@solidjs/testing-library';
-import { afterEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, expect, it, vi } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { PropertyChangeText } from './property-change';
 
 vi.mock('@property/component/propertyValue/PropertyValueIcon', () => ({
   PropertyValueIcon: () => null,
 }));
 vi.mock('@property/tags/TagDot', () => ({ TagDot: () => null }));
+beforeAll(() => setInterfaceLanguage('en'));
 afterEach(cleanup);
 it('uses host-resolved labels even when the generic property formatter cannot name the values', () => {
   const from = { collaboratorId: 'first' };

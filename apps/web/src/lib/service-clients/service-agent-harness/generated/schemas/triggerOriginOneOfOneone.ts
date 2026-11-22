@@ -4,7 +4,7 @@
  * agent_harness_service
  * OpenAPI spec version: 0.1.0
  */
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { TriggerOriginOneOfOneoneOrigin } from './triggerOriginOneOfOneoneOrigin';
 
 /**
@@ -13,6 +13,6 @@ runs under, not which agent called it.
  */
 export type TriggerOriginOneOfOneone = {
   /** The user whose authority the work runs under. */
-  on_behalf_of: MacroUserIdStr;
+  on_behalf_of: RoxUserIdStr;
   origin: TriggerOriginOneOfOneoneOrigin;
 };

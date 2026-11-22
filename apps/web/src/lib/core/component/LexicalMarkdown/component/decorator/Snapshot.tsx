@@ -15,7 +15,7 @@ import TrashSimple from '@icon/system/regular/trash-simple.svg';
 import {
   $isSnapshotNode,
   type SnapshotDecoratorProps,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { isAccessiblePreviewItem, useItemPreview } from '@queries/preview';
 import { blockNameToItemType } from '@service-storage/client';
 import { createCallback } from '@solid-primitives/rootless';

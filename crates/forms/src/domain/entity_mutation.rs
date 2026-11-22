@@ -10,7 +10,7 @@ use entity_mutation::{
     DeleteEntityPermanently, EntityMutationEffect, EntityMutationErrorCode, MoveEntity,
     RenameEntity, RestoreEntity, TrashEntity, capability::MoveEntityRequest, project_refs,
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use model_entity::Entity;
 
 use super::models::FormError;
@@ -62,7 +62,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {
@@ -87,7 +87,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {
@@ -127,7 +127,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {
@@ -151,7 +151,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {
@@ -175,7 +175,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {

@@ -3,10 +3,10 @@
  * can do, and what happens when an event fires. Each area's context is made
  * once here, and its sources, capabilities and handlers are given it.
  */
-import type { Agent } from '@macro-inc/muppet/core/agent';
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
-import type { Script as ScriptOf } from '@macro-inc/muppet/core/code';
-import { fileStore, scheduling } from '@macro-inc/muppet/utilities/schedules';
+import type { Agent } from '@rox-one/muppet/core/agent';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
+import type { Script as ScriptOf } from '@rox-one/muppet/core/code';
+import { fileStore, scheduling } from '@rox-one/muppet/utilities/schedules';
 import { browserContext } from './capabilities/browser/context.ts';
 import { browserCapabilities } from './capabilities/browser/index.ts';
 import { callsContext } from './capabilities/calls/context.ts';

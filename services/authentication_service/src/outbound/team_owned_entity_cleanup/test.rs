@@ -1,5 +1,5 @@
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::StatusCode;
 
 use super::*;
@@ -67,11 +67,11 @@ fn registry_rows_of_teams_and_bots_become_purgeable_and_a_users_row_is_refused()
             owner: TeamDeletionOwner::Team(team),
         }
     );
-    let user = MacroUserIdStr::parse_from_str("macro|member@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|member@example.com").unwrap();
     assert!(owned_entity_ref(record(Owner::User(user))).is_err());
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn empty_team_skips_disabled_vault_rpc_but_existing_state_requires_acknowledged_purge(
     pool: sqlx::PgPool,
 ) {
@@ -128,7 +128,7 @@ async fn empty_team_skips_disabled_vault_rpc_but_existing_state_requires_acknowl
     }
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn empty_deletion_proof_keeps_first_create_lease_admission_closed_until_deletion_finishes(
     pool: sqlx::PgPool,
 ) {

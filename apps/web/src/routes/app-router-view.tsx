@@ -41,6 +41,7 @@ import type { JSX } from 'solid-js';
 import { paneRoute } from './app-route';
 import { BasePathComponent } from './BasePath';
 import {
+  AccountPortalRouteView,
   ActivityRouteView,
   AgentsRouteView,
   BookingLinksRouteView,
@@ -93,6 +94,7 @@ import {
 } from './pages';
 import {
   accountManagerRoute,
+  accountRoute,
   activityRoute,
   agentChatsRoute,
   agentSetupDoneRoute,
@@ -326,6 +328,10 @@ export function appRouteElements(): JSX.Element {
           />
         </Route>
         <Route definition={settingsRoute} component={SettingsRouteView} />
+        <Route
+          definition={accountRoute}
+          component={AccountPortalRouteView}
+        />
         <Route
           definition={routineCreateRoute}
           component={AgentsRouteView}

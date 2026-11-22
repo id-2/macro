@@ -2,7 +2,7 @@ use crate::domain::{
     models::{contact::ContactName, page::MAX_CONTACT_PAGE_SIZE},
     ports::ContactNameReader,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use non_empty::NonEmpty;
 use rootcause::{Report, prelude::*};
 use sqlx::PgPool;
@@ -24,8 +24,8 @@ impl ContactNameReader for DbContactNames {
     #[tracing::instrument(name = "contacts.names.read", skip_all, fields(contact_count = contacts.len() as i64), err)]
     async fn contact_names(
         &self,
-        viewer: MacroUserIdStr<'_>,
-        contacts: &[MacroUserIdStr<'static>],
+        viewer: RoxUserIdStr<'_>,
+        contacts: &[RoxUserIdStr<'static>],
     ) -> Result<Vec<ContactName>, Report> {
         if contacts.len() > usize::from(MAX_CONTACT_PAGE_SIZE) {
             return Err(rootcause::report!("contact name batch exceeded its bound"));
@@ -38,7 +38,7 @@ impl ContactNameReader for DbContactNames {
         ) else {
             return Ok(Vec::new());
         };
-        let names = macro_db_client::user::get_user_name::get_user_names_with_email(
+        let names = rox_db_client::user::get_user_name::get_user_names_with_email(
             &self.db,
             viewer.as_ref(),
             ids,
@@ -49,7 +49,7 @@ impl ContactNameReader for DbContactNames {
             .into_iter()
             .filter_map(|name| {
                 Some(ContactName {
-                    user_id: MacroUserIdStr::try_from(name.id).ok()?,
+                    user_id: RoxUserIdStr::try_from(name.id).ok()?,
                     first_name: name.first_name,
                     last_name: name.last_name,
                 })

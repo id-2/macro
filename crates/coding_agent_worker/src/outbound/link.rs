@@ -15,7 +15,7 @@ pub async fn dial(
     let mut request = gateway_url.into_client_request()?;
     let headers = request.headers_mut();
     let token = harness_token.parse().map_err(bad_header)?;
-    headers.insert("x-macro-harness-token", token);
+    headers.insert("x-rox-harness-token", token);
     // The service sends the optional messages this daemon handles only
     // because it lists them here.
     headers.insert(

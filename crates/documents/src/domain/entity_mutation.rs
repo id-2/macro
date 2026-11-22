@@ -11,7 +11,7 @@ use entity_mutation::{
     DuplicateEntity, EntityMutationEffect, EntityMutationErrorCode, MoveEntity, RenameEntity,
     TrashEntity, UpdateEntitySharePolicy, capability::MoveEntityRequest, project_refs,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::DocumentBasic;
 use model_entity::{Entity, EntityType};
 use model_owner::CreationPrincipal;
@@ -21,7 +21,7 @@ use crate::domain::ports::sync::DocumentSyncPort;
 use connection::domain::ports::ConnectionService;
 use entity_access_management::domain::ports::EntityAccessManagementService;
 use foreign_entity::domain::ports::ForeignEntityService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 
 use super::{
     models::{DocumentError, EditDocumentServiceArgs},
@@ -71,7 +71,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > RenameEntity for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 where
@@ -108,7 +108,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > MoveEntity for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 where
@@ -160,7 +160,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > UpdateEntitySharePolicy for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 where
@@ -197,7 +197,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > TrashEntity for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 where
@@ -233,7 +233,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > DuplicateEntity for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 where
@@ -245,7 +245,7 @@ where
         &self,
         entity: Entity<'static>,
         receipt: EntityAccessReceipt<Self::Receipt>,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         display_name: Option<String>,
     ) -> Result<Vec<EntityMutationEffect>, EntityMutationErrorCode> {
         let document = self.internal_get_basic_document(&entity.entity_id).await?;

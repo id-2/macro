@@ -4,11 +4,11 @@
 //! the doppler configuration.
 #![deny(missing_docs)]
 
-use macro_env_var::env_vars;
+use rox_env_var::env_vars;
 
 env_vars! {
 /// RoxDB database url
 pub struct DatabaseUrl;
-/// MacroCache redis uri
+/// RoxCache redis uri
 pub struct RedisUri;
 }

@@ -10,11 +10,11 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, post},
 };
-use macro_authorization::{
-    InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
     UserOnly, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -32,12 +32,12 @@ const MAX_COMMAND_BYTES: usize = 1024 * 1024;
 /// Independent state for the internal coding agent capability.
 pub struct CodingAgentsState<Service, Auth> {
     service: Arc<Service>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Service, Auth> CodingAgentsState<Service, Auth> {
     /// Compose the domain capability with shared internal authentication.
-    pub fn new(service: Arc<Service>, authorization: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<Service>, authorization: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization,
@@ -54,7 +54,7 @@ impl<Service, Auth> Clone for CodingAgentsState<Service, Auth> {
     }
 }
 
-impl<Service, Auth> FromRef<CodingAgentsState<Service, Auth>> for MacroAuthorizationState<Auth> {
+impl<Service, Auth> FromRef<CodingAgentsState<Service, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &CodingAgentsState<Service, Auth>) -> Self {
         state.authorization.clone()
     }
@@ -62,7 +62,7 @@ impl<Service, Auth> FromRef<CodingAgentsState<Service, Auth>> for MacroAuthoriza
 
 /// Mount credential-protected commands beneath `/internal/coding-agents`,
 /// and the signed-in user's listing at `GET /coding-agents`.
-pub fn coding_agents_router<Service: CodingAgentService, Auth: MacroAuthorizationService>(
+pub fn coding_agents_router<Service: CodingAgentService, Auth: RoxAuthorizationService>(
     state: CodingAgentsState<Service, Auth>,
 ) -> Router {
     Router::new()
@@ -86,7 +86,7 @@ pub fn coding_agents_router<Service: CodingAgentService, Auth: MacroAuthorizatio
 
 #[derive(Deserialize)]
 struct ListRequest {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 }
 
 /// The coding agents the caller can start a session as right now.
@@ -160,9 +160,9 @@ async fn bounded_response(
     }
 }
 
-async fn list<Service: CodingAgentService, Auth: MacroAuthorizationService>(
+async fn list<Service: CodingAgentService, Auth: RoxAuthorizationService>(
     State(state): State<CodingAgentsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<ListRequest>, JsonRejection>,
 ) -> Result<Json<CodingAgentsResponse>, ApiError> {
     Ok(Json(CodingAgentsResponse {
@@ -187,20 +187,20 @@ async fn list<Service: CodingAgentService, Auth: MacroAuthorizationService>(
 )]
 pub async fn list_coding_agents_handler<
     Service: CodingAgentService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CodingAgentsState<Service, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
 ) -> Result<Json<CodingAgentsResponse>, ApiError> {
     Ok(Json(CodingAgentsResponse {
         agents: state.service.list(user.authorization.macro_user_id).await?,
     }))
 }
 
-async fn updates<Service: CodingAgentService, Auth: MacroAuthorizationService>(
+async fn updates<Service: CodingAgentService, Auth: RoxAuthorizationService>(
     State(state): State<CodingAgentsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<AgentUpdates>, ApiError> {
     Ok(Json(
         state
@@ -210,9 +210,9 @@ async fn updates<Service: CodingAgentService, Auth: MacroAuthorizationService>(
     ))
 }
 
-async fn dispatch<Service: CodingAgentService, Auth: MacroAuthorizationService>(
+async fn dispatch<Service: CodingAgentService, Auth: RoxAuthorizationService>(
     State(state): State<CodingAgentsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<DispatchCodingAgentRequest>, JsonRejection>,
 ) -> Result<Json<DispatchedCodingAgent>, ApiError> {
     Ok(Json(state.service.dispatch(command?.0).await?))
@@ -221,9 +221,9 @@ async fn dispatch<Service: CodingAgentService, Auth: MacroAuthorizationService>(
 #[cfg(test)]
 mod test;
 
-async fn create<Service: CodingAgentService, Auth: MacroAuthorizationService>(
+async fn create<Service: CodingAgentService, Auth: RoxAuthorizationService>(
     State(state): State<CodingAgentsState<Service, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     command: Result<Json<DispatchCodingAgentRequest>, JsonRejection>,
 ) -> Result<Json<DispatchedCodingAgent>, ApiError> {
     Ok(Json(state.service.create(command?.0).await?))

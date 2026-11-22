@@ -1,25 +1,25 @@
-# Task creation
+# Создание задач
 
-In addition to creating a task with `c -> t` or by typing `/task`, you can turn any checkbox list into a list of tasks by selecting the rows and clicking the `Tasks` button. Here, try it below:
+Кроме сочетания `c -> t` и команды `/task`, любой список с флажками можно превратить в список задач: выделите строки и нажмите кнопку `Задачи`. Попробуйте ниже:
 
-- [ ] stop
-- [ ] drop
-- [ ] roll
+- [ ] стоп
+- [ ] брось
+- [ ] катись
 
-Similarly, any Channel message can be turned into a task, by hovering the message and clicking the `Task` button.
+Точно так же любое сообщение в канале можно превратить в задачу: наведите на сообщение и нажмите кнопку `Задача`.
 
-# GitHub integration
+# Связь с GitHub
 
-Rox tasks integrate with GitHub: as you create, review, and merge branches, the task automatically moves to “In Progress,” “In Review,” or “Done,” and the task records which pull request is associated with it.
+Задачи Rox связаны с GitHub: когда вы создаёте, проверяете и сливаете ветки, задача сама переходит в «В работе», «На проверке» или «Готово» и запоминает, какой запрос на слияние к ней относится.
 
-To connect your GitHub, go to [the Connections page](https://rox.one/app/settings/connections) in Settings. 
+Чтобы подключить GitHub, откройте [страницу подключений](https://rox.one/app/settings/connections) в настройках.
 
-To associate a task with a branch, simply copy a task's branch name, with its special Rox identifier, and use that as your branch name. There's a button for that under the task title, or press `cmd+k` and search "Copy branch name". 
+Чтобы связать задачу с веткой, скопируйте имя ветки задачи с особым идентификатором Rox и используйте его как имя ветки. Кнопка для этого есть под названием задачи, или нажмите `cmd+k` и найдите «Скопировать имя ветки».
 
 # Rox MCP
 
-[Connect the Rox MCP](https://rox.one/app/settings/mcp-server) to your coding agent to give your agent direct access to your tasks.
+[Подключите Rox MCP](https://rox.one/app/settings/mcp-server) к агенту для кода, чтобы у агента был прямой доступ к вашим задачам.
 
-# Cloud Agent Integration
+# Облачный агент
 
-In the Info Panel (which lives on the right when there is enough room, or behind the info button in the top-right at narrower width), in the Actions section, you'll find tools for integrating your tasks with outside agents. You can copy the task as a prompt, or even open up a cloud agent with the press of a button.
+В панели сведений (справа, когда хватает места, или за кнопкой сведений в правом верхнем углу на узком экране), в разделе действий, есть средства связи задач с внешними агентами. Можно скопировать задачу как запрос или открыть облачного агента одной кнопкой.

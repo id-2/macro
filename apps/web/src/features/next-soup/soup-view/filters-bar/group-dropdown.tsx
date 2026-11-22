@@ -2,6 +2,7 @@ import type {
   GroupOption,
   GroupOptionId,
 } from '@app/features/next-soup/soup-view/group-options';
+import { t } from '@app/lib/i18n';
 import StackSimpleIcon from '@icon/system/regular/stack-simple.svg';
 import {
   Button,
@@ -35,16 +36,16 @@ export const GroupDropdown: Component<GroupDropdownProps> = (props) => {
       onOpenChange={props.onOpenChange}
       placement="bottom-start"
     >
-      <Tooltip label="Group">
+      <Tooltip label={t('common.group')}>
         <Dropdown.Trigger
           as={props.grouped ? ButtonGroup.Button : Button}
           variant={props.variant ?? 'secondary'}
           size={triggerSize()}
-          aria-label={props.hideLabel ? 'Group' : undefined}
+          aria-label={props.hideLabel ? t('common.group') : undefined}
         >
           <StackSimpleIcon class="size-4 touch:size-6 shrink-0 pointer-events-none" />
           <Show when={!props.hideLabel}>
-            <span>Group</span>
+            <span>{t('common.group')}</span>
           </Show>
         </Dropdown.Trigger>
       </Tooltip>

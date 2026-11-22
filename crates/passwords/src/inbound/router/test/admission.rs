@@ -322,7 +322,7 @@ async fn import_enforces_body_and_batch_limits_without_echoing_payloads() {
         .unwrap()
         .insert("macro|synthetic@example.test".into(), vec![team]);
     let app = router(PasswordRouterState {
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
         service: Arc::new(PasswordService {
             repository,
             provider: Arc::new(FakeProvider::new()),
@@ -429,7 +429,7 @@ async fn import_accepts_and_audits_every_parser_format() {
         .unwrap()
         .insert("macro|synthetic@example.test".into(), vec![team]);
     let app = router(PasswordRouterState {
-        authorization: MacroAuthorizationState::new(Arc::new(Authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(Authorization)),
         service: Arc::new(PasswordService {
             repository: repository.clone(),
             provider: Arc::new(FakeProvider::new()),

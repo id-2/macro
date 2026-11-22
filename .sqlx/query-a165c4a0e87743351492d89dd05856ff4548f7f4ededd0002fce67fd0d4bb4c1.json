@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_links SET macro_id = 'macro|self@example.com',fusionauth_user_id = $3,grant_id = $2 WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a165c4a0e87743351492d89dd05856ff4548f7f4ededd0002fce67fd0d4bb4c1"
+}

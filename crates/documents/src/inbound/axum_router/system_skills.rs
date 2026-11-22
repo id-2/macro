@@ -1,7 +1,7 @@
 //! Handler for `GET /documents/system_skills`.
 
 use axum::Json;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 
 use crate::domain::models::{SystemSkillSummary, SystemSkillsResponse};
 
@@ -19,8 +19,8 @@ use crate::domain::models::{SystemSkillSummary, SystemSkillsResponse};
     )
 )]
 #[tracing::instrument(skip_all)]
-pub async fn get_system_skills_handler<Auth: MacroAuthorizationService>(
-    _user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+pub async fn get_system_skills_handler<Auth: RoxAuthorizationService>(
+    _user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Json<SystemSkillsResponse> {
     Json(SystemSkillsResponse {
         skills: system_skills::SYSTEM_SKILLS

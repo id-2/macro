@@ -2,7 +2,7 @@
 //! repository construction or cross-domain outbound imports belong here.
 
 use import::domain::{models as ledger, ports::CanonicalImportRepo};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::{
@@ -47,7 +47,7 @@ impl<R: CanonicalImportRepo> ImportLedger for CanonicalImportLedger<R> {
     async fn reserve(
         &self,
         team: TeamId,
-        requester: &MacroUserIdStr<'static>,
+        requester: &RoxUserIdStr<'static>,
         metadata: &ConversationMetadata,
         authorized_existing_target: Option<Uuid>,
     ) -> PortResult<TargetReservation> {

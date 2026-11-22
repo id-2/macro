@@ -8,8 +8,8 @@ import type {
   SendEmail,
 } from '../../../generated/agent-reviews';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { AgentSession } from './agent-session';
 import type { CodeExecution } from './code-execution';
 
@@ -23,9 +23,9 @@ function typedRecord(record: unknown): ReviewRecord {
 }
 
 /** A persistent review remains actionable after the code execution ends. */
-export class SessionReview extends MacroEntity<ReviewRecord> {
+export class SessionReview extends RoxEntity<ReviewRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     private readonly parent: AgentSession,
     id: string,
     seed?: ReviewRecord,
@@ -33,21 +33,21 @@ export class SessionReview extends MacroEntity<ReviewRecord> {
     super(client, id, seed);
   }
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     session: AgentSession,
     id: string,
   ): SessionReview {
     return new SessionReview(client, session, id);
   }
   static fromRecord(
-    client: MacroClient,
+    client: RoxClient,
     session: AgentSession,
     record: ReviewRecord,
   ): SessionReview {
     return new SessionReview(client, session, record.id, record);
   }
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     execution: CodeExecution,
     input: CreateReviewOptions,
   ): Promise<SessionReview> {
@@ -60,7 +60,7 @@ export class SessionReview extends MacroEntity<ReviewRecord> {
   }
   /** Present a review in a session without requiring a code execution. */
   static async createForSession(
-    client: MacroClient,
+    client: RoxClient,
     session: AgentSession,
     input: CreateReviewOptions,
     execution?: CodeExecution,
@@ -74,7 +74,7 @@ export class SessionReview extends MacroEntity<ReviewRecord> {
     return SessionReview.fromRecord(client, session, typedRecord(record));
   }
   static async list(
-    client: MacroClient,
+    client: RoxClient,
     execution: CodeExecution,
   ): Promise<SessionReview[]> {
     const records = unwrap(

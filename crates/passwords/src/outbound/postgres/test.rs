@@ -1,19 +1,19 @@
 use super::*;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn metadata_grants_intents_folders_and_deletion_are_team_isolated(pool: PgPool) {
     let first = TeamId(Uuid::now_v7());
     let second = TeamId(Uuid::now_v7());
     let owner = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|owner@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.test")
             .expect("fixture")
             .into_owned(),
     };
     let viewer = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|viewer@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|viewer@example.test")
             .expect("fixture")
             .into_owned(),
     };
@@ -684,7 +684,7 @@ async fn distinct_team_leases_share_admission_and_reserve_database_query_capacit
 async fn stale_totp_setup_and_removal_cannot_override_a_newer_enrollment_or_removal(pool: PgPool) {
     let team = TeamId(Uuid::now_v7());
     let item = ItemId(Uuid::now_v7());
-    let owner = MacroUserIdStr::parse_from_str("macro|revision@example.test")
+    let owner = RoxUserIdStr::parse_from_str("macro|revision@example.test")
         .expect("identity")
         .into_owned();
     let macro_user_id = Uuid::now_v7();

@@ -1,4 +1,4 @@
-import type { DataValidation } from '@macro-inc/spreadsheet/sheet-rules';
+import type { DataValidation } from '@rox-one/spreadsheet/sheet-rules';
 import { describe, expect, it } from 'vitest';
 import {
   choiceColors,

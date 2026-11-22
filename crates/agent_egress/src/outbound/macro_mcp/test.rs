@@ -3,8 +3,8 @@ use crate::domain::model::McpServerSlug;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
 }
 
 fn connected(slug: &str) -> McpDestination {
@@ -46,10 +46,10 @@ impl CountingTokens {
     }
 }
 
-impl MacroApiTokens for &CountingTokens {
+impl RoxApiTokens for &CountingTokens {
     async fn mint(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         agent: BotId,
         _session: uuid::Uuid,
     ) -> Result<String, EgressError> {
@@ -71,7 +71,7 @@ struct SpyInner {
 impl McpCredentials for &SpyInner {
     async fn resolve(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _agent: BotId,
         _session: uuid::Uuid,
         destination: &McpDestination,
@@ -92,7 +92,7 @@ fn macro_url() -> Url {
 async fn answers_macros_own_destination_with_a_minted_token() {
     let tokens = CountingTokens::fresh();
     let inner = SpyInner::default();
-    let credentials = WithMacroMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
+    let credentials = WithRoxMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
 
     let McpResolution::Connected(call) = credentials
         .resolve(
@@ -120,7 +120,7 @@ async fn answers_macros_own_destination_with_a_minted_token() {
 async fn reuses_a_token_until_it_nears_expiry() {
     let tokens = CountingTokens::fresh();
     let inner = SpyInner::default();
-    let credentials = WithMacroMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
+    let credentials = WithRoxMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
 
     for _ in 0..3 {
         credentials
@@ -144,7 +144,7 @@ async fn reuses_a_token_until_it_nears_expiry() {
 async fn each_agent_of_one_owner_gets_its_own_token() {
     let tokens = CountingTokens::fresh();
     let inner = SpyInner::default();
-    let credentials = WithMacroMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
+    let credentials = WithRoxMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
 
     for agent in [BotId::TEST_A, BotId::TEST_B, BotId::TEST_A] {
         credentials
@@ -164,7 +164,7 @@ async fn a_token_about_to_expire_is_replaced() {
     // Inside the margin from the start, so every resolve re-mints.
     let tokens = CountingTokens::expiring_at(Utc::now() + ChronoDuration::minutes(1));
     let inner = SpyInner::default();
-    let credentials = WithMacroMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
+    let credentials = WithRoxMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
 
     for _ in 0..2 {
         credentials
@@ -185,7 +185,7 @@ async fn a_token_about_to_expire_is_replaced() {
 async fn every_other_slug_delegates_to_the_inner_resolver() {
     let tokens = CountingTokens::fresh();
     let inner = SpyInner::default();
-    let credentials = WithMacroMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
+    let credentials = WithRoxMcp::new(&inner, &tokens, macro_url(), false).expect("constructed");
 
     let refusal = credentials
         .resolve(
@@ -209,13 +209,13 @@ async fn refuses_a_cleartext_url_unless_local_dev_permits_it() {
     let tokens = CountingTokens::fresh();
     let url = Url::parse("http://mcp-service:8080/mcp").expect("url");
 
-    let refusal = WithMacroMcp::new(&SpyInner::default(), &tokens, url.clone(), false)
+    let refusal = WithRoxMcp::new(&SpyInner::default(), &tokens, url.clone(), false)
         .err()
         .expect("refused");
     assert!(matches!(refusal, EgressError::InsecureUpstream(_)));
 
     let inner = SpyInner::default();
-    let permitted = WithMacroMcp::new(&inner, &tokens, url, true).expect("constructed");
+    let permitted = WithRoxMcp::new(&inner, &tokens, url, true).expect("constructed");
     let McpResolution::Connected(call) = permitted
         .resolve(
             &owner(),
@@ -250,7 +250,7 @@ fn an_unreadable_token_is_an_upstream_error() {
 async fn sessions_of_the_same_agent_never_share_mcp_credentials() {
     let tokens = CountingTokens::fresh();
     let inner = SpyInner::default();
-    let credentials = WithMacroMcp::new(&inner, &tokens, macro_url(), false).unwrap();
+    let credentials = WithRoxMcp::new(&inner, &tokens, macro_url(), false).unwrap();
     let first = uuid::Uuid::now_v7();
     let second = uuid::Uuid::now_v7();
     for session in [first, second, first] {
@@ -265,7 +265,7 @@ async fn sessions_of_the_same_agent_never_share_mcp_credentials() {
 /// A routine run's token signs its routine and, for a dry run, its scope.
 #[test]
 fn a_routine_token_signs_its_routine_and_scope() {
-    let routine = macro_uuid::Uuid::from_u128(7);
+    let routine = rox_uuid::Uuid::from_u128(7);
     assert_eq!(
         SignedClaims::routine(
             None,

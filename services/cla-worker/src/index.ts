@@ -450,21 +450,12 @@ function escapeHtml(text: string): string {
     .replaceAll("'", "&#39;");
 }
 
-// The Rox M mark (apps/web/src/components/icon/macro-logo.svg), inlined so
-// the page stays a single self-contained response.
-const LOGO_SVG = `<svg width="34" height="34" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-  <path d="M0 10.014v6.801a.75.75 0 0 0 .225.513l2.742 2.644 2.002-.8v-7.099l-2.97-2.859z"/>
-  <path d="M4.078 4.8v5.786l1.36 1.309v1.313L12.481 20l2.002-.8-.001-7.1L6.078 4z"/>
-  <path d="M13.594 4.8v5.786l1.36 1.311-.013 1.3L22 20 24 19.2V12.42a.75.75 0 0 0-.225-.533L15.595 4z"/>
-</svg>`;
-
-// The app's favicon (apps/web/public/macro-favicon.svg) in white, inlined as
-// a data URI so the worker serves a single self-contained page.
-const FAVICON_DATA_URI =
-  "data:image/svg+xml," +
-  "%3Csvg width='100%25' height='100%25' fill='%23ffffff' viewBox='0 0 24 24' xmlns='http://www.w3.org/2000/svg'%3E" +
-  "%3Cpath d='m6.25 4.038-2.242 0.8792v5.8184l-1.756-1.6582-2.242 0.8792v6.6766c0 0.2568 0.106 0.502 0.292 0.6784l2.794 2.6422 2.244-0.879v-5.8184l7.084 6.6974 2.244-0.879v-5.8184l7.086 6.6976 2.24-0.8792v-6.6766c0-0.2568-0.104-0.5022-0.292-0.6784l-8.124-7.6816-2.244 0.879v5.8184z'/%3E" +
-  "%3C/svg%3E";
+// The Rox mark the app itself shows (apps/web/public/rox-mark.png). It comes
+// from the public site because the worker runs on workers.dev, off the app's
+// origin; `alt` is the wordmark shown when the image cannot load.
+const ROX_MARK_URL = "https://rox.one/app/rox-mark.png";
+const LOGO_IMG = `<img src="${ROX_MARK_URL}" width="34" height="34" alt="Rox"
+  style="display:block;border-radius:8px;background:#fff">`;
 
 function pageShell(title: string, content: string): string {
   return `<!doctype html>
@@ -474,7 +465,7 @@ function pageShell(title: string, content: string): string {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="dark">
-<link rel="icon" type="image/svg+xml" href="${FAVICON_DATA_URI}">
+<link rel="icon" type="image/png" href="${ROX_MARK_URL}">
 <title>${escapeHtml(title)}</title>
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -497,7 +488,7 @@ function pageShell(title: string, content: string): string {
 </head>
 <body>
 <main>
-<div class="logo">${LOGO_SVG}</div>
+<div class="logo">${LOGO_IMG}</div>
 ${content}
 </main>
 </body>

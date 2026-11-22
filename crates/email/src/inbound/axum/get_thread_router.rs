@@ -10,7 +10,7 @@ use axum::{
 use entity_access::domain::models::{EntityPermission, ViewAccessLevel};
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::ThreadAccessLevelExtractor;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use thiserror::Error;
 
@@ -26,7 +26,7 @@ const MESSAGE_MAX: i64 = 100;
 pub struct EmailThreadRouterState<T, Svc, Auth> {
     pub service: Arc<T>,
     pub access_service: Arc<Svc>,
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, Svc, Auth> Clone for EmailThreadRouterState<T, Svc, Auth> {
@@ -45,7 +45,7 @@ impl<T, Svc, Auth> FromRef<EmailThreadRouterState<T, Svc, Auth>> for Arc<Svc> {
     }
 }
 
-impl<T, Svc, Auth> FromRef<EmailThreadRouterState<T, Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Svc, Auth> FromRef<EmailThreadRouterState<T, Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &EmailThreadRouterState<T, Svc, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -56,7 +56,7 @@ where
     S: Send + Sync + 'static,
     T: EmailService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         .route("/{thread_id}", get(get_thread_handler::<T, Svc, Auth>))
@@ -119,7 +119,7 @@ impl IntoResponse for GetThreadError {
 pub async fn get_thread_handler<
     T: EmailService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<EmailThreadRouterState<T, Svc, Auth>>,
     access: ThreadAccessLevelExtractor<ViewAccessLevel, Svc, Auth>,

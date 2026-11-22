@@ -1,7 +1,7 @@
 //! Handler for `GET /system-status`.
 
 use axum::{Json, extract::State};
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 
 use super::SystemStatusRouterState;
 use crate::domain::models::{CurrentSystemStatus, SystemStatusError};
@@ -20,7 +20,7 @@ use crate::domain::ports::SystemStatusService;
     )
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: SystemStatusService, Auth: MacroAuthorizationService>(
+pub async fn handler<T: SystemStatusService, Auth: RoxAuthorizationService>(
     State(state): State<SystemStatusRouterState<T, Auth>>,
 ) -> Result<Json<CurrentSystemStatus>, SystemStatusError> {
     Ok(Json(state.service.current_status().await?))

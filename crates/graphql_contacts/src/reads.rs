@@ -6,7 +6,7 @@ use contacts::domain::{
     },
     ports::ContactDirectory,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::{future::Future, pin::Pin, sync::Arc};
 
@@ -15,20 +15,20 @@ type ReadFuture<'a, T> = Pin<Box<dyn Future<Output = Result<T, Report>> + Send +
 pub(crate) trait ContactsGraphqlReads: Send + Sync {
     fn page(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         after: Option<ContactCursor>,
         limit: ContactPageSize,
     ) -> ReadFuture<'_, ContactPage>;
     fn search(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         search: ContactSearch,
         after: Option<ContactCursor>,
         limit: ContactPageSize,
     ) -> ReadFuture<'_, ContactPage>;
     fn lookup(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         lookup: ContactLookup,
     ) -> ReadFuture<'_, Vec<Contact>>;
 }
@@ -52,7 +52,7 @@ struct ServiceReads<S>(Arc<S>);
 impl<S: ContactDirectory> ContactsGraphqlReads for ServiceReads<S> {
     fn page(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         after: Option<ContactCursor>,
         limit: ContactPageSize,
     ) -> ReadFuture<'_, ContactPage> {
@@ -60,7 +60,7 @@ impl<S: ContactDirectory> ContactsGraphqlReads for ServiceReads<S> {
     }
     fn search(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         search: ContactSearch,
         after: Option<ContactCursor>,
         limit: ContactPageSize,
@@ -73,7 +73,7 @@ impl<S: ContactDirectory> ContactsGraphqlReads for ServiceReads<S> {
     }
     fn lookup(
         &self,
-        viewer: MacroUserIdStr<'static>,
+        viewer: RoxUserIdStr<'static>,
         lookup: ContactLookup,
     ) -> ReadFuture<'_, Vec<Contact>> {
         Box::pin(async move { self.0.lookup_contacts(viewer, &lookup).await })

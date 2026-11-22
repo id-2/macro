@@ -1,6 +1,6 @@
 //! Query for channel membership check.
 
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -10,7 +10,7 @@ use uuid::Uuid;
 #[tracing::instrument(err, skip(pool, user_id))]
 pub async fn check_user_channel_membership(
     pool: &PgPool,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
     channel_ids: &[Uuid],
 ) -> Result<Vec<Uuid>, sqlx::Error> {
     let user_id = user_id.map(AsRef::as_ref).unwrap_or("");

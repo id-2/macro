@@ -1,12 +1,12 @@
 use axum::http::StatusCode;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rate_limit::domain::models::RateLimitExceeded;
 use std::time::Duration;
 
 use super::{picture_changed_metadata, throttle_result};
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
 }
 
 #[test]

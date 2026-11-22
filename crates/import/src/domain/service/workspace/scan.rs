@@ -1,7 +1,7 @@
 //! Recording what a planning run has found in Notion so far, so the user
 //! sees the scan grow while the inventory walks the workspace.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::sync::watch;
 use tokio::time::Instant;
 
@@ -17,7 +17,7 @@ mod test;
 /// Returns once the sender is gone and everything sent is written.
 pub(in crate::domain::service) async fn record_scan<R: NotionPlanRepo>(
     repo: &R,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     mut counts: watch::Receiver<ScanCounts>,
     source: ImportSource,
 ) {
@@ -45,7 +45,7 @@ pub(in crate::domain::service) async fn record_scan<R: NotionPlanRepo>(
 
 async fn write<R: NotionPlanRepo>(
     repo: &R,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     scanned: ScanCounts,
     source: ImportSource,
 ) {

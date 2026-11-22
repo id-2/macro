@@ -2,12 +2,12 @@
 use super::{ToolDocumentService, ToolDocumentToolContext, ToolEntityAccessService};
 use std::sync::Arc;
 
-macro_env_var::env_var! {
+rox_env_var::env_var! {
     /// Static file bucket, used only with local AWS.
     pub struct StaticStorageBucket;
 }
 
-macro_env_var::env_var! {
+rox_env_var::env_var! {
     /// Internal service authentication for static file uploads.
     struct InternalApiKey;
 }
@@ -42,18 +42,18 @@ pub fn build_image_generation_tool_context(
 ) -> anyhow::Result<ToolImageGenerationToolContext> {
     // Local service URLs address the API container, while public file bytes
     // live in the static-file bucket. Providers receive bytes from this reader.
-    let cdn_base = if let Some(local_aws) = macro_aws_config::LocalAwsUrl::new() {
+    let cdn_base = if let Some(local_aws) = rox_aws_config::LocalAwsUrl::new() {
         format!(
             "{}/{}",
             local_aws.as_ref().trim_end_matches('/'),
             StaticStorageBucket::new()?.as_ref(),
         )
     } else {
-        macro_service_urls::StaticFileServiceUrl::new()?.to_string()
+        rox_service_urls::StaticFileServiceUrl::new()?.to_string()
     };
     let storage = static_file_service_client::StaticFileServiceClient::new(
         InternalApiKey::new()?.to_string(),
-        macro_service_urls::StaticFileServiceUrl::new()?.to_string(),
+        rox_service_urls::StaticFileServiceUrl::new()?.to_string(),
     );
     Ok(build_with_cdn(
         documents, generator, recorder, cdn_base, storage,

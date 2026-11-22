@@ -156,12 +156,12 @@ async fn fifty_random_seeds(pool: PgPool, shard: u32, label_write_batches: bool)
     );
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn fifty_random_seeds_keep_gmail_the_database_and_the_user_in_agreement(pool: PgPool) {
     fifty_random_seeds(pool, 50, false).await;
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn fifty_random_seeds_agree_with_label_write_batches(pool: PgPool) {
     fifty_random_seeds(pool, 51, true).await;
 }
@@ -185,25 +185,25 @@ async fn run_shard(pool: PgPool, shard: u32) {
 
 // One test per shard: sqlx names each test's database after the test, so
 // parallel processes need different tests.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 #[ignore = "seeded simulation, configured by SIM_* environment variables"]
 async fn randomized_shard_1(pool: PgPool) {
     run_shard(pool, 1).await;
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 #[ignore = "seeded simulation, configured by SIM_* environment variables"]
 async fn randomized_shard_2(pool: PgPool) {
     run_shard(pool, 2).await;
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 #[ignore = "seeded simulation, configured by SIM_* environment variables"]
 async fn randomized_shard_3(pool: PgPool) {
     run_shard(pool, 3).await;
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 #[ignore = "seeded simulation, configured by SIM_* environment variables"]
 async fn randomized_shard_4(pool: PgPool) {
     run_shard(pool, 4).await;

@@ -29,7 +29,7 @@ use crate::inbox::{Mail, Provider};
 use crate::infra::postgres::Database;
 use crate::infra::redis::RedisDatabase;
 use crate::infra::sqs::Queues;
-use crate::macro_services::{HeldRequest, MacroServices, ServiceRequest};
+use crate::macro_services::{HeldRequest, RoxServices, ServiceRequest};
 use crate::process::ServiceProcess;
 use crate::recording_proxy::RecordingProxy;
 use crate::tls::TlsFront;
@@ -151,7 +151,7 @@ pub struct Stack {
     redis: Option<RedisDatabase>,
     queues: Option<Queues>,
     aws: Option<Aws>,
-    macro_services: Option<MacroServices>,
+    macro_services: Option<RoxServices>,
     tls: Option<TlsFront>,
     /// What the scenario made the services do.
     recorder: Recorder,
@@ -562,7 +562,7 @@ impl Stack {
         recorder: &Recorder,
     ) -> Result<Booted, Report> {
         let aws = Aws::start(&servers.sqs, recorder.clone()).await?;
-        let macro_services = MacroServices::start(
+        let macro_services = RoxServices::start(
             &gmail.base_url(),
             &outlook.base_url(),
             &format!("{}/{}", aws.url(), environment::UPLOADS_BUCKET),
@@ -719,7 +719,7 @@ impl Stack {
     pub fn service_requests(&self) -> Vec<ServiceRequest> {
         self.macro_services
             .as_ref()
-            .map(MacroServices::requests)
+            .map(RoxServices::requests)
             .unwrap_or_default()
     }
 
@@ -1167,7 +1167,7 @@ impl Stack {
         let gmail_tokens = self
             .macro_services
             .as_ref()
-            .map(MacroServices::gmail_token_requests)
+            .map(RoxServices::gmail_token_requests)
             .unwrap_or_default()
             .into_iter()
             .map(|(method, status)| {
@@ -1509,7 +1509,7 @@ async fn start_calendar(
 /// What [`Stack::boot`] started.
 struct Booted {
     aws: Aws,
-    macro_services: MacroServices,
+    macro_services: RoxServices,
     http: reqwest::Client,
     api: ServiceProcess,
     tls: TlsFront,

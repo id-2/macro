@@ -11,7 +11,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock('@service-email/client', () => ({
   emailClient: { updateThreadLabel: mocks.updateThreadLabel },
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: mocks.error },
 }));
 vi.mock('@service-storage/graphql-soup', () => ({

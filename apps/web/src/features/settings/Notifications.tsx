@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { NotificationSoundSettingsView } from '@app/features/notification-sounds/views/NotificationSoundSettingsView';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
@@ -76,7 +77,7 @@ export function Notifications() {
       }
     } catch (error) {
       console.error('Could not update notification permission', error);
-      toast.failure('Could not update notifications. Try again.');
+      toast.failure('Не удалось обновить уведомления. Повторите попытку.');
     } finally {
       setPushPending(false);
     }
@@ -86,7 +87,7 @@ export function Notifications() {
     try {
       await setTypeEnabled.mutateAsync({ type, enabled });
     } catch {
-      toast.failure('Could not update notification preference');
+      toast.failure('Не удалось обновить настройку уведомлений');
     }
   };
 
@@ -94,36 +95,36 @@ export function Notifications() {
     try {
       await unmuteItem.mutateAsync(item);
     } catch {
-      toast.failure('Could not unmute item');
+      toast.failure('Не удалось включить уведомления для элемента');
     }
   };
 
   const pushLabel = isNativeMobilePlatform()
-    ? 'Mobile notifications'
-    : 'Desktop notifications';
+    ? 'Уведомления на телефоне'
+    : 'Уведомления на компьютере';
   const pushDescription = isNativeMobilePlatform()
-    ? 'Receive push notifications on this device'
-    : 'Receive notifications on this browser or desktop app';
+    ? 'Получать push-уведомления на этом устройстве'
+    : 'Получать уведомления в этом браузере или приложении для компьютера';
 
   return (
     <SettingsPage
-      title="Notifications"
-      description="Choose when you'll be notified. Inbox items always arrive unless you mute a type or an item."
+      title="Уведомления"
+      description="Выберите, когда вас уведомлять. Элементы входящих всегда приходят, пока вы не отключите тип или элемент."
     >
-      <SettingsSection title="Delivery">
+      <SettingsSection title="Доставка">
         <SettingsCard>
           <SettingsRow
-            label="Inbox"
-            description="Always on for types you have not muted"
+            label="Входящие"
+            description="Всегда включены для типов, которые вы не отключили"
           >
-            <span class="text-sm text-ink-muted">Always on</span>
+            <span class="text-sm text-ink-muted">Всегда включено</span>
           </SettingsRow>
           <Show
             when={platformSettings.isSupported && platformSettings}
             fallback={
               <SettingsRow label={pushLabel} description={pushDescription}>
                 <span class="text-sm text-ink-muted">
-                  Not supported on this device
+                  Не поддерживается на этом устройстве
                 </span>
               </SettingsRow>
             }
@@ -144,8 +145,8 @@ export function Notifications() {
             )}
           </Show>
           <SettingsRow
-            label="Email digest"
-            description="A periodic email of unread notifications. Inbox items are unchanged."
+            label="Сводка по почте"
+            description="Периодическое письмо с непрочитанными уведомлениями. Элементы входящих не меняются."
           >
             <ToggleSwitch
               size="md"
@@ -163,7 +164,7 @@ export function Notifications() {
 
       <For each={NOTIFICATION_EVENT_GROUPS}>
         {(group) => (
-          <SettingsSection title={group.label}>
+          <SettingsSection title={t(group.labelKey)}>
             <SettingsCard>
               <For
                 each={group.events.filter(
@@ -172,8 +173,8 @@ export function Notifications() {
               >
                 {(event) => (
                   <SettingsRow
-                    label={event.label}
-                    description={event.description}
+                    label={t(event.labelKey)}
+                    description={t(event.descriptionKey)}
                   >
                     <ToggleSwitch
                       size="md"
@@ -190,12 +191,12 @@ export function Notifications() {
       </For>
 
       <SettingsSection
-        title="Snoozed items"
-        description="Notifications pause until the time you choose. Items stay visible in your inbox."
+        title="Отложенные"
+        description="Уведомления на паузе до выбранного времени. Элементы остаются во входящих."
       >
         <SettingsCard>
           <Show when={mutedEntitiesQuery.isError}>
-            <SettingsRow label="Could not load snoozed items">
+            <SettingsRow label="Не удалось загрузить отложенные">
               <button
                 type="button"
                 onClick={() =>
@@ -205,7 +206,7 @@ export function Notifications() {
                   )
                 }
               >
-                Retry
+                Повторить
               </button>
             </SettingsRow>
           </Show>
@@ -215,7 +216,7 @@ export function Notifications() {
             }
             fallback={
               !mutedEntitiesQuery.isError && (
-                <SettingsRow label="Loading snoozed items…" />
+                <SettingsRow label="Загрузка отложенных…" />
               )
             }
           >
@@ -223,8 +224,8 @@ export function Notifications() {
               when={snoozedEntities().length > 0}
               fallback={
                 <SettingsRow
-                  label="Nothing snoozed"
-                  description="Right-click an item or use the command menu and choose Snooze notifications."
+                  label="Ничего не отложено"
+                  description="Щёлкните элемент правой кнопкой или откройте меню команд и выберите «Отложить уведомления»."
                 />
               }
             >
@@ -249,8 +250,8 @@ export function Notifications() {
 
       <Show when={mentionsOnlyEntities().length > 0}>
         <SettingsSection
-          title="Mentions only"
-          description="These channels notify you only when someone @mentions you."
+          title="Только упоминания"
+          description="Эти каналы уведомляют вас, только когда вас упоминают через @."
         >
           <SettingsCard>
             <For each={mentionsOnlyEntities()}>
@@ -269,16 +270,16 @@ export function Notifications() {
       </Show>
 
       <SettingsSection
-        title="Muted items"
-        description="These items will not send you notifications."
+        title="Отключённые"
+        description="Эти элементы не будут присылать вам уведомления."
       >
         <SettingsCard>
           <Show
             when={permanentlyMutedEntities().length > 0}
             fallback={
               <SettingsRow
-                label="Nothing muted"
-                description="Items you mute stop sending notifications."
+                label="Ничего не отключено"
+                description="Отключённые элементы больше не присылают уведомления."
               />
             }
           >

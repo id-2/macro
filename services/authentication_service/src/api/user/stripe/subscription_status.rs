@@ -1,7 +1,7 @@
 //! Authenticated adapter for the caller's renewal and pending seat change.
 
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 
 use super::StripeOperationError;
 use crate::api::context::{ApiContext, AuthorizationService};
@@ -23,7 +23,7 @@ use model::response::ErrorResponse;
 #[tracing::instrument(skip(ctx, user), err)]
 pub async fn subscription_status(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Json<SubscriptionStatus>, StripeOperationError> {
     Ok(Json(
         ctx.subscription_status

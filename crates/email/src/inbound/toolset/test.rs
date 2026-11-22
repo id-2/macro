@@ -3,12 +3,12 @@ use super::*;
 use crate::domain::models::UserProvider;
 use ai_toolset::schema::generate_validated_input_schema;
 use chrono::Utc;
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 
 fn make_link(macro_id: &'static str, email: &'static str, is_primary: bool) -> Link {
     Link {
         id: uuid::Uuid::new_v4(),
-        macro_id: MacroUserIdStr::parse_from_str(macro_id).unwrap(),
+        macro_id: RoxUserIdStr::parse_from_str(macro_id).unwrap(),
         fusionauth_user_id: "fa-user".to_string(),
         email_address: EmailStr::parse_from_str(email).unwrap(),
         provider: UserProvider::Gmail,
@@ -310,8 +310,8 @@ mod unreachable_access {
         EntityPermission, EntityType, RequiredPermission, TeamRole, UserTeamInfo,
     };
     use entity_access::domain::ports::EntityAccessService;
-    use macro_user_id::lowercased::Lowercase;
-    use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+    use rox_user_id::lowercased::Lowercase;
+    use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
     use uuid::Uuid;
 
     #[derive(Clone)]
@@ -320,7 +320,7 @@ mod unreachable_access {
     impl EntityAccessService for UnreachableAccessService {
         async fn generate_entity_access_receipt<T: RequiredPermission>(
             &self,
-            _user_id: &MacroUserId<Lowercase<'_>>,
+            _user_id: &RoxUserId<Lowercase<'_>>,
             _user_org_id: Option<i64>,
             _entity_id: &str,
             _entity_type: EntityType,
@@ -340,7 +340,7 @@ mod unreachable_access {
 
         async fn get_access_level(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
         ) -> std::result::Result<Option<AccessLevel>, AccessError> {
@@ -349,7 +349,7 @@ mod unreachable_access {
 
         async fn check_access(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
             _required_level: AccessLevel,
@@ -368,7 +368,7 @@ mod unreachable_access {
 
         async fn get_entity_permission(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
             _user_org_id: Option<i64>,
@@ -378,7 +378,7 @@ mod unreachable_access {
 
         async fn get_crm_entity_permission_with_team(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
         ) -> std::result::Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -389,7 +389,7 @@ mod unreachable_access {
             &self,
             _entity_id: &str,
             _entity_type: EntityType,
-        ) -> std::result::Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+        ) -> std::result::Result<Vec<RoxUserIdStr<'static>>, AccessError> {
             unreachable!("the selector check returns before any access check")
         }
 
@@ -409,7 +409,7 @@ mod unreachable_access {
 
         async fn get_user_team(
             &self,
-            _user_id: &MacroUserId<Lowercase<'_>>,
+            _user_id: &RoxUserId<Lowercase<'_>>,
         ) -> std::result::Result<Option<UserTeamInfo>, AccessError> {
             unreachable!("the selector check returns before any access check")
         }
@@ -446,7 +446,7 @@ async fn a_label_named_both_ways_or_not_at_all_fails_before_any_provider_acts() 
             tool.call(
                 ServiceContext(context),
                 RequestContext::new(
-                    MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+                    RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
                 ),
             )
             .await

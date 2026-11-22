@@ -8,7 +8,7 @@ use outlook_emulator::OutlookEmulator;
 use rootcause::prelude::*;
 
 use crate::infra::sqs::Queues;
-use crate::macro_services::{CONNECTION_GATEWAY, DOCUMENT_STORAGE, MacroServices, STATIC_FILES};
+use crate::macro_services::{CONNECTION_GATEWAY, DOCUMENT_STORAGE, RoxServices, STATIC_FILES};
 
 /// The key the scenario's requests and the services' calls to each other
 /// carry.
@@ -101,7 +101,7 @@ pub(crate) struct Addresses<'a> {
     pub(crate) cdn_url: String,
     pub(crate) gmail: &'a GmailEmulator,
     pub(crate) outlook: &'a OutlookEmulator,
-    pub(crate) macro_services: &'a MacroServices,
+    pub(crate) macro_services: &'a RoxServices,
     pub(crate) queues: &'a Queues,
 }
 

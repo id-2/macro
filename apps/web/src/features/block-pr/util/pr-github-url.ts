@@ -1,4 +1,4 @@
-import { isGithubPullRequestUrl } from '@macro-inc/lexical-core';
+import { isGithubPullRequestUrl } from '@rox-one/lexical-core';
 import type { ForeignEntity } from '@service-storage/generated/schemas';
 import { parseGithubKey, prHtmlUrl } from './prKey';
 

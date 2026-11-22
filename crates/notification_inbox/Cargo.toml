@@ -15,7 +15,7 @@ chrono = { workspace = true }
 connection_gateway_client = { path = "../connection_gateway_client", optional = true }
 filter_ast = { path = "../filter_ast" }
 item_filters = { path = "../item_filters" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 model_notifications = { path = "../model_notifications" }
 notification = { path = "../notification", default-features = false }

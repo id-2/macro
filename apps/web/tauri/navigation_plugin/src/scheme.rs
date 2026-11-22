@@ -4,22 +4,27 @@ use serde::{Deserialize, Serialize};
 use thiserror::Error;
 use url::Url;
 
+/// The app's custom URL scheme: `rox://` is the primary scheme and `macro://`
+/// is the pre-rebrand scheme still accepted from links already sent out.
+pub const APP_SCHEME: &str = "rox";
+pub const LEGACY_APP_SCHEME: &str = "macro";
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(transparent)]
 #[non_exhaustive]
-pub struct MacroScheme(pub Url);
+pub struct RoxScheme(pub Url);
 
-impl MacroScheme {
+impl RoxScheme {
     pub fn new(url: Url) -> Result<Self, SchemeError> {
-        let "macro" = url.scheme() else {
+        if !matches!(url.scheme(), APP_SCHEME | LEGACY_APP_SCHEME) {
             return Err(SchemeError::InvalidScheme {
-                expected: "macro".to_string(),
+                expected: format!("{APP_SCHEME} or {LEGACY_APP_SCHEME}"),
                 found: url.scheme().to_string(),
             });
-        };
+        }
         Ok(Self(url))
     }
-    /// turn a http(s) url into a macro scheme url
+    /// turn a http(s) url into a rox scheme url
     #[tracing::instrument(skip(url), err)]
     pub fn from_url(url: &Url) -> Result<Self, SchemeError> {
         let ("http" | "https" | "tauri") = url.scheme() else {
@@ -46,22 +51,22 @@ impl MacroScheme {
         }
         let query = url.query();
         let mut inner = match query {
-            Some(q) => format!("macro:///{rest}?{q}"),
-            None => format!("macro:///{rest}"),
+            Some(q) => format!("{APP_SCHEME}:///{rest}?{q}"),
+            None => format!("{APP_SCHEME}:///{rest}"),
         }
         .parse::<Url>()?;
         inner.set_fragment(fragment);
-        Ok(MacroScheme(inner))
+        Ok(RoxScheme(inner))
     }
 }
 
-impl AsRef<str> for MacroScheme {
+impl AsRef<str> for RoxScheme {
     fn as_ref(&self) -> &str {
         self.0.as_str()
     }
 }
 
-impl Deref for MacroScheme {
+impl Deref for RoxScheme {
     type Target = Url;
 
     fn deref(&self) -> &Self::Target {

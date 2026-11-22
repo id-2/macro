@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 pub struct PgConnectionLinks<R> {
     pub db: sqlx::PgPool,
@@ -11,7 +11,7 @@ impl<R: ConnectionLinkLookup> ConnectionLinks for PgConnectionLinks<R> {
 
     async fn attempt(&self, id: Uuid) -> Result<GoogleConnectionAttempt, Self::Err> {
         let attempt =
-            macro_db_client::in_progress_user_link::get_in_progress_user_link(&self.db, &id)
+            rox_db_client::in_progress_user_link::get_in_progress_user_link(&self.db, &id)
                 .await?;
         Ok(GoogleConnectionAttempt {
             provider: attempt.email_provider,
@@ -23,7 +23,7 @@ impl<R: ConnectionLinkLookup> ConnectionLinks for PgConnectionLinks<R> {
     }
 
     async fn account_for_email(&self, email: &str) -> Result<Option<String>, Self::Err> {
-        match macro_db_client::user::get::get_user_id_by_email(self.db.clone(), email).await {
+        match rox_db_client::user::get::get_user_id_by_email(self.db.clone(), email).await {
             Ok(id) => Ok(Some(id)),
             Err(sqlx::Error::RowNotFound) => Ok(None),
             Err(error) => Err(anyhow::Error::from(error).into()),
@@ -42,7 +42,7 @@ impl<R: ConnectionLinkLookup> ConnectionLinks for PgConnectionLinks<R> {
     async fn link_for_identity(
         &self,
         owner: &str,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
     ) -> Result<Option<Uuid>, Self::Err> {
         Ok(self
             .lookup
@@ -60,13 +60,13 @@ impl<R: ConnectionLinkLookup> ConnectionLinks for PgConnectionLinks<R> {
     }
 
     async fn account_fusion_id(&self, email: &str) -> Result<Option<Uuid>, Self::Err> {
-        macro_db_client::user::get::get_macro_user_id_by_email(&self.db, email)
+        rox_db_client::user::get::get_macro_user_id_by_email(&self.db, email)
             .await
             .map_err(|error| anyhow::Error::from(error).into())
     }
 
     async fn organization(&self, actor: &str) -> Result<Option<i32>, Self::Err> {
-        macro_db_client::user::get_user_organization::get_user_organization(self.db.clone(), actor)
+        rox_db_client::user::get_user_organization::get_user_organization(self.db.clone(), actor)
             .await
             .map_err(|error| anyhow::Error::from(error).into())
     }
@@ -79,7 +79,7 @@ impl<R: ConnectionLinkLookup> ConnectionLinks for PgConnectionLinks<R> {
     }
 
     async fn cleanup_attempt(&self, link_id: Uuid, owner: &str) {
-        macro_db_client::in_progress_user_link::delete_owned_in_progress_user_link(&self.db, link_id, owner)
+        rox_db_client::in_progress_user_link::delete_owned_in_progress_user_link(&self.db, link_id, owner)
             .await
             .inspect_err(|del_err| {
                 tracing::warn!(error = ?del_err, ?link_id, "Failed to clean up in_progress_user_link after failed init");

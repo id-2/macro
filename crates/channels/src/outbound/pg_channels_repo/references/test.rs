@@ -1,6 +1,6 @@
 use crate::domain::models::{MessageParent, ReferenceSource, ReferenceTarget, ReferencingMessage};
 use crate::outbound::pg_channels_repo::PgChannelsRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 

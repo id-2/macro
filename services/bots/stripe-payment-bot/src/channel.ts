@@ -1,5 +1,5 @@
 import type { Env } from '../../../../packages/sdk/src/config';
-import { Macro } from '../../../../packages/sdk/src/macro';
+import { Macro } from '../../../../packages/sdk/src/rox';
 import { unwrap } from '../../../../packages/sdk/src/utils';
 
 export type ChannelConfig = {

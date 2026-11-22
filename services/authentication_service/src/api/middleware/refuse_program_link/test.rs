@@ -5,12 +5,12 @@ use axum::{
     http::{Request, StatusCode},
     routing::post,
 };
-use macro_auth::{
-    macro_api_token::{EncodeMacroApiTokenArgs, encode_macro_api_token},
+use rox_auth::{
+    macro_api_token::{EncodeRoxApiTokenArgs, encode_macro_api_token},
     middleware::decode_jwt::JwtValidationArgs,
 };
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, PgUserApiKeyAuthorizationRepo,
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, PgUserApiKeyAuthorizationRepo,
     PgUserApiKeyAuthorizer,
 };
 use std::sync::Arc;
@@ -30,13 +30,13 @@ fn router() -> Router {
         .acquire_timeout(std::time::Duration::from_millis(200))
         .connect_lazy("postgres://nobody@127.0.0.1:1/none")
         .unwrap();
-    let authorization = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(JwtValidationArgs::testing_macro_token("fixture", PUBLIC)),
+    let authorization = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(JwtValidationArgs::testing_macro_token("fixture", PUBLIC)),
         InternalAuthConfig {
             api_key: "test-internal-key".to_owned(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db)),
     )));
     Router::new()
@@ -46,7 +46,7 @@ fn router() -> Router {
 }
 
 fn token(agent: Option<Uuid>, routine: Option<Uuid>) -> String {
-    encode_macro_api_token(EncodeMacroApiTokenArgs {
+    encode_macro_api_token(EncodeRoxApiTokenArgs {
         fusionauth_id: "fixture".into(),
         macro_user_id: "macro|owner@example.com".into(),
         organization_id: None,
@@ -66,7 +66,7 @@ fn token(agent: Option<Uuid>, routine: Option<Uuid>) -> String {
 async fn start(uri: &str, bearer: &str, code_execution: bool) -> (StatusCode, String) {
     let mut request = Request::post(uri).header("authorization", format!("Bearer {bearer}"));
     if code_execution {
-        request = request.header(macro_authorization::CODE_EXECUTION_HEADER, "1");
+        request = request.header(rox_authorization::CODE_EXECUTION_HEADER, "1");
     }
     let response = router()
         .oneshot(request.body(Body::empty()).unwrap())

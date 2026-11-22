@@ -1,7 +1,7 @@
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use model_entity::EntityType;
 use model_owner::Owner;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -612,8 +612,8 @@ const TEST_DOCUMENT_ID: &str = "d0000000-0000-0000-0000-000000000001";
 const TEST_DOCUMENT_OWNER_ID: &str = "macro|user@user.com";
 const TEST_DOCUMENT_NON_OWNER_ID: &str = "macro|teammate1@user.com";
 
-fn user_id(user_id: &str) -> macro_user_id::user_id::MacroUserIdStr<'static> {
-    macro_user_id::user_id::MacroUserIdStr::parse_from_str(user_id)
+fn user_id(user_id: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
+    rox_user_id::user_id::RoxUserIdStr::parse_from_str(user_id)
         .unwrap()
         .into_owned()
 }
@@ -719,8 +719,8 @@ async fn team_task_numbers(pool: &Pool<Postgres>, team_id: uuid::Uuid) -> Vec<i3
 }
 
 fn short_id_for_document_id(document_id: &str) -> String {
-    let uuid = macro_uuid::string_to_uuid(document_id).unwrap();
-    macro_uuid::ShortUuidConverter::default().from_uuid(&uuid)
+    let uuid = rox_uuid::string_to_uuid(document_id).unwrap();
+    rox_uuid::ShortUuidConverter::default().from_uuid(&uuid)
 }
 
 async fn insert_github_pr_task(
@@ -776,7 +776,7 @@ async fn share_permission_columns(
 }
 
 async fn insert_non_owner_user_access(pool: &Pool<Postgres>) {
-    let document_id = macro_uuid::string_to_uuid(TEST_DOCUMENT_ID).unwrap();
+    let document_id = rox_uuid::string_to_uuid(TEST_DOCUMENT_ID).unwrap();
 
     sqlx::query!(
         r#"
@@ -793,7 +793,7 @@ async fn insert_non_owner_user_access(pool: &Pool<Postgres>) {
 }
 
 async fn direct_user_access_sources(pool: &Pool<Postgres>) -> Vec<String> {
-    let document_id = macro_uuid::string_to_uuid(TEST_DOCUMENT_ID).unwrap();
+    let document_id = rox_uuid::string_to_uuid(TEST_DOCUMENT_ID).unwrap();
 
     sqlx::query_scalar!(
         r#"
@@ -1656,7 +1656,7 @@ async fn test_share_with_team_creates_access_for_team_members(pool: Pool<Postgre
     set_comment_share(&repo).await;
 
     // The owner and team have independent direct access rows.
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
     let rows = sqlx::query!(
         r#"
         SELECT source_id, access_level::text as "access_level"
@@ -1720,7 +1720,7 @@ async fn test_share_with_team_idempotent(pool: Pool<Postgres>) {
         2
     );
 
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
     let count = sqlx::query_scalar!(
         r#"
         SELECT COUNT(*) as "count!"
@@ -1756,7 +1756,7 @@ async fn test_team_share_roundtrip(pool: Pool<Postgres>) {
     assert_eq!(state.team_id, Some(TEST_TEAM_ID));
     assert!(state.shared_with_team);
 
-    let doc_uuid = macro_uuid::string_to_uuid(document_id).unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid(document_id).unwrap();
     let team_row = sqlx::query!(
         r#"
         SELECT access_level::text as "access_level"
@@ -1987,7 +1987,7 @@ async fn test_team_share_no_team_owner(pool: Pool<Postgres>) {
 async fn test_share_with_team_skips_user_with_existing_direct_access(pool: Pool<Postgres>) {
     let repo = test_repo(pool.clone());
 
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
 
     // Give teammate1 direct user-sourced edit access before team sharing
     sqlx::query!(
@@ -2031,7 +2031,7 @@ async fn test_share_with_owner_team(pool: Pool<Postgres>) {
 
     set_comment_share(&repo).await;
 
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
     let rows = sqlx::query!(
         r#"
         SELECT source_id, access_level::text as "access_level"
@@ -2539,7 +2539,7 @@ async fn test_edit_document_channel_share_creates_user_item_access(pool: Pool<Po
     );
 
     // Verify entity_access rows were created for the channel
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
 
     let access_rows = sqlx::query!(
         r#"
@@ -2599,7 +2599,7 @@ async fn test_edit_document_channel_share_idempotent(pool: Pool<Postgres>) {
     repo.edit_document(make_args()).await.unwrap();
     repo.edit_document(make_args()).await.unwrap();
 
-    let doc_uuid = macro_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
+    let doc_uuid = rox_uuid::string_to_uuid("d0000000-0000-0000-0000-000000000001").unwrap();
     let count = sqlx::query_scalar!(
         r#"
         SELECT COUNT(*) as "count!"

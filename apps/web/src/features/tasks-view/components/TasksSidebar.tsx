@@ -124,7 +124,7 @@ function TaskFavorites(props: {
       preferNewSplit: event.shiftKey,
     });
     if (result.status === 'reused' && result.owner !== result.sourceOwner) {
-      toast.alert('Content already open');
+      toast.alert('Содержимое уже открыто');
     }
   };
 
@@ -135,11 +135,11 @@ function TaskFavorites(props: {
         onOpenChange={props.onOpenChange}
       >
         <CollapsibleSection.Trigger>
-          <span class="min-w-0 truncate">Favorites</span>
+          <span class="min-w-0 truncate">Избранное</span>
           <CollapsibleSection.Indicator />
         </CollapsibleSection.Trigger>
         <CollapsibleSection.Content>
-          <ViewSidebar.Nav aria-label="Favorite tasks">
+          <ViewSidebar.Nav aria-label="Избранные задачи">
             <For each={favorites()}>
               {(favorite) => (
                 <FavoriteRow favorite={favorite} onOpen={openFavorite} />
@@ -177,15 +177,15 @@ export function TasksSidebar() {
   });
 
   return (
-    <ViewSidebar.Root aria-label="Tasks navigation" class="relative">
+    <ViewSidebar.Root aria-label="Навигация по задачам" class="relative">
       <SidebarCreateHeader
-        title="Tasks"
+        title="Задачи"
         createAction={
           !isTouchDevice() ? (
             <TasksCreateAction presentation="sidebar" />
           ) : undefined
         }
-        label={isProjectTab(state.tab) ? t('viewMenus.newProject') : 'New task'}
+        label={isProjectTab(state.tab) ? t('viewMenus.newProject') : 'Новая задача'}
         onCreate={() =>
           layout.popoverSplit({
             type: 'component',

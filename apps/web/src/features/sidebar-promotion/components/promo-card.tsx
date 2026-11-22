@@ -56,11 +56,11 @@ export function PromoCard(props: {
       </div>
       <h2 class="mt-2.5 text-xs font-medium text-ink">{props.headline}</h2>
       <p class="mt-1 text-[11px] leading-4 text-ink-muted">{props.pitch}</p>
-      <div class="mt-3 flex gap-2">
+      <div class="mt-3 flex flex-wrap gap-2">
         <Button
           variant="secondary"
           size="sm"
-          class="min-w-0 flex-1"
+          class="min-w-0 flex-1 basis-0 whitespace-nowrap px-2 text-[11px]"
           onClick={(event) => props.action.onClick(event.currentTarget)}
         >
           {props.action.label}
@@ -70,7 +70,7 @@ export function PromoCard(props: {
             <Button
               variant="secondary"
               size="sm"
-              class="min-w-0 flex-1"
+              class="min-w-0 flex-1 basis-0 whitespace-nowrap px-2 text-[11px]"
               onClick={(event) => secondary().onClick(event.currentTarget)}
             >
               {secondary().label}

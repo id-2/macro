@@ -3,7 +3,7 @@ import { reloadApp } from '@app/observability/reload';
 import { useBlockId, useIsNestedBlock } from '@core/block';
 import { LoadingBlock } from '@core/component/LoadingBlock';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import { formsKeys } from '@queries/storage/keys';
 import { Button } from '@ui';

@@ -1,5 +1,5 @@
 use chrono::{TimeZone, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::super::test::{USER_A, insert_user, sample_action, test_repo, user_owner};

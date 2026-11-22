@@ -1,5 +1,8 @@
-import { describe, expect, it } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { compactAge, relativeAge } from './format-age';
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 const NOW = Date.parse('2026-09-15T12:00:00Z');
 const ago = (ms: number) => NOW - ms;

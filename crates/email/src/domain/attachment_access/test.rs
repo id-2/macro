@@ -26,13 +26,13 @@ impl EmailUserRepo for Probe {
     }
     async fn user_inbox_details(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<EmailInboxDetails>, EmailErr> {
         Ok(Vec::new())
     }
     async fn user_accessible_inboxes(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<crate::domain::models::Link>, EmailErr> {
         let link = &self.record.link;
         Ok(if self.accessible {
@@ -125,9 +125,9 @@ fn probe(accessible: bool) -> Probe {
             message_provider_id: "provider-message".into(),
             link: Link {
                 id: link,
-                macro_id: MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+                macro_id: RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
                 fusionauth_user_id: "owner".into(),
-                email_address: macro_user_id::email::EmailStr::try_from(
+                email_address: rox_user_id::email::EmailStr::try_from(
                     "owner@example.com".to_owned(),
                 )
                 .unwrap(),
@@ -164,7 +164,7 @@ async fn unauthorized_reader_cannot_use_either_attachment_cache() {
         files: probe.clone(),
         access: NoOpEntityAccessService,
     };
-    let actor = MacroUserIdStr::try_from_email("unrelated@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("unrelated@example.com").unwrap();
     let id = probe.record.attachment.db_id;
     assert!(matches!(
         service.document(&actor, id).await,
@@ -187,7 +187,7 @@ async fn authorized_delegate_uses_cache_without_provider_credentials() {
         files: probe.clone(),
         access: NoOpEntityAccessService,
     };
-    let actor = MacroUserIdStr::try_from_email("delegate@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("delegate@example.com").unwrap();
     let id = probe.record.attachment.db_id;
     assert_eq!(
         service.document(&actor, id).await.unwrap(),
@@ -217,7 +217,7 @@ async fn opening_a_document_whose_upload_never_finished_stores_it_again() {
         files: probe.clone(),
         access: NoOpEntityAccessService,
     };
-    let actor = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let id = probe.record.attachment.db_id;
     assert_eq!(
         service.document(&actor, id).await.unwrap(),
@@ -238,7 +238,7 @@ async fn a_failed_repair_still_opens_the_existing_document() {
         files: probe.clone(),
         access: NoOpEntityAccessService,
     };
-    let actor = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let id = probe.record.attachment.db_id;
     assert_eq!(
         service.document(&actor, id).await.unwrap(),
@@ -258,7 +258,7 @@ async fn unauthorized_reader_cannot_trigger_a_repair() {
         files: probe.clone(),
         access: NoOpEntityAccessService,
     };
-    let actor = MacroUserIdStr::try_from_email("unrelated@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("unrelated@example.com").unwrap();
     assert!(matches!(
         service
             .document(&actor, probe.record.attachment.db_id)
@@ -279,7 +279,7 @@ async fn cloud_reference_is_authorized_without_file_or_provider_io() {
         files: probe.clone(),
         access: NoOpEntityAccessService,
     };
-    let actor = MacroUserIdStr::try_from_email("delegate@example.com").unwrap();
+    let actor = RoxUserIdStr::try_from_email("delegate@example.com").unwrap();
     let id = probe.record.attachment.db_id;
     let attachment = service.download(&actor, id).await.unwrap();
     assert!(attachment.reference_url.is_some());

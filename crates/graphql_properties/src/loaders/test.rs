@@ -1,11 +1,11 @@
 use super::*;
 use entity_access::domain::models::{AccessError, AccessLevel, Entity};
-use macro_user_id::{cowlike::CowLike, lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{cowlike::CowLike, lowercased::Lowercase, user_id::RoxUserId};
 use std::sync::atomic::{AtomicUsize, Ordering};
 
 fn receipt(key: &model_entity::Entity<'static>) -> EntityAccessReceipt<ViewAccessLevel> {
     EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::parse_from_str("macro|viewer@example.com").unwrap(),
+        RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap(),
         Entity {
             entity_id: key.entity_id.to_string(),
             entity_type: key.entity_type,
@@ -76,12 +76,12 @@ struct DocumentAccess {
 }
 
 fn grant<T: entity_access::domain::models::RequiredPermission>(
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
     entity_id: &str,
     entity_type: model_entity::EntityType,
 ) -> Result<EntityAccessReceipt<T>, AccessError> {
     EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr(user_id.clone().into_owned()),
+        RoxUserIdStr(user_id.clone().into_owned()),
         Entity {
             entity_id: entity_id.into(),
             entity_type,
@@ -101,7 +101,7 @@ impl EntityAccessService for DocumentAccess {
         T: entity_access::domain::models::RequiredPermission,
     >(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: model_entity::EntityType,
@@ -118,7 +118,7 @@ impl EntityAccessService for DocumentAccess {
 
     async fn generate_document_view_access_receipts<'a>(
         &'a self,
-        user_id: &'a MacroUserId<Lowercase<'_>>,
+        user_id: &'a RoxUserId<Lowercase<'_>>,
         document_ids: &'a [String],
     ) -> Result<HashMap<String, EntityAccessReceipt<ViewAccessLevel>>, AccessError> {
         if self.bulk_fails {
@@ -150,7 +150,7 @@ impl EntityAccessService for DocumentAccess {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: model_entity::EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -159,7 +159,7 @@ impl EntityAccessService for DocumentAccess {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: model_entity::EntityType,
         _required_level: AccessLevel,
@@ -178,7 +178,7 @@ impl EntityAccessService for DocumentAccess {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: model_entity::EntityType,
         _user_org_id: Option<i64>,
@@ -188,7 +188,7 @@ impl EntityAccessService for DocumentAccess {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: model_entity::EntityType,
     ) -> Result<
@@ -206,7 +206,7 @@ impl EntityAccessService for DocumentAccess {
         &self,
         _entity_id: &str,
         _entity_type: model_entity::EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(not_used())
     }
 
@@ -226,7 +226,7 @@ impl EntityAccessService for DocumentAccess {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<entity_access::domain::models::UserTeamInfo>, AccessError> {
         Err(not_used())
     }
@@ -247,7 +247,7 @@ fn mixed_documents() -> Vec<model_entity::Entity<'static>> {
 
 async fn authorized_ids(access: &DocumentAccess) -> Vec<String> {
     let reader = PropertiesEntityPropertyReader::new(Arc::new(()), Arc::new(access.clone()));
-    let user = MacroUserIdStr::parse_from_str("macro|viewer@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap();
     let mut ids = reader
         .view_receipts(&user, &mixed_documents())
         .await

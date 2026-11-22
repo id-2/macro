@@ -262,9 +262,9 @@ fn saved_pdf_message(file_type: FileType, version: &str) -> SearchExtractorMessa
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(
-        path = "../../../../../../crates/macro_db_client/fixtures",
+        path = "../../../../../../crates/rox_db_client/fixtures",
         scripts("basic_versioned_document")
     )
 )]
@@ -363,9 +363,9 @@ fn fake_opensearch(endpoint: &str) -> OpensearchClient {
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(
-        path = "../../../../../../crates/macro_db_client/fixtures",
+        path = "../../../../../../crates/rox_db_client/fixtures",
         scripts("basic_versioned_document")
     )
 )]
@@ -387,9 +387,9 @@ async fn a_message_for_a_version_the_pdf_is_not_served_from_changes_nothing(pool
 
 #[cfg(all(feature = "pdf", not(feature = "no_pdf")))]
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(
-        path = "../../../../../../crates/macro_db_client/fixtures",
+        path = "../../../../../../crates/rox_db_client/fixtures",
         scripts("basic_versioned_document")
     )
 )]
@@ -471,7 +471,7 @@ fn indexed_content(bulk: &[serde_json::Value]) -> Vec<&str> {
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(path = "../../../../fixtures", scripts("text_documents"))
 )]
 async fn html_in_a_legacy_charset_is_indexed_by_its_text(pool: sqlx::PgPool) {
@@ -496,7 +496,7 @@ async fn html_in_a_legacy_charset_is_indexed_by_its_text(pool: sqlx::PgPool) {
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(path = "../../../../fixtures", scripts("text_documents"))
 )]
 async fn html_with_invalid_utf8_is_indexed_instead_of_failing(pool: sqlx::PgPool) {
@@ -516,7 +516,7 @@ async fn html_with_invalid_utf8_is_indexed_instead_of_failing(pool: sqlx::PgPool
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(path = "../../../../fixtures", scripts("text_documents"))
 )]
 async fn valid_utf8_html_is_indexed_unchanged(pool: sqlx::PgPool) {
@@ -530,7 +530,7 @@ async fn valid_utf8_html_is_indexed_unchanged(pool: sqlx::PgPool) {
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(path = "../../../../fixtures", scripts("text_documents"))
 )]
 async fn a_binary_file_named_as_html_is_indexed_by_name_only(pool: sqlx::PgPool) {
@@ -553,7 +553,7 @@ async fn a_binary_file_named_as_html_is_indexed_by_name_only(pool: sqlx::PgPool)
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(path = "../../../../fixtures", scripts("text_documents"))
 )]
 async fn legacy_markdown_with_invalid_utf8_is_indexed(pool: sqlx::PgPool) {
@@ -581,7 +581,7 @@ fn indexed_parent(bulk: &[serde_json::Value]) -> &serde_json::Value {
 }
 
 #[sqlx::test(
-    migrations = "../../crates/macro_db_client/migrations",
+    migrations = "../../crates/rox_db_client/migrations",
     fixtures(path = "../../../../fixtures", scripts("email_attachment_documents"))
 )]
 async fn a_full_index_marks_only_email_attachments(pool: sqlx::PgPool) {

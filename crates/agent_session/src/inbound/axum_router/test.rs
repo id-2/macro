@@ -3,12 +3,12 @@ use crate::domain::model::{SessionStatus, session_owner_user};
 use axum::body::Body;
 use axum::http::{Request, header};
 use chrono::Utc;
-use macro_authorization::{
+use rox_authorization::{
     BOT_FOR_MACRO_USER_ID_HEADER, BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims,
     BotAuthentication, BotAuthorizer, BotScope, HARNESS_FOR_MACRO_USER_ID_HEADER,
     HARNESS_TOKEN_HEADER, HarnessAuthentication, HarnessAuthorizationOwner, HarnessAuthorizer,
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroUserAuthentication, NoUserApiKeyAuthorizer, ValidatedIdentity,
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxUserAuthentication, NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
 use rootcause::Report;
 use std::sync::{Arc, Mutex};
@@ -101,9 +101,9 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -127,16 +127,16 @@ impl BotAuthorizer for SelfBotAuthorizer {
         bot_token: &str,
         bot_scope: BotScope,
         acting_user: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         if bot_token != BOT_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         let acting_user = match acting_user.and_then(|claims| claims.user_id) {
             Some(user_id) => {
-                let macro_user_id = MacroUserIdStr::try_from(user_id.clone())
-                    .map_err(|_| Report::new(MacroAuthorizationError::ActingUserNotAuthorized))?;
-                Some(MacroUserAuthentication {
-                    origin: macro_authorization::CredentialOrigin::Bot,
+                let macro_user_id = RoxUserIdStr::try_from(user_id.clone())
+                    .map_err(|_| Report::new(RoxAuthorizationError::ActingUserNotAuthorized))?;
+                Some(RoxUserAuthentication {
+                    origin: rox_authorization::CredentialOrigin::Bot,
                     agent_id: None,
                     agent_via: None,
                     routine_id: None,
@@ -171,13 +171,13 @@ impl HarnessAuthorizer for SelfHarnessAuthorizer {
         &self,
         harness_token: &str,
         acting_user_claim: Option<String>,
-    ) -> Result<HarnessAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<HarnessAuthentication, Report<RoxAuthorizationError>> {
         if harness_token != HARNESS_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         let macro_user_id =
-            MacroUserIdStr::try_from(acting_user_claim.unwrap_or_else(|| OWNER.to_owned()))
-                .map_err(|_| Report::new(MacroAuthorizationError::ActingUserNotAuthorized))?;
+            RoxUserIdStr::try_from(acting_user_claim.unwrap_or_else(|| OWNER.to_owned()))
+                .map_err(|_| Report::new(RoxAuthorizationError::ActingUserNotAuthorized))?;
         let user_id = macro_user_id.as_ref().to_owned();
         Ok(HarnessAuthentication {
             harness_id: harness_id::HarnessId::TEST_A,
@@ -185,8 +185,8 @@ impl HarnessAuthorizer for SelfHarnessAuthorizer {
             owner: HarnessAuthorizationOwner::User {
                 user_id: user_id.clone(),
             },
-            acting_user: MacroUserAuthentication {
-                origin: macro_authorization::CredentialOrigin::Harness,
+            acting_user: RoxUserAuthentication {
+                origin: rox_authorization::CredentialOrigin::Harness,
                 agent_id: None,
                 agent_via: None,
                 routine_id: None,
@@ -320,7 +320,7 @@ impl OneBotDirectory {
                 has_agent: true,
                 is_managed: false,
                 is_system: false,
-                owner_user_id: Some(MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()),
+                owner_user_id: Some(RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()),
                 owner_team_id: None,
                 harness_id: Some(harness_id::HarnessId::TEST_A),
                 on_team_agent_computer: false,
@@ -338,7 +338,7 @@ impl OneBotDirectory {
                 has_agent: true,
                 is_managed: false,
                 is_system: false,
-                owner_user_id: Some(MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()),
+                owner_user_id: Some(RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()),
                 owner_team_id: None,
                 harness_id: Some(harness_id::HarnessId::TEST_A),
                 on_team_agent_computer: false,
@@ -360,7 +360,7 @@ impl OneBotDirectory {
                 has_agent: true,
                 is_managed: true,
                 is_system: false,
-                owner_user_id: Some(MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()),
+                owner_user_id: Some(RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()),
                 owner_team_id: None,
                 harness_id: None,
                 on_team_agent_computer: false,
@@ -382,7 +382,7 @@ impl OneBotDirectory {
                 has_agent: true,
                 is_managed: true,
                 is_system: false,
-                owner_user_id: Some(MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()),
+                owner_user_id: Some(RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()),
                 owner_team_id: None,
                 harness_id: None,
                 on_team_agent_computer: false,
@@ -404,7 +404,7 @@ impl OneBotDirectory {
                 has_agent: false,
                 is_managed: false,
                 is_system: false,
-                owner_user_id: Some(MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()),
+                owner_user_id: Some(RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()),
                 owner_team_id: None,
                 harness_id: None,
                 on_team_agent_computer: false,
@@ -441,7 +441,7 @@ impl BotDirectory for OneBotDirectory {
 
     async fn user_has_team(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _team_id: Uuid,
     ) -> crate::domain::error::Result<bool> {
         Ok(false)
@@ -449,7 +449,7 @@ impl BotDirectory for OneBotDirectory {
 
     async fn user_shares_channel_with_bot(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> crate::domain::error::Result<bool> {
         Ok(self.shares_channel_with.contains(&user.as_ref()))
@@ -502,7 +502,7 @@ impl ExternalSessionRequester for RecordingRequester {
             name: crate::domain::model::DEFAULT_AGENT_SESSION_NAME.to_owned(),
             archived: None,
             owner_id: if self.foreign {
-                Owner::User(MacroUserIdStr::try_from(STRANGER.to_owned()).unwrap())
+                Owner::User(RoxUserIdStr::try_from(STRANGER.to_owned()).unwrap())
             } else {
                 Owner::User(request.owner.clone())
             },
@@ -583,7 +583,7 @@ impl AgentSessionNotificationRecipient for RecordingControls {
         _: AgentSessionId,
         _: AgentActionId,
         _: String,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
         _: crate::domain::model::PrompterKind,
     ) -> crate::domain::error::Result<()> {
         unreachable!()
@@ -592,7 +592,7 @@ impl AgentSessionNotificationRecipient for RecordingControls {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> crate::domain::error::Result<()> {
         unreachable!()
     }
@@ -600,7 +600,7 @@ impl AgentSessionNotificationRecipient for RecordingControls {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> crate::domain::error::Result<()> {
         unreachable!()
     }
@@ -619,7 +619,7 @@ impl AgentSessionNotificationRecipient for RecordingControls {
     }
     async fn delete_user_sessions(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> crate::domain::error::Result<()> {
         unreachable!()
     }
@@ -657,7 +657,7 @@ fn router_with_controls(
     controls: Arc<RecordingControls>,
     non_user_owners: NonUserOwners,
 ) -> Router {
-    let service = MacroAuthorizationServiceImpl::new(
+    let service = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".to_string(),
@@ -672,7 +672,7 @@ fn router_with_controls(
         Arc::new(bots),
         requests,
         controls,
-        MacroAuthorizationState::new(Arc::new(service)),
+        RoxAuthorizationState::new(Arc::new(service)),
         non_user_owners,
     ))
 }
@@ -1353,7 +1353,7 @@ async fn a_program_using_a_persons_credential_has_its_tab_dropped_on_the_create(
         .to_string(),
     );
     request.headers_mut().insert(
-        macro_authorization::CODE_EXECUTION_HEADER,
+        rox_authorization::CODE_EXECUTION_HEADER,
         axum::http::HeaderValue::from_static("1"),
     );
 
@@ -1428,7 +1428,7 @@ async fn anyone_can_select_a_managed_system_bot() {
 async fn an_owner_starts_their_roxd_agent_from_the_composer() {
     let opener = Arc::new(RecordingOpener::default());
     let requests = Arc::new(RecordingRequester::default());
-    let minted = macro_uuid::generate_uuid_v7();
+    let minted = rox_uuid::generate_uuid_v7();
     let request = as_user(
         OWNER,
         serde_json::json!({
@@ -1482,7 +1482,7 @@ async fn an_owner_starts_their_roxd_agent_from_the_composer() {
 async fn a_roxd_agent_gets_the_first_prompt_once_its_runtime_opens_the_session() {
     let requests = Arc::new(RecordingRequester::default());
     let controls = Arc::new(RecordingControls::default());
-    let minted = macro_uuid::generate_uuid_v7();
+    let minted = rox_uuid::generate_uuid_v7();
     let action = AgentActionId::mint();
     let request = as_user(
         OWNER,
@@ -1583,7 +1583,7 @@ async fn a_first_prompt_never_reaches_someone_elses_session() {
     let request = as_user(
         OWNER,
         serde_json::json!({
-            "id": macro_uuid::generate_uuid_v7(),
+            "id": rox_uuid::generate_uuid_v7(),
             "botId": BotId::TEST_A.as_uuid(),
             "prompt": "fix it",
         })
@@ -1898,7 +1898,7 @@ mod tool_actions;
 #[tokio::test]
 async fn internal_notifications_use_the_session_mount_once() {
     use crate::inbound::notifications::{NotificationRouterState, notification_router};
-    let authorization = MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
+    let authorization = RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".into(),
@@ -1939,15 +1939,15 @@ async fn internal_notifications_use_the_session_mount_once() {
 #[test]
 fn an_agents_program_is_not_a_user_principal() {
     use crate::domain::control::ControlPrincipal;
-    use macro_authorization::{CODE_EXECUTION_HEADER, CredentialOrigin};
+    use rox_authorization::{CODE_EXECUTION_HEADER, CredentialOrigin};
 
     let user = |origin: CredentialOrigin, agent: bool| {
-        UserBotOrHarnessAuthorization::User(MacroUserAuthentication {
+        UserBotOrHarnessAuthorization::User(RoxUserAuthentication {
             origin,
             agent_id: agent.then_some(BotId::TEST_A),
             agent_via: None,
             routine_id: None,
-            macro_user_id: MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+            macro_user_id: RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
             user_context: model_user::UserContext {
                 user_id: "macro|owner@example.com".to_owned(),
                 fusion_user_id: "fusion-owner".to_owned(),
@@ -1960,7 +1960,7 @@ fn an_agents_program_is_not_a_user_principal() {
     let mut program = axum::http::HeaderMap::new();
     program.insert(CODE_EXECUTION_HEADER, "1".parse().unwrap());
 
-    for origin in [CredentialOrigin::Session, CredentialOrigin::MacroApiJwt] {
+    for origin in [CredentialOrigin::Session, CredentialOrigin::RoxApiJwt] {
         assert!(matches!(
             control_principal(&user(origin, false), &plain),
             ControlPrincipal::User
@@ -1968,8 +1968,8 @@ fn an_agents_program_is_not_a_user_principal() {
     }
     for (caller, headers) in [
         (user(CredentialOrigin::Session, false), &program),
-        (user(CredentialOrigin::MacroApiJwt, false), &program),
-        (user(CredentialOrigin::MacroApiJwt, true), &plain),
+        (user(CredentialOrigin::RoxApiJwt, false), &program),
+        (user(CredentialOrigin::RoxApiJwt, true), &plain),
     ] {
         assert!(matches!(
             control_principal(&caller, headers),
@@ -1978,12 +1978,12 @@ fn an_agents_program_is_not_a_user_principal() {
     }
     // A routine code step running as its owner signs `routine_id` and no
     // `agent_id`; the token alone makes it a program.
-    let UserBotOrHarnessAuthorization::User(owner) = user(CredentialOrigin::MacroApiJwt, false)
+    let UserBotOrHarnessAuthorization::User(owner) = user(CredentialOrigin::RoxApiJwt, false)
     else {
         unreachable!()
     };
-    let routine_step = UserBotOrHarnessAuthorization::User(MacroUserAuthentication {
-        routine_id: Some(macro_uuid::Uuid::from_u128(0x7001)),
+    let routine_step = UserBotOrHarnessAuthorization::User(RoxUserAuthentication {
+        routine_id: Some(rox_uuid::Uuid::from_u128(0x7001)),
         ..owner
     });
     assert!(matches!(

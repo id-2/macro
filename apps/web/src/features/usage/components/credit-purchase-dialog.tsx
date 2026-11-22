@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import XIcon from '@icon/system/regular/x.svg';
 import { Button, Dialog, InputGroup, Surface } from '@ui';
 import { createUniqueId, For, Show } from 'solid-js';
@@ -41,16 +42,18 @@ export function CreditPurchaseDialog(props: {
         <div class="flex max-h-[85dvh] flex-col gap-5 overflow-y-auto p-6">
           <header class="pr-8">
             <Dialog.Title class="text-xl font-semibold text-ink">
-              Need more usage?
+              {t('settingsUsage.needMoreUsageTitle')}
             </Dialog.Title>
             <Dialog.Description class="mt-1 text-sm text-ink-muted">
               {props.sharedWithTeam
-                ? 'These credits are shared by your entire team.'
-                : 'Choose an amount to start. You can always buy more later.'}
+                ? t('settingsUsage.creditsSharedShort')
+                : t('settingsUsage.chooseAmount')}
             </Dialog.Description>
           </header>
           <fieldset class="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <legend class="sr-only">Credit amount</legend>
+            <legend class="sr-only">
+              {t('settingsUsage.creditAmount')}
+            </legend>
             <For each={[2_500, 5_000, 10_000, 'other'] as const}>
               {(amount) => (
                 <label class="relative flex min-h-22 items-start rounded-xl border border-edge-muted p-4 has-checked:border-accent has-checked:ring-1 has-checked:ring-accent focus-within:ring-2 focus-within:ring-accent">
@@ -63,7 +66,9 @@ export function CreditPurchaseDialog(props: {
                     onChange={() => props.onSelect(amount)}
                   />
                   <span class="text-base font-semibold text-ink">
-                    {amount === 'other' ? 'Other' : formatCreditBalance(amount)}
+                    {amount === 'other'
+                      ? t('settingsUsage.other')
+                      : formatCreditBalance(amount)}
                   </span>
                 </label>
               )}
@@ -72,10 +77,10 @@ export function CreditPurchaseDialog(props: {
           <Show when={props.selection === 'other'}>
             <InputGroup size="xl">
               <InputGroup.Input
-                aria-label="Custom credit amount in dollars"
+                aria-label={t('settingsUsage.customAmountLabel')}
                 inputMode="decimal"
                 class="text-sm"
-                placeholder="Enter amount"
+                placeholder={t('settingsUsage.enterAmount')}
                 value={props.customAmount}
                 onInput={(event) =>
                   props.onCustomAmount(event.currentTarget.value)
@@ -87,12 +92,14 @@ export function CreditPurchaseDialog(props: {
           <div class="rounded-xl border border-edge-muted p-4 text-sm text-ink">
             <div class="flex justify-between gap-4">
               <span>
-                {props.sharedWithTeam ? 'Team usage credits' : 'Usage credits'}
+                {props.sharedWithTeam
+                  ? t('settingsUsage.teamUsageCredits')
+                  : t('settingsUsage.usageCredits')}
               </span>
               <span>{formatCreditBalance(props.amountCents ?? 0)}</span>
             </div>
             <div class="mt-4 flex justify-between gap-4 border-t border-edge-muted pt-4">
-              <span>Total</span>
+              <span>{t('settingsUsage.total')}</span>
               <span class="font-semibold">
                 {formatCreditBalance(props.amountCents ?? 0)}
               </span>
@@ -100,8 +107,8 @@ export function CreditPurchaseDialog(props: {
           </div>
           <p class="text-xs text-ink-muted">
             {props.teamCard
-              ? "Charged right away to your team owner's card on file."
-              : 'Charged right away to your card on file.'}
+              ? t('settingsUsage.chargedToTeamCard')
+              : t('settingsUsage.chargedToOwnCard')}
           </p>
           <Show when={props.notice}>
             <p class="text-sm text-ink-muted" role="status">
@@ -115,7 +122,7 @@ export function CreditPurchaseDialog(props: {
           </Show>
           <div class="flex justify-end gap-2">
             <Button variant="ghost" onClick={props.onClose}>
-              Cancel
+              {t('settingsUsage.cancel')}
             </Button>
             <Show
               when={props.onViewPlans}
@@ -126,22 +133,24 @@ export function CreditPurchaseDialog(props: {
                   onClick={props.onBuy}
                 >
                   {props.pending
-                    ? 'Charging…'
-                    : `Buy ${formatCreditBalance(props.amountCents ?? 0)} in credits`}
+                    ? t('settingsUsage.charging')
+                    : t('settingsUsage.buyCredits', {
+                        amount: formatCreditBalance(props.amountCents ?? 0),
+                      })}
                 </Button>
               }
             >
               {(viewPlans) => (
                 <Button variant="primary" onClick={viewPlans()}>
-                  View plans
+                  {t('settingsUsage.viewPlans')}
                 </Button>
               )}
             </Show>
           </div>
         </div>
         <Button
-          aria-label="Close credit purchase"
-          tooltip="Close credit purchase"
+          aria-label={t('settingsUsage.closeCreditPurchase')}
+          tooltip={t('settingsUsage.closeCreditPurchase')}
           class="absolute right-4 top-4"
           size="icon-sm"
           variant="ghost"

@@ -1,21 +1,21 @@
 import type { TeamInviteDetails } from '../../../generated/auth/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 
 /**
  * A pending invite to the caller's current team. Reading and revoking invites
  * requires a team admin or owner; `Team.invite` sends new ones.
  */
-export class TeamInvite extends MacroEntity<TeamInviteDetails> {
+export class TeamInvite extends RoxEntity<TeamInviteDetails> {
   /** A handle to a pending team invite by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): TeamInvite {
+  static byId(client: RoxClient, id: string): TeamInvite {
     return new TeamInvite(client, id);
   }
 
   /** Build an invite from an already-fetched record (pre-seeded, no fetch). */
-  static from(client: MacroClient, record: TeamInviteDetails): TeamInvite {
+  static from(client: RoxClient, record: TeamInviteDetails): TeamInvite {
     return new TeamInvite(client, record.id, record);
   }
 
@@ -24,7 +24,7 @@ export class TeamInvite extends MacroEntity<TeamInviteDetails> {
       (candidate) => candidate.id === this.id,
     );
     if (!invite)
-      throw new MacroNotFoundError(`team invite ${this.id} not found`);
+      throw new RoxNotFoundError(`team invite ${this.id} not found`);
     return invite;
   }
 

@@ -19,7 +19,7 @@ use agent_session::domain::events::AgentSessionLifecycleEvent;
 use agent_session::domain::lifecycle::session_identity;
 use agent_session::domain::ports::AgentSessionLifecyclePublisher;
 use agent_session::domain::service::AgentSessionService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::model::{HeldToolCall, ToolApprovalChange};
 use crate::domain::notifications::plan_tool_approval;
@@ -95,7 +95,7 @@ where
     Notifier: AgentSessionNotifier,
     HeldCalls: HeldToolCallObserver,
 {
-    async fn requested(&self, approval: &ToolApproval, _owner: &MacroUserIdStr<'static>) {
+    async fn requested(&self, approval: &ToolApproval, _owner: &RoxUserIdStr<'static>) {
         self.record(approval).await;
         self.held_calls.changed(
             approval.session,

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { HOME_SETUP_PROMOTION as COPY } from '@app/features/sidebar-promotion/core/promotions';
 import { createLastKnown } from '@app/features/sidebar-promotion/primitives/last-known';
 import {
@@ -37,7 +38,7 @@ export function HomeSetupPromotion(props: { class?: string }) {
       headline={COPY.headline}
       pitch={COPY.pitch}
       class={props.class}
-      dismissLabel="Dismiss workspace setup"
+      dismissLabel={t('home.dismissWorkspaceSetup')}
       action={{
         label: COPY.action,
         onClick: () => openSettings('Connected'),

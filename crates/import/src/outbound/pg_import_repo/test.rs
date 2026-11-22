@@ -3,8 +3,8 @@ use crate::domain::models::{
     ImportTargetKey, ImportTargetKind, SlackConversationId, SlackWorkspaceId,
 };
 use crate::domain::ports::{CanonicalImportRepo, NotionPlanRepo, PlanRow};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn team_members_returns_only_the_requested_roster(pool: PgPool) {
@@ -478,7 +478,7 @@ async fn recording_an_import_over_a_staged_row_marks_it_imported(pool: PgPool) {
     assert_eq!(row.entity_id.as_deref(), Some("doc-1"));
 }
 
-async fn ledger_actor(pool: &PgPool, label: &str) -> MacroUserIdStr<'static> {
+async fn ledger_actor(pool: &PgPool, label: &str) -> RoxUserIdStr<'static> {
     let id = Uuid::now_v7();
     let email = format!("{label}@example.com");
     let user_id = format!("macro|{email}");
@@ -500,12 +500,12 @@ async fn ledger_actor(pool: &PgPool, label: &str) -> MacroUserIdStr<'static> {
     .execute(pool)
     .await
     .unwrap();
-    MacroUserIdStr::parse_from_str(&user_id)
+    RoxUserIdStr::parse_from_str(&user_id)
         .unwrap()
         .into_owned()
 }
 
-async fn ledger_team(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> Uuid {
+async fn ledger_team(pool: &PgPool, owner: &RoxUserIdStr<'static>) -> Uuid {
     let id = Uuid::now_v7();
     sqlx::query!(
         "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Ledger test', $2)",
@@ -519,7 +519,7 @@ async fn ledger_team(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> Uuid {
     id
 }
 
-async fn join_ledger_team(pool: &PgPool, user: &MacroUserIdStr<'static>, team: Uuid) {
+async fn join_ledger_team(pool: &PgPool, user: &RoxUserIdStr<'static>, team: Uuid) {
     sqlx::query!(
         r#"INSERT INTO team_user (user_id, team_id, team_role) VALUES ($1, $2, 'admin')
            ON CONFLICT (user_id) DO UPDATE SET team_id = EXCLUDED.team_id"#,
@@ -554,7 +554,7 @@ async fn ledger_channel(pool: &PgPool, id: Uuid, team: Option<Uuid>, kind: Impor
 
 async fn legacy_mapping(
     repo: &PgImportRepo,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     key: &ImportTargetKey,
     channel_id: Uuid,
 ) {

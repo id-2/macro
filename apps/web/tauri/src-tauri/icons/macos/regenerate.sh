@@ -15,4 +15,5 @@ xcrun actool "$icon_dir/Macro.icon" \
 
 # Info.plist holds hand-written keys (usage descriptions, activity types), so
 # it is not regenerated; keep its CFBundleIcon* keys in step with --app-icon.
-cp "$output_dir/Assets.car" "$output_dir/Macro.icns" "$icon_dir/"
+cp "$output_dir/Assets.car" "$icon_dir/"
+cp "$output_dir/Macro.icns" "$icon_dir/Rox.icns"

@@ -1,6 +1,6 @@
 use entity_registry::{EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use model_owner::Owner;
 use sqlx::{Pool, Postgres};
 

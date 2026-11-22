@@ -1,11 +1,20 @@
-import MacroBrandLoader from '@icon/macro-brand-loader-2.svg';
+import { RoxMark } from '@core/component/RoxMark';
 import { cn } from '@ui';
 import { createSignal, onMount } from 'solid-js';
 
+/**
+ * The Rox mark, breathing while content loads. It is the same artwork as the
+ * boot shell and the install icon, so every waiting surface shows one glyph.
+ */
 export function LoadingSpinner(props: { class?: string }) {
   return (
-    <div class={cn('text-accent size-48 p-14', props.class)}>
-      <MacroBrandLoader class="size-full" />
+    <div
+      class={cn(
+        'size-48 p-14 animate-pulse motion-reduce:animate-none',
+        props.class
+      )}
+    >
+      <RoxMark class="size-full" />
     </div>
   );
 }

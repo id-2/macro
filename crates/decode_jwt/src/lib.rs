@@ -15,12 +15,12 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::either::Either;
-use macro_auth::{
-    error::MacroAuthError,
+use rox_auth::{
+    error::RoxAuthError,
     headers::AccessTokenExtractor,
     middleware::decode_jwt::{JwtToken, JwtValidationArgs},
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_error_response::ErrorResponse;
 use model_user::UserContext;
 use serde::Deserialize;
@@ -49,7 +49,7 @@ pub struct DecodedJwt {
     pub jwt_context: Option<JwtContext>,
 
     /// the parsed macro user id of the user
-    pub macro_user_id: MacroUserIdStr<'static>,
+    pub macro_user_id: RoxUserIdStr<'static>,
 }
 
 impl<S> FromRequestParts<S> for DecodedJwt
@@ -91,7 +91,7 @@ impl DecodedJwt {
             let user_id =
                 std::env::var("LOCAL_USER_ID").unwrap_or("macro|orguser@org.com".to_string());
             let Ok(macro_user_id) =
-                MacroUserIdStr::parse_from_str(&user_id).map(CowLike::into_owned)
+                RoxUserIdStr::parse_from_str(&user_id).map(CowLike::into_owned)
             else {
                 return Err(DecodeJwtError::InvalidUserId(user_id));
             };
@@ -130,14 +130,14 @@ impl DecodedJwt {
             }
         };
 
-        let jwt = macro_auth::middleware::decode_jwt::handler(jwt_validation_args, &access_token)
+        let jwt = rox_auth::middleware::decode_jwt::handler(jwt_validation_args, &access_token)
             .map_err(|e| match e {
-            MacroAuthError::JwtExpired => DecodeJwtError::Expired,
+            RoxAuthError::JwtExpired => DecodeJwtError::Expired,
             other => DecodeJwtError::Invalid(other),
         })?;
 
         let (user_id, fusion_user_id, organization_id) = match &jwt {
-            JwtToken::MacroAccessToken(token) => (
+            JwtToken::RoxAccessToken(token) => (
                 token.macro_user_id.clone(),
                 token
                     .root_macro_id
@@ -145,14 +145,14 @@ impl DecodedJwt {
                     .unwrap_or_else(|| token.fusion_user_id.clone()),
                 token.macro_organization_id,
             ),
-            JwtToken::MacroApiToken(token) => (
+            JwtToken::RoxApiToken(token) => (
                 token.macro_user_id.clone(),
                 token.fusion_user_id.clone(),
                 token.macro_organization_id,
             ),
         };
 
-        let jwt_context = if let JwtToken::MacroAccessToken(token) = jwt {
+        let jwt_context = if let JwtToken::RoxAccessToken(token) = jwt {
             Some(JwtContext {
                 audience: token.aud,
                 tid: token.tid,
@@ -161,7 +161,7 @@ impl DecodedJwt {
             None
         };
 
-        let Ok(macro_user_id) = MacroUserIdStr::parse_from_str(&user_id).map(CowLike::into_owned)
+        let Ok(macro_user_id) = RoxUserIdStr::parse_from_str(&user_id).map(CowLike::into_owned)
         else {
             return Err(DecodeJwtError::InvalidUserId(user_id));
         };
@@ -187,7 +187,7 @@ pub enum DecodeJwtError {
     /// The token was present but expired.
     Expired,
     /// The token was present but validation failed.
-    Invalid(MacroAuthError),
+    Invalid(RoxAuthError),
     /// The macro user id could not be parsed
     InvalidUserId(String),
 }

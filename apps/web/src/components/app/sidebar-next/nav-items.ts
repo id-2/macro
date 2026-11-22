@@ -208,7 +208,9 @@ export const SIDEBAR_NEXT_NAV_ITEMS = [
   },
   {
     id: 'activity',
-    label: 'Activity',
+    get label() {
+      return t('nav.activity');
+    },
     href: '/activity',
     icon: PulseIcon,
     iconActive: PulseFillIcon,

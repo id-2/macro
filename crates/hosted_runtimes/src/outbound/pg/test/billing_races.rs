@@ -285,7 +285,7 @@ fn purchase_request(key: &str) -> PurchaseRequest {
         billing: PurchaseBilling::Stripe,
         purchase_key: PurchaseKey::try_new(key.to_owned()).unwrap(),
         team_id: TEAM,
-        created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
         size: ComputerSize::Standard,
         name: None,
         extra_items: vec![],

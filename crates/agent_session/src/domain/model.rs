@@ -2,8 +2,8 @@ use agent_client_protocol::schema::v1::SessionId;
 use agent_runtime_protocol::domain::schema::v0::{AcpMessage, SystemEvent, ToServerMessage};
 use bots::domain::models::BotId;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::Owner;
 
 use super::error::AgentSessionError;
@@ -549,7 +549,7 @@ impl AgentSession {
     }
 
     /// The user this session runs as; see [`session_owner_user`].
-    pub fn owner_user(&self) -> Result<&MacroUserIdStr<'static>, AgentSessionError> {
+    pub fn owner_user(&self) -> Result<&RoxUserIdStr<'static>, AgentSessionError> {
         self.owner_id
             .as_user()
             .ok_or_else(|| AgentSessionError::OwnerNotUser(self.owner_id.owner_type()))
@@ -561,7 +561,7 @@ impl AgentSession {
 /// A session spends its owner's credentials and bills them, so only a user
 /// can own one until the runtime has a bot execution context.
 // TODO(ownership-v2): T5.4 admits bot owners once the runtime has a bot execution context.
-pub fn session_owner_user(owner: &Owner) -> Result<MacroUserIdStr<'static>, AgentSessionError> {
+pub fn session_owner_user(owner: &Owner) -> Result<RoxUserIdStr<'static>, AgentSessionError> {
     owner
         .as_user()
         .cloned()
@@ -719,7 +719,7 @@ pub struct TurnPrompter {
     /// The action that opened the turn.
     pub action_id: agent_runtime_protocol::domain::action::AgentActionId,
     /// The user who prompted it, absent when a bot acted on nobody's behalf.
-    pub user: Option<MacroUserIdStr<'static>>,
+    pub user: Option<RoxUserIdStr<'static>>,
     /// The app tab the person typed the prompt in, when they typed it in one.
     pub client: Option<UiClientId>,
 }
@@ -758,7 +758,7 @@ impl TurnPrompter {
     /// malformed or old storage includes a user alongside the system kind.
     /// A program's turn acts with the user's access; checks that need the
     /// person's own word read `kind` too.
-    pub fn acting_user(&self) -> Option<&MacroUserIdStr<'static>> {
+    pub fn acting_user(&self) -> Option<&RoxUserIdStr<'static>> {
         matches!(self.kind, PrompterKind::User | PrompterKind::Program)
             .then_some(self.user.as_ref())
             .flatten()
@@ -780,7 +780,7 @@ pub struct StoredQueuedAction {
     pub action: agent_runtime_protocol::domain::action::AgentAction,
     /// The user who queued it, absent when a bot acted on nobody's behalf.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// When it was accepted.
     pub created_at: DateTime<Utc>,
     /// Harness announce origin, opaque to this crate.

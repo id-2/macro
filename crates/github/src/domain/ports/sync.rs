@@ -2,12 +2,12 @@
 
 use std::future::Future;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::{
     AppJwt, EnrichedGithubPullRequest, GithubAppInstallationSource, GithubAuthenticatedUser,
     GithubError, GithubInstallationAccessToken, GithubKey, GithubPullRequestDetails,
-    GithubRepository, GithubSetupAccessToken, GithubUserInstallation, MacroTaskId,
+    GithubRepository, GithubSetupAccessToken, GithubUserInstallation, RoxTaskId,
     PullRequestIndexPage, PullRequestIndexRequest, ResolvedTeamTaskReference, TeamTaskReference,
     ValidatedGithubWebhookEvent,
 };
@@ -25,13 +25,13 @@ pub trait GithubSyncRepo: Send + Sync + 'static {
     fn get_task_ids(
         &self,
         github_key: GithubKey,
-    ) -> impl Future<Output = Result<Vec<MacroTaskId>, Self::Err>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxTaskId>, Self::Err>> + Send;
 
     /// Upserts task ids for a given github key
     fn upsert_task_ids(
         &self,
         github_key: GithubKey,
-        task_ids: &[MacroTaskId],
+        task_ids: &[RoxTaskId],
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Filters out all pre-existing tasks for the github key
@@ -39,8 +39,8 @@ pub trait GithubSyncRepo: Send + Sync + 'static {
     fn filter_duplicate_tasks(
         &self,
         github_key: GithubKey,
-        task_ids: &[MacroTaskId],
-    ) -> impl Future<Output = Result<Vec<MacroTaskId>, Self::Err>> + Send;
+        task_ids: &[RoxTaskId],
+    ) -> impl Future<Output = Result<Vec<RoxTaskId>, Self::Err>> + Send;
 
     /// Resolves team-scoped task references for a GitHub App installation.
     ///
@@ -106,7 +106,7 @@ pub trait GithubSyncRepo: Send + Sync + 'static {
     fn get_team_member_ids(
         &self,
         team_id: uuid::Uuid,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>, Self::Err>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>, Self::Err>> + Send;
 
     /// Upserts associations between a GitHub App installation and its sources.
     /// Ignores conflicts (idempotent).
@@ -262,7 +262,7 @@ pub trait GithubSyncService: Send + Sync + 'static {
     /// Begins an authenticated GitHub App installation setup flow.
     fn begin_installation_setup(
         &self,
-        _macro_user_id: &MacroUserIdStr<'_>,
+        _macro_user_id: &RoxUserIdStr<'_>,
         _team_id: Option<uuid::Uuid>,
     ) -> impl Future<Output = Result<String, GithubError>> + Send {
         async {
@@ -306,7 +306,7 @@ pub trait GithubSyncRealtime: Send + Sync + 'static {
     /// Forward a saved entity; recipient selection belongs to the sync service.
     fn publish_pull_request(
         &self,
-        recipients: &[MacroUserIdStr<'static>],
+        recipients: &[RoxUserIdStr<'static>],
         entity: &foreign_entity::domain::models::ForeignEntity,
     ) -> impl Future<Output = Result<(), GithubError>> + Send;
 }

@@ -34,10 +34,10 @@ async fn preference_changes_wait_for_rollout_without_other_patch_effects() {
         NoOpTeamCrmSettingsRepository,
     );
     let team_id = uuid::Uuid::from_u128(1);
-    let actor = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let actor = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     let request = PatchTeamRequest {
         member_crm_access: Some(PatchTeamMemberCrmAccess {
-            user_id: MacroUserIdStr::parse_from_str("macro|member@example.com")
+            user_id: RoxUserIdStr::parse_from_str("macro|member@example.com")
                 .unwrap()
                 .into_owned(),
             enabled: false,

@@ -7,8 +7,8 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::dcs::get_chats_for_attachment::{
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::dcs::get_chats_for_attachment::{
     get_latest_single_attachment_chat, get_multi_attachment_chat,
 };
 use sqlx::PgPool;
@@ -32,7 +32,7 @@ pub struct Params {
 #[tracing::instrument(skip(db, user), fields(user_id=%user.authorization.user.macro_user_id))]
 pub async fn get_chats_for_attachment_handler(
     State(db): State<PgPool>,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     Path(Params { attachment_id }): Path<Params>,
 ) -> Result<Response, Response> {
     let user_id = user.authorization.user.macro_user_id.as_ref();

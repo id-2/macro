@@ -850,7 +850,7 @@ function McpPanel() {
               </span>{' '}
               claude mcp add --transport http \<br />
               <span style={{ 'padding-left': '14px', display: 'inline-block' }}>
-                <span style={{ color: 'var(--c2)' }}>macro</span> {MCP_ENDPOINT}
+                <span style={{ color: 'var(--c2)' }}>rox</span> {MCP_ENDPOINT}
               </span>
             </div>
           </div>

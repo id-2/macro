@@ -7,7 +7,7 @@ use attachment::{
     ResolutionError, image::ImageData,
 };
 use futures::future::join_all;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use non_empty::NonEmpty;
 
@@ -29,7 +29,7 @@ impl<R: StaticFileRepo> AttachmentService for StaticFileAttachmentService<R> {
     #[tracing::instrument(skip_all)]
     async fn resolve_attachments<'a>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&'a Entity<'a>]>,
     ) -> Attachments<'a> {
         let results = join_all(ids.iter().map(|entity| async move {

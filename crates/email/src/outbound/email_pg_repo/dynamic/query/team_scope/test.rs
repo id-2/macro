@@ -5,8 +5,8 @@ use item_filters::NotificationState;
 use item_filters::ast::date::DateLiteral;
 use item_filters::ast::email::{AttachmentKind, Email, SubjectQuery};
 use item_filters::ast::properties::{PropertiesLiteral, PropertyMatchValue};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::email::EmailStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::email::EmailStr;
 use models_pagination::{Query, SimpleSortMethod};
 use sqlx::Execute;
 use std::cell::RefCell;
@@ -275,7 +275,7 @@ fn record_and(term: Expr<EmailLiteral>) -> Expr<EmailLiteral> {
 /// inbox alone, so they may read no other column of `t`. The pages of both
 /// streams, for each kind of thread and message term a team read takes
 /// beside the record, plain, negated and in a mixed OR, must plan.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn checks_read_only_the_threads_id_and_inbox(pool: sqlx::PgPool) -> anyhow::Result<()> {
     let date = Utc.with_ymd_and_hms(2026, 1, 2, 3, 4, 5).unwrap();
     let subject = || SubjectQuery::try_from("quarterly".to_owned());
@@ -389,7 +389,7 @@ async fn resolved_inboxes(
 /// deleted; u7's (link 9) has consent off; and u3's (link 3) is named only by
 /// u8's consent. Delta's u9 consents on link 10, which only Delta reads.
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn contributing_inboxes_restate_the_privacy_function(
@@ -429,7 +429,7 @@ async fn contributing_inboxes_restate_the_privacy_function(
 /// Delta and consents there, and u1, who contributes to Gamma, joins Delta
 /// and blocks dense.test there.
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn another_teams_consent_and_lists_never_apply(pool: sqlx::PgPool) -> anyhow::Result<()> {
@@ -488,7 +488,7 @@ async fn another_teams_consent_and_lists_never_apply(pool: sqlx::PgPool) -> anyh
 /// test. The fixture's hand-made threads are where only a draft or a spam
 /// message carries a participant.
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn allowed_restates_the_privacy_function(pool: sqlx::PgPool) -> anyhow::Result<()> {
@@ -626,7 +626,7 @@ async fn sparse_page(pool: &sqlx::PgPool) -> anyhow::Result<Vec<ThreadPreviewCur
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn a_mid_request_import_cannot_outgrow_the_sparse_probe(
@@ -675,7 +675,7 @@ async fn a_mid_request_import_cannot_outgrow_the_sparse_probe(
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn a_mid_request_withdrawal_applies_to_the_next_request(
@@ -717,7 +717,7 @@ async fn a_mid_request_withdrawal_applies_to_the_next_request(
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn a_mid_request_exclusion_applies_to_the_next_request(
@@ -768,7 +768,7 @@ async fn a_mid_request_exclusion_applies_to_the_next_request(
 }
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(
         path = "../../../../../../fixtures",
         scripts("email_crm_team_read", "email_sender_probe_cap")

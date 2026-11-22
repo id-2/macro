@@ -5,7 +5,7 @@
  * OpenAPI spec version: 0.1.0
  */
 import type { AgentActionId } from './agentActionId';
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { SessionIdentity } from './sessionIdentity';
 import type { SessionMentionedMetadataMentionedBy } from './sessionMentionedMetadataMentionedBy';
 import type { SessionMentionedMetadataOriginMessageId } from './sessionMentionedMetadataOriginMessageId';
@@ -22,7 +22,7 @@ export interface SessionMentionedMetadata {
   identity: SessionIdentity;
   /** The users named, already narrowed to those who can open the session
 and never including the author. */
-  mentioned: MacroUserIdStr[];
+  mentioned: RoxUserIdStr[];
   mentioned_by?: SessionMentionedMetadataMentionedBy;
   /** The channel or document message the prompt was posted as, when it
 arrived from a thread rather than the session view. That message

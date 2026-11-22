@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ListSkeleton } from '@app/components/view-shell/ListSkeleton';
 import { TraceFlow, usePending } from '@app/observability/flow';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -72,10 +73,10 @@ function StepBody(props: { finishing: boolean; onFinish(): void }) {
   const count = () => step.selectedCount();
   const busy = () => step.enabling() || props.finishing;
   const continueLabel = () => {
-    if (props.finishing) return 'Opening your workspace…';
-    if (step.enabling()) return 'Turning on routines…';
-    if (count() === 0) return 'Continue to workspace';
-    return `Turn on ${count()} ${count() === 1 ? 'routine' : 'routines'}`;
+    if (props.finishing) return t('onboarding.openingWorkspace');
+    if (step.enabling()) return t('onboarding.turningOnRoutines');
+    if (count() === 0) return t('onboarding.continueToWorkspace');
+    return t('onboarding.turnOnRoutines', { count: count() });
   };
   const forYou = () => {
     const view = step.view();
@@ -93,16 +94,14 @@ function StepBody(props: { finishing: boolean; onFinish(): void }) {
           tabindex="-1"
           class="mt-5 font-[Roboto_Slab_Variable] text-[clamp(1.75rem,8vw,3rem)] font-[315] leading-[1.12] tracking-tight outline-none text-balance"
         >
-          Put your busywork on autopilot.
+          {t('onboarding.routinesTitle')}
         </h1>
         <p class="mx-auto mt-6 max-w-[440px] text-sm leading-6 text-ink-muted text-balance sm:text-[15px]">
           <Show
             when={forYou()}
-            fallback="Routines are AI agents that run on their own. Switch on the ones you want; you can change them any time."
+            fallback={t('onboarding.routinesDescription')}
           >
-            Routines are AI agents that run on their own. We picked these from
-            your inbox and tools. Switch on the ones you want; you can change
-            them any time.
+            {t('onboarding.routinesDescriptionPicked')}
           </Show>
         </p>
       </header>
@@ -142,11 +141,11 @@ function StepBody(props: { finishing: boolean; onFinish(): void }) {
                 <Show when={view().arriving}>
                   <div class="flex flex-col gap-2">
                     <p class="px-3 text-xs text-ink-muted" aria-live="polite">
-                      Finding more routines for you…
+                      {t('onboarding.findingMoreRoutines')}
                     </p>
                     <SuggestionSkeleton
                       rows={1}
-                      label="Finding more routines"
+                      label={t('onboarding.findingMoreRoutinesLabel')}
                     />
                   </div>
                 </Show>
@@ -156,10 +155,9 @@ function StepBody(props: { finishing: boolean; onFinish(): void }) {
           <Match when={step.view().kind === 'loading'}>
             <div class="flex flex-col gap-3">
               <p class="px-3 text-xs text-ink-muted" aria-live="polite">
-                Studying your workspace to suggest routines that fit how you
-                work…
+                {t('onboarding.studyingWorkspace')}
               </p>
-              <SuggestionSkeleton rows={3} label="Finding routines for you" />
+              <SuggestionSkeleton rows={3} label={t('onboarding.findingRoutinesLabel')} />
             </div>
           </Match>
           <Match when={step.view().kind === 'error'}>
@@ -167,29 +165,28 @@ function StepBody(props: { finishing: boolean; onFinish(): void }) {
               role="alert"
               class="flex flex-col items-center gap-3 px-6 py-10 text-center text-sm text-ink-muted"
             >
-              Couldn't load suggestions.
+              {t('onboarding.routinesLoadFailed')}
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={() => fireAndForget(step.refresh(), 'onboarding')}
               >
                 <ArrowsClockwiseIcon class="size-4" aria-hidden="true" />
-                Try again
+                {t('onboarding.retry')}
               </Button>
             </div>
           </Match>
           <Match when={step.view().kind === 'empty'}>
             <div class="flex flex-col items-center gap-3 px-6 py-10 text-center text-sm text-ink-muted">
               <RoutineSparkGlyph />
-              No routines to suggest yet. As your workspace grows, ideas show up
-              in each sidebar.
+              {t('onboarding.noRoutinesToSuggest')}
             </div>
           </Match>
         </Switch>
       </div>
       <Show when={step.anyFailed()}>
         <p role="alert" class="mt-6 text-center text-sm text-failure">
-          Some routines couldn't be turned on. Try again, or skip them for now.
+          {t('onboarding.routinesFailed')}
         </p>
       </Show>
       <ContinueButton

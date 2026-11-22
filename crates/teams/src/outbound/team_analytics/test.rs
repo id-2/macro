@@ -1,13 +1,13 @@
 use std::sync::Arc;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 
 use super::*;
 use crate::domain::model::TeamRole;
 
-fn macro_user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid macro user id")
+fn macro_user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid macro user id")
 }
 
 fn test_events() -> Vec<TeamAnalyticsEvent> {

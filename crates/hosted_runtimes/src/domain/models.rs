@@ -1,6 +1,6 @@
 //! Computers, hosts, purchases and what the team sees.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use bot_id::BotId;
 use harness_id::HarnessId;
@@ -106,7 +106,7 @@ pub struct Computer {
     /// Last guest creation begun by the fleet; retries keep the same generation.
     pub enrollment_generation: crate::domain::enrollment::EnrollmentGeneration,
     /// Rox user who purchased the computer.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// Time the computer was reserved.
     pub created_at: DateTime<Utc>,
     /// When roxd first connected; setup is over from then on.
@@ -313,13 +313,13 @@ pub struct NewReservation {
     /// The saved price, or the comp reason.
     pub funding: Funding,
     /// Rox user who purchased the computer.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// Joined into the computer's subscription update, replayed exactly.
     pub extra_items: Vec<SubscriptionItem>,
     /// The purchase's trace context, carried to the computer.
     pub provision_traceparent: Option<String>,
     /// The agent teammate the computer is bought for, if any.
-    pub agent: Option<MacroUserIdStr<'static>>,
+    pub agent: Option<RoxUserIdStr<'static>>,
 }
 
 /// Capacity held on a host for a purchase whose charge is being confirmed.
@@ -344,7 +344,7 @@ pub struct Reservation {
     /// The saved price, or the comp reason.
     pub funding: Funding,
     /// Rox user who purchased the computer.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// Joined into the computer's subscription update, replayed exactly.
     pub extra_items: Vec<SubscriptionItem>,
     /// The purchase's trace context, carried to the computer.
@@ -352,7 +352,7 @@ pub struct Reservation {
     /// After this the confirm worker settles the charge and stops replaying it.
     pub expires_at: DateTime<Utc>,
     /// The agent teammate the computer is bought for, if any.
-    pub agent: Option<MacroUserIdStr<'static>>,
+    pub agent: Option<RoxUserIdStr<'static>>,
     /// When the purchase began.
     pub created_at: DateTime<Utc>,
 }
@@ -440,7 +440,7 @@ pub struct PurchaseRequest {
     /// Team that owns the computer.
     pub team_id: Uuid,
     /// The admin or owner buying it.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// Purchased catalog size.
     pub size: ComputerSize,
     /// Display name; defaults to "Rox computer".

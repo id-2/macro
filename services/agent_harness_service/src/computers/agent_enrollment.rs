@@ -8,14 +8,14 @@ use hosted_runtimes::domain::{
     enrollment::EnrollmentGeneration,
     ids::ComputerId,
 };
-use macro_authorization::INTERNAL_API_KEY_HEADER;
+use rox_authorization::INTERNAL_API_KEY_HEADER;
 use reqwest::{StatusCode, header::HeaderValue};
 
 /// Calls `POST /internal/team_agent_enrollment/{computer}/{generation}`.
 /// Neither response bodies nor credentials are logged.
 pub(crate) struct AuthAgentEnrollment {
     http: reqwest::Client,
-    base: macro_service_urls::AuthServiceUrl,
+    base: rox_service_urls::AuthServiceUrl,
     key: HeaderValue,
 }
 
@@ -31,7 +31,7 @@ impl AuthAgentEnrollment {
             http: reqwest::Client::builder()
                 .timeout(Duration::from_secs(60))
                 .build()?,
-            base: macro_service_urls::AuthServiceUrl::new()?,
+            base: rox_service_urls::AuthServiceUrl::new()?,
             key,
         })
     }
@@ -42,7 +42,7 @@ impl AuthAgentEnrollment {
         generation: EnrollmentGeneration,
     ) -> Result<Option<AgentEnrollment>, AgentEnrollmentError> {
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .http
             .post(format!(

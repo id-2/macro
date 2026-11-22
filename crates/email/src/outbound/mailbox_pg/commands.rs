@@ -54,7 +54,7 @@ impl PgMailboxSync {
             .await
             .map_err(db_error)?;
             let payload = serde_json::json!({"kind":"organization","thread_id":row.thread_id});
-            sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload).execute(&mut **tx).await.map_err(db_error)?;
+            sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload).execute(&mut **tx).await.map_err(db_error)?;
         }
         Ok(())
     }
@@ -248,7 +248,7 @@ impl MailboxCommandRepository for PgMailboxSync {
                 let label = sqlx::query_scalar!(r#"
                     INSERT INTO email_labels (id,link_id,provider_label_id,name,type) VALUES ($1,$2,$3::text,$3::text,'User')
                     ON CONFLICT (link_id,provider_label_id) DO UPDATE SET name = EXCLUDED.name RETURNING id
-                "#,macro_uuid::generate_uuid_v7(),lease.mailbox.link_id,tag).fetch_one(&mut *tx).await.map_err(db_error)?;
+                "#,rox_uuid::generate_uuid_v7(),lease.mailbox.link_id,tag).fetch_one(&mut *tx).await.map_err(db_error)?;
                 sqlx::query!("INSERT INTO email_message_labels (message_id,label_id) VALUES ($1,$2) ON CONFLICT DO NOTHING",target.message_id,label).execute(&mut *tx).await.map_err(db_error)?;
             }
         } else if let MailboxAction::Category { name, present } = &lease.action {

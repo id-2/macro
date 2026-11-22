@@ -4,7 +4,7 @@ import {
 } from '@graphql-cache/people/generated';
 import type { PeopleCache } from '@graphql-cache/people/host';
 import { PEOPLE_UNSUPPORTED } from '@graphql-cache/people/protocol';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import {
   EMPTY_PERSON_FACTS,
   equalPersonFacts,

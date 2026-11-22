@@ -5,13 +5,13 @@ use std::sync::{
 
 use crate::service::signup_policy::SignupPolicy;
 use axum::http::StatusCode;
-use macro_user_id::email::Email;
+use rox_user_id::email::Email;
 use model::authentication::webhooks::{
     Event, EventInfo, FusionAuthUserWebhook, User as FusionAuthWebhookUser,
 };
 use serde_json::Value;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::{
     MACRO_SUPPORT_EMAILS, UserCreateWebhookError, dispatch_user_create_webhook,
@@ -24,7 +24,7 @@ use super::{
 fn support_emails_are_distinct_user_ids() {
     let participants = MACRO_SUPPORT_EMAILS
         .into_iter()
-        .map(MacroUserIdStr::try_from_email)
+        .map(RoxUserIdStr::try_from_email)
         .collect::<Result<std::collections::HashSet<_>, _>>()
         .expect("every support email is a valid user id");
 

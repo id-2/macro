@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import ArchiveIcon from '@icon/system/regular/archive.svg';
 import UndoIcon from '@icon/system/regular/arrow-u-up-left.svg';
@@ -38,8 +39,7 @@ function VisibilityControl(props: RecordVisibilityActionProps) {
   const [failed, setFailed] = createSignal(false);
   const [submitting, setSubmitting] = createSignal(false);
   const permissionHintId = createUniqueId();
-  const permissionHint =
-    'Ask a team admin or owner to archive or restore this record.';
+  const permissionHint = t('crm.askAdminToArchive');
   let alive = true;
   let button: HTMLButtonElement | undefined;
   onCleanup(() => {
@@ -55,7 +55,8 @@ function VisibilityControl(props: RecordVisibilityActionProps) {
         ?.focus()
     );
   });
-  const label = () => (props.hidden ? 'Restore' : 'Archive');
+  const label = () =>
+    props.hidden ? t('viewMenus.crmRestore') : t('viewMenus.crmArchive');
   const pending = () => props.pending || submitting();
   const submit = () => {
     if (!props.canManage || pending() || props.parentPending) return;
@@ -134,7 +135,7 @@ function VisibilityControl(props: RecordVisibilityActionProps) {
       </Show>
       <Show when={failed() && !confirming()}>
         <span role="alert" class="text-xs text-failure">
-          Could not restore. Try again.
+          {t('crm.couldNotRestore')}
         </span>
       </Show>
       <ConfirmDialog
@@ -151,11 +152,19 @@ function VisibilityControl(props: RecordVisibilityActionProps) {
         }}
         title={
           props.hidden && props.parentArchived
-            ? 'Restore the company first'
-            : `${label()} ${props.kind === 'company' ? 'company' : 'person'}?`
+            ? t('crm.restoreCompanyFirst')
+            : t('crm.archiveEntityTitle', {
+                action: label(),
+                kind:
+                  props.kind === 'company'
+                    ? t('crm.company')
+                    : t('crm.person'),
+              })
         }
         confirmLabel={
-          props.hidden && props.parentArchived ? 'Open company' : label()
+          props.hidden && props.parentArchived
+            ? t('crm.openCompany')
+            : label()
         }
         pending={pending()}
         onConfirm={() => {
@@ -171,13 +180,12 @@ function VisibilityControl(props: RecordVisibilityActionProps) {
               when={props.hidden}
               fallback={
                 <>
-                  Archive <span class="font-medium text-ink">{props.name}</span>{' '}
-                  for your team. The record and its history are kept, and you
-                  can restore it later.
+                  {t('crm.archiveBodyBefore')}{' '}
+                  <span class="font-medium text-ink">{props.name}</span>{' '}
+                  {t('crm.archiveBodyAfter')}
                   <Show when={props.kind === 'company'}>
                     {' '}
-                    All of its people will also be archived, and team email
-                    syncing will be turned off.
+                    {t('crm.archiveCompanyAlso')}
                   </Show>
                 </>
               }
@@ -186,26 +194,22 @@ function VisibilityControl(props: RecordVisibilityActionProps) {
                 when={props.parentArchived}
                 fallback={
                   <>
-                    Restore{' '}
-                    <span class="font-medium text-ink">{props.name}</span> to
-                    your team's visible CRM lists.
+                    {t('crm.restoreBodyBefore')}{' '}
+                    <span class="font-medium text-ink">{props.name}</span>{' '}
+                    {t('crm.restoreBodyAfter')}
                     <Show when={props.kind === 'company'}>
                       {' '}
-                      All of its people will also be restored, including people
-                      archived individually. Email syncing will stay off until
-                      enabled separately.
+                      {t('crm.restoreCompanyAlso')}
                     </Show>
                   </>
                 }
               >
-                This person is archived with their company. Open the company to
-                review and confirm restoring it and all its people. Email
-                syncing stays off.
+                {t('crm.restoreParentArchived')}
               </Show>
             </Show>
             <Show when={failed()}>
               <p role="alert" class="mt-3 text-failure">
-                Could not save the change. Try again or cancel.
+                {t('crm.couldNotSaveChangeConfirm')}
               </p>
             </Show>
           </>

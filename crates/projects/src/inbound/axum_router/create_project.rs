@@ -6,7 +6,7 @@ use entity_access::{
     inbound::axum_extractors::ProjectBodyAccessLevelExtractorV2,
 };
 use entity_registry::CreationPrincipalExtractor;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model::project::{request::CreateProjectRequest, response::CreateProjectResponse};
 
 use super::ProjectRouterState;
@@ -33,7 +33,7 @@ pub async fn create_project_handler<T, Svc, Auth>(
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let data = state
         .service

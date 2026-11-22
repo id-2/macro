@@ -1,4 +1,4 @@
-import type { ConnectorStyle } from '@macro-inc/graphics';
+import type { ConnectorStyle } from '@rox-one/graphics';
 import { For } from 'solid-js';
 import {
   ConnectorEndpointIcon,

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ViewBreadcrumbs } from '@app/components/view-shell';
 import { CallDetailView } from '@block-call/views/CallDetailView';
 import PhoneCallIcon from '@icon/system/regular/phone-call.svg';
@@ -32,7 +33,7 @@ function DriveCallBreadcrumb(props: { callId: string; name: string }) {
           </ViewBreadcrumbs.Button>
         )}
       </ViewBreadcrumbs.Item>
-      <DriveBreadcrumbsOutlet aria-label="Call location" />
+      <DriveBreadcrumbsOutlet aria-label={t('drive.callLocation')} />
     </>
   );
 }
@@ -52,7 +53,7 @@ export function DriveCallDetail(props: {
       header={(data) => (
         <DriveCallBreadcrumb
           callId={props.callId}
-          name={data()?.name ?? 'Call Recording'}
+          name={data()?.name ?? t('drive.callRecording')}
         />
       )}
     />

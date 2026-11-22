@@ -1,3 +1,4 @@
+import { formatLocale, interfaceLanguage } from '@app/lib/i18n';
 import { getPropertyOptionLabel } from '@entity/utils/task-properties';
 import { NUMBER_DECIMAL_PLACES } from '../constants';
 import type { DateRangeValue, Property, PropertyOptionValue } from '../types';
@@ -23,36 +24,66 @@ export function formatNumber(value: number): string {
   return NUMBER_FORMAT.format(rounded === 0 ? 0 : rounded);
 }
 
-// One formatter for every date: toLocaleDateString builds one per call,
+// One formatter per locale: toLocaleDateString builds one per call,
 // which a table of a thousand dates pays for a thousand times.
-const DATE_FORMAT = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  year: 'numeric',
-});
+const DATE_FORMATS = new Map<string, Intl.DateTimeFormat>();
+
+function dateFormat(locale: string): Intl.DateTimeFormat {
+  let format = DATE_FORMATS.get(locale);
+  if (!format) {
+    format = new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+    DATE_FORMATS.set(locale, format);
+  }
+  return format;
+}
 
 /**
- * Format a date value for display
+ * Format a date value for display, in the interface language: `Mar 14, 2025`
+ * in English, `14 мар. 2025 г.` in Russian.
  */
 export function formatDate(value: Date | string): string {
   const date = typeof value === 'string' ? new Date(value) : value;
-  return DATE_FORMAT.format(date);
+  return dateFormat(formatLocale()).format(date);
 }
 
-const DATE_TIME_FORMAT = new Intl.DateTimeFormat('en-US', {
-  month: 'short',
-  day: 'numeric',
-  hour: 'numeric',
-  minute: '2-digit',
-});
+const TIME_FORMATS = new Map<string, Intl.DateTimeFormat>();
+
+/**
+ * The locale's own clock, except Russian, which the interface shows in
+ * 24-hour time. Keyed by locale and clock so a table reuses one formatter.
+ */
+function timeFormat(locale: string, hour12: boolean): Intl.DateTimeFormat {
+  const key = `${locale}|${hour12 ? '12' : '24'}`;
+  let format = TIME_FORMATS.get(key);
+  if (!format) {
+    format = new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12,
+    });
+    TIME_FORMATS.set(key, format);
+  }
+  return format;
+}
 
 /**
  * A time range, compact where its ends share a day, month or year: all day
  * `Oct 9 – 13, 2026`; timed `Oct 9, 9:00 AM – 5:00 PM` or
- * `Oct 9, 9:00 AM – Oct 13, 5:00 PM`.
+ * `Oct 9, 9:00 AM – Oct 13, 5:00 PM`. Follows the interface language, so
+ * Russian reads `9 окт. 2026 г.` and `9 окт., 9:00 – 17:00`.
  */
 export function formatTimeRange(range: DateRangeValue): string {
-  return (range.allDay ? DATE_FORMAT : DATE_TIME_FORMAT).formatRange(
+  const locale = formatLocale();
+  if (range.allDay) {
+    return dateFormat(locale).formatRange(range.start, range.end);
+  }
+  return timeFormat(locale, interfaceLanguage() === 'en').formatRange(
     range.start,
     range.end
   );

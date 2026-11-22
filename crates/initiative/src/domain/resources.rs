@@ -2,7 +2,7 @@
 
 use std::{collections::HashMap, future::Future, pin::Pin};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use entity_access::domain::models::{
     EditAccessLevel, Entity, EntityAccessAuth, EntityAccessReceipt, EntityType, ViewAccessLevel,
@@ -26,7 +26,7 @@ pub trait InitiativeResources: std::fmt::Debug + Send + Sync + 'static {
     /// properties service. All or nothing: if any value is rejected, none remain.
     fn set_initial_properties(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         id: InitiativeId,
         values: Vec<InitialPropertyValue>,
     ) -> ResourceFuture<'_, ()>;

@@ -55,7 +55,7 @@ async fn registered_session(
 ) -> (
     PgAgentSessionRepo<PgBotsRepo>,
     AgentSessionId,
-    MacroUserIdStr<'static>,
+    RoxUserIdStr<'static>,
 ) {
     let repo = test_repo(pool);
     let bot = create_test_bot(pool).await;

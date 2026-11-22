@@ -26,7 +26,7 @@ export function VerifyForm(props: {
       }}
     >
       <p class="text-xs text-ink-muted leading-snug">
-        Enter the 6-digit code we sent to{' '}
+        Введите 6-значный код, который мы отправили на адрес{' '}
         <span class="text-ink font-medium break-all">{props.email}</span>.
       </p>
       <OtpInput
@@ -36,26 +36,26 @@ export function VerifyForm(props: {
         onComplete={(code) => props.onVerify(code)}
       />
       <p class="text-center text-xs text-ink-muted" aria-live="polite">
-        Didn't receive a code?{' '}
+        Не получили код?{' '}
         <button
           type="button"
           onClick={() => props.onResend()}
           disabled={props.resending || props.verifying || props.resendIn > 0}
           class="font-medium text-ink transition-colors hover:text-ink-muted disabled:text-ink-extra-muted"
         >
-          <Show when={props.resendIn > 0} fallback="Resend">
-            Resend ({props.resendIn})
+          <Show when={props.resendIn > 0} fallback="Отправить снова">
+            Отправить снова ({props.resendIn})
           </Show>
         </button>
       </p>
       <FormError message={props.error} />
       <AuthButton type="submit" disabled={!props.canVerify}>
-        Verify
+        Подтвердить
         <ArrowRight class="size-5 shrink-0" />
       </AuthButton>
       <AuthButton variant="secondary" onClick={props.onBack}>
         <ArrowLeft class="size-5 shrink-0" />
-        Change email
+        Изменить адрес почты
       </AuthButton>
     </form>
   );

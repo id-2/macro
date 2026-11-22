@@ -11,8 +11,8 @@ use crate::domain::models::{
 use crate::domain::ports::{ImportError, ImportRepo, Result};
 use agent_session::domain::notifications::NotificationWriter;
 use chrono::{DateTime, Utc};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{PgConnection, PgPool};
 use std::collections::HashSet;
 use std::str::FromStr;
@@ -184,7 +184,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn get_own_by_foreign_id(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         foreign_id: &str,
     ) -> Result<Option<ImportEntity>> {
@@ -208,7 +208,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn find_team_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         foreign_id: &str,
     ) -> Result<Option<ImportEntity>> {
@@ -237,7 +237,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self, metadata), err)]
     async fn upsert_staged(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         kind: ImportKind,
         initiator: Initiator,
@@ -271,7 +271,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self, metadata), err)]
     async fn upsert_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         kind: ImportKind,
         initiator: Initiator,
@@ -327,7 +327,7 @@ impl ImportRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn get(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<Option<ImportEntity>> {
+    async fn get(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<Option<ImportEntity>> {
         let row = sqlx::query_as!(
             ImportEntityDbRow,
             r#"
@@ -347,7 +347,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn list(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: Option<ImportSource>,
         status: Option<ImportStatus>,
     ) -> Result<Vec<ImportEntity>> {
@@ -406,7 +406,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self, ids), fields(count = ids.len()), err)]
     async fn mark_importing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         ids: &[Uuid],
     ) -> Result<Vec<ImportEntity>> {
         if ids.is_empty() {
@@ -433,7 +433,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn mark_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         entity_id: &str,
         entity_type: &str,
@@ -484,7 +484,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn mark_import_failed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         error: &str,
     ) -> Result<bool> {
@@ -513,7 +513,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn fail_stale_importing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         older_than_secs: i64,
     ) -> Result<u64> {
         let result = sqlx::query!(
@@ -535,7 +535,7 @@ impl ImportRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self, ids), fields(rows = ids.len()), err)]
-    async fn touch_importing(&self, user: &MacroUserIdStr<'static>, ids: &[Uuid]) -> Result<u64> {
+    async fn touch_importing(&self, user: &RoxUserIdStr<'static>, ids: &[Uuid]) -> Result<u64> {
         let result = sqlx::query!(
             r#"
             UPDATE import_entity
@@ -551,7 +551,7 @@ impl ImportRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn discard(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<bool> {
+    async fn discard(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<bool> {
         let result = sqlx::query!(
             r#"
             UPDATE import_entity
@@ -567,7 +567,7 @@ impl ImportRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn user_team_id(&self, user: &MacroUserIdStr<'static>) -> Result<Option<Uuid>> {
+    async fn user_team_id(&self, user: &RoxUserIdStr<'static>) -> Result<Option<Uuid>> {
         let team_id = sqlx::query_scalar!(
             r#"SELECT team_id FROM team_user WHERE user_id = $1"#,
             user.as_ref(),
@@ -578,13 +578,13 @@ impl ImportRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn team_members(&self, team_id: Uuid) -> Result<Vec<MacroUserIdStr<'static>>> {
+    async fn team_members(&self, team_id: Uuid) -> Result<Vec<RoxUserIdStr<'static>>> {
         let rows = sqlx::query!("SELECT user_id FROM team_user WHERE team_id = $1", team_id,)
             .fetch_all(&self.pool)
             .await?;
         let mut members = Vec::with_capacity(rows.len());
         for row in rows {
-            match MacroUserIdStr::parse_from_str(&row.user_id).map(|id| id.into_owned()) {
+            match RoxUserIdStr::parse_from_str(&row.user_id).map(|id| id.into_owned()) {
                 Ok(id) => members.push(id),
                 Err(error) => {
                     tracing::warn!(?error, %team_id, "skipping unparseable team member id");
@@ -595,7 +595,7 @@ impl ImportRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn list_runs(&self, user: &MacroUserIdStr<'static>) -> Result<Vec<ImportRun>> {
+    async fn list_runs(&self, user: &RoxUserIdStr<'static>) -> Result<Vec<ImportRun>> {
         let rows = sqlx::query_as!(
             ImportRunDbRow,
             r#"
@@ -617,7 +617,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn start_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         from: &[RunStatus],
     ) -> Result<bool> {
@@ -645,7 +645,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn fail_stale_runs(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         older_than_secs: i64,
     ) -> Result<u64> {
         let result = sqlx::query!(
@@ -668,7 +668,7 @@ impl ImportRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn finish_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         to: RunStatus,
         error: Option<&str>,

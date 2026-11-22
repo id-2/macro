@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_message_reconciliation SET attempts = 2, available_at = now() WHERE link_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "fb1785b135586711f1cdabd86048d18e5f020c824c2f265928330686d13bdf84"
+}

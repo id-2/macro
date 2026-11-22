@@ -320,7 +320,11 @@ export function CommandMenuInner(props: CommandMenuInnerProps) {
       <Show when={expanded() && eligible()} fallback={searchMenu()}>
         <CommandComposerMenu {...props}>
           <Suspense
-            fallback={<p class="text-sm text-ink-muted">Opening composer…</p>}
+            fallback={
+              <p class="text-sm text-ink-muted">
+                {t('commandMenu.openingComposer')}
+              </p>
+            }
           >
             <CommandUniversalInput
               text={CommandState.query()}
@@ -957,7 +961,7 @@ function CommandSearchMenu(
             when={isEntityActionMode()}
             fallback={
               <Tabs
-                aria-label="Result categories"
+                aria-label={t('commandMenu.resultCategories')}
                 size="sm"
                 options={categoryTabs()}
                 value={categoryFilter()}

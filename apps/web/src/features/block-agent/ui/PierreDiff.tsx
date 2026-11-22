@@ -19,6 +19,7 @@
  *   instead of pierre's OS-preference "system" mode.
  */
 
+import { t } from '@app/lib/i18n';
 import {
   createThemeType,
   PIERRE_STYLE_VARIABLES,
@@ -139,7 +140,7 @@ function PierreFileView(props: {
   return (
     <Show
       when={!failed()}
-      fallback={<DiffNote>diff could not be rendered</DiffNote>}
+      fallback={<DiffNote>{t('agentChat.diffRenderFailed')}</DiffNote>}
     >
       <div
         ref={container}
@@ -202,8 +203,8 @@ export function PierreDiff(props: { diffs: FileDiff[] }): JSX.Element {
         fallback={
           <DiffNote>
             {workers().kind === 'failed'
-              ? 'diff could not be rendered'
-              : 'Loading diff…'}
+              ? t('agentChat.diffRenderFailed')
+              : t('agentChat.loadingDiff')}
           </DiffNote>
         }
       >

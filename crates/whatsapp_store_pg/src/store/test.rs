@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 use whatsmeow::signal::CurveSignatures;

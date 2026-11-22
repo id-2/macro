@@ -15,14 +15,14 @@ use external_chat::domain::{
     ports::{ExternalChatResult, MutationTarget, SendIntent, StoredSend},
     timeline::view::People,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Owner-scoped account and pairing transitions.
 #[async_trait]
 pub trait AccountRepository: Send + Sync {
     /// The person's account, if they ever started pairing.
-    async fn owned_account(&self, user: &MacroUserIdStr<'_>)
+    async fn owned_account(&self, user: &RoxUserIdStr<'_>)
     -> ExternalChatResult<Option<Account>>;
     /// Return the live transaction, or start one: create the account if absent,
     /// otherwise move it to `pairing` and bump its generation. Fails with
@@ -32,7 +32,7 @@ pub trait AccountRepository: Send + Sync {
     /// Signals `whatsapp_pairing_requested`.
     async fn begin_pairing(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         replace: bool,
     ) -> ExternalChatResult<Pairing>;
     /// The owner's transaction with its current codes; an unconsumed transaction
@@ -40,14 +40,14 @@ pub trait AccountRepository: Send + Sync {
     /// `NotFound` for another user's transaction.
     async fn pair_state(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         pairing: Uuid,
     ) -> ExternalChatResult<PairState>;
     /// Store the owner's WebAuthn assertion for a live transaction waiting on a
     /// passkey; `NotFound` otherwise. Signals `whatsapp_pairing_requested`.
     async fn submit_passkey(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         pairing: Uuid,
         response: &serde_json::Value,
     ) -> ExternalChatResult<()>;
@@ -55,7 +55,7 @@ pub trait AccountRepository: Send + Sync {
     /// Signals `whatsapp_pairing_requested`. Idempotent.
     async fn cancel_pairing(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         pairing: Uuid,
     ) -> ExternalChatResult<()>;
     /// End consent at exactly this generation: state `disconnected`, generation
@@ -64,7 +64,7 @@ pub trait AccountRepository: Send + Sync {
     /// Signals `whatsapp_account_changed`.
     async fn disconnect(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         generation: i64,
     ) -> ExternalChatResult<bool>;
     /// The Rox user who linked this account.
@@ -128,7 +128,7 @@ pub trait GroupRepository: Send + Sync {
     /// newest first.
     async fn visible_adoptions(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         groups: &[String],
     ) -> ExternalChatResult<Vec<VisibleAdoption>>;
     /// Latest metadata for a chat's group from any account consenting to it,
@@ -202,7 +202,7 @@ pub struct Adoption {
 /// A new external chat, authorized by the domain.
 pub struct AdoptionRecord<'a> {
     /// Adopting person.
-    pub user: &'a MacroUserIdStr<'a>,
+    pub user: &'a RoxUserIdStr<'a>,
     /// Their account at the generation that authorized adoption.
     pub account: &'a Account,
     /// What to add.
@@ -242,7 +242,7 @@ pub trait SendRepository: Send + Sync {
     async fn stored_send(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         idempotency_key: Uuid,
     ) -> ExternalChatResult<Option<StoredSend>>;
     /// Record the intent and assign the chat sequence. Replays with the same key
@@ -254,13 +254,13 @@ pub trait SendRepository: Send + Sync {
     async fn open_sends(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ExternalChatResult<Vec<SendProgress>>;
     /// The person's sends for these chat messages or intent ids.
     async fn sends_for(
         &self,
         chat_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         ids: &[Uuid],
     ) -> ExternalChatResult<Vec<SendProgress>>;
     /// The state of the viewer's newest send of each of these messages.

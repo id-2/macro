@@ -16,13 +16,13 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use http_body_util::BodyExt;
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_user::UserContext;
 use rootcause::Report;
@@ -201,7 +201,7 @@ impl StubEntityAccessService {
 impl EntityAccessService for StubEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -221,7 +221,7 @@ impl EntityAccessService for StubEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -230,7 +230,7 @@ impl EntityAccessService for StubEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -249,7 +249,7 @@ impl EntityAccessService for StubEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -271,7 +271,7 @@ impl EntityAccessService for StubEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, uuid::Uuid, TeamRole), AccessError> {
@@ -282,7 +282,7 @@ impl EntityAccessService for StubEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unreachable!("foreign entity router does not list entity users")
     }
 
@@ -302,7 +302,7 @@ impl EntityAccessService for StubEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unreachable!("foreign entity router does not resolve user teams")
     }
@@ -313,27 +313,27 @@ const VALID_INTERNAL_KEY: &str = "valid-internal-key";
 #[derive(Clone, Debug, Default)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, _jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, _jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         unreachable!("internal requests should not authorize user credentials")
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != VALID_INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(claims.user_id.map(|user_id| UserContext {
@@ -356,7 +356,7 @@ fn router_with_access(
     foreign_entity_router(ForeignEntityRouterState::new(
         service,
         Arc::new(access_service),
-        MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     ))
 }
 

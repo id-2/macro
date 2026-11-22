@@ -7,7 +7,7 @@ use std::collections::{HashMap, HashSet};
 use std::future::Future;
 use std::sync::Arc;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde::Serialize;
 use serde::de::DeserializeOwned;
@@ -60,8 +60,8 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// Get users who have muted notifications.
     fn get_muted_users<'a>(
         &self,
-        user_ids: &[MacroUserIdStr<'a>],
-    ) -> impl Future<Output = Result<HashSet<MacroUserIdStr<'static>>, Report>> + Send;
+        user_ids: &[RoxUserIdStr<'a>],
+    ) -> impl Future<Output = Result<HashSet<RoxUserIdStr<'static>>, Report>> + Send;
 
     /// Get users who silenced a specific item for this notification: every
     /// unsubscribed user, minus those who kept direct mentions when
@@ -70,8 +70,8 @@ pub trait NotificationRepository: Send + Sync + 'static {
         &self,
         item_id: &str,
         is_direct_mention: bool,
-        user_ids: &[MacroUserIdStr<'a>],
-    ) -> impl Future<Output = Result<HashSet<MacroUserIdStr<'static>>, Report>> + Send;
+        user_ids: &[RoxUserIdStr<'a>],
+    ) -> impl Future<Output = Result<HashSet<RoxUserIdStr<'static>>, Report>> + Send;
 
     /// Create a notification and user notification records.
     ///
@@ -101,20 +101,20 @@ pub trait NotificationRepository: Send + Sync + 'static {
     fn update_sent_status<'a>(
         &self,
         notification_id: Uuid,
-        user_ids: &[MacroUserIdStr<'a>],
+        user_ids: &[RoxUserIdStr<'a>],
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     /// Get device endpoints for push notifications.
     fn get_device_endpoints<'a>(
         &self,
-        user_ids: &[MacroUserIdStr<'a>],
-    ) -> impl Future<Output = Result<HashMap<MacroUserIdStr<'static>, Vec<DeviceEndpoint>>, Report>> + Send;
+        user_ids: &[RoxUserIdStr<'a>],
+    ) -> impl Future<Output = Result<HashMap<RoxUserIdStr<'static>, Vec<DeviceEndpoint>>, Report>> + Send;
 
     /// Atomically apply `MarkSeen` from [`super::models::NotificationAction`].
     /// Preserve done state and any recorded viewing timestamp; return user-owned rows.
     fn mark_notifications_seen(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
     ) -> impl Future<Output = Result<Vec<UserNotificationRow<serde_json::Value>>, Report>> + Send;
 
@@ -123,7 +123,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// return the updated user-owned rows, following [`super::models::NotificationState::apply`].
     fn mark_notifications_done(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
         done: bool,
     ) -> impl Future<Output = Result<Vec<UserNotificationRow<serde_json::Value>>, Report>> + Send;
@@ -133,7 +133,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// Notifications no longer done are left alone. Return the updated rows.
     fn reopen_notifications(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
         unseen: &[Uuid],
     ) -> impl Future<Output = Result<Vec<UserNotificationRow<serde_json::Value>>, Report>> + Send;
@@ -142,7 +142,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// entity that need the requested status transition or an initial viewing timestamp.
     fn get_notification_ids_for_entities(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
         status: &NotificationStatus,
     ) -> impl Future<Output = Result<Vec<Uuid>, Report>> + Send;
@@ -158,7 +158,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// Includes only unseen notifications that exist and are not soft-deleted.
     fn get_digest_eligible_notification_ids(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
     ) -> impl Future<Output = Result<HashSet<Uuid>, Report>> + Send;
 
@@ -167,7 +167,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// The metadata JSON column is deserialized into `T`. `filters` selects exact states.
     fn get_user_notifications<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         limit: u32,
         cursor: Query<Uuid, CreatedAt, ()>,
         filters: NotificationListFilters,
@@ -178,7 +178,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// Only returns notifications matching one of the provided `event_item_ids` and the status filters.
     fn get_user_notifications_by_event_item_ids<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         event_item_ids: &[Uuid],
         limit: u32,
         cursor: Query<Uuid, CreatedAt, ()>,
@@ -189,7 +189,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// The default query preserves the complete active-notification edge.
     fn get_entity_notifications_batch(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         entities: Vec<Entity<'static>>,
         query: super::models::entity_query::EntityNotificationQuery,
     ) -> impl Future<
@@ -204,28 +204,28 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// Returns `None` if no active (non-deleted) notification exists for the given user and ID.
     fn get_user_notification_by_id<T: DeserializeOwned + Send>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> impl Future<Output = Result<Option<UserNotificationRow<T>>, Report>> + Send;
 
     /// Soft-delete a single user notification.
     fn delete_user_notification(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     /// Soft-delete multiple user notifications.
     fn bulk_delete_user_notifications(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_ids: &[Uuid],
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     /// Hard-delete all notifications for a user.
     fn delete_all_user_notifications(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     /// Look up an existing device endpoint ARN by its device token.
@@ -241,7 +241,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// record if the endpoint already exists.
     fn upsert_device(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_endpoint: &str,
         device_type: &DeviceType,
@@ -254,7 +254,7 @@ pub trait NotificationRepository: Send + Sync + 'static {
     /// Returns the endpoint ARNs that were removed (empty if none matched).
     fn delete_user_devices_by_token(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_type: &DeviceType,
     ) -> impl Future<Output = Result<Vec<String>, Report>> + Send;
@@ -281,26 +281,26 @@ pub trait NotificationRepository: Send + Sync + 'static {
     fn get_users_with_type_disabled<'a>(
         &self,
         notification_event_type: &str,
-        user_ids: &[MacroUserIdStr<'a>],
-    ) -> impl Future<Output = Result<HashSet<MacroUserIdStr<'static>>, Report>> + Send;
+        user_ids: &[RoxUserIdStr<'a>],
+    ) -> impl Future<Output = Result<HashSet<RoxUserIdStr<'static>>, Report>> + Send;
 
     /// Get all disabled notification types for a user.
     fn get_disabled_notification_types(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<DisabledNotificationType>, Report>> + Send;
 
     /// Disable a notification type for a user (insert).
     fn disable_notification_type(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_event_type: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 
     /// Re-enable a notification type for a user (delete).
     fn enable_notification_type(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_event_type: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send;
 }
@@ -338,9 +338,9 @@ pub trait RealtimeSender: Send + Sync + 'static {
     /// (i.e., they were online and the message was delivered).
     fn send_notifications<'a, T: Serialize + Send + Sync>(
         &self,
-        recipients: &[MacroUserIdStr<'a>],
+        recipients: &[RoxUserIdStr<'a>],
         notification: &T,
-    ) -> impl Future<Output = Result<HashSet<MacroUserIdStr<'static>>, Report>> + Send;
+    ) -> impl Future<Output = Result<HashSet<RoxUserIdStr<'static>>, Report>> + Send;
 }
 
 /// Receives events from the notifications topic with notification metadata decoded as `T`.
@@ -404,14 +404,14 @@ impl<T> WebSocketNotificationSubscription<T> {
 /// Provides user-scoped subscriptions to received WebSocket notification updates of type `T`.
 pub trait WebSocketNotificationSubscriptionService<T>: Send + Sync + 'static {
     /// Subscribes to WebSocket notification updates addressed to `user_id`.
-    fn subscribe(&self, user_id: MacroUserIdStr<'static>) -> WebSocketNotificationSubscription<T>;
+    fn subscribe(&self, user_id: RoxUserIdStr<'static>) -> WebSocketNotificationSubscription<T>;
 }
 
 impl<S, T> WebSocketNotificationSubscriptionService<T> for std::sync::Arc<S>
 where
     S: WebSocketNotificationSubscriptionService<T>,
 {
-    fn subscribe(&self, user_id: MacroUserIdStr<'static>) -> WebSocketNotificationSubscription<T> {
+    fn subscribe(&self, user_id: RoxUserIdStr<'static>) -> WebSocketNotificationSubscription<T> {
         self.as_ref().subscribe(user_id)
     }
 }
@@ -423,7 +423,7 @@ pub struct NoopWebSocketNotificationSubscriptionService;
 impl<T: Send + 'static> WebSocketNotificationSubscriptionService<T>
     for NoopWebSocketNotificationSubscriptionService
 {
-    fn subscribe(&self, _user_id: MacroUserIdStr<'static>) -> WebSocketNotificationSubscription<T> {
+    fn subscribe(&self, _user_id: RoxUserIdStr<'static>) -> WebSocketNotificationSubscription<T> {
         let (_sender, receiver) = tokio::sync::mpsc::channel(1);
         let (exit_reason_sender, exit_reason) = tokio::sync::oneshot::channel();
         let _ = exit_reason_sender.send(WebSocketNotificationSubscriptionExit::Closed);
@@ -439,7 +439,7 @@ pub trait EmailSender: Send + Sync + 'static {
     /// of the notification the email delivers.
     fn send_email(
         &self,
-        recipient: MacroUserIdStr<'_>,
+        recipient: RoxUserIdStr<'_>,
         notification_type: &str,
         content: &EmailContent,
     ) -> impl Future<Output = Result<(), Report>> + Send;
@@ -572,7 +572,7 @@ pub trait VoipPushDelivery: Send + Sync + 'static {
     fn send_voip_push(
         &self,
         endpoint_arn: &str,
-        recipient_id: &MacroUserIdStr<'_>,
+        recipient_id: &RoxUserIdStr<'_>,
         payload: &VoipPushPayload,
     ) -> impl Future<Output = Result<String, Report>> + Send;
 }
@@ -586,7 +586,7 @@ pub trait VoipPushSender: Send + Sync + 'static {
     /// Batch-resolve VoIP endpoints before the caller mints per-recipient tokens.
     fn get_voip_push_targets(
         &self,
-        recipient_ids: &[MacroUserIdStr<'_>],
+        recipient_ids: &[RoxUserIdStr<'_>],
     ) -> impl Future<Output = Result<Vec<VoipPushTarget>, Report>> + Send;
 
     /// Send recipient-specific payloads to already-resolved VoIP endpoints.
@@ -603,7 +603,7 @@ pub trait VoipPushSender: Send + Sync + 'static {
 impl VoipPushSender for () {
     async fn get_voip_push_targets(
         &self,
-        _: &[MacroUserIdStr<'_>],
+        _: &[RoxUserIdStr<'_>],
     ) -> Result<Vec<VoipPushTarget>, Report> {
         Ok(Vec::new())
     }
@@ -619,7 +619,7 @@ impl VoipPushSender for () {
 impl<V: VoipPushSender> VoipPushSender for Option<V> {
     async fn get_voip_push_targets(
         &self,
-        recipient_ids: &[MacroUserIdStr<'_>],
+        recipient_ids: &[RoxUserIdStr<'_>],
     ) -> Result<Vec<VoipPushTarget>, Report> {
         if let Some(inner) = self {
             inner.get_voip_push_targets(recipient_ids).await

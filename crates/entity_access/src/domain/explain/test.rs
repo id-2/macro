@@ -13,7 +13,7 @@ struct FakeRepo {
 impl ExplainAccessRepository for FakeRepo {
     fn list_access_grants(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> impl Future<Output = Result<Vec<AccessGrant>, AccessError>> + Send {
@@ -22,8 +22,8 @@ impl ExplainAccessRepository for FakeRepo {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("explain@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("explain@example.com").unwrap()
 }
 
 #[tokio::test]

@@ -1,4 +1,4 @@
-import MacroLogo from '@icon/macro-logo.svg';
+import RoxLogo from '@icon/rox-logo.svg';
 import CursorIcon from '@icon/wide-cursor-ide.svg';
 import { cn } from '@ui';
 import { type JSX, Show, splitProps } from 'solid-js';
@@ -32,7 +32,7 @@ export function AgentRosterRow(props: {
   return (
     <div class="arow">
       <span class="grid size-9 shrink-0 place-items-center rounded-xl border border-edge-muted bg-surface-2">
-        <Show when={props.coder} fallback={<MacroLogo class="size-5" />}>
+        <Show when={props.coder} fallback={<RoxLogo class="size-5" />}>
           <CursorIcon class="size-5" />
         </Show>
       </span>

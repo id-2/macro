@@ -8,8 +8,8 @@ use entity_access::domain::{
     models::{EditAccessLevel, EntityType},
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal, UserOrInternalCaller,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal, UserOrInternalCaller,
 };
 use model::{
     folder::{UploadFolderRequest, UploadFolderResponseData},
@@ -61,13 +61,13 @@ pub struct UploadExtractParams {
 )]
 pub async fn upload_folder_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<UploadFolderRequest>,
 ) -> Result<Json<UploadFolderResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     ensure_parent_edit_access(&state, &user, request.parent_id.as_deref()).await?;
     let data = state
@@ -101,13 +101,13 @@ where
 )]
 pub async fn upload_extract_folder_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<UploadExtractFolderRequest>,
 ) -> Result<Json<UploadExtractFolderResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     ensure_parent_edit_access(&state, &user, request.parent_id.as_deref()).await?;
     let data = state
@@ -139,13 +139,13 @@ where
 )]
 pub async fn get_upload_extract_status_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(UploadExtractParams { request_id }): Path<UploadExtractParams>,
 ) -> Result<Json<UploadExtractStatusResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let data = state
         .service
@@ -157,7 +157,7 @@ where
 
 async fn ensure_parent_edit_access<T, Svc, Auth>(
     state: &ProjectRouterState<T, Svc, Auth>,
-    user: &MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: &RoxAuthorizationExtractor<Auth, UserOrInternal>,
     parent_id: Option<&str>,
 ) -> Result<(), ProjectError>
 where
@@ -192,13 +192,13 @@ where
 )]
 pub async fn mark_uploaded_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<MarkProjectUploadedRequest>,
 ) -> Result<Json<MarkProjectUploadedResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let project_ids = state
         .service

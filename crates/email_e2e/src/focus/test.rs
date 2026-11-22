@@ -2,8 +2,8 @@ use std::time::Duration;
 
 use feature_flags::FeatureFlags;
 use feature_flags::outbound::posthog_local::PostHogLocalFeatureFlags;
-use macro_env::Environment;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_env::Environment;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::{FOCUS_FLAG, FocusStandIns, POSTHOG_PROJECT_KEY, POSTHOG_SECRET_KEY};
 
@@ -23,7 +23,7 @@ fn worker_flags(stand_ins: &FocusStandIns) -> PostHogLocalFeatureFlags {
 
 async fn has_flag(flags: &PostHogLocalFeatureFlags, address: &str) -> bool {
     let id = format!("macro|{address}");
-    let owner = MacroUserIdStr::parse_from_str(&id).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(&id).unwrap();
     flags.load(&owner).await.unwrap().is_enabled(FOCUS_FLAG)
 }
 

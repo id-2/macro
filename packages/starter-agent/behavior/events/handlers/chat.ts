@@ -1,6 +1,6 @@
-import type { Woke } from '@macro-inc/muppet/core/agent';
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import type { Woke } from '@rox-one/muppet/core/agent';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import type { ChatContext } from '../../capabilities/chat/context.ts';
 import { judge } from '../../capabilities/chat/listen.ts';
 import { replyPrompt, threadOf } from '../../capabilities/chat/prompt.ts';

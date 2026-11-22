@@ -2076,7 +2076,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/MacroApiTokenResponse"
+                  "$ref": "#/components/schemas/RoxApiTokenResponse"
                 }
               }
             }
@@ -8687,7 +8687,7 @@
       "EmailConnectionProviders": {
         "type": "object",
         "description": "What the provider selector offers the requesting user.",
-        "required": ["gmail", "outlook"],
+        "required": ["gmail", "outlook", "github"],
         "properties": {
           "gmail": {
             "type": "boolean"
@@ -8695,6 +8695,10 @@
           "outlook": {
             "type": "boolean",
             "description": "Whether this user may start a new Outlook connection: the deployment\nswitch and their `enable-outlook` flag."
+          },
+          "github": {
+            "type": "boolean",
+            "description": "Whether this deployment can start a GitHub link at all: its sign-in\nservice has the `github` identity provider. False on a stack started\nwithout a real GitHub OAuth app (`local-github-client` placeholders), so\nthe app knows the link-status read could only answer \"not linked\"."
           },
           "outlook_admin_consent_url": {
             "type": ["string", "null"],
@@ -9660,7 +9664,7 @@
         "description": "Defines who can access an item through its share link.",
         "enum": ["PUBLIC", "TEAM"]
       },
-      "MacroApiTokenResponse": {
+      "RoxApiTokenResponse": {
         "type": "object",
         "required": ["macro_api_token"],
         "properties": {

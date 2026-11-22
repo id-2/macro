@@ -3,7 +3,7 @@ use std::sync::Mutex;
 
 fn actor() -> InboxActor {
     InboxActor {
-        macro_id: MacroUserIdStr::parse_from_str("macro|leaving@example.com").unwrap(),
+        macro_id: RoxUserIdStr::parse_from_str("macro|leaving@example.com").unwrap(),
         credential_owner: "leaving-owner".into(),
     }
 }
@@ -233,7 +233,7 @@ async fn assert_double_match_removal(with_replacement: bool) {
         };
         let owner = DeletedUserBinding {
             actor: InboxActor {
-                macro_id: MacroUserIdStr::try_from(before.owner.clone()).unwrap(),
+                macro_id: RoxUserIdStr::try_from(before.owner.clone()).unwrap(),
                 credential_owner: "leaving-owner".into(),
             },
             link_id: before.link_id,
@@ -322,7 +322,7 @@ async fn deleted_user_single_binding_keeps_existing_removal_decision() {
             actor()
         } else {
             InboxActor {
-                macro_id: MacroUserIdStr::try_from(before.owner.clone()).unwrap(),
+                macro_id: RoxUserIdStr::try_from(before.owner.clone()).unwrap(),
                 credential_owner: "leaving-owner".into(),
             }
         };
@@ -450,7 +450,7 @@ async fn deleted_user_orders_links_then_binding_kind_then_actors() {
     .into_iter()
     .map(|(link_id, actor_id, kind)| DeletedUserBinding {
         actor: InboxActor {
-            macro_id: MacroUserIdStr::parse_from_str(actor_id).unwrap(),
+            macro_id: RoxUserIdStr::parse_from_str(actor_id).unwrap(),
             credential_owner: "leaving-owner".into(),
         },
         link_id,

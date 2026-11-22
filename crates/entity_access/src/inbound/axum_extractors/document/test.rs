@@ -18,16 +18,16 @@ use axum::{
     http::{Request, StatusCode, header},
     response::IntoResponse,
 };
-use macro_authorization::{
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims, BotAuthentication, BotScope,
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
 };
 #[allow(deprecated)]
-use macro_authorization::{
+use rox_authorization::{
     LEGACY_DSS_INTERNAL_API_KEY_HEADER, LEGACY_DSS_INTERNAL_MACRO_USER_ID_HEADER,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::DocumentBasic;
 use model_owner::Owner;
 use model_user::UserContext;
@@ -55,23 +55,23 @@ impl FakeAuthorizationService {
     }
 }
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             "owner" => Ok(user_context(OWNER_ID)),
             "valid" => Ok(user_context(USER_ID)),
-            "expired" => Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            "expired" => Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_bot(
@@ -79,12 +79,12 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         token: &str,
         bot_scope: BotScope,
         _claims: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         match token {
             VALID_BOT_TOKEN => Ok(valid_bot_authentication(bot_scope)),
             MALFORMED_SYSTEM_BOT_TOKEN => Ok(malformed_system_bot_authentication(bot_scope)),
             OWNER_ACTING_BOT_TOKEN => Ok(owner_scoped_bot_authentication()),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
@@ -92,9 +92,9 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(claims
@@ -106,7 +106,7 @@ impl MacroAuthorizationService for FakeAuthorizationService {
 
 struct TestState {
     entity_access: Arc<FakeEntityAccessService>,
-    authorization: MacroAuthorizationState<FakeAuthorizationService>,
+    authorization: RoxAuthorizationState<FakeAuthorizationService>,
 }
 
 impl TestState {
@@ -134,7 +134,7 @@ impl TestState {
     ) -> Self {
         Self {
             entity_access: Arc::new(entity_access),
-            authorization: MacroAuthorizationState::new(Arc::new(authorization)),
+            authorization: RoxAuthorizationState::new(Arc::new(authorization)),
         }
     }
 }
@@ -145,7 +145,7 @@ impl FromRef<TestState> for Arc<FakeEntityAccessService> {
     }
 }
 
-impl FromRef<TestState> for MacroAuthorizationState<FakeAuthorizationService> {
+impl FromRef<TestState> for RoxAuthorizationState<FakeAuthorizationService> {
     fn from_ref(state: &TestState) -> Self {
         state.authorization.clone()
     }
@@ -167,7 +167,7 @@ fn owner_scoped_bot_authentication() -> BotAuthentication {
         .as_mut()
         .expect("user-scoped bot should have an acting user");
     acting_user.macro_user_id =
-        MacroUserIdStr::parse_from_str(OWNER_ID).expect("owner id should be valid");
+        RoxUserIdStr::parse_from_str(OWNER_ID).expect("owner id should be valid");
     acting_user.user_context = user_context(OWNER_ID);
     authentication
 }
@@ -502,7 +502,7 @@ async fn user_scoped_bot_uses_acting_user_scope() {
             .expect("receipt should retain bot scope")
             .scope(),
         &BotReceiptScope::User {
-            acting_user: MacroUserIdStr::parse_from_str(BOT_ACTING_USER_ID)
+            acting_user: RoxUserIdStr::parse_from_str(BOT_ACTING_USER_ID)
                 .expect("acting user id should be valid"),
         }
     );
@@ -511,7 +511,7 @@ async fn user_scoped_bot_uses_acting_user_scope() {
         [BotAccessCall {
             bot_id: BOT_ID,
             scope: BotAccessScope::User {
-                user_id: MacroUserIdStr::parse_from_str(BOT_ACTING_USER_ID)
+                user_id: RoxUserIdStr::parse_from_str(BOT_ACTING_USER_ID)
                     .expect("acting user id should be valid"),
                 user_org_id: Some(i64::from(BOT_ACTING_USER_ORGANIZATION_ID)),
             },
@@ -625,7 +625,7 @@ async fn bot_acting_as_document_owner_still_uses_scoped_service() {
     assert_eq!(
         state.entity_access.bot_calls()[0].scope,
         BotAccessScope::User {
-            user_id: MacroUserIdStr::parse_from_str(OWNER_ID).expect("owner id should be valid"),
+            user_id: RoxUserIdStr::parse_from_str(OWNER_ID).expect("owner id should be valid"),
             user_org_id: None,
         }
     );

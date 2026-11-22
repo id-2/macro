@@ -56,7 +56,7 @@ database. Nothing talks to WhatsApp or AWS (the KMS is
   pointing at a migrated RoxDB (the query macros check against it; each test
   gets its own database on that server). If the shared `macrodb` is stale,
   create and migrate your own `macrodb_<name>` with
-  `sqlx migrate run --source crates/macro_db_client/migrations`.
+  `sqlx migrate run --source crates/rox_db_client/migrations`.
 
 ## Gotchas
 

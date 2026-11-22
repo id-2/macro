@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_messages SET internal_date_ts = '2026-09-01T09:00:00Z' WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "8d35caa73c50383d5bd637100f3ab5e822609e7bcd703a23279ba09fc0b0d724"
+}

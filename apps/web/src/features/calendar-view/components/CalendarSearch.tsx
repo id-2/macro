@@ -154,7 +154,7 @@ function formatEventWhen(
   if (!time) return '';
   if (time.kind === 'allDay') {
     const date = parseLocalDate(time.startDate);
-    return date ? `${formatDateLabel(date)} · All day` : '';
+    return date ? `${formatDateLabel(date)} · Весь день` : '';
   }
   const start = new Date(time.startsAt);
   if (Number.isNaN(start.getTime())) return '';
@@ -619,7 +619,7 @@ function CalendarSearchControl(props: {
     hotkey: 'cmd+f',
     scopeId: panel.splitHotkeyScope,
     hotkeyToken: TOKENS.calendar.search,
-    description: 'Search events',
+    description: 'Искать события',
     runWithInputFocused: true,
     keyDownHandler: () => {
       if (props.inline) {
@@ -666,7 +666,7 @@ function CalendarSearchControl(props: {
             variant="ghost"
             size="icon-lg"
             class="rounded-full"
-            aria-label="Search events"
+            aria-label="Искать события"
           >
             <SearchIcon class="size-5 mobile:size-6" />
           </Popover.Trigger>
@@ -679,9 +679,9 @@ function CalendarSearchControl(props: {
           >
             <Show when={props.expanded === false}>
               <Button
-                aria-label="Search events"
+                aria-label="Искать события"
                 tooltip={{
-                  content: 'Search events',
+                  content: 'Искать события',
                   hotkey: TOKENS.calendar.search,
                 }}
                 ref={searchButton}
@@ -706,7 +706,7 @@ function CalendarSearchControl(props: {
             >
               <SearchBar
                 ref={(element) => (inputRef = element)}
-                label="Search events"
+                label="Искать события"
                 class="has-[input:focus-visible]:ring-inset"
                 onClose={props.onDismiss ? dismissSearch : undefined}
                 value={rawQuery()}
@@ -717,7 +717,7 @@ function CalendarSearchControl(props: {
                 onKeyDown={handleSearchKeyDown}
                 onEscape={dismissSearch}
                 hotkey="cmd+f"
-                placeholder="Search events"
+                placeholder="Искать события"
               />
             </div>
           </Popover.Anchor>
@@ -797,7 +797,7 @@ function CalendarSearchControl(props: {
                             changeQuery(event.currentTarget.value)
                           }
                           onKeyDown={handleSearchKeyDown}
-                          placeholder="Search events"
+                          placeholder="Искать события"
                           class="min-w-0 flex-1 bg-transparent text-sm caret-accent outline-none placeholder:text-ink-placeholder"
                         />
                         {filterActions()}

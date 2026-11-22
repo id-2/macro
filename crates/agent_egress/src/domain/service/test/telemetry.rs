@@ -27,7 +27,7 @@ impl ActorMcpTransport for AnsweringTransport {
     async fn exchange(
         &self,
         _: AgentSessionId,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: UpstreamCall,
         _: Value,
     ) -> Result<Value, EgressError> {

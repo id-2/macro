@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use email::domain::message_reads::SummaryReadError;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use models_email::service::message::MessageSendersRequest;
 use strum_macros::AsRefStr;
 use thiserror::Error;
@@ -43,7 +43,7 @@ impl IntoResponse for GetMessageSendersError {
 #[tracing::instrument(skip_all)]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Json(req_body): Json<MessageSendersRequest>,
 ) -> Result<Response, GetMessageSendersError> {
     let response = ctx

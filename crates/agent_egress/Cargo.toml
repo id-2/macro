@@ -42,16 +42,16 @@ http-body-util = { workspace = true }
 lru = { workspace = true }
 # Signing Rox API tokens, with the same shared vocabulary
 # `authentication_service` mints through.
-macro_auth = { path = "../macro_auth" }
+rox_auth = { path = "../rox_auth" }
 # The owner's `User` row, which carries the FusionAuth id the exchange needs.
-macro_db_client = { path = "../macro_db_client" }
-macro_tower_layers = { path = "../macro_tower_layers" }
-macro_user_id = { path = "../macro_user_id" }
+rox_db_client = { path = "../rox_db_client" }
+rox_tower_layers = { path = "../rox_tower_layers" }
+rox_user_id = { path = "../rox_user_id" }
 # The rows holding the owner's custom (URL-added) MCP servers and their
 # encrypted grants, and the refresh that keeps a grant live. Port and domain
 # service only; the Postgres adapter is the composition root's to build.
 mcp_client = { path = "../mcp_client" }
-macro_uuid = { path = "../macro_uuid" }
+rox_uuid = { path = "../rox_uuid" }
 model_owner = { path = "../model_owner" }
 # The rows saying which apps an owner connected, and the client that turns one
 # into Pipedream's MCP endpoint plus the headers scoping a call to it.

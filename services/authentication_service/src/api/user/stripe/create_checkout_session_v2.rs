@@ -2,8 +2,8 @@ use crate::service::subscription_checkout::CheckoutRequest;
 use axum::{Json, extract::State};
 use entity_access::domain::models::OwnerTeamRole;
 use entity_access::domain::ports::EntityAccessService;
-use entity_access::inbound::axum_extractors::OptionalMacroUserTeamExtractorV2;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use entity_access::inbound::axum_extractors::OptionalRoxUserTeamExtractorV2;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -71,8 +71,8 @@ pub struct CheckoutSessionV2Response {
 #[tracing::instrument(skip(ctx, user, optional_team), err, fields(user_id = %user.authorization.user.macro_user_id))]
 pub async fn create_checkout_session<Eas: EntityAccessService>(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
-    optional_team: OptionalMacroUserTeamExtractorV2<OwnerTeamRole, Eas, AuthorizationService>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    optional_team: OptionalRoxUserTeamExtractorV2<OwnerTeamRole, Eas, AuthorizationService>,
     Json(req): Json<CreateCheckoutSessionV2Request>,
 ) -> Result<Json<CheckoutSessionV2Response>, StripeOperationError> {
     // Build subscription metadata from optional tracking fields

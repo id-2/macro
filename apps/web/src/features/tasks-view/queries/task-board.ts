@@ -172,11 +172,11 @@ export function taskBoardColumns(
     addColumn(
       '',
       {
-        status: 'No status',
-        priority: 'No priority',
-        assignee: 'Unassigned',
-        project: 'No Project',
-        due_date: 'No due date',
+        status: 'Без статуса',
+        priority: 'Без приоритета',
+        assignee: 'Не назначено',
+        project: 'Без проекта',
+        due_date: 'Без срока',
       }[grouping]
     );
   }
@@ -214,7 +214,7 @@ export function taskBoardColumns(
         : [row.groupId];
 
     for (const key of keys) {
-      const column = addColumn(key, key || 'Not set');
+      const column = addColumn(key, key || 'Не задано');
 
       const ids = seen.get(key) ?? new Set<string>();
       seen.set(key, ids);

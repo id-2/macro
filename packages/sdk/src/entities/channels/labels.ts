@@ -4,7 +4,7 @@ import type {
   SmartTagPreview,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Channel } from './channel';
 
 export type { ChannelLabel, ChannelLabelRule, SmartTagPreview };
@@ -22,7 +22,7 @@ export type { ChannelLabel, ChannelLabelRule, SmartTagPreview };
  * smart tags per team or account. Direct messages cannot be grouped.
  */
 export class ChannelLabelsNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Every label in the authenticated user's shared or private scope.

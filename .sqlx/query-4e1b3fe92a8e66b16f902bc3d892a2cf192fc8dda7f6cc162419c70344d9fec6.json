@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO entity_access (entity_id,entity_type,source_id,source_type,access_level) VALUES ($1,'email_thread',$2,'user','view')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4e1b3fe92a8e66b16f902bc3d892a2cf192fc8dda7f6cc162419c70344d9fec6"
+}

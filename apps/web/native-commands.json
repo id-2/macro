@@ -122,6 +122,7 @@
     "plugin:websocket|recover",
     "plugin:websocket|send",
     "pop_shared_files",
+    "prune_session_cookies",
     "read_desktop_diagnostics",
     "read_shared_file_text",
     "record_frontend_diagnostic",

@@ -24,7 +24,7 @@ use cognition::domain::{
     Cognition, DecisionRequest, DecisionResponse, GenerateObjectRequest, GenerateObjectResponse,
     RoutingRequest,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::{Value, json};
 use tokio_util::sync::CancellationToken;
@@ -37,7 +37,7 @@ struct Recorded(Vec<String>);
 impl Cognition for Recorded {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         Err(rootcause::report!(
@@ -47,7 +47,7 @@ impl Cognition for Recorded {
 
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         // Each question reads "Would the SDK entity <name> help with this
@@ -81,7 +81,7 @@ fn strings(value: &Value) -> Vec<String> {
         .unwrap_or_default()
 }
 
-async fn documentation(request: &Value, user: &MacroUserIdStr<'static>) -> String {
+async fn documentation(request: &Value, user: &RoxUserIdStr<'static>) -> String {
     let guidance = match request["guidance"].as_str() {
         Some("Selected") => Guidance::Selected,
         _ => Guidance::Inline,
@@ -102,7 +102,7 @@ async fn documentation(request: &Value, user: &MacroUserIdStr<'static>) -> Strin
 
 fn main() {
     let input: Value = serde_json::from_reader(std::io::stdin()).expect("a JSON request on stdin");
-    let user = MacroUserIdStr::parse_from_str("macro|reconstruct@example.com").expect("a user id");
+    let user = RoxUserIdStr::parse_from_str("macro|reconstruct@example.com").expect("a user id");
     let runtime = tokio::runtime::Builder::new_current_thread()
         .enable_all()
         .build()

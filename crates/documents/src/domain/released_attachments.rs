@@ -20,8 +20,8 @@
 //! attachment any more. As a folder's trash does for the documents in it, open
 //! lists drop the trashed ones and nothing else reacts per document.
 
-use super::events::{DocumentMacroEvent, EmailAttachmentsReleasedMetadata};
-use macro_event_broker::MacroEventBroker;
+use super::events::{DocumentRoxEvent, EmailAttachmentsReleasedMetadata};
+use rox_event_broker::RoxEventBroker;
 use std::future::Future;
 
 pub mod orphans;
@@ -91,7 +91,7 @@ pub struct ReleasedAttachmentService<R, B> {
     broker: B,
 }
 
-impl<R: ReleasedAttachmentRepo, B: MacroEventBroker> ReleasedAttachmentService<R, B> {
+impl<R: ReleasedAttachmentRepo, B: RoxEventBroker> ReleasedAttachmentService<R, B> {
     /// Build the service over its queue storage and the event broker.
     pub fn new(repo: R, broker: B) -> Self {
         Self { repo, broker }
@@ -186,7 +186,7 @@ impl<R: ReleasedAttachmentRepo, B: MacroEventBroker> ReleasedAttachmentService<R
 
         let published = match batch.trashed.first().or(batch.kept.first()) {
             Some(first) => {
-                let event = DocumentMacroEvent::email_attachments_released(
+                let event = DocumentRoxEvent::email_attachments_released(
                     first.clone(),
                     EmailAttachmentsReleasedMetadata {
                         trashed_document_ids: batch.trashed.clone(),

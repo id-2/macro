@@ -3,6 +3,7 @@ import {
   useViewTabHotkeys,
   ViewShell,
 } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import { MobileListLayout } from '@app/components/view-shell/MobileListLayout';
 import { FolderDropZone } from '@app/features/next-soup/actions';
 import { SplitRouter } from '@app/lib/split-router';
@@ -31,7 +32,7 @@ export function DriveLoading() {
     <div class="grid size-full place-items-center text-ink-muted">
       <SpinnerIcon
         aria-hidden={false}
-        aria-label="Loading files"
+        aria-label={t('drive.loadingFiles')}
         class="size-5 animate-spin"
       />
     </div>

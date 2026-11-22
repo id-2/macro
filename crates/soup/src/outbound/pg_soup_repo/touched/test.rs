@@ -1,8 +1,8 @@
 use super::*;
 use crate::domain::models::TouchedPagePosition;
 use item_filters::ast::EntityFilterAst;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -21,7 +21,7 @@ fn req<'a>(
     link_ids: &'a [uuid::Uuid],
 ) -> TouchedSoupRequest<'a> {
     TouchedSoupRequest {
-        user_id: MacroUserIdStr::parse_from_str(user_id).unwrap(),
+        user_id: RoxUserIdStr::parse_from_str(user_id).unwrap(),
         limit: 50,
         after: None,
         filter,

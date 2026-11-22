@@ -9,7 +9,7 @@ import { trashDatabase } from '@block-database/queries/trash-database';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
 import ChartBar from '@icon/system/regular/chart-bar.svg';
-import { $createDocumentCardNode } from '@macro-inc/lexical-core';
+import { $createDocumentCardNode } from '@rox-one/lexical-core';
 import { createForm, onFormFirstQuestion } from '@queries/storage/forms';
 import { getEntityGraphqlClient } from '@service-storage/graphql-soup';
 import { Dialog, type ManagedDialogProps, openDialog } from '@ui';

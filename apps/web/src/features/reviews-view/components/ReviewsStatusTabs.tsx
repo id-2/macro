@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import GitMergeIcon from '@icon/system/regular/git-merge.svg';
 import GitPullRequestIcon from '@icon/system/regular/git-pull-request.svg';
@@ -17,15 +18,15 @@ export function ReviewsStatusTabs(props: {
   return (
     <Tabs
       ref={props.ref}
-      aria-label="Pull request status"
+      aria-label={t('reviews.statusLabel')}
       touch="inset"
       fullWidth={isTouchDevice()}
       iconOnly={props.iconOnly}
       class={props.class}
       options={[
-        { value: 'open', label: 'Open', icon: GitPullRequestIcon },
-        { value: 'closed', label: 'Closed', icon: GitMergeIcon },
-        { value: 'all', label: 'All', icon: StackIcon },
+        { value: 'open', label: t('reviews.statusOpen'), icon: GitPullRequestIcon },
+        { value: 'closed', label: t('reviews.statusClosed'), icon: GitMergeIcon },
+        { value: 'all', label: t('reviews.statusAll'), icon: StackIcon },
       ]}
       value={props.value}
       onChange={props.onChange}

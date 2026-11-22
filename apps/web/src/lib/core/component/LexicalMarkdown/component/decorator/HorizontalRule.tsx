@@ -1,5 +1,5 @@
 import Trash from '@icon/system/regular/x.svg';
-import type { HorizontalRuleDecoratorProps } from '@macro-inc/lexical-core';
+import type { HorizontalRuleDecoratorProps } from '@rox-one/lexical-core';
 import { debounce } from '@solid-primitives/scheduled';
 import { Button } from '@ui';
 import { $createNodeSelection, $setSelection } from 'lexical';

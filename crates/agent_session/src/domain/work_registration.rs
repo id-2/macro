@@ -12,8 +12,8 @@ use std::time::Duration;
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt};
 use futures::{StreamExt as _, stream};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use rootcause::Report;
 use tokio_util::task::TaskTracker;
 use tracing::Instrument as _;
@@ -56,7 +56,7 @@ impl WorkRegistrationId {
     /// A new id, sorting by creation time.
     #[must_use]
     pub fn generate() -> Self {
-        Self(macro_uuid::generate_uuid_v7())
+        Self(rox_uuid::generate_uuid_v7())
     }
 
     /// The id of a stored registration.
@@ -100,7 +100,7 @@ pub struct WorkRegistration {
     /// The registration.
     pub id: WorkRegistrationId,
     /// The account whose work this is.
-    pub account_id: MacroUserIdStr<'static>,
+    pub account_id: RoxUserIdStr<'static>,
     /// The session registered.
     pub session: AgentSessionId,
     /// When the account registered it.
@@ -175,28 +175,28 @@ pub trait WorkRegistrationRepo: Clone + Send + Sync + 'static {
     /// is missing or archived, atomically with an archive ending the session's registrations.
     fn register(
         &self,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> impl Future<Output = Result<Registered>> + Send;
 
     /// End `account`'s active registration of `session`. Whether there was one.
     fn unregister(
         &self,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> impl Future<Output = Result<bool>> + Send;
 
     /// Active registrations of `accounts` on unarchived sessions, newest first, at most `limit`.
     fn active_registrations(
         &self,
-        accounts: &[MacroUserIdStr<'static>],
+        accounts: &[RoxUserIdStr<'static>],
         limit: u32,
     ) -> impl Future<Output = Result<Vec<WorkRegistration>>> + Send;
 
     /// Registrations of `accounts` on `sessions` that are active or ended after `ended_after`.
     fn registration_states(
         &self,
-        accounts: &[MacroUserIdStr<'static>],
+        accounts: &[RoxUserIdStr<'static>],
         sessions: &[AgentSessionId],
         ended_after: DateTime<Utc>,
     ) -> impl Future<Output = Result<Vec<WorkRegistrationState>>> + Send;
@@ -252,29 +252,29 @@ pub trait WorkRegistrations: Send + Sync + 'static {
     fn register(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<WorkRegistration>> + Send;
 
     /// End `account`'s own registration of `session`. Repeating does nothing.
     fn unregister(
         &self,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Active registrations of `accounts` that `viewer` can see, newest first.
     fn visible_registrations(
         &self,
-        viewer: &MacroUserIdStr<'static>,
-        accounts: &[MacroUserIdStr<'static>],
+        viewer: &RoxUserIdStr<'static>,
+        accounts: &[RoxUserIdStr<'static>],
     ) -> impl Future<Output = Result<Vec<WorkRegistration>>> + Send;
 
     /// What `sessions` changing means for `viewer` watching `accounts`, reporting registrations
     /// that ended after `ended_after`.
     fn changes(
         &self,
-        viewer: &MacroUserIdStr<'static>,
-        accounts: &[MacroUserIdStr<'static>],
+        viewer: &RoxUserIdStr<'static>,
+        accounts: &[RoxUserIdStr<'static>],
         sessions: &[AgentSessionId],
         ended_after: DateTime<Utc>,
     ) -> impl Future<Output = Result<WorkRegistrationChanges>> + Send;
@@ -325,7 +325,7 @@ where
     /// one bad lookup must not fail the read or show what may not be visible.
     async fn viewable_sessions(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         sessions: HashSet<AgentSessionId>,
     ) -> HashSet<AgentSessionId> {
         stream::iter(sessions)
@@ -361,7 +361,7 @@ where
     async fn register(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
     ) -> Result<WorkRegistration> {
         let session = session_id(access)?;
         tracing::Span::current().record("agent.session.id", tracing::field::display(session));
@@ -381,7 +381,7 @@ where
     )]
     async fn unregister(
         &self,
-        account: &MacroUserIdStr<'static>,
+        account: &RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> Result<()> {
         let ended = self.repo.unregister(account, session).await?;
@@ -394,8 +394,8 @@ where
 
     async fn visible_registrations(
         &self,
-        viewer: &MacroUserIdStr<'static>,
-        accounts: &[MacroUserIdStr<'static>],
+        viewer: &RoxUserIdStr<'static>,
+        accounts: &[RoxUserIdStr<'static>],
     ) -> Result<Vec<WorkRegistration>> {
         let mut registrations = self
             .repo
@@ -409,8 +409,8 @@ where
 
     async fn changes(
         &self,
-        viewer: &MacroUserIdStr<'static>,
-        accounts: &[MacroUserIdStr<'static>],
+        viewer: &RoxUserIdStr<'static>,
+        accounts: &[RoxUserIdStr<'static>],
         sessions: &[AgentSessionId],
         ended_after: DateTime<Utc>,
     ) -> Result<WorkRegistrationChanges> {

@@ -17,7 +17,7 @@ backfill — plus legacy storage/workflow helpers that remain to be separated.
 ## Scope
 
 - Owns: email-table statements, relational predicates and transaction-scoped
-  storage operations. The schema lives in `crates/macro_db_client/migrations/`.
+  storage operations. The schema lives in `crates/rox_db_client/migrations/`.
 - Put new workflow policy in `crates/email` and provider protocol implementations
   in `email_api_client`. Preserve SQL guards and lock order when extracting
   existing Rust decisions into domain services.
@@ -40,7 +40,7 @@ backfill — plus legacy storage/workflow helpers that remain to be separated.
 - Add a query to an existing table: the module in `src/<area>/` (e.g.
   `src/messages/get.rs`) → its `mod.rs` → a fixture under `fixtures/*.sql` if
   the test needs seed data.
-- Add a column or table: see `crates/macro_db_client/AGENTS.md` (this crate
+- Add a column or table: see `crates/rox_db_client/AGENTS.md` (this crate
   only owns queries, not migrations).
 
 ## Checks
@@ -116,7 +116,7 @@ Parsed message responses expose the draft generation captured in the same SQL sn
   with it, so an imported draft attachment would stay in Drive as a plain
   file. Media uploads to static files still include drafts.
 - Quote and alias camelCase columns to Rust field names; check
-  `crates/macro_db_client/migrations/` for real column spelling, don't guess.
+  `crates/rox_db_client/migrations/` for real column spelling, don't guess.
 - A Rox draft (no provider id, or a live `email_mailbox_drafts` row) puts its
   thread in the inbox only when `email_threads.has_received_mail` is true.
   `recompute_thread_metadata` and the email crate's

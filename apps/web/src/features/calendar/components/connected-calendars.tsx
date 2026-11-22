@@ -167,7 +167,7 @@ export function ConnectedCalendars(props: {
                       }
                     >
                       {account().needsPermission
-                        ? 'Connect calendar'
+                        ? 'Подключить календарь'
                         : 'Disconnect'}
                     </Button>
                   </Show>

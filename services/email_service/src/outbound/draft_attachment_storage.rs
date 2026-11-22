@@ -42,7 +42,7 @@ impl DraftAttachmentStorage for DraftAttachmentS3 {
             .await
             // A local stack signs for its storage's in-network name; the
             // browser uploads through the stack's public endpoint.
-            .map(|url| macro_aws_config::transform_aws_url(&url))
+            .map(|url| rox_aws_config::transform_aws_url(&url))
             .map_err(|_| AttachmentError::Infrastructure)
     }
 }

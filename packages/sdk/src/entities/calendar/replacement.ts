@@ -1,16 +1,16 @@
 import type { CalendarReplacementView } from '../../../generated/calendar/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 /** Durable organizer replacement, recoverable even after the original event is retired. */
 export class CalendarReplacement {
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     readonly id: string,
   ) {}
 
   /** A handle to a replacement by its operation id. */
-  static byId(client: MacroClient, id: string): CalendarReplacement {
+  static byId(client: RoxClient, id: string): CalendarReplacement {
     return new CalendarReplacement(client, id);
   }
 

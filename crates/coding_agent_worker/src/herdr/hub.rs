@@ -13,7 +13,7 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use agent_client_protocol::LineDirection;
 use agent_runtime_protocol::domain::action::AgentAction;
 use agent_session::domain::model::AgentSessionId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 use tokio::io::{AsyncBufReadExt as _, AsyncWriteExt as _, BufReader};
 use tokio::net::{UnixListener, UnixStream};
@@ -34,7 +34,7 @@ mod test;
 const BACKLOG_LIMIT: usize = 20_000;
 const TITLE_LIMIT: usize = 48;
 
-type Owner = MacroUserIdStr<'static>;
+type Owner = RoxUserIdStr<'static>;
 
 /// A handle on the running integration. Cheap to clone; the socket and its
 /// tasks stop when the last clone drops.

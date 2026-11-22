@@ -1,11 +1,11 @@
 //! Delivery of committed vault access-request events: an inbox notification
 //! to reviewers for a new request, and a private `macro.passwords` hint to the
 //! requesting agent for a resolution. Neither grants anything.
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_notifications::PasswordAccessRequestedMetadata;
 use notification::domain::{models::SendNotificationRequestBuilder, service::NotificationIngress};
-use password_events::{AccessRequestResolution, AccessRequestResolvedMetadata, PasswordMacroEvent};
+use password_events::{AccessRequestResolution, AccessRequestResolvedMetadata, PasswordRoxEvent};
 use passwords::domain::{
     agent::{
         StoredRequestStatus,
@@ -22,7 +22,7 @@ pub struct PasswordAccessDelivery<I, B> {
 }
 
 #[async_trait::async_trait]
-impl<I: NotificationIngress + Send + Sync + 'static, B: MacroEventBroker> AccessEventSink
+impl<I: NotificationIngress + Send + Sync + 'static, B: RoxEventBroker> AccessEventSink
     for PasswordAccessDelivery<I, B>
 {
     #[tracing::instrument(name = "passwords.agent.events.deliver_one", skip_all, fields(event_id = %event.id, team_id = %event.team.0, item_id = %event.item.0, request_id = %event.request_id), err)]
@@ -35,7 +35,7 @@ impl<I: NotificationIngress + Send + Sync + 'static, B: MacroEventBroker> Access
         };
         let published = self
             .broker
-            .send_event(&PasswordMacroEvent::access_request_resolved(
+            .send_event(&PasswordRoxEvent::access_request_resolved(
                 event.id,
                 AccessRequestResolvedMetadata {
                     recipient_user_id: event.agent.clone(),
@@ -55,7 +55,7 @@ impl<I: NotificationIngress + Send + Sync + 'static, B: MacroEventBroker> Access
 
 impl<I: NotificationIngress, B> PasswordAccessDelivery<I, B> {
     async fn notify_reviewers(&self, event: &AccessEvent) -> Result<(), Error> {
-        let recipients: HashSet<MacroUserIdStr<'static>> =
+        let recipients: HashSet<RoxUserIdStr<'static>> =
             event.reviewers.iter().cloned().collect();
         if recipients.is_empty() {
             return Ok(());

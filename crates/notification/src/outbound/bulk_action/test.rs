@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use notification_state::NotificationState;
 use serde_json::json;
 use sqlx::{Pool, Postgres};
@@ -6,8 +6,8 @@ use sqlx::{Pool, Postgres};
 use super::*;
 use crate::{domain::bulk_action::BulkActionItem, outbound::repository::NotificationDbOps};
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("user@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("user@example.com").unwrap()
 }
 
 /// A notification for the test user in `state`, created `age_seconds` ago.
@@ -317,7 +317,7 @@ async fn creating_the_same_action_twice_creates_it_once(pool: Pool<Postgres>) {
         CreatedBulkAction::Conflict
     ));
     let other_user = NewBulkAction {
-        user_id: MacroUserIdStr::try_from_email("other@example.com").unwrap(),
+        user_id: RoxUserIdStr::try_from_email("other@example.com").unwrap(),
         ..new
     };
     assert!(matches!(

@@ -25,11 +25,11 @@ use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, EntityAccessAuth, EntityAccessReceipt, EntityPermission,
     EntityType, OwnerAccessLevel, RequiredPermission, ViewAccessLevel,
 };
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Level;
 
-use crate::domain::events::{self, FormMacroEvent, FormTopicEvent};
+use crate::domain::events::{self, FormRoxEvent, FormTopicEvent};
 use crate::domain::models::{
     DatabaseId, Form, FormAccess, FormDetail, FormError, FormId, FormLayout, FormTally, ListedForm,
     MyResponse, Respondent, ResponseSummary, StoredForm, Submission, SubmissionOutcome, UpdateForm,
@@ -134,8 +134,8 @@ fn receipt_respondent<Level: RequiredPermission>(
 }
 
 /// A form's owner, as the user its writes act for when nobody signed in.
-fn owner_of(form: &Form) -> Result<MacroUserIdStr<'static>, FormError> {
-    MacroUserIdStr::try_from(form.owner_id.clone()).map_err(|error| {
+fn owner_of(form: &Form) -> Result<RoxUserIdStr<'static>, FormError> {
+    RoxUserIdStr::try_from(form.owner_id.clone()).map_err(|error| {
         FormError::Repository(rootcause::report!(
             "stored form owner is not a user id: {error}"
         ))
@@ -161,7 +161,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {
@@ -192,7 +192,7 @@ where
     /// Publish one domain event. The change it describes already committed,
     /// so a broker failure is logged rather than surfaced.
     fn emit(&self, event: FormTopicEvent) {
-        if let Err(error) = self.broker.send_event(&FormMacroEvent::new(event)) {
+        if let Err(error) = self.broker.send_event(&FormRoxEvent::new(event)) {
             tracing::warn!(error = ?error, "failed to publish form event");
         }
     }
@@ -293,7 +293,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {

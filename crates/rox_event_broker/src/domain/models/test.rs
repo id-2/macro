@@ -1,0 +1,375 @@
+use rox_event_topics::{RoxDocumentsTopic, RoxExampleTopic, Topic};
+use serde::{Deserialize, Serialize};
+use serde_json::json;
+use uuid::Uuid;
+
+use super::*;
+use crate::{RoxEventCollection, MessageParts};
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct ExampleCreatedMetadata {
+    name: String,
+    count: u32,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "event_type", content = "metadata")]
+pub enum ExampleTopicEvent {
+    #[serde(rename = "example.created")]
+    Created(ExampleCreatedMetadata),
+}
+
+impl TopicEvent for ExampleTopicEvent {
+    type Topic = RoxExampleTopic;
+
+    const SCHEMA_VERSION: u8 = 1;
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ExampleRoxEvent {
+    key: String,
+    event: Event<ExampleTopicEvent>,
+}
+
+impl ExampleRoxEvent {
+    fn with_event(key: impl Into<String>, event: Event<ExampleTopicEvent>) -> Self {
+        Self {
+            key: key.into(),
+            event,
+        }
+    }
+}
+
+impl RoxEvent for ExampleRoxEvent {
+    type EventPayload = ExampleTopicEvent;
+
+    fn key(&self) -> &str {
+        &self.key
+    }
+
+    fn event(&self) -> &Event<Self::EventPayload> {
+        &self.event
+    }
+
+    fn from_event(key: String, event: Event<Self::EventPayload>) -> Self {
+        Self::with_event(key, event)
+    }
+}
+
+enum ExampleConsumerEvent {
+    Example(ExampleRoxEvent),
+}
+
+impl ExampleConsumerEvent {
+    fn decode(topic: &str, key: &str, payload: &[u8]) -> Result<Self, EventBrokerError> {
+        match topic {
+            topic if topic == RoxExampleTopic::TOPIC_STR => {
+                Ok(Self::Example(ExampleRoxEvent::decode(key, payload)?))
+            }
+            unknown => Err(EventBrokerError::UnknownTopic(unknown.to_string())),
+        }
+    }
+}
+
+fn example_event() -> Event<ExampleTopicEvent> {
+    Event::with_event_id(
+        Uuid::from_u128(1),
+        ExampleTopicEvent::Created(ExampleCreatedMetadata {
+            name: "hello".to_string(),
+            count: 7,
+        }),
+    )
+}
+
+#[test]
+fn event_serializes_to_tagged_wire_shape() {
+    let event = example_event();
+
+    assert_eq!(
+        serde_json::to_value(&event).unwrap(),
+        json!({
+            "event_id": "00000000-0000-0000-0000-000000000001",
+            "schema_version": 1,
+            "event_type": "example.created",
+            "metadata": {
+                "name": "hello",
+                "count": 7,
+            },
+        })
+    );
+}
+
+#[test]
+fn macro_event_decodes_from_payload() {
+    let event = example_event();
+    let payload = serde_json::to_vec(&event).unwrap();
+
+    let decoded = ExampleRoxEvent::decode("msg-123", &payload).unwrap();
+
+    assert_eq!(decoded.key(), "msg-123");
+    assert_eq!(decoded.event(), &event);
+}
+
+#[test]
+fn consumer_specific_enum_decodes_by_topic() {
+    let event = example_event();
+    let payload = serde_json::to_vec(&event).unwrap();
+
+    let decoded = ExampleConsumerEvent::decode(RoxExampleTopic::TOPIC_STR, "msg-123", &payload)
+        .expect("topic should decode");
+
+    let ExampleConsumerEvent::Example(decoded) = decoded;
+    assert_eq!(decoded.key(), "msg-123");
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DocumentsTopicEvent;
+
+impl TopicEvent for DocumentsTopicEvent {
+    type Topic = RoxDocumentsTopic;
+
+    const SCHEMA_VERSION: u8 = 1;
+}
+
+pub struct DocumentsRoxEvent {
+    key: String,
+    event: Event<DocumentsTopicEvent>,
+}
+
+impl RoxEvent for DocumentsRoxEvent {
+    type EventPayload = DocumentsTopicEvent;
+
+    fn key(&self) -> &str {
+        &self.key
+    }
+
+    fn event(&self) -> &Event<Self::EventPayload> {
+        &self.event
+    }
+
+    fn from_event(key: String, event: Event<Self::EventPayload>) -> Self {
+        Self { key, event }
+    }
+}
+
+crate::declare_topics!(TestRoxEvents: ExampleRoxEvent, DocumentsRoxEvent,);
+
+type DeclaredRoxEvent = TestRoxEvents;
+
+struct TestMessage {
+    topic: &'static str,
+    key: Option<&'static str>,
+    payload: Option<Vec<u8>>,
+}
+
+impl MessageParts for TestMessage {
+    fn key(&self) -> Option<&str> {
+        self.key
+    }
+
+    fn payload(&self) -> Option<&[u8]> {
+        self.payload.as_deref()
+    }
+
+    fn topic(&self) -> &str {
+        self.topic
+    }
+}
+
+#[test]
+fn exposes_each_declared_topic_in_order() {
+    assert_eq!(
+        DeclaredRoxEvent::topics(),
+        [RoxExampleTopic::TOPIC_STR, RoxDocumentsTopic::TOPIC_STR,]
+    );
+}
+
+#[test]
+fn decodes_each_declared_topic_into_its_enum_variant() {
+    let correlation_id = Uuid::from_u128(42);
+    let mut event = example_event();
+    event.agent_correlation_id = Some(correlation_id);
+    let example_payload = serde_json::to_vec(&event).unwrap();
+    let example_message = MessageWrapper::<_, DeclaredRoxEvent>::new(TestMessage {
+        topic: RoxExampleTopic::TOPIC_STR,
+        key: Some("example-key"),
+        payload: Some(example_payload),
+    });
+
+    let decoded = example_message.decode_payload().unwrap();
+    assert_eq!(decoded.agent_correlation_id(), Some(correlation_id));
+    match decoded {
+        DeclaredRoxEvent::ExampleRoxEvent(event) => {
+            assert_eq!(event.key(), "example-key");
+        }
+        DeclaredRoxEvent::DocumentsRoxEvent(_) => panic!("decoded the wrong event type"),
+    }
+
+    let documents_payload = serde_json::to_vec(&Event::new(DocumentsTopicEvent)).unwrap();
+    let documents_message = MessageWrapper::<_, DeclaredRoxEvent>::new(TestMessage {
+        topic: RoxDocumentsTopic::TOPIC_STR,
+        key: Some("documents-key"),
+        payload: Some(documents_payload),
+    });
+
+    let decoded = documents_message.decode_payload().unwrap();
+    assert_eq!(decoded.agent_correlation_id(), None);
+    match decoded {
+        DeclaredRoxEvent::DocumentsRoxEvent(event) => {
+            assert_eq!(event.key(), "documents-key");
+        }
+        DeclaredRoxEvent::ExampleRoxEvent(_) => panic!("decoded the wrong event type"),
+    }
+}
+
+#[test]
+fn rejects_topics_not_declared_by_the_macro() {
+    let message = MessageWrapper::<_, DeclaredRoxEvent>::new(TestMessage {
+        topic: "macro.unknown",
+        key: None,
+        payload: None,
+    });
+
+    assert!(matches!(
+        message.decode_payload(),
+        Err(EventBrokerError::UnknownTopic(topic)) if topic == "macro.unknown"
+    ));
+}
+
+#[test]
+fn rejects_a_missing_message_key() {
+    let message = MessageWrapper::<_, DeclaredRoxEvent>::new(TestMessage {
+        topic: RoxExampleTopic::TOPIC_STR,
+        key: None,
+        payload: Some(serde_json::to_vec(&example_event()).unwrap()),
+    });
+
+    assert!(matches!(
+        message.decode_payload(),
+        Err(EventBrokerError::MissingMessageKey)
+    ));
+}
+
+#[test]
+fn rejects_a_missing_message_payload() {
+    let message = MessageWrapper::<_, DeclaredRoxEvent>::new(TestMessage {
+        topic: RoxExampleTopic::TOPIC_STR,
+        key: Some("example-key"),
+        payload: None,
+    });
+
+    assert!(matches!(
+        message.decode_payload(),
+        Err(EventBrokerError::MissingMessagePayload)
+    ));
+}
+
+#[test]
+fn rejects_an_unsupported_schema_version() {
+    let event = Event::with_event_id_and_schema_version(
+        Uuid::from_u128(1),
+        2,
+        ExampleTopicEvent::Created(ExampleCreatedMetadata {
+            name: "hello".to_string(),
+            count: 7,
+        }),
+    );
+    let message = MessageWrapper::<_, DeclaredRoxEvent>::new(TestMessage {
+        topic: RoxExampleTopic::TOPIC_STR,
+        key: Some("example-key"),
+        payload: Some(serde_json::to_vec(&event).unwrap()),
+    });
+
+    assert!(matches!(
+        message.decode_payload(),
+        Err(EventBrokerError::UnsupportedSchemaVersion {
+            topic,
+            expected: 1,
+            actual: 2,
+        }) if topic == RoxExampleTopic::TOPIC_STR
+    ));
+}
+
+#[tokio::test]
+async fn envelope_round_trip_preserves_correlation_and_legacy_events_default_to_none() {
+    let id = Uuid::now_v7();
+    let event = agent_correlation::context::scope_with_verb(
+        Some(id),
+        Some(agent_correlation::AgentVerb::Edited),
+        async { example_event() },
+    )
+    .await;
+    let decoded: Event<ExampleTopicEvent> =
+        serde_json::from_slice(&serde_json::to_vec(&event).unwrap()).unwrap();
+    assert_eq!(decoded.agent_correlation_id, Some(id));
+    assert_eq!(decoded.agent_verb.as_deref(), Some("edited"));
+    let mut future = serde_json::to_value(&decoded).unwrap();
+    future["agent_verb"] = serde_json::json!("future_verb");
+    let future: Event<ExampleTopicEvent> = serde_json::from_value(future).unwrap();
+    assert_eq!(future.agent_verb.as_deref(), Some("future_verb"));
+    let mut legacy = serde_json::to_value(event).unwrap();
+    legacy
+        .as_object_mut()
+        .unwrap()
+        .remove("agent_correlation_id");
+    legacy.as_object_mut().unwrap().remove("agent_verb");
+    assert_eq!(
+        serde_json::from_value::<Event<ExampleTopicEvent>>(legacy.clone())
+            .unwrap()
+            .agent_correlation_id,
+        None
+    );
+    assert_eq!(
+        serde_json::from_value::<Event<ExampleTopicEvent>>(legacy)
+            .unwrap()
+            .agent_verb,
+        None
+    );
+}
+
+#[tokio::test]
+async fn event_built_for_a_routine_run_carries_its_routine() {
+    let routine_id = Uuid::from_u128(0x7001);
+    let attribution = agent_correlation::context::Attribution {
+        correlation_id: None,
+        routine_id: Some(routine_id),
+        ..agent_correlation::context::Attribution::default()
+    };
+
+    let event =
+        agent_correlation::context::scope_attribution(attribution, async { example_event() }).await;
+
+    assert_eq!(event.routine_id, Some(routine_id));
+    assert_eq!(
+        serde_json::to_value(&event).unwrap(),
+        json!({
+            "event_id": "00000000-0000-0000-0000-000000000001",
+            "schema_version": 1,
+            "routine_id": "00000000-0000-0000-0000-000000007001",
+            "event_type": "example.created",
+            "metadata": {
+                "name": "hello",
+                "count": 7,
+            },
+        })
+    );
+    let decoded = ExampleRoxEvent::decode("msg-123", &serde_json::to_vec(&event).unwrap())
+        .expect("routine event decodes");
+    assert_eq!(decoded.event().routine_id, Some(routine_id));
+}
+
+#[test]
+fn event_without_routine_id_decodes() {
+    let payload = json!({
+        "event_id": "00000000-0000-0000-0000-000000000001",
+        "schema_version": 1,
+        "event_type": "example.created",
+        "metadata": { "name": "hello", "count": 7 },
+    });
+
+    let decoded =
+        ExampleRoxEvent::decode("msg-123", &serde_json::to_vec(&payload).unwrap()).unwrap();
+
+    assert_eq!(decoded.event(), &example_event());
+    assert_eq!(decoded.event().routine_id, None);
+}

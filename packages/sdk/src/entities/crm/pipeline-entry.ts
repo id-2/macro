@@ -10,7 +10,7 @@ import type {
   PipelineImportResponse,
   SkippedImportRecord,
 } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Company } from './company';
 import { Contact } from './contact';
 import type { CrmPipeline } from './pipeline';
@@ -117,7 +117,7 @@ export class PipelineEntry {
 
   /** @internal Seed from a workflow response of a pipeline tracking `recordType`, or nothing. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     pipeline: CrmPipeline,
     recordType: 'company' | 'contact' | null | undefined,
     entry: Pick<PipelineEntryRecord, 'entryId' | 'record'> & {
@@ -178,7 +178,7 @@ export class PipelineEntry {
 
 /** The handle of an entry's tracked record, if the pipeline tracks one. */
 function trackedRecord(
-  client: MacroClient,
+  client: RoxClient,
   recordType: 'company' | 'contact' | null | undefined,
   id: string | undefined,
 ): Company | Contact | undefined {

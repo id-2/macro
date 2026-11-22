@@ -1,6 +1,6 @@
 use crate::api::context::AuthorizationService;
 use axum::{http::StatusCode, response::IntoResponse};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{GenericErrorResponse, GenericResponse, GenericSuccessResponse};
 
 /// Populates the users items
@@ -20,7 +20,7 @@ use model::response::{GenericErrorResponse, GenericResponse, GenericSuccessRespo
     )]
 #[tracing::instrument(skip(user), fields(user_id=?user.authorization.user.macro_user_id))]
 pub async fn populate_items_handler(
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> impl IntoResponse {
     let response_data = GenericSuccessResponse { success: true };
 

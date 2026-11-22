@@ -3,7 +3,7 @@ import {
   thrownResultErrorHasCode,
   throwOnErr,
 } from '@core/util/result';
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import { documentLoadKeys } from '@queries/storage/documentLoad/keys';
 import { fetchFileDocumentOpenContext } from '@queries/storage/documentLoad/sync-document-context';

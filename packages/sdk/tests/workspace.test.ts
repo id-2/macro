@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from 'bun:test';
 import type { TagSetResponse } from '../generated/properties/types.gen';
 import type { SoupApiItem } from '../generated/storage/types.gen';
-import { Macro, type WorkspaceType } from '../src/macro';
+import { Macro, type WorkspaceType } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {

@@ -1,4 +1,4 @@
-import { NOOP_SPAN, type Span, Telemetry } from '@macro-inc/observability';
+import { NOOP_SPAN, type Span, Telemetry } from '@rox-one/observability';
 import type { SamplingClass } from './sampling';
 
 export type UiOperationOutcome =

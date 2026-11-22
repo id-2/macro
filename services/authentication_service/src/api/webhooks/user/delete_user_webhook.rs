@@ -7,8 +7,8 @@ use comms_db_client::{
     channels::get_channels::get_org_channels,
     participants::remove_participant::{RemoveParticipantOptions, remove_participant},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
+use rox_user_id::user_id::RoxUserIdStr;
 use model::{authentication::webhooks::FusionAuthUserWebhook, user::UserInfo};
 use notification::domain::ports::NotificationRepository;
 use notification::outbound::repository::DbNotificationRepository;
@@ -30,7 +30,7 @@ use sqs_client::email::LinkManagerMessage;
 )]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(req): extract::Json<FusionAuthUserWebhook>,
 ) -> Result<Response, Response> {
     tracing::info!("received FusionAuth delete user webhook");
@@ -39,7 +39,7 @@ pub async fn handler(
 
     // if fusionauth_user_id is part of an account_merge_request, return early as we are in
     // the process of merging the accounts
-    if macro_db_client::account_merge_request::check_merge_request_for_to_merge_macro_user_id(
+    if rox_db_client::account_merge_request::check_merge_request_for_to_merge_macro_user_id(
         &ctx.db,
         &fusionauth_user_id,
     )
@@ -56,7 +56,7 @@ pub async fn handler(
         return Ok(StatusCode::OK.into_response());
     }
 
-    let macro_user = match macro_db_client::macro_user::get_macro_user(&ctx.db, &fusionauth_user_id)
+    let macro_user = match rox_db_client::macro_user::get_macro_user(&ctx.db, &fusionauth_user_id)
         .await
     {
         Ok(user) => user,
@@ -79,7 +79,7 @@ pub async fn handler(
     };
 
     let user_ids: Vec<String> =
-        macro_db_client::user::get::get_user_profiles_by_fusionauth_user_id(
+        rox_db_client::user::get::get_user_profiles_by_fusionauth_user_id(
             &ctx.db,
             &fusionauth_user_id,
         )
@@ -118,7 +118,7 @@ pub async fn handler(
 )]
 async fn delete_user(
     ctx: ApiContext,
-    macro_user: macro_db_client::macro_user::MacroUser,
+    macro_user: rox_db_client::macro_user::RoxUser,
     fusionauth_user_id: String,
     user_ids: Vec<String>,
 ) -> anyhow::Result<()> {
@@ -175,7 +175,7 @@ async fn delete_user(
         .map(|user_id| {
             let db = ctx.db.clone();
             async move {
-                let result = macro_db_client::user::get::get_user_profile(&db, &user_id).await;
+                let result = rox_db_client::user::get::get_user_profile(&db, &user_id).await;
                 (user_id, result)
             }
         })
@@ -202,7 +202,7 @@ async fn delete_user(
         "loaded user info for profiles"
     );
 
-    // MacroCache deletion
+    // RoxCache deletion
     tokio::spawn(
         {
             let redis_client = ctx.macro_cache_client.clone();
@@ -259,7 +259,7 @@ async fn delete_user(
             async move {
                 for user_info in user_infos {
                     let user_id = user_info.id.clone();
-                    match MacroUserIdStr::parse_from_str(&user_id) {
+                    match RoxUserIdStr::parse_from_str(&user_id) {
                         Ok(macro_user_id) => {
                             match notification_repo
                                 .delete_all_user_notifications(macro_user_id)
@@ -284,7 +284,7 @@ async fn delete_user(
     // Use the authoritative profile ids, not the best-effort user-info lookups.
     let users = user_ids
         .iter()
-        .map(|id| MacroUserIdStr::try_from(id.clone()))
+        .map(|id| RoxUserIdStr::try_from(id.clone()))
         .collect::<Result<Vec<_>, _>>()?;
     let start_time = std::time::Instant::now();
     crate::service::user::delete_user::delete_user_data(

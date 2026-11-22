@@ -6,7 +6,7 @@ use entity_access::domain::{
     models::{AccessError, AccessLevel, EntityType},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::ports::CommentParentAccess;
 
@@ -51,7 +51,7 @@ impl<E: EntityAccessService> CommentParentAccess for EntityAccessCommentParents<
         let Some(entity_type) = self::parent_entity_type(parent_entity_type) else {
             return Ok(false);
         };
-        let Ok(viewer) = MacroUserIdStr::try_from(viewer.to_string()) else {
+        let Ok(viewer) = RoxUserIdStr::try_from(viewer.to_string()) else {
             return Ok(false);
         };
         match self

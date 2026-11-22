@@ -23,7 +23,7 @@ async fn capacity_wait_is_visible_before_and_after_first_enrollment() {
                 },
                 purchase_key: key("buy-dialog-1"),
                 team_id: TEAM,
-                created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+                created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
                 size: ComputerSize::Standard,
                 name: None,
                 extra_items: vec![],

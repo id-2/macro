@@ -26,7 +26,8 @@ Its API context carries that state to the optional extractor; handlers do not
 compose a database/JWT verifier for each request.
 
 The accepted ID lives in request-local async context, independent of trace
-sampling. A validated code-mode request may also supply `x-macro-sdk-verb`, a
+sampling. A validated code-mode request may also supply `x-rox-sdk-verb` (the
+earlier `x-macro-sdk-verb` is still read), a
 display-only value from the closed SDK verb vocabulary. Unknown values are
 absent; the verb never changes authorization or whether activity is recorded.
 Event constructors copy the ID and verb into the Kafka envelope. Spawned mutation

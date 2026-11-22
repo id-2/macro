@@ -380,7 +380,7 @@ pub struct SubscriptionFacts {
     /// The `team_id` metadata: set for team subscriptions.
     pub team_id: Option<Uuid>,
     /// The `owner_id` metadata of a team subscription.
-    pub owner_id: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+    pub owner_id: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     /// The `macro_plan_change_at` metadata Rox stamps on an immediate plan change.
     pub plan_change_at: Option<DateTime<Utc>>,
     /// Marketing attribution.

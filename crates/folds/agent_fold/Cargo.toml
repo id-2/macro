@@ -50,8 +50,8 @@ dynamic_ui = { path = "../../dynamic_ui" }
 clap = { workspace = true, optional = true }
 html-escape = { workspace = true }
 lazy-regex = { workspace = true }
-macro_user_id = { path = "../../macro_user_id" }
-macro_uuid = { path = "../../macro_uuid" }
+rox_user_id = { path = "../../rox_user_id" }
+rox_uuid = { path = "../../rox_uuid" }
 nom = { workspace = true }
 non_empty = { path = "../../non_empty" }
 rootcause = { workspace = true }

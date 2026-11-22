@@ -19,7 +19,7 @@ const mocks = vi.hoisted(() => ({
   error: vi.fn(),
 }));
 vi.mock('@core/component/Toast/Toast', () => ({ toast: mocks }));
-vi.mock('@macro-inc/observability', () => ({ Telemetry: mocks }));
+vi.mock('@rox-one/observability', () => ({ Telemetry: mocks }));
 vi.mock('@queries/client', () => ({ queryClient: {} }));
 vi.mock('@queries/email/integration', () => ({}));
 vi.mock('@queries/email/keys', () => ({}));

@@ -11,7 +11,7 @@ use email::domain::{
     followup::{EmailFollowupMailbox, FollowupMessage, FollowupThread},
     models::EmailErr,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::sync::atomic::{AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
@@ -56,8 +56,8 @@ impl ReminderDispatch for PausedDelivery {
 
 const THREAD: Uuid = Uuid::from_u128(11);
 const LINK: Uuid = Uuid::from_u128(12);
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|followup@test.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|followup@test.com").unwrap()
 }
 #[derive(Clone)]
 struct FixedClock(DateTime<Utc>);
@@ -78,7 +78,7 @@ struct Mail {
 impl EmailFollowupMailbox for Mailbox {
     async fn reminder_threads(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _receipts: Vec<
             entity_access::domain::models::EntityAccessReceipt<
                 entity_access::domain::models::ViewAccessLevel,
@@ -90,7 +90,7 @@ impl EmailFollowupMailbox for Mailbox {
     }
     async fn followup_thread(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         thread: Uuid,
     ) -> Result<Option<FollowupThread>, EmailErr> {
         if actor != user() || thread != THREAD {
@@ -100,7 +100,7 @@ impl EmailFollowupMailbox for Mailbox {
     }
     async fn set_followup_inbox(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         thread: Uuid,
         link: Uuid,
         visible: bool,
@@ -460,7 +460,7 @@ async fn archive_failure_rolls_back_and_ineligible_mail_never_returns(pool: PgPo
             .await
             .is_err()
     );
-    let other = MacroUserIdStr::parse_from_str("macro|other@test.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@test.com").unwrap();
     assert!(
         service
             .execute(

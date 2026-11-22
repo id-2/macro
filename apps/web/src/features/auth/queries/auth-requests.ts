@@ -11,6 +11,16 @@ import type {
 /** Where the passwordless magic link returns. */
 const REDIRECT_URI = `${window.location.origin}/app`;
 
+/**
+ * Opt-in for a local stack that returns the sign-in code in the response:
+ * build with `VITE_PASSWORDLESS_AUTO_CODE=true` (and run the auth service with
+ * `PASSWORDLESS_RETURN_CODE=true`) to sign in without opening Mailpit.
+ * Unset everywhere else, including the public stand, so only a code the person
+ * typed is ever exchanged.
+ */
+const PASSWORDLESS_AUTO_CODE =
+  import.meta.env.VITE_PASSWORDLESS_AUTO_CODE === 'true';
+
 /** The one account that signs in with a password instead of a code. */
 const PASSWORD_LOGIN_EMAIL_SHA256 =
   '0d10222b5594dbb0eb5d2bccbc9b5d8e9ff83e99421b573fb32c8a7b74491c81';
@@ -70,6 +80,13 @@ export async function sendEmailCode(input: {
   if (!response) return { t: 'failed', message: 'Unable to reach Rox.' };
   if (!response.ok) {
     const message = await response.text();
+    // Too many claims for this address or IP: the form says so in its own
+    // words instead of echoing the service's English text.
+    if (
+      response.status === 429 ||
+      message.toLowerCase().includes('rate limit')
+    )
+      return { t: 'rate-limited' };
     // An unknown address needs a handle; the form asks for one and resends.
     if (
       response.status === 400 &&
@@ -101,8 +118,11 @@ export async function sendEmailCode(input: {
     return { t: 'redirected' };
   }
 
-  // Local backends return the code so seeded persona logins skip the inbox.
-  if (import.meta.env.DEV) {
+  // A stack that returns the code (PASSWORDLESS_RETURN_CODE=true) can skip the
+  // inbox, but only a build that opts in may spend a code the person did not
+  // type: a public stand would otherwise hand out sessions. `import.meta.env.DEV`
+  // is not a safe gate, because the public stand is built in development mode.
+  if (PASSWORDLESS_AUTO_CODE) {
     const body = (await response.json().catch(() => undefined)) as
       | { code?: string }
       | undefined;

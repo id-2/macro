@@ -8,7 +8,7 @@ use crate::domain::models::{
 };
 use crate::domain::ports::{CanonicalImportRepo, ImportError, Result};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Postgres, Transaction};
 use uuid::Uuid;
 
@@ -135,7 +135,7 @@ impl CanonicalImportRepo for PgImportRepo {
 
     async fn reserve_target(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         key: &ImportTargetKey,
         kind: ImportTargetKind,
         existing_channel_id: Option<Uuid>,

@@ -17,7 +17,7 @@ use cognition::domain::{
     Answer, BatchedOutcome, Cognition, MAX_QUESTIONS, RoutingRequest, decide_in_batches,
 };
 use futures::future::join_all;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio_util::sync::CancellationToken;
 use uuid::Uuid;
 
@@ -137,7 +137,7 @@ impl SkillSelection {
 pub async fn select_skills<Svc: SkillService>(
     service: &Svc,
     cognition: Option<&Arc<dyn Cognition>>,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     request: RoutingRequest<'_>,
     already_loaded: &[Uuid],
     cancel: &CancellationToken,
@@ -181,7 +181,7 @@ pub async fn select_skills<Svc: SkillService>(
 async fn select<Svc: SkillService>(
     service: &Svc,
     cognition: Option<&Arc<dyn Cognition>>,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     request: RoutingRequest<'_>,
     already_loaded: &[Uuid],
     cancel: &CancellationToken,
@@ -256,7 +256,7 @@ fn candidates(
 /// why none did.
 async fn score(
     cognition: &dyn Cognition,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     request: RoutingRequest<'_>,
     candidates: &[SkillSummary],
 ) -> Result<Vec<(SkillSummary, f32)>, SelectionStatus> {
@@ -326,7 +326,7 @@ fn choose(mut scores: Vec<(SkillSummary, f32)>) -> (Vec<(SkillSummary, f32)>, Ve
 /// is left out.
 async fn read<Svc: SkillService>(
     service: &Svc,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     chosen: Vec<(SkillSummary, f32)>,
 ) -> Vec<LoadedSkill> {
     let reads = chosen.iter().map(|(skill, _)| async {

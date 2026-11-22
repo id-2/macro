@@ -1,4 +1,4 @@
-import type { CellBounds } from '@macro-inc/spreadsheet/sheet-rules';
+import type { CellBounds } from '@rox-one/spreadsheet/sheet-rules';
 import {
   createEffect,
   createSignal,

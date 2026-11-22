@@ -1,7 +1,7 @@
 use crate::api::context::ApiContext;
 use crate::api::context::{AuthorizationService, EntityAccessService};
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use models_permissions::share_permission::access_level::ViewAccessLevel;
 use rayon::prelude::*;
 use std::str::FromStr;
@@ -58,7 +58,7 @@ pub async fn get_location_handler(
         AuthorizationService,
     >,
     State(state): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     document_context: Extension<DocumentBasic>,
     Path(Params { document_id }): Path<Params>,
     params: Query<LocationQueryParams>,
@@ -105,7 +105,7 @@ pub async fn get_location_handler(
         .header("Cache-Control", format!("max-age={}", max_age))
         .header(
             "X-custom-response-uuid",
-            macro_uuid::generate_uuid_v7().to_string(),
+            rox_uuid::generate_uuid_v7().to_string(),
         ) // this is used to verify if a response is cached between requests
         .body(Body::from(serde_json::to_vec(&response_data).unwrap()))
         .unwrap()
@@ -168,12 +168,12 @@ pub(in crate::api::documents) async fn get_versioned_url(
     let document_version_id = match document_version_id {
         Some(v) if !is_static => v,
         _ if is_static => {
-            macro_db_client::document::get_document_version_id(&state.db, document_id)
+            rox_db_client::document::get_document_version_id(&state.db, document_id)
                 .await?
                 .0
         }
         _ => {
-            macro_db_client::document::get_latest_document_version_id(&state.db, document_id)
+            rox_db_client::document::get_latest_document_version_id(&state.db, document_id)
                 .await?
                 .0
         }
@@ -208,10 +208,10 @@ async fn get_docx_urls(
     let start_shas = std::time::Instant::now();
     // Get all shas
     let shas: Vec<String> = if let Some(document_version_id) = document_version_id {
-        macro_db_client::document::document_shas::get_document_shas(&state.db, document_version_id)
+        rox_db_client::document::document_shas::get_document_shas(&state.db, document_version_id)
             .await?
     } else {
-        macro_db_client::document::document_shas::get_document_shas_by_document_id(
+        rox_db_client::document::document_shas::get_document_shas_by_document_id(
             &state.db,
             document_id,
         )

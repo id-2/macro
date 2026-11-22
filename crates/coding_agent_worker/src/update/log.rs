@@ -10,11 +10,11 @@ use std::path::{Path, PathBuf};
 mod test;
 
 mod environment {
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Home;
     }
     #[cfg(windows)]
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Userprofile;
     }
 }

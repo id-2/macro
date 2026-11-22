@@ -27,7 +27,7 @@ pub struct TeamId(
 #[derive(Clone)]
 pub struct Actor {
     /// Authenticated Rox user identity; never a provider credential.
-    pub user_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub user_id: rox_user_id::user_id::RoxUserIdStr<'static>,
 }
 
 /// Owned sensitive text. Deliberately does not implement Debug or Display.
@@ -236,7 +236,7 @@ pub struct Record {
     /// Searchable fields only; excludes all private payloads.
     pub metadata: ItemMetadata,
     /// Immutable creator; ownership remains with the team after this person leaves.
-    pub user_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub user_id: rox_user_id::user_id::RoxUserIdStr<'static>,
     /// Explicit recipients and their item capabilities.
     pub grants: Vec<Grant>,
     /// Deletion fence; prevents reads and delayed-write resurrection.

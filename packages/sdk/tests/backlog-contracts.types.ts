@@ -9,7 +9,7 @@ import type {
   RoutineEventFilter,
   SharePermissionOptions,
   TimelineOptions,
-} from '../src/macro';
+} from '../src/rox';
 
 type AssertFalse<T extends false> = T;
 type AssertTrue<T extends true> = T;

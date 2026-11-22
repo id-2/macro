@@ -1,8 +1,8 @@
 //! Email attachment property types.
 
 use super::source_entity::SourceEntity;
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::RoxUserId;
 
 /// Email attachment properties to set on an entity.
 #[derive(Debug, Clone, Default)]
@@ -12,9 +12,9 @@ pub struct EmailAttachmentProperty<'a> {
     /// Company entity IDs.
     pub companies: Option<Vec<String>>,
     /// Sender user ID.
-    pub sender: Option<MacroUserId<Lowercase<'a>>>,
+    pub sender: Option<RoxUserId<Lowercase<'a>>>,
     /// Recipient user IDs.
-    pub recipients: Option<Vec<MacroUserId<Lowercase<'a>>>>,
+    pub recipients: Option<Vec<RoxUserId<Lowercase<'a>>>>,
     /// Subject line.
     pub subject: Option<String>,
 }

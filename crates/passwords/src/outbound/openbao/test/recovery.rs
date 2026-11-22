@@ -3,7 +3,7 @@ use crate::{
     domain::{ports::Repository, service::PasswordService},
     outbound::postgres::PgRepository,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
@@ -183,7 +183,7 @@ async fn accepted_create_survives_postwrite_lookup_interruption_and_same_operati
             .success()
     );
     let owner = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|enrollment@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|enrollment@example.test")
             .expect("synthetic identity")
             .into_owned(),
     };

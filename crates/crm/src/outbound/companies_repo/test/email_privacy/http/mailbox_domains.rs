@@ -20,7 +20,7 @@ impl JwtValidator for GuardCredential {
     fn validate_credential(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, rootcause::Report<RoxAuthorizationError>> {
         let mut credential = FixtureCredential.validate_credential(token)?;
         credential.identity.user_id = if token == "owner" {
             GUARD_OWNER.into()
@@ -75,8 +75,8 @@ async fn mailbox_domain_guard_covers_privacy_sdk_and_existing_entries(
         entity_access_service: Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
             pool.clone(),
         ))),
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
                 GuardCredential,
                 InternalAuthConfig {
                     api_key: "fixture-only".into(),

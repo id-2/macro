@@ -3,12 +3,12 @@ use agent_code_mode::domain::{
     CodeModeError, ExecutionCredentials, ExecutionIdentity, IssuedRun, UserExecutionCredentials,
 };
 use agent_correlation::domain::{CorrelationRepository, SessionScope};
-use agent_egress::outbound::macro_mcp::{MacroApiTokenSigner, SignedCorrelation};
+use agent_egress::outbound::macro_mcp::{RoxApiTokenSigner, SignedCorrelation};
 use agent_inmem::domain::tool_gate::{NativeToolGate, NativeToolVerdict};
 use async_trait::async_trait;
 use code_execution::domain::{Egress, RunEnvironment, SdkEndpoints};
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{collections::BTreeMap, sync::Arc};
 use tokio_util::sync::CancellationToken;
 use tracing::Instrument;
@@ -50,7 +50,7 @@ impl<Flags> EgressRollout<Flags> {
 
 impl<Flags: FeatureFlags> EgressRollout<Flags> {
     /// The egress for runs acting as `user`.
-    pub async fn egress(&self, user: &MacroUserIdStr<'_>) -> Egress {
+    pub async fn egress(&self, user: &RoxUserIdStr<'_>) -> Egress {
         let Some(flags) = &self.flags else {
             return Egress::Direct;
         };
@@ -100,7 +100,7 @@ impl<Flags: FeatureFlags> EgressRollout<Flags> {
 
 pub struct RunCredentials {
     pub egress: EgressRollout,
-    pub signer: MacroApiTokenSigner,
+    pub signer: RoxApiTokenSigner,
     pub correlations: agent_correlation::outbound::PgCorrelationRepository,
     pub gate: Arc<dyn NativeToolGate>,
     pub endpoints: SdkEndpoints,
@@ -207,7 +207,7 @@ impl NativeToolGate for ScopedToolGate {
         Box::pin(async move {
             match self.scopes.scope(session.as_uuid()).await {
                 Ok(Some(_)) => Some(format!(
-                    "This session can't use {tool}; it reaches no app outside Macro."
+                    "This session can't use {tool}; it reaches no app outside Rox."
                 )),
                 Ok(None) => self.inner.refuse_remote_mcp(session, tool).await,
                 Err(error) => {
@@ -287,7 +287,7 @@ impl ExecutionCredentials for RunCredentials {
 /// no owner gate.
 pub struct UserRunCredentials {
     pub egress: EgressRollout,
-    pub signer: MacroApiTokenSigner,
+    pub signer: RoxApiTokenSigner,
     pub correlations: agent_correlation::outbound::PgCorrelationRepository,
     pub endpoints: SdkEndpoints,
     pub scopes: Arc<dyn SessionScopes>,
@@ -297,7 +297,7 @@ pub struct UserRunCredentials {
 impl UserExecutionCredentials for UserRunCredentials {
     async fn issue(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: &ai_toolset::ToolCaller,
         session: Option<uuid::Uuid>,
     ) -> Result<RunEnvironment, CodeModeError> {
@@ -353,7 +353,7 @@ impl UserExecutionCredentials for UserRunCredentials {
 /// The current trace context, for the SDK to forward on authenticated requests.
 pub(crate) fn trace_headers() -> BTreeMap<String, String> {
     let mut headers = axum::http::HeaderMap::new();
-    macro_tower_layers::inject_trace_headers(&mut headers);
+    rox_tower_layers::inject_trace_headers(&mut headers);
     headers
         .iter()
         .filter_map(|(name, value)| {
@@ -365,7 +365,7 @@ pub(crate) fn trace_headers() -> BTreeMap<String, String> {
         .collect()
 }
 
-macro_env_var::env_var! { struct DocumentStorageServiceCloudfrontDistributionUrl; }
+rox_env_var::env_var! { struct DocumentStorageServiceCloudfrontDistributionUrl; }
 
 /// A host code mode's SDK reaches, named as the SDK names it. The test
 /// `every_sdk_host_holds_a_scoped_credential_to_its_scope` says how each
@@ -398,7 +398,7 @@ enum SdkHost {
 impl SdkHost {
     /// Its base URL in this environment.
     fn url(self) -> anyhow::Result<String> {
-        use macro_service_urls::*;
+        use rox_service_urls::*;
         Ok(match self {
             Self::DocumentContent => {
                 DocumentStorageServiceCloudfrontDistributionUrl::new()?.to_string()
@@ -430,7 +430,7 @@ pub fn sdk_endpoints() -> anyhow::Result<SdkEndpoints> {
         .collect::<anyhow::Result<_>>()?;
     Ok(SdkEndpoints {
         hosts,
-        web_app_url: macro_service_urls::AppServiceUrl::new()?.to_string(),
+        web_app_url: rox_service_urls::AppServiceUrl::new()?.to_string(),
     })
 }
 
@@ -444,7 +444,7 @@ async fn approve_run(
     identity: &ExecutionIdentity,
     source: &str,
     cancel: &CancellationToken,
-) -> Result<macro_user_id::user_id::MacroUserIdStr<'static>, CodeModeError> {
+) -> Result<rox_user_id::user_id::RoxUserIdStr<'static>, CodeModeError> {
     let args = serde_json::json!({"source": source, "acting_as": identity.acting_as, "turn_id": identity.turn});
     let verdict = tokio::select! {
         biased;

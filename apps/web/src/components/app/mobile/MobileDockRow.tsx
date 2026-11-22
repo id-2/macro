@@ -12,7 +12,7 @@ import CaretUpIcon from '@icon/system/regular/caret-up.svg';
 import DotsSixVerticalIcon from '@icon/system/regular/dots-six-vertical.svg';
 import IconGear from '@icon/system/regular/gear.svg';
 import SearchIcon from '@icon/system/regular/magnifying-glass.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createElementSize } from '@solid-primitives/resize-observer';
 import { cn } from '@ui';
 import { createMemo, createSignal, For, Show, Suspense } from 'solid-js';

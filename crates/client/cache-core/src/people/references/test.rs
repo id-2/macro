@@ -32,7 +32,7 @@ fn record(email: &str, name: Option<&str>) -> Record {
 }
 
 fn push(collector: &mut ReferenceCollector<'_>, email: &str, name: Option<&str>) {
-    let user = MacroUserIdStr::try_from_email(email).unwrap();
+    let user = RoxUserIdStr::try_from_email(email).unwrap();
     let key = contact_key(&collector.request.scope.identity, user.as_ref());
     collector.push(&key, &record(email, name));
 }

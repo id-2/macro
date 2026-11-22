@@ -7,7 +7,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use models_properties::api::{AddPropertyOptionRequest, UpdatePropertyOptionRequest};
 use models_properties::service::property_option::PropertyOption;
 use thiserror::Error;
@@ -59,11 +59,11 @@ impl IntoResponse for GetPropertyOptionsErr {
 pub async fn get_property_options<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Path(property_uuid): Path<Uuid>,
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: PropertyTeamExtractor<A, Auth>,
 ) -> Result<Json<Vec<PropertyOption>>, GetPropertyOptionsErr> {
     let user = user.authorization.user.macro_user_id;
@@ -127,11 +127,11 @@ impl IntoResponse for AddPropertyOptionErr {
 pub async fn add_property_option<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Path(property_uuid): Path<Uuid>,
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: PropertyTeamExtractor<A, Auth>,
     Json(request): Json<AddPropertyOptionRequest>,
 ) -> Result<(StatusCode, Json<PropertyOption>), AddPropertyOptionErr> {
@@ -199,11 +199,11 @@ impl IntoResponse for UpdatePropertyOptionErr {
 pub async fn update_property_option<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Path((def_uuid, option_uuid)): Path<(Uuid, Uuid)>,
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: PropertyTeamExtractor<A, Auth>,
     Json(request): Json<UpdatePropertyOptionRequest>,
 ) -> Result<(StatusCode, Json<PropertyOption>), UpdatePropertyOptionErr> {
@@ -265,11 +265,11 @@ impl IntoResponse for DeletePropertyOptionErr {
 pub async fn delete_property_option<
     S: PropertiesService,
     A: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     Path((def_uuid, option_uuid)): Path<(Uuid, Uuid)>,
     State(state): State<PropertiesRouterState<S, A, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     team: PropertyTeamExtractor<A, Auth>,
 ) -> Result<StatusCode, DeletePropertyOptionErr> {
     let user = user.authorization.user.macro_user_id;

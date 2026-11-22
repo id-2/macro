@@ -9,7 +9,7 @@ use crate::domain::models::{
 };
 use cowlike::CowLike;
 use itertools::Itertools;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -48,9 +48,9 @@ pub struct SendNotificationRequestBuilder<'a, T> {
     /// The notification payload (implements `Notification` trait).
     pub notification: T,
     /// The user who triggered this notification (optional).
-    pub sender_id: Option<MacroUserIdStr<'a>>,
+    pub sender_id: Option<RoxUserIdStr<'a>>,
     /// The users who should receive this notification.
-    pub recipient_ids: HashSet<MacroUserIdStr<'a>>,
+    pub recipient_ids: HashSet<RoxUserIdStr<'a>>,
 }
 
 impl<'a, T> SendNotificationRequestBuilder<'a, T>
@@ -168,8 +168,8 @@ impl<'a, T: NotificationExtEmail, U> SendNotificationRequest<'a, T, U> {
     /// actual Rox user. Multi-recipient redirection is deliberately rejected.
     pub fn with_email_destination(
         mut self,
-        owner: &MacroUserIdStr<'_>,
-        destination: MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'_>,
+        destination: RoxUserIdStr<'static>,
     ) -> Result<Self, rootcause::Report> {
         if self.req.recipient_ids.len() != 1 || !self.req.recipient_ids.contains(owner) {
             return Err(rootcause::report!(
@@ -208,9 +208,9 @@ impl<'a, T, U> SendNotificationRequest<'a, T, U> {
 
     pub(crate) fn update_recipients(
         mut self,
-        muted_users: HashSet<MacroUserIdStr<'a>>,
-        unsubscribed_users: HashSet<MacroUserIdStr<'a>>,
-        type_disabled_users: HashSet<MacroUserIdStr<'a>>,
+        muted_users: HashSet<RoxUserIdStr<'a>>,
+        unsubscribed_users: HashSet<RoxUserIdStr<'a>>,
+        type_disabled_users: HashSet<RoxUserIdStr<'a>>,
     ) -> (Self, Vec<RecipientExclusion<'a>>) {
         let recipient_is_sender = |id: FilteredRecipient<'a>| match (id, &self.req.sender_id) {
             (FilteredRecipient::Allowed(macro_user_id_str), Some(sender))
@@ -293,7 +293,7 @@ pub struct NotificationResult<'a> {
     /// The unique ID of the created notification.
     pub notification_id: Uuid,
     /// The users who were actually notified (after filtering).
-    pub notified_recipients: HashSet<MacroUserIdStr<'a>>,
+    pub notified_recipients: HashSet<RoxUserIdStr<'a>>,
 }
 
 /// the status the user is requesting to set on the notification
@@ -346,7 +346,7 @@ impl NotificationStatus {
 #[derive(Debug)]
 pub struct UpdateNotificationsRequest<'a> {
     /// The user whose notifications are being updated.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// The notification IDs to update.
     pub notification_ids: &'a [Uuid],
     /// The status to set on the notifications.
@@ -357,7 +357,7 @@ pub struct UpdateNotificationsRequest<'a> {
 #[derive(Debug)]
 pub struct UpdateNotificationsForEntitiesRequest<'a> {
     /// The user whose notifications are being updated.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// The primary or secondary entities whose notifications should be updated.
     pub entities: Vec<Entity<'a>>,
     /// The status to set on matching notifications.
@@ -390,7 +390,7 @@ impl NotificationListFilters {
 #[derive(Debug)]
 pub struct GetNotificationsByEventItemIdsRequest<'a> {
     /// The user whose notifications to retrieve.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// The event item IDs to filter by.
     pub event_item_ids: &'a [Uuid],
     /// Maximum number of results per page (default 20, max 500).

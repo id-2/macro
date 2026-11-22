@@ -190,7 +190,7 @@ fn notification_request(
     let identifier = match notification_id {
         Some(notification_id) => {
             let mut url =
-                url::Url::parse("macro:///notification").expect("static notification URL");
+                url::Url::parse("rox:///notification").expect("static notification URL");
             url.query_pairs_mut()
                 .append_pair("notificationId", notification_id)
                 .append_pair("deliveryId", &delivery_id);

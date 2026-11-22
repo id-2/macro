@@ -2087,7 +2087,7 @@ async fn automatic_decline_candidates_are_fair_bounded_and_respect_disabled_occu
 /// The migration that stores Outlook organizers, whom Graph lists as not
 /// having answered, as holding their meetings.
 const OUTLOOK_ORGANIZERS_HOLD_THEIR_MEETINGS: &str = include_str!(
-    "../../../../../macro_db_client/migrations/20261026191007_outlook_organizers_hold_their_meetings.sql"
+    "../../../../../rox_db_client/migrations/20261026191007_outlook_organizers_hold_their_meetings.sql"
 );
 
 fn unanswered(email: &str, is_organizer: bool) -> CalendarAttendee {
@@ -2547,7 +2547,7 @@ async fn reconnecting_clears_a_reauth_badge_through_the_change_log(pool: PgPool)
 /// The migration that logs every visible Outlook calendar, so caches that
 /// missed a change to its sync error badge refetch it.
 const LOG_OUTLOOK_CALENDARS: &str = include_str!(
-    "../../../../../macro_db_client/migrations/20261105002046_log_outlook_calendars_for_their_sync_error.sql"
+    "../../../../../rox_db_client/migrations/20261105002046_log_outlook_calendars_for_their_sync_error.sql"
 );
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]

@@ -7,8 +7,8 @@ use std::sync::Mutex;
 
 const EVENT_ICS: &str = "BEGIN:VCALENDAR\r\nMETHOD:PUBLISH\r\nEND:VCALENDAR\r\n";
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|guest@example.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|guest@example.com").unwrap()
 }
 
 fn link(address: &str) -> Link {
@@ -62,7 +62,7 @@ impl CalendarEventForwardSource for Fake {
 impl SendingInboxResolver for Fake {
     async fn resolve_sending_inbox(
         &self,
-        _macro_id: MacroUserIdStr<'_>,
+        _macro_id: RoxUserIdStr<'_>,
         request: SendingInboxRequest<'_>,
     ) -> Result<ResolvedSendingInbox, EmailErr> {
         let requested = request.requested_address.map(str::to_owned);
@@ -107,7 +107,7 @@ impl EmailFileSendService for Fake {
             bcc: Vec::new(),
             body_text: input.body_text.clone(),
             body_html: None,
-            body_macro: None,
+            body_rox: None,
             headers_json: None,
             send_time: None,
         };

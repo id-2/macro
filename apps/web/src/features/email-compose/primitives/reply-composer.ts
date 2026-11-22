@@ -10,7 +10,7 @@ import { $generateHtmlFromNodes } from '@lexical/html';
 import {
   $appendWatermarkNodeToLast,
   $removeAllWatermarkNodes,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import type { LexicalEditor } from 'lexical';
 import { $addUpdateTag, $getRoot } from 'lexical';
 import {
@@ -81,7 +81,7 @@ import {
   clearEmailBody,
   hasDraftContent,
   prepareEmailBody,
-  prepareMacroBody,
+  prepareRoxBody,
   TOGGLE_APPEND_EMAIL_THREAD_COMMAND,
 } from './prepare-email-body';
 import { announceQueuedSend } from './queued-send-notice';
@@ -249,7 +249,7 @@ export function createReplyComposer(
       ? signature()
       : undefined;
 
-  const [bodyMacro, setBodyMacro] = createSignal<string>('');
+  const [bodyRox, setBodyMacro] = createSignal<string>('');
   const [restoring, setRestoring] = createSignal(false);
   const [scrollContainer, setScrollContainer] = createSignal<HTMLElement>();
   // Gmail-style sizing: the composer opens compact and grows to the full cap
@@ -654,7 +654,7 @@ export function createReplyComposer(
     ) {
       return null;
     }
-    // We attach the drafts entirely using bodyHTML (because this is how the appended reply parsing works) so we are not including bodyMacro or bodyText
+    // We attach the drafts entirely using bodyHTML (because this is how the appended reply parsing works) so we are not including bodyRox or bodyText
     return {
       sender_email: activeInboxEmail(),
       bcc: form.recipients().bcc.map(convertEmailRecipientToContactInfo),
@@ -664,7 +664,7 @@ export function createReplyComposer(
       replying_to_id: replyTarget?.db_id,
       subject: form.subject(),
       to: form.recipients().to.map(convertEmailRecipientToContactInfo),
-      body_macro: forDelivery ? prepareMacroBody(bodyMacro()) : undefined,
+      body_rox: forDelivery ? prepareRoxBody(bodyRox()) : undefined,
       include_signature: includeSignature() ? undefined : false,
       draft_generation: draftGeneration(),
     };
@@ -1271,7 +1271,7 @@ export function createReplyComposer(
       // Append watermark after all validation passes so failed sends don't
       // leave orphaned watermark nodes in the editor tree.
       const restoration = prepareEmailBody(currentEditor);
-      const restoreMacro = bodyMacro();
+      const restoreRox = bodyRox();
       const cleanupWatermark = $appendWatermarkNodeToLast(
         currentEditor,
         !hasPaidAccess() ? MACRO_EMAIL_SIGNATURE : undefined
@@ -1293,7 +1293,7 @@ export function createReplyComposer(
         return;
       }
 
-      const processedMacroBody = prepareMacroBody(bodyMacro());
+      const processedRoxBody = prepareRoxBody(bodyRox());
 
       const currentDraftId = savedDraftId();
 
@@ -1314,13 +1314,13 @@ export function createReplyComposer(
           .flatMap((a) => (a.attachmentId ? [a.attachmentId] : [])),
         restoreBodyHtml: restoration?.bodyHtml,
         restoreBodyText: restoration?.bodyText,
-        restoreBodyMacro: restoreMacro,
+        restoreBodyRox: restoreRox,
         message: {
           sender_email: activeInboxEmail(),
           db_id: currentDraftId,
           bcc,
           body_html: prepared.bodyHtml,
-          body_macro: processedMacroBody,
+          body_rox: processedRoxBody,
           body_text: prepared.bodyText,
           cc,
           provider_id: draftSeed?.provider_id,
@@ -1757,7 +1757,7 @@ export function createReplyComposer(
     settle: settleTerminal,
   });
 
-  const hasBodyText = () => bodyMacro().trim().length > 0;
+  const hasBodyText = () => bodyRox().trim().length > 0;
   const editingDisabled = () =>
     restoring() ||
     operationBlocked() ||

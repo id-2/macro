@@ -216,7 +216,7 @@ impl StaticFileServiceClient {
         // use LocalStack's own hostname to reach the same object. No-op
         // outside local AWS.
         let presigned_url =
-            macro_aws_config::transform_aws_url_for_internal_fetch(&put_file_data.upload_url);
+            rox_aws_config::transform_aws_url_for_internal_fetch(&put_file_data.upload_url);
 
         let upload_response = self
             .client

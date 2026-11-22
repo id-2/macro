@@ -1,4 +1,4 @@
-import type { EventContext } from '@macro-inc/muppet/core/agent';
+import type { EventContext } from '@rox-one/muppet/core/agent';
 import type { Config } from '../context/config.ts';
 import type { Profile } from './claude.ts';
 

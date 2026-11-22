@@ -1,0 +1,35 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT attempts,\n            available_at = 'infinity' AS \"abandoned!\",\n            CASE WHEN available_at = 'infinity' THEN 0\n                ELSE ceil(EXTRACT(EPOCH FROM available_at - now()))::bigint END AS \"delay_seconds!\"\n        FROM email_message_reconciliation WHERE link_id = $1 AND provider_id = $2",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "attempts",
+        "type_info": "Int4"
+      },
+      {
+        "ordinal": 1,
+        "name": "abandoned!",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 2,
+        "name": "delay_seconds!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": [
+      false,
+      null,
+      null
+    ]
+  },
+  "hash": "273488c2f799ec13c8f97a42e564becbeb3f330a64feda24ab7040b753e13a26"
+}

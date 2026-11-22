@@ -20,6 +20,7 @@ import {
   isCalendarEventVisible,
 } from '../types';
 import { useCalendarPreferences } from '../utils/preferences';
+import { resolveCalendarTimeFormat } from '../utils/time-format';
 
 interface CalendarDisplaySettings {
   readonly periodView: CalendarPeriodView;
@@ -159,7 +160,8 @@ export const [CalendarViewContextProvider, useCalendarView] =
           return preferences.weekStartsOn;
         },
         get timeFormat() {
-          return preferences.timeFormat;
+          // The settings row shows the clock the interface actually writes.
+          return resolveCalendarTimeFormat(preferences.timeFormat);
         },
       };
 

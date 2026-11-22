@@ -28,6 +28,7 @@ import { useBlockEntityCommands } from '@app/features/next-soup/actions';
 import { SessionAgentRuntime } from '@app/features/runtime-sharing/views/SessionAgentRuntime';
 import { LocalRuntimePrompt } from '@app/features/settings/components/local-runtime-prompt';
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
+import { t } from '@app/lib/i18n';
 import { SplitHeaderScope } from '@components/app/SplitHeaderScope';
 import { SidePanel, useSidePanel } from '@components/app/side-panel';
 import { SplitFileMenu } from '@components/app/split-layout/components/SplitFileMenu';
@@ -257,8 +258,14 @@ function SessionContent(props: {
                                     const provider =
                                       session()?.external?.provider;
                                     return provider
-                                      ? `Open in ${provider.charAt(0).toUpperCase()}${provider.slice(1)}`
-                                      : 'Open externally';
+                                      ? t('agentChat.openIn', {
+                                          provider:
+                                            provider
+                                              .charAt(0)
+                                              .toUpperCase() +
+                                            provider.slice(1),
+                                        })
+                                      : t('agentChat.openExternally');
                                   },
                                   icon: ArrowSquareOut,
                                   condition: () =>
@@ -269,7 +276,7 @@ function SessionContent(props: {
                                   },
                                 },
                                 {
-                                  label: 'Share',
+                                  label: t('agentChat.share'),
                                   icon: ShareIcon,
                                   action: openShare,
                                 },
@@ -324,7 +331,7 @@ function SessionContent(props: {
               <section
                 class="page pane size-full min-w-0 @container/agent-session"
                 data-active
-                aria-label="Agent session"
+                aria-label={t('agentChat.agentSession')}
               >
                 <Show
                   when={!loadFailed()}
@@ -336,15 +343,15 @@ function SessionContent(props: {
                           when={accessDenied()}
                           fallback={
                             <LoadErrorPanel
-                              title="Unable to load this session"
+                              title={t('agentChat.sessionLoadFailed')}
                               onRetry={loadRetryable() ? retryLoad : undefined}
                             />
                           }
                         >
                           <EmptyStatePanel
                             centered
-                            title="You don't have access to this session"
-                            description="Ask a participant to share it with you."
+                            title={t('agentChat.sessionNoAccess')}
+                            description={t('agentChat.sessionNoAccessBody')}
                           />
                         </Show>
                       }
@@ -352,7 +359,7 @@ function SessionContent(props: {
                       {(error) => (
                         <EmptyStatePanel
                           centered
-                          title="The agent could not be started"
+                          title={t('agentChat.agentStartFailed')}
                           description={error()}
                         />
                       )}

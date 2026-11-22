@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::models::{Notification, SendNotificationRequestBuilder, TaggedContent};
 use crate::outbound::repository::NotificationDbOps;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use model_entity::EntityType;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -24,7 +24,7 @@ impl Notification for MessageSend {
 
 async fn insert<T: Notification + Serialize + Send + Sync>(
     pool: &PgPool,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     notification: T,
 ) -> Uuid {
     let id = Uuid::now_v7();
@@ -47,8 +47,8 @@ async fn insert<T: Notification + Serialize + Send + Sync>(
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn reads_only_the_users_active_rows_of_the_requested_types_newest_first(pool: PgPool) {
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
-    let other = MacroUserIdStr::try_from_email("other@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@example.com").unwrap();
     let oldest = insert(&pool, &viewer, DocumentMention).await;
     let mention = insert(&pool, &viewer, ChannelMention).await;
     let seen = insert(&pool, &viewer, DocumentMention).await;

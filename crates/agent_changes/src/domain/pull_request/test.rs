@@ -3,7 +3,7 @@ use crate::domain::model::{ChangesetRange, GitRef, GithubPullRequestChangeset};
 use agent_session::domain::model::AgentSessionId;
 use agent_session::testing::test_agent_session;
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 
 #[derive(Default)]
@@ -23,7 +23,7 @@ impl GithubPullRequestChangesets for Changesets {
 
     async fn capture(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         pr: &PullRequestRef,
     ) -> Result<GithubPullRequestChangeset, GithubPullRequestChangesError> {
         self.calls
@@ -54,7 +54,7 @@ impl GithubPullRequestChangesets for Changesets {
 
     async fn patch(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<String, GithubPullRequestChangesError> {
         if let Some(error) = self.patch_error {

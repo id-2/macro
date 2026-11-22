@@ -2,7 +2,7 @@
 
 use super::repository::DbDeviceType;
 use crate::domain::models::device::DeviceType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sqlx::PgPool;
 
@@ -26,7 +26,7 @@ pub trait DeviceRegistrationDbOps: Send + Sync + 'static {
     /// Upsert a device registration.
     fn upsert_device(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_endpoint: &str,
         device_type: &DeviceType,
@@ -37,7 +37,7 @@ pub trait DeviceRegistrationDbOps: Send + Sync + 'static {
     /// returning the removed endpoint ARNs.
     fn delete_user_devices_by_token(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_type: &DeviceType,
     ) -> impl std::future::Future<Output = Result<Vec<String>, Report>> + Send;
@@ -91,13 +91,13 @@ impl DeviceRegistrationDbOps for PgPool {
 
     async fn upsert_device(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_endpoint: &str,
         device_type: &DeviceType,
         native_call_capable: bool,
     ) -> Result<(), Report> {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let user_id_str = user_id.as_ref();
         sqlx::query!(
             r#"
@@ -120,7 +120,7 @@ impl DeviceRegistrationDbOps for PgPool {
 
     async fn delete_user_devices_by_token(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         device_token: &str,
         device_type: &DeviceType,
     ) -> Result<Vec<String>, Report> {

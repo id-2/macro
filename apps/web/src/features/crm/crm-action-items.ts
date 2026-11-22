@@ -40,9 +40,9 @@ export function createCrmEntityActionItems() {
     const crmItems: CrmEntityActionItem[] = [];
 
     for (const [field, label, icon] of [
-      ['stage', 'Set stage', FlagIcon],
-      ['owner', 'Set owner', UserIcon],
-      ['revenue', 'Set revenue', CurrencyDollarIcon],
+      ['stage', t('crm.setStage'), FlagIcon],
+      ['owner', t('crm.setOwner'), UserIcon],
+      ['revenue', t('crm.setRevenue'), CurrencyDollarIcon],
     ] as const) {
       if (
         !canExecuteAll((entity) =>

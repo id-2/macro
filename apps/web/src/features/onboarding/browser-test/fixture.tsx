@@ -145,6 +145,7 @@ function Fixture() {
             onNavigate={(target) => land({ t: 'app', target })}
             onRedirect={(url) => location.assign(url)}
             onSignedOut={() => land({ t: 'signed-out' })}
+            restart
             renderInviteOffer={renderInviteOfferStub}
           />
         </Match>

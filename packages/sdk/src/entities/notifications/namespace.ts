@@ -3,7 +3,7 @@ import type {
   NotifEvent,
 } from '../../../generated/notification/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Notification } from './notification';
 
 /** A notification event type name, e.g. `channel_mention`. */
@@ -15,7 +15,7 @@ type NotificationTypePreferences = GetNotificationTypePreferencesResponses[200];
  * @routing Use when reading the user's notifications or marking them seen, such as catching up on what they missed; not sending messages.
  */
 export class NotificationNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to a notification by id. */
   byId(id: string): Notification {

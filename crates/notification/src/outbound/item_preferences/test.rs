@@ -2,10 +2,10 @@ use super::*;
 use crate::outbound::repository::NotificationDbOps;
 use chrono::Duration;
 use cowlike::CowLike;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(&format!("macro|{email}@example.com"))
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(&format!("macro|{email}@example.com"))
         .unwrap()
         .into_owned()
 }

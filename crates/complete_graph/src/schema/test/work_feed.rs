@@ -50,7 +50,7 @@ fn comment(id: u128, minute: u32) -> Arc<UserNotificationRow<NotifEvent>> {
     }))
     .unwrap();
     Arc::new(UserNotificationRow {
-        owner_id: MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+        owner_id: RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
         notification_id: Uuid::from_u128(id),
         notification_event_type: "commented_on_document".to_string(),
         entity: doc_key().entity().clone(),
@@ -181,13 +181,13 @@ impl WorkFeedGraphqlService for Recording {
 #[derive(Default, Clone)]
 struct ManualTriggers {
     sender: Arc<Mutex<Option<tokio::sync::mpsc::Sender<FeedTrigger>>>>,
-    subscribed: Arc<Mutex<Vec<(MacroUserIdStr<'static>, CandidateKeying, bool)>>>,
+    subscribed: Arc<Mutex<Vec<(RoxUserIdStr<'static>, CandidateKeying, bool)>>>,
 }
 
 impl FeedTriggers for ManualTriggers {
     fn subscribe(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         keying: CandidateKeying,
         own_work: bool,
     ) -> tokio::sync::mpsc::Receiver<FeedTrigger> {
@@ -206,7 +206,7 @@ struct NoTeam;
 impl FeedViewerResolver for NoTeam {
     fn team(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
     ) -> BoxFuture<'_, Result<Option<EntityAccessReceipt<MemberTeamRole>>, rootcause::Report>> {
         Box::pin(async { Ok(None) })
     }
@@ -223,8 +223,8 @@ fn context(
     )
 }
 
-fn viewer_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap()
+fn viewer_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap()
 }
 
 #[tokio::test]

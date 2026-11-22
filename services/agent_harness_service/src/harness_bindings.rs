@@ -20,7 +20,7 @@ use agent_harness::domain::ports::{
 use agent_session::domain::model::ReplicaId;
 use bot_id::BotId;
 use harness_id::HarnessId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use tracing::Instrument as _;
 
@@ -64,7 +64,7 @@ impl HarnessBindings for PgHarnessBindings {
     async fn access_facts(
         &self,
         bot: BotId,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> anyhow::Result<Option<RuntimeAccessFacts>> {
         let actor_id: Option<&str> = actor.map(|actor| actor.as_ref());
         let row = sqlx::query!(

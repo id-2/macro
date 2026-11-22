@@ -1,8 +1,8 @@
 use super::*;
 use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{email}")).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
 }
 
 #[tokio::test]

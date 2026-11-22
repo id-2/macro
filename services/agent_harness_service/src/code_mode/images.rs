@@ -4,7 +4,7 @@ use agent_code_mode::domain::{
 };
 use async_trait::async_trait;
 use base64::Engine as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use static_file_service_client::StaticFileServiceClient;
 
 #[cfg(test)]
@@ -24,7 +24,7 @@ impl ModelImages for StaticFileModelImages {
     async fn load_png(
         &self,
         file: &StaticFileId,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> anyhow::Result<ModelImage> {
         // Refuse other people's files and other uploads before downloading them.
         let metadata = self
@@ -47,7 +47,7 @@ impl ModelImages for StaticFileModelImages {
 fn owned_png(
     file_owner: &str,
     content_type: &str,
-    owner: &MacroUserIdStr<'_>,
+    owner: &RoxUserIdStr<'_>,
 ) -> anyhow::Result<()> {
     anyhow::ensure!(
         file_owner == owner.as_ref(),

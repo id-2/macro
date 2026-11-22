@@ -27,7 +27,7 @@ transport. It preserves the upstream serializers, retry, timeout, batching and
 keepalive rules. The injected fetch takes precedence over global fetch discovery.
 
 Node and Bun processes, such as agent teammates, use `createNodeTracingProvider`
-from `@macro-inc/observability/node` as their `tracingProvider`. It registers an
+from `@rox-one/observability/node` as their `tracingProvider`. It registers an
 async context manager, so a span's context follows its awaits, and exports to
 `tracesUrl`. A span hands on its trace context only after enablement settles:
 await `Telemetry.flush()` once after `Telemetry.init` before relying on

@@ -8,7 +8,7 @@ use agent_runtime_protocol::domain::action::AgentActionId;
 use agent_runtime_protocol::domain::tool_approval::ToolApprovalStatus;
 use agent_session::domain::model::TurnPrompter;
 use agent_session::testing::{InMemoryAgentSessionRepo, test_agent_session};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 
@@ -20,7 +20,7 @@ struct Heard {
 }
 
 impl ToolApprovalAnnouncer for Heard {
-    async fn requested(&self, approval: &ToolApproval, _owner: &MacroUserIdStr<'static>) {
+    async fn requested(&self, approval: &ToolApproval, _owner: &RoxUserIdStr<'static>) {
         self.statuses.lock().unwrap().push(approval.status);
         self.requested.notify_one();
     }
@@ -34,8 +34,8 @@ impl ToolApprovalAnnouncer for Heard {
 type Approvals =
     ToolApprovalService<InMemoryToolApprovalStore, InProcessToolApprovalSignals, Heard>;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 
 struct Rig {
@@ -73,7 +73,7 @@ fn rig() -> Rig {
     }
 }
 
-async fn prompted_by(rig: &Rig, user: Option<MacroUserIdStr<'static>>) {
+async fn prompted_by(rig: &Rig, user: Option<RoxUserIdStr<'static>>) {
     rig.sessions
         .set_turn_prompter(
             rig.session,
@@ -109,7 +109,7 @@ async fn somebody_elses_turn_runs_only_once_the_owner_approves() {
     let rig = rig();
     prompted_by(
         &rig,
-        Some(MacroUserIdStr::try_from_email("asker@example.com").unwrap()),
+        Some(RoxUserIdStr::try_from_email("asker@example.com").unwrap()),
     )
     .await;
     let arguments = serde_json::json!({ "limit": 3, "acting_as":"owner" });
@@ -172,7 +172,7 @@ async fn a_public_web_search_runs_without_asking_even_for_somebody_else() {
 #[tokio::test]
 async fn requester_access_runs_without_asking_the_session_owner() {
     let rig = rig();
-    let asker = MacroUserIdStr::try_from_email("asker@example.com").unwrap();
+    let asker = RoxUserIdStr::try_from_email("asker@example.com").unwrap();
     prompted_by(&rig, Some(asker.clone())).await;
     let verdict = rig
         .gate
@@ -231,7 +231,7 @@ async fn code_execution_cannot_resolve_the_requester_of_a_replacement_turn() {
         .await
         .unwrap()
         .unwrap();
-    let requester = MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+    let requester = RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     prompted_by(&rig, Some(requester.clone())).await;
     let current = rig
         .sessions
@@ -271,7 +271,7 @@ async fn abandoning_a_held_call_cancels_its_approval_and_a_later_approval_is_ref
     let rig = rig();
     prompted_by(
         &rig,
-        Some(MacroUserIdStr::try_from_email("asker@example.com").unwrap()),
+        Some(RoxUserIdStr::try_from_email("asker@example.com").unwrap()),
     )
     .await;
     let arguments = serde_json::json!({"acting_as":"owner"});

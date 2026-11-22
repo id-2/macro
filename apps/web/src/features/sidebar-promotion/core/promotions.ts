@@ -34,11 +34,11 @@ export const HOME_SETUP_PROMOTION = {
     logo('Google Drive', IconGoogleDrive),
     logo('Jira', IconJira),
   ],
-  headline: 'Make Rox your home base',
+  headline: 'Сделайте Rox своим домом',
   pitch:
-    'Connect the tools you use every day and invite teammates to work in Rox.',
-  action: 'Connect tools',
-  secondaryAction: 'Invite team',
+    'Подключите инструменты, которыми пользуетесь каждый день, и позовите коллег работать в Rox.',
+  action: 'Подключить',
+  secondaryAction: 'Позвать',
 } satisfies PromotionCopy;
 
 export const CALENDAR_ACCOUNTS_PROMOTION = {
@@ -46,14 +46,14 @@ export const CALENDAR_ACCOUNTS_PROMOTION = {
   logos: [logo('Google Calendar', IconGoogleCalendar)],
   /** Joins the logos while the server offers this user Outlook connections. */
   outlookLogo: logo('Outlook', IconOutlook),
-  headline: 'Connect more calendars',
+  headline: 'Подключить ещё календари',
   pitch:
-    'Add another account to see your work and personal calendars together.',
-  action: 'Connect a calendar',
+    'Подключите ещё один аккаунт, чтобы видеть рабочие и личные календари вместе.',
+  action: 'Подключить календарь',
   /** Shown instead while one of your accounts lacks calendar access. */
-  enableAction: 'Turn on calendar',
+  enableAction: 'Включить календарь',
   /** Shown instead while a calendar grant has expired. */
-  reconnectAction: 'Reconnect calendar',
+  reconnectAction: 'Переподключить календарь',
 } satisfies PromotionCopy & {
   outlookLogo: PromotionLogo;
   enableAction: string;

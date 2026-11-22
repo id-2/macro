@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { BaseTool } from '@core/component/AI/component/tool/BaseTool';
 import { createToolRenderer } from '@core/component/AI/component/tool/ToolRenderer';
 import FileCsv from '@icon/system/regular/file-csv.svg';
@@ -68,11 +69,11 @@ const listPipelinesHandler = createToolRenderer({
       <Label
         status={
           ctx.response
-            ? pluralize(ctx.response.data.pipelines.length, 'pipeline')
+            ? t('crm.pipelineCount', { count: ctx.response.data.pipelines.length })
             : undefined
         }
       >
-        List CRM pipelines
+        {t('crm.toolListPipelines')}
       </Label>
     </BaseTool>
   ),
@@ -83,7 +84,9 @@ const findPipelineEntriesHandler = createToolRenderer({
   render: (ctx) => {
     const groups = () => ctx.response?.data.pipelines ?? [];
     const target = () =>
-      groups().length === 1 ? ` in ${groups()[0]?.pipelineName}` : '';
+      groups().length === 1
+        ? ` ${t('crm.toolInPipeline', { name: groups()[0]?.pipelineName ?? '' })}`
+        : '';
     return (
       <BaseTool
         icon={Kanban}
@@ -93,7 +96,7 @@ const findPipelineEntriesHandler = createToolRenderer({
           ctx.response ? (
             <PipelineEntriesToolResponse
               entries={groups().flatMap((group) => group.entries)}
-              empty="No matching entries."
+              empty={t('crm.noMatchingEntries')}
             />
           ) : undefined
         }
@@ -101,12 +104,14 @@ const findPipelineEntriesHandler = createToolRenderer({
         <Label
           status={
             ctx.response
-              ? pluralize(ctx.response.data.matched, 'entry', 'entries')
+              ? t('crm.entryCount', { count: ctx.response.data.matched })
               : undefined
           }
         >
-          {`Find pipeline entries${target()}${
-            ctx.tool.data.search ? ` matching "${ctx.tool.data.search}"` : ''
+          {`${t('crm.toolFindEntries')}${target()}${
+            ctx.tool.data.search
+              ? ` ${t('crm.toolMatching', { search: ctx.tool.data.search })}`
+              : ''
           }`}
         </Label>
       </BaseTool>
@@ -127,10 +132,10 @@ const addToPipelineHandler = createToolRenderer({
           ctx.response ? (
             <PipelineEntriesToolResponse
               entries={added()}
-              empty="Nothing added."
+              empty={t('crm.nothingAdded')}
               noted={{
                 entries: ctx.response.data.alreadyPresent ?? [],
-                note: 'Already in pipeline',
+                note: t('crm.alreadyInPipeline'),
               }}
             />
           ) : undefined
@@ -139,17 +144,20 @@ const addToPipelineHandler = createToolRenderer({
         <Label
           status={
             ctx.response
-              ? `${pluralize(added().length, 'entry', 'entries')} added`
+              ? t('crm.entriesAdded', { count: added().length })
               : undefined
           }
         >
           {ctx.response
-            ? `Added ${
-                added()
-                  .map((entry) => recordName(entry.record))
-                  .join(', ') || 'nothing'
-              } to pipeline`
-            : `Add ${pluralize(ctx.tool.data.entries.length, 'record')} to pipeline`}
+            ? t('crm.toolAddedToPipeline', {
+                names:
+                  added()
+                    .map((entry) => recordName(entry.record))
+                    .join(', ') || t('crm.nothing'),
+              })
+            : t('crm.toolAddRecords', {
+                count: ctx.tool.data.entries.length,
+              })}
         </Label>
       </BaseTool>
     );
@@ -172,11 +180,11 @@ const updatePipelineEntriesHandler = createToolRenderer({
       <Label
         status={
           ctx.response
-            ? pluralize(ctx.response.data.updated.length, 'entry', 'entries')
+            ? t('crm.entryCount', { count: ctx.response.data.updated.length })
             : undefined
         }
       >
-        {ctx.response ? 'Updated pipeline entries' : 'Update pipeline entries'}
+        {ctx.response ? t('crm.updatedEntries') : t('crm.updateEntries')}
       </Label>
     </BaseTool>
   ),
@@ -193,7 +201,7 @@ const removeFromPipelineHandler = createToolRenderer({
         ctx.response ? (
           <PipelineEntriesToolResponse
             entries={ctx.response.data.removed}
-            empty="Nothing removed."
+            empty={t('crm.nothingRemoved')}
           />
         ) : undefined
       }
@@ -201,11 +209,13 @@ const removeFromPipelineHandler = createToolRenderer({
       <Label
         status={
           ctx.response
-            ? `${pluralize(ctx.response.data.removed.length, 'entry', 'entries')} removed`
+            ? t('crm.entriesRemoved', {
+                count: ctx.response.data.removed.length,
+              })
             : undefined
         }
       >
-        {ctx.response ? 'Removed from pipeline' : 'Remove from pipeline'}
+        {ctx.response ? t('crm.removedFromPipeline') : t('crm.removeFromPipeline')}
       </Label>
     </BaseTool>
   ),
@@ -226,7 +236,9 @@ const createPipelineHandler = createToolRenderer({
       }
     >
       <Label>
-        {`${ctx.response ? 'Created' : 'Create'} pipeline ${ctx.tool.data.name}`}
+        {ctx.response
+          ? t('crm.createdPipeline', { name: ctx.tool.data.name })
+          : t('crm.createPipelineNamed', { name: ctx.tool.data.name })}
       </Label>
     </BaseTool>
   ),
@@ -248,8 +260,8 @@ const editPipelineHandler = createToolRenderer({
     >
       <Label>
         {ctx.response
-          ? `Updated pipeline ${ctx.response.data.pipeline.name}`
-          : 'Edit pipeline'}
+          ? t('crm.updatedPipeline', { name: ctx.response.data.pipeline.name })
+          : t('crm.editPipeline')}
       </Label>
     </BaseTool>
   ),
@@ -270,13 +282,13 @@ const importCompaniesCsvHandler = createToolRenderer({
       <Label
         status={
           ctx.response
-            ? `${pluralize(ctx.response.data.created, 'company', 'companies')} created`
+            ? t('crm.companiesCreated', { count: ctx.response.data.created })
             : undefined
         }
       >
         {ctx.response
-          ? 'Imported companies from CSV'
-          : 'Import companies from CSV'}
+          ? t('crm.importedCompaniesCsv')
+          : t('crm.importCompaniesCsv')}
       </Label>
     </BaseTool>
   ),
@@ -297,13 +309,13 @@ const importPipelineCsvHandler = createToolRenderer({
       <Label
         status={
           ctx.response
-            ? `${pluralize(ctx.response.data.added, 'entry', 'entries')} added`
+            ? t('crm.entriesAdded', { count: ctx.response.data.added })
             : undefined
         }
       >
         {ctx.response
-          ? `Imported CSV into ${ctx.response.data.pipelineName}`
-          : 'Import CSV into pipeline'}
+          ? t('crm.importedCsvInto', { name: ctx.response.data.pipelineName })
+          : t('crm.importCsvIntoPipeline')}
       </Label>
     </BaseTool>
   ),
@@ -323,13 +335,13 @@ const exportPipelineCsvHandler = createToolRenderer({
       <Label
         status={
           ctx.response
-            ? pluralize(ctx.response.data.rows, 'entry', 'entries')
+            ? t('crm.entryCount', { count: ctx.response.data.rows })
             : undefined
         }
       >
         {ctx.response
-          ? `Exported ${ctx.response.data.fileName} to CSV`
-          : 'Export pipeline to CSV'}
+          ? t('crm.exportedCsv', { name: ctx.response.data.fileName })
+          : t('crm.exportPipelineCsv')}
       </Label>
     </BaseTool>
   ),

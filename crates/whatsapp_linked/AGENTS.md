@@ -107,7 +107,7 @@ They share no HTTP: only RoxDB rows and `NOTIFY` (`external_chat`'s
   calls `notify_change` (`external_chat_changed`); DSS pushes it to viewers.
   Roster writes signal only real changes (`groups.rs` `same_facts`).
 - Migrations:
-  `crates/macro_db_client/migrations/20261027061310_whatsapp_linked.sql` (the
+  `crates/rox_db_client/migrations/20261027061310_whatsapp_linked.sql` (the
   first schema, with its entity type validation), then
   `20261027194950_whatsapp_attachments_as_static_files.sql` (attachments keep a
   static `file_id`), then `*_external_chat.sql` (the generic `external_chat*`

@@ -29,8 +29,8 @@ import {
   handleFileFolderDrop,
   uploadFile,
 } from '@core/util/upload';
-import type { PendingShareFile } from '@macro/tauri';
-import { useShareTarget, useTauri } from '@macro/tauri';
+import type { PendingShareFile } from '@rox/tauri';
+import { useShareTarget, useTauri } from '@rox/tauri';
 import { invalidateListChannels } from '@queries/channel/channels';
 import {
   useGetOrCreateDirectMessageMutation,

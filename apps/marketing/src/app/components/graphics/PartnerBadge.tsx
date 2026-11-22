@@ -115,7 +115,7 @@ export function PartnerBadge() {
         stroke-width="0.8"
       />
 
-      <image href="/macro-favicon.svg" x="70" y="70" width="100" height="100" />
+      <image href="/rox-favicon.svg" x="70" y="70" width="100" height="100" />
     </svg>
   );
 }

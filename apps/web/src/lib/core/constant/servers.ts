@@ -1,4 +1,5 @@
 import { developmentProxyUrl } from './developmentProxy';
+import { isDesktopShellOrigin } from '@core/util/siteHost';
 
 const serverHostLocal: Servers = {
   'auth-service': 'http://localhost:8080',
@@ -93,6 +94,10 @@ const wsProxyOrigin = proxyOrigin?.replace(/^http/, 'ws');
 // this: their proxies keep each stack's cookies apart on any hostname.
 function resolveProxyOrigin(configured: string | undefined) {
   if (!configured || typeof window === 'undefined') return configured;
+  // The desktop shell serves the bundle from its own `tauri.localhost`
+  // container (or `tauri://`), which is not a backend host: there is nothing
+  // to follow, so a bundle built for a fixed backend origin keeps it.
+  if (isDesktopShellOrigin()) return configured;
   try {
     const url = new URL(configured);
     url.hostname = window.location.hostname;

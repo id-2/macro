@@ -14,7 +14,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     /// The table's rows and columns in order, when the receipt's database is
     /// live and holds it.
@@ -57,7 +57,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     #[tracing::instrument(skip(self, receipt, rows), fields(rows = rows.len()), err)]
     async fn cells_of_rows(

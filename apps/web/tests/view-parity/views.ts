@@ -117,11 +117,11 @@ export const PARITY_VIEWS: ParityView[] = [
     id: 'task',
     path: '/tasks',
     ready: async (page) => {
-      await expect(rowNamed(page, 'Intro to tasks')).toBeVisible();
+      await expect(rowNamed(page, 'Введение в задачи')).toBeVisible();
     },
     states: [
-      { name: 'detail', go: openDocument('Intro to tasks') },
-      { name: 'menu', only: 'touch', go: openTitleMenu('Intro to tasks') },
+      { name: 'detail', go: openDocument('Введение в задачи') },
+      { name: 'menu', only: 'touch', go: openTitleMenu('Введение в задачи') },
     ],
   },
   {

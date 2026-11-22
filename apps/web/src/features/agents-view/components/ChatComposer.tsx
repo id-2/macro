@@ -26,7 +26,7 @@ import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { useTouchOutsideToDismissKeyboard } from '@core/mobile/useTouchOutsideToDismissKeyboard';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { handleFileFolderDrop } from '@core/util/upload';
-import { $insertReferencedPaste } from '@macro-inc/lexical-core';
+import { $insertReferencedPaste } from '@rox-one/lexical-core';
 import { makeEventListener } from '@solid-primitives/event-listener';
 import { createResizeObserver } from '@solid-primitives/resize-observer';
 import { Button, ComposerSurface, SendButton } from '@ui';
@@ -293,9 +293,9 @@ export function ChatComposer(props: {
             ? // Phones are too narrow for the full mention and skills hint.
               'Message Rox AI'
             : (props.placeholder ??
-              'Type @ to mention docs, people, or channels, / for skills')
+              t('agentControls.mentionHint'))
         }
-        ariaLabel="Message the agent"
+        ariaLabel={t('agentChat.messageTheAgent')}
         autofocus={
           !isTouchDevice() &&
           (props.autoFocus ?? props.session?.autofocus ?? true)
@@ -317,7 +317,7 @@ export function ChatComposer(props: {
           <div
             class="composer-drawer-content"
             role="group"
-            aria-label="Conversation settings"
+            aria-label={t('agentChat.conversationSettings')}
           >
             {props.drawer}
           </div>
@@ -444,7 +444,7 @@ export function ChatComposer(props: {
                   data-composer-controls
                   class="order-2 flex min-w-0 max-w-[55%] group-data-[composer-compact=false]/composer:max-w-none group-data-[composer-compact=false]/composer:flex-1 shrink-0 items-center gap-2"
                   role="group"
-                  aria-label="Composer settings"
+                  aria-label={t('agentChat.composerSettings')}
                 >
                   <div class="ml-auto flex min-w-0 max-w-full items-center gap-2 [&_.menu]:right-0 [&_.menu]:left-auto [&_.menu-anchor]:min-w-0 [&_.pill]:max-w-full">
                     <div
@@ -472,7 +472,7 @@ export function ChatComposer(props: {
                         <SendButton
                           appearance="composer"
                           class="touch:bg-transparent touch:text-ink touch:data-disabled:bg-transparent"
-                          aria-label="Send"
+                          aria-label={t('agentChat.send')}
                           title={props.blockedReason}
                           disabled={
                             !hasContent() ||
@@ -485,8 +485,8 @@ export function ChatComposer(props: {
                       }
                     >
                       <Button
-                        aria-label="Stop"
-                        tooltip="Stop"
+                        aria-label={t('agentChat.stop')}
+                        tooltip={t('agentChat.stop')}
                         variant="secondary"
                         class="touch:glass touch:bg-chrome touch:text-ink touch:data-disabled:bg-chrome"
                         size="icon-md"

@@ -13,14 +13,14 @@ struct FakeRepo {
 impl AutoArchiveRepo for FakeRepo {
     async fn user_auto_archive_preferences(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
     ) -> Result<AutoArchivePreferences> {
         Ok(AutoArchivePreferences::default())
     }
 
     async fn set_user_auto_archive_preferences(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _preferences: AutoArchivePreferences,
     ) -> Result<()> {
         Ok(())

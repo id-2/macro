@@ -4,7 +4,7 @@ use agent_session::domain::model::{AgentSession, AgentSessionId};
 use async_trait::async_trait;
 use code_execution::domain::{ExecuteRequest, Limits, Outcome, ProgramExecutor};
 use entity_access::domain::models::{EntityAccessReceipt, EntityType, ViewAccessLevel};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::sync::Semaphore;
 use tokio_util::sync::CancellationToken;
 use tracing::Instrument;
@@ -20,7 +20,7 @@ pub trait SessionCodeMode: Send + Sync + 'static {
         session: &AgentSession,
         execution: ExecutionId,
         acting_as: ai_toolset::actor::ToolActor,
-        turn: macro_uuid::Uuid,
+        turn: rox_uuid::Uuid,
         request: ExecuteRequest,
         cancel: CancellationToken,
     ) -> Result<ExecutionReceipt, CodeModeError>;
@@ -71,7 +71,7 @@ impl CodeModeService {
     async fn attach_images(
         &self,
         session: AgentSessionId,
-        acting_user: Option<&MacroUserIdStr<'static>>,
+        acting_user: Option<&RoxUserIdStr<'static>>,
         receipt: &mut ExecutionReceipt,
     ) {
         let images = returned_images(receipt);
@@ -105,7 +105,7 @@ impl CodeModeService {
         execution: ExecutionId,
         request: ExecuteRequest,
         cancel: CancellationToken,
-    ) -> Result<(ExecutionReceipt, Option<MacroUserIdStr<'static>>), CodeModeError> {
+    ) -> Result<(ExecutionReceipt, Option<RoxUserIdStr<'static>>), CodeModeError> {
         let mut record = ExecutionRecord {
             execution_id: execution,
             acting_as: Some(identity.acting_as),
@@ -473,7 +473,7 @@ impl SessionCodeMode for CodeModeService {
         session: &AgentSession,
         execution: ExecutionId,
         acting_as: ai_toolset::actor::ToolActor,
-        turn: macro_uuid::Uuid,
+        turn: rox_uuid::Uuid,
         request: ExecuteRequest,
         cancel: CancellationToken,
     ) -> Result<ExecutionReceipt, CodeModeError> {

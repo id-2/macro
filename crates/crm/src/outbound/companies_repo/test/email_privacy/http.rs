@@ -13,9 +13,9 @@ use axum::{
     routing::get,
 };
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_authorization::{
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
+use rox_authorization::{
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
     ValidatedIdentity,
 };
 use serde_json::{Value, json};
@@ -29,7 +29,7 @@ struct ThreadExclusionRollout(Arc<AtomicBool>);
 
 #[async_trait::async_trait]
 impl crate::domain::email_privacy::ThreadExclusionGate for ThreadExclusionRollout {
-    async fn enabled_for(&self, _: macro_user_id::user_id::MacroUserIdStr<'_>) -> bool {
+    async fn enabled_for(&self, _: rox_user_id::user_id::RoxUserIdStr<'_>) -> bool {
         self.0.load(Ordering::SeqCst)
     }
 }
@@ -40,18 +40,18 @@ impl JwtValidator for FixtureCredential {
     fn validate_credential(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, rootcause::Report<RoxAuthorizationError>> {
         let user = match token {
             "owner" => OWNER,
             "member" => MEMBER,
             _ => {
                 return Err(rootcause::Report::new(
-                    MacroAuthorizationError::InvalidCredentials,
+                    RoxAuthorizationError::InvalidCredentials,
                 ));
             }
         };
         Ok(ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -139,8 +139,8 @@ async fn privacy_http_preserves_records_and_enforces_mailbox_and_role_boundaries
         entity_access_service: Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
             pool.clone(),
         ))),
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
                 FixtureCredential,
                 InternalAuthConfig {
                     api_key: "fixture-only".into(),

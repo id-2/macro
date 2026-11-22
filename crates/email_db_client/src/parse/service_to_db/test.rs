@@ -47,7 +47,7 @@ fn message_with(from: Option<ContactInfo>, to: Vec<ContactInfo>) -> message::Mes
         labels: vec![],
         body_text: None,
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         attachments: vec![],
         attachments_draft: vec![],
         attachments_forwarded: vec![],

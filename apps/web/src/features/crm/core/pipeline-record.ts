@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { Pipeline } from './pipeline';
 
 // Light client-side check for a bare domain like "acme.com"; the server
@@ -66,17 +67,17 @@ export function recordChoiceProblem(
   if (choice.kind === 'existing') return undefined;
   if (!choice.name.trim())
     return choice.kind === 'new-company'
-      ? 'Enter a company name'
-      : 'Enter a name';
+      ? t('crm.enterCompanyName')
+      : t('crm.enterName');
   if (choice.kind === 'new-company')
     return !choice.domain.trim() || isCompanyDomain(choice.domain.trim())
       ? undefined
-      : 'Enter a valid domain like acme.com';
+      : t('crm.enterValidDomain');
   const email = choice.email.trim();
   const domain = EMAIL_PATTERN.exec(email)?.[1];
-  if (!domain) return 'Enter an email like jane@acme.com';
+  if (!domain) return t('crm.enterValidEmail');
   const company = choice.companyId
     ? companies.find((company) => company.id === choice.companyId)
     : undefined;
-  return company ? undefined : 'Choose a company for this contact';
+  return company ? undefined : t('crm.chooseCompanyForContact');
 }

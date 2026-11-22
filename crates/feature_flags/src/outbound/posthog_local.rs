@@ -8,8 +8,8 @@
 //! rollout percentage. Any other definition fails the load: it never guesses.
 
 use crate::{FeatureFlags, FlagSnapshot, FlagValue};
-use macro_env::Environment;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_env::Environment;
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::{Client, StatusCode, Url, header};
 use rootcause::Report;
 use serde::Deserialize;
@@ -132,7 +132,7 @@ impl PostHogLocalFeatureFlags {
 
 impl Inner {
     /// Poll when due, then evaluate every named flag for `user_id`.
-    async fn load(&self, user_id: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
+    async fn load(&self, user_id: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
         let mut state = self.state.lock().await;
         if state.next_poll.is_none_or(|due| Instant::now() >= due) {
             match self.poll(state.definitions.as_ref()).await {
@@ -256,7 +256,7 @@ impl Inner {
 }
 
 impl FeatureFlags for PostHogLocalFeatureFlags {
-    async fn load(&self, user_id: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
+    async fn load(&self, user_id: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
         self.inner.load(user_id).await
     }
 }
@@ -268,7 +268,7 @@ struct Person<'a> {
 }
 
 impl<'a> Person<'a> {
-    fn new(user_id: &'a MacroUserIdStr<'_>, environment: Environment) -> Self {
+    fn new(user_id: &'a RoxUserIdStr<'_>, environment: Environment) -> Self {
         Self {
             distinct_id: user_id.as_ref(),
             properties: [

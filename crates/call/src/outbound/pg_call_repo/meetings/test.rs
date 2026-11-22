@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::ports::CallRepository;
 use chrono::{Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const OWNER: &str = "macro|user-b@test.com";
 const PARTICIPANT_EMAIL: &str = "user-c@test.com";
@@ -124,8 +124,8 @@ async fn expired_preparation_is_not_claimed(pool: PgPool) {
 
 async fn repo(pool: PgPool) -> PgCallRepo {
     for user in [
-        MacroUserIdStr::parse_from_str(OWNER).unwrap(),
-        MacroUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap(),
+        RoxUserIdStr::parse_from_str(OWNER).unwrap(),
+        RoxUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap(),
     ] {
         crate::outbound::pg_call_repo::test::insert_user_mapping(&pool, &user, Uuid::now_v7())
             .await
@@ -166,7 +166,7 @@ async fn start_with_guest(repo: &PgCallRepo, meeting: Meeting) -> (Meeting, Uuid
 async fn active_meetings_include_owner_and_same_session_attendee_only(pool: PgPool) {
     let repo = repo(pool).await;
     let (meeting, call_id, _) = start_with_guest(&repo, meeting()).await;
-    let participant = MacroUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
+    let participant = RoxUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
 
     // A guest can keep the owner's call live before the owner joins.
     let owned = repo.list_active_meetings(OWNER).await.unwrap();
@@ -253,7 +253,7 @@ async fn active_meetings_exclude_empty_cancelled_scheduled_and_channel_calls(poo
     assert!(repo.list_active_meetings(OWNER).await.unwrap().is_empty());
 
     // Signed-in occupancy also counts when every guest has left.
-    let participant = MacroUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
+    let participant = RoxUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
     repo.add_meeting_participant(&call_id, participant.clone())
         .await
         .unwrap();
@@ -271,7 +271,7 @@ async fn active_meetings_exclude_empty_cancelled_scheduled_and_channel_calls(poo
 async fn active_meetings_do_not_grant_discovery_from_an_earlier_session(pool: PgPool) {
     let repo = repo(pool).await;
     let (meeting, call_id, guest) = start_with_guest(&repo, meeting()).await;
-    let participant = MacroUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
+    let participant = RoxUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
     repo.add_meeting_participant(&call_id, participant.clone())
         .await
         .unwrap();
@@ -306,7 +306,7 @@ async fn active_meetings_do_not_grant_discovery_from_an_earlier_session(pool: Pg
 async fn invitees_discover_only_the_invited_session_without_becoming_participants(pool: PgPool) {
     let repo = repo(pool.clone()).await;
     let (meeting, call_id, guest) = start_with_guest(&repo, meeting()).await;
-    let invitee = MacroUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
+    let invitee = RoxUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
     for _ in 0..2 {
         repo.add_meeting_invitees(&meeting.id, &call_id, std::slice::from_ref(&invitee))
             .await
@@ -391,7 +391,7 @@ async fn invitees_discover_only_the_invited_session_without_becoming_participant
 )]
 async fn invitations_do_not_make_empty_cancelled_or_scheduled_calls_live(pool: PgPool) {
     let repo = repo(pool).await;
-    let invitee = MacroUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
+    let invitee = RoxUserIdStr::try_from_email(PARTICIPANT_EMAIL).unwrap();
     let (quick, quick_call_id, guest) = start_with_guest(&repo, meeting()).await;
     let (empty, empty_call_id, empty_guest) = start_with_guest(&repo, meeting()).await;
     repo.reconcile_guest(&empty_call_id, empty_guest, false)

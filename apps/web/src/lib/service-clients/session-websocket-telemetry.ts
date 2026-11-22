@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 
 type Attempt = { span: Span; phase: Span };
 type Session = { root: Span; attempt?: Attempt; retries: number };

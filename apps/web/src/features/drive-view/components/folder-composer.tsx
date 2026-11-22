@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fileFolderDrop } from '@core/directive/fileFolderDrop';
 import ArrowsOutIcon from '@icon/system/regular/arrows-out.svg';
 import FileIcon from '@icon/system/regular/file.svg';
@@ -38,7 +39,7 @@ export function FolderComposer(props: {
   return (
     <form
       class="h-full min-h-0"
-      aria-label="New folder"
+      aria-label={t('drive.newFolderTitle')}
       aria-busy={props.busy}
       onSubmit={(event) => {
         event.preventDefault();
@@ -64,8 +65,8 @@ export function FolderComposer(props: {
                 variant="ghost"
                 tabIndex={-1}
                 size="icon-md"
-                aria-label="Continue editing in split"
-                tooltip="Continue editing in split"
+                aria-label={t('drive.continueInSplit')}
+                tooltip={t('drive.continueInSplit')}
                 disabled={props.busy}
                 onClick={props.onExpand}
               >
@@ -84,15 +85,15 @@ export function FolderComposer(props: {
                 nameInput?.focus();
               }}
             >
-              Clear Draft
+              {t('drive.clearDraft')}
             </Button>
           </Show>
           <Button
             variant="ghost"
             tabIndex={-1}
             size="icon-md"
-            aria-label="Close"
-            tooltip="Close"
+            aria-label={t('drive.close')}
+            tooltip={t('drive.close')}
             disabled={props.busy}
             onClick={props.onClose}
           >
@@ -104,8 +105,8 @@ export function FolderComposer(props: {
             <input
               ref={nameInput}
               autofocus
-              aria-label="Folder name"
-              placeholder="Folder name"
+              aria-label={t('drive.folderName')}
+              placeholder={t('drive.folderName')}
               required
               class="ph-no-capture w-full min-w-0 text-xl/7 font-medium outline-none bg-transparent placeholder:text-ink-placeholder"
               value={props.name}
@@ -134,10 +135,10 @@ export function FolderComposer(props: {
                 <UploadIcon class="size-8 text-ink-extra-muted" />
                 <div>
                   <p class="text-sm text-ink">
-                    Drop files or nested folders here
+                    {t('drive.dropFolderFiles')}
                   </p>
                   <p class="mt-1 text-xs text-ink-muted">
-                    Add everything you want inside this folder.
+                    {t('drive.dropFolderFilesHint')}
                   </p>
                 </div>
                 <div class="flex flex-wrap justify-center gap-2">
@@ -147,7 +148,7 @@ export function FolderComposer(props: {
                     disabled={props.busy}
                     onClick={props.onFiles}
                   >
-                    Add files
+                    {t('drive.addFiles')}
                   </Button>
                   <Button
                     size="sm"
@@ -155,18 +156,18 @@ export function FolderComposer(props: {
                     disabled={props.busy}
                     onClick={props.onFolder}
                   >
-                    Add folder
+                    {t('drive.addFolder')}
                   </Button>
                 </div>
                 <Show when={props.preparing}>
                   <p role="status" class="text-xs text-ink-muted">
-                    Preparing files…
+                    {t('drive.preparingFiles')}
                   </p>
                 </Show>
               </div>
               <Show when={props.files.length}>
                 <ul
-                  aria-label="Folder contents"
+                  aria-label={t('drive.folderContents')}
                   class="mt-4 flex flex-col gap-1 border-t border-edge-muted pt-3"
                 >
                   <For each={props.files}>
@@ -191,8 +192,10 @@ export function FolderComposer(props: {
                         <Button
                           variant="ghost"
                           size="icon-sm"
-                          aria-label={`Remove ${entry.file.name}`}
-                          tooltip="Remove"
+                          aria-label={t('drive.removeFile', {
+                            name: entry.file.name,
+                          })}
+                          tooltip={t('drive.remove')}
                           disabled={props.busy}
                           onClick={() => props.onRemove(entry)}
                         >
@@ -215,7 +218,7 @@ export function FolderComposer(props: {
           <span class="flex min-w-0 items-center gap-1.5 px-2 text-xs text-ink-muted">
             <FolderIcon class="size-4 shrink-0" />
             <span class="truncate" title={props.destination}>
-              Inside {props.destination}
+              {t('drive.insideDestination', { destination: props.destination })}
             </span>
           </span>
           <EntityComposer.Submit
@@ -225,11 +228,11 @@ export function FolderComposer(props: {
           >
             {props.busy
               ? props.preparing
-                ? 'Preparing…'
-                : 'Creating…'
+                ? t('drive.preparing')
+                : t('drive.creating')
               : props.created
-                ? 'Retry'
-                : 'Create Folder'}
+                ? t('drive.retry')
+                : t('drive.createFolder')}
           </EntityComposer.Submit>
         </EntityComposer.Footer>
       </EntityComposer.Root>

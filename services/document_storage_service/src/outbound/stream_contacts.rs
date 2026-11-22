@@ -2,7 +2,7 @@
 
 use contacts::domain::models::query::ContactLookup;
 use contacts::domain::ports::ContactsPageRepository;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use webhook::domain::ports::WebhookContactChecker;
 
@@ -32,8 +32,8 @@ impl<R: ContactsPageRepository> WebhookContactChecker for ContactsStreamChecker<
 
     async fn is_contact(
         &self,
-        user: MacroUserIdStr<'static>,
-        other: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
+        other: RoxUserIdStr<'static>,
     ) -> Result<bool, Self::Err> {
         let Some(lookup) = ContactLookup::new(vec![other.clone()]) else {
             return Ok(false);

@@ -14,18 +14,18 @@ use std::future::Future;
 use std::str::FromStr as _;
 use std::time::Duration;
 
-use channels::domain::broker_events::{ChannelMacroEvent, ChannelTopicEvent};
-use documents::domain::events::{DocumentMacroEvent, DocumentTopicEvent};
-use email::domain::events::{EmailMacroEvent, EmailTopicEvent};
+use channels::domain::broker_events::{ChannelRoxEvent, ChannelTopicEvent};
+use documents::domain::events::{DocumentRoxEvent, DocumentTopicEvent};
+use email::domain::events::{EmailRoxEvent, EmailTopicEvent};
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    EventConsumer, KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _,
-    MacroEventConsumerService, MessageWrapper,
+use rox_event_broker::{
+    EventConsumer, KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _,
+    RoxEventConsumerService, MessageWrapper,
 };
 use messages::domain::models::MessageParent;
-use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
+use messages::outbound::broker::{MessageRoxEvent, MessageTopicEvent};
 use model_entity::EntityType;
-use projects::domain::events::{ProjectMacroEvent, ProjectTopicEvent};
+use projects::domain::events::{ProjectRoxEvent, ProjectTopicEvent};
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message};
 use rootcause::Report;
@@ -34,12 +34,12 @@ use tracing::Instrument as _;
 use crate::domain::ports::ResolveSuggestions;
 use crate::domain::resolution::{Item, ResolutionEvent};
 
-macro_event_broker::declare_topics!(
-    SuggestionEvent: DocumentMacroEvent,
-    ChannelMacroEvent,
-    MessageMacroEvent,
-    EmailMacroEvent,
-    ProjectMacroEvent
+rox_event_broker::declare_topics!(
+    SuggestionEvent: DocumentRoxEvent,
+    ChannelRoxEvent,
+    MessageRoxEvent,
+    EmailRoxEvent,
+    ProjectRoxEvent
 );
 
 struct SuggestionResolutionGroup;
@@ -85,7 +85,7 @@ fn parent_item(parent: &MessageParent) -> Option<Item> {
 /// What a decoded record means for suggestions, if anything.
 fn resolution_event(event: &SuggestionEvent) -> Option<ResolutionEvent> {
     match event {
-        SuggestionEvent::EmailMacroEvent(event) => match &event.event().event {
+        SuggestionEvent::EmailRoxEvent(event) => match &event.event().event {
             // Sent by the inbox's owner, through Rox or (no actor) from
             // another client.
             EmailTopicEvent::MessageSent(sent) => Some(ResolutionEvent::Replied {
@@ -96,7 +96,7 @@ fn resolution_event(event: &SuggestionEvent) -> Option<ResolutionEvent> {
             }),
             _ => None,
         },
-        SuggestionEvent::MessageMacroEvent(event) => match &event.event().event {
+        SuggestionEvent::MessageRoxEvent(event) => match &event.event().event {
             MessageTopicEvent::Posted(posted) => Some(ResolutionEvent::Replied {
                 // A bot's post never answers for the person.
                 user: posted.sender.as_user()?.clone(),
@@ -110,7 +110,7 @@ fn resolution_event(event: &SuggestionEvent) -> Option<ResolutionEvent> {
             }),
             _ => None,
         },
-        SuggestionEvent::ChannelMacroEvent(event) => match &event.event().event {
+        SuggestionEvent::ChannelRoxEvent(event) => match &event.event().event {
             ChannelTopicEvent::Deleted(deleted) => Some(ResolutionEvent::Deleted {
                 item: item(EntityType::Channel, deleted.channel_id.to_string()),
                 part: None,
@@ -123,7 +123,7 @@ fn resolution_event(event: &SuggestionEvent) -> Option<ResolutionEvent> {
             }
             _ => None,
         },
-        SuggestionEvent::DocumentMacroEvent(event) => match &event.event().event {
+        SuggestionEvent::DocumentRoxEvent(event) => match &event.event().event {
             DocumentTopicEvent::Deleted(deleted) => Some(ResolutionEvent::Deleted {
                 item: item(EntityType::Document, deleted.document_id.clone()),
                 part: None,
@@ -140,7 +140,7 @@ fn resolution_event(event: &SuggestionEvent) -> Option<ResolutionEvent> {
             }
             _ => None,
         },
-        SuggestionEvent::ProjectMacroEvent(event) => match &event.event().event {
+        SuggestionEvent::ProjectRoxEvent(event) => match &event.event().event {
             ProjectTopicEvent::Deleted(deleted) => Some(ResolutionEvent::Deleted {
                 item: item(EntityType::Project, deleted.project_id.clone()),
                 part: None,
@@ -207,7 +207,7 @@ where
     C: CommittingConsumer,
     for<'a> C::MessageType<'a>: Message,
 {
-    let consumer = MacroEventConsumerService::new(consumer);
+    let consumer = RoxEventConsumerService::new(consumer);
     let mut shutdown = std::pin::pin!(shutdown);
     loop {
         let message = tokio::select! {

@@ -120,7 +120,7 @@ async fn recovery_preserves_history_closes_stale_turn_and_fences_old_writer(pool
     let batch = repo
         .create_batch_fenced(
             vec![StoredAgentSessionLog {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 created_at: chrono::Utc::now(),
                 entry: fenced_log(session.id),
             }],

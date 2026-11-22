@@ -1,6 +1,6 @@
 import { createUrqlInfiniteQuery, createUrqlQuery } from '@app/lib/urql-solid';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { OperationResult } from '@urql/core';
 import {
   type Accessor,

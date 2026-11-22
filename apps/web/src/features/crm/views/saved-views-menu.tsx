@@ -8,10 +8,11 @@ import TrashIcon from '@icon/system/regular/trash.svg';
 import { Button, ButtonGroup, cn, Dropdown, Tabs, Tooltip } from '@ui';
 import { createSignal, For, type JSX, Show } from 'solid-js';
 import { unwrap } from 'solid-js/store';
+import { t } from '@app/lib/i18n';
 import { useCrmContext } from '../context/crm-context';
 import { useCrmWorkspace } from '../context/workspace-context';
 import {
-  CRM_LIST_COLUMN_LABELS,
+  crmListColumnLabel,
   type CrmListColumnId,
 } from '../core/display-options';
 import type { CrmViewConfig } from '../core/saved-view';
@@ -50,10 +51,18 @@ const SavedViewRow = (props: {
     </Show>
     <Show when={props.onSetDefault}>
       {(onSetDefault) => (
-        <Tooltip label={props.isDefault ? 'Remove default' : 'Set as default'}>
+        <Tooltip
+          label={
+            props.isDefault ? t('crm.removeDefault') : t('crm.setAsDefault')
+          }
+        >
           <Button
-            aria-label={props.isDefault ? 'Remove default' : 'Set as default'}
-            tooltip={props.isDefault ? 'Remove default' : 'Set as default'}
+            aria-label={
+              props.isDefault ? t('crm.removeDefault') : t('crm.setAsDefault')
+            }
+            tooltip={
+              props.isDefault ? t('crm.removeDefault') : t('crm.setAsDefault')
+            }
             variant="ghost"
             size="icon-sm"
             class={cn(
@@ -68,10 +77,10 @@ const SavedViewRow = (props: {
         </Tooltip>
       )}
     </Show>
-    <Tooltip label="Copy link">
+    <Tooltip label={t('crm.copyLink')}>
       <Button
-        aria-label="Copy link"
-        tooltip="Copy link"
+        aria-label={t('crm.copyLink')}
+        tooltip={t('crm.copyLink')}
         variant="ghost"
         size="icon-sm"
         class="size-6 shrink-0 p-1 text-ink-muted opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
@@ -82,10 +91,10 @@ const SavedViewRow = (props: {
     </Tooltip>
     <Show when={props.onDelete}>
       {(onDelete) => (
-        <Tooltip label="Delete view">
+        <Tooltip label={t('crm.deleteView')}>
           <Button
-            aria-label="Delete view"
-            tooltip="Delete view"
+            aria-label={t('crm.deleteView')}
+            tooltip={t('crm.deleteView')}
             variant="ghost"
             size="icon-sm"
             class="size-6 shrink-0 p-1 text-ink-muted opacity-0 group-hover:opacity-100 focus-visible:opacity-100"
@@ -168,7 +177,7 @@ export function CompanyViewsMenu(
     setSaveFormOpen(false);
     setSaveName('');
     setOpen(false);
-    toast.success('View saved');
+    toast.success(t('crm.viewSaved'));
   };
 
   const canDeleteTeamView = (createdBy: string | undefined) =>
@@ -190,24 +199,24 @@ export function CompanyViewsMenu(
   return (
     <Dropdown open={open()} onOpenChange={handleOpenChange}>
       <Dropdown.Trigger
-        tooltip={props.hideLabel ? 'Views' : undefined}
+        tooltip={props.hideLabel ? t('crm.views') : undefined}
         as={props.grouped ? ButtonGroup.Button : Button}
         variant="ghost"
         size={triggerSize()}
-        aria-label={props.hideLabel ? 'Views' : undefined}
+        aria-label={props.hideLabel ? t('crm.views') : undefined}
       >
         <StackIcon class="size-4 touch:size-6 shrink-0 pointer-events-none" />
         <Show when={!props.hideLabel}>
-          <span>Views</span>
+          <span>{t('crm.views')}</span>
         </Show>
       </Dropdown.Trigger>
 
       <Dropdown.Content class="w-64">
         <Dropdown.Group>
-          <Dropdown.GroupLabel>My views</Dropdown.GroupLabel>
+          <Dropdown.GroupLabel>{t('crm.myViews')}</Dropdown.GroupLabel>
           <For
             each={personal.views()}
-            fallback={<EmptyViewsHint>No saved views</EmptyViewsHint>}
+            fallback={<EmptyViewsHint>{t('crm.noSavedViews')}</EmptyViewsHint>}
           >
             {(view) => (
               <SavedViewRow
@@ -227,10 +236,10 @@ export function CompanyViewsMenu(
         </Dropdown.Group>
 
         <Dropdown.Group>
-          <Dropdown.GroupLabel>Team views</Dropdown.GroupLabel>
+          <Dropdown.GroupLabel>{t('crm.teamViews')}</Dropdown.GroupLabel>
           <For
             each={team.views()}
-            fallback={<EmptyViewsHint>No team views</EmptyViewsHint>}
+            fallback={<EmptyViewsHint>{t('crm.noTeamViews')}</EmptyViewsHint>}
           >
             {(view) => (
               <SavedViewRow
@@ -265,7 +274,7 @@ export function CompanyViewsMenu(
                 onSelect={() => setSaveFormOpen(true)}
               >
                 <FloppyDiskIcon class="size-3.5 shrink-0 text-ink-muted" />
-                <span class="flex-1 truncate">Save current view…</span>
+                <span class="flex-1 truncate">{t('crm.saveCurrentView')}</span>
               </Dropdown.Item>
             }
           >
@@ -281,7 +290,7 @@ export function CompanyViewsMenu(
                   e.stopPropagation();
                   if (e.key === 'Enter') saveCurrentView();
                 }}
-                placeholder="View name"
+                placeholder={t('crm.viewName')}
                 class={cn(
                   'w-full rounded-md border border-edge-muted bg-transparent px-2 py-1 text-sm',
                   'outline-none focus:border-accent placeholder:text-ink-placeholder'
@@ -291,12 +300,12 @@ export function CompanyViewsMenu(
                 <Tabs
                   touch="segmented"
                   size="sm"
-                  aria-label="View visibility"
+                  aria-label={t('crm.viewVisibility')}
                   value={saveScope()}
                   onChange={(value) => setSaveScope(value)}
                   options={[
-                    { value: 'personal', label: 'Personal' },
-                    { value: 'team', label: 'Team' },
+                    { value: 'personal', label: t('crm.personal') },
+                    { value: 'team', label: t('crm.team') },
                   ]}
                 />
                 <Button
@@ -305,7 +314,7 @@ export function CompanyViewsMenu(
                   disabled={!saveName().trim()}
                   onClick={saveCurrentView}
                 >
-                  Save
+                  {t('crm.save')}
                 </Button>
               </div>
             </div>
@@ -314,7 +323,7 @@ export function CompanyViewsMenu(
             icon={<LinkIcon class="size-4" />}
             onCopy={() => copyShareLink(captureCurrentView(), { silent: true })}
           >
-            <span class="flex-1 truncate">Copy link to current view</span>
+            <span class="flex-1 truncate">{t('crm.copyLinkCurrentView')}</span>
           </Dropdown.CopyItem>
         </Dropdown.Group>
       </Dropdown.Content>
@@ -332,10 +341,10 @@ export function CompanyDisplayMenu(props: { grouped?: boolean } = {}) {
 
   return (
     <Dropdown>
-      <Tooltip label="Display options">
+      <Tooltip label={t('crm.displayOptions')}>
         <Dropdown.Trigger
-          aria-label="Display options"
-          tooltip="Display options"
+          aria-label={t('crm.displayOptions')}
+          tooltip={t('crm.displayOptions')}
           as={props.grouped ? ButtonGroup.Button : Button}
           variant="ghost"
           size="icon-md"
@@ -346,8 +355,12 @@ export function CompanyDisplayMenu(props: { grouped?: boolean } = {}) {
 
       <Dropdown.Content class="w-56">
         <Dropdown.Group>
-          <Dropdown.GroupLabel>List columns</Dropdown.GroupLabel>
-          <For each={Object.keys(CRM_LIST_COLUMN_LABELS) as CrmListColumnId[]}>
+          <Dropdown.GroupLabel>{t('crm.listColumns')}</Dropdown.GroupLabel>
+          <For
+            each={
+              ['stage', 'owner', 'revenue'] as CrmListColumnId[]
+            }
+          >
             {(column) => (
               <Dropdown.CheckboxItem
                 checked={options().listColumns[column]}
@@ -355,7 +368,7 @@ export function CompanyDisplayMenu(props: { grouped?: boolean } = {}) {
                 closeOnSelect={false}
               >
                 <span class="flex-1 truncate">
-                  {CRM_LIST_COLUMN_LABELS[column]}
+                  {crmListColumnLabel(column)}
                 </span>
               </Dropdown.CheckboxItem>
             )}

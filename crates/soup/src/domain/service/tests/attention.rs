@@ -5,7 +5,7 @@ use crate::domain::models::{
 
 fn work_feed_request(limit: u16) -> AttentionSoupRequest {
     AttentionSoupRequest {
-        user: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
         link_ids: vec![],
         limit,
         own_work: true,

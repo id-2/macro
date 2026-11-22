@@ -10,10 +10,10 @@ use axum::{
 };
 use entity_access::{
     domain::{models::AdminTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 use std::sync::Arc;
 
@@ -24,7 +24,7 @@ pub struct EnterpriseRouterState<S, Eas, Auth> {
     /// Team receipt minting.
     pub entity_access_service: Arc<Eas>,
     /// Caller authentication.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Eas, Auth> Clone for EnterpriseRouterState<S, Eas, Auth> {
@@ -43,7 +43,7 @@ impl<S, Eas, Auth> FromRef<EnterpriseRouterState<S, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<S, Eas, Auth> FromRef<EnterpriseRouterState<S, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Eas, Auth> FromRef<EnterpriseRouterState<S, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &EnterpriseRouterState<S, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -56,7 +56,7 @@ pub fn enterprise_router<S, Eas, Auth>(state: EnterpriseRouterState<S, Eas, Auth
 where
     S: EnterpriseAdminService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         .route(
@@ -79,7 +79,7 @@ where
 #[derive(serde::Deserialize)]
 pub struct MemberPath {
     /// The team member whose lifecycle state changes.
-    pub member_user_id: MacroUserIdStr<'static>,
+    pub member_user_id: RoxUserIdStr<'static>,
 }
 
 /// Disables a team member and revokes their server-side harness records.
@@ -100,14 +100,14 @@ pub struct MemberPath {
     ),
 )]
 pub async fn disable_member<S, Eas, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<EnterpriseRouterState<S, Eas, Auth>>,
     Path(path): Path<MemberPath>,
 ) -> Result<Json<DisableMemberReport>, EnterpriseError>
 where
     S: EnterpriseAdminService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -135,14 +135,14 @@ where
     ),
 )]
 pub async fn enable_member<S, Eas, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<EnterpriseRouterState<S, Eas, Auth>>,
     Path(path): Path<MemberPath>,
 ) -> Result<StatusCode, EnterpriseError>
 where
     S: EnterpriseAdminService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service
@@ -166,14 +166,14 @@ where
     ),
 )]
 pub async fn set_runtime_allowlist<S, Eas, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<EnterpriseRouterState<S, Eas, Auth>>,
     Json(allowlist): Json<RuntimePresetAllowlist>,
 ) -> Result<Json<RuntimePresetAllowlist>, EnterpriseError>
 where
     S: EnterpriseAdminService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -197,13 +197,13 @@ where
     ),
 )]
 pub async fn clear_runtime_allowlist<S, Eas, Auth>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<EnterpriseRouterState<S, Eas, Auth>>,
 ) -> Result<StatusCode, EnterpriseError>
 where
     S: EnterpriseAdminService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service

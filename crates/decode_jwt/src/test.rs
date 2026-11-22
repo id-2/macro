@@ -7,8 +7,8 @@ use axum::http::Request;
 use axum::http::StatusCode;
 use axum::routing::get;
 use http_body_util::BodyExt;
-use macro_auth::headers::{AccessTokenCookieExtractor, AccessTokenExtractor};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_auth::headers::{AccessTokenCookieExtractor, AccessTokenExtractor};
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
 use tower::util::ServiceExt;
 
 use super::*;
@@ -542,7 +542,12 @@ async fn router_bearer_beside_another_credential_header_reads_the_bearer() {
     let router = test_router();
     let expected = bearer_only_body(&router).await;
     let token = valid_token();
-    for header in ["x-macro-user-api-key", "x-macro-bot-token"] {
+    for header in [
+        "x-rox-user-api-key",
+        "x-rox-bot-token",
+        "x-macro-user-api-key",
+        "x-macro-bot-token",
+    ] {
         let req = Request::get("/protected")
             .header("authorization", format!("Bearer {token}"))
             .header(header, "something")

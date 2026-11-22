@@ -9,8 +9,8 @@ use item_filters::{
     CallStatus,
     ast::{LiteralTree, call::CallLiteral},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -49,8 +49,8 @@ const BY_ACTIVITY: [Uuid; 8] = [A2, L1, A1, I1, S2, U1, T2, T1];
 /// The viewer's calls by start, newest first.
 const BY_START: [Uuid; 8] = [L1, A1, I1, A2, S2, U1, T2, T1];
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
 fn page(by_start: bool) -> CallRecordPage {

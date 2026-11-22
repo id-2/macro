@@ -4,7 +4,7 @@ use models_properties::EntityType;
 
 use super::*;
 use crate::domain::model::{PropertyRow, SystemPropertyKey};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]

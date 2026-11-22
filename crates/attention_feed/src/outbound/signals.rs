@@ -1,6 +1,6 @@
 //! Cross-session change signals over the user-addressed Soup realtime topic.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use soup_realtime::domain::{
     models::{Patch, SoupRealtimeMessage},
@@ -26,7 +26,7 @@ impl<P> FeedSignals for SoupRealtimeFeedSignals<P>
 where
     P: SoupRealtimePublisher,
 {
-    async fn changed(&self, user: MacroUserIdStr<'static>, entities: Vec<Entity<'static>>) {
+    async fn changed(&self, user: RoxUserIdStr<'static>, entities: Vec<Entity<'static>>) {
         for entity in entities {
             let message = SoupRealtimeMessage::new(user.clone(), Patch::Updated(entity));
             if let Err(error) = self.publisher.publish(message).await {

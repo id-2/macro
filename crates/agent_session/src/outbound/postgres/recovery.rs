@@ -99,7 +99,7 @@ impl<B: BotFacts + 'static> StaleSessionRepo for PgAgentSessionRepo<B> {
         if revoked.is_none() {
             return Ok(None);
         }
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let created_at = sqlx::query_scalar!(
             r#"
             INSERT INTO agent_session_log (id, agent_session_id, user_id, direction, content, created_at)

@@ -8,7 +8,7 @@ use foreign_entity::domain::{
     ports::ForeignEntityListQuery,
 };
 use item_filters::ast::{LiteralTree, github_pull_request::GithubPullRequestLiteral};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::models::{
     EnrichedGithubPullRequest, GithubPullRequestChangesError, GithubPullRequestChangeset,
@@ -165,7 +165,7 @@ pub trait GithubPullRequestDiffReader: Send + Sync + 'static {
     /// `user`'s behalf. Never falls back to a branch or workspace diff.
     fn read(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         pull_request: &PullRequestRef,
     ) -> impl Future<Output = Result<GithubPullRequestDiff, GithubPullRequestDiffError>> + Send;
 }
@@ -222,7 +222,7 @@ pub trait GithubPullRequestChangesets: Send + Sync + 'static {
     /// Read the pull request's current diff and store it, once per base and head.
     fn capture(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         pull_request: &PullRequestRef,
     ) -> impl Future<Output = Result<GithubPullRequestChangeset, GithubPullRequestChangesError>> + Send;
 
@@ -231,7 +231,7 @@ pub trait GithubPullRequestChangesets: Send + Sync + 'static {
     /// that base and head.
     fn patch(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: uuid::Uuid,
     ) -> impl Future<Output = Result<String, GithubPullRequestChangesError>> + Send;
 }
@@ -261,7 +261,7 @@ pub trait GithubPullRequestFacetService: Send + Sync + 'static {
     /// once.
     fn github_pull_request_facets(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         team: Option<EntityAccessReceipt<MemberTeamRole>>,
     ) -> impl Future<Output = Result<GithubPullRequestFacets, GithubPullRequestError>> + Send;
 }

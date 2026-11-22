@@ -15,7 +15,7 @@ import { useUserId } from '@core/context/user';
 import { idToDisplayName } from '@core/user/util';
 import { messageSendMotion } from '@core/util/message-send-motion';
 import { openExternalUrl } from '@core/util/url';
-import { stripAgentContext } from '@macro-inc/lexical-core/utils/parsers';
+import { stripAgentContext } from '@rox-one/lexical-core/utils/parsers';
 import type {
   FoldedMessage,
   MessagePart,
@@ -74,7 +74,7 @@ import { ToolCallPart } from './parts/ToolCallPart';
  * instruction is the same whatever the runtime said went wrong.
  */
 const TURN_FAILED_LABEL =
-  'An error was encountered with your session. Send another message to continue';
+  'Произошла ошибка в сессии. Отправьте сообщение ещё раз, чтобы продолжить';
 
 function AgentMessagePart(props: {
   part: MessagePart;

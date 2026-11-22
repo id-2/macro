@@ -1,5 +1,5 @@
 use filter_ast::{ExpandFrame, Expr, FoldTree, TryExpandNode};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -13,7 +13,7 @@ pub enum CallLiteral {
     /// filter by the channel a call belongs to
     ChannelId(Uuid),
     /// filter by the speaker of a transcript segment
-    Speaker(MacroUserIdStr<'static>),
+    Speaker(RoxUserIdStr<'static>),
     /// viewer-relative attendance status for the call
     Status(CallStatus),
     /// whether the requesting user attended the call
@@ -48,7 +48,7 @@ impl ExpandFrame<CallLiteral> for CallFilters {
 
         let speaker_ids = speaker_ids
             .iter()
-            .map(|s| MacroUserIdStr::parse_from_str(s).map(CowLike::into_owned))
+            .map(|s| RoxUserIdStr::parse_from_str(s).map(CowLike::into_owned))
             .try_expand(|r| r.map(CallLiteral::Speaker), Expr::or)?;
 
         let status = status.map(|status| Expr::Literal(CallLiteral::Status(status)));

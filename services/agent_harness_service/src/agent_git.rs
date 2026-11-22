@@ -21,8 +21,8 @@ use agent_git::outbound::push_rate_limiter::PgPushRateLimiter;
 use agent_git::outbound::repo_directories::RepoDirectories;
 use agent_git::outbound::team_admins::TeamRepositoryAdmins;
 use axum::Router;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
-use macro_service_urls::AgentGitServiceUrl;
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
+use rox_service_urls::AgentGitServiceUrl;
 use sqlx::PgPool;
 use tokio_util::task::TaskTracker;
 use tower_http::trace::TraceLayer;
@@ -50,12 +50,12 @@ pub(crate) struct AgentGitSettings<'config> {
 pub(crate) async fn router<Auth>(
     settings: AgentGitSettings<'_>,
     pool: PgPool,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
     git_tasks: TaskTracker,
     feature_flags: Option<feature_flags::outbound::posthog::PostHogFeatureFlags>,
 ) -> anyhow::Result<Router>
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     check_git(Path::new("git"))?;
     // Fail at startup, not on the first clone, when the volume is missing.
@@ -95,12 +95,12 @@ where
     // No compression layer: pack streams are already compressed.
     Ok(Router::new().nest(GATEWAY_PATH_PREFIX, routes).layer(
         TraceLayer::new_for_http()
-            .make_span_with(macro_tower_layers::MakeSpanWithRemoteParent)
+            .make_span_with(rox_tower_layers::MakeSpanWithRemoteParent)
             .on_request(())
-            .on_response(macro_tower_layers::CustomOnResponse::new_with_threshold(
+            .on_response(rox_tower_layers::CustomOnResponse::new_with_threshold(
                 std::time::Duration::from_millis(200),
             ))
-            .on_failure(macro_tower_layers::CustomOnFailure),
+            .on_failure(rox_tower_layers::CustomOnFailure),
     ))
 }
 

@@ -24,7 +24,7 @@ vi.mock('@service-storage/crm-contact-edit', () => ({
 vi.mock('@queries/soup/graphql/active-queries', () => ({
   refreshActiveGraphqlSoupQueries: mocks.refresh,
 }));
-vi.mock('@macro-inc/observability', () => {
+vi.mock('@rox-one/observability', () => {
   const span = {
     setAttr() {},
     span: (_name: string, run: () => unknown) => run(),

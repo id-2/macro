@@ -1,4 +1,5 @@
 import { ViewSidebar } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import { SoupSectionHeader } from '@app/features/next-soup/soup-view/section-header';
 import { usePending } from '@app/observability/flow';
 import { SplitHeaderLeft } from '@components/app/split-layout/components/SplitHeader';
@@ -152,7 +153,7 @@ export function MyActivityView(props: {
     <div class="@container/u-list flex size-full flex-col">
       <SplitHeaderLeft>
         <div class="flex items-center gap-3">
-          <ViewSidebar.Title caret={false}>Activity</ViewSidebar.Title>
+          <ViewSidebar.Title caret={false}>{t('activity.title')}</ViewSidebar.Title>
           <Show when={!isTouchDevice()}>
             <ActivityScopeTabs
               value={props.scope}
@@ -234,18 +235,18 @@ function FeedRowView(props: {
       />
     ))
     .with({ kind: 'status', status: 'loading' }, () => (
-      <FeedStatus>Loading…</FeedStatus>
+      <FeedStatus>{t('activity.loading')}</FeedStatus>
     ))
     .with({ kind: 'status', status: 'error' }, () => (
       <FeedStatus>
-        Activity is unavailable right now. Try again in a moment.
+        {t('activity.unavailable')}
       </FeedStatus>
     ))
     .with({ kind: 'status', status: 'empty' }, () => (
       <FeedStatus>
         {props.scope === 'team'
-          ? 'No activity from your team yet.'
-          : 'No activity yet.'}
+          ? t('activity.emptyTeam')
+          : t('activity.emptyMine')}
       </FeedStatus>
     ))
     .with({ kind: 'tail' }, () => <FeedTail state={props.state} />)
@@ -263,15 +264,15 @@ function FeedTail(props: { state: MyActivityState }) {
       aria-live="polite"
       data-activity-feed-tail
     >
-      <Show when={ready()?.loadingMore}>Loading…</Show>
+      <Show when={ready()?.loadingMore}>{t('activity.loading')}</Show>
       <Show when={!ready()?.loadingMore && ready()?.moreFailed}>
-        <span>Couldn't load more.</span>
+        <span>{t('activity.loadMoreFailed')}</span>
         <button
           type="button"
           class="text-ink underline-offset-2 hover:underline"
           onClick={() => props.state.retryMore()}
         >
-          Retry
+          {t('activity.retry')}
         </button>
       </Show>
     </div>
@@ -301,7 +302,7 @@ function OverviewRow(props: {
             }
           >
             <p class="px-2 py-1 text-ink-extra-muted text-xs">
-              Activity overview is unavailable right now.
+              {t('activity.overviewUnavailable')}
             </p>
           </Show>
         </OverviewInset>

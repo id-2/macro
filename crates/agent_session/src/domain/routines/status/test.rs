@@ -6,7 +6,7 @@ fn frame(direction: &str, mut content: Value) -> StoredAgentSessionLog {
     content["type"] = json!("acp");
     content["jsonrpc"] = json!("2.0");
     StoredAgentSessionLog {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         created_at: chrono::Utc::now(),
         entry: parse_log(&json!({"direction": direction, "content": content}).to_string())
             .pop()

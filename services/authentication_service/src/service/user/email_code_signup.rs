@@ -9,7 +9,7 @@ mod test;
 
 use std::future::Future;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 
 use super::agent_signup::AGENT_SIGNUP_DATA_KEY;
@@ -50,13 +50,13 @@ pub(crate) trait EmailCodeSignupPort {
     /// already on one.
     fn join_domain_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = anyhow::Result<Option<uuid::Uuid>>> + Send;
 
     /// Records that `referral_code` referred the user and rewards the referrer.
     fn track_referral(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         referral_code: &str,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
 }
@@ -116,7 +116,7 @@ async fn first_proof<P: EmailCodeSignupPort>(
         return EmailCodeSignupOutcome::NotEmailCodeSignup;
     }
     // The parse error quotes the address, so it is not logged.
-    let Ok(user_id) = MacroUserIdStr::try_from_email(login.email) else {
+    let Ok(user_id) = RoxUserIdStr::try_from_email(login.email) else {
         tracing::error!("email-code login address is not a Macro user id");
         return EmailCodeSignupOutcome::ClaimFailed;
     };

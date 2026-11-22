@@ -1,6 +1,6 @@
 import { type Span, SpanStatusCode, trace } from '@opentelemetry/api';
 
-const tracer = trace.getTracer('@macro-inc/sdk/calls');
+const tracer = trace.getTracer('@rox-one/sdk/calls');
 
 export function recordError(span: Span, error: unknown): void {
   span.recordException(error instanceof Error ? error : String(error));

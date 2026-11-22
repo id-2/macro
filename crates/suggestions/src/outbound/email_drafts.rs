@@ -2,8 +2,8 @@
 
 use email::domain::models::MessageRow;
 use email::domain::ports::EmailRepo;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use crate::domain::model::preview_of;
 use crate::domain::ports::{FoundDraft, SuggestionDrafts};
@@ -27,7 +27,7 @@ where
 
     async fn email_draft(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         draft: Uuid,
     ) -> Result<Option<FoundDraft>, Self::Err> {
         // Only the person's own inboxes: an inbox delegated to them is

@@ -7,18 +7,18 @@ mod test;
 use std::future::Future;
 use std::time::Duration;
 
-use call::domain::events::CallMacroEvent;
-use channels::domain::broker_events::ChannelMacroEvent;
-use documents::domain::events::DocumentMacroEvent;
-use email::domain::events::EmailMacroEvent;
-use github::broker::GithubWebhookMacroEvent;
+use call::domain::events::CallRoxEvent;
+use channels::domain::broker_events::ChannelRoxEvent;
+use documents::domain::events::DocumentRoxEvent;
+use email::domain::events::EmailRoxEvent;
+use github::broker::GithubWebhookRoxEvent;
 use kafka_util::{GroupName, InitialOffset, KafkaEventConsumer};
-use macro_event_broker::{
-    EventBrokerError, EventConsumer, KafkaConsumerAdapter, MacroEvent as _,
-    MacroEventCollection as _, MacroEventConsumerService, MessageWrapper,
+use rox_event_broker::{
+    EventBrokerError, EventConsumer, KafkaConsumerAdapter, RoxEvent as _,
+    RoxEventCollection as _, RoxEventConsumerService, MessageWrapper,
 };
-use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
-use properties::domain::events::PropertyMacroEvent;
+use messages::outbound::broker::{MessageRoxEvent, MessageTopicEvent};
+use properties::domain::events::PropertyRoxEvent;
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message};
 use rootcause::Report;
@@ -27,14 +27,14 @@ use tracing::Instrument as _;
 use crate::domain::event_runs::{EventIngestion, EventIngestionResult};
 use crate::domain::event_trigger::{EventPayload, IncomingEvent, MessageFact};
 
-macro_event_broker::declare_topics!(
-    DeclaredMacroEvent: DocumentMacroEvent,
-    ChannelMacroEvent,
-    MessageMacroEvent,
-    PropertyMacroEvent,
-    EmailMacroEvent,
-    CallMacroEvent,
-    GithubWebhookMacroEvent
+rox_event_broker::declare_topics!(
+    DeclaredRoxEvent: DocumentRoxEvent,
+    ChannelRoxEvent,
+    MessageRoxEvent,
+    PropertyRoxEvent,
+    EmailRoxEvent,
+    CallRoxEvent,
+    GithubWebhookRoxEvent
 );
 
 struct ScheduledActionEventIngestionGroup;
@@ -48,7 +48,7 @@ impl GroupName for ScheduledActionEventIngestionGroup {
 }
 
 type ScheduledActionKafkaAdapter =
-    KafkaConsumerAdapter<ScheduledActionEventIngestionGroup, DeclaredMacroEvent>;
+    KafkaConsumerAdapter<ScheduledActionEventIngestionGroup, DeclaredRoxEvent>;
 
 const MAX_INGEST_ATTEMPTS: u8 = 5;
 // Four delays (1+2+4+8 seconds) before the fifth and final attempt.
@@ -56,7 +56,7 @@ const INGEST_RETRY_BASE_DELAY: Duration = Duration::from_secs(1);
 
 // Transport-only seam: tests exercise the same receive/admit/commit loop without
 // a broker. The domain sees only EventIngestion, never Kafka delivery controls.
-trait CommittingConsumer: EventConsumer<DeclaredMacroEvent> {
+trait CommittingConsumer: EventConsumer<DeclaredRoxEvent> {
     fn commit(&self, message: &Self::MessageType<'_>) -> Result<(), Report>;
 }
 
@@ -68,9 +68,9 @@ impl CommittingConsumer for ScheduledActionKafkaAdapter {
     }
 }
 
-fn incoming_event(event: DeclaredMacroEvent) -> IncomingEvent {
+fn incoming_event(event: DeclaredRoxEvent) -> IncomingEvent {
     match event {
-        DeclaredMacroEvent::DocumentMacroEvent(event) => {
+        DeclaredRoxEvent::DocumentRoxEvent(event) => {
             let envelope = event.event();
             IncomingEvent {
                 event_id: envelope.event_id,
@@ -79,7 +79,7 @@ fn incoming_event(event: DeclaredMacroEvent) -> IncomingEvent {
                 payload: EventPayload::Document(envelope.event.clone()),
             }
         }
-        DeclaredMacroEvent::ChannelMacroEvent(event) => {
+        DeclaredRoxEvent::ChannelRoxEvent(event) => {
             let envelope = event.event();
             IncomingEvent {
                 event_id: envelope.event_id,
@@ -88,7 +88,7 @@ fn incoming_event(event: DeclaredMacroEvent) -> IncomingEvent {
                 payload: EventPayload::Channel(envelope.event.clone()),
             }
         }
-        DeclaredMacroEvent::MessageMacroEvent(event) => {
+        DeclaredRoxEvent::MessageRoxEvent(event) => {
             let envelope = event.event();
             IncomingEvent {
                 event_id: envelope.event_id,
@@ -97,7 +97,7 @@ fn incoming_event(event: DeclaredMacroEvent) -> IncomingEvent {
                 payload: EventPayload::Message(message_fact(&envelope.event)),
             }
         }
-        DeclaredMacroEvent::PropertyMacroEvent(event) => {
+        DeclaredRoxEvent::PropertyRoxEvent(event) => {
             let envelope = event.event();
             IncomingEvent {
                 event_id: envelope.event_id,
@@ -106,7 +106,7 @@ fn incoming_event(event: DeclaredMacroEvent) -> IncomingEvent {
                 payload: EventPayload::Property(envelope.event.clone()),
             }
         }
-        DeclaredMacroEvent::EmailMacroEvent(event) => {
+        DeclaredRoxEvent::EmailRoxEvent(event) => {
             let envelope = event.event();
             IncomingEvent {
                 event_id: envelope.event_id,
@@ -115,7 +115,7 @@ fn incoming_event(event: DeclaredMacroEvent) -> IncomingEvent {
                 payload: EventPayload::Email(envelope.event.clone()),
             }
         }
-        DeclaredMacroEvent::CallMacroEvent(event) => {
+        DeclaredRoxEvent::CallRoxEvent(event) => {
             let envelope = event.event();
             IncomingEvent {
                 event_id: envelope.event_id,
@@ -124,7 +124,7 @@ fn incoming_event(event: DeclaredMacroEvent) -> IncomingEvent {
                 payload: EventPayload::Call(envelope.event.clone()),
             }
         }
-        DeclaredMacroEvent::GithubWebhookMacroEvent(event) => {
+        DeclaredRoxEvent::GithubWebhookRoxEvent(event) => {
             let envelope = event.event();
             IncomingEvent {
                 event_id: envelope.event_id,
@@ -198,7 +198,7 @@ async fn ingest_with_retry(
 async fn process_message<C: CommittingConsumer>(
     consumer: &C,
     service: &impl EventIngestion,
-    message: &MessageWrapper<C::MessageType<'_>, DeclaredMacroEvent>,
+    message: &MessageWrapper<C::MessageType<'_>, DeclaredRoxEvent>,
     base_delay: Duration,
 ) -> Result<(), Report> {
     match message.decode_payload() {
@@ -235,7 +235,7 @@ where
     C: CommittingConsumer,
     for<'a> C::MessageType<'a>: Message,
 {
-    let consumer = MacroEventConsumerService::new(consumer);
+    let consumer = RoxEventConsumerService::new(consumer);
     let mut shutdown = std::pin::pin!(shutdown);
     loop {
         let message = tokio::select! {
@@ -282,9 +282,9 @@ pub async fn run_scheduled_action_event_consumer(
 ) -> Result<(), Report> {
     let consumer = KafkaEventConsumer::<ScheduledActionEventIngestionGroup>::from_env(brokers)?;
     let consumer = KafkaConsumerAdapter::<ScheduledActionEventIngestionGroup, ()>::new(consumer)
-        .subscribe::<DeclaredMacroEvent>()?;
+        .subscribe::<DeclaredRoxEvent>()?;
     tracing::info!(
-        topics = ?DeclaredMacroEvent::topics(),
+        topics = ?DeclaredRoxEvent::topics(),
         group = ScheduledActionEventIngestionGroup::GROUP_NAME,
         "scheduled action event consumer listening"
     );

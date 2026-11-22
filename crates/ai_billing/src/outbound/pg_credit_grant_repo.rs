@@ -7,8 +7,8 @@ use super::pg_funding_repo::lock_payer;
 use crate::domain::credit_grant::{CreditGrant, CreditGrantRepo};
 use crate::domain::invite_reward::FreeAllowanceBonusRepo;
 use crate::domain::{BillingError, Result};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use sqlx::PgPool;
 
 /// Postgres-backed [`CreditGrantRepo`].
@@ -31,7 +31,7 @@ fn storage(e: impl Into<anyhow::Error>) -> BillingError {
 impl CreditGrantRepo for PgCreditGrantRepo {
     async fn record_credit_grant(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         grant: &CreditGrant,
     ) -> Result<bool> {
         let mut tx = self.pool.begin().await.map_err(storage)?;
@@ -56,7 +56,7 @@ impl CreditGrantRepo for PgCreditGrantRepo {
         Ok(result.rows_affected() == 1)
     }
 
-    async fn credit_grant_balance_cents(&self, payer: &MacroUserIdStr<'_>) -> Result<i64> {
+    async fn credit_grant_balance_cents(&self, payer: &RoxUserIdStr<'_>) -> Result<i64> {
         sqlx::query_scalar!(
             r#"
             SELECT COALESCE(SUM(delta_cents), 0)::bigint AS "balance!"
@@ -74,7 +74,7 @@ impl CreditGrantRepo for PgCreditGrantRepo {
 impl FreeAllowanceBonusRepo for PgCreditGrantRepo {
     async fn record_free_allowance_bonus(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         cost_cents: i64,
         note: &str,

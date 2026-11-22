@@ -4,7 +4,7 @@ use crate::{
     domain::service::{PasswordService, test::fakes::FakeAvailability},
     outbound::{openbao::OpenBaoProvider, postgres::test::folder_fixture},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::process::Command;
 
 mod benchmark;

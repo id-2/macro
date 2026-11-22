@@ -13,7 +13,7 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::IntoResponse;
 use futures::StreamExt;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::sync::Arc;
@@ -99,7 +99,7 @@ impl IntoResponse for StructuredCompletionError {
 pub async fn structured_completion(
     State(state): State<ApiContext>,
     model_access: DcsChatModelAccess,
-    user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     Json(request): Json<StructuredCompletionRequest>,
 ) -> Result<Json<StructuredCompletionResponse>, StructuredCompletionError> {
     let ctx = Arc::new(state);

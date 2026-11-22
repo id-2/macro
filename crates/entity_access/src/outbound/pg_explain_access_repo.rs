@@ -5,7 +5,7 @@ use crate::domain::{
     ports::ExplainAccessRepository,
 };
 use crate::outbound::pg_access_repo::{anyhow_access_error, queries};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use models_entity_access_management::EntityAccessSourceType;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -27,7 +27,7 @@ impl PgExplainAccessRepository {
 }
 
 fn foreign_entity_source_pairs(
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
     user_team: Option<UserTeamInfo>,
 ) -> (Vec<String>, Vec<String>) {
     let mut source_ids = vec![user_id.as_ref().to_string()];
@@ -49,7 +49,7 @@ impl ExplainAccessRepository for PgExplainAccessRepository {
     #[tracing::instrument(err, skip(self, user_id))]
     async fn list_access_grants(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<Vec<AccessGrant>, AccessError> {
@@ -292,7 +292,7 @@ impl ExplainAccessRepository for PgExplainAccessRepository {
 async fn explain_reminder_access(
     pool: &PgPool,
     reminder_id: &Uuid,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<AccessGrant>, AccessError> {
     let owns = sqlx::query_scalar!(
         r#"SELECT EXISTS (
@@ -313,7 +313,7 @@ async fn explain_reminder_access(
 async fn explain_calendar_event_access(
     pool: &PgPool,
     event_id: &Uuid,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<AccessGrant>, AccessError> {
     let is_owner = sqlx::query_scalar!(
         r#"

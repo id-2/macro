@@ -1,7 +1,7 @@
 //! Authenticated, read-only introductory trial eligibility.
 
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 
 use super::StripeOperationError;
@@ -23,7 +23,7 @@ use crate::service::subscription_checkout::TrialEligibility;
 #[tracing::instrument(skip_all, err)]
 pub async fn trial_eligibility(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Json<TrialEligibility>, StripeOperationError> {
     Ok(Json(
         ctx.subscription_checkout

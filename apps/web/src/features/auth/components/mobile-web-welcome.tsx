@@ -16,10 +16,10 @@ export function MobileWebWelcome(props: {
     <div class="flex flex-col size-full p-6 overflow-hidden relative">
       <div class="flex flex-col items-start gap-4 w-full max-w-md mx-auto mt-6">
         <RoxMark class="size-16 self-center" />
-        <h2 class="text-3xl font-semibold text-ink mt-3">Welcome to Rox.</h2>
+        <h2 class="text-3xl font-semibold text-ink mt-3">Добро пожаловать в Rox.</h2>
         <p class="text-base text-ink/60 mt-4">
-          Rox is a unified system for work{'\u2060'}—built for{' '}
-          <strong>speed</strong> and <strong>focus</strong>.
+          Rox — единая система для работы, собранная ради{' '}
+          <strong>скорости</strong> и <strong>сосредоточенности</strong>.
         </p>
 
         <form
@@ -31,8 +31,8 @@ export function MobileWebWelcome(props: {
         >
           <input
             type="email"
-            aria-label="Email address"
-            placeholder="name@company.com"
+            aria-label="Адрес почты"
+            placeholder="имя@company.com"
             value={email()}
             onInput={(e) => setEmail(e.currentTarget.value)}
             class="w-full px-3 py-2.5 text-base border border-edge-muted rounded-lg bg-surface text-ink placeholder:text-ink-placeholder outline-none focus:border-accent"
@@ -42,11 +42,11 @@ export function MobileWebWelcome(props: {
             disabled={props.pending}
             class="w-full px-3 py-2.5 text-lg font-bold rounded-xs bg-accent text-surface border-none"
           >
-            Sign Up
+            Зарегистрироваться
           </button>
         </form>
 
-        <p class="text-sm text-ink/50 mt-20">Already have an account?</p>
+        <p class="text-sm text-ink/50 mt-20">Уже есть учётная запись?</p>
         <a
           href="/app/login"
           onClick={(event) => {
@@ -55,7 +55,7 @@ export function MobileWebWelcome(props: {
           }}
           class="w-full px-3 py-2.5 text-lg rounded-xs flex items-center justify-between gap-2 border border-edge-muted bg-transparent text-ink/50 hover:bg-hover/60"
         >
-          Login
+          Войти
         </a>
       </div>
     </div>

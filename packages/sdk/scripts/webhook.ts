@@ -2,7 +2,7 @@ import { parseArgs } from 'node:util';
 import type { Env } from '../src/config';
 import type { EventName } from '../src/events/types';
 import { resolveLocalPortmap } from '../src/local-portmap';
-import { Rox } from '../src/macro';
+import { Rox } from '../src/rox';
 
 const localEndpoint = 'http://sdk-webhook-relay:8787/macro-events';
 
@@ -71,18 +71,18 @@ async function register(): Promise<void> {
 Webhook registered.
 
 MACRO_WEBHOOK_ID=${webhook.id}
-MACRO_WEBHOOK_SECRET="${secret}"
+ROX_WEBHOOK_SECRET="${secret}"
 
 Start the event printer and validation receiver:
-MACRO_WEBHOOK_SECRET="${secret}" bun run webhook receive ${webhook.id} --env ${env}${userId ? ` --user-id "${userId}"` : ''}
+ROX_WEBHOOK_SECRET="${secret}" bun run webhook receive ${webhook.id} --env ${env}${userId ? ` --user-id "${userId}"` : ''}
 `);
 }
 
 async function receive(id: string): Promise<void> {
   const env = parseEnv(values.env) ?? fail('--env is required');
   const secret =
-    process.env.MACRO_WEBHOOK_SECRET ??
-    fail('MACRO_WEBHOOK_SECRET is required');
+    process.env.ROX_WEBHOOK_SECRET ??
+    fail('ROX_WEBHOOK_SECRET is required');
   const port = Number(
     values.port ?? resolveLocalPortmap()?.sdkWebhookHostReceiverPort ?? 8787,
   );
@@ -135,7 +135,7 @@ Register a webhook or receive and print its events.
                    [--port <port>] [--user-id <macro-user-id>]
 
 For just run_local, use ${localEndpoint} for --url. Run receive on the host
-with MACRO_WEBHOOK_SECRET set to the value printed by register.
+with ROX_WEBHOOK_SECRET set to the value printed by register.
 `);
 }
 

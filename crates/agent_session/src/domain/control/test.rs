@@ -2,8 +2,8 @@ use super::*;
 use crate::domain::model::PrompterKind;
 use entity_access::domain::models::{AccessLevel, Entity, EntityPermission, EntityType};
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("editor@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("editor@example.com").unwrap()
 }
 
 fn access(level: AccessLevel) -> EntityAccessReceipt<EditAccessLevel> {
@@ -204,7 +204,7 @@ fn public_controls_cannot_supply_internal_review_context() {
 
 #[test]
 fn a_person_names_the_tab_they_typed_in() {
-    let tab = crate::domain::model::UiClientId::from_uuid(macro_uuid::Uuid::from_u128(0xc1));
+    let tab = crate::domain::model::UiClientId::from_uuid(rox_uuid::Uuid::from_u128(0xc1));
 
     let event = ControlEvent::authorized(
         AgentAction::prompt("open the plan"),
@@ -221,7 +221,7 @@ fn a_person_names_the_tab_they_typed_in() {
 
 #[test]
 fn a_runtime_cannot_name_a_tab() {
-    let tab = crate::domain::model::UiClientId::from_uuid(macro_uuid::Uuid::from_u128(0xc1));
+    let tab = crate::domain::model::UiClientId::from_uuid(rox_uuid::Uuid::from_u128(0xc1));
 
     let result = ControlEvent::authorized(
         AgentAction::prompt("open the plan"),
@@ -237,7 +237,7 @@ fn a_runtime_cannot_name_a_tab() {
 
 #[test]
 fn a_program_using_a_persons_credential_cannot_name_a_tab() {
-    let tab = crate::domain::model::UiClientId::from_uuid(macro_uuid::Uuid::from_u128(0xc1));
+    let tab = crate::domain::model::UiClientId::from_uuid(rox_uuid::Uuid::from_u128(0xc1));
 
     let event = ControlEvent::authorized(
         AgentAction::prompt("open the plan"),

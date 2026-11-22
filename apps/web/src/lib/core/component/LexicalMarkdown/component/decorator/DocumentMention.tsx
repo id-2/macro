@@ -46,7 +46,7 @@ import {
   $isDocumentMentionNode,
   DocumentCardNode,
   type DocumentMentionDecoratorProps,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { useExternalChatDetailQuery } from '@queries/external-chats';
 import {
   type AccessiblePreviewItem,

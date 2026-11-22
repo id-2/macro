@@ -1,6 +1,6 @@
 use crate::domain::{
     events::{
-        EmailEventOrigin, EmailMacroEvent, LabelRef, MessageSendCancelledMetadata, SendCancelReason,
+        EmailEventOrigin, EmailRoxEvent, LabelRef, MessageSendCancelledMetadata, SendCancelReason,
     },
     models::{
         EmailErr, Link, LinkLabel, MAX_BULK_ARCHIVE_THREADS, SetThreadsArchivedResult,
@@ -9,7 +9,7 @@ use crate::domain::{
     ports::{EmailMessageEnqueuer, EmailRepo},
 };
 use frecency::domain::ports::FrecencyQueryService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use std::collections::HashSet;
 use std::ops::Range;
 use uuid::Uuid;
@@ -111,14 +111,14 @@ where
     U: FrecencyQueryService,
     E: EmailMessageEnqueuer,
     CS: crm::domain::service::CrmService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
     anyhow::Error: From<E::Err>,
 {
     /// Set `action`'s state on the thread; the number of messages it changed.
     pub(crate) async fn change_thread_mailbox_state_impl(
         &self,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
         action: MailboxAction,
     ) -> Result<usize, EmailErr> {
@@ -177,7 +177,7 @@ where
         &self,
         link: &Link,
         thread_id: Uuid,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         junk: bool,
     ) -> Result<usize, EmailErr> {
         let spam = self
@@ -225,7 +225,7 @@ where
         &self,
         link: &Link,
         thread_id: Uuid,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         action: MailboxAction,
     ) -> Result<UpdateThreadLabelsResult, EmailErr> {
         let messages = self
@@ -251,7 +251,7 @@ where
     #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id))]
     pub(crate) async fn mark_thread_seen_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<usize, EmailErr> {
         let link = self
@@ -315,7 +315,7 @@ where
     #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id))]
     pub(crate) async fn mark_thread_unread_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<usize, EmailErr> {
         let link = self
@@ -349,7 +349,7 @@ where
     #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id, archived))]
     pub(crate) async fn set_thread_archived_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> Result<usize, EmailErr> {
@@ -373,7 +373,7 @@ where
         &self,
         link: &Link,
         thread_id: Uuid,
-        actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+        actor: rox_user_id::user_id::RoxUserIdStr<'static>,
         in_inbox: bool,
     ) -> Result<usize, EmailErr> {
         if link.provider == UserProvider::Outlook {
@@ -467,7 +467,7 @@ where
     #[tracing::instrument(err, skip(self), fields(user_id = %macro_id, %thread_id, %label_id, add))]
     pub(crate) async fn update_thread_labels_for_user_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
         label_id: Uuid,
         add: bool,
@@ -502,7 +502,7 @@ where
         thread_id: Uuid,
         label_id: Uuid,
         add: bool,
-        actor: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        actor: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) -> Result<UpdateThreadLabelsResult, EmailErr> {
         let label = self
             .email_repo
@@ -525,7 +525,7 @@ where
                 .await;
         }
 
-        let write_id = macro_uuid::generate_uuid_v7();
+        let write_id = rox_uuid::generate_uuid_v7();
         let thread = self
             .stage_thread_labels(link, thread_id, &label.provider_label_id, add, write_id)
             .await?;
@@ -559,7 +559,7 @@ where
     )]
     pub(crate) async fn set_threads_archived_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
         archived: bool,
     ) -> Result<SetThreadsArchivedResult, EmailErr> {
@@ -608,7 +608,7 @@ where
                             link,
                             label,
                             add: !archived,
-                            write_id: macro_uuid::generate_uuid_v7(),
+                            write_id: rox_uuid::generate_uuid_v7(),
                             threads: Vec::new(),
                         });
                         writes.len() - 1
@@ -706,7 +706,7 @@ where
     async fn commit_thread_label_write(
         &self,
         write: ThreadLabelWrite,
-        actor: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        actor: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) -> Result<(), UnsentThreads> {
         let ThreadLabelWrite {
             link,
@@ -841,7 +841,7 @@ where
 
     /// Map a user-initiated thread label change onto the semantic
     /// macro.email event for that label (see
-    /// [`EmailMacroEvent::thread_label_change`]). Scheduled sends cancelled
+    /// [`EmailRoxEvent::thread_label_change`]). Scheduled sends cancelled
     /// by trashing publish `message_send_cancelled`. Actor is not tracked on
     /// this path — the inbox owner is on `link`.
     fn publish_thread_label_events(
@@ -851,9 +851,9 @@ where
         label: &LinkLabel,
         add: bool,
         cancelled_send_ids: &[Uuid],
-        actor: Option<macro_user_id::user_id::MacroUserIdStr<'static>>,
+        actor: Option<rox_user_id::user_id::RoxUserIdStr<'static>>,
     ) {
-        let event = EmailMacroEvent::thread_label_change(
+        let event = EmailRoxEvent::thread_label_change(
             link.id,
             link.macro_id.clone(),
             actor.clone(),
@@ -872,7 +872,7 @@ where
         }
 
         for message_id in cancelled_send_ids {
-            self.publish_email_event(&EmailMacroEvent::message_send_cancelled(
+            self.publish_email_event(&EmailRoxEvent::message_send_cancelled(
                 MessageSendCancelledMetadata {
                     link_id: link.id,
                     owner: link.macro_id.clone(),

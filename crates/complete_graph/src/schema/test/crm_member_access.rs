@@ -19,7 +19,7 @@ fn crm_records() -> Vec<ActivityRecord> {
     .map(|(index, entity_type)| ActivityRecord {
         id: Uuid::from_u128(index as u128 + 1),
         actor: activity::Actor::new_from_user(
-            MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+            RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
         ),
         subject_id: VALID_USER_ID.into(),
         entity_type,
@@ -50,7 +50,7 @@ impl Query {
 
 struct SubscriptionService(Mutex<Option<ActivitySubscription>>);
 impl ActivitySubscriptionService for SubscriptionService {
-    fn subscribe(&self, _: MacroUserIdStr<'static>) -> ActivitySubscription {
+    fn subscribe(&self, _: RoxUserIdStr<'static>) -> ActivitySubscription {
         self.0.lock().unwrap().take().unwrap()
     }
 }
@@ -79,7 +79,7 @@ async fn open_graphql_subscription_rechecks_crm_access_after_revocation_and_regr
     let request = async_graphql::Request::new(
         "subscription { activityUpdates { __typename ... on GraphqlActivityEvent { id } ... on GraphqlActivityInvalidation { refresh } } }",
     )
-    .data(MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap());
+    .data(RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap());
     let mut responses = Box::pin(schema.execute_stream(request));
     for enabled in [true, false, true] {
         // Queue while permitted, then revoke before consuming the next frame.
@@ -222,7 +222,7 @@ impl AgentActivityReads for SessionActivity {
 async fn session_activity_requires_current_crm_access_but_keeps_an_individual_pipeline() {
     let access = CountingEntityAccessService::default();
     let receipt = EntityAccessReceipt::try_new_authenticated_user(
-        MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+        RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
         entity_access::domain::models::Entity {
             entity_id: Uuid::from_u128(100).to_string(),
             entity_type: EntityType::AgentSession,

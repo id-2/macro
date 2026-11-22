@@ -4,9 +4,9 @@
 use activity::Actor;
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::RoxDatabasesTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxDatabasesTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::models::{DatabaseId, TableId, TableVersion};
@@ -19,12 +19,12 @@ pub struct Attribution {
     pub actor: Actor<'static>,
     /// The user the actor acted for, when different from the actor.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
 }
 
 impl Attribution {
     /// A user acting for themselves.
-    pub fn user(user: MacroUserIdStr<'static>) -> Self {
+    pub fn user(user: RoxUserIdStr<'static>) -> Self {
         Self {
             actor: Actor::new_from_user(user),
             on_behalf_of: None,
@@ -32,7 +32,7 @@ impl Attribution {
     }
 
     /// `user` acting, or `bot` acting for them.
-    pub fn acting(user: MacroUserIdStr<'static>, bot: Option<BotId>) -> Self {
+    pub fn acting(user: RoxUserIdStr<'static>, bot: Option<BotId>) -> Self {
         match bot {
             Some(bot) => Self {
                 actor: Actor::new_from_bot(bot),
@@ -49,7 +49,7 @@ pub struct DatabaseCreatedMetadata {
     /// The id of the created database.
     pub database_id: DatabaseId,
     /// The owner (creator) of the database.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The display name it was created with.
     pub name: String,
     /// Creation timestamp reported by the repository.
@@ -173,12 +173,12 @@ impl TopicEvent for DatabaseTopicEvent {
 }
 
 /// Publishable event for [`RoxDatabasesTopic`], keyed by database id.
-pub struct DatabaseMacroEvent {
+pub struct DatabaseRoxEvent {
     key: String,
     event: Event<DatabaseTopicEvent>,
 }
 
-impl DatabaseMacroEvent {
+impl DatabaseRoxEvent {
     /// Build a created event keyed by the new database id.
     pub fn created(metadata: DatabaseCreatedMetadata) -> Self {
         Self::new(
@@ -249,7 +249,7 @@ impl DatabaseMacroEvent {
     }
 }
 
-impl MacroEvent for DatabaseMacroEvent {
+impl RoxEvent for DatabaseRoxEvent {
     type EventPayload = DatabaseTopicEvent;
 
     fn key(&self) -> &str {

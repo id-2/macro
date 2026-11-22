@@ -7,8 +7,8 @@ use analytics_client::{
     AnalyticsClient, AnalyticsClientConfig, BackgroundSender, PostHogConfig, ProductEventProperties,
 };
 use entity_access::{domain::ports::AccessRepository, outbound::PgAccessRepository};
-use macro_env::Environment;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_env::Environment;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Serialize;
 use sqlx::PgPool;
 
@@ -64,7 +64,7 @@ impl ProductAnalytics {
 
     /// Records `event` in the background so analytics never delays or fails
     /// the work it describes.
-    pub fn track<P>(&self, user_id: MacroUserIdStr<'static>, event: &'static str, properties: P)
+    pub fn track<P>(&self, user_id: RoxUserIdStr<'static>, event: &'static str, properties: P)
     where
         P: Serialize + Send + Sync + 'static,
     {
@@ -84,7 +84,7 @@ impl PostHogSink {
     async fn capture<P: Serialize>(
         &self,
         posthog: &AnalyticsClient,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         event: &'static str,
         properties: P,
     ) {

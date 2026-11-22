@@ -5,7 +5,7 @@ import type {
   PropertyOwner,
 } from '../../../generated/properties/types.gen';
 import { Lazy, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { CreatePropertyScope, PropertyDataType } from './namespace';
 import {
   PropertyOption,
@@ -24,7 +24,7 @@ export class PropertyDefinition {
   private readonly detail: Lazy<PropertyDefinitionRecord>;
 
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     readonly id: string,
     seed?: PropertyDefinitionRecord,
   ) {
@@ -41,7 +41,7 @@ export class PropertyDefinition {
 
   /** Create a new property definition. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: {
       displayName: string;
       scope: CreatePropertyScope;
@@ -61,13 +61,13 @@ export class PropertyDefinition {
   }
 
   /** A handle to an existing definition by id. Fields load lazily on first access. */
-  static byId(client: MacroClient, id: string): PropertyDefinition {
+  static byId(client: RoxClient, id: string): PropertyDefinition {
     return new PropertyDefinition(client, id);
   }
 
   /** Wrap a record already in hand (e.g. from a list response). */
   static fromRecord(
-    client: MacroClient,
+    client: RoxClient,
     record: PropertyDefinitionRecord,
   ): PropertyDefinition {
     return new PropertyDefinition(client, record.id, record);

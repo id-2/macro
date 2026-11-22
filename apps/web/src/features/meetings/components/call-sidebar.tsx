@@ -13,7 +13,7 @@ function CallListError(props: { message: string; onRetry: () => void }) {
     >
       <span>{props.message}</span>
       <button type="button" class="shrink-0 underline" onClick={props.onRetry}>
-        Retry
+        Повторить
       </button>
     </div>
   );
@@ -145,7 +145,7 @@ export function CallSidebar(props: {
           props.upcoming.length === 0
         }
       >
-        <p class="px-2 py-1 text-xs text-ink-muted">No upcoming events</p>
+        <p class="px-2 py-1 text-xs text-ink-muted">Нет ближайших событий</p>
       </Show>
     </div>
   );

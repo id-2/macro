@@ -1,11 +1,11 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const USER: &str = "macro|owner@example.com";
 
 fn connection(app_slug: &str) -> PipedreamConnection {
     PipedreamConnection {
-        user_id: MacroUserIdStr::parse_from_str(USER).unwrap().into_owned(),
+        user_id: RoxUserIdStr::parse_from_str(USER).unwrap().into_owned(),
         app_slug: app_slug.to_owned(),
         server_name: app_slug.to_owned(),
         account_id: format!("apn_{app_slug}"),

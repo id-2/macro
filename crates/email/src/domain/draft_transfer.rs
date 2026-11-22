@@ -10,7 +10,7 @@ use super::{
 };
 use chrono::{DateTime, Utc};
 use email_api_client::domain::models::EmailApiError;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{future::Future, sync::Arc};
@@ -158,14 +158,14 @@ where
 {
     pub async fn recover(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<Option<DraftTransferReceipt>, EmailErr> {
         self.repository.recover_transfer(actor.as_ref(), id).await
     }
     pub async fn transfer(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         request: DraftTransferRequest,
     ) -> Result<DraftTransferReceipt, EmailErr> {
         let links = self
@@ -311,7 +311,7 @@ pub struct DraftRetirementService<R, G> {
 }
 impl<R: DraftTransferRepository, G: DraftRetirementGateway> DraftRetirementService<R, G> {
     pub async fn execute_once(&self) -> Result<bool, MailboxError> {
-        let lease = macro_uuid::generate_uuid_v7();
+        let lease = rox_uuid::generate_uuid_v7();
         let Some(mut plan) = self.repository.claim_transfer_cleanup(lease).await? else {
             return Ok(false);
         };

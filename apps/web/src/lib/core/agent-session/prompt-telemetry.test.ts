@@ -17,7 +17,7 @@ type RecordedSpan = {
 
 const telemetry = vi.hoisted(() => ({ spans: [] as RecordedSpan[] }));
 
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: (name: string) => {
       const record: RecordedSpan = {

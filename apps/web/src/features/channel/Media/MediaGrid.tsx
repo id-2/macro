@@ -2,7 +2,7 @@ import { FileDownloadButton } from '@core/component/FileDownload';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { createFileDownload } from '@core/util/createFileDownload';
 import ExpandIcon from '@icon/system/regular/arrows-out-simple.svg';
-import { constrainImageDimensions } from '@macro-inc/lexical-core/utils/media';
+import { constrainImageDimensions } from '@rox-one/lexical-core/utils/media';
 import { Button, cn } from '@ui';
 import { createMemo, createSignal, For, Match, Show, Switch } from 'solid-js';
 import { mediaDownloadSource } from '../queries/static-media-download';

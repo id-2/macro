@@ -21,28 +21,6 @@ export function onboardingPathWithStep(step: unknown): string {
   return parsed ? `/onboarding?step=${parsed}` : '/onboarding';
 }
 
-/**
- * First-run redirect into onboarding. A validated `step` stays on the link.
- * Any other arrival that is not Home becomes `next`.
- */
-export function onboardingRedirectPath(target: string): string {
-  const queryIndex = target.indexOf('?');
-  const path = queryIndex === -1 ? target : target.slice(0, queryIndex);
-  const params = new URLSearchParams(
-    queryIndex === -1 ? '' : target.slice(queryIndex + 1)
-  );
-  const step = parseOnboardingStepParam(params.get('step'));
-  params.delete('step');
-  const rest = params.toString();
-  const withoutStep = rest ? `${path}?${rest}` : path;
-  const generic = withoutStep === '/' || withoutStep.startsWith(DEFAULT_ROUTE);
-  const query = new URLSearchParams();
-  if (!generic) query.set('next', withoutStep);
-  if (step) query.set('step', step);
-  const search = query.toString();
-  return search ? `/onboarding?${search}` : '/onboarding';
-}
-
 /** Where leaving onboarding lands: the first valid deep link, else Home. */
 export function afterOnboardingTarget(
   ...candidates: readonly unknown[]

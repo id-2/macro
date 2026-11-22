@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const OWNER_TEAM: &str = "00000000-0000-0000-0000-0000000ea001";
 const OTHER_TEAM: &str = "00000000-0000-0000-0000-0000000ea002";

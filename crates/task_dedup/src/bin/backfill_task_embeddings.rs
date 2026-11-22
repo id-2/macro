@@ -11,8 +11,8 @@ use embedding::entity::Task;
 use embedding::{EmbeddingModel, VectorStore};
 use futures::StreamExt;
 use lexical_client::LexicalClient;
-use macro_env_var::env_var;
-use macro_service_urls::LexicalServiceUrl;
+use rox_env_var::env_var;
+use rox_service_urls::LexicalServiceUrl;
 use secretsmanager_client::{SecretManager, SecretsManager};
 use task_dedup::outbound::postgres::PgTaskVectorDb;
 
@@ -41,9 +41,9 @@ impl Env {
     /// Resolve the lexical-service URL for the environment.
     fn lexical_service_url(self) -> Result<String> {
         let environment = match self {
-            Env::Local => macro_service_urls::macro_env::Environment::Local,
-            Env::Dev => macro_service_urls::macro_env::Environment::Develop,
-            Env::Prod => macro_service_urls::macro_env::Environment::Production,
+            Env::Local => rox_service_urls::rox_env::Environment::Local,
+            Env::Dev => rox_service_urls::rox_env::Environment::Develop,
+            Env::Prod => rox_service_urls::rox_env::Environment::Production,
         };
 
         Ok(LexicalServiceUrl::new_for_environment(environment)?.to_string())
@@ -180,7 +180,7 @@ impl ResolvedConfig {
         let database_url = fetch_database_url(env)?;
 
         let secrets = SecretsManager::new(aws_sdk_secretsmanager::Client::new(
-            &macro_aws_config::get_macro_aws_config().await,
+            &rox_aws_config::get_macro_aws_config().await,
         ));
         let openai_api_key = secrets.get_secret_value("openai-key").await?;
         let internal_api_secret_key = secrets

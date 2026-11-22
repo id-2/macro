@@ -3,7 +3,7 @@
 use std::os::unix::fs::PermissionsExt;
 use std::path::{Path, PathBuf};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::io::AsyncWriteExt;
 use uuid::Uuid;
 
@@ -217,7 +217,7 @@ impl RepoStore for BareRepoStore {
     #[tracing::instrument(skip_all, err)]
     async fn create_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         files: &[RenderedFile],
     ) -> Result<(), BareRepoStoreError> {
         let repo_path = self.directories.repo_path(agent_user_id);
@@ -281,7 +281,7 @@ impl RepoStore for BareRepoStore {
     #[tracing::instrument(skip_all, err)]
     async fn delete_repo(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), BareRepoStoreError> {
         let repo_path = self.directories.repo_path(agent_user_id);
         let tombstone = self
@@ -310,7 +310,7 @@ impl RepoStore for BareRepoStore {
     #[tracing::instrument(skip_all, err)]
     async fn repo_size_bytes(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
     ) -> Result<u64, BareRepoStoreError> {
         let repo_path = self.directories.repo_path(agent_user_id);
         let walked = repo_path.clone();
@@ -323,7 +323,7 @@ impl RepoStore for BareRepoStore {
     #[tracing::instrument(skip_all, fields(path = %path), err)]
     async fn read_file(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         path: &str,
     ) -> Result<Option<Vec<u8>>, BareRepoStoreError> {
         let repo = self.directories.repo_path(agent_user_id);
@@ -359,7 +359,7 @@ impl RepoStore for BareRepoStore {
     #[tracing::instrument(skip_all, fields(path = %path, attempts = tracing::field::Empty), err)]
     async fn commit_file(
         &self,
-        agent_user_id: &MacroUserIdStr<'_>,
+        agent_user_id: &RoxUserIdStr<'_>,
         path: &str,
         contents: &[u8],
         message: &str,

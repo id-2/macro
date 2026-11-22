@@ -12,7 +12,7 @@ use std::collections::{HashMap, HashSet};
 
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ use crate::domain::models::{ChannelType, NameLookup};
 pub async fn batch_resolve_channel_names<'a>(
     pool: &PgPool,
     channel_ids: &[Uuid],
-    viewer_user_id: MacroUserIdStr<'a>,
+    viewer_user_id: RoxUserIdStr<'a>,
 ) -> Result<HashMap<Uuid, String>, sqlx::Error> {
     if channel_ids.is_empty() {
         return Ok(HashMap::new());
@@ -68,8 +68,8 @@ pub async fn batch_resolve_channel_names<'a>(
 pub async fn resolve_channel_name_for_viewers<'a>(
     pool: &PgPool,
     channel_id: Uuid,
-    viewer_user_ids: &[MacroUserIdStr<'a>],
-) -> Result<HashMap<MacroUserIdStr<'static>, String>, sqlx::Error> {
+    viewer_user_ids: &[RoxUserIdStr<'a>],
+) -> Result<HashMap<RoxUserIdStr<'static>, String>, sqlx::Error> {
     if viewer_user_ids.is_empty() {
         return Ok(HashMap::new());
     }
@@ -103,7 +103,7 @@ pub struct ChannelNameMatch {
 #[derive(Debug)]
 pub struct ChannelNameSearch<'a> {
     /// Whose channels to search, and whose view of each name to match.
-    pub viewer_user_id: MacroUserIdStr<'a>,
+    pub viewer_user_id: RoxUserIdStr<'a>,
     /// One pattern per search term. A channel matches when every pattern
     /// matches its stored name or the display name of some participant other
     /// than the viewer.
@@ -270,10 +270,10 @@ async fn load_viewer_dependent_names(
     .await?;
 
     let mut participants_by_channel: HashMap<Uuid, Vec<String>> = HashMap::new();
-    let mut user_ids: HashSet<MacroUserIdStr<'static>> = HashSet::new();
+    let mut user_ids: HashSet<RoxUserIdStr<'static>> = HashSet::new();
     let mut bot_ids: HashSet<BotId> = HashSet::new();
     for row in participant_rows {
-        if let Ok(user_id) = MacroUserIdStr::try_from(row.user_id.clone()) {
+        if let Ok(user_id) = RoxUserIdStr::try_from(row.user_id.clone()) {
             user_ids.insert(user_id);
         } else if let Ok(bot) = bot_id::BotIdStr::parse_from_str(&row.user_id) {
             bot_ids.insert(bot.bot_id());
@@ -283,7 +283,7 @@ async fn load_viewer_dependent_names(
             .or_default()
             .push(row.user_id);
     }
-    let user_ids: Vec<MacroUserIdStr<'static>> = user_ids.into_iter().collect();
+    let user_ids: Vec<RoxUserIdStr<'static>> = user_ids.into_iter().collect();
     let bot_ids: Vec<BotId> = bot_ids.into_iter().collect();
     let user_names = load_user_display_names(pool, &user_ids).await?;
     let bot_names = load_bot_display_names(pool, &bot_ids).await?;

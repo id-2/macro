@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT import_started_at,import_completed_at FROM email_sync_streams WHERE link_id = $1 AND kind = 'folder_catalog'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "import_started_at",
+        "type_info": "Timestamptz"
+      },
+      {
+        "ordinal": 1,
+        "name": "import_completed_at",
+        "type_info": "Timestamptz"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true,
+      true
+    ]
+  },
+  "hash": "27607a0437cf8e97fec8d788c27a75dc035bcc382706178ed6f162440ac0742b"
+}

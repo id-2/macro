@@ -24,7 +24,7 @@ import { callRecordingDownloadSource } from '../../queries/recording-download';
  */
 export function useCallRecordingHeaderTools(record: () => CallRecord) {
   const blockId = useBlockId();
-  const callName = () => record().customName ?? record().channelName ?? 'Call';
+  const callName = () => record().customName ?? record().channelName ?? t('calls.title');
   const permissions = useGetPermissions();
   const openShare = useShareModal(() => ({
     id: blockId,

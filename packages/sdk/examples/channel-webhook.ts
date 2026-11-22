@@ -9,7 +9,7 @@
  * usage: MACRO_WEBHOOK_TOKEN=mbot_... bun examples/channel-webhook.ts <channel-id> [mention-user-id]
  */
 import type { Env } from '../src/config';
-import { here, msg, Rox } from '../src/macro';
+import { here, msg, Rox } from '../src/rox';
 
 const token = process.env.MACRO_WEBHOOK_TOKEN;
 const [channelId, mentionUserId] = process.argv.slice(2);
@@ -22,7 +22,7 @@ if (!token || !channelId) {
 }
 
 const macro = new Rox({
-  env: (process.env.MACRO_ENV ?? 'dev') as Env,
+  env: (process.env.ROX_ENV ?? 'dev') as Env,
   auth: { type: 'bot', token },
 });
 const channel = macro.channels.byId(channelId);

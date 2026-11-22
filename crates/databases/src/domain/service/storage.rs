@@ -51,7 +51,7 @@ where
     C: CellStore,
     E: TableEventPublisher,
     A: AccessDirectory,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// The columns of `tables` with their definitions, by table, then in
     /// display order.
@@ -127,7 +127,7 @@ where
     C: CellStore + DatabaseStorage,
     E: TableEventPublisher,
     A: AccessDirectory,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     #[tracing::instrument(name = "database.storage.board_positions", skip_all, fields(database_id = %id, table_id = %table, view_id = %view), err)]
     async fn storage_view_positions(

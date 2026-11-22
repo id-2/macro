@@ -1,8 +1,8 @@
 use std::collections::HashSet;
 
 use email::{domain::focus::FocusService, outbound::FocusPgRepository};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -15,7 +15,7 @@ use crate::test_support::{
 fn inbox(n: u128) -> FocusInboxOwner {
     FocusInboxOwner {
         link_id: Uuid::from_u128(n),
-        owner: MacroUserIdStr::try_from_email(&format!("owner{n}@acme.example")).unwrap(),
+        owner: RoxUserIdStr::try_from_email(&format!("owner{n}@acme.example")).unwrap(),
     }
 }
 
@@ -200,7 +200,7 @@ async fn fill_speed(pool: Pool<Postgres>) {
             .backfill(
                 &FocusInboxOwner {
                     link_id,
-                    owner: MacroUserIdStr::try_from_email(&owner).unwrap(),
+                    owner: RoxUserIdStr::try_from_email(&owner).unwrap(),
                 },
                 chrono::Duration::days(30),
                 THREADS_AT_ONCE,
@@ -222,7 +222,7 @@ async fn fill_speed(pool: Pool<Postgres>) {
     for n in 0..inboxes {
         let owner = format!("step{n}@acme.example");
         seed_inbox(&pool, Uuid::from_u128(0xc000 + n), &owner, threads, 29).await;
-        owners.insert(MacroUserIdStr::try_from_email(&owner).unwrap());
+        owners.insert(RoxUserIdStr::try_from_email(&owner).unwrap());
     }
     let classifier = RecordingClassifier::new(Duration::from_millis(150)).focus_in_tenths(3);
     let mut asked = classifier.asked_count.subscribe();

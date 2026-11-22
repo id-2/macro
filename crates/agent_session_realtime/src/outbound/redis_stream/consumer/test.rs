@@ -10,7 +10,7 @@ use agent_session::domain::model::{
     AgentSessionId, AgentSessionLog, LogAppended, Message, StoredAgentSessionLog,
 };
 use agent_session::domain::ports::{AgentSessionRealtime as _, NoOpRealtime};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use redis::AsyncCommands as _;
 use redis::streams::StreamInfoGroupsReply;
 
@@ -20,7 +20,7 @@ use crate::outbound::redis_stream::publisher::RedisLogStreamRealtime;
 const RECV_TIMEOUT: Duration = Duration::from_secs(10);
 
 fn client() -> redis::Client {
-    let url = macro_env_var::maybe_read_env("REDIS_URL")
+    let url = rox_env_var::maybe_read_env("REDIS_URL")
         .unwrap_or_else(|| "redis://127.0.0.1:6379".to_owned());
     redis::Client::open(url).expect("valid Redis URL")
 }
@@ -33,7 +33,7 @@ struct TestStream {
 impl TestStream {
     fn new(test: &str) -> Self {
         Self {
-            key: format!("test:{test}:{}", macro_uuid::generate_uuid_v7()),
+            key: format!("test:{test}:{}", rox_uuid::generate_uuid_v7()),
         }
     }
 
@@ -346,7 +346,7 @@ async fn a_young_group_that_has_not_read_yet_is_not_reaped() {
 
 #[test]
 fn a_group_minted_now_is_young_and_a_foreign_name_has_no_age() {
-    let group = format!("{GROUP_PREFIX}{}", macro_uuid::generate_uuid_v7());
+    let group = format!("{GROUP_PREFIX}{}", rox_uuid::generate_uuid_v7());
     let age = group_age(&group).expect("a minted group has an age");
     assert!(age < Duration::from_secs(5), "{age:?}");
     assert_eq!(group_age("someone-elses-group"), None);

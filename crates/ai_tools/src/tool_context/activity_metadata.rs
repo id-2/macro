@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
 use entity_access::domain::ports::EntityAccessService as _;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::DataType;
 use models_properties::service::property_option::PropertyOptionValue;
 
@@ -30,7 +30,7 @@ impl ToolActivityMetadataResolver {
 impl activity::ActivityMetadataResolver for ToolActivityMetadataResolver {
     async fn resolve_properties(
         &self,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         property_ids: &[String],
     ) -> std::collections::HashMap<String, activity::ActivityPropertyMetadata> {
         use entity_access::domain::models::{

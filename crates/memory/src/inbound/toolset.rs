@@ -111,7 +111,7 @@ impl<R: ComposedMemoryRepo> AsyncTool<MemoryToolContext<R>> for GetUserActivity 
     ) -> ToolResult<Self::Output> {
         let user = match &self.user_id {
             Some(id) => {
-                macro_user_id::user_id::MacroUserIdStr::try_from(id.clone()).map_err(|e| {
+                rox_user_id::user_id::RoxUserIdStr::try_from(id.clone()).map_err(|e| {
                     ToolCallError {
                         description: "Invalid Rox user id".into(),
                         internal_error: e.into(),

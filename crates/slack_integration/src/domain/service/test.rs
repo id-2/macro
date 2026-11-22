@@ -3,7 +3,7 @@ use chrono::Utc;
 use entity_access::domain::models::{
     BotIdStr, BotReceiptScope, Entity, EntityAccessAuth, EntityPermission, TeamRole,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::{
     collections::HashMap,
     sync::{
@@ -18,7 +18,7 @@ struct Fake(Arc<Mutex<State>>);
 
 #[derive(Default)]
 struct State {
-    owner: Option<(TeamId, MacroUserIdStr<'static>, CreateImport)>,
+    owner: Option<(TeamId, RoxUserIdStr<'static>, CreateImport)>,
     progress: Option<ImportProgress>,
     uploads: HashMap<UploadId, RegisteredUpload>,
     sealed: bool,
@@ -35,8 +35,8 @@ struct State {
 fn team() -> TeamId {
     Uuid::from_u128(1).try_into().unwrap()
 }
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|admin@example.com")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|admin@example.com")
         .unwrap()
         .into_owned()
 }
@@ -152,7 +152,7 @@ impl ImportRepo for Fake {
     async fn create(
         &self,
         team: TeamId,
-        admin: &MacroUserIdStr<'_>,
+        admin: &RoxUserIdStr<'_>,
         command: &CreateImport,
         limits: &ImportLimits,
     ) -> PortResult<ImportProgress> {
@@ -308,7 +308,7 @@ impl ImportRepo for Fake {
         &self,
         team: TeamId,
         job: JobId,
-    ) -> PortResult<Option<MacroUserIdStr<'static>>> {
+    ) -> PortResult<Option<RoxUserIdStr<'static>>> {
         let s = self.0.lock().unwrap();
         s.owned(team, job)?;
         Ok(s.owner.as_ref().map(|(_, user, _)| user.clone()))
@@ -352,7 +352,7 @@ impl ImportLedger for Fake {
     async fn reserve(
         &self,
         _: TeamId,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &ConversationMetadata,
         _: Option<Uuid>,
     ) -> PortResult<TargetReservation> {
@@ -363,7 +363,7 @@ impl ImportLedger for Fake {
     }
 }
 impl ImportAuthorizer for Fake {
-    async fn require_admin(&self, _: TeamId, _: &MacroUserIdStr<'_>) -> PortResult<()> {
+    async fn require_admin(&self, _: TeamId, _: &RoxUserIdStr<'_>) -> PortResult<()> {
         let mut s = self.0.lock().unwrap();
         s.calls.push("revalidate");
         if s.revoked {
@@ -374,7 +374,7 @@ impl ImportAuthorizer for Fake {
     async fn require_target(
         &self,
         _: TeamId,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: &ConversationMetadata,
         _: Uuid,
     ) -> PortResult<()> {
@@ -384,7 +384,7 @@ impl ImportAuthorizer for Fake {
 impl ImportProgressAccess for Fake {
     async fn participating_targets(
         &self,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         targets: &[Uuid],
     ) -> PortResult<Vec<Uuid>> {
         let mut state = self.0.lock().unwrap();
@@ -405,7 +405,7 @@ impl ImportProgressAccess for Fake {
 impl ImportNotifier for Fake {
     async fn invalidate(
         &self,
-        requester: &MacroUserIdStr<'_>,
+        requester: &RoxUserIdStr<'_>,
         _: TeamId,
         job: JobId,
         revision: u64,
@@ -479,7 +479,7 @@ async fn receipts_revalidate_disclosure_without_hiding_selected_work_or_failing_
     );
     assert_eq!(svc.create(access(team()), command).await.unwrap(), detail);
     // Another admin must be checked as the viewer, not the original requesting admin.
-    let other = MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
     svc.progress(
         receipt(team(), EntityAccessAuth::Authenticated(other)),
         JobCommand { job_id: job },
@@ -960,7 +960,7 @@ async fn shape_only_seal_and_other_admin_notify_original_requester_only() {
     )
     .await
     .unwrap();
-    let other = MacroUserIdStr::parse_from_str("macro|other@example.com")
+    let other = RoxUserIdStr::parse_from_str("macro|other@example.com")
         .unwrap()
         .into_owned();
     fake.0.lock().unwrap().fail_notification = true;

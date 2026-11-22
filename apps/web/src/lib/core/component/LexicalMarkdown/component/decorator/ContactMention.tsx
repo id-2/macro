@@ -3,7 +3,7 @@ import { openInNewSplitForMention } from '@core/util/openInNewSplit';
 import { useNativeSplitNavigationHandler } from '@core/util/useSplitNavigationHandler';
 import BuildingIcon from '@icon/system/regular/buildings.svg';
 import UserIcon from '@icon/system/regular/user.svg';
-import type { ContactMentionDecoratorProps } from '@macro-inc/lexical-core';
+import type { ContactMentionDecoratorProps } from '@rox-one/lexical-core';
 import { cn } from '@ui';
 import { COMMAND_PRIORITY_NORMAL, KEY_ENTER_COMMAND } from 'lexical';
 import { createSignal, Show, useContext } from 'solid-js';

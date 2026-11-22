@@ -1,12 +1,12 @@
 import type { AnswerToolApprovalRequest } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { AgentSession } from './agent-session';
 
 /** A permission request scoped to its originating agent session. */
 export class ToolApproval {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** Owning session. */
     readonly session: AgentSession,
     /** Approval identity. */
@@ -15,7 +15,7 @@ export class ToolApproval {
 
   /** Construct a scoped approval handle. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     session: AgentSession,
     id: string,
   ): ToolApproval {

@@ -1,9 +1,9 @@
-use crate::api::MACRO_INTERNAL_USER_ID;
+use crate::api::is_internal_user_id;
 use crate::api::context::{ApiContext, AuthorizationService};
 use axum::Json;
 use axum::extract::{Query, State};
 use axum::http::StatusCode;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::document_storage_service_internal::GetItemIDsResponse;
 
 #[derive(serde::Deserialize)]
@@ -16,7 +16,7 @@ pub struct Params {
 #[tracing::instrument(skip(ctx, user), fields(user_id=?user.authorization.user.macro_user_id))]
 pub async fn get_item_ids_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Query(Params {
         item_type,
         exclude_owned,
@@ -26,14 +26,14 @@ pub async fn get_item_ids_handler(
 
     let user_id = user.authorization.user.user_context.user_id.clone();
 
-    if matches!(user_id.as_str(), "" | MACRO_INTERNAL_USER_ID) {
+    if is_internal_user_id(&user_id) {
         return Err((
             StatusCode::UNAUTHORIZED,
             "No user id found in context".to_string(),
         ));
     }
 
-    let items = match macro_db_client::item_access::get_accessible_items::get_user_accessible_items(
+    let items = match rox_db_client::item_access::get_accessible_items::get_user_accessible_items(
         &ctx.db,
         &user_id,
         item_type,

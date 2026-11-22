@@ -2,8 +2,8 @@ import type {
   ArtifactLibrary,
   ArtifactLibraryEdit,
   ArtifactLibraryKind,
-} from '@macro-inc/graphics/loro';
-import { ARTIFACT_LIBRARY_ENTRY_MAX_LENGTH } from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics/loro';
+import { ARTIFACT_LIBRARY_ENTRY_MAX_LENGTH } from '@rox-one/graphics/loro';
 import { Button, Input } from '@ui';
 import { createSignal, For } from 'solid-js';
 import { InspectorField } from './inspector-field';

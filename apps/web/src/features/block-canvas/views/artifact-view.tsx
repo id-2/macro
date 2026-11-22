@@ -1,4 +1,4 @@
-import type { ShapeViewProps } from '@macro-inc/graphics/solid';
+import type { ShapeViewProps } from '@rox-one/graphics/solid';
 import { ArtifactFrame } from './artifact-frame';
 
 export function CanvasArtifactView(

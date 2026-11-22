@@ -12,9 +12,9 @@ use lambda_runtime::{
     Error, LambdaEvent, run, service_fn,
     tracing::{self},
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_env_var::env_vars;
-use macro_service_urls::ConnectionGatewayUrl;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env_var::env_vars;
+use rox_service_urls::ConnectionGatewayUrl;
 use model::{
     document::{FileType, FileTypeExt},
     folder::{FileSystemNodeWithIds, FolderItem, S3Destination, S3DestinationMap},
@@ -732,7 +732,7 @@ fn get_file_path_for_item(extract_dir: &Path, item: &FolderItem) -> PathBuf {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     tracing::trace!("initiating lambda");
 
     let upload_staging_bucket = UploadBucketName::new()
@@ -747,7 +747,7 @@ async fn main() -> Result<(), Error> {
         .to_string();
     let connection_gateway_url = ConnectionGatewayUrl::new()?.to_string();
 
-    let config = macro_aws_config::get_macro_aws_config().await;
+    let config = rox_aws_config::get_macro_aws_config().await;
     let s3_client = S3Client::new(&config);
 
     let dss_client = DocumentStorageServiceClient::new(internal_api_secret_key.clone(), dss_url);

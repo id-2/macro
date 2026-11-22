@@ -1,3 +1,4 @@
+import { formatLocale, t } from '@app/lib/i18n';
 import {
   EntityIcon,
   type EntityIconSelector,
@@ -103,8 +104,10 @@ function MutedItemLayout(props: {
 }) {
   const dmRecipientId = useMutedChannelDmRecipientId(() => props.item);
   const resumeLabel = () => {
-    if (props.item.mentions_only) return 'Notify for all';
-    return props.item.snoozed_until ? 'Resume' : 'Unmute';
+    if (props.item.mentions_only) return t('settingsNotifications.notifyForAll');
+    return props.item.snoozed_until
+      ? t('settingsNotifications.resume')
+      : t('settingsNotifications.unmute');
   };
 
   return (
@@ -133,7 +136,9 @@ function MutedItemLayout(props: {
         <Show when={props.item.snoozed_until}>
           {(until) => (
             <div class="text-xs text-ink-muted">
-              Until {formatSnoozeDeadline(until())}
+              {t('settingsNotifications.until', {
+                date: formatSnoozeDeadline(until(), formatLocale()),
+              })}
             </div>
           )}
         </Show>
@@ -146,7 +151,9 @@ function MutedItemLayout(props: {
             disabled={props.pending}
             onClick={props.onSnooze}
           >
-            {props.item.snoozed_until ? 'Change time' : 'Snooze instead'}
+            {props.item.snoozed_until
+              ? t('settingsNotifications.changeTime')
+              : t('settingsNotifications.snoozeInstead')}
           </button>
         </Show>
         <button

@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import { GRAPHICS_METADATA_ORIGIN } from '@macro-inc/graphics/loro';
+import { GRAPHICS_METADATA_ORIGIN } from '@rox-one/graphics/loro';
 import type { LoroDoc } from 'loro-crdt';
 import { onCleanup } from 'solid-js';
 import type { CanvasReferenceSource } from '../context/reference-source';

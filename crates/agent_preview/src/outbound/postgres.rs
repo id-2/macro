@@ -3,7 +3,7 @@ use crate::domain::{PreviewError, PreviewId, PreviewStatus, storage::*};
 use agent_fold::domain::log::AgentSessionId;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{PgPool, types::Json};
 use std::net::SocketAddr;
 use uuid::Uuid;
@@ -230,7 +230,7 @@ impl PreviewRepository for PgPreviewRepository {
             preview: id.clone(),
             user: row
                 .0
-                .map(MacroUserIdStr::try_from)
+                .map(RoxUserIdStr::try_from)
                 .transpose()
                 .map_err(|_| PreviewError::Unavailable)?,
             expires: row.1.timestamp_millis(),
@@ -271,7 +271,7 @@ impl PreviewRepository for PgPreviewRepository {
     async fn watch(
         &self,
         session: AgentSessionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         limits: WatchLimits,
     ) -> Result<(), PreviewError> {
         let expires = timestamp(limits.expires)?;
@@ -296,9 +296,9 @@ impl PreviewRepository for PgPreviewRepository {
         &self,
         session: AgentSessionId,
         limit: i64,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, PreviewError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, PreviewError> {
         sqlx::query_scalar!("SELECT user_id FROM agent_preview_watcher WHERE session_id = $1 AND expires_at > now() ORDER BY user_id LIMIT $2", session.as_uuid(), limit)
-            .fetch_all(&self.pool).await.map_err(unavailable)?.into_iter().map(|u| MacroUserIdStr::try_from(u).map_err(|_| PreviewError::Unavailable)).collect()
+            .fetch_all(&self.pool).await.map_err(unavailable)?.into_iter().map(|u| RoxUserIdStr::try_from(u).map_err(|_| PreviewError::Unavailable)).collect()
     }
     #[tracing::instrument(skip_all, err)]
     async fn sweep(&self) -> Result<Vec<crate::domain::Preview>, PreviewError> {

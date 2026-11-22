@@ -1,6 +1,6 @@
 import { afterEach, expect, mock, spyOn, test } from 'bun:test';
 import type { ArchiveThreadsRequest } from '../generated/email/types.gen';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 afterEach(() => mock.restore());
 

@@ -7,8 +7,8 @@ export function DesktopApp() {
   if (!isPlatform('desktop')) return <DesktopAppDownload />;
   return (
     <NativeAppInfo
-      title="Desktop App (Alpha)"
-      description="Your installed version of Rox Alpha."
+      title="Приложение для компьютера (альфа)"
+      description="Установленная у вас альфа-версия Rox."
     />
   );
 }

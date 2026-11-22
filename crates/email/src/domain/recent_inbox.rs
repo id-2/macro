@@ -4,7 +4,7 @@
 use std::future::Future;
 
 use email_api_client::domain::models::EmailApiError;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::service::message::RecentInboxMessage;
 use models_email::service::link::UserProvider;
 use tracing::{Instrument, Span};
@@ -42,7 +42,7 @@ pub trait RecentInboxMailboxes: Send + Sync + 'static {
     /// delegated to them belong to someone else and are left out.
     fn readable_owned_inboxes(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<RecentInboxMailbox>, MailboxError>> + Send;
 }
 
@@ -86,7 +86,7 @@ impl<R: RecentInboxMailboxes, P: RecentInboxReader> RecentInboxService<R, P> {
     )]
     pub async fn read(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         limit: u16,
         snippet_chars: u16,
     ) -> Result<Vec<RecentInboxMessage>, MailboxError> {

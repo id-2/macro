@@ -31,7 +31,7 @@ pub async fn get_document_info(
     db: &sqlx::Pool<sqlx::Postgres>,
     search_extractor_message: &SearchExtractorMessage,
 ) -> anyhow::Result<DocumentInfo> {
-    let document_basic = match macro_db_client::document::get_basic_document(
+    let document_basic = match rox_db_client::document::get_basic_document(
         db,
         search_extractor_message.document_id.as_str(),
     )
@@ -46,7 +46,7 @@ pub async fn get_document_info(
         return Ok(DocumentInfo::Removable);
     }
 
-    let metadata = match macro_db_client::document::get_document(
+    let metadata = match rox_db_client::document::get_document(
         db,
         search_extractor_message.document_id.as_str(),
     )

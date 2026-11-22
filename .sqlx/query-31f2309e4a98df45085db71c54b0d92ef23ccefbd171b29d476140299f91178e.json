@@ -1,0 +1,32 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT message_id, provider_label_id, write_id FROM email_gmail_pending_label_writes ORDER BY message_id, seq",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "message_id",
+        "type_info": "Uuid"
+      },
+      {
+        "ordinal": 1,
+        "name": "provider_label_id",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "write_id",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "31f2309e4a98df45085db71c54b0d92ef23ccefbd171b29d476140299f91178e"
+}

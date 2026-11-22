@@ -288,8 +288,8 @@ impl GraphqlSoupEmailMessage {
     }
 
     /// The message body in Rox's rich-text format.
-    async fn body_macro(&self) -> Option<&str> {
-        self.parsed().body_macro.as_deref()
+    async fn body_rox(&self) -> Option<&str> {
+        self.parsed().body_rox.as_deref()
     }
 
     /// The message body with quoted replies removed.
@@ -567,7 +567,7 @@ mod tests {
 
     use async_graphql::{EmptyMutation, EmptySubscription, Schema};
     use chrono::Utc;
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_user_id::user_id::RoxUserIdStr;
     use uuid::Uuid;
 
     use super::*;
@@ -601,7 +601,7 @@ mod tests {
     impl SoupEmailThreadMetadataEdgeReader for ContentReader {
         async fn get_email_thread_metadata(
             &self,
-            _user_id: &MacroUserIdStr<'static>,
+            _user_id: &RoxUserIdStr<'static>,
             thread_ids: Vec<Uuid>,
         ) -> HashMap<Uuid, EmailThreadMetadataLoad> {
             thread_ids
@@ -627,7 +627,7 @@ mod tests {
     impl SoupEmailThreadMailProjectionEdgeReader for ContentReader {
         async fn get_email_thread_mail_projections(
             &self,
-            _user_id: &MacroUserIdStr<'static>,
+            _user_id: &RoxUserIdStr<'static>,
             thread_ids: Vec<Uuid>,
         ) -> HashMap<Uuid, EmailThreadMailProjectionLoad> {
             thread_ids
@@ -645,7 +645,7 @@ mod tests {
     impl SoupEmailContentEdgeReader for ContentReader {
         async fn get_email_content(
             &self,
-            _user_id: &MacroUserIdStr<'static>,
+            _user_id: &RoxUserIdStr<'static>,
             keys: Vec<EmailContentKey>,
         ) -> HashMap<EmailContentKey, EmailContentLoad> {
             keys.into_iter()
@@ -676,7 +676,7 @@ mod tests {
             body_parsed: Some("Hello from the edge".to_owned()),
             body_text: Some("Hello from the edge".to_owned()),
             body_html_sanitized: None,
-            body_macro: None,
+            body_rox: None,
             body_replyless: Some("Hello from the edge".to_owned()),
             internal_date_ts: Some(now),
             sent_at: Some(now),
@@ -692,7 +692,7 @@ mod tests {
 
     #[tokio::test]
     async fn executes_paginated_messages_with_request_scoped_loader() {
-        let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+        let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
         let schema = Schema::build(ContentQuery, EmptyMutation, EmptySubscription)
             .data(email_content_loader(user_id, ContentReader))
             .finish();
@@ -710,7 +710,7 @@ mod tests {
 
     #[tokio::test]
     async fn executes_content_field_with_request_scoped_loader() {
-        let user_id = MacroUserIdStr::try_from_email("reader@example.com").unwrap();
+        let user_id = RoxUserIdStr::try_from_email("reader@example.com").unwrap();
         let schema = Schema::build(ContentQuery, EmptyMutation, EmptySubscription)
             .data(email_content_loader(user_id, ContentReader))
             .finish();

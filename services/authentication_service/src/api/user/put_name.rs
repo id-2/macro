@@ -4,11 +4,11 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_db_client::user::update_user_name::update_user_name;
+use rox_db_client::user::update_user_name::update_user_name;
 
 use crate::api::context::{ApiContext, AuthorizationService};
 
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::EmptyResponse;
 use model::response::ErrorResponse;
 use model::user::PutUserNameQueryParams;
@@ -29,7 +29,7 @@ use model::user::PutUserNameQueryParams;
 pub async fn handler(
     State(ctx): State<ApiContext>,
     Query(params): Query<PutUserNameQueryParams>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, Response> {
     tracing::info!("put_user_name");
 

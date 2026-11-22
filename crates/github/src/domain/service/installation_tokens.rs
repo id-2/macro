@@ -20,7 +20,7 @@
 //! minting a token needs a database handle and an HTTP client, and a caller
 //! that only wants a token should not have to construct the rest.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::models::{
     GithubAppInstallationSource, GithubError, GithubInstallationAccessToken, app_jwt,
@@ -75,7 +75,7 @@ where
     #[tracing::instrument(skip(self, permissions), err, fields(%macro_user_id, owner, repository))]
     pub async fn for_repository(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        macro_user_id: &RoxUserIdStr<'_>,
         owner: &str,
         repository: &str,
         permissions: &[(&str, &str)],
@@ -108,7 +108,7 @@ where
     #[tracing::instrument(skip(self), err, fields(%macro_user_id, owner, repository))]
     pub async fn branches_for_repository(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        macro_user_id: &RoxUserIdStr<'_>,
         owner: &str,
         repository: &str,
     ) -> Result<Vec<String>, GithubError> {
@@ -124,7 +124,7 @@ where
     /// belong to.
     async fn ensure_reachable(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        macro_user_id: &RoxUserIdStr<'_>,
         installation: u64,
     ) -> Result<(), GithubError> {
         let sources = self

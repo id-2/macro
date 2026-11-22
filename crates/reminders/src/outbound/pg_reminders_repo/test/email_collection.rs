@@ -41,14 +41,14 @@ async fn email_candidates_page_by_thread_and_keep_private(pool: PgPool) {
     insert_user(&pool, USER_B).await;
     let repo = PgRemindersRepo::new(pool);
     let now = at(2026, 10, 2, 12);
-    let thread = macro_uuid::generate_uuid_v7();
+    let thread = rox_uuid::generate_uuid_v7();
     let nearest = snooze(&repo, USER_A, thread, now).await;
     snooze(&repo, USER_B, thread, now - Duration::hours(1)).await;
     for i in 0..105 {
         snooze(
             &repo,
             USER_A,
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             now + Duration::days(1) + Duration::seconds(i),
         )
         .await;
@@ -104,15 +104,15 @@ async fn email_candidates_workflow_membership_is_not_archive_status(pool: PgPool
         FollowupState::Cancelled,
         FollowupState::Removed,
     ] {
-        let thread = macro_uuid::generate_uuid_v7();
+        let thread = rox_uuid::generate_uuid_v7();
         let record = FollowupRecord {
             followup: EmailFollowup {
                 reminder_id: Uuid::now_v7(),
                 thread_id: thread,
-                link_id: macro_uuid::generate_uuid_v7(),
+                link_id: rox_uuid::generate_uuid_v7(),
                 condition: EmailReminderCondition::IfNoReply,
                 remind_at: now + Duration::hours(1),
-                revision: macro_uuid::generate_uuid_v7(),
+                revision: rox_uuid::generate_uuid_v7(),
                 state,
             },
             user_id: user(USER_A).into_owned(),
@@ -144,7 +144,7 @@ async fn email_candidates_skip_malformed_workflows_with_cursor_progress(pool: Pg
         serde_json::Value::Null,
         serde_json::json!({"invalid": true}),
     ] {
-        let thread = macro_uuid::generate_uuid_v7();
+        let thread = rox_uuid::generate_uuid_v7();
         let mirror = snooze(&repo, USER_A, thread, now).await;
         sqlx::query!(
             "UPDATE reminder_email_followup SET payload = $2 WHERE reminder_id = $1",

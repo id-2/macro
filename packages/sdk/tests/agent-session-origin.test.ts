@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'bun:test';
 import { sessionOrigin } from '../src/entities/agent-sessions/origin';
-import type { MacroClient } from '../src/utils/client';
+import type { RoxClient } from '../src/utils/client';
 
 // Handles are lazy, so mapping never touches the network.
-const client = {} as MacroClient;
+const client = {} as RoxClient;
 
 const user = 'macro|user@example.com';
 const bot = '01a00000-0000-7000-8000-0000000000b7';

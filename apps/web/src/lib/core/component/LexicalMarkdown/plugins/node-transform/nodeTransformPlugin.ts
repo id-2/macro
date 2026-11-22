@@ -21,8 +21,8 @@ import {
   $ensureForwardRangeSelection,
   $setBlocksType,
 } from '@lexical/selection';
-import type { ElementName } from '@macro-inc/lexical-core';
-import { CustomCodeNode } from '@macro-inc/lexical-core';
+import type { ElementName } from '@rox-one/lexical-core';
+import { CustomCodeNode } from '@rox-one/lexical-core';
 import type {
   ElementNode,
   Klass,

@@ -1,7 +1,7 @@
 //! Focus value objects.
 
 use chrono::{DateTime, NaiveDate, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use strum::{Display, EnumString};
 use uuid::Uuid;
@@ -277,7 +277,7 @@ pub struct FocusInbox {
     /// Inbox that holds the thread.
     pub link_id: Uuid,
     /// Owner of that inbox.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The inbox's address, lowercased.
     pub owner_email: String,
     /// Whether the thread is in the signal inbox.
@@ -305,7 +305,7 @@ pub struct FocusThread {
     /// Inbox that holds the thread.
     pub link_id: Uuid,
     /// Owner of that inbox.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The inbox's address.
     pub owner_email: String,
     /// Whether the thread is in the signal inbox.
@@ -343,7 +343,7 @@ pub struct FocusInboxOwner {
     /// The inbox.
     pub link_id: Uuid,
     /// Its owner, whose place in the rollout decides whether it is classified.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
 }
 
 /// An inbox thread whose stored classification may be out of date.

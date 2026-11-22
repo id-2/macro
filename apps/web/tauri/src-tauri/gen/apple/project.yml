@@ -1,6 +1,6 @@
 name: app
 options:
-  bundleIdPrefix: com.macro.app.prod
+  bundleIdPrefix: com.rox.app.prod
   deploymentTarget:
     iOS: 15.0
 packages:
@@ -13,8 +13,8 @@ configs:
 settingGroups:
   app:
     base:
-      PRODUCT_NAME: macro
-      PRODUCT_BUNDLE_IDENTIFIER: com.macro.app.prod
+      PRODUCT_NAME: rox
+      PRODUCT_BUNDLE_IDENTIFIER: com.rox.app.prod
       DEVELOPMENT_TEAM: TY74Q77JBD
       CODE_SIGN_STYLE: Automatic
       CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: YES
@@ -68,16 +68,17 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         CFBundleURLTypes:
           - CFBundleURLSchemes:
+              - rox
               - macro
-            CFBundleURLName: macro
+            CFBundleURLName: rox
         NSUserActivityTypes:
           - INSendMessageIntent
           - NSUserActivityTypeBrowsingWeb
-        NSCameraUsageDescription: "Macro uses the camera for video calls and for photos and videos you attach."
-        NSMicrophoneUsageDescription: "Macro uses the microphone for calls and for videos you record to attach."
+        NSCameraUsageDescription: "Rox uses the camera for video calls and for photos and videos you attach."
+        NSMicrophoneUsageDescription: "Rox uses the microphone for calls and for videos you record to attach."
         NSPhotoLibraryUsageDescription: "This app needs access to your photo library to upload attachments."
         LSApplicationQueriesSchemes:
-          - macro
+          - rox
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
           UISceneConfigurations:
@@ -97,7 +98,7 @@ targets:
         com.apple.developer.usernotifications.communication: true
         com.apple.developer.usernotifications.time-sensitive: true
         com.apple.security.application-groups:
-          - group.com.macro.app.prod
+          - group.com.rox.app.prod
     scheme:
       environmentVariables:
         RUST_BACKTRACE: full
@@ -150,7 +151,7 @@ targets:
         CFBundleShortVersionString: 2.0.19
         CFBundleVersion: "200"
         LSApplicationQueriesSchemes:
-          - macro
+          - rox
         NSExtension:
           NSExtensionAttributes:
             NSExtensionActivationRule:
@@ -163,10 +164,10 @@ targets:
       path: ShareExtension/ShareExtension.entitlements
       properties:
         com.apple.security.application-groups:
-          - group.com.macro.app.prod
+          - group.com.rox.app.prod
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.macro.app.prod.ShareExtension
+        PRODUCT_BUNDLE_IDENTIFIER: com.rox.app.prod.ShareExtension
         DEVELOPMENT_TEAM: TY74Q77JBD
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: YES
@@ -189,7 +190,7 @@ targets:
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).NotificationService
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.macro.app.prod.NotificationServiceExtension
+        PRODUCT_BUNDLE_IDENTIFIER: com.rox.app.prod.NotificationServiceExtension
         DEVELOPMENT_TEAM: TY74Q77JBD
         CODE_SIGN_STYLE: Automatic
         CODE_SIGN_ALLOW_ENTITLEMENTS_MODIFICATION: YES

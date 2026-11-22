@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import StatusCanceled from '@icon/system/fill/task-canceled-fill.svg';
 import StatusDone from '@icon/system/fill/task-completed-fill.svg';
 import StatusCreated from '@icon/system/regular/task-created.svg';
@@ -20,27 +21,37 @@ const STATUS_ICONS: Record<
 > = {
   [PROPERTY_OPTION_IDS.STATUS.NOT_STARTED]: {
     icon: StatusCreated,
-    label: 'Not started',
+    get label() {
+      return t('common.statusNotStarted');
+    },
     color: 'text-task-status-not-started',
   },
   [PROPERTY_OPTION_IDS.STATUS.IN_PROGRESS]: {
     icon: StatusInProgress,
-    label: 'In progress',
+    get label() {
+      return t('common.statusInProgress');
+    },
     color: 'text-task-status-in-progress',
   },
   [PROPERTY_OPTION_IDS.STATUS.IN_REVIEW]: {
     icon: StatusInReview,
-    label: 'In review',
+    get label() {
+      return t('common.statusInReview');
+    },
     color: 'text-task-status-in-review',
   },
   [PROPERTY_OPTION_IDS.STATUS.COMPLETED]: {
     icon: StatusDone,
-    label: 'Completed',
+    get label() {
+      return t('common.statusCompleted');
+    },
     color: 'text-task-status-completed',
   },
   [PROPERTY_OPTION_IDS.STATUS.CANCELED]: {
     icon: StatusCanceled,
-    label: 'Canceled',
+    get label() {
+      return t('common.statusCanceled');
+    },
     color: 'text-task-status-canceled',
   },
 };
@@ -67,7 +78,7 @@ export function TaskStatusIcon(
   return (
     <span
       role="img"
-      aria-label={`Task: ${status().label}`}
+      aria-label={t('common.taskStatus', { status: status().label })}
       aria-hidden={props.decorative || undefined}
       class={cn(
         ICON_SIZE_CLASSES[props.size ?? 'xs'],

@@ -10,6 +10,7 @@
  * and the `Tool` card idiom.
  */
 
+import { t } from '@app/lib/i18n';
 import { Collapsible } from '@kobalte/core/collapsible';
 import { Tooltip } from '@ui/components/Tooltip';
 import { createSignal, For, type JSX, Show } from 'solid-js';
@@ -52,7 +53,7 @@ export function ToolCard(props: ToolCardProps) {
   // Conditional callers supply presence separately; Kobalte mounts the body.
   const hasChildren = () => props.hasContent ?? 'children' in props;
   const summary = () =>
-    props.trailing ?? (props.status === 'failed' ? 'Failed' : undefined);
+    props.trailing ?? (props.status === 'failed' ? t('agentChat.failed') : undefined);
 
   const row = (expandable: boolean) => (
     <>

@@ -19,7 +19,7 @@ use crate::domain::{
 use anyhow::Context;
 use bot_token::{HashedBotToken, hash_token};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use uuid::Uuid;
@@ -356,10 +356,10 @@ impl BotRepo for PgBotsRepo {
     async fn create_agent(
         &self,
         owner: BotOwner,
-        created_by: MacroUserIdStr<'static>,
+        created_by: RoxUserIdStr<'static>,
         req: CreateAgentRequest,
     ) -> Result<Agent, Self::Err> {
-        let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+        let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
         let (owner_user_id, team_id) = owner_columns(owner);
         let mut tx = self
             .pool
@@ -629,7 +629,7 @@ impl BotRepo for PgBotsRepo {
 
     async fn list_manageable_agents(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<Agent>, Self::Err> {
         let rows = sqlx::query_as!(
             AgentRow,
@@ -730,7 +730,7 @@ impl BotRepo for PgBotsRepo {
 
     async fn user_has_channels(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_ids: &[Uuid],
     ) -> Result<bool, Self::Err> {
         sqlx::query_scalar!(
@@ -758,10 +758,10 @@ impl BotRepo for PgBotsRepo {
     async fn create_owned_bot(
         &self,
         owner: BotOwner,
-        created_by: MacroUserIdStr<'static>,
+        created_by: RoxUserIdStr<'static>,
         req: CreateBotRequest,
     ) -> Result<Bot, Self::Err> {
-        let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+        let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
         let (owner_user_id, team_id) = owner_columns(owner);
         let row = sqlx::query_as!(
             BotRow,
@@ -806,13 +806,13 @@ impl BotRepo for PgBotsRepo {
     async fn create_channel_scoped_bot(
         &self,
         owner: BotOwner,
-        created_by: MacroUserIdStr<'static>,
+        created_by: RoxUserIdStr<'static>,
         channel_id: Uuid,
         token: HashedBotToken,
         req: CreateChannelScopedBotRequest,
     ) -> Result<(Bot, BotToken), Self::Err> {
-        let bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
-        let token_id = macro_uuid::generate_uuid_v7();
+        let bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
+        let token_id = rox_uuid::generate_uuid_v7();
         let (owner_user_id, team_id) = owner_columns(owner);
         let mut tx = self
             .pool
@@ -900,7 +900,7 @@ impl BotRepo for PgBotsRepo {
 
     async fn list_manageable_bots(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<Bot>, Self::Err> {
         let rows = sqlx::query_as!(
             BotRow,
@@ -1078,7 +1078,7 @@ impl BotRepo for PgBotsRepo {
         Ok(profiles)
     }
 
-    async fn bot_audience(&self, bot_id: BotId) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    async fn bot_audience(&self, bot_id: BotId) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         let user_ids = sqlx::query_scalar!(
             r#"
             WITH bot AS (
@@ -1114,7 +1114,7 @@ impl BotRepo for PgBotsRepo {
         user_ids
             .into_iter()
             .map(|user_id| {
-                MacroUserIdStr::try_from(user_id).context("bot audience holds an invalid user id")
+                RoxUserIdStr::try_from(user_id).context("bot audience holds an invalid user id")
             })
             .collect()
     }
@@ -1256,7 +1256,7 @@ impl BotRepo for PgBotsRepo {
 
     async fn user_has_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         let has_team = sqlx::query_scalar!(
@@ -1337,7 +1337,7 @@ impl BotRepo for PgBotsRepo {
 
     async fn user_shares_channel_with_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<bool, Self::Err> {
         let shares = sqlx::query_scalar!(
@@ -1373,7 +1373,7 @@ impl BotRepo for PgBotsRepo {
 
     async fn user_can_administer_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         let can_administer = sqlx::query_scalar!(
@@ -1397,7 +1397,7 @@ impl BotRepo for PgBotsRepo {
 
     async fn user_owns_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         let owns_team = sqlx::query_scalar!(
@@ -1621,7 +1621,7 @@ impl BotRepo for PgBotsRepo {
         token: HashedBotToken,
         req: CreateBotTokenRequest,
     ) -> Result<BotToken, Self::Err> {
-        let token_id = macro_uuid::generate_uuid_v7();
+        let token_id = rox_uuid::generate_uuid_v7();
         let row = sqlx::query_as!(
             BotTokenRow,
             r#"

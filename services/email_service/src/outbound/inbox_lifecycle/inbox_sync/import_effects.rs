@@ -5,7 +5,7 @@ use crate::util::upload_attachment::{
 };
 use contacts::domain::{models::messages::ContactConnection, ports::ContactsIngress};
 use email_api_client::domain::models::{CalendarPart, ChangeBatch};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{
     attachment::{Attachment, AttachmentUploadArgs},
     message::Message,
@@ -90,8 +90,8 @@ impl InboxSyncUploads for InboxSyncEffects {
 impl InboxSyncContacts for InboxSyncEffects {
     fn connect<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'static>,
-        contacts: Vec<MacroUserIdStr<'static>>,
+        owner: &'a RoxUserIdStr<'static>,
+        contacts: Vec<RoxUserIdStr<'static>>,
     ) -> BoxFuture<'a, anyhow::Result<()>> {
         Box::pin(async move {
             let connections = contacts

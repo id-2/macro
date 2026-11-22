@@ -7,13 +7,28 @@ use async_trait::async_trait;
 use cognition::domain::{
     Cognition, DecisionRequest, DecisionResponse, GenerateObjectRequest, GenerateObjectResponse,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::json;
 
 use super::{AutoModelSelector, DefaultAutoModel, HIGH_MODEL, JevAutoModel, MID_MODEL};
+use crate::domain::models::{AUTO_MODEL, resolve};
 
-const GEMINI: &str = "google/gemini-3.8-flash";
+/// Auto's default in this deployment's environment, which is where a turn
+/// without a usable classification lands.
+fn auto() -> &'static str {
+    resolve(AUTO_MODEL)
+}
+
+/// What a classified turn runs on: `model` while its provider key is real,
+/// Auto's default otherwise.
+fn callable(model: &'static str) -> &'static str {
+    if agent::provider_keys::model_is_callable(model) {
+        model
+    } else {
+        auto()
+    }
+}
 
 enum Answer {
     Probabilities(&'static [(&'static str, f32)]),
@@ -30,7 +45,7 @@ struct FakeCognition {
 impl Cognition for FakeCognition {
     async fn generate_object(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: GenerateObjectRequest,
     ) -> Result<GenerateObjectResponse, Report> {
         panic!("choosing a model must not generate text")
@@ -38,7 +53,7 @@ impl Cognition for FakeCognition {
 
     async fn decide(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, Report> {
         self.seen.lock().unwrap().push(request);
@@ -68,8 +83,8 @@ fn selector(answer: Answer) -> (JevAutoModel, Arc<FakeCognition>) {
     (JevAutoModel::new(cognition.clone()), cognition)
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").unwrap()
 }
 
 #[tokio::test]
@@ -80,7 +95,7 @@ async fn a_hard_prompt_escalates_to_opus() {
         .select(&owner(), "Prove the scheduler cannot deadlock")
         .await;
 
-    assert_eq!(model, HIGH_MODEL);
+    assert_eq!(model, callable(HIGH_MODEL));
     assert_eq!(HIGH_MODEL, "anthropic/claude-opus-5-5");
     let seen = cognition.seen.lock().unwrap();
     assert_eq!(
@@ -97,7 +112,7 @@ async fn a_hard_prompt_escalates_to_opus() {
 async fn a_simple_prompt_stays_on_gemini() {
     let (selector, _) = selector(Answer::Probabilities(&[("high", 0.03), ("simple", 0.98)]));
 
-    assert_eq!(selector.select(&owner(), "hi").await, GEMINI);
+    assert_eq!(selector.select(&owner(), "hi").await, auto());
 }
 
 #[tokio::test]
@@ -106,7 +121,7 @@ async fn an_ordinary_prompt_runs_on_sol() {
 
     assert_eq!(
         selector.select(&owner(), "Summarize this doc").await,
-        MID_MODEL
+        callable(MID_MODEL)
     );
     assert_eq!(MID_MODEL, "openai/gpt-6.1-sol");
 }
@@ -115,24 +130,24 @@ async fn an_ordinary_prompt_runs_on_sol() {
 async fn a_missing_answer_stays_on_gemini() {
     let (selector, _) = selector(Answer::Probabilities(&[("high", 0.9)]));
 
-    assert_eq!(selector.select(&owner(), "hi").await, GEMINI);
+    assert_eq!(selector.select(&owner(), "hi").await, auto());
 }
 
 #[tokio::test]
 async fn a_failed_decision_stays_on_gemini() {
     let (selector, _) = selector(Answer::Fails);
 
-    assert_eq!(selector.select(&owner(), "hi").await, GEMINI);
+    assert_eq!(selector.select(&owner(), "hi").await, auto());
 }
 
 #[tokio::test(start_paused = true)]
 async fn a_slow_decision_stays_on_gemini() {
     let (selector, _) = selector(Answer::Hangs);
 
-    assert_eq!(selector.select(&owner(), "hi").await, GEMINI);
+    assert_eq!(selector.select(&owner(), "hi").await, auto());
 }
 
 #[tokio::test]
 async fn without_cognition_auto_is_gemini() {
-    assert_eq!(DefaultAutoModel.select(&owner(), "hi").await, GEMINI);
+    assert_eq!(DefaultAutoModel.select(&owner(), "hi").await, auto());
 }

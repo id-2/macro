@@ -1,13 +1,13 @@
 use super::*;
 use email_api_client::domain::models::FolderRole;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 mod import_pacing;
 mod import_reads;
 mod retries;
 
 pub(super) async fn fixture(db: &PgPool) -> (PgMailboxSync, Uuid) {
-    let link = macro_uuid::generate_uuid_v7();
+    let link = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"
         INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider,grant_generation)
         VALUES ($1,'macro|outlook-test@example.com','outlook-owner','outlook-test@example.com','OUTLOOK',1)
@@ -17,7 +17,7 @@ pub(super) async fn fixture(db: &PgPool) -> (PgMailboxSync, Uuid) {
         INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id)
         VALUES ($1,$2,1,'mail_folder','folder')
     "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link
     )
     .execute(db)
@@ -42,7 +42,7 @@ pub(super) fn page() -> MailboxChangePage {
 async fn a_round_records_the_reader_revision_it_started_at(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     let first = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -58,7 +58,7 @@ async fn a_round_records_the_reader_revision_it_started_at(db: PgPool) {
     .await
     .unwrap();
     let next = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -92,7 +92,7 @@ async fn a_round_records_the_reader_revision_it_started_at(db: PgPool) {
 async fn checkpoint_commits_with_deduplicated_changes_and_folder_removals(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     let lease = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -121,7 +121,7 @@ async fn checkpoint_commits_with_deduplicated_changes_and_folder_removals(db: Pg
 async fn stale_worker_cannot_advance_cursor_or_enqueue_work(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     let stale = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -133,7 +133,7 @@ async fn stale_worker_cannot_advance_cursor_or_enqueue_work(db: PgPool) {
     .await
     .unwrap();
     let current = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -157,13 +157,13 @@ async fn stale_worker_cannot_advance_cursor_or_enqueue_work(db: PgPool) {
 async fn wakeup_arriving_during_reconciliation_survives_old_acknowledgement(db: PgPool) {
     let (repo, _) = fixture(&db).await;
     let stream = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     repo.commit_page(&stream, &page()).await.unwrap();
     let work = repo
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -175,7 +175,7 @@ async fn wakeup_arriving_during_reconciliation_survives_old_acknowledgement(db: 
     .await
     .unwrap();
     let stream = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -191,13 +191,13 @@ async fn wakeup_arriving_during_reconciliation_survives_old_acknowledgement(db: 
 async fn expired_stream_reset_preserves_other_streams_and_pending_work(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     let stream = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     repo.commit_page(&stream, &page()).await.unwrap();
     let known = repo
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -216,7 +216,7 @@ async fn expired_stream_reset_preserves_other_streams_and_pending_work(db: PgPoo
     .await
     .unwrap();
     let lease = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -248,9 +248,9 @@ async fn expired_stream_reset_preserves_other_streams_and_pending_work(db: PgPoo
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn complete_catalog_resolves_roles_and_creates_folder_streams(db: PgPool) {
     let (repo, link) = fixture(&db).await;
-    sqlx::query!("INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id) VALUES ($1,$2,1,'folder_catalog','mail')",macro_uuid::generate_uuid_v7(),link).execute(&db).await.unwrap();
+    sqlx::query!("INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id) VALUES ($1,$2,1,'folder_catalog','mail')",rox_uuid::generate_uuid_v7(),link).execute(&db).await.unwrap();
     let lease = repo
-        .claim_catalog(macro_uuid::generate_uuid_v7())
+        .claim_catalog(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -281,7 +281,7 @@ async fn complete_catalog_resolves_roles_and_creates_folder_streams(db: PgPool) 
 
     sqlx::query!("UPDATE email_sync_streams SET next_run_at = now() WHERE link_id = $1 AND kind = 'folder_catalog'",link).execute(&db).await.unwrap();
     let rediscovery = repo
-        .claim_catalog(macro_uuid::generate_uuid_v7())
+        .claim_catalog(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -310,7 +310,7 @@ pub(super) fn snapshot(
 ) -> email_api_client::domain::models::MailboxMessage {
     use email_api_client::domain::models::{MailboxMessage, MessageWithCalendarParts};
     let message = serde_json::from_value(serde_json::json!({
-        "db_id":macro_uuid::generate_uuid_v7(),"thread_db_id":macro_uuid::generate_uuid_v7(),"link_id":link_id,
+        "db_id":rox_uuid::generate_uuid_v7(),"thread_db_id":rox_uuid::generate_uuid_v7(),"link_id":link_id,
         "provider_id":provider_id,"provider_thread_id":"conversation","subject":"Outlook message",
         "internal_date_ts":"2026-10-01T12:00:00Z","body_text":"retained content",
         "is_read":state.is_read,"is_starred":state.is_flagged,"is_draft":state.is_draft,"is_sent":false,"has_attachments":false,
@@ -338,13 +338,13 @@ async fn ingestion_commits_content_state_and_outbox_without_treating_categories_
     use email_api_client::domain::models::{Attention, MailboxState};
     let (repo, link) = fixture(&db).await;
     let stream = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     repo.commit_page(&stream, &page()).await.unwrap();
     let work = repo
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -389,13 +389,13 @@ async fn ingestion_commits_content_state_and_outbox_without_treating_categories_
 async fn stale_ingestion_cannot_overwrite_a_reconnected_mailbox(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     let stream = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     repo.commit_page(&stream, &page()).await.unwrap();
     let work = repo
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -431,13 +431,13 @@ async fn projection_ack_keeps_version_watermark_and_exposes_normalized_state(db:
     use crate::domain::mailbox::projection::MailboxProjectionRepository;
     let (repo, link) = fixture(&db).await;
     let stream = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     repo.commit_page(&stream, &page()).await.unwrap();
     let work = repo
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -452,7 +452,7 @@ async fn projection_ack_keeps_version_watermark_and_exposes_normalized_state(db:
     .await
     .unwrap();
     let event = repo
-        .claim_projection(macro_uuid::generate_uuid_v7())
+        .claim_projection(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -473,7 +473,7 @@ async fn projection_ack_keeps_version_watermark_and_exposes_normalized_state(db:
     .await
     .unwrap();
     assert!(
-        repo.claim_projection(macro_uuid::generate_uuid_v7())
+        repo.claim_projection(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .is_none()
@@ -487,7 +487,7 @@ async fn projection_crash_reclaims_work_and_old_worker_cannot_ack_successor(db: 
     let payload = serde_json::json!({"kind":"link_connected","actor_id":"macro|outlook-test@example.com","is_new":true});
     sqlx::query!(
         "INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,1,$3)",
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link,
         payload
     )
@@ -495,13 +495,13 @@ async fn projection_crash_reclaims_work_and_old_worker_cannot_ack_successor(db: 
     .await
     .unwrap();
     let old = repo
-        .claim_projection(macro_uuid::generate_uuid_v7())
+        .claim_projection(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     sqlx::query!("UPDATE email_projection_outbox SET lease_until = now() - interval '1 second' WHERE id = $1",old.id).execute(&db).await.unwrap();
     let successor = repo
-        .claim_projection(macro_uuid::generate_uuid_v7())
+        .claim_projection(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -529,17 +529,17 @@ async fn mailbox_previews_distinguish_categories_trash_and_imported_drafts(db: P
         models::{PreviewCursorQuery, PreviewView, PreviewViewStandardLabel},
         ports::EmailRepo,
     };
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_user_id::user_id::RoxUserIdStr;
     use models_pagination::{Query, SimpleSortMethod};
     let (sync, link) = fixture(&db).await;
     let stream = sync
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     sync.commit_page(&stream, &page()).await.unwrap();
     let work = sync
-        .claim_message(macro_uuid::generate_uuid_v7())
+        .claim_message(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -563,7 +563,7 @@ async fn mailbox_previews_distinguish_categories_trash_and_imported_drafts(db: P
                 query: Query::new(None, SimpleSortMethod::UpdatedAt, None),
                 team_id: None,
             },
-            MacroUserIdStr::try_from_email("outlook-test@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("outlook-test@example.com").unwrap(),
         )
     };
     assert_eq!(

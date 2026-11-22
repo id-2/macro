@@ -4,12 +4,12 @@ import {
   $createDocumentMentionNode,
   $createGroupMentionNode,
   $createUserMentionNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   NodeReplacements,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core/node-list';
-import { markdownToSerializedEditorStateWithIds } from '@macro-inc/lexical-core/utils/markdown-state';
+} from '@rox-one/lexical-core/node-list';
+import { markdownToSerializedEditorStateWithIds } from '@rox-one/lexical-core/utils/markdown-state';
 import {
   $createParagraphNode,
   $createTextNode,

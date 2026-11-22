@@ -16,7 +16,7 @@
 	<true/>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.macro.app.prod</string>
+		<string>group.com.rox.app.prod</string>
 	</array>
 </dict>
 </plist>

@@ -1,6 +1,6 @@
 use crate::{map_soup_type, outbound::pg_soup_repo::type_err};
 use document_sub_type::DocumentSubType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Query, SimpleSortMethod};
 use models_soup::item::SoupItem;
 use sqlx::PgPool;
@@ -18,7 +18,7 @@ use uuid::Uuid;
 #[tracing::instrument(skip(db, limit, cursor))]
 pub async fn unexpanded_generic_cursor_soup(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     limit: u16,
     cursor: Query<Uuid, SimpleSortMethod, ()>,
 ) -> Result<Vec<SoupItem<()>>, sqlx::Error> {

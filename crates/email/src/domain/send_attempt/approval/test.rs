@@ -52,7 +52,7 @@ fn approved_content_changes_conflict_for_both_legacy_and_versioned_requests() {
         |s: &mut SendSnapshot| s.message.to[0].name = Some("Other name".into()),
         |s: &mut SendSnapshot| {
             s.message.sender_email = Some(
-                macro_user_id::email::EmailStr::parse_from_str("alias@example.invalid").unwrap(),
+                rox_user_id::email::EmailStr::parse_from_str("alias@example.invalid").unwrap(),
             )
         },
         |s: &mut SendSnapshot| s.message.include_signature = Some(false),

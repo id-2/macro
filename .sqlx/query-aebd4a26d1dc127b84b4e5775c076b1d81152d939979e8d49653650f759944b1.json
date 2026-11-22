@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "WITH imported_threads AS (\n    INSERT INTO email_threads (\n        id, provider_id, link_id, inbox_visible, is_read,\n        latest_inbound_message_ts, latest_non_spam_message_ts,\n        created_at, updated_at\n    )\n    SELECT md5('snapshot-thread-' || i)::uuid, 'snapshot-import-' || i,\n           $1, true, false, '2027-01-01'::timestamptz,\n           '2027-01-01'::timestamptz, '2027-01-01'::timestamptz,\n           '2027-01-01'::timestamptz\n    FROM generate_series(1, 5001) i\n    RETURNING id, provider_id, link_id, created_at\n), imported_messages AS (\n    INSERT INTO email_messages (\n        id, provider_id, thread_id, link_id, internal_date_ts,\n        from_contact_id, is_sent, is_draft, is_starred, is_read,\n        created_at, updated_at\n    )\n    SELECT md5('snapshot-message-' || t.id)::uuid, t.provider_id,\n           t.id, t.link_id, t.created_at, c.id, true, false, false,\n           false, t.created_at, t.created_at\n    FROM imported_threads t\n    JOIN email_contacts c ON c.link_id = t.link_id\n        AND c.email_address = 'u0@gamma.test'\n    RETURNING id\n)\nINSERT INTO email_message_recipients (message_id, contact_id, recipient_type)\nSELECT m.id, c.id, 'TO'::email_recipient_type\nFROM imported_messages m\nJOIN email_contacts c ON c.link_id = $1 AND c.email_address = 'p0@sparse.test'\n",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "aebd4a26d1dc127b84b4e5775c076b1d81152d939979e8d49653650f759944b1"
+}

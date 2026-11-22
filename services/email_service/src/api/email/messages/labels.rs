@@ -6,7 +6,7 @@ use axum::response::{IntoResponse, Response};
 use email::domain::message_labels::{
     MAX_MESSAGE_LABEL_BATCH, MessageLabelChange, MessageLabelError, StageFailure,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use std::borrow::Cow;
 use utoipa::ToSchema;
@@ -45,7 +45,7 @@ pub struct UpdateLabelBatchResponse {
 #[tracing::instrument(skip(ctx, authorization, body), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(body): Json<UpdateLabelBatchRequest>,
 ) -> Result<Response, Response> {
     let outcome = ctx

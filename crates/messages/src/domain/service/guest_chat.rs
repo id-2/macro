@@ -1,7 +1,7 @@
 //! Guests share the persisted call thread through a narrowly scoped session capability.
 use super::*;
 use chrono::{DateTime, Utc};
-use macro_user_id::email::ReadEmailParts;
+use rox_user_id::email::ReadEmailParts;
 use mention_utils::parse::{
     ParsedAgentSessionMention, ParsedBookingLinkMention, ParsedContactMention, ParsedDateMention,
     ParsedDocumentMention, ParsedGroupMention, ParsedLink, ParsedPullRequestMention,
@@ -306,13 +306,13 @@ pub(super) fn rewrite_quote_content(
                     }
                     let target = Uuid::parse_str(value.get("targetMessageId")?.as_str()?).ok()?;
                     let sender = senders.get(&target)?;
-                    let expected = if sender.starts_with("macro|") {
+                    let expected = if sender.starts_with("macro|") || sender.starts_with("rox|") {
                         opaque_id(call_id, sender)
                     } else {
                         sender.clone()
                     };
                     (id == expected).then_some(sender.clone())
-                } else if id.starts_with("macro|") {
+                } else if id.starts_with("macro|") || id.starts_with("rox|") {
                     Some(opaque_id(call_id, id))
                 } else {
                     Some(id.to_owned())

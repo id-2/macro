@@ -15,15 +15,18 @@ use axum::{
 };
 use axum_extra::extract::Cached;
 use bots::outbound::pg_bots_repo::PgBotsRepo;
-use complete_graph::{GraphqlRequestParts, MAIL_CACHE_PROFILE_HEADER, MailCacheProfile};
+use complete_graph::{
+    GraphqlRequestParts, LEGACY_MAIL_CACHE_PROFILE_HEADER, MAIL_CACHE_PROFILE_HEADER,
+    MailCacheProfile,
+};
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
 use graphql_soup::email_mutation_thread_loader;
-use macro_authorization::{
-    MacroUserAuthentication, OptionalMacroAuthorizationExtractor, UserOrInternalService,
+use rox_authorization::{
+    RoxUserAuthentication, OptionalRoxAuthorizationExtractor, UserOrInternalService,
     UserOrInternalServiceAuthorization,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 mod websocket;
@@ -54,7 +57,7 @@ fn graphiql_source(endpoint: &str) -> String {
 async fn graphql_handler(
     State(state): State<ApiContext>,
     Cached(auth): Cached<
-        OptionalMacroAuthorizationExtractor<AuthorizationService, UserOrInternalService>,
+        OptionalRoxAuthorizationExtractor<AuthorizationService, UserOrInternalService>,
     >,
     request_parts: Parts,
     request: GraphQLRequest,
@@ -67,6 +70,7 @@ async fn graphql_handler(
         request_parts
             .headers
             .get(MAIL_CACHE_PROFILE_HEADER)
+            .or_else(|| request_parts.headers.get(LEGACY_MAIL_CACHE_PROFILE_HEADER))
             .and_then(|value| value.to_str().ok()),
     );
     let result = telemetry::observe(request.into_inner(), acting_user.is_some(), |request| {
@@ -99,7 +103,7 @@ fn graphql_response(result: async_graphql::Response) -> Response {
 async fn subscription_handler(
     State(state): State<ApiContext>,
     Cached(auth): Cached<
-        OptionalMacroAuthorizationExtractor<AuthorizationService, UserOrInternalService>,
+        OptionalRoxAuthorizationExtractor<AuthorizationService, UserOrInternalService>,
     >,
     upgrade: GraphqlWebSocketUpgrade,
 ) -> Response {
@@ -125,13 +129,13 @@ async fn subscription_handler(
 
 /// The viewer's opaque account id (`macro_user.id`, the FusionAuth user id),
 /// logged in place of the email-bearing Rox user id.
-fn opaque_viewer_id(user: &MacroUserAuthentication) -> Option<Uuid> {
+fn opaque_viewer_id(user: &RoxUserAuthentication) -> Option<Uuid> {
     Uuid::parse_str(&user.user_context.fusion_user_id).ok()
 }
 
 fn graphql_subscription_context_data(
     state: &ApiContext,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     organization_id: Option<i64>,
     viewer_id: Option<Uuid>,
 ) -> Data {
@@ -143,7 +147,7 @@ fn graphql_subscription_context_data(
 fn graphql_query_context_data(
     mut req: async_graphql::Request,
     state: &ApiContext,
-    macro_user_id: Option<MacroUserIdStr<'static>>,
+    macro_user_id: Option<RoxUserIdStr<'static>>,
     organization_id: Option<i64>,
     viewer_id: Option<Uuid>,
 ) -> async_graphql::Request {
@@ -160,7 +164,7 @@ fn graphql_query_context_data(
 fn insert_graphql_context_data(
     data: &mut Data,
     state: &ApiContext,
-    macro_user_id: Option<MacroUserIdStr<'static>>,
+    macro_user_id: Option<RoxUserIdStr<'static>>,
     organization_id: Option<i64>,
     viewer_id: Option<Uuid>,
 ) {

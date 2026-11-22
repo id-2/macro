@@ -8,16 +8,16 @@
 //! ```
 //! use model_owner::{Owner, OwnerType};
 //!
-//! let owner = Owner::parse(OwnerType::User, "macro|hutch@rox.one").unwrap();
-//! assert_eq!(owner.principal_id(), "macro|hutch@rox.one");
+//! let owner = Owner::parse(OwnerType::User, "rox|hutch@rox.one").unwrap();
+//! assert_eq!(owner.principal_id(), "rox|hutch@rox.one");
 //! ```
 
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use std::str::FromStr;
 
 use bot_id::{BotId, BotIdStr};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -29,7 +29,7 @@ pub mod team;
 
 pub use creation_principal::CreationPrincipal;
 
-const USER_PRINCIPAL_PREFIX: &str = "macro|";
+const USER_PRINCIPAL_PREFIXES: [&str; 2] = ["macro|", "rox|"];
 const BOT_PRINCIPAL_PREFIX: &str = "bot|";
 const TEAM_UUID_HYPHENATED_LEN: usize = 36;
 
@@ -41,8 +41,8 @@ const OWNER_TYPE_TEAM: &str = "team";
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(into = "String", try_from = "String")]
 pub enum Owner {
-    /// A Macro user (`macro|<email>`).
-    User(MacroUserIdStr<'static>),
+    /// A Rox user (`rox|<email>`, or the legacy `macro|<email>`).
+    User(RoxUserIdStr<'static>),
     /// A bot (`bot|<uuid>`).
     Bot(BotId),
     /// A team (hyphenated UUID, no prefix).
@@ -107,7 +107,7 @@ impl Owner {
     /// This is strict: the string must match that type's storage form.
     pub fn parse(owner_type: OwnerType, value: &str) -> Result<Self, OwnerParseError> {
         match owner_type {
-            OwnerType::User => MacroUserIdStr::parse_from_str(value)
+            OwnerType::User => RoxUserIdStr::parse_from_str(value)
                 .map(CowLike::into_owned)
                 .map(Self::User)
                 .map_err(|_| OwnerParseError::invalid(value)),
@@ -120,7 +120,10 @@ impl Owner {
 
     /// Parse a principal by prefix.
     pub fn from_principal_str(value: &str) -> Result<Self, OwnerParseError> {
-        if value.starts_with(USER_PRINCIPAL_PREFIX) {
+        if USER_PRINCIPAL_PREFIXES
+            .iter()
+            .any(|prefix| value.starts_with(prefix))
+        {
             Self::parse(OwnerType::User, value)
         } else if value.starts_with(BOT_PRINCIPAL_PREFIX) {
             Self::parse(OwnerType::Bot, value)
@@ -131,7 +134,7 @@ impl Owner {
 
     /// True when this owner is the given user.
     #[must_use]
-    pub fn is_user(&self, user: &MacroUserIdStr<'_>) -> bool {
+    pub fn is_user(&self, user: &RoxUserIdStr<'_>) -> bool {
         matches!(self, Self::User(owner) if owner == user)
     }
 
@@ -141,7 +144,7 @@ impl Owner {
     /// attributing work to them - so the kinds an owner can be are handled
     /// where a user is needed rather than assumed.
     #[must_use]
-    pub fn as_user(&self) -> Option<&MacroUserIdStr<'static>> {
+    pub fn as_user(&self) -> Option<&RoxUserIdStr<'static>> {
         match self {
             Self::User(user) => Some(user),
             Self::Bot(_) | Self::Team(_) => None,
@@ -159,8 +162,8 @@ impl Display for Owner {
     }
 }
 
-impl From<MacroUserIdStr<'static>> for Owner {
-    fn from(user: MacroUserIdStr<'static>) -> Self {
+impl From<RoxUserIdStr<'static>> for Owner {
+    fn from(user: RoxUserIdStr<'static>) -> Self {
         Self::User(user)
     }
 }

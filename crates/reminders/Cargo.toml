@@ -14,7 +14,7 @@ dispatch-sqs = ["dep:aws-sdk-sqs", "dispatch", "outbound"]
 inbound = [
   "dep:axum",
   "dep:axum-extra",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:utoipa",
   "entity_access/inbound",
@@ -23,7 +23,7 @@ inbound = [
 notify = ["dep:model_notifications", "dep:notification", "outbound"]
 outbound = ["ports"]
 ports = ["dep:entity_access", "dep:tracing", "dep:email", "dep:serde_json"]
-postgres = ["dep:macro_uuid", "dep:sqlx", "dep:tokio", "outbound"]
+postgres = ["dep:rox_uuid", "dep:sqlx", "dep:tokio", "outbound"]
 
 [dependencies]
 email = { path = "../email", optional = true, default-features = false, features = ["ports"] }
@@ -34,9 +34,9 @@ axum = { workspace = true, optional = true }
 axum-extra = { workspace = true, optional = true, features = ["query"] }
 chrono = { workspace = true, features = ["serde"] }
 entity_access = { path = "../entity_access", optional = true, default-features = false, features = ["ports"] }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = ["axum"] }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid", optional = true }
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = ["axum"] }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid", optional = true }
 model-entity = { path = "../model-entity" }
 rootcause = { workspace = true }
 model-error-response = { path = "../model-error-response", optional = true }
@@ -58,7 +58,7 @@ crm = { path = "../crm", default-features = false, features = ["ports"] }
 email = { path = "../email", default-features = false, features = ["outbound"] }
 entity_access_management = { path = "../entity_access_management" }
 frecency = { path = "../frecency", features = ["postgres"] }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 model_user = { path = "../model_user" }
 serde_json = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }

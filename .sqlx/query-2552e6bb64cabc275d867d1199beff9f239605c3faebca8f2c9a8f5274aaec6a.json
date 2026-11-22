@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO crm_personal_email_blocklist (team_id, user_id, domain)\n        VALUES ($1, 'macro|u1@gamma.test', 'dense.test')\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "2552e6bb64cabc275d867d1199beff9f239605c3faebca8f2c9a8f5274aaec6a"
+}

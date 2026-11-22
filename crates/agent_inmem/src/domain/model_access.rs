@@ -73,21 +73,21 @@ impl SessionModels {
         }
     }
 
-    /// Keep a persisted/default model the session may run. Without a key, an
-    /// inaccessible one becomes the free model; with one, a model from
-    /// another provider (saved before the key) becomes the first `supported`
-    /// model the key can run.
+    /// Keep a persisted/default model the session may run and the session is
+    /// offered. One the catalog no longer carries - a provider whose key is a
+    /// placeholder, or another provider's model saved before an agent key -
+    /// becomes the first offered model the session may run: without a key,
+    /// the plan's free model; with one, the first of that provider's.
     #[must_use]
     pub fn default_model<'a>(self, configured: &'a str, supported: &[&'a str]) -> &'a str {
-        match self.agent_key {
-            Some(_) if self.allows(configured) => configured,
-            Some(_) => supported
-                .iter()
-                .copied()
-                .find(|model| self.allows(model))
-                .unwrap_or(configured),
-            None => self.access.default_model(configured),
+        if self.allows(configured) && supported.contains(&configured) {
+            return configured;
         }
+        supported
+            .iter()
+            .copied()
+            .find(|model| *model != super::models::AUTO_MODEL && self.allows(model))
+            .unwrap_or(configured)
     }
 
     /// The supported models the session may select.

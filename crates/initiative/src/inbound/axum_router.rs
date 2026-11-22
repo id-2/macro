@@ -26,7 +26,7 @@ use axum::{
     routing::{self},
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
 
@@ -51,7 +51,7 @@ use crate::domain::{
 pub struct InitiativeRouterState<S, Eas, Auth> {
     service: Arc<S>,
     entity_access_service: Arc<Eas>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Eas, Auth> Clone for InitiativeRouterState<S, Eas, Auth> {
@@ -73,7 +73,7 @@ where
     pub fn new(
         service: Arc<S>,
         entity_access_service: Arc<Eas>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -89,7 +89,7 @@ impl<S, Eas, Auth> FromRef<InitiativeRouterState<S, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<S, Eas, Auth> FromRef<InitiativeRouterState<S, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Eas, Auth> FromRef<InitiativeRouterState<S, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &InitiativeRouterState<S, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -117,7 +117,7 @@ pub fn initiative_router<S, Eas, Auth, T>(state: InitiativeRouterState<S, Eas, A
 where
     S: InitiativeService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     let initiative_id_routes = Router::new()
@@ -164,7 +164,7 @@ async fn ensure_initiative_exists<S, Eas, Auth>(
 where
     S: InitiativeService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let id = match InitiativeId::from_str(&initiative_id) {
         Ok(id) => id,

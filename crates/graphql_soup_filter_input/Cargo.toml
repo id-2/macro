@@ -15,7 +15,7 @@ document_sub_type = { path = "../document_sub_type", default-features = false }
 filter_ast = { path = "../filter_ast" }
 graphql_common = { path = "../graphql_common", optional = true }
 item_filters = { path = "../item_filters", default-features = false }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model_file_type = { path = "../model_file_type" }
 model_owner = { path = "../model_owner" }
 notification_state = { path = "../notification_state" }

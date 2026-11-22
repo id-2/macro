@@ -1,6 +1,6 @@
 use agent_session::domain::model::AgentSessionId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -20,7 +20,7 @@ pub struct ExecutionId(
 impl ExecutionId {
     /// Mint an execution identity.
     pub fn mint() -> Self {
-        Self(macro_uuid::generate_uuid_v7())
+        Self(rox_uuid::generate_uuid_v7())
     }
     /// Read a UUID from an authenticated route.
     pub fn from_uuid(id: Uuid) -> Self {
@@ -48,7 +48,7 @@ pub struct ExecutionIdentity {
     /// Session whose owner authorized this execution.
     pub session: AgentSessionId,
     /// Session owner; credential issuance resolves acting_as against the verified turn.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Agent from the authenticated session, used to attribute SDK messages.
     pub agent_id: bot_id::BotId,
     /// The server-resolved turn. Work cannot outlive or move to another turn.

@@ -12,11 +12,11 @@ use crate::domain::{
     team_service::invite_resend_interval,
 };
 use entity_access_db_utils::{EntityAccessSourceType, delete_source_grants, team_share};
-use macro_user_id::{
+use rox_user_id::{
     cowlike::CowLike,
     email::{Email, ReadEmailParts},
     lowercased::Lowercase,
-    user_id::MacroUserIdStr,
+    user_id::RoxUserIdStr,
 };
 use model_owner::Owner;
 use model_user::Language;
@@ -75,7 +75,7 @@ impl TeamRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn create_team_inner(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_name: &str,
         team_slug: &str,
         subscription_id: Option<&stripe::SubscriptionId>,
@@ -84,7 +84,7 @@ impl TeamRepositoryImpl {
     ) -> Result<Team, sqlx::Error> {
         let mut transaction = self.pool.begin().await?;
 
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
 
         let team = sqlx::query!(
             r#"
@@ -110,7 +110,7 @@ impl TeamRepositoryImpl {
                 id: row.id,
                 name: row.name,
                 slug: row.slug,
-                owner_id: MacroUserIdStr::parse_from_str(&row.owner_id)
+                owner_id: RoxUserIdStr::parse_from_str(&row.owner_id)
                     .map_err(type_err)?
                     .into_owned(),
                 // The card file starts on; the settings row below records that.
@@ -209,7 +209,7 @@ impl TeamMembersService for TeamRepositoryImpl {
         >,
     ) -> Result<TeamMembers, TeamError> {
         let team_id =
-            macro_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
+            rox_uuid::string_to_uuid(&entity_access_receipt.entity().entity_id).unwrap();
 
         let members = self.get_team_by_id(&team_id).await?.members;
         let invited = self.get_team_invites(&team_id).await?;
@@ -223,7 +223,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn is_seat_included(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, TeamError> {
         let seat_included = sqlx::query_scalar!(
             r#"
@@ -243,7 +243,7 @@ impl TeamRepository for TeamRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn get_stripe_customer_id(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<stripe::CustomerId>, TeamError> {
         let stripe_customer_id = sqlx::query!(
             r#"
@@ -272,7 +272,7 @@ impl TeamRepository for TeamRepositoryImpl {
 
     #[tracing::instrument(skip(self), err)]
     #[allow(clippy::disallowed_methods, reason = "legacy code. fix later")]
-    async fn has_user_trialed(&self, user_id: &MacroUserIdStr<'_>) -> Result<bool, TeamError> {
+    async fn has_user_trialed(&self, user_id: &RoxUserIdStr<'_>) -> Result<bool, TeamError> {
         let has_trialed = sqlx::query_scalar::<_, bool>(
             r#"
             SELECT mu.has_trialed
@@ -353,7 +353,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn get_team_owner(
         &self,
         team_id: &uuid::Uuid,
-    ) -> Result<MacroUserIdStr<'static>, TeamError> {
+    ) -> Result<RoxUserIdStr<'static>, TeamError> {
         let owner_id = sqlx::query!(
             r#"
             SELECT owner_id
@@ -366,7 +366,7 @@ impl TeamRepository for TeamRepositoryImpl {
         .fetch_one(&self.pool)
         .await?;
 
-        MacroUserIdStr::parse_from_str(owner_id.as_str())
+        RoxUserIdStr::parse_from_str(owner_id.as_str())
             .map(|id| id.into_owned())
             .map_err(|error| TeamError::StorageLayerError(error.into()))
     }
@@ -374,7 +374,7 @@ impl TeamRepository for TeamRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn create_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_name: &str,
         team_slug: &str,
         subscription_id: Option<&stripe::SubscriptionId>,
@@ -400,7 +400,7 @@ impl TeamRepository for TeamRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn move_github_app_installation_to_team_if_exists(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_id: &uuid::Uuid,
     ) -> Result<(), CreateTeamError> {
         sqlx::query!(
@@ -424,7 +424,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn invite_users_to_team(
         &self,
         team_id: &uuid::Uuid,
-        invited_by: &MacroUserIdStr<'_>,
+        invited_by: &RoxUserIdStr<'_>,
         invites: non_empty::NonEmpty<&[Email<Lowercase<'_>>]>,
         is_agent: bool,
     ) -> Result<Vec<TeamInvite<'_>>, InviteUsersToTeamError> {
@@ -435,12 +435,12 @@ impl TeamRepository for TeamRepositoryImpl {
 
         let macro_user_ids: Vec<String> = invites
             .iter()
-            .map(|email| format!("macro|{}", email.as_ref()))
+            .map(|email| format!("{}|{}", rox_user_id::user_id::ROX_PREFIX, email.as_ref()))
             .collect();
 
         let team_invite_ids: Vec<uuid::Uuid> = invites
             .iter()
-            .map(|_| macro_uuid::generate_uuid_v7())
+            .map(|_| rox_uuid::generate_uuid_v7())
             .collect();
 
         let mut transaction = self.pool.begin().await?;
@@ -550,7 +550,7 @@ impl TeamRepository for TeamRepositoryImpl {
 
         let macro_user_ids: Vec<String> = invites
             .iter()
-            .map(|email| format!("macro|{}", email.as_ref()))
+            .map(|email| format!("{}|{}", rox_user_id::user_id::ROX_PREFIX, email.as_ref()))
             .collect();
 
         let rows = sqlx::query!(
@@ -685,7 +685,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn remove_user_from_team(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<RemovedTeamMember<'static>, RemoveUserFromTeamError> {
         let owner_id = self.get_team_owner(team_id).await?;
 
@@ -908,7 +908,7 @@ impl TeamRepository for TeamRepositoryImpl {
             .into_iter()
             .map(|row| {
                 let user_id =
-                    MacroUserIdStr::parse_from_str(&row.user_id).map(|id| id.into_owned());
+                    RoxUserIdStr::parse_from_str(&row.user_id).map(|id| id.into_owned());
 
                 if let Ok(user_id) = user_id {
                     Ok(TeamMember {
@@ -936,7 +936,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn accept_team_invite(
         &self,
         team_invite_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<AcceptedTeamInvite<'static>, TeamError> {
         let mut transaction = self.pool.begin().await?;
 
@@ -962,7 +962,7 @@ impl TeamRepository for TeamRepositoryImpl {
                 .map(|e| e.into_owned().lowercase())
                 .map_err(|e| TeamError::StorageLayerError(e.into()))?,
             team_role: invite.try_get("team_role")?,
-            invited_by: MacroUserIdStr::parse_from_str(
+            invited_by: RoxUserIdStr::parse_from_str(
                 invite.try_get::<String, _>("invited_by")?.as_str(),
             )
             .map(|id| id.into_owned())
@@ -1010,7 +1010,7 @@ impl TeamRepository for TeamRepositoryImpl {
         transaction.commit().await?;
 
         let member = TeamMember {
-            user_id: MacroUserIdStr::parse_from_str(
+            user_id: RoxUserIdStr::parse_from_str(
                 team_member.try_get::<String, _>("user_id")?.as_str(),
             )
             .map(|id| id.into_owned())
@@ -1122,7 +1122,7 @@ impl TeamRepository for TeamRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn is_user_member_of_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, TeamError> {
         let team_member: Option<()> = sqlx::query!(
             r#"
@@ -1160,7 +1160,7 @@ impl TeamRepository for TeamRepositoryImpl {
             .into_iter()
             .map(|row| {
                 let user_id =
-                    MacroUserIdStr::parse_from_str(&row.user_id).map(|id| id.into_owned());
+                    RoxUserIdStr::parse_from_str(&row.user_id).map(|id| id.into_owned());
 
                 if let Ok(user_id) = user_id {
                     Ok(TeamMember {
@@ -1187,8 +1187,8 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn bulk_is_member_of_other_team(
         &self,
         ignore_team_ids: non_empty::NonEmpty<&[uuid::Uuid]>,
-        users: non_empty::NonEmpty<&[MacroUserIdStr<'_>]>,
-    ) -> Result<Vec<MacroUserIdStr<'_>>, TeamError> {
+        users: non_empty::NonEmpty<&[RoxUserIdStr<'_>]>,
+    ) -> Result<Vec<RoxUserIdStr<'_>>, TeamError> {
         let result = sqlx::query!(
             r#"
             SELECT user_id
@@ -1211,7 +1211,7 @@ impl TeamRepository for TeamRepositoryImpl {
 
         let members: Vec<Result<_, _>> = result
             .into_iter()
-            .map(|row| MacroUserIdStr::parse_from_str(&row.user_id).map(|id| id.into_owned()))
+            .map(|row| RoxUserIdStr::parse_from_str(&row.user_id).map(|id| id.into_owned()))
             .collect();
 
         let members = members
@@ -1242,7 +1242,7 @@ impl TeamRepository for TeamRepositoryImpl {
                 id: row.id,
                 name: row.name,
                 slug: row.slug,
-                owner_id: MacroUserIdStr::parse_from_str(&row.owner_id)
+                owner_id: RoxUserIdStr::parse_from_str(&row.owner_id)
                     .map_err(type_err)?
                     .into_owned(),
                 crm_enabled: row.crm_enabled,
@@ -1277,7 +1277,7 @@ impl TeamRepository for TeamRepositoryImpl {
         let members = members
             .into_iter()
             .filter_map(|row| {
-                MacroUserIdStr::parse_from_str(&row.user_id)
+                RoxUserIdStr::parse_from_str(&row.user_id)
                     .map(|id| TeamMember {
                         user_id: id.into_owned(),
                         role: row.team_role,
@@ -1297,7 +1297,7 @@ impl TeamRepository for TeamRepositoryImpl {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn get_user_teams(&self, user_id: &MacroUserIdStr<'_>) -> Result<Vec<Team>, TeamError> {
+    async fn get_user_teams(&self, user_id: &RoxUserIdStr<'_>) -> Result<Vec<Team>, TeamError> {
         let teams = sqlx::query!(
             r#"
             SELECT t.id, t.name, t.slug, t.owner_id, t.auto_join_domain, t.enterprise,
@@ -1317,7 +1317,7 @@ impl TeamRepository for TeamRepositoryImpl {
                 id: row.id,
                 name: row.name,
                 slug: row.slug,
-                owner_id: MacroUserIdStr::parse_from_str(&row.owner_id)
+                owner_id: RoxUserIdStr::parse_from_str(&row.owner_id)
                     .map_err(type_err)?
                     .into_owned(),
                 crm_enabled: row.crm_enabled,
@@ -1337,7 +1337,7 @@ impl TeamRepository for TeamRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn get_user_team_invites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<TeamInviteDetails>, TeamError> {
         let email = user_id.email_part().lowercase();
 
@@ -1430,7 +1430,7 @@ impl TeamRepository for TeamRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn get_user_display_name(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<String>, TeamError> {
         let row = sqlx::query!(
             r#"
@@ -1509,7 +1509,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn get_team_role(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<TeamRole>, TeamError> {
         let team_role = sqlx::query!(
             r#"
@@ -1531,7 +1531,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn get_team_member(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<TeamMember<'_>, TeamError> {
         let member = sqlx::query!(
             r#"
@@ -1547,7 +1547,7 @@ impl TeamRepository for TeamRepositoryImpl {
         )
         .try_map(|r| {
             Ok(TeamMember {
-                user_id: MacroUserIdStr::parse_from_str(&r.user_id)
+                user_id: RoxUserIdStr::parse_from_str(&r.user_id)
                     .map_err(type_err)?
                     .into_owned(),
                 team_id: *team_id,
@@ -1565,8 +1565,8 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn set_member_crm_access(
         &self,
         team_id: uuid::Uuid,
-        actor: &MacroUserIdStr<'_>,
-        member: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
         enabled: bool,
     ) -> Result<(), TeamError> {
         let mut transaction = self.pool.begin().await?;
@@ -1610,7 +1610,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn patch_team_user_role(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         team_role: TeamRole,
     ) -> Result<(), TeamError> {
         let result = sqlx::query!(
@@ -1638,7 +1638,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn patch_team_member_plan(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         plan: SeatPlan,
     ) -> Result<(), TeamError> {
         let result = sqlx::query!(
@@ -1745,7 +1745,7 @@ impl TeamRepository for TeamRepositoryImpl {
         let new_domain = if team.auto_join_domain.is_some() {
             None
         } else {
-            let owner_id = MacroUserIdStr::parse_from_str(&team.owner_id)
+            let owner_id = RoxUserIdStr::parse_from_str(&team.owner_id)
                 .map_err(|e| TeamError::StorageLayerError(e.into()))?;
             let owner_email = owner_id.email_part().lowercase();
             let domain = owner_email.domain_part();
@@ -1789,7 +1789,7 @@ impl TeamRepository for TeamRepositoryImpl {
         &self,
         team_id: &uuid::Uuid,
         token: &TeamInviteLinkToken,
-        created_by: &MacroUserIdStr<'_>,
+        created_by: &RoxUserIdStr<'_>,
     ) -> Result<(), TeamError> {
         invite_link::set_team_invite_link(&self.pool, team_id, token, created_by).await
     }
@@ -1798,7 +1798,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn get_team_invite_link_creator(
         &self,
         token: &TeamInviteLinkToken,
-    ) -> Result<Option<MacroUserIdStr<'static>>, TeamError> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, TeamError> {
         invite_link::get_team_invite_link_creator(&self.pool, token).await
     }
 
@@ -1856,7 +1856,7 @@ impl TeamRepository for TeamRepositoryImpl {
     async fn add_user_to_team(
         &self,
         team_id: &uuid::Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         seat_included: bool,
     ) -> Result<Option<TeamMember<'static>>, TeamError> {
         let mut transaction = self.pool.begin().await?;
@@ -1927,7 +1927,7 @@ impl TeamRepository for TeamRepositoryImpl {
     #[tracing::instrument(skip(self), err)]
     async fn get_team_id_by_domain(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<uuid::Uuid>, TeamError> {
         let user_email = user_id.email_part().lowercase();
         let domain = user_email.domain_part();

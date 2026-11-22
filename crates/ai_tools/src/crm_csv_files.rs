@@ -103,7 +103,7 @@ where
         };
         // The location is browser-facing; a server-side fetch on the local
         // stack must reach LocalStack directly (a no-op elsewhere).
-        let url = macro_aws_config::transform_aws_url_for_internal_fetch(&presigned_url);
+        let url = rox_aws_config::transform_aws_url_for_internal_fetch(&presigned_url);
         let response = self
             .http
             .get(&url)

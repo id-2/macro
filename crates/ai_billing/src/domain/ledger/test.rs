@@ -6,8 +6,8 @@ use crate::domain::models::{
 use crate::domain::pricing::AiPricing;
 use chrono::{TimeZone, Utc};
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{email}")).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{email}")).unwrap()
 }
 
 fn policy(active: bool, limit: i64, ended: bool) -> SettlementPolicy {
@@ -51,7 +51,7 @@ fn included_allowance_is_each_plans_configured_amount_at_cost() {
     team.billed_users.push(user("b@x.com"));
     team.seat_tiers.push(PlanTier::Premium);
     team.scope = PayerScope::TeamOwner {
-        team_id: macro_uuid::generate_uuid_v7(),
+        team_id: rox_uuid::generate_uuid_v7(),
     };
     assert_eq!(team.seats(), 3);
     assert_eq!(team.included_ai_cents(AiPricing::testing()), 2_000);
@@ -72,7 +72,7 @@ fn mixed_seat_plans_keep_one_allowance_per_seat() {
     team.billed_users.push(user("b@x.com"));
     team.seat_tiers.push(PlanTier::Premium);
     team.scope = PayerScope::TeamOwner {
-        team_id: macro_uuid::generate_uuid_v7(),
+        team_id: rox_uuid::generate_uuid_v7(),
     };
     assert_eq!(team.seats(), 3);
     assert_eq!(team.included_ai_cents(AiPricing::testing()), 2_000);
@@ -540,7 +540,7 @@ fn credit_scope_follows_team_ownership_even_with_only_one_seat() {
         (PayerScope::Personal, false),
         (
             PayerScope::TeamOwner {
-                team_id: macro_uuid::generate_uuid_v7(),
+                team_id: rox_uuid::generate_uuid_v7(),
             },
             true,
         ),
@@ -575,7 +575,7 @@ fn team_member_is_not_the_payer() {
         payer: owner.clone(),
         billed_users: vec![owner, member.clone()],
         scope: PayerScope::TeamMember {
-            team_id: macro_uuid::generate_uuid_v7(),
+            team_id: rox_uuid::generate_uuid_v7(),
         },
     };
     let s = build_snapshot(

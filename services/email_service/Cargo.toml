@@ -90,7 +90,7 @@ default = [
   "sfs_delete",
 ]
 gmail_webhook_auth = []
-local_auth = ["macro_authorization/local_auth"]
+local_auth = ["rox_authorization/local_auth"]
 local_queue = []
 sfs_map = []
 sfs_delete = []
@@ -100,7 +100,7 @@ agent_correlation = { path = "../../crates/agent_correlation", features = ["http
 calendar_events = { path = "../../crates/calendar_events", features = ["google", "inbound", "postgres", "schema"] }
 anyhow = { workspace = true }
 authentication_service_client = { path = "../../crates/authentication_service_client" }
-macro_aws_config = { path = "../../crates/macro_aws_config", features = ["s3", "sqs"] }
+rox_aws_config = { path = "../../crates/rox_aws_config", features = ["s3", "sqs"] }
 aws-sdk-s3 = { workspace = true }
 aws-sdk-secretsmanager = { workspace = true }
 aws-sdk-sqs = { workspace = true }
@@ -131,23 +131,23 @@ html-escape = { workspace = true }
 http-body-util = { workspace = true }
 infer = { workspace = true }
 lol_html = { workspace = true }
-macro_auth = { path = "../../crates/macro_auth" }
-macro_authorization = { path = "../../crates/macro_authorization", features = [
+rox_auth = { path = "../../crates/rox_auth" }
+rox_authorization = { path = "../../crates/rox_authorization", features = [
   "postgres",
 ] }
-macro_cors = { path = "../../crates/macro_cors" }
-macro_tower_layers = { path = "../../crates/macro_tower_layers" }
-macro_config = { path = "../../crates/macro_config" }
-macro_db_client = { path = "../../crates/macro_db_client" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env = { path = "../../crates/macro_env" }
-macro_event_broker = { path = "../../crates/macro_event_broker" }
-macro_env_var = { path = "../../crates/macro_env_var" }
-macro_queues = { path = "../../crates/macro_queues" }
-macro_middleware = { path = "../../crates/macro_middleware", default-features = false }
+rox_cors = { path = "../../crates/rox_cors" }
+rox_tower_layers = { path = "../../crates/rox_tower_layers" }
+rox_config = { path = "../../crates/rox_config" }
+rox_db_client = { path = "../../crates/rox_db_client" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env = { path = "../../crates/rox_env" }
+rox_event_broker = { path = "../../crates/rox_event_broker" }
+rox_env_var = { path = "../../crates/rox_env_var" }
+rox_queues = { path = "../../crates/rox_queues" }
+rox_middleware = { path = "../../crates/rox_middleware", default-features = false }
 notification = { path = "../../crates/notification" }
-macro_user_id = { path = "../../crates/macro_user_id" }
-macro_uuid = { path = "../../crates/macro_uuid" }
+rox_user_id = { path = "../../crates/rox_user_id" }
+rox_uuid = { path = "../../crates/rox_uuid" }
 mime_guess = "2.0.5"
 channels = { path = "../../crates/channels", features = ["outbound"] }
 contacts = { path = "../../crates/contacts" }
@@ -202,7 +202,7 @@ utoipa-swagger-ui = { workspace = true }
 uuid = { workspace = true }
 zeroize = { workspace = true }
 
-macro_service_urls = { path = "../../crates/macro_service_urls" }
+rox_service_urls = { path = "../../crates/rox_service_urls" }
 workspace-hack = { version = "0.1", path = "../../crates/workspace-hack" }
 
 [dev-dependencies]
@@ -210,5 +210,5 @@ opentelemetry = { workspace = true, features = ["trace"] }
 opentelemetry_sdk = { workspace = true, features = ["trace", "testing"] }
 tracing-opentelemetry = { workspace = true }
 tracing-subscriber = { workspace = true }
-macro_auth = { path = "../../crates/macro_auth", features = ["testing"] }
-macro_db_migrator = { path = "../../crates/macro_db_migrator" }
+rox_auth = { path = "../../crates/rox_auth", features = ["testing"] }
+rox_db_migrator = { path = "../../crates/rox_db_migrator" }

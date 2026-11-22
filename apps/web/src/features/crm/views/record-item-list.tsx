@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { DateGroupHeading } from '@app/features/next-soup/soup-view/date-group-heading';
 import { dateBucket } from '@app/features/soup/collection/date-buckets';
 import { createKeyedProjection } from '@app/lib/queries/soup/create-keyed-projection';
@@ -114,7 +115,7 @@ export function RecordItemList(props: {
             when={props.narrowLayout !== 'condensed'}
             fallback={
               <CrmListRetry
-                message="Couldn't load this list."
+                message={t('crm.couldNotLoadThisList')}
                 onRetry={() => props.source.refetch()}
               />
             }
@@ -137,13 +138,13 @@ export function RecordItemList(props: {
                     when={props.narrowLayout !== 'condensed'}
                     fallback={
                       <div class="p-3 text-xs text-ink-muted">
-                        {props.empty ?? 'No items yet.'}
+                        {props.empty ?? t('crm.noItemsPlaceholder')}
                       </div>
                     }
                   >
                     {props.emptyContent ?? (
                       <CrmListEmpty
-                        title="No items yet"
+                        title={t('crm.noItemsYet')}
                         description={props.empty}
                       />
                     )}
@@ -151,7 +152,7 @@ export function RecordItemList(props: {
                 }
               >
                 <CrmListSearchEmpty
-                  title="No matching items"
+                  title={t('crm.noMatchingItems')}
                   onClearSearch={props.onClearSearch}
                 />
               </Show>
@@ -160,11 +161,11 @@ export function RecordItemList(props: {
             <Show
               when={props.source.isFetchNextPageError}
               fallback={
-                <CrmListSkeleton label="Searching more items" count={2} />
+                <CrmListSkeleton label={t('crm.searchingMoreItems')} count={2} />
               }
             >
               <CrmListRetry
-                message="Couldn't load more."
+                message={t('crm.couldNotLoadMoreItems')}
                 onRetry={() => props.source.fetchNextPage()}
               />
             </Show>
@@ -193,13 +194,13 @@ export function RecordItemList(props: {
                     }
                     fallback={
                       <CrmListSearchEmpty
-                        title="No matching items."
+                        title={t('crm.noMatchingItems')}
                         onClearSearch={props.onClearSearch}
                       />
                     }
                   >
                     <Show when={!props.source.isFetchNextPageError}>
-                      <CrmListSkeleton label="Searching more items" count={2} />
+                      <CrmListSkeleton label={t('crm.searchingMoreItems')} count={2} />
                     </Show>
                   </Show>
                 </Show>
@@ -234,7 +235,7 @@ export function RecordItemList(props: {
             when={!props.source.isFetchNextPageError}
             fallback={
               <CrmListRetry
-                message="Couldn't load more."
+                message={t('crm.couldNotLoadMoreItems')}
                 onRetry={() => props.source.fetchNextPage()}
               />
             }
@@ -243,7 +244,7 @@ export function RecordItemList(props: {
               <div ref={setSentinelRef} class="h-px" />
             </Show>
             <Show when={props.source.isFetchingNextPage}>
-              <CrmListSkeleton label="Loading more items" count={2} />
+              <CrmListSkeleton label={t('crm.loadingMoreItems')} count={2} />
             </Show>
           </Show>
         </Match>

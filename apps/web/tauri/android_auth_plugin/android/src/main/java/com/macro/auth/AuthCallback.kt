@@ -9,7 +9,7 @@ internal object AuthCallback {
     fun isExpectedUrl(value: String): Boolean = try {
         val uri = URI(value)
         val nonce = uri.path.removePrefix("/")
-        uri.scheme == "macro" && uri.rawAuthority == "android-auth" &&
+        (uri.scheme == "rox" || uri.scheme == "macro") && uri.rawAuthority == "android-auth" &&
             uri.rawQuery == null && uri.rawFragment == null &&
             UUID.fromString(nonce).toString() == nonce
     } catch (_: Exception) {

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_messages SET mailbox_state = mailbox_state || '{\"in_inbox\":true,\"in_trash\":false}' WHERE thread_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "d082a1f35a4fbfc57ac4cac7314263a4673328c9bb6e9be099a26b19173d2bc6"
+}

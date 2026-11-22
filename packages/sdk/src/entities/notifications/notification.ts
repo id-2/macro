@@ -3,8 +3,8 @@ import type {
   NotificationState,
 } from '../../../generated/notification/types.gen';
 import { iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 
 type NotificationDetail = GetTypedNotificationByIdResponses[200];
@@ -12,7 +12,7 @@ type NotificationDetail = GetTypedNotificationByIdResponses[200];
 /**
  * A notification in the viewer's feed.
  */
-export class Notification extends MacroEntity<NotificationDetail> {
+export class Notification extends RoxEntity<NotificationDetail> {
   protected async fetch(): Promise<NotificationDetail> {
     return unwrap(
       await this.client.notification.getTypedNotificationById({
@@ -22,18 +22,18 @@ export class Notification extends MacroEntity<NotificationDetail> {
   }
 
   /** A handle to a notification by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Notification {
+  static byId(client: RoxClient, id: string): Notification {
     return new Notification(client, id);
   }
 
   /** Build a notification from a list-endpoint record (pre-seeded, no fetch). */
-  static from(client: MacroClient, data: NotificationDetail): Notification {
+  static from(client: RoxClient, data: NotificationDetail): Notification {
     return new Notification(client, data.id, data);
   }
 
   /** The viewer's notification feed, most recent first, auto-paginated; `maxItems` caps the total. */
   static list(
-    client: MacroClient,
+    client: RoxClient,
     opts?: {
       pageSize?: number;
       states?: NotificationState[];

@@ -136,8 +136,20 @@ MCP catalog lacks any `mcp__macro_internal__` code tool fails
   user message that loaded them in the model's copy only, and remembered per
   session in `SessionSkills` (memory; lost on restart). Eval:
   `route_evaluation` (ignored; needs `TYPESAFE_API_KEY`).
-- Keep session-aware `NameSearch`, `ContentSearch`, and `ListEntities` native in
-  code mode; legacy `ReadChat` must not appear in either runtime tool catalog.
+- Code mode drops `NameSearch`, `ContentSearch`, `ListEntities` and legacy
+  `ReadChat` from its toolset (`agent_code_mode::domain::covered_by_code_sdk`);
+  the SDK's `macro.search` and `macro.workspace` replace them, so prompt text a
+  code-mode turn reads must not instruct a call to those tools. Other hosts
+  keep the three native.
+- The system prompt's tool names must be callable. Groq rejects any generated
+  name that is not in `request.tools`, and the model reads the internal MCP
+  tools by their short names (`ExecuteCode`, `ReadCodeDocs`, …) in Rox's
+  guidance, their descriptions and the SDK notes. So `GatedToolSet` advertises
+  those tools under the short name (`advertised_name`) and maps a call back to
+  the registered `mcp__macro_internal__<tool>` before dispatch
+  (`listed_name`); a description that shows a tool under its server name names
+  the same listed short name. Other MCP servers' tools keep their mangled
+  names.
 - Every turn cuts tool results over `agent::ToolResultLimit`'s limit (about
   25k tokens) for the model and offers `ReadToolResult` to page through them.
   The stream, log and history keep the whole result; replay cuts it again, so

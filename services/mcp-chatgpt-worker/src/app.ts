@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   buildTools,
   catalog,
@@ -12,7 +12,7 @@ import {
   runOperation,
   type Tool,
   type ToolGrouping,
-} from '@macro-inc/sdk-mcp';
+} from '@rox-one/sdk-mcp';
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { WebStandardStreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/webStandardStreamableHttp.js';
 import {
@@ -23,7 +23,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { match } from 'ts-pattern';
 import { HOSTS, type ServiceName } from '../../../packages/sdk/src/config';
-import { Macro } from '../../../packages/sdk/src/macro';
+import { Macro } from '../../../packages/sdk/src/rox';
 import type { Config } from './config';
 import {
   keyBytes,
@@ -49,7 +49,7 @@ const PEOPLE_LISTED = {
   name: PEOPLE_TOOL,
   title: 'Look up people',
   description:
-    "Other tools return people as tokens (person_u_… for a Macro user, person_e_… for an email address) instead of their user ids and emails. Pass those tokens back as they are wherever a tool takes a user id or email (assigning, mentioning, sharing, filtering by person). Call this tool only when the user asks for someone's contact details or needs their email address: it returns each token's name and email.",
+    "Other tools return people as tokens (person_u_… for a Rox user, person_e_… for an email address) instead of their user ids and emails. Pass those tokens back as they are wherever a tool takes a user id or email (assigning, mentioning, sharing, filtering by person). Call this tool only when the user asks for someone's contact details or needs their email address: it returns each token's name and email.",
   inputSchema: {
     type: 'object' as const,
     properties: {
@@ -160,7 +160,7 @@ export function createHandler(config: Config) {
   );
   const validators = new InputValidators(catalog);
   const hosts = Object.fromEntries(
-    Object.entries(config.MACRO_HOSTS ?? {}).filter(([name]) =>
+    Object.entries(config.ROX_HOSTS ?? {}).filter(([name]) =>
       isServiceName(name)
     )
   );

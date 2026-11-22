@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 
@@ -33,7 +33,7 @@ fn unnamed_private_channel_lists_people_and_bots_but_not_the_viewer() {
     ];
     let mut user_names = NameLookup::new();
     user_names.insert(
-        MacroUserIdStr::try_from("macro|gabriel@test.com".to_string()).unwrap(),
+        RoxUserIdStr::try_from("macro|gabriel@test.com".to_string()).unwrap(),
         "Gabriel Birman".to_string(),
     );
     let bot_names = HashMap::from([(bot_id::CODEX_BOT_ID, "Codex".to_string())]);
@@ -54,8 +54,8 @@ fn unnamed_private_channel_lists_people_and_bots_but_not_the_viewer() {
 const VIEWER: &str = "macro|viewer@example.com";
 const MATCH_CHANNEL_NAMES_SQL: &str = include_str!("match_channel_names.sql");
 
-fn viewer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(VIEWER.to_string()).unwrap()
+fn viewer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(VIEWER.to_string()).unwrap()
 }
 
 fn channel(suffix: u8) -> Uuid {

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { TasksControls } from '@app/features/tasks-view/components/TasksControls';
 import { TaskList } from '@app/features/tasks-view/components/task-list/TaskList';
 import { useTasksDataSource } from '@app/features/tasks-view/queries/use-tasks-query';
@@ -43,7 +44,7 @@ export function CrmRecordTasks(props: { scope: CrmRecordScope }) {
                   {
                     type: 'document',
                     id: task.id,
-                    name: task.fallbackName ?? 'Task',
+                    name: task.fallbackName ?? t('crm.taskFallback'),
                     fileType: 'md',
                     subType: { type: 'task' },
                   },
@@ -92,36 +93,36 @@ function RecordTasksBody(props: { scope: CrmRecordScope }) {
 
   return (
     <RecordSection
-      title="Tasks"
+      title={t('crm.tasks')}
       search={state.search}
       onSearchChange={(search) => setState('search', search)}
       onSearchEscape={() => listElement?.focus()}
       actions={<TasksControls />}
-      createAction={{ label: 'New task', onClick: composeTask }}
+      createAction={{ label: t('crm.newTask'), onClick: composeTask }}
       toolbarCreate
     >
       <TaskList
-        loadingContent={<CrmListSkeleton label="Loading tasks" />}
+        loadingContent={<CrmListSkeleton label={t('crm.loadingTasks')} />}
         errorContent={
           <CrmListError
-            title="Tasks couldn’t be loaded."
+            title={t('crm.tasksLoadFailed')}
             onRetry={() => source.refresh()}
           />
         }
         emptyContent={
           state.search.trim() && source.hasMore() ? (
-            <span>Search more results to find matching tasks.</span>
+            <span>{t('crm.searchMoreResults')}</span>
           ) : state.search.trim() ? (
             <CrmListSearchEmpty
-              title="No tasks match this search"
+              title={t('crm.noTasksMatchSearch')}
               onClearSearch={() => setState('search', '')}
             />
           ) : (
             <CrmListEmpty
-              title="No tasks yet"
+              title={t('crm.noTasksYet')}
               graphic={EmptyStateTasksGraphic}
-              description="Tasks associated with this record will appear here."
-              action={{ label: 'New task', onClick: composeTask }}
+              description={t('crm.tasksWillAppear')}
+              action={{ label: t('crm.newTask'), onClick: composeTask }}
             />
           )
         }

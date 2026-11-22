@@ -16,7 +16,7 @@ import {
   size,
   type VirtualElement,
 } from '@floating-ui/dom';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { Accessor, JSX } from 'solid-js';
 import { createEffect, createSignal, on, onCleanup, onMount } from 'solid-js';
 import { iosSafePadding, iosSizeMiddleware } from './iosFloatingMiddleware';

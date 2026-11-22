@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 import { requestAuthHeaders } from '../src/utils/client';
 
 describe('requestAuthHeaders', () => {
@@ -19,7 +19,7 @@ describe('requestAuthHeaders', () => {
     await expect(
       requestAuthHeaders({ type: 'user', apiKey: 'mbot_x' }),
     ).rejects.toThrow(
-      "bot token passed as a user credential. Use auth: { type: 'bot', token } or MACRO_BOT_TOKEN.",
+      "bot token passed as a user credential. Use auth: { type: 'bot', token } or ROX_BOT_TOKEN.",
     );
   });
 
@@ -33,7 +33,7 @@ describe('requestAuthHeaders', () => {
     await expect(
       requestAuthHeaders({ type: 'user', token: 'mbot_x' }),
     ).rejects.toThrow(
-      "bot token passed as a user credential. Use auth: { type: 'bot', token } or MACRO_BOT_TOKEN.",
+      "bot token passed as a user credential. Use auth: { type: 'bot', token } or ROX_BOT_TOKEN.",
     );
   });
 
@@ -41,7 +41,7 @@ describe('requestAuthHeaders', () => {
     await expect(
       requestAuthHeaders({ type: 'bot', token: 'mak_abc' }),
     ).rejects.toThrow(
-      "user API key passed as a bot token. Use auth: { type: 'user', apiKey } or MACRO_API_KEY.",
+      "user API key passed as a bot token. Use auth: { type: 'user', apiKey } or ROX_API_KEY.",
     );
   });
 
@@ -49,7 +49,7 @@ describe('requestAuthHeaders', () => {
     await expect(
       requestAuthHeaders({ type: 'bot', token: 'legacy0123' }),
     ).rejects.toThrow(
-      "user API key passed as a bot token. Use auth: { type: 'user', apiKey } or MACRO_API_KEY.",
+      "user API key passed as a bot token. Use auth: { type: 'user', apiKey } or ROX_API_KEY.",
     );
   });
 });

@@ -12,7 +12,7 @@ use std::path::PathBuf;
 
 use serde_json::{Map, Value};
 
-use crate::config::MacroApi;
+use crate::config::RoxApi;
 
 #[cfg(test)]
 mod test;
@@ -42,7 +42,7 @@ pub struct Computer {
 
 impl Computer {
     /// The enrolled computer's settings.
-    pub fn new(macro_api: &MacroApi, workspace: &std::path::Path) -> Self {
+    pub fn new(macro_api: &RoxApi, workspace: &std::path::Path) -> Self {
         Self {
             workspace: workspace.to_owned(),
             egress_url: macro_api.egress_url.clone(),

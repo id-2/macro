@@ -8,8 +8,8 @@ use access_requests::{
 };
 use chrono::{DateTime, Utc};
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use sqlx::PgPool;
 use std::sync::{
@@ -41,8 +41,8 @@ fn setup(pool: PgPool) -> (Service, TestClock) {
         clock,
     )
 }
-fn user(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{name}@requests.test")).unwrap()
+fn user(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{name}@requests.test")).unwrap()
 }
 fn entity() -> ShareEntity {
     ShareEntity {

@@ -3,7 +3,7 @@ use crate::domain::models::{ImageAspectRatio, StoredImage};
 use ai_billing::{AiAdmissionError, DenyReason};
 use axum::body::{Body, to_bytes};
 use axum::http::Request;
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
 use model_owner::CreationPrincipal;
 use model_user::UserContext;
 use rootcause::Report;
@@ -19,10 +19,10 @@ const STATIC_FILE_ID: Uuid = Uuid::from_u128(0x123);
 #[derive(Clone)]
 struct TestAuthorizationService;
 
-impl MacroAuthorizationService for TestAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for TestAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: USER_ID.to_owned(),
@@ -35,18 +35,18 @@ impl MacroAuthorizationService for TestAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -95,7 +95,7 @@ fn router(result: Outcome) -> (Router, Arc<StubService>) {
     });
     let router = image_generation_router(ImageGenerationRouterState {
         service: service.clone(),
-        authorization_state: MacroAuthorizationState::new(Arc::new(TestAuthorizationService)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(TestAuthorizationService)),
         non_user_owners: NonUserOwners::Disabled,
     });
     (router, service)

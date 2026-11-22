@@ -1,4 +1,5 @@
 import { AGENTS_TOUR } from '@app/features/agents-view/tour';
+import { t } from '@app/lib/i18n';
 import TerminalIcon from '@icon/system/regular/terminal-window.svg';
 import CursorIcon from '@icon/wide-cursor-ide.svg';
 import { useCursorApiKeyStatusQuery } from '@queries/auth/cursor-api-key';
@@ -63,27 +64,31 @@ export function AgentSetupStrips(props: {
   const setup = tourTarget(AGENTS_TOUR.agentSetup);
 
   return (
-    <section ref={setup} aria-label="Agent setup" class="flex flex-col gap-3">
+    <section
+      ref={setup}
+      aria-label={t('settingsAgents.setupSectionLabel')}
+      class="flex flex-col gap-3"
+    >
       <Show
         when={cursorConnected()}
         fallback={
           <SetupStrip
             icon={<CursorIcon />}
-            title="Connect Cursor"
-            subject="Cursor"
-            description="Use your Cursor subscription to run agents in Rox."
-            action="Connect"
+            title={t('settingsAgents.connectCursor')}
+            subject={t('settingsAgents.cursorSubject')}
+            description={t('settingsAgents.connectCursorDescription')}
+            action={t('settingsAgents.connect')}
             onAction={props.onCursor}
           />
         }
       >
         <SetupStrip
           icon={<CursorIcon />}
-          title="Cursor"
-          subject="Cursor"
-          description="Runs on your Cursor plan."
-          status="Connected"
-          action="Manage"
+          title={t('settingsAgents.cursorSubject')}
+          subject={t('settingsAgents.cursorSubject')}
+          description={t('settingsAgents.cursorPlan')}
+          status={t('settingsAgents.connected')}
+          action={t('settingsAgents.manage')}
           onAction={props.onCursor}
         />
       </Show>
@@ -92,23 +97,23 @@ export function AgentSetupStrips(props: {
         fallback={
           <SetupStrip
             icon={<TerminalIcon />}
-            title="Bring your own agent"
-            subject="your own agent"
-            description="Pair Claude Code, Codex, or another local agent with roxd."
-            action="Set up"
+            title={t('settingsAgents.bringYourOwnAgent')}
+            subject={t('settingsAgents.ownAgentSubject')}
+            description={t('settingsAgents.bringYourOwnAgentDescription')}
+            action={t('settingsAgents.setUp')}
             onAction={props.onSetUpRuntime}
           />
         }
       >
         <SetupStrip
           icon={<TerminalIcon />}
-          title="Bring your own agent"
-          subject="paired machines"
+          title={t('settingsAgents.bringYourOwnAgent')}
+          subject={t('settingsAgents.pairedMachinesSubject')}
           description={paired()
             .map((harness) => harness.name)
             .join(', ')}
-          status="Paired"
-          action="Manage"
+          status={t('settingsAgents.paired')}
+          action={t('settingsAgents.manage')}
           onAction={props.onManageRuntimes}
         />
       </Show>

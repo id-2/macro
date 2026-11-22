@@ -7,7 +7,7 @@ use slack_integration::{domain::models::ImportError, inbound::worker::WorkerConf
 mod test;
 
 /// Settings supplied by the deployment, never by an import archive.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// RoxDB connection URL.

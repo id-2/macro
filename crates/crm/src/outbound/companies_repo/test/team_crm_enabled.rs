@@ -1,6 +1,6 @@
 use super::helpers::seed_team;
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

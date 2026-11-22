@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import type { EntityMessageCreateData } from '../../../generated/storage/types.gen';
-import { MacroError } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
 import { StaticImage } from '../images/image';
 import { Channel } from './channel';
@@ -9,7 +9,7 @@ import { Message } from './message';
 import { Thread } from './thread';
 
 function recordingClient(): {
-  client: MacroClient;
+  client: RoxClient;
   bodies: EntityMessageCreateData['body'][];
 } {
   const bodies: EntityMessageCreateData['body'][] = [];
@@ -26,7 +26,7 @@ function recordingClient(): {
         return { data: { id: 'message' } };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, bodies };
 }
 
@@ -82,13 +82,13 @@ describe('channel.send with documents', () => {
           throw new Error('must not post');
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     await expect(
       Channel.byId(client, 'channel').send('the plan', {
         documents: [Document.byId(client, 'plan')],
       }),
-    ).rejects.toBeInstanceOf(MacroError);
+    ).rejects.toBeInstanceOf(RoxError);
   });
 });
 
@@ -126,7 +126,7 @@ describe('silent posts', () => {
           return { data: { message_id: 'message' } };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     await Channel.byId(client, 'channel').send('build finished', {
       silent: true,

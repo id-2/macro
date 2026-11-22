@@ -5,8 +5,8 @@
  * Everything here is made once, so the watcher's memory is shared by its
  * source and its handler. Nothing connects, polls or starts until used.
  */
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import { jsonLine } from '../../context/disk.ts';
 import type { Base } from '../../context/index.ts';
 import type { People, Work } from '../../contracts.ts';

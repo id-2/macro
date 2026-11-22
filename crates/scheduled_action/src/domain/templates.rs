@@ -11,8 +11,8 @@ use chrono::{DateTime, Utc};
 use chrono_tz::Tz;
 use entity_access::domain::models::{EntityAccessReceipt, OwnerAccessLevel};
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityAppearance;
 use model_owner::{CreationPrincipal, Owner};
 use serde::{Deserialize, Serialize};
@@ -167,7 +167,7 @@ impl<Actions, Templates, Flags: FeatureFlags>
     }
 
     #[tracing::instrument(name = "routine.sharing_flag", err, skip_all)]
-    async fn require_sharing(&self, user: Option<&MacroUserIdStr<'_>>) -> Result<()> {
+    async fn require_sharing(&self, user: Option<&RoxUserIdStr<'_>>) -> Result<()> {
         let (Some(flags), Some(user)) = (&self.flags, user) else {
             anyhow::bail!(ActionPolicyError::NotFound);
         };
@@ -231,7 +231,7 @@ where
     }
 
     #[tracing::instrument(err, skip_all, fields(template_id = %id))]
-    async fn get_template(&self, user: &MacroUserIdStr<'_>, id: Uuid) -> Result<RoutineTemplate> {
+    async fn get_template(&self, user: &RoxUserIdStr<'_>, id: Uuid) -> Result<RoutineTemplate> {
         self.require_sharing(Some(user)).await?;
         self.templates
             .get_template(&id)

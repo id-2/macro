@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT generic_plans, custom_plans FROM pg_prepared_statements WHERE name = 'matching_thread_stream'",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "generic_plans",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "custom_plans",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      true,
+      true
+    ]
+  },
+  "hash": "22d6add0a26e8806b944a4a1fb25c0f1cb4ab134ecc94a3fd9d2e4487fa22a83"
+}

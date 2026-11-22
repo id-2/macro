@@ -7,8 +7,8 @@ use super::*;
 
 const MAIL: &str = "Please send the signed contract by Friday.";
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@acme.example").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@acme.example").unwrap()
 }
 
 fn input() -> DueDateInput {

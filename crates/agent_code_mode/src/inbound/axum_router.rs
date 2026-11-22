@@ -20,11 +20,11 @@ use entity_access::{
     },
     inbound::axum_extractors::AgentSessionAccessLevelExtractor,
 };
-use macro_authorization::{
-    ActingUser, CredentialAttribution, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState, UserOnly, is_program_run,
+use rox_authorization::{
+    ActingUser, CredentialAttribution, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState, UserOnly, is_program_run,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use std::sync::Arc;
 
 /// Dependencies for the read-only browser API.
@@ -34,7 +34,7 @@ pub struct CodeExecutionRouterState<Access, Auth> {
     connected_apps: ConnectedAppService,
     ui_commands: UiCommandService,
     entity_access: Arc<Access>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Access, Auth> CodeExecutionRouterState<Access, Auth> {
@@ -45,7 +45,7 @@ impl<Access, Auth> CodeExecutionRouterState<Access, Auth> {
         connected_apps: ConnectedAppService,
         ui_commands: UiCommandService,
         entity_access: Arc<Access>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -78,7 +78,7 @@ impl<Access, Auth> FromRef<CodeExecutionRouterState<Access, Auth>> for Arc<Acces
 }
 
 impl<Access, Auth> FromRef<CodeExecutionRouterState<Access, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &CodeExecutionRouterState<Access, Auth>) -> Self {
         state.authorization.clone()
@@ -89,7 +89,7 @@ impl<Access, Auth> FromRef<CodeExecutionRouterState<Access, Auth>>
 pub fn code_execution_router<Access, Auth>(state: CodeExecutionRouterState<Access, Auth>) -> Router
 where
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         .route(
@@ -184,7 +184,7 @@ impl IntoResponse for CodeExecutionApiError {
     params(("session_id" = Uuid, Path, description = "Owning session"), ("execution_id" = Uuid, Path, description = "Execution receipt identity")),
     responses((status = 200, body = ExecutionRecord), (status = 401), (status = 403), (status = 404), (status = 500)))]
 /// Fetch one execution only after the caller has obtained view access to its session.
-pub async fn get_code_execution<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn get_code_execution<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, execution)): Path<(Uuid, Uuid)>,
@@ -202,9 +202,9 @@ pub async fn get_code_execution<Access: EntityAccessService, Auth: MacroAuthoriz
 
 #[utoipa::path(post, path = "/agent-sessions/{session_id}/reviews", tag = "agent-sessions", operation_id = "create_session_review", params(("session_id" = Uuid, Path)), request_body = CreateReview, responses((status = 200, body = ReviewRecord), (status = 403), (status = 400)))]
 /// Persist a review without keeping the agent turn blocked.
-pub async fn create_review<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn create_review<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     body: Bytes,
 ) -> Result<Json<ReviewRecord>, CodeExecutionApiError> {
@@ -222,9 +222,9 @@ pub async fn create_review<Access: EntityAccessService, Auth: MacroAuthorization
 }
 #[utoipa::path(post, path = "/agent-sessions/{session_id}/views", tag = "agent-sessions", operation_id = "present_session_view", params(("session_id" = Uuid, Path)), request_body = PresentView, responses((status = 204), (status = 403), (status = 400)))]
 /// Present a view in the session: a review with nothing saved.
-pub async fn present_view<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn present_view<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Json(input): Json<PresentView>,
 ) -> Result<StatusCode, CodeExecutionApiError> {
@@ -243,9 +243,9 @@ pub async fn present_view<Access: EntityAccessService, Auth: MacroAuthorizationS
 /// Open an item in a new pane of the app tab the person who prompted the
 /// running turn typed in. Only a running execution of the session's current
 /// turn may send, as the account it acts as.
-pub async fn open_in_app<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn open_in_app<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     body: Bytes,
 ) -> Result<Json<UiCommandOutcome>, CodeExecutionApiError> {
@@ -263,7 +263,7 @@ pub async fn open_in_app<Access: EntityAccessService, Auth: MacroAuthorizationSe
 }
 #[utoipa::path(get, path = "/agent-sessions/{session_id}/reviews/{review_id}", tag = "agent-sessions", operation_id = "get_session_review", params(("session_id" = Uuid, Path), ("review_id" = Uuid, Path)), responses((status = 200, body = ReviewRecord), (status = 403), (status = 404)))]
 /// Read a persisted interactive block.
-pub async fn get_review<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn get_review<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, id)): Path<(Uuid, Uuid)>,
@@ -277,7 +277,7 @@ pub async fn get_review<Access: EntityAccessService, Auth: MacroAuthorizationSer
 }
 #[utoipa::path(get, path = "/agent-sessions/{session_id}/code-executions/{execution_id}/reviews", tag = "agent-sessions", operation_id = "list_execution_reviews", params(("session_id" = Uuid, Path), ("execution_id" = Uuid, Path)), responses((status = 200, body = Vec<ReviewRecord>), (status = 403)))]
 /// List blocks created during an execution, including interrupted executions.
-pub async fn list_reviews<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn list_reviews<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, id)): Path<(Uuid, Uuid)>,
@@ -305,9 +305,9 @@ fn decode_user_decision(
 
 #[utoipa::path(post, path = "/agent-sessions/{session_id}/reviews/{review_id}", tag = "agent-sessions", operation_id = "decide_session_review", params(("session_id" = Uuid, Path), ("review_id" = Uuid, Path)), request_body = ReviewDecision, responses((status = 200, body = ReviewRecord), (status = 403), (status = 409)))]
 /// Save edits or atomically claim the exact draft revision the user submitted.
-pub async fn decide_review<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn decide_review<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, UserOnly>,
+    caller: RoxAuthorizationExtractor<Auth, UserOnly>,
     headers: HeaderMap,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, id)): Path<(Uuid, Uuid)>,
@@ -331,9 +331,9 @@ pub async fn decide_review<Access: EntityAccessService, Auth: MacroAuthorization
     params(("session_id" = Uuid, Path), ("execution_id" = Uuid, Path, description = "A running execution of the session's current turn")),
     responses((status = 200, body = Vec<ConnectedApp>), (status = 403), (status = 404)))]
 /// List the connected apps and custom MCP servers the session's agent may use.
-pub async fn list_connected_apps<Access: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn list_connected_apps<Access: EntityAccessService, Auth: RoxAuthorizationService>(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, execution)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Vec<ConnectedApp>>, CodeExecutionApiError> {
@@ -355,10 +355,10 @@ pub async fn list_connected_apps<Access: EntityAccessService, Auth: MacroAuthori
 /// List the tools one connected app serves.
 pub async fn list_connected_app_tools<
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, execution, kind, key)): Path<(Uuid, Uuid, ConnectedAppKind, String)>,
 ) -> Result<Json<Vec<ConnectedTool>>, CodeExecutionApiError> {
@@ -382,10 +382,10 @@ pub async fn list_connected_app_tools<
 /// Call one tool of a connected app as the execution's account.
 pub async fn call_connected_app_tool<
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, execution, kind, key)): Path<(Uuid, Uuid, ConnectedAppKind, String)>,
     body: Bytes,
@@ -412,10 +412,10 @@ pub async fn call_connected_app_tool<
 /// Search the connectable app catalog, or inspect one app's tools and connection status.
 pub async fn discover_connected_apps<
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, execution)): Path<(Uuid, Uuid)>,
     body: Bytes,
@@ -442,10 +442,10 @@ pub async fn discover_connected_apps<
 /// Add a custom MCP server to the execution account's connections.
 pub async fn add_connected_mcp_server<
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, execution)): Path<(Uuid, Uuid)>,
     body: Bytes,
@@ -477,10 +477,10 @@ pub struct ConnectedToolQuery {
 /// Find tools across the agent's connected apps by keywords.
 pub async fn search_connected_app_tools<
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     State(state): State<CodeExecutionRouterState<Access, Auth>>,
     Path((_session, execution)): Path<(Uuid, Uuid)>,
     axum::extract::Query(query): axum::extract::Query<ConnectedToolQuery>,

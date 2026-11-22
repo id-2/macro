@@ -26,7 +26,7 @@ subscriptions, and voice agents already build on them through `AgentSession`. A 
 wrapper would have to chase all of that, and would get in the way of those tools.
 
 ```ts
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 
 const macro = new Macro();
 const call = await macro.channels.byId(id).activeCall();
@@ -35,7 +35,7 @@ const connection = await call.join();
 ```
 
 ```ts
-import { connectRoom } from '@macro-inc/sdk/calls/node';
+import { connectRoom } from '@rox-one/sdk/calls/node';
 
 const { room, connection } = await connectRoom(call); // a real @livekit/rtc-node Room
 await session.start({ agent, room });                 // LiveKit AgentSession, unchanged
@@ -47,8 +47,8 @@ So there are two levels, and a program can use either:
 
 | Level | Package | Returns | Runs in |
 | --- | --- | --- | --- |
-| Token | `@macro-inc/sdk` | `CallConnection`: URL, token, identity, room name | Anywhere except code mode |
-| Room | `@macro-inc/sdk/calls/node` and `@macro-inc/sdk/calls/browser` | A LiveKit `Room`, already connected and with Macro's defaults | Node, Bun or a browser |
+| Token | `@rox-one/sdk` | `CallConnection`: URL, token, identity, room name | Anywhere except code mode |
+| Room | `@rox-one/sdk/calls/node` and `@rox-one/sdk/calls/browser` | A LiveKit `Room`, already connected and with Macro's defaults | Node, Bun or a browser |
 
 Keep room helpers out of the core entry point so ordinary SDK imports and the
 code-mode bundle never load a media runtime. Optional peers avoid installing it
@@ -204,7 +204,7 @@ All in `crates/call`, in its hexagonal layout.
 
 **Refuse tokens in code mode.** All token routes return `403` to a program: a credential
 signed for an agent or a routine run (`is_program_run`), or a request carrying
-`x-macro-code-execution`, which a program could drop with a raw `fetch`. The sandbox cannot use a token, and it would land in the model's
+`x-rox-code-execution` (the earlier `x-macro-code-execution` is still accepted), which a program could drop with a raw `fetch`. The sandbox cannot use a token, and it would land in the model's
 context and the transcript. Tokens live 6 hours and cannot be revoked. `toJSON` on
 `CallConnection` also omits the token, and it is never logged or put on a span.
 
@@ -252,7 +252,7 @@ the contract, not code.
 
 - Backend: `call.join` and `call.start` with `call.id`, principal kind, `call.client`, and
   outcome (`in_other_call`, `already_connected`, `ended`).
-- `@macro-inc/sdk/calls`: `call.sdk.connect`, `call.sdk.publish_screen` (source kind,
+- `@rox-one/sdk/calls`: `call.sdk.connect`, `call.sdk.publish_screen` (source kind,
   resolution, fps, outcome), `call.sdk.disconnected` (reason), sent through the SDK's
   existing observer, searchable by `call.id`.
 - Never: tokens, display names, share links.

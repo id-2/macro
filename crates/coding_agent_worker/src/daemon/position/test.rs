@@ -5,7 +5,7 @@ use agent_trigger::domain::broker_events::{
     AgentSessionRequestedEvent, AgentTriggerTopicEvent, NewAgentSessionEvent,
 };
 use bot_id::BotId;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use super::*;
 
@@ -18,7 +18,7 @@ fn request(bot: BotId, minted: SystemTime) -> TriggerEvent {
     let random: [u8; 10] = Uuid::new_v4().as_bytes()[..10].try_into().unwrap();
     let id = uuid::Builder::from_unix_timestamp_millis(u64::try_from(millis).unwrap(), &random)
         .into_uuid();
-    macro_event_broker::Event::with_event_id(
+    rox_event_broker::Event::with_event_id(
         id,
         AgentTriggerTopicEvent::New(NewAgentSessionEvent::Requested(
             AgentSessionRequestedEvent {

@@ -39,7 +39,7 @@ export function sharingApi(
       ...init,
       headers: {
         'content-type': 'application/json',
-        'x-macro-user-api-key': key,
+        'x-rox-user-api-key': key,
       },
     }
   );
@@ -58,7 +58,7 @@ export async function answerSharingAsUser(
       url: `${base}${url.pathname.slice('/dss'.length)}${url.search}`,
       headers: {
         'content-type': 'application/json',
-        'x-macro-user-api-key': key,
+        'x-rox-user-api-key': key,
       },
     });
     await route.fulfill({ response });

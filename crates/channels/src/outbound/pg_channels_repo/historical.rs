@@ -1,7 +1,7 @@
 //! Silent archive persistence and the shared live/archive DM transaction.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{PgConnection, Postgres, Transaction};
 use uuid::Uuid;
 
@@ -109,7 +109,7 @@ impl HistoricalChannelRepo for PgChannelsRepo {
     async fn insert_historical_participants(
         &self,
         channel_id: Uuid,
-        participants: &[MacroUserIdStr<'static>],
+        participants: &[RoxUserIdStr<'static>],
         joined_at: DateTime<Utc>,
     ) -> anyhow::Result<()> {
         let mut tx = self.pool.begin().await?;
@@ -179,7 +179,7 @@ pub async fn ensure_dm_in(
 ) -> anyhow::Result<EnsuredChannel> {
     let owner = creation.owner(&pair)?;
     let (id, created_at) = match &creation {
-        DmCreation::Live(_) => (macro_uuid::generate_uuid_v7(), None),
+        DmCreation::Live(_) => (rox_uuid::generate_uuid_v7(), None),
         DmCreation::Historical { id, created_at } => {
             validate_reserved_id(*id)?;
             (*id, Some(*created_at))
@@ -252,7 +252,7 @@ pub async fn find_dm(connection: &mut PgConnection, pair: &DmPair) -> anyhow::Re
 async fn insert_owner(
     tx: &mut Transaction<'_, Postgres>,
     channel_id: Uuid,
-    owner: &MacroUserIdStr<'_>,
+    owner: &RoxUserIdStr<'_>,
     joined_at: DateTime<Utc>,
 ) -> anyhow::Result<()> {
     sqlx::query!(
@@ -272,7 +272,7 @@ async fn insert_owner(
 pub async fn insert_members(
     tx: &mut Transaction<'_, Postgres>,
     channel_id: Uuid,
-    participants: &[MacroUserIdStr<'static>],
+    participants: &[RoxUserIdStr<'static>],
     joined_at: DateTime<Utc>,
 ) -> anyhow::Result<()> {
     let user_ids = participants
@@ -309,7 +309,7 @@ pub struct LockedChannel {
 pub async fn inspect_in(
     tx: &mut Transaction<'_, Postgres>,
     id: Uuid,
-    requester: Option<&MacroUserIdStr<'_>>,
+    requester: Option<&RoxUserIdStr<'_>>,
 ) -> anyhow::Result<Option<LockedChannel>> {
     let row = sqlx::query!(
         r#"SELECT channel_type AS "channel_type: ChannelType", team_id

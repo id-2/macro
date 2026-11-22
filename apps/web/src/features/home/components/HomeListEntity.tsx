@@ -1,4 +1,5 @@
 import { ViewSidebar } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import { AgentSessionListItem } from '@app/features/agents-view/views/AgentSessionListItem';
 import { ChannelMutedIndicator } from '@channel/components/ChannelMutedIndicator';
 import { groupChatName, isNamedForPeople } from '@channel/group-chat-name';
@@ -190,14 +191,14 @@ function HomeThreadTitle(
   };
   const senderLabel = () => {
     const value = sender();
-    if (!value) return 'Someone';
-    if (!value.id) return value.displayName?.trim() || 'Someone';
-    if (value.id === currentUserId()) return 'You';
+    if (!value) return t('home.someone');
+    if (!value.id) return value.displayName?.trim() || t('home.someone');
+    if (value.id === currentUserId()) return t('home.you');
     return (
       getBotDisplayName(value.id, value.details) ||
       getDisplayName(tryMacroId(value.id), { emailFallback: 'local-part' }) ||
       value.details?.name ||
-      'Someone'
+      t('home.someone')
     );
   };
   // Channels go by "#name"; a DM, or a group chat named for its people, by
@@ -215,7 +216,7 @@ function HomeThreadTitle(
   return (
     <span class="flex min-w-0 items-center">
       <span class="max-w-1/2 truncate">{senderLabel()}</span>
-      <span class="shrink-0 whitespace-pre"> in </span>
+      <span class="shrink-0 whitespace-pre">{t('home.threadIn')}</span>
       <span class="min-w-0 truncate">{location()}</span>
     </span>
   );
@@ -230,17 +231,17 @@ function HomeNotificationTitle(props: {
     if (senderId) {
       return (
         getDisplayName(tryMacroId(senderId), { emailFallback: 'local-part' }) ||
-        'Someone'
+        t('home.someone')
       );
     }
-    return getNotificationAgentSender(props.notification)?.name ?? 'Someone';
+    return getNotificationAgentSender(props.notification)?.name ?? t('home.someone');
   };
   const action = () =>
     match(props.notification.notification_metadata.tag)
-      .with('mentioned_in_document_comment', () => ' mentioned you on ')
-      .with('replied_to_document_comment_thread', () => ' replied on ')
-      .with('calendar_event_join_request', () => ' asked to join ')
-      .otherwise(() => ' commented on ');
+      .with('mentioned_in_document_comment', () => t('home.mentionedYouOn'))
+      .with('replied_to_document_comment_thread', () => t('home.repliedOn'))
+      .with('calendar_event_join_request', () => t('home.askedToJoin'))
+      .otherwise(() => t('home.commentedOn'));
   return (
     <span class="flex min-w-0 items-center">
       <span class="max-w-1/2 shrink-0 truncate">{sender()}</span>

@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Calendar } from './calendar';
 import { CalendarNamespace } from './namespace';
 
@@ -12,7 +12,7 @@ test('calendar.createConfirmed creates through the confirmed tool with the quote
         return { data: { eventId: 'created-event' } };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
 
   const event = await new CalendarNamespace(client).createConfirmed({
     title: 'Q3 review',

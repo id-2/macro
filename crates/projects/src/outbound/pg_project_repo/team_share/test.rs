@@ -1,8 +1,8 @@
 use bot_id::BotId;
 use entity_access_management::domain::ports::EntityAccessManagementRepository;
 use entity_access_management::outbound::PgRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_owner::Owner;
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -25,7 +25,7 @@ const TEAM_ID: Uuid = Uuid::from_u128(0xb2222222_2222_2222_2222_222222222222);
 const BOT: &str = "bot|00000000-0000-0000-0000-00000000b07a";
 
 fn owner() -> Owner {
-    Owner::User(MacroUserIdStr::try_from(OWNER).unwrap())
+    Owner::User(RoxUserIdStr::try_from(OWNER).unwrap())
 }
 
 async fn create_project(repo: &TestRepo, name: &str) -> String {
@@ -71,7 +71,7 @@ async fn edit_team_share(
 ) -> Result<(), ProjectError> {
     let facts = repo.get_team_share_facts(project_id).await?;
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from(OWNER).unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from(OWNER).unwrap()),
         project_id: project_id.to_string(),
         name: None,
         update_parent: false,
@@ -417,7 +417,7 @@ async fn edit_with_team_level_but_no_command_returns_unauthorized(pool: PgPool) 
 
     let result = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from(OWNER).unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from(OWNER).unwrap()),
             project_id: project_id.clone(),
             name: Some("Renamed".to_string()),
             update_parent: false,
@@ -453,7 +453,7 @@ async fn edit_rejects_command_for_other_project_or_mismatched_level(pool: PgPool
 
     let wrong_project = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from(OWNER).unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from(OWNER).unwrap()),
             project_id: project_id.clone(),
             name: None,
             update_parent: false,
@@ -466,7 +466,7 @@ async fn edit_rejects_command_for_other_project_or_mismatched_level(pool: PgPool
 
     let wrong_level = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from(OWNER).unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from(OWNER).unwrap()),
             project_id: project_id.clone(),
             name: None,
             update_parent: false,
@@ -500,7 +500,7 @@ async fn edit_stale_command_returns_conflict(pool: PgPool) {
 
     let replay = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from(OWNER).unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from(OWNER).unwrap()),
             project_id: project_id.clone(),
             name: None,
             update_parent: false,
@@ -524,7 +524,7 @@ async fn edit_team_share_and_link_share_in_one_call_persists_both(pool: PgPool) 
     let facts = repo.get_team_share_facts(&project_id).await.unwrap();
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from(OWNER).unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from(OWNER).unwrap()),
         project_id: project_id.clone(),
         name: Some("Renamed".to_string()),
         update_parent: false,

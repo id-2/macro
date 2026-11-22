@@ -35,7 +35,7 @@ by on the root.
 
 ## Frontend and Cloudflare Workers
 
-Use the `@macro-inc/observability` facade (`packages/observability`); never
+Use the `@rox-one/observability` facade (`packages/observability`); never
 import OpenTelemetry directly.
 
 - `Telemetry.span(name, fn)` for a phase; `span.span(name, fn)` for a child.
@@ -55,7 +55,7 @@ import OpenTelemetry directly.
 - Transports without headers carry `span.traceparent()` another way, such as a
   WebSocket query parameter.
 - Workers wrap their handler with `instrument()` and `createWorkerTraceConfig`
-  from `@macro-inc/observability/worker`, which adopts the incoming
+  from `@rox-one/observability/worker`, which adopts the incoming
   `traceparent`.
 
 ## Frontend view loading

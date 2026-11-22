@@ -89,7 +89,7 @@ pub struct RunLocalArgs {
 
 #[derive(Args, Clone, Default)]
 pub struct InstanceArgs {
-    /// Stack name. Absent (or `macro`) is the default instance.
+    /// Stack name. Absent (or `rox`) is the default instance.
     #[arg(long)]
     pub instance: Option<String>,
     /// Use this port window instead of an automatically allocated one. Later

@@ -7,9 +7,9 @@ fn normal_and_deep_link_launches_do_not_record() {
             .unwrap()
             .record_memory
     );
-    let options = LaunchOptions::try_parse_from(["macro", "macro://app/channel/123"]).unwrap();
+    let options = LaunchOptions::try_parse_from(["macro", "rox://app/channel/123"]).unwrap();
     assert!(!options.record_memory);
-    assert_eq!(options.urls, ["macro://app/channel/123"]);
+    assert_eq!(options.urls, ["rox://app/channel/123"]);
 }
 
 #[test]

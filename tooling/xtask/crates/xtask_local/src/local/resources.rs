@@ -20,11 +20,11 @@ const ACCOUNT_ID: &str = "000000000000";
 /// seed env, so it is named rather than inlined.
 pub const DOC_STORAGE_BUCKET: &str = "doc-storage";
 /// The bucket of email attachments: drafts' uploads and received files.
-pub const EMAIL_ATTACHMENTS_BUCKET: &str = "macro-email-attachments";
+pub const EMAIL_ATTACHMENTS_BUCKET: &str = "rox-email-attachments";
 
 /// The queue doc-storage ObjectCreated events publish to — referenced by the
 /// upload-finalizer wiring, so it is named.
-pub const UPLOAD_FINALIZER_QUEUE: &str = macro_queues::DocumentUploadFinalizerQueue::LOCAL;
+pub const UPLOAD_FINALIZER_QUEUE: &str = rox_queues::DocumentUploadFinalizerQueue::LOCAL;
 
 // DynamoDB table names: referenced both by their bespoke create-table schema in
 // `localstack` and by the env binding below, so they are named.
@@ -104,19 +104,19 @@ impl Queue {
         use aws_sdk_sqs::types::QueueAttributeName;
 
         match self.name {
-            macro_queues::SlackImportQueue::LOCAL => [
+            rox_queues::SlackImportQueue::LOCAL => [
                 (QueueAttributeName::VisibilityTimeout, "900".to_string()),
                 (
                     QueueAttributeName::RedrivePolicy,
                     serde_json::json!({
-                        "deadLetterTargetArn": queue_arn(macro_queues::SlackImportDlq::LOCAL),
+                        "deadLetterTargetArn": queue_arn(rox_queues::SlackImportDlq::LOCAL),
                         "maxReceiveCount": 5,
                     })
                     .to_string(),
                 ),
             ]
             .into(),
-            macro_queues::SlackImportDlq::LOCAL => [(
+            rox_queues::SlackImportDlq::LOCAL => [(
                 QueueAttributeName::MessageRetentionPeriod,
                 (14 * 24 * 60 * 60).to_string(),
             )]
@@ -148,56 +148,56 @@ use QueueForm::{Name, Url};
 /// Every local SQS queue and the env var(s) that reference it.
 pub const QUEUES: &[Queue] = &[
     Queue {
-        name: macro_queues::SlackImportQueue::LOCAL,
-        bindings: &[(macro_queues::SlackImportQueue::OVERRIDE_ENV_VAR_NAME, Url)],
+        name: rox_queues::SlackImportQueue::LOCAL,
+        bindings: &[(rox_queues::SlackImportQueue::OVERRIDE_ENV_VAR_NAME, Url)],
     },
     Queue {
-        name: macro_queues::SlackImportDlq::LOCAL,
-        bindings: &[(macro_queues::SlackImportDlq::OVERRIDE_ENV_VAR_NAME, Url)],
+        name: rox_queues::SlackImportDlq::LOCAL,
+        bindings: &[(rox_queues::SlackImportDlq::OVERRIDE_ENV_VAR_NAME, Url)],
     },
     Queue {
-        name: macro_queues::NotificationQueue::LOCAL,
+        name: rox_queues::NotificationQueue::LOCAL,
         bindings: &[("NOTIFICATION_QUEUE", Url)],
     },
     Queue {
-        name: macro_queues::NotificationIngressQueue::LOCAL,
+        name: rox_queues::NotificationIngressQueue::LOCAL,
         bindings: &[("NOTIFICATION_INGRESS_QUEUE", Url)],
     },
     Queue {
-        name: macro_queues::PushNotificationEventHandlerQueue::LOCAL,
+        name: rox_queues::PushNotificationEventHandlerQueue::LOCAL,
         bindings: &[("PUSH_NOTIFICATION_EVENT_HANDLER_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::WebhookEventQueue::LOCAL,
-        bindings: &[(macro_queues::WebhookEventQueue::OVERRIDE_ENV_VAR_NAME, Url)],
+        name: rox_queues::WebhookEventQueue::LOCAL,
+        bindings: &[(rox_queues::WebhookEventQueue::OVERRIDE_ENV_VAR_NAME, Url)],
     },
     Queue {
-        name: macro_queues::EmailBackfillQueue::LOCAL,
+        name: rox_queues::EmailBackfillQueue::LOCAL,
         bindings: &[("BACKFILL_QUEUE", Name), ("EMAIL_BACKFILL_QUEUE", Url)],
     },
     Queue {
         // Consumed by email_service's nightly CRM-cleanup workers; without the
         // queue existing in LocalStack they tight-loop on receive errors.
-        name: macro_queues::EmailCrmCleanupQueue::LOCAL,
+        name: rox_queues::EmailCrmCleanupQueue::LOCAL,
         bindings: &[(
-            macro_queues::EmailCrmCleanupQueue::OVERRIDE_ENV_VAR_NAME,
+            rox_queues::EmailCrmCleanupQueue::OVERRIDE_ENV_VAR_NAME,
             Url,
         )],
     },
     Queue {
-        name: macro_queues::ChatDeleteQueue::LOCAL,
+        name: rox_queues::ChatDeleteQueue::LOCAL,
         bindings: &[("CHAT_DELETE_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::ContactsQueue::LOCAL,
+        name: rox_queues::ContactsQueue::LOCAL,
         bindings: &[("CONTACTS_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::ConvertQueue::LOCAL,
+        name: rox_queues::ConvertQueue::LOCAL,
         bindings: &[("CONVERT_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::DocumentDeleteQueue::LOCAL,
+        name: rox_queues::DocumentDeleteQueue::LOCAL,
         bindings: &[("DOCUMENT_DELETE_QUEUE", Name)],
     },
     Queue {
@@ -205,47 +205,47 @@ pub const QUEUES: &[Queue] = &[
         bindings: &[("DOCUMENT_UPLOAD_FINALIZER_QUEUE_URL", Url)],
     },
     Queue {
-        name: macro_queues::DocumentTextExtractorQueue::LOCAL,
+        name: rox_queues::DocumentTextExtractorQueue::LOCAL,
         bindings: &[("DOCUMENT_TEXT_EXTRACTOR_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::EmailScheduledQueue::LOCAL,
+        name: rox_queues::EmailScheduledQueue::LOCAL,
         bindings: &[("EMAIL_SCHEDULED_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::GmailInboxSyncQueue::LOCAL,
+        name: rox_queues::GmailInboxSyncQueue::LOCAL,
         bindings: &[("GMAIL_INBOX_SYNC_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::GmailInboxSyncRetryQueue::LOCAL,
+        name: rox_queues::GmailInboxSyncRetryQueue::LOCAL,
         bindings: &[("GMAIL_INBOX_SYNC_RETRY_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::GmailOpsQueue::LOCAL,
+        name: rox_queues::GmailOpsQueue::LOCAL,
         bindings: &[("GMAIL_OPS_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::GmailOpsRetryQueue::LOCAL,
+        name: rox_queues::GmailOpsRetryQueue::LOCAL,
         bindings: &[("GMAIL_OPS_RETRY_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::LinkManagerQueue::LOCAL,
+        name: rox_queues::LinkManagerQueue::LOCAL,
         bindings: &[("LINK_MANAGER_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::SearchEventQueue::LOCAL,
+        name: rox_queues::SearchEventQueue::LOCAL,
         bindings: &[("SEARCH_EVENT_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::SfsDeleteQueue::LOCAL,
+        name: rox_queues::SfsDeleteQueue::LOCAL,
         bindings: &[("SFS_DELETE_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::SfsUploaderQueue::LOCAL,
+        name: rox_queues::SfsUploaderQueue::LOCAL,
         bindings: &[("SFS_UPLOADER_QUEUE", Name)],
     },
     Queue {
-        name: macro_queues::StaticFileServiceS3EventQueueUrl::LOCAL,
+        name: rox_queues::StaticFileServiceS3EventQueueUrl::LOCAL,
         bindings: &[("STATIC_FILE_SERVICE_S3_EVENT_QUEUE_URL", Url)],
     },
     Queue {
@@ -256,9 +256,9 @@ pub const QUEUES: &[Queue] = &[
         // No EventBridge locally — LocalStack has `events` disabled — so nothing
         // puts the minutely tick on this queue. `just poke_reminder_sweep` (or
         // `just tick_reminder_sweeps`) stands in for the schedule.
-        name: macro_queues::ReminderDispatchQueue::LOCAL,
+        name: rox_queues::ReminderDispatchQueue::LOCAL,
         bindings: &[(
-            macro_queues::ReminderDispatchQueue::OVERRIDE_ENV_VAR_NAME,
+            rox_queues::ReminderDispatchQueue::OVERRIDE_ENV_VAR_NAME,
             Url,
         )],
     },
@@ -266,9 +266,9 @@ pub const QUEUES: &[Queue] = &[
         // Same EventBridge stand-in as the reminders queue above:
         // `just poke_calendar_reminder_sweep` (or
         // `just tick_calendar_reminder_sweeps`) supplies the minutely tick.
-        name: macro_queues::CalendarReminderDispatchQueue::LOCAL,
+        name: rox_queues::CalendarReminderDispatchQueue::LOCAL,
         bindings: &[(
-            macro_queues::CalendarReminderDispatchQueue::OVERRIDE_ENV_VAR_NAME,
+            rox_queues::CalendarReminderDispatchQueue::OVERRIDE_ENV_VAR_NAME,
             Url,
         )],
     },
@@ -277,9 +277,9 @@ pub const QUEUES: &[Queue] = &[
         // workers (which tight-loop on receive errors if the queue is absent).
         // Bound through the queue's own override var in URL form so the service
         // dials the full LocalStack URL rather than the bare name.
-        name: macro_queues::CalendarServiceBackfillQueue::LOCAL,
+        name: rox_queues::CalendarServiceBackfillQueue::LOCAL,
         bindings: &[(
-            macro_queues::CalendarServiceBackfillQueue::OVERRIDE_ENV_VAR_NAME,
+            rox_queues::CalendarServiceBackfillQueue::OVERRIDE_ENV_VAR_NAME,
             Url,
         )],
     },
@@ -308,7 +308,7 @@ pub const BUCKETS: &[Bucket] = &[
         env_key: "UPLOAD_STAGING_BUCKET",
     },
     Bucket {
-        name: "macro-call-recording-local",
+        name: "rox-call-recording-local",
         env_key: "CALL_RECORDING_BUCKET_NAME",
     },
     Bucket {

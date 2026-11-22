@@ -7,7 +7,7 @@ use databases::domain::models::Viewer;
 use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, EntityAccessReceipt, OwnerAccessLevel, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{
@@ -64,7 +64,7 @@ pub trait FormAccessDirectory: Send + Sync + 'static {
     /// Every live form the user holds a grant on, at the highest level.
     fn accessible_forms(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<(FormId, AccessLevel)>, Self::Error>> + Send;
 }
 
@@ -219,7 +219,7 @@ pub trait FormsRepo: Send + Sync + 'static {
     fn response_of(
         &self,
         form: FormId,
-        respondent: &MacroUserIdStr<'_>,
+        respondent: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<FormResponse>, Self::Error>> + Send;
 
     /// Record that a gate stopped a signed-in respondent: their entry
@@ -228,7 +228,7 @@ pub trait FormsRepo: Send + Sync + 'static {
     fn record_stop(
         &self,
         form: FormId,
-        respondent: &MacroUserIdStr<'_>,
+        respondent: &RoxUserIdStr<'_>,
         section: FormSectionId,
         at: DateTime<Utc>,
     ) -> impl Future<Output = Result<(), Self::Error>> + Send;
@@ -241,7 +241,7 @@ pub trait FormsRepo: Send + Sync + 'static {
     fn record_submission(
         &self,
         form: FormId,
-        respondent: Option<&MacroUserIdStr<'_>>,
+        respondent: Option<&RoxUserIdStr<'_>>,
         row: RowId,
         at: DateTime<Utc>,
     ) -> impl Future<Output = Result<RecordedResponse, Self::Error>> + Send;
@@ -254,7 +254,7 @@ pub trait FormsRepo: Send + Sync + 'static {
     fn record_anonymous_submission(
         &self,
         form: FormId,
-        voter: Option<&MacroUserIdStr<'_>>,
+        voter: Option<&RoxUserIdStr<'_>>,
         row: RowId,
         day: DateTime<Utc>,
     ) -> impl Future<Output = Result<RecordedResponse, Self::Error>> + Send;
@@ -264,7 +264,7 @@ pub trait FormsRepo: Send + Sync + 'static {
     fn holds_receipt(
         &self,
         form: FormId,
-        voter: &MacroUserIdStr<'_>,
+        voter: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, Self::Error>> + Send;
 
     /// Point an entry at a new row, for a response whose row was deleted
@@ -294,7 +294,7 @@ pub trait FormsRepo: Send + Sync + 'static {
     fn respondents_by_row(
         &self,
         form: FormId,
-    ) -> impl Future<Output = Result<Vec<(RowId, MacroUserIdStr<'static>)>, Self::Error>> + Send;
+    ) -> impl Future<Output = Result<Vec<(RowId, RoxUserIdStr<'static>)>, Self::Error>> + Send;
 }
 
 /// The forms domain service.

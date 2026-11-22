@@ -3,12 +3,12 @@
 use agent_session::domain::error::AgentSessionError;
 use agent_session::domain::ports::AgentSessionRepo;
 use channels::domain::models::ChannelType;
-use macro_event_broker::{EventBrokerError, MacroEvent as _, MacroEventBroker};
-use macro_uuid::Uuid;
+use rox_event_broker::{EventBrokerError, RoxEvent as _, RoxEventBroker};
+use rox_uuid::Uuid;
 use messages::domain::events::MessagePostedMetadata;
 use messages::domain::models::MessageParent;
 
-use super::broker_events::{AgentSessionMacroEvent, AgentTriggerEventName};
+use super::broker_events::{AgentSessionRoxEvent, AgentTriggerEventName};
 use super::context::{DiscussionReader, discussion_trigger};
 use super::service::{
     AgentBotLookup, AgentTriggerService, ChannelParticipationLookup, ExplicitReplyExtractor,
@@ -92,7 +92,7 @@ where
     History: ThreadHistory,
     Kinds: ChannelTypeLookup,
     Discussions: DiscussionReader,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     tracing::Span::current().record("macro.event.type", "message.posted");
     let posted = &input.posted;
@@ -160,7 +160,7 @@ where
         let context = discussion
             .clone()
             .map(|discussion| discussion_trigger(&decision, discussion));
-        let yielded = AgentSessionMacroEvent::from_decision(decision, channel_type, context)
+        let yielded = AgentSessionRoxEvent::from_decision(decision, channel_type, context)
             .map_err(|error| AgentSessionError::Unknown(error.into()))?;
         let event_type: &'static str = AgentTriggerEventName::from(&yielded.event().event).into();
         tracing::info!(

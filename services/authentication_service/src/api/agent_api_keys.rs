@@ -17,13 +17,13 @@ use bots::domain::{
     models::{Agent, BotOwner},
     ports::{BotError, BotService},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOnly};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationExtractor, UserOnly};
+use rox_user_id::user_id::RoxUserIdStr;
 use utoipa::ToSchema;
 
 use crate::api::context::{ApiContext, AuthorizationService};
 
-type Caller = MacroAuthorizationExtractor<AuthorizationService, UserOnly>;
+type Caller = RoxAuthorizationExtractor<AuthorizationService, UserOnly>;
 
 /// Routes for an agent's API key, under `/agents/{agent_id}/api-key`.
 pub fn router() -> Router<ApiContext> {
@@ -181,7 +181,7 @@ async fn keyed_agent(
         .await?;
     let owner = match agent.bot.owner {
         Some(BotOwner::User { user_id }) => AgentOwner::User(
-            MacroUserIdStr::try_from(user_id).map_err(|_| AgentApiKeyError::Internal)?,
+            RoxUserIdStr::try_from(user_id).map_err(|_| AgentApiKeyError::Internal)?,
         ),
         Some(BotOwner::Team { team_id }) => AgentOwner::Team(team_id),
         None => return Err(AgentApiKeyError::Forbidden),

@@ -162,7 +162,7 @@ async fn main() -> Result<(), rootcause::Report> {
         host,
         state,
         harness_id: None,
-        created_by: macro_user_id::user_id::MacroUserIdStr::try_from(
+        created_by: rox_user_id::user_id::RoxUserIdStr::try_from(
             "macro|smoke@example.com".to_owned(),
         )?,
         created_at: now,

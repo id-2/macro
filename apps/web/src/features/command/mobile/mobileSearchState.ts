@@ -1,5 +1,5 @@
 import { createControlledOpenSignal } from '@core/util/createControlledOpenSignal';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { type Accessor, batch, createSignal } from 'solid-js';
 import { shouldUseUniversalInput } from '../core/universal-input-mode';
 import type { EntitySearchCategory } from '../queries/entity-search';

@@ -4,7 +4,7 @@ use crate::outbound::postgres::test::{
     OWNER, create_session, create_test_bot, insert_originating_thread_fixture, new_session,
     test_repo,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_permissions::share_permission::channel_share_permission::{
     UpdateChannelSharePermission, UpdateOperation,
 };
@@ -42,8 +42,8 @@ fn request() -> UpdateSharePermissionRequestV2 {
     }
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()
 }
 
 #[sqlx::test(migrations = false)]
@@ -105,7 +105,7 @@ async fn settings_and_channel_grants_round_trip_without_promoting_viewers(pool: 
     let repo = test_repo(&pool);
     let bot = create_test_bot(&pool).await;
     let session = create_session(&repo, new_session(bot, None, None)).await;
-    let channel = macro_uuid::generate_uuid_v7().to_string();
+    let channel = rox_uuid::generate_uuid_v7().to_string();
     let initial = repo.permissions(session.id).await.unwrap();
     assert_eq!(initial.link_share, None);
     assert_eq!(initial.channel_share_permissions, Some(vec![]));

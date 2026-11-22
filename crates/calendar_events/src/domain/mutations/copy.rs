@@ -13,7 +13,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     pub(super) async fn copy_into_calendar(
@@ -131,7 +131,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(

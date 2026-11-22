@@ -5,12 +5,12 @@ use axum::{
     routing::get,
 };
 use harness_id::HarnessId;
-use macro_authorization::{
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotScope, HarnessAuthentication, HarnessAuthorizationOwner,
-    INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, MacroAuthorization,
-    MacroUserAuthentication,
+    INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, RoxAuthorization,
+    RoxUserAuthentication,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use tower::ServiceExt;
 use uuid::Uuid;
@@ -83,13 +83,13 @@ async fn response_body(response: axum::response::Response) -> String {
     String::from_utf8(body.to_vec()).expect("response body should be UTF-8")
 }
 
-fn user_authentication(user_id: &str) -> MacroUserAuthentication {
-    MacroUserAuthentication {
-        origin: macro_authorization::CredentialOrigin::Session,
+fn user_authentication(user_id: &str) -> RoxUserAuthentication {
+    RoxUserAuthentication {
+        origin: rox_authorization::CredentialOrigin::Session,
         agent_id: None,
         agent_via: None,
         routine_id: None,
-        macro_user_id: MacroUserIdStr::try_from(user_id.to_string()).expect("valid user id"),
+        macro_user_id: RoxUserIdStr::try_from(user_id.to_string()).expect("valid user id"),
         user_context: UserContext {
             user_id: user_id.to_string(),
             fusion_user_id: "fusion-user-id".to_string(),
@@ -122,18 +122,18 @@ fn caller_from_authorization_table() {
     };
 
     let cases = [
-        (Some(MacroAuthorization::Bot(bot)), ("bot", None)),
-        (Some(MacroAuthorization::Internal(None)), ("internal", None)),
+        (Some(RoxAuthorization::Bot(bot)), ("bot", None)),
+        (Some(RoxAuthorization::Internal(None)), ("internal", None)),
         (
-            Some(MacroAuthorization::Internal(Some(user.clone()))),
+            Some(RoxAuthorization::Internal(Some(user.clone()))),
             ("person", Some(USER_ID.to_string())),
         ),
         (
-            Some(MacroAuthorization::User(user)),
+            Some(RoxAuthorization::User(user)),
             ("person", Some(USER_ID.to_string())),
         ),
         (
-            Some(MacroAuthorization::Harness(harness)),
+            Some(RoxAuthorization::Harness(harness)),
             ("person", Some(HARNESS_ACTING_USER_ID.to_string())),
         ),
         (None, ("person", None)),

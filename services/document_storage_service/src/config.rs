@@ -1,9 +1,9 @@
 use anyhow::Context;
 pub use dictation::outbound::OpenaiApiKey;
 use entity_registry::NonUserOwners;
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::{env_vars, maybe_env_vars};
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::{env_vars, maybe_env_vars};
 use secretsmanager_client::LocalOrRemoteSecret;
 
 #[cfg(test)]
@@ -99,7 +99,7 @@ maybe_env_vars! {
 }
 
 /// The configuration parameters for the application.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     pub openbao_address: OpenbaoAddress,
@@ -270,7 +270,7 @@ impl Config {
         let enforcement = ai_usage::config::load_ai_usage_enforcement()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let mut config =
-            macro_config::ConfigLoader::load::<Config>().context("failed to load config")?;
+            rox_config::ConfigLoader::load::<Config>().context("failed to load config")?;
         config.enable_ai_usage_enforcement = enforcement;
         Ok(config)
     }

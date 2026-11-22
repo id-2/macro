@@ -1,5 +1,5 @@
 import { useSplitLayout } from '@components/app/split-layout/layout';
-import type { MagicChipData } from '@macro-inc/lexical-core';
+import type { MagicChipData } from '@rox-one/lexical-core';
 import { $createNodeSelection, $setSelection, type NodeKey } from 'lexical';
 import { type Component, useContext } from 'solid-js';
 import { LexicalWrapperContext } from '../../../context/LexicalWrapperContext';

@@ -1,8 +1,8 @@
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_uuid::Uuid;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_uuid::Uuid;
 use rdkafka::message::{OwnedMessage, Timestamp};
 use serde_json::{Value, json};
 use sqlx::PgPool;
@@ -70,7 +70,7 @@ fn settled(session: &str, action: &str, reason: &str) -> Value {
 
 fn decoded(payload: &Value) -> Option<SessionEvent> {
     let message = MessageWrapper::<_, SessionLifecycle>::new(record(0, payload));
-    let SessionLifecycle::AgentSessionLifecycleMacroEvent(event) =
+    let SessionLifecycle::AgentSessionLifecycleRoxEvent(event) =
         message.decode_payload().unwrap();
     session_event(&event.event().event)
 }

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useUserId } from '@core/context/user';
 import { useAgentPreview } from '@queries/agent-session/preview';
 import { createSignal, Show } from 'solid-js';
@@ -17,7 +18,7 @@ export function AgentPreviewBanner() {
     // Reserve the tab in the click gesture, before waiting for authorization.
     const tab = window.open('', '_blank');
     if (!tab) {
-      setError('Allow popups to open the preview.');
+      setError(t('agentChat.previewAllowPopups'));
       return;
     }
     tab.opener = null;
@@ -50,7 +51,7 @@ export function AgentPreviewBanner() {
     } catch {
       tab.close();
       setError(
-        'Unable to open this preview. It may have ended or your access may have changed.'
+        t('agentChat.previewUnavailable')
       );
     } finally {
       setBusy(false);
@@ -62,7 +63,7 @@ export function AgentPreviewBanner() {
     try {
       await preview.stop();
     } catch {
-      setError('Unable to stop sharing. Please try again.');
+      setError(t('agentChat.previewStopFailed'));
     } finally {
       setBusy(false);
     }
@@ -74,9 +75,9 @@ export function AgentPreviewBanner() {
       case 'ready':
         return 'Agent is sharing a preview';
       case 'expired':
-        return 'Preview expired. Ask the agent to share again.';
+        return t('agentChat.previewExpired');
       case 'offline':
-        return 'Preview disconnected. Ask the agent to reconnect.';
+        return t('agentChat.previewDisconnected');
       case 'stopped':
         return 'Preview sharing stopped';
       default:

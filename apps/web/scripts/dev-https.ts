@@ -20,10 +20,10 @@ export function devHttps(
     apply: (_config, { command, isPreview }) =>
       command === 'serve' &&
       !isPreview &&
-      !env.MACRO_LOCAL_BACKEND_PROXY &&
+      !env.ROX_LOCAL_BACKEND_PROXY &&
       !env.TAURI_ENV_PLATFORM &&
       !env.TAURI_DEV_HOST &&
-      env.MACRO_DEV_HTTPS !== 'false',
+      env.ROX_DEV_HTTPS !== 'false',
     config() {
       hostname = execFileSync('hostname', { encoding: 'utf8' })
         .trim()

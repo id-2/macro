@@ -19,7 +19,7 @@ whose hash lives in `account_manager_grants` rather than `"UserApiKey"`.
 ## Scope
 
 - Owns: the `"UserApiKey"` table's lifecycle.
-- Not here: validating the `x-macro-user-api-key` header on an incoming
+- Not here: validating the `x-rox-user-api-key` header on an incoming
   request → `macro_authorization`.
 
 ## Boundaries

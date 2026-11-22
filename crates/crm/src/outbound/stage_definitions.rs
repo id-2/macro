@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use entity_access::domain::models::MemberTeamRole;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::api::{
     CreatePropertyDefinitionRequest, CreatePropertyScope, PropertyDataType, SelectStringOption,
 };
@@ -84,7 +84,7 @@ fn stage_set_from_definition(definition: PropertyDefinitionWithOptions) -> TeamS
 
 fn acting_user(
     access: &CrmTeamReceipt<MemberTeamRole>,
-) -> Result<&MacroUserIdStr<'static>, CrmError> {
+) -> Result<&RoxUserIdStr<'static>, CrmError> {
     access.receipt().acting_user_id().ok_or_else(|| {
         CrmError::InvalidRequest("editing deal stages requires an authenticated user".into())
     })

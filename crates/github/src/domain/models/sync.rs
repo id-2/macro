@@ -667,7 +667,7 @@ impl TeamTaskReference {
 
 /// The text to put in a pull request so the webhook links it to `task`: the team reference
 /// when the webhook's parser reads it back, else `MACRO-{short_uuid}`.
-pub fn pull_request_task_reference(task: &MacroTaskId, team: Option<&TeamTaskReference>) -> String {
+pub fn pull_request_task_reference(task: &RoxTaskId, team: Option<&TeamTaskReference>) -> String {
     team.and_then(|team| {
         let reference = format!(
             "{}-{}",
@@ -692,21 +692,21 @@ pub struct ResolvedTeamTaskReference {
     /// The team whose slug and task number matched the reference.
     pub team_id: uuid::Uuid,
     /// The task document backing the team task.
-    pub task_id: MacroTaskId,
+    pub task_id: RoxTaskId,
 }
 
 /// A Rox task ID in the form `MACRO-{short_uuid}`.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-pub struct MacroTaskId {
+pub struct RoxTaskId {
     /// The Flickr base58 short UUID portion
     pub short_uuid: String,
 }
 
-impl MacroTaskId {
+impl RoxTaskId {
     /// Create from a raw short UUID string, validating that all characters
     /// are in the Flickr base58 alphabet.
     pub fn from_short_uuid(s: &str) -> Option<Self> {
-        let converter = macro_uuid::ShortUuidConverter::default();
+        let converter = rox_uuid::ShortUuidConverter::default();
         if converter.is_short_uuid(s) {
             Some(Self {
                 short_uuid: s.to_string(),
@@ -718,7 +718,7 @@ impl MacroTaskId {
 
     /// Create from a full UUID by converting to a short UUID.
     pub fn from_uuid(uuid: &uuid::Uuid) -> Self {
-        let converter = macro_uuid::ShortUuidConverter::default();
+        let converter = rox_uuid::ShortUuidConverter::default();
         Self {
             short_uuid: converter.from_uuid(uuid),
         }
@@ -726,7 +726,7 @@ impl MacroTaskId {
 
     /// Convert back to a full UUID.
     pub fn to_uuid(&self) -> anyhow::Result<uuid::Uuid> {
-        let converter = macro_uuid::ShortUuidConverter::default();
+        let converter = rox_uuid::ShortUuidConverter::default();
         converter.to_uuid(&self.short_uuid)
     }
 
@@ -742,7 +742,7 @@ impl MacroTaskId {
     /// Only short UUIDs that decode to an RFC 4122 UUID are kept. Free text is
     /// full of `macro-` words that are valid base58 but are not task ids, such
     /// as the `macro-inc` org in GitHub URLs or `MACRO-3692` team task numbers.
-    pub fn extract_from_text(text: &str) -> Vec<MacroTaskId> {
+    pub fn extract_from_text(text: &str) -> Vec<RoxTaskId> {
         let mut seen = HashSet::new();
         let mut results = Vec::new();
 
@@ -764,7 +764,7 @@ fn is_rfc4122_uuid(uuid: &uuid::Uuid) -> bool {
     uuid.get_variant() == uuid::Variant::RFC4122 && uuid.get_version().is_some()
 }
 
-impl fmt::Display for MacroTaskId {
+impl fmt::Display for RoxTaskId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "MACRO-{}", self.short_uuid)
     }

@@ -5,15 +5,15 @@ import type {
   Surface,
 } from '../../../generated/scheduled-action/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import type { MacroEntityType } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import type { RoxEntityType } from '../entity';
 import { Routine, type RoutineOptions, routineBody } from './routine';
 import { RoutineSuggestion } from './suggestion';
 
 /** Something created for a routine to use: any handle with an entity type, such as a `Database`. */
 export interface CreatedEntity {
   readonly id: string;
-  readonly entityType: MacroEntityType;
+  readonly entityType: RoxEntityType;
 }
 
 /**
@@ -36,7 +36,7 @@ export interface CreatedEntity {
  * - Create beforehand only what the routine needs to exist before it runs: when the request asks for something new that the routine then uses by id (a database it adds rows to, a folder it files into, a channel it posts in), create it with the name given and use its id. Create nothing else.
  * - Never do the routine's own work while setting it up; it does its work each time it runs. "Every Monday make a task" makes no task today; "when an email arrives, reply" sends nothing; "post the weekly summary" posts nothing.
  * - In a cron `schedule` (six fields: second minute hour day-of-month month day-of-week), name weekdays MON to SUN: weekday numbers start at 1 = Sunday, so Monday to Friday is `MON-FRI`, never `1-5`.
- * - In code, check the whole routine with `macro.routines.check` before creating it, naming in `created` what you created for it, and fix what it reports until `ok` is true.
+ * - In code, check the whole routine with `rox.routines.check` before creating it, naming in `created` what you created for it, and fix what it reports until `ok` is true.
  *
  * Events an `events` trigger starts on (`EventName` lists every one):
  *
@@ -54,7 +54,7 @@ export interface CreatedEntity {
  * - `call.ended`: a call you joined ends. The routine gets the call's participants and transcript.
  */
 export class RoutineNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a lazy routine handle. */
   byId(id: string): Routine {
@@ -73,7 +73,7 @@ export class RoutineNamespace {
    * 7-field schedule that names one date runs once. A code step's `source`
    * exports `async function main({ macro, run, trigger, steps, knobs })` and
    * is type-checked against this SDK when saved. A rejected routine throws a
-   * `MacroApiError` whose message says what the server refused, including
+   * `RoxApiError` whose message says what the server refused, including
    * type-check errors.
    *
    * Inside a routine's run, the new routine is that routine's sub-routine
@@ -85,7 +85,7 @@ export class RoutineNamespace {
    *
    * @example
    * // Every ten minutes, in New York time.
-   * const routine = await macro.routines.create({
+   * const routine = await rox.routines.create({
    *   name: 'Check the import',
    *   trigger: {
    *     type: 'cron',
@@ -101,7 +101,7 @@ export class RoutineNamespace {
    *   ],
    * });
    * // Once, at 14:30 on 3 November 2027.
-   * await macro.routines.create({
+   * await rox.routines.create({
    *   name: 'Follow up on the review',
    *   trigger: { type: 'cron', schedule: '0 30 14 3 11 * 2027', timezone: 'UTC' },
    *   steps: [
@@ -114,7 +114,7 @@ export class RoutineNamespace {
    * });
    * // A code step that posts in a channel, disabled until turned on. The
    * // user asked for the post to come from them.
-   * await macro.routines.create({
+   * await rox.routines.create({
    *   name: 'Say hello',
    *   trigger: { type: 'once', at: '2027-11-03T14:30:00Z' },
    *   enabled: false,
@@ -123,14 +123,14 @@ export class RoutineNamespace {
    *       type: 'code',
    *       title: 'Post hello',
    *       source: `export async function main({ macro }: StepContext) {
-   *   await macro.channels.byId('<channel id>').send('Hello');
+   *   await rox.channels.byId('<channel id>').send('Hello');
    * }`,
    *     },
    *   ],
    *   dangerouslyOperateAsUser: true,
    * });
    * // In a routine's code step: one follow-up per task, however often it runs.
-   * await macro.routines.create(
+   * await rox.routines.create(
    *   {
    *     name: `Check on ${taskName}`,
    *     trigger: { type: 'once', at: tomorrow },
@@ -179,7 +179,7 @@ export class RoutineNamespace {
    * exists.
    *
    * @example
-   * const check = await macro.routines.check({
+   * const check = await rox.routines.check({
    *   name: 'Say hello',
    *   trigger: { type: 'once', at: '2027-11-03T14:30:00Z' },
    *   steps: [{ type: 'code', title: 'Post hello', source }],
@@ -221,7 +221,7 @@ export class RoutineNamespace {
    * not, the `problems` to fix before suggesting it again.
    *
    * @example
-   * const outcome = await macro.routines.suggest({
+   * const outcome = await rox.routines.suggest({
    *   kind: 'catalog',
    *   key: 'inbox',
    *   knobs: {},

@@ -29,7 +29,7 @@ use entity_access::domain::models::{
     AccessLevel, BotAccessScope, BotId, CallChannelInfo, EntityAccessReceipt, EntityPermission,
     RequiredPermission, TeamRole, UserTeamInfo,
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use messages::domain::events::{
     MessageAttachmentCreatedMetadata, MessageAttachmentRemovedMetadata, MessageDeletedMetadata,
     MessageMentionedMetadata, MessagePatchedMetadata, MessagePostedMetadata,
@@ -145,8 +145,8 @@ fn lock<T>(mutex: &Mutex<T>) -> MutexGuard<'_, T> {
     mutex.lock().expect("test mutex is not poisoned")
 }
 
-fn user_id(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user_id(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn sender(id: &str) -> ChannelSender<'static> {
@@ -166,13 +166,13 @@ enum AccessFailure {
 
 #[derive(Clone)]
 struct MockAccessService {
-    users: Vec<MacroUserIdStr<'static>>,
+    users: Vec<RoxUserIdStr<'static>>,
     failure: Option<AccessFailure>,
     calls: Arc<Mutex<Vec<(String, EntityType)>>>,
 }
 
 impl MockAccessService {
-    fn with_users(users: Vec<MacroUserIdStr<'static>>) -> Self {
+    fn with_users(users: Vec<RoxUserIdStr<'static>>) -> Self {
         Self {
             users,
             failure: None,
@@ -184,7 +184,7 @@ impl MockAccessService {
 impl EntityAccessService for MockAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -204,7 +204,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -213,7 +213,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -232,7 +232,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -242,7 +242,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -253,7 +253,7 @@ impl EntityAccessService for MockAccessService {
         &self,
         entity_id: &str,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         lock(&self.calls).push((entity_id.to_string(), entity_type));
         match self.failure {
             Some(AccessFailure::Internal) => Err(AccessError::internal("mock access failure")),
@@ -277,7 +277,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!("not used by webhook event ingestion")
     }
@@ -295,7 +295,7 @@ struct MockRepositoryState {
     matching_webhooks: Vec<Webhook>,
     fail_workspace_resolution: bool,
     fail_matching: bool,
-    workspace_calls: Vec<Vec<MacroUserIdStr<'static>>>,
+    workspace_calls: Vec<Vec<RoxUserIdStr<'static>>>,
     match_calls: Vec<MatchCall>,
 }
 
@@ -324,7 +324,7 @@ impl WebhookWorkspaceResolver for MockRepository {
 
     async fn resolve_workspace_ids(
         &self,
-        people: Vec<MacroUserIdStr<'static>>,
+        people: Vec<RoxUserIdStr<'static>>,
     ) -> Result<Vec<String>, Self::Err> {
         let mut state = lock(&self.state);
         state.workspace_calls.push(people);
@@ -336,7 +336,7 @@ impl WebhookWorkspaceResolver for MockRepository {
 
     async fn get_user_team_workspace_id(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> Result<Option<String>, Self::Err> {
         Ok(None)
     }
@@ -347,7 +347,7 @@ impl WebhookRepo for MockRepository {
 
     async fn create_webhook(
         &self,
-        _created_by_user_id: MacroUserIdStr<'static>,
+        _created_by_user_id: RoxUserIdStr<'static>,
         _workspace_id: String,
         _request: CreateWebhookRequest,
         _signing_secret: String,
@@ -407,7 +407,7 @@ impl WebhookRepo for MockRepository {
 
     async fn get_user_team_workspace_id(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> Result<Option<String>, Self::Err> {
         unimplemented!("not used by webhook event ingestion")
     }
@@ -1788,14 +1788,14 @@ fn agent_session_lifecycle_event(
     ) -> agent_session::domain::events::AgentSessionLifecycleEvent,
 ) -> Event<agent_session::domain::events::AgentSessionLifecycleEvent> {
     use agent_session::domain::events::{SessionIdentity, ThreadOrigin};
-    use macro_user_id::cowlike::CowLike as _;
+    use rox_user_id::cowlike::CowLike as _;
 
     Event::new(event(SessionIdentity {
         session_id: agent_session::domain::model::AgentSessionId::TEST_A,
         session_name: "Fix the flaky test".to_owned(),
         bot_id: bot_id::BotId::new_from_uuid(uuid::Uuid::from_u128(0xB07)),
         bot_name: "Rox Coder".to_owned(),
-        owner_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|asker@example.com")
+        owner_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|asker@example.com")
             .expect("valid user id")
             .into_owned(),
         origin: Some(ThreadOrigin::new(

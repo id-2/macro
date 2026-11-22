@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 async fn setup(db: &PgPool) -> (PgMailboxSync, Uuid) {
     let (repo, link) = super::super::test::fixture(db).await;

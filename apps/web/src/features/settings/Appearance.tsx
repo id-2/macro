@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
 import ClipboardIcon from '@icon/system/regular/clipboard.svg';
@@ -60,10 +61,10 @@ function CopyThemeButton(props: {
 }) {
   return (
     <Button
-      aria-label={`Copy ${props.name}`}
+      aria-label={`Копировать ${props.name}`}
       variant="ghost"
       size={props.size}
-      tooltip="Copy theme"
+      tooltip="Копировать тему"
       onPointerDown={(e) => e.stopPropagation()}
       onPointerUp={(e) => e.stopPropagation()}
       onClick={(e) => {
@@ -86,10 +87,10 @@ function CopyThemeButton(props: {
 function EditThemeButton(props: { name: string; onEdit: () => void }) {
   return (
     <Button
-      aria-label={`Edit ${props.name}`}
+      aria-label={`Изменить ${props.name}`}
       variant="ghost"
       size="icon-md"
-      tooltip="Edit theme"
+      tooltip="Изменить тему"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -145,7 +146,7 @@ function createThemeEditorController(onSelect: (id: string) => void) {
     undefined
   );
   // The editable name of the theme being edited.
-  const [themeName, setThemeName] = createSignal('New Theme');
+  const [themeName, setThemeName] = createSignal('Новая тема');
 
   const closeEditor = () => {
     setEditorOpen(false);
@@ -175,7 +176,7 @@ function createThemeEditorController(onSelect: (id: string) => void) {
     clearThemePreview();
     setEditingThemeId(undefined);
     setIsThemeSaved(false);
-    setThemeName('New Theme');
+    setThemeName('Новая тема');
     setEditorOpen(true);
   };
 
@@ -189,11 +190,11 @@ function createThemeEditorController(onSelect: (id: string) => void) {
     const isCustom = userThemes().some((t) => t.id === id);
     if (isCustom) {
       setEditingThemeId(id);
-      setThemeName(source?.name ?? 'Theme');
+      setThemeName(source?.name ?? 'Тема');
     } else {
       setEditingThemeId(undefined);
       setIsThemeSaved(false);
-      setThemeName(`${source?.name ?? 'Theme'} copy`);
+      setThemeName(`${source?.name ?? 'Тема'} — копия`);
     }
     setEditorOpen(true);
   };
@@ -201,7 +202,7 @@ function createThemeEditorController(onSelect: (id: string) => void) {
   // Save the live theme: update the bound custom theme in place, or create a new
   // one, point the target at it, and keep editing it.
   const saveCurrentTheme = () => {
-    const name = themeName().trim() || 'New Theme';
+    const name = themeName().trim() || 'Новая тема';
     const editing = editingThemeId();
     if (editing) {
       updateTheme(editing, name);
@@ -211,7 +212,7 @@ function createThemeEditorController(onSelect: (id: string) => void) {
       setEditingThemeId(newId);
       onSelect(newId);
     }
-    toast.success('Theme saved');
+    toast.success('Тема сохранена');
   };
 
   const deleteThemeById = (theme: ThemeV3) => {
@@ -324,8 +325,8 @@ function InterfaceThemeSelect(props: {
         <CopyThemeButton themeId={theme.id} name={theme.name} size="icon-xs" />
         <Show when={editable}>
           <Button
-            aria-label={`Edit ${theme.name}`}
-            tooltip={`Edit ${theme.name}`}
+            aria-label={`Изменить ${theme.name}`}
+            tooltip={`Изменить ${theme.name}`}
             variant="ghost"
             size="icon-xs"
             onPointerDown={(e) => e.stopPropagation()}
@@ -340,8 +341,8 @@ function InterfaceThemeSelect(props: {
             <PencilIcon class="size-3 touch:size-3.5" />
           </Button>
           <Button
-            aria-label={`Delete ${theme.name}`}
-            tooltip={`Delete ${theme.name}`}
+            aria-label={`Удалить ${theme.name}`}
+            tooltip={`Удалить ${theme.name}`}
             variant="ghost"
             size="icon-xs"
             onPointerDown={(e) => e.stopPropagation()}
@@ -380,7 +381,7 @@ function InterfaceThemeSelect(props: {
           // deleted), fall back to the live tokens so the swatch still reflects
           // the current colors and the label reads "Unsaved Theme".
           theme={current() ?? getLiveTheme()}
-          name={current()?.name ?? 'Unsaved Theme'}
+          name={current()?.name ?? 'Несохранённая тема'}
         />
         <Dropdown.Content
           // Render as a plain div (not Surface) so the edge is a faint ink
@@ -421,7 +422,7 @@ function InterfaceThemeSelect(props: {
                   const item = e.key === 'ArrowDown' ? items[0] : items.at(-1);
                   item?.focus();
                 }}
-                placeholder="Filter themes…"
+                placeholder="Фильтр тем…"
                 spellcheck={false}
                 class="h-8 w-full rounded-md border border-edge-muted bg-transparent px-2.5 text-sm text-ink outline-none placeholder:text-ink-placeholder focus:border-accent"
               />
@@ -430,13 +431,13 @@ function InterfaceThemeSelect(props: {
             <div class="max-h-64 overflow-y-auto bg-surface">
               <Show when={defaults().length > 0}>
                 <Dropdown.Group>
-                  <Dropdown.GroupLabel>Default</Dropdown.GroupLabel>
+                  <Dropdown.GroupLabel>По умолчанию</Dropdown.GroupLabel>
                   <For each={defaults()}>{(theme) => themeItem(theme)}</For>
                 </Dropdown.Group>
               </Show>
               <Show when={customs().length > 0}>
                 <Dropdown.Group>
-                  <Dropdown.GroupLabel>Custom</Dropdown.GroupLabel>
+                  <Dropdown.GroupLabel>Свои</Dropdown.GroupLabel>
                   <For each={customs()}>
                     {(theme) => themeItem(theme, true)}
                   </For>
@@ -444,7 +445,7 @@ function InterfaceThemeSelect(props: {
               </Show>
               <Show when={defaults().length === 0 && customs().length === 0}>
                 <div class="px-3 py-4 text-center text-xs text-ink-muted">
-                  No themes match “{filter()}”
+                  Нет тем по запросу «{filter()}»
                 </div>
               </Show>
             </div>
@@ -457,7 +458,7 @@ function InterfaceThemeSelect(props: {
               >
                 <span class="flex items-center gap-2 text-ink-muted">
                   <PlusIcon class="size-4" />
-                  New theme
+                  Новая тема
                 </span>
               </Dropdown.Item>
               <Dropdown.Item
@@ -467,7 +468,7 @@ function InterfaceThemeSelect(props: {
               >
                 <span class="flex items-center gap-2 text-ink-muted">
                   <DownloadIcon class="size-4" />
-                  Import from clipboard
+                  Импорт из буфера обмена
                 </span>
               </Dropdown.Item>
             </Dropdown.Group>
@@ -477,7 +478,7 @@ function InterfaceThemeSelect(props: {
       <Show when={current()}>
         <ThemePillActions
           themeId={props.value()}
-          name={current()?.name ?? 'Theme'}
+          name={current()?.name ?? 'Тема'}
           onEdit={() =>
             props.editorOpen?.()
               ? props.onCloseEditor?.()
@@ -497,10 +498,10 @@ export function Appearance() {
     ) ?? DEFAULT_THEMES.find((theme) => theme.mode === mode)!;
   return (
     <div class="h-full">
-      <SettingsPage title="Appearance">
+      <SettingsPage title={t('settingsNav.tabAppearance')}>
         <SettingsSection
-          title="Color Theme"
-          description="Choose how Rox looks on your screen."
+          title={t('settingsNav.colorTheme')}
+          description={t('settingsNav.colorThemeDescription')}
         >
           <div
             class="mx-auto w-full max-w-lg py-2"
@@ -517,8 +518,10 @@ export function Appearance() {
             />
             <p class="mt-3 text-center text-sm text-ink-muted">
               {themeMode() === 'system'
-                ? 'Switches between your light and dark themes with your device.'
-                : `Always use your ${themeMode()} theme.`}
+                ? t('settingsNav.themeFollowsDevice')
+                : themeMode() === 'dark'
+                  ? t('settingsNav.alwaysUseDark')
+                  : t('settingsNav.alwaysUseLight')}
             </p>
           </div>
           <SettingsCard class="@container">
@@ -527,8 +530,8 @@ export function Appearance() {
                 <>
                   <Show when={mode !== 'dark'}>
                     <ThemeSelectorRow
-                      label="Light theme"
-                      description="Colors and style for light mode."
+                      label={t('settingsNav.lightTheme')}
+                      description={t('settingsNav.lightThemeDescription')}
                       value={lightModeTheme}
                       onSelect={setLightModeTheme}
                       filter={(theme) => theme.mode === 'light'}
@@ -536,8 +539,8 @@ export function Appearance() {
                   </Show>
                   <Show when={mode !== 'light'}>
                     <ThemeSelectorRow
-                      label="Dark theme"
-                      description="Colors and style for dark mode."
+                      label={t('settingsNav.darkTheme')}
+                      description={t('settingsNav.darkThemeDescription')}
                       value={darkModeTheme}
                       onSelect={setDarkModeTheme}
                       filter={(theme) => theme.mode === 'dark'}
@@ -549,26 +552,26 @@ export function Appearance() {
           </SettingsCard>
         </SettingsSection>
 
-        <SettingsSection title="Interface">
+        <SettingsSection title="Интерфейс">
           <SettingsCard>
             <SettingsRow
-              label="Monochrome icons"
-              description="Use single-color icons across the app."
+              label="Одноцветные значки"
+              description="Одноцветные значки по всему приложению."
             >
               <ToggleSwitch
                 size="md"
-                aria-label="Monochrome icons"
+                aria-label="Одноцветные значки"
                 onChange={setMonochromeIcons}
                 checked={monochromeIcons()}
               />
             </SettingsRow>
             <SettingsRow
-              label="Show tooltips"
-              description="Show hover hints on buttons and controls."
+              label="Показывать подсказки"
+              description="Подсказки при наведении на кнопки и элементы управления."
             >
               <ToggleSwitch
                 size="md"
-                aria-label="Show tooltips"
+                aria-label="Показывать подсказки"
                 onChange={setTooltipsEnabled}
                 checked={tooltipsEnabled()}
               />

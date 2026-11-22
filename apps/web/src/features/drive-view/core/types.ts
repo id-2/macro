@@ -30,15 +30,45 @@ export type DriveState = {
 };
 
 export const DRIVE_TABS = [
-  { id: 'owned', label: 'My Files' },
-  { id: 'recent', label: 'Recent' },
-  { id: 'shared', label: 'Shared with me' },
+  {
+    id: 'owned',
+    get label() {
+      return t('drive.tabOwned');
+    },
+  },
+  {
+    id: 'recent',
+    get label() {
+      return t('drive.tabRecent');
+    },
+  },
+  {
+    id: 'shared',
+    get label() {
+      return t('drive.tabShared');
+    },
+  },
 ] satisfies { id: DriveTab; label: string }[];
 
 export const DRIVE_SORT_OPTIONS = [
-  { id: 'updated_at', label: 'Last modified' },
-  { id: 'created_at', label: 'Created' },
-  { id: 'viewed_at', label: 'Last viewed' },
+  {
+    id: 'updated_at',
+    get label() {
+      return t('drive.sortUpdated');
+    },
+  },
+  {
+    id: 'created_at',
+    get label() {
+      return t('drive.sortCreated');
+    },
+  },
+  {
+    id: 'viewed_at',
+    get label() {
+      return t('drive.sortViewed');
+    },
+  },
   {
     id: 'name',
     get label() {

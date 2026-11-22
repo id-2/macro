@@ -5,8 +5,8 @@ import {
   CallEndedError,
   InOtherCallError,
   Macro,
-} from '../src/macro';
-import { MacroClient } from '../src/utils/client';
+} from '../src/rox';
+import { RoxClient } from '../src/utils/client';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -189,7 +189,7 @@ test('discussion follows the record location', async () => {
 
 test('call notifications hydrate entity handles', async () => {
   const { hydrateCallEvent } = await import('../src/events/hydrate/call');
-  const client = new MacroClient({
+  const client = new RoxClient({
     auth: { type: 'user', apiKey: 'test_key' },
     hosts: { storage: 'https://storage.test' },
   });

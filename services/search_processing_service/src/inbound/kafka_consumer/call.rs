@@ -1,7 +1,7 @@
 //! Maps call lifecycle events to search-index actions and processes them.
 
-use ::call::domain::events::{CallMacroEvent, CallTopicEvent};
-use macro_event_broker::MacroEvent as _;
+use ::call::domain::events::{CallRoxEvent, CallTopicEvent};
+use rox_event_broker::RoxEvent as _;
 use opensearch_client::OpensearchClient;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -97,7 +97,7 @@ async fn process_call_index_action(
 pub(super) async fn process_call_event(
     db: &PgPool,
     opensearch_client: &OpensearchClient,
-    event: &CallMacroEvent,
+    event: &CallRoxEvent,
     partition: i32,
     offset: i64,
 ) -> EventOutcome {

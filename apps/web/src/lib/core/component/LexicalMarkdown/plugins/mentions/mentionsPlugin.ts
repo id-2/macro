@@ -2,7 +2,7 @@ import { verifyBlockName } from '@core/constant/allBlocks';
 import { untrackMention } from '@core/signal/mention';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { $wrapNodeInElement, mergeRegister } from '@lexical/utils';
-import type { PeerIdValidator } from '@macro-inc/lexical-core';
+import type { PeerIdValidator } from '@rox-one/lexical-core';
 import {
   $collapseInlineSearch,
   $createAgentSessionMentionNode,
@@ -51,9 +51,9 @@ import {
   type UserMentionInfo,
   UserMentionNode,
   validTriggerPosition,
-} from '@macro-inc/lexical-core';
-import { $getId } from '@macro-inc/lexical-core/plugins/nodeIdPlugin';
-import type { MentionNode } from '@macro-inc/lexical-core/utils/mentions';
+} from '@rox-one/lexical-core';
+import { $getId } from '@rox-one/lexical-core/plugins/nodeIdPlugin';
+import type { MentionNode } from '@rox-one/lexical-core/utils/mentions';
 import { blockNameToItemType, type ItemType } from '@service-storage/client';
 import {
   $createParagraphNode,

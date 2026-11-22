@@ -95,7 +95,7 @@ function ImportLinearAction() {
     <ViewTourAction
       onClick={() => openWithSplit({ type: 'component', id: 'import-linear' })}
     >
-      Import from Linear
+      Импорт из Linear
     </ViewTourAction>
   );
 }
@@ -116,7 +116,7 @@ function TasksViewRoot() {
     return view?.kind === 'unavailable' ? view.message : undefined;
   };
 
-  onMount(() => panel.handle.setDisplayName('Tasks'));
+  onMount(() => panel.handle.setDisplayName('Задачи'));
 
   const taskList = () => (
     <MobileListLayout header={<TasksMobileControls />}>

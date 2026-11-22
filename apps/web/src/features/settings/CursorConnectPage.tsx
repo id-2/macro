@@ -58,10 +58,10 @@ export function CursorConnectPage(props: { onClose: () => void }) {
     try {
       await saveKey.mutateAsync(key);
       setApiKey('');
-      toast.success('Cursor connected');
+      toast.success('Cursor подключён');
     } catch (error) {
       toast.failure(
-        failureMessage(error, 'Failed to save your Cursor API key')
+        failureMessage(error, 'Не удалось сохранить ключ API Cursor')
       );
     }
   };
@@ -69,33 +69,33 @@ export function CursorConnectPage(props: { onClose: () => void }) {
   const disconnectCursor = async () => {
     if (disconnect.isPending) return;
     const confirmed = await confirmDialog({
-      title: 'Disconnect Cursor?',
-      body: "Remove your Cursor connection from Rox? This removes Rox's copy of the API key but does not revoke it in Cursor.",
-      confirmLabel: 'Disconnect',
+      title: 'Отключить Cursor?',
+      body: 'Убрать подключение Cursor из Rox? Копия ключа API в Rox будет удалена, но в Cursor ключ не отзовётся.',
+      confirmLabel: 'Отключить',
       tone: 'danger',
     });
     if (!confirmed || disconnect.isPending) return;
     try {
       await disconnect.mutateAsync();
-      toast.success('Cursor disconnected');
+      toast.success('Cursor отключён');
     } catch (error) {
-      toast.failure(failureMessage(error, 'Failed to disconnect Cursor'));
+      toast.failure(failureMessage(error, 'Не удалось отключить Cursor'));
     }
   };
 
   return (
     <SettingsPage
-      title={connected() ? 'Cursor' : 'Connect Cursor'}
+      title={connected() ? 'Cursor' : 'Подключить Cursor'}
       showTitleInSheet
-      description="Run agents on your own Cursor subscription. Sessions run in Cursor Cloud and stream into Rox."
+      description="Запускайте агентов на своей подписке Cursor. Сессии идут в Cursor Cloud и появляются в Rox."
       actions={
         <Button variant="ghost" size="sm" onClick={props.onClose}>
           <ArrowLeftIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-          Back
+          Назад
         </Button>
       }
     >
-      <section aria-label="Connect Cursor">
+      <section aria-label="Подключить Cursor">
         <SettingsSurface class="@container p-6">
           <form
             onSubmit={(event) => {
@@ -103,37 +103,36 @@ export function CursorConnectPage(props: { onClose: () => void }) {
               fireAndForget(connect(), 'cursor-connect');
             }}
           >
-            <ol aria-label="Cursor setup steps" class="list-none">
-              <SetupStep number={1} title="Create an API key in Cursor">
+            <ol aria-label="Шаги настройки Cursor" class="list-none">
+              <SetupStep number={1} title="Создайте ключ API в Cursor">
                 <p>
-                  In the Cursor dashboard, open{' '}
-                  <span class="font-medium text-ink">API &amp; SSH Keys</span>{' '}
-                  and click{' '}
-                  <span class="font-medium text-ink">New API Key</span>.
+                  В панели Cursor откройте{' '}
+                  <span class="font-medium text-ink">API &amp; SSH Keys</span> и
+                  нажмите <span class="font-medium text-ink">New API Key</span>.
                 </p>
                 <img
                   src={cursorApiKeysScreenshot}
-                  alt="Cursor dashboard with API & SSH Keys selected and the New API Key button"
+                  alt="Панель Cursor: выбран раздел API & SSH Keys и кнопка New API Key"
                   width={1200}
                   height={145}
                   class="block h-auto w-full rounded-[10px] border border-ink/10"
                 />
                 <SetupLink href={CURSOR_API_KEYS_URL}>
-                  Open API &amp; SSH Keys
+                  Открыть API &amp; SSH Keys
                 </SetupLink>
               </SetupStep>
-              <SetupStep number={2} title="Paste your API key">
+              <SetupStep number={2} title="Вставьте ключ API">
                 <p>
-                  Rox stores it encrypted and only uses it to start and follow
-                  your Cursor sessions.
+                  Rox хранит его в зашифрованном виде и использует только чтобы
+                  запускать ваши сессии Cursor и следить за ними.
                 </p>
                 <Show
                   when={loaded()}
                   fallback={
                     <p class="text-xs">
                       {status.isError
-                        ? 'Could not load your Cursor connection. Try refreshing this page.'
-                        : 'Loading…'}
+                        ? 'Не удалось загрузить подключение Cursor. Обновите страницу.'
+                        : 'Загрузка…'}
                     </p>
                   }
                 >
@@ -145,7 +144,7 @@ export function CursorConnectPage(props: { onClose: () => void }) {
                           for="cursor-api-key"
                           class="text-xs font-medium text-ink"
                         >
-                          API key
+                          Ключ API
                         </label>
                         <ApiKeyInput
                           ref={focusOnMount}
@@ -161,19 +160,19 @@ export function CursorConnectPage(props: { onClose: () => void }) {
                           id="cursor-api-key-help"
                           class="text-xs text-ink-extra-muted"
                         >
-                          You can remove the key at any time from this page.
+                          Ключ можно удалить на этой странице в любой момент.
                         </p>
                       </div>
                     }
                   >
                     <div class="flex flex-wrap items-center gap-3">
                       <span class="inline-flex h-5 shrink-0 items-center whitespace-nowrap rounded-md bg-success-bg px-2 text-[11px]/none font-medium text-success">
-                        Connected
+                        Подключено
                       </span>
                       <Show when={status.data?.updatedAt}>
                         {(updatedAt) => (
                           <span class="text-xs text-ink-muted">
-                            Key saved{' '}
+                            Ключ сохранён{' '}
                             {new Date(updatedAt()).toLocaleDateString()}
                           </span>
                         )}
@@ -188,27 +187,27 @@ export function CursorConnectPage(props: { onClose: () => void }) {
                           fireAndForget(disconnectCursor(), 'cursor-connect')
                         }
                       >
-                        Disconnect
+                        Отключить
                       </Button>
                     </div>
                   </Show>
                 </Show>
               </SetupStep>
-              <SetupStep number={3} title="Choose default model">
+              <SetupStep number={3} title="Выберите модель по умолчанию">
                 <p>
-                  New Cursor agents start with this model. You can change it per
-                  agent.
+                  Новые агенты Cursor начинают с этой модели. Для каждого агента
+                  её можно сменить.
                 </p>
                 <div class="flex flex-col gap-1.5">
                   <span class="text-xs font-medium text-ink">
-                    Default model
+                    Модель по умолчанию
                   </span>
                   <Show
                     when={connected()}
                     fallback={
                       <SetupField class="text-sm text-ink-muted">
                         <span aria-disabled="true">
-                          Available once Cursor is connected
+                          Доступно после подключения Cursor
                         </span>
                       </SetupField>
                     }
@@ -216,7 +215,7 @@ export function CursorConnectPage(props: { onClose: () => void }) {
                     <CursorDefaultModel triggerClass="flex w-full items-center justify-between gap-2 rounded-lg border border-edge-muted bg-ink/[0.025] px-3 py-2 text-left text-sm text-ink outline-none transition-colors hover:border-ink/20 focus-visible:border-accent data-expanded:border-accent" />
                   </Show>
                   <p class="text-xs text-ink-extra-muted">
-                    Used when an agent doesn’t pick its own.
+                    Используется, если агент не выбирает свою.
                   </p>
                 </div>
               </SetupStep>
@@ -232,7 +231,7 @@ export function CursorConnectPage(props: { onClose: () => void }) {
                       size="sm"
                       onClick={props.onClose}
                     >
-                      Cancel
+                      Отмена
                     </Button>
                     <Button
                       type="submit"
@@ -240,7 +239,7 @@ export function CursorConnectPage(props: { onClose: () => void }) {
                       size="sm"
                       disabled={!apiKey().trim() || saveKey.isPending}
                     >
-                      {saveKey.isPending ? 'Connecting…' : 'Connect Cursor'}
+                      {saveKey.isPending ? 'Подключение…' : 'Подключить Cursor'}
                     </Button>
                   </>
                 }
@@ -251,7 +250,7 @@ export function CursorConnectPage(props: { onClose: () => void }) {
                   size="sm"
                   onClick={props.onClose}
                 >
-                  Done
+                  Готово
                 </Button>
               </Show>
             </div>

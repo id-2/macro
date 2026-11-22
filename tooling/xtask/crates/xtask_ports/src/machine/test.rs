@@ -26,7 +26,7 @@ fn the_census_sorts_instances_by_what_they_hold() {
             network("databases-up", Some("up"), &[]),
             network("databases-old", Some("old"), &[]),
             network("auth-old", Some("old"), &[]),
-            network("macro_services", None, &[]),
+            network("rox_services", None, &[]),
         ],
         containers: vec![
             container(Some("up"), true, &[]),
@@ -90,7 +90,7 @@ fn an_instance_keeps_its_block_despite_its_own_bridge_routes() {
         networks: vec![
             network("databases-agent-a", Some("agent-a"), &["10.254.175.0/26"]),
             network(
-                "macro-agent-a_auth-internal",
+                "rox-agent-a_auth-internal",
                 Some("agent-a"),
                 &["10.254.175.192/26"],
             ),
@@ -109,8 +109,8 @@ fn an_instance_keeps_its_block_despite_its_own_bridge_routes() {
     let own = BTreeSet::from([
         "databases-agent-a".to_string(),
         "auth-agent-a".to_string(),
-        "macro-agent-a_services".to_string(),
-        "macro-agent-a_auth-internal".to_string(),
+        "rox-agent-a_services".to_string(),
+        "rox-agent-a_auth-internal".to_string(),
     ]);
 
     let used = machine.used_subnets(&own);

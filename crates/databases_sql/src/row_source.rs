@@ -28,7 +28,7 @@ use item_filters::ast::properties::{
     EntityRefId, PropertiesLiteral, PropertyEntityType, PropertyMatchValue,
 };
 use item_filters::ast::{EmailFilterAst, EntityFilterAst};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::position::PositionError;
 use models_databases::{DateRange, OptionId, RowId, TableId};
 use models_grouping::{GroupByField, GroupingConfig};
@@ -48,7 +48,7 @@ use uuid::Uuid;
 pub(crate) struct SoupRowSource<'statement, Soup, Contacts> {
     pub(crate) soup: &'statement Soup,
     pub(crate) contacts: &'statement Contacts,
-    pub(crate) viewer: &'statement MacroUserIdStr<'static>,
+    pub(crate) viewer: &'statement RoxUserIdStr<'static>,
     /// The statement's catalog, for the value kinds of grouped columns.
     pub(crate) catalog: &'statement Catalog,
 }
@@ -312,7 +312,7 @@ where
 /// One person as a `people` row. People have no row ids of their own, so
 /// the row is named by its user id in the OID namespace, as the browser
 /// names it.
-fn person_row(person: &MacroUserIdStr<'_>) -> Row {
+fn person_row(person: &RoxUserIdStr<'_>) -> Row {
     let id: &str = person.as_ref();
     let email = person.email_str().to_owned();
     let name = email.split('@').next().unwrap_or_default().to_owned();

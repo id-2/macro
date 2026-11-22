@@ -12,7 +12,10 @@ pub async fn get_gmail_access_token(config: &Config, macro_id: &str) -> anyhow::
     let mut headers = reqwest::header::HeaderMap::new();
     headers.insert("Authorization", config.fusionauth_api_key.parse()?);
 
-    let user_email = macro_id.strip_prefix("macro|").unwrap();
+    let user_email = macro_id
+        .strip_prefix("macro|")
+        .or_else(|| macro_id.strip_prefix("rox|"))
+        .unwrap_or(macro_id);
 
     let url = format!(
         "{}/api/user?email={}",

@@ -5,7 +5,7 @@ mod test;
 
 use std::future::Future;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::{
     dm::{EnsureDms, EnsureDmsSummary, ensure_dms_for_joining_member},
@@ -58,8 +58,8 @@ impl TeammateDmError {
 /// Create a DM between `member_id` and every id in `teammate_ids`.
 pub async fn ensure_joined_member_dms<C: TeammateDirectMessages>(
     channels: &C,
-    member_id: MacroUserIdStr<'static>,
-    teammate_ids: impl IntoIterator<Item = MacroUserIdStr<'static>>,
+    member_id: RoxUserIdStr<'static>,
+    teammate_ids: impl IntoIterator<Item = RoxUserIdStr<'static>>,
 ) -> Result<EnsureDmsSummary, TeammateDmError> {
     let summary = channels
         .ensure_dms(ensure_dms_for_joining_member(member_id, teammate_ids))

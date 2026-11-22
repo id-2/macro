@@ -18,7 +18,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     #[tracing::instrument(skip(self, receipt), err)]
     async fn share_permissions(
@@ -112,7 +112,7 @@ where
             SharingWrite::Changed => return Err(SharingError::Changed.into()),
         }
         if !grants.is_empty() || team_share.is_some() {
-            self.emit(DatabaseMacroEvent::sharing_changed(
+            self.emit(DatabaseRoxEvent::sharing_changed(
                 events::DatabaseSharingChangedMetadata {
                     database_id: database.id,
                     attribution: receipt_attribution(&receipt),

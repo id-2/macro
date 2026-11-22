@@ -57,7 +57,7 @@ type ShareConflict = {
 function EmptyTagRows(props: { scope: TagScope }) {
   return (
     <div class="px-6 py-8 text-center text-sm text-ink-extra-muted">
-      No {props.scope === 'team' ? 'team' : 'personal'} tags
+      {props.scope === 'team' ? 'Нет командных тегов' : 'Нет личных тегов'}
     </div>
   );
 }
@@ -89,7 +89,7 @@ function TagListSection(props: {
           onClick={() => props.onCreate(props.scope)}
         >
           <PlusIcon class="size-4" />
-          New tag
+          Новый тег
         </Button>
       }
     >
@@ -115,10 +115,10 @@ function TagListSection(props: {
                         <Show when={props.onShare}>
                           {(onShare) => (
                             <Button
-                              aria-label={`Share ${optionLabel(option)} with team`}
+                              aria-label={`Поделиться «${optionLabel(option)}» с командой`}
                               variant="ghost"
                               size="icon-sm"
-                              tooltip="Share with team"
+                              tooltip="Поделиться с командой"
                               disabled={
                                 props.deleting ||
                                 props.sharingOptionId !== undefined
@@ -135,20 +135,20 @@ function TagListSection(props: {
                           )}
                         </Show>
                         <Button
-                          aria-label={`Edit ${optionLabel(option)}`}
+                          aria-label={`Изменить «${optionLabel(option)}»`}
                           variant="ghost"
                           size="icon-sm"
-                          tooltip="Edit tag"
+                          tooltip="Изменить тег"
                           disabled={props.deleting}
                           onClick={() => props.onEdit(tag())}
                         >
                           <PencilIcon class="size-3.5 touch:size-4" />
                         </Button>
                         <Button
-                          aria-label={`Delete ${optionLabel(option)}`}
+                          aria-label={`Удалить «${optionLabel(option)}»`}
                           variant="ghost"
                           size="icon-sm"
-                          tooltip="Delete tag"
+                          tooltip="Удалить тег"
                           disabled={props.deleting}
                           onClick={() => props.onDelete(tag())}
                         >
@@ -204,7 +204,7 @@ function ConfirmDialog(props: {
               disabled={props.pending}
               onClick={props.onClose}
             >
-              Cancel
+              Отмена
             </Button>
             <Button
               variant="secondary"
@@ -240,7 +240,7 @@ export function Tags() {
 
   const tagSet = (scope: TagScope) =>
     tagsQuery.data?.find((set) => set.scope === scope);
-  const teamName = () => teamQuery.data?.team.name?.trim() || 'Team';
+  const teamName = () => teamQuery.data?.team.name?.trim() || 'Команда';
   const hasTeam = () =>
     tagsQuery.data?.some((set) => set.scope === 'team') ||
     Boolean(teamQuery.data?.team);
@@ -310,17 +310,17 @@ export function Tags() {
 
   return (
     <SettingsPage
-      title="Tags"
-      description="Manage personal labels and shared team labels."
+      title="Теги"
+      description="Управляйте личными тегами и общими тегами команды."
       actions={
         <Button variant="primary" size="sm" onClick={() => openCreate('user')}>
           <PlusIcon class="size-4" />
-          New tag
+          Новый тег
         </Button>
       }
     >
       <TagListSection
-        title="Personal"
+        title="Личные"
         scope="user"
         set={tagSet('user')}
         onCreate={openCreate}
@@ -332,7 +332,7 @@ export function Tags() {
       />
       <Show when={hasTeam()}>
         <TagListSection
-          title="Team"
+          title="Команда"
           description={teamName()}
           scope="team"
           set={tagSet('team')}
@@ -352,8 +352,8 @@ export function Tags() {
 
       <ConfirmDialog
         open={pendingShare() !== null}
-        title="Share with team"
-        confirmLabel="Share"
+        title="Поделиться с командой"
+        confirmLabel="Поделиться"
         pending={promoteTag.isPending}
         onConfirm={confirmShare}
         onClose={() => setPendingShare(null)}
@@ -361,25 +361,23 @@ export function Tags() {
         <span class="font-medium text-ink">
           {optionLabel(pendingShare()?.option)}
         </span>{' '}
-        moves into the {teamName()} team tag set. This action cannot be
-        reversed.
+        перейдёт в набор тегов команды {teamName()}. Это действие нельзя
+        отменить.
       </ConfirmDialog>
 
       <ConfirmDialog
         open={conflict() !== null}
-        title="Team label already exists"
-        confirmLabel="Use team label"
+        title="Тег команды уже существует"
+        confirmLabel="Использовать тег команды"
         pending={mergeTag.isPending}
         onConfirm={confirmMerge}
         onClose={() => setConflict(null)}
       >
-        Your team already has a label named{' '}
+        У команды уже есть тег{' '}
         <span class="font-medium text-ink">
           {optionLabel(conflict()?.conflictingOption)}
-        </span>
-        . Everything tagged with your personal label will be retagged with the
-        team's, and your personal label will be removed. This action cannot be
-        reversed.
+        </span>. Всё, что помечено вашим личным тегом, будет перенесено на
+        командный, а личный тег будет удалён. Это действие нельзя отменить.
       </ConfirmDialog>
     </SettingsPage>
   );

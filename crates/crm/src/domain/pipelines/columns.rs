@@ -40,7 +40,7 @@ pub(super) fn tracked_columns(
                 .into_iter()
                 .map(|label| {
                     (
-                        macro_uuid::generate_uuid_v7(),
+                        rox_uuid::generate_uuid_v7(),
                         PropertyOptionValue::String(label),
                     )
                 })

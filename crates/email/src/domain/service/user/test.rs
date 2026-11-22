@@ -4,7 +4,7 @@ use std::{
 };
 
 use chrono::Utc;
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use uuid::Uuid;
 
 use crate::domain::{
@@ -26,7 +26,7 @@ struct FakeUserRepo {
     inboxes: Vec<Link>,
     labels: HashMap<Uuid, Vec<LinkLabel>>,
     details: Vec<EmailInboxDetails>,
-    requested_users: Arc<Mutex<Vec<MacroUserIdStr<'static>>>>,
+    requested_users: Arc<Mutex<Vec<RoxUserIdStr<'static>>>>,
     requested_label_links: Arc<Mutex<Vec<Uuid>>>,
 }
 
@@ -39,7 +39,7 @@ impl EmailUserRepo for FakeUserRepo {
     }
     async fn user_accessible_inboxes(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<Link>, crate::domain::models::EmailErr> {
         self.requested_users.lock().unwrap().push(macro_id);
         Ok(self.inboxes.clone())
@@ -55,7 +55,7 @@ impl EmailUserRepo for FakeUserRepo {
 
     async fn user_inbox_details(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<EmailInboxDetails>, crate::domain::models::EmailErr> {
         self.requested_users.lock().unwrap().push(macro_id);
         Ok(self.details.clone())
@@ -78,14 +78,14 @@ fn service(repo: FakeUserRepo) -> EmailServiceImpl<FakeUserRepo, (), (), (), (),
     }
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|viewer@example.com").unwrap()
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap()
 }
 
 fn link(id: Uuid, owner: &str) -> Link {
     Link {
         id,
-        macro_id: MacroUserIdStr::try_from_email(owner).unwrap(),
+        macro_id: RoxUserIdStr::try_from_email(owner).unwrap(),
         fusionauth_user_id: "internal-auth-id".to_owned(),
         email_address: EmailStr::try_from(owner.to_owned()).unwrap(),
         provider: UserProvider::Gmail,
@@ -152,7 +152,7 @@ async fn links_are_scoped_to_the_user_and_enriched_by_domain_policy() {
     let repo = FakeUserRepo {
         details: vec![EmailInboxDetails {
             id: link_id,
-            macro_id: MacroUserIdStr::try_from_email("delegate@example.com").unwrap(),
+            macro_id: RoxUserIdStr::try_from_email("delegate@example.com").unwrap(),
             email_address: EmailStr::try_from("delegate@example.com".to_owned()).unwrap(),
             photo_url: Some("https://example.com/photo.png".to_owned()),
             provider: UserProvider::Gmail,

@@ -18,7 +18,7 @@ import type { ChannelsDataSource, ChannelsSources } from '../../../../queries';
 import { deduplicateChannels } from '../../../../queries';
 import { useChannelListSearchPool } from '../../../../queries/channel-list-search-pool';
 import { ChannelsMobileView } from '../../../ChannelsMobileView';
-import { SectionChannelsPicker } from '../SectionChannelsDialog';
+import { sectionChromeName } from '../../ChannelLabelRows';
 import { MobileSectionOptions } from './MobileSectionOptions';
 import {
   channelsForMobileSection,
@@ -109,7 +109,7 @@ export function MobileSectionsView(props: {
     if (key === 'all') return t('mobile.all');
     if (key === 'direct_messages')
       return t('channelSections.directMessagesPill');
-    return labels().find((label) => `label:${label.id}` === key)?.name ?? '';
+    return sectionChromeName(labels().find((label) => `label:${label.id}` === key)?.name ?? '');
   };
   const choose = (value: string) => {
     const key = keys().find((key) => key === value);

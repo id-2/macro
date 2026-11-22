@@ -16,7 +16,7 @@ where
 }
 
 use anyhow::Context;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_permissions::share_permission::access_level::AccessLevel;
 use models_permissions::share_permission::{LinkShare, TeamLinkShareDefault};
 use sqlx::{Executor, PgPool, Postgres};
@@ -122,7 +122,7 @@ where
             .await?
         }
         "call" => {
-            let item_id = macro_uuid::string_to_uuid(item_id)?;
+            let item_id = rox_uuid::string_to_uuid(item_id)?;
             sqlx::query_scalar!(
                 r#"
                 SELECT share_permission_id as "share_permission_id!"
@@ -134,7 +134,7 @@ where
             .await?
         }
         "external_chat" => {
-            let item_id = macro_uuid::string_to_uuid(item_id)?;
+            let item_id = rox_uuid::string_to_uuid(item_id)?;
             sqlx::query_scalar!(
                 "SELECT share_permission_id FROM external_chat WHERE id = $1",
                 item_id
@@ -143,7 +143,7 @@ where
             .await?
         }
         "initiative" => {
-            let item_id = macro_uuid::string_to_uuid(item_id)?;
+            let item_id = rox_uuid::string_to_uuid(item_id)?;
             sqlx::query_scalar!(
                 r#"
                 SELECT share_permission_id as "share_permission_id!"
@@ -212,7 +212,7 @@ pub async fn ensure_thread_share_permission(pool: &PgPool, thread_id: &str) -> a
         return Ok(());
     }
 
-    let thread_uuid = macro_uuid::string_to_uuid(thread_id).context("invalid thread id")?;
+    let thread_uuid = rox_uuid::string_to_uuid(thread_id).context("invalid thread id")?;
     let owner_id = sqlx::query_scalar!(
         r#"
         SELECT l.macro_id as "macro_id!"
@@ -226,7 +226,7 @@ pub async fn ensure_thread_share_permission(pool: &PgPool, thread_id: &str) -> a
     .await
     .with_context(|| format!("failed to fetch macro_id for thread ID {thread_id}"))?
     .context("thread not found")?;
-    let owner_id = MacroUserIdStr::parse_from_str(&owner_id)
+    let owner_id = RoxUserIdStr::parse_from_str(&owner_id)
         .context("invalid thread owner macro user id")?
         .into_owned();
 

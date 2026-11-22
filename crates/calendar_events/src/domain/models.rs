@@ -1561,6 +1561,9 @@ pub struct CalendarEventMutationTarget {
     /// on its secondary calendar. Changes only the organizer may make go
     /// through that copy, as in Google's own client.
     pub organizer_copy_calendar_id: Option<Uuid>,
+    /// Whether the addressed copy lives on a calendar Rox keeps itself, with
+    /// no provider behind it to read or change the event.
+    pub is_local: bool,
 }
 
 impl CalendarEventMutationTarget {
@@ -1741,6 +1744,9 @@ pub struct CalendarCreationTarget {
     pub is_primary: bool,
     /// Grant of the connected inbox this calendar belongs to.
     pub token_identity: CalendarLinkTokenIdentity,
+    /// Whether the calendar keeps its events inside Rox and has no provider to
+    /// write through. Such a calendar writes locally instead of calling one.
+    pub is_local: bool,
     /// The clicker's owned inboxes. `None` when they own none.
     pub actor: Option<ActorInboxes>,
 }

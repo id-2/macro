@@ -3,8 +3,8 @@
 //! with its sender's name.
 
 use email::domain::ports::EmailRepo;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use sqlx::PgPool;
 
@@ -30,7 +30,7 @@ where
 {
     async fn waiting(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> Result<Option<Waiting>, rootcause::Report> {
         match target.entity_type {
@@ -84,7 +84,7 @@ impl<R: EmailRepo> ItemReplyWaits<R> {
     /// The channel message the target names, unless the person sent it.
     async fn channel_waiting(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> Result<Option<Waiting>, sqlx::Error> {
         let (Some(message), Ok(channel)) = (

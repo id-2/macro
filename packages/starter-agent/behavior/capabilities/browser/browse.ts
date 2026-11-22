@@ -4,7 +4,7 @@
  * host and the outcome; never a page's content, a selector's text or a full
  * URL, which can carry tokens.
  */
-import type { Tab, Target } from '@macro-inc/muppet/utilities/browser';
+import type { Tab, Target } from '@rox-one/muppet/utilities/browser';
 import type { Trace } from '../../agent/claude.ts';
 
 export type Step =

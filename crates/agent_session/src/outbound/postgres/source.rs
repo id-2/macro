@@ -15,11 +15,11 @@ mod test;
 pub(super) struct SourceRow {
     id: Uuid,
     kind: String,
-    actor_user_id: Option<MacroUserIdStr<'static>>,
+    actor_user_id: Option<RoxUserIdStr<'static>>,
     actor_bot_id: Option<Uuid>,
-    on_behalf_of_user_id: Option<MacroUserIdStr<'static>>,
+    on_behalf_of_user_id: Option<RoxUserIdStr<'static>>,
     acting_session_id: Option<Uuid>,
-    root_user_id: Option<MacroUserIdStr<'static>>,
+    root_user_id: Option<RoxUserIdStr<'static>>,
     root_routine_id: Option<Uuid>,
     message_id: Option<Uuid>,
     task_id: Option<String>,
@@ -230,7 +230,7 @@ pub(super) async fn insert_source(
     let Some((kind, columns)) = source_columns(origin) else {
         return Ok(None);
     };
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO agent_session_source (

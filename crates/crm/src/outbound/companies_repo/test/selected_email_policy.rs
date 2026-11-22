@@ -8,7 +8,7 @@ use crate::domain::email_rules::{
     EmailInclusionRule, EmailRuleDefinitionError, EmailRuleSet, MAX_EMAIL_RULE_BYTES,
 };
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -530,7 +530,7 @@ async fn eligibility_upgrade_refuses_preexisting_selected_mode(pool: PgPool) -> 
         .execute(&pool)
         .await?;
         let mut tx = pool.begin().await?;
-        let error = sqlx::raw_sql(include_str!("../../../../../macro_db_client/migrations/20261116223559_crm_selected_email_eligibility.sql"))
+        let error = sqlx::raw_sql(include_str!("../../../../../rox_db_client/migrations/20261116223559_crm_selected_email_eligibility.sql"))
             .execute(&mut *tx).await.expect_err("old inline readers cannot coexist with selected rows during this rollout");
         assert!(
             error

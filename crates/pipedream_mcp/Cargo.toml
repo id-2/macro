@@ -14,10 +14,10 @@ chrono.workspace = true
 connect_client = { path = "../connect_client" }
 futures.workspace = true
 http.workspace = true
-macro_authorization = { path = "../macro_authorization", default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", default-features = false, features = [
   "axum",
 ] }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 mcp_toolset = { path = "../mcp_toolset" }
 model-error-response = { path = "../model-error-response" }
 reqwest.workspace = true
@@ -34,7 +34,7 @@ utoipa.workspace = true
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 tokio.workspace = true
 tower = { workspace = true }
 wiremock = { workspace = true }

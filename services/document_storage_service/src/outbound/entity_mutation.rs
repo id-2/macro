@@ -11,8 +11,8 @@ use crate::{
     },
 };
 use entity_mutation::EntityMutationActor;
-use macro_event_broker::MacroEventBroker;
-use macro_sha_count_client::Redis;
+use rox_event_broker::RoxEventBroker;
+use rox_sha_count_client::Redis;
 use model_entity::{Entity, EntityType};
 use models_permissions::share_permission::UpdateSharePermissionRequestV2;
 use sqlx::PgPool;
@@ -33,14 +33,14 @@ fn row_error(error: sqlx::Error) -> LifecycleError {
 }
 
 /// Production lifecycle adapter backed by the legacy persistence clients.
-pub struct DssEntityLifecycleAdapter<B: MacroEventBroker> {
+pub struct DssEntityLifecycleAdapter<B: RoxEventBroker> {
     db: PgPool,
     redis: Arc<Redis>,
     sqs: Arc<sqs_client::SQS>,
     event_broker: B,
 }
 
-impl<B: MacroEventBroker> DssEntityLifecycleAdapter<B> {
+impl<B: RoxEventBroker> DssEntityLifecycleAdapter<B> {
     /// Construct the adapter from concrete outbound dependencies.
     pub fn new(db: PgPool, redis: Arc<Redis>, sqs: Arc<sqs_client::SQS>, event_broker: B) -> Self {
         Self {
@@ -52,7 +52,7 @@ impl<B: MacroEventBroker> DssEntityLifecycleAdapter<B> {
     }
 }
 
-impl<B: MacroEventBroker> EntityLifecycleService for DssEntityLifecycleAdapter<B> {
+impl<B: RoxEventBroker> EntityLifecycleService for DssEntityLifecycleAdapter<B> {
     async fn update_thread_share_policy(
         &self,
         actor: &EntityMutationActor,
@@ -63,7 +63,7 @@ impl<B: MacroEventBroker> EntityLifecycleService for DssEntityLifecycleAdapter<B
         // middleware's get-or-create so a first-time share succeeds. The
         // caller has already proven Owner access, so the thread exists.
         let permission =
-            macro_middleware::cloud_storage::thread::ensure_thread_exists::insert_thread_share_permissions(
+            rox_middleware::cloud_storage::thread::ensure_thread_exists::insert_thread_share_permissions(
                 &self.db,
                 &entity.entity_id,
             )
@@ -72,7 +72,7 @@ impl<B: MacroEventBroker> EntityLifecycleService for DssEntityLifecycleAdapter<B
         let thread_id = uuid::Uuid::parse_str(&entity.entity_id)
             .map_err(|error| LifecycleError::InvalidInput(format!("invalid thread id: {error}")))?;
         let mut transaction = self.db.begin().await.map_err(|error| internal!(error))?;
-        macro_db_client::share_permission::edit::edit_thread_permission(
+        rox_db_client::share_permission::edit::edit_thread_permission(
             &mut transaction,
             &thread_id,
             &permission.share_permission_id,
@@ -93,10 +93,10 @@ impl<B: MacroEventBroker> EntityLifecycleService for DssEntityLifecycleAdapter<B
         _actor: &EntityMutationActor,
         entity: &Entity<'static>,
     ) -> Result<Vec<Entity<'static>>, LifecycleError> {
-        let document = macro_db_client::document::get_basic_document(&self.db, &entity.entity_id)
+        let document = rox_db_client::document::get_basic_document(&self.db, &entity.entity_id)
             .await
             .map_err(row_error)?;
-        macro_db_client::document::revert_delete::revert_delete_document(
+        rox_db_client::document::revert_delete::revert_delete_document(
             &self.db,
             &entity.entity_id,
             document.project_id.as_deref(),
@@ -115,11 +115,11 @@ impl<B: MacroEventBroker> EntityLifecycleService for DssEntityLifecycleAdapter<B
         _actor: &EntityMutationActor,
         entity: &Entity<'static>,
     ) -> Result<Vec<Entity<'static>>, LifecycleError> {
-        let document = macro_db_client::document::get_basic_document(&self.db, &entity.entity_id)
+        let document = rox_db_client::document::get_basic_document(&self.db, &entity.entity_id)
             .await
             .map_err(row_error)?;
         if document.file_type.as_deref() == Some("docx") {
-            let bom_parts = macro_db_client::document::get_bom_parts(&self.db, &entity.entity_id)
+            let bom_parts = rox_db_client::document::get_bom_parts(&self.db, &entity.entity_id)
                 .await
                 .map_err(|error| internal!(error))?;
             self.redis
@@ -129,7 +129,7 @@ impl<B: MacroEventBroker> EntityLifecycleService for DssEntityLifecycleAdapter<B
                 .await
                 .map_err(|error| internal!(error))?;
         }
-        macro_db_client::document::delete_document(&self.db, &entity.entity_id)
+        rox_db_client::document::delete_document(&self.db, &entity.entity_id)
             .await
             .map_err(|error| internal!(error))?;
         comms_db_client::entity_mentions::delete_entity_mentions_by_source(
@@ -157,12 +157,12 @@ impl<B: MacroEventBroker> EntityLifecycleService for DssEntityLifecycleAdapter<B
 #[cfg(test)]
 mod test {
     use super::*;
-    use macro_event_broker::NoopMacroEventBroker;
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_event_broker::NoopRoxEventBroker;
+    use rox_user_id::user_id::RoxUserIdStr;
     use models_permissions::share_permission::{LinkShare, access_level::AccessLevel};
 
     async fn migrate_for_test(pool: &PgPool) {
-        let migrations = macro_db_migrator::MACRO_DB_MIGRATIONS
+        let migrations = rox_db_migrator::MACRO_DB_MIGRATIONS
             .iter()
             .map(|migration| {
                 let mut migration = migration.clone();
@@ -211,9 +211,9 @@ mod test {
             sqs_config,
         )));
         let adapter =
-            DssEntityLifecycleAdapter::new(pool.clone(), redis, sqs, NoopMacroEventBroker);
+            DssEntityLifecycleAdapter::new(pool.clone(), redis, sqs, NoopRoxEventBroker);
         let actor = EntityMutationActor {
-            user_id: MacroUserIdStr::try_from("macro|entity-mutation@example.com")?,
+            user_id: RoxUserIdStr::try_from("macro|entity-mutation@example.com")?,
             organization_id: None,
         };
         let entity = EntityType::EmailThread.with_entity_string(thread_id.to_string());

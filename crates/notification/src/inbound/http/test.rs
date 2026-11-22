@@ -24,11 +24,11 @@ fn notification_state_query_parameters_are_exact_and_support_unions() {
 }
 use hmac::{Hmac, Mac};
 use http_body_util::BodyExt;
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use model_user::UserContext;
 use models_pagination::{CreatedAt, Paginated, Query};
@@ -62,10 +62,10 @@ const VALID_USER_ID: &str = "macro|user@example.com";
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, token: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, token: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if token != VALID_BEARER_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(UserContext {
@@ -79,19 +79,19 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != VALID_INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         let Some(user_id) = claims.user_id else {
@@ -135,7 +135,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn get_user_notifications<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _limit: Option<u32>,
         _cursor: Query<Uuid, CreatedAt, ()>,
         _filters: crate::domain::models::request::NotificationListFilters,
@@ -154,7 +154,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn get_entity_notifications_batch<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _entity_refs: Vec<Entity<'static>>,
         _query: crate::domain::models::entity_query::EntityNotificationQuery,
     ) -> impl Future<Output = Result<HashMap<Entity<'static>, Vec<UserNotificationRow<T>>>, Report>> + Send
@@ -164,7 +164,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn get_user_notification_by_id<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_id: Uuid,
     ) -> impl Future<Output = Result<Option<UserNotificationRow<T>>, Report>> + Send {
         async { unreachable!("should not be called") }
@@ -172,7 +172,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn delete_user_notification(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_id: Uuid,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!("should not be called") }
@@ -180,7 +180,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn bulk_delete_user_notifications(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_ids: &[Uuid],
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!("should not be called") }
@@ -188,7 +188,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn register_device(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _device_token: &str,
         _device_type: &DeviceType,
         _native_call_capable: bool,
@@ -198,7 +198,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn unregister_device(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _device_token: &str,
         _device_type: &DeviceType,
     ) -> impl Future<Output = Result<(), Report>> + Send {
@@ -207,7 +207,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn get_disabled_notification_types(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<DisabledNotificationType>, Report>> + Send {
         async move {
             assert_eq!(user_id.to_string(), VALID_USER_ID);
@@ -217,7 +217,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn disable_notification_type(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _type_name: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!("should not be called") }
@@ -225,7 +225,7 @@ impl NotificationReader for AuthenticationTestService {
 
     fn enable_notification_type(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _type_name: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!("should not be called") }
@@ -237,7 +237,7 @@ static BLOCKABLE: std::sync::LazyLock<HashSet<&'static str>> =
 
 fn test_router() -> Router {
     let hmac_key = Hmac::<Sha256>::new_from_slice(b"test-key").unwrap();
-    let authorization_state = MacroAuthorizationState::new(Arc::new(FakeAuthorizationService));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(FakeAuthorizationService));
     let state = NotificationRouterState::new(
         AuthenticationTestService,
         &BLOCKABLE,
@@ -621,7 +621,7 @@ impl NotificationReader for PresignedTestService {
 
     fn get_user_notifications<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _limit: Option<u32>,
         _cursor: Query<Uuid, CreatedAt, ()>,
         _filters: crate::domain::models::request::NotificationListFilters,
@@ -640,7 +640,7 @@ impl NotificationReader for PresignedTestService {
 
     fn get_entity_notifications_batch<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _entity_refs: Vec<Entity<'static>>,
         _query: crate::domain::models::entity_query::EntityNotificationQuery,
     ) -> impl Future<Output = Result<HashMap<Entity<'static>, Vec<UserNotificationRow<T>>>, Report>> + Send
@@ -650,7 +650,7 @@ impl NotificationReader for PresignedTestService {
 
     fn get_user_notification_by_id<T: DeserializeOwned + Send>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_id: Uuid,
     ) -> impl Future<Output = Result<Option<UserNotificationRow<T>>, Report>> + Send {
         async { unreachable!() }
@@ -658,7 +658,7 @@ impl NotificationReader for PresignedTestService {
 
     fn delete_user_notification(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_id: Uuid,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!() }
@@ -666,7 +666,7 @@ impl NotificationReader for PresignedTestService {
 
     fn bulk_delete_user_notifications(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _notification_ids: &[Uuid],
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!() }
@@ -674,7 +674,7 @@ impl NotificationReader for PresignedTestService {
 
     fn register_device(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _device_token: &str,
         _device_type: &DeviceType,
         _native_call_capable: bool,
@@ -684,7 +684,7 @@ impl NotificationReader for PresignedTestService {
 
     fn unregister_device(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _device_token: &str,
         _device_type: &DeviceType,
     ) -> impl Future<Output = Result<(), Report>> + Send {
@@ -693,14 +693,14 @@ impl NotificationReader for PresignedTestService {
 
     fn get_disabled_notification_types(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<DisabledNotificationType>, Report>> + Send {
         async { unreachable!() }
     }
 
     fn disable_notification_type(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _type_name: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { Ok(()) }
@@ -708,7 +708,7 @@ impl NotificationReader for PresignedTestService {
 
     fn enable_notification_type(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         _type_name: &str,
     ) -> impl Future<Output = Result<(), Report>> + Send {
         async { unreachable!() }
@@ -721,7 +721,7 @@ const LEGACY_NOTIFICATION_ORIGIN: &str = "https://notifications.rox.one";
 
 fn presigned_router() -> Router {
     let hmac_key = Hmac::<Sha256>::new_from_slice(HMAC_KEY).unwrap();
-    let authorization_state = MacroAuthorizationState::new(Arc::new(FakeAuthorizationService));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(FakeAuthorizationService));
     let state = NotificationRouterState::new(
         PresignedTestService,
         &BLOCKABLE,

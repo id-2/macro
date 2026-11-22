@@ -2,15 +2,15 @@
 use super::pg_memory_repo::PgMemoryRepo;
 use crate::domain::{models::*, ports::*};
 use chrono::NaiveDate;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 /// The `memory_refresh_piece.piece` of a staged profile; activity pieces use their granularity.
 const PROFILE_PIECE: &str = "profile";
 
 impl ComposedMemoryRepo for PgMemoryRepo {
     #[tracing::instrument(skip_all, err)]
-    async fn enroll(&self, user: &MacroUserIdStr<'_>) -> Result<()> {
+    async fn enroll(&self, user: &RoxUserIdStr<'_>) -> Result<()> {
         sqlx::query!(
             "INSERT INTO memory_refresh_job (user_id) VALUES ($1) ON CONFLICT DO NOTHING",
             user.as_ref()
@@ -22,7 +22,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
 
     #[tracing::instrument(skip_all, err)]
     async fn claim_refresh(&self, yesterday: NaiveDate) -> Result<Option<RefreshClaim>> {
-        let token = macro_uuid::generate_uuid_v7();
+        let token = rox_uuid::generate_uuid_v7();
         // Attempts count claims of the same day, so a crash or timeout counts too.
         let row = sqlx::query!(r#"
             WITH due AS (
@@ -39,7 +39,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
         "#, yesterday, token).fetch_optional(&self.inner).await?;
         row.map(|r| {
             Ok(RefreshClaim {
-                user: MacroUserIdStr::try_from(r.user_id)
+                user: RoxUserIdStr::try_from(r.user_id)
                     .map_err(|e| MemoryError::Other(e.into()))?,
                 date: r.day,
                 token,
@@ -70,7 +70,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn staged(&self, user: &MacroUserIdStr<'_>, date: NaiveDate) -> Result<StagedPieces> {
+    async fn staged(&self, user: &RoxUserIdStr<'_>, date: NaiveDate) -> Result<StagedPieces> {
         let rows = sqlx::query!(
             "SELECT piece, period_start, period_end, content FROM memory_refresh_piece WHERE user_id = $1 AND date = $2",
             user.as_ref(),
@@ -98,7 +98,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn stage(&self, user: &MacroUserIdStr<'_>, date: NaiveDate, piece: &Piece) -> Result<()> {
+    async fn stage(&self, user: &RoxUserIdStr<'_>, date: NaiveDate, piece: &Piece) -> Result<()> {
         let (kind, start, end, content) = match piece {
             Piece::Activity(row) => (
                 row.granularity.as_ref(),
@@ -129,7 +129,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn latest_activity(&self, user: &MacroUserIdStr<'_>) -> Result<Vec<Activity>> {
+    async fn latest_activity(&self, user: &RoxUserIdStr<'_>) -> Result<Vec<Activity>> {
         Ok(sqlx::query_as!(Activity, r#"
             SELECT DISTINCT ON (granularity) granularity AS "granularity: Granularity", period_start, period_end, content
             FROM memory_activity WHERE user_id = $1 ORDER BY granularity, period_start DESC
@@ -137,7 +137,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
     }
 
     #[tracing::instrument(skip_all, err)]
-    async fn explicit(&self, user: &MacroUserIdStr<'_>) -> Result<ExplicitMemory> {
+    async fn explicit(&self, user: &RoxUserIdStr<'_>) -> Result<ExplicitMemory> {
         Ok(sqlx::query_as!(
             ExplicitMemory,
             "SELECT content, revision FROM memory_explicit WHERE user_id = $1",
@@ -151,7 +151,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
     #[tracing::instrument(skip_all, err)]
     async fn save_explicit(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         expected: i64,
         content: &str,
     ) -> Result<ExplicitMemory> {
@@ -182,7 +182,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
     #[tracing::instrument(skip_all, err)]
     async fn snapshot(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         since: NaiveDate,
     ) -> Result<MemorySnapshot> {
         let mut tx = self.inner.begin().await?;
@@ -217,7 +217,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
     #[tracing::instrument(skip_all, err)]
     async fn save_generation(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         expected: i64,
         date: NaiveDate,
         profile: Option<&str>,
@@ -293,7 +293,7 @@ impl ComposedMemoryRepo for PgMemoryRepo {
     #[tracing::instrument(skip_all, err)]
     async fn activity(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         start: NaiveDate,
         end: NaiveDate,
     ) -> Result<Vec<Activity>> {

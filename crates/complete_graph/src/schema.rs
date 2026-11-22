@@ -75,11 +75,11 @@ use graphql_work_feed::{
     GraphqlWorkFeedPage, WorkFeedInput, WorkFeedMutationRoot, WorkFeedSubscriptionRoot,
     resolve_work_feed,
 };
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthorizationService, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoopMacroAuthJwtValidator,
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthorizationService, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoopRoxAuthJwtValidator,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_notifications::NotifEvent;
 use notification::domain::{
     models::NotificationSubscriptionUpdate,
@@ -167,9 +167,9 @@ where
     AS: ActivitySubscriptionService,
     EAS: EntityAccessService,
     Arc<EAS>: FromRef<St>,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     NR: SoupNotificationEdgeReader,
     PR: EntityPropertyReader,
     ER: SoupEmailEdgeReader,
@@ -244,7 +244,7 @@ pub type SchemaOnlySoupSchema = SoupSchema<
 >;
 
 /// Authorization service used only to construct the GraphQL schema for SDL export.
-pub type SchemaOnlyAuthorizationService = MacroAuthorizationServiceImpl<NoopMacroAuthJwtValidator>;
+pub type SchemaOnlyAuthorizationService = RoxAuthorizationServiceImpl<NoopRoxAuthJwtValidator>;
 
 /// Axum-style state used only to construct the GraphQL schema for SDL export.
 #[derive(Clone, Copy, Debug, Default)]
@@ -262,18 +262,18 @@ impl FromRef<SchemaOnlyState> for Arc<NoOpEntityAccessService> {
     }
 }
 
-impl FromRef<SchemaOnlyState> for MacroAuthorizationState<SchemaOnlyAuthorizationService> {
+impl FromRef<SchemaOnlyState> for RoxAuthorizationState<SchemaOnlyAuthorizationService> {
     fn from_ref(_state: &SchemaOnlyState) -> Self {
-        let service = MacroAuthorizationServiceImpl::new(
-            NoopMacroAuthJwtValidator,
+        let service = RoxAuthorizationServiceImpl::new(
+            NoopRoxAuthJwtValidator,
             InternalAuthConfig {
                 api_key: String::new(),
                 default_user_id: None,
             },
-            macro_authorization::NoBotAuthorizer,
-            macro_authorization::NoUserApiKeyAuthorizer,
+            rox_authorization::NoBotAuthorizer,
+            rox_authorization::NoUserApiKeyAuthorizer,
         );
-        MacroAuthorizationState::new(Arc::new(service))
+        RoxAuthorizationState::new(Arc::new(service))
     }
 }
 
@@ -331,8 +331,8 @@ pub struct GraphqlUser<S, E, EAS, Auth, St, NR, PR, ER, FR, AR, AcR> {
     service: S,
     /// Associates the user object with its adapter and reader types.
     _marker: ServicesMarker<E, EAS, Auth, St, NR, PR, ER, FR, AR, AcR>,
-    /// The [MacroUserIdStr] of the resolving user
-    user_id: MacroUserIdStr<'static>,
+    /// The [RoxUserIdStr] of the resolving user
+    user_id: RoxUserIdStr<'static>,
 }
 
 /// Input for fetching one email thread by its canonical identifier.
@@ -390,11 +390,11 @@ where
     S: SoupService + Clone,
     E: EmailService + EmailUserService + EmailSendService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
     EmailRouterState<E>: FromRef<St>,
     Arc<EAS>: FromRef<St>,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     W: EntityPropertyWriter,
     M: EntityMutationService,
     FM: FavoritesMutationService,
@@ -451,11 +451,11 @@ where
     AS: ActivitySubscriptionService,
     E: EmailService + EmailUserService + EmailSendService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
     EmailRouterState<E>: FromRef<St>,
     Arc<EAS>: FromRef<St>,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     W: EntityPropertyWriter,
     M: EntityMutationService,
     FM: FavoritesMutationService,
@@ -512,11 +512,11 @@ where
     S: SoupService,
     E: EmailService + EmailUserService + EmailSendService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
     EmailRouterState<E>: FromRef<St>,
     Arc<EAS>: FromRef<St>,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     W: EntityPropertyWriter,
     M: EntityMutationService,
     FM: FavoritesMutationService,
@@ -567,11 +567,11 @@ where
     AS: ActivitySubscriptionService,
     E: EmailService + EmailUserService + EmailSendService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
     EmailRouterState<E>: FromRef<St>,
     Arc<EAS>: FromRef<St>,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     W: EntityPropertyWriter,
     M: EntityMutationService,
     FM: FavoritesMutationService,
@@ -600,11 +600,11 @@ where
     S: SoupService + Clone,
     E: EmailService + EmailUserService + EmailSendService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
     EmailRouterState<E>: FromRef<St>,
     Arc<EAS>: FromRef<St>,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     NR: SoupNotificationEdgeReader,
     PR: EntityPropertyReader,
     ER: SoupEmailEdgeReader,
@@ -635,9 +635,9 @@ where
     R: SoupRealtimeSubscriptionService,
     EAS: EntityAccessService,
     Arc<EAS>: FromRef<St>,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     NR: SoupNotificationEdgeReader,
     PR: EntityPropertyReader,
     ER: SoupEmailEdgeReader,
@@ -788,11 +788,11 @@ where
     S: SoupService,
     E: EmailService + EmailUserService + EmailSendService,
     EAS: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Clone + Send + Sync + 'static,
     EmailRouterState<E>: FromRef<St>,
     Arc<EAS>: FromRef<St>,
-    MacroAuthorizationState<Auth>: FromRef<St>,
+    RoxAuthorizationState<Auth>: FromRef<St>,
     NR: SoupNotificationEdgeReader,
     PR: EntityPropertyReader,
     ER: SoupEmailEdgeReader,

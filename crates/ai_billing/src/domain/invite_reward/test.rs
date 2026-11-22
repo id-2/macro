@@ -3,22 +3,22 @@ use std::sync::Mutex;
 use super::*;
 use crate::domain::{BillingError, Entitlement, PlanTier};
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 struct FixedEntitlement(Entitlement);
 
 impl EntitlementSource for FixedEntitlement {
-    async fn entitlement(&self, _user: &MacroUserIdStr<'_>) -> Result<Entitlement> {
+    async fn entitlement(&self, _user: &RoxUserIdStr<'_>) -> Result<Entitlement> {
         Ok(self.0.clone())
     }
 
-    async fn stripe_customer_id(&self, _user: &MacroUserIdStr<'_>) -> Result<Option<String>> {
+    async fn stripe_customer_id(&self, _user: &RoxUserIdStr<'_>) -> Result<Option<String>> {
         Ok(None)
     }
 
-    async fn team_payer(&self, _team_id: Uuid) -> Result<Option<MacroUserIdStr<'static>>> {
+    async fn team_payer(&self, _team_id: Uuid) -> Result<Option<RoxUserIdStr<'static>>> {
         Ok(None)
     }
 }
@@ -32,7 +32,7 @@ struct Books {
 impl CreditGrantRepo for &'static Books {
     async fn record_credit_grant(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         grant: &CreditGrant,
     ) -> Result<bool> {
         let mut grants = self.grants.lock().unwrap();
@@ -43,7 +43,7 @@ impl CreditGrantRepo for &'static Books {
         Ok(true)
     }
 
-    async fn credit_grant_balance_cents(&self, _payer: &MacroUserIdStr<'_>) -> Result<i64> {
+    async fn credit_grant_balance_cents(&self, _payer: &RoxUserIdStr<'_>) -> Result<i64> {
         Err(BillingError::Storage(anyhow::anyhow!("unused")))
     }
 }
@@ -51,7 +51,7 @@ impl CreditGrantRepo for &'static Books {
 impl FreeAllowanceBonusRepo for &'static Books {
     async fn record_free_allowance_bonus(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         cost_cents: i64,
         _note: &str,
@@ -69,7 +69,7 @@ fn books() -> &'static Books {
     Box::leak(Box::default())
 }
 
-fn reward(beneficiary: &MacroUserIdStr<'static>, key: &str) -> InviteReward {
+fn reward(beneficiary: &RoxUserIdStr<'static>, key: &str) -> InviteReward {
     InviteReward {
         beneficiary: beneficiary.clone(),
         event_key: key.to_owned(),

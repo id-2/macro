@@ -9,7 +9,7 @@ import { PaywallKey, usePaywallState } from '@core/constant/PaywallState';
 import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isPlatform } from '@core/util/platform';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useInitGmailLink } from '@queries/auth';
 import { useInitOutlookLink } from '@queries/auth/outlook-link';
 import { invalidateUserInfo } from '@queries/auth/user-info';
@@ -254,7 +254,7 @@ type AddInboxOptions = {
  * shared-inbox conflict is surfaced through `requestShareInboxConfirmation`,
  * rendered by the globally mounted dialog.
  *
- * Desktop opens consent in the system browser and returns through a macro:///
+ * Desktop opens consent in the system browser and returns through a rox:///
  * deep link; web navigates the page. Both stash the current layout against the
  * new link id so the callback restores it. Native mobile needs no stash: its
  * layout never unmounts.
@@ -401,7 +401,7 @@ export function useAddInboxFlow() {
 
     const desktop = isPlatform('desktop');
     const callbackUrl = desktop
-      ? 'macro:///inbox-link-callback'
+      ? 'rox:///inbox-link-callback'
       : `${window.location.origin}${ROUTER_BASE_CONCAT}inbox-link-callback`;
     const result = await initialize(
       callbackUrl,

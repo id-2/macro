@@ -19,7 +19,7 @@ fn an_unknown_kinds_turn_acts_for_nobody() {
     let prompter = TurnPrompter {
         kind: PrompterKind::from_stored("bogus"),
         action_id: AgentActionId::mint(),
-        user: Some(MacroUserIdStr::try_from_email("owner@example.com").unwrap()),
+        user: Some(RoxUserIdStr::try_from_email("owner@example.com").unwrap()),
         client: None,
     };
     assert_eq!(prompter.acting_user(), None);

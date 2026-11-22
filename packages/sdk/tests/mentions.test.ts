@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { type Mentionable, msg, wrapXml } from '../src/macro';
+import { type Mentionable, msg, wrapXml } from '../src/rox';
 
 const DOCUMENT_MENTION =
   /<m-document-mention>([\s\S]*?)<\/m-document-mention>/g;

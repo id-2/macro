@@ -152,8 +152,8 @@ fn lock_build_in(dir: &Path, on_wait: impl FnOnce()) -> Result<File> {
 fn prepare_dependencies(stage: &Stage) -> Result<()> {
     let mut prepare = Command::new("bun");
     prepare.current_dir(app_dir()).args(["run", "dev:prepare"]);
-    if macro_env_var::maybe_read_env("WASM_PKG_CACHE_DIR").is_none() {
-        let home = macro_env_var::maybe_read_env("HOME").context("HOME is not set")?;
+    if rox_env_var::maybe_read_env("WASM_PKG_CACHE_DIR").is_none() {
+        let home = rox_env_var::maybe_read_env("HOME").context("HOME is not set")?;
         prepare.env(
             "WASM_PKG_CACHE_DIR",
             Path::new(&home).join(".cache/macro-local/wasm-pkgs"),
@@ -363,7 +363,7 @@ fn dev_env(instance: &Instance, mode: Mode, traces_enabled: bool) -> Result<Vec<
         // filtered by that env — actually match the emitted spans/records.
         env.push((
             "VITE_OTEL_ENV".to_string(),
-            macro_env_var::maybe_read_env("DD_ENV").unwrap_or_else(|| "local".into()),
+            rox_env_var::maybe_read_env("DD_ENV").unwrap_or_else(|| "local".into()),
         ));
     }
     env.push((
@@ -553,7 +553,7 @@ pub fn start(
         return Ok(None);
     }
     let ready_timeout = frontend_ready_timeout(
-        macro_env_var::maybe_read_env(FRONTEND_READY_TIMEOUT_ENV).as_deref(),
+        rox_env_var::maybe_read_env(FRONTEND_READY_TIMEOUT_ENV).as_deref(),
     )?;
     let port = instance.port(Port::Frontend);
     // A successful connect means something is already listening — almost

@@ -3,7 +3,7 @@
 //! deletes it, and an unknown outcome leaves it to the confirm worker.
 
 use chrono::Duration;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{Clock, ComputerError, ComputerService, computer_name, internal};
@@ -54,7 +54,7 @@ impl<
     pub async fn purchase_for_agent(
         &self,
         mut request: PurchaseRequest,
-        agent: MacroUserIdStr<'static>,
+        agent: RoxUserIdStr<'static>,
     ) -> Result<Purchase, ComputerError> {
         self.require_rollout(&request.created_by).await?;
         self.require_attached().await?;
@@ -81,7 +81,7 @@ impl<
     async fn purchase_linked(
         &self,
         request: PurchaseRequest,
-        agent: Option<MacroUserIdStr<'static>>,
+        agent: Option<RoxUserIdStr<'static>>,
     ) -> Result<Purchase, ComputerError> {
         self.require_attached().await?;
         if !self.billing.sales_available() {

@@ -1,5 +1,6 @@
 import { DocumentTitleHoverCard } from '@app/components/entity-detail/DocumentTitleHoverCard';
 import { ViewBreadcrumbs } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import { useBlockEntityCommands } from '@app/features/next-soup/actions';
 import { FileDownloadHeader } from '@components/app/FileDownloadHeader';
 import { useSplitHeaderScope } from '@components/app/SplitHeaderScope';
@@ -50,7 +51,7 @@ export function FileDetailBreadcrumbItem(props: {
     accessible()?.rawName ??
     props.documentMetadata.documentName ??
     props.fallbackName ??
-    'Untitled';
+    t('drive.unknownFilename');
   useSplitDisplayName(documentName);
 
   useBlockEntityCommands({

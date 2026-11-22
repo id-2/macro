@@ -31,7 +31,7 @@ use ai_tools::{DeferredToolSet, ToolServiceContext};
 use ai_toolset::{AsyncToolCollection, ToolSet as AiToolSet};
 use axum::extract::FromRef;
 use futures::{FutureExt as _, StreamExt as _};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use memory::domain::MemoryService as _;
 use memory::domain::service::MemoryServiceImpl;
 use memory::outbound::pg_memory_repo::PgMemoryRepo;
@@ -152,7 +152,15 @@ struct GatedToolSet<Context> {
     reviewed_tools: Vec<String>,
     /// The turn's remote MCP tools, to tell which server a call reaches.
     remote: Option<mcp_toolset::RemoteMcpToolSet>,
+    /// How often each (tool, arguments) pair has been dispatched this turn.
+    /// A model stuck on `DescribeCodeTools` otherwise repeats it until the
+    /// loop's turn cap, burning the session; the third identical call is
+    /// answered with an explicit refusal instead of the same result again.
+    repeated: std::sync::Mutex<std::collections::HashMap<(String, String), u8>>,
 }
+
+/// Identical calls a turn lets through before refusing more.
+const IDENTICAL_CALLS_PER_TURN: u8 = 2;
 
 impl<Context> GatedToolSet<Context> {
     /// Whether `tool_name` is a remote MCP tool of a server other than the
@@ -166,6 +174,43 @@ impl<Context> GatedToolSet<Context> {
                 .as_ref()
                 .and_then(|remote| remote.server_of(tool_name))
                 != Some(crate::domain::mcp::MACRO_INTERNAL_MCP_NAME)
+    }
+
+    /// The name a tool of the harness's own MCP server is advertised under:
+    /// `ExecuteCode` for the registered `mcp__macro_internal__ExecuteCode`.
+    ///
+    /// Rox's guidance, tool descriptions and SDK notes call these tools by
+    /// their short names, and a model that copies one into a call names a
+    /// tool the provider never saw in `request.tools`; Groq rejects the whole
+    /// turn as `tool_use_failed`. So the tool list carries the short name and
+    /// [`Self::listed_name`] maps a call back before dispatch.
+    fn advertised_name<'a>(&self, tool_name: &'a str) -> &'a str {
+        let internal = self
+            .remote
+            .as_ref()
+            .and_then(|remote| remote.server_of(tool_name))
+            == Some(crate::domain::mcp::MACRO_INTERNAL_MCP_NAME);
+        if !internal {
+            return tool_name;
+        }
+        mcp_toolset::unmangle(tool_name).map_or(tool_name, |(_, tool)| tool)
+    }
+
+    /// The registered name a call to `tool_name` reaches: a short name of one
+    /// of the harness's own MCP tools, `None` for any other name, the
+    /// already-mangled ones included.
+    fn listed_name(&self, tool_name: &str) -> Option<String> {
+        if tool_name.starts_with(mcp_select::MANGLED_PREFIX) {
+            return None;
+        }
+        let full = format!(
+            "{}{}__{tool_name}",
+            mcp_select::MANGLED_PREFIX,
+            crate::domain::mcp::MACRO_INTERNAL_MCP_NAME
+        );
+        let remote = self.remote.as_ref()?;
+        (remote.server_of(&full) == Some(crate::domain::mcp::MACRO_INTERNAL_MCP_NAME))
+            .then_some(full)
     }
 }
 
@@ -182,6 +227,39 @@ where
     ) -> ai_toolset::ToolCallFuture<'a> {
         Box::pin(async move {
             let mut request_context = request_context;
+            // The model calls the harness's own tools by the short name its
+            // guidance uses; the MCP server registered them mangled.
+            let listed = self.listed_name(tool_name);
+            let tool_name = listed.as_deref().unwrap_or(tool_name);
+            // Anything the model reads back names the tool as its list does,
+            // never the registered name it cannot call.
+            let shown = self.advertised_name(tool_name);
+            // A model stuck on one call repeats it until the loop's turn cap.
+            // The third identical call is answered with a short refusal so it
+            // changes approach instead of reading the same result again.
+            let calls = {
+                let mut repeated = self.repeated.lock().expect("repeated calls poisoned");
+                let count = repeated
+                    .entry((tool_name.to_owned(), json.to_string()))
+                    .or_default();
+                *count += 1;
+                *count
+            };
+            if calls > IDENTICAL_CALLS_PER_TURN {
+                tracing::warn!(
+                    tool = tool_name,
+                    calls,
+                    "refused a repeated identical tool call"
+                );
+                return Ok(Err(ai_toolset::ToolCallError {
+                    internal_error: anyhow::anyhow!(
+                        "{tool_name} was called {calls} times with the same arguments this turn"
+                    ),
+                    description: format!(
+                        "{shown} already ran {IDENTICAL_CALLS_PER_TURN} times with these exact arguments this turn. Change approach or answer with what you have."
+                    ),
+                }));
+            }
             if self.reaches_remote_server(tool_name)
                 && let Some(reason) = self.gate.refuse_remote_mcp(self.session, tool_name).await
             {
@@ -245,6 +323,19 @@ where
             if request_context.cancel.is_cancelled() {
                 return Ok(Err(cancelled_call(tool_name)));
             }
+            // A model that repeats a call expects a different answer; after
+            // two identical dispatches this turn it gets told to move on
+            // instead of the loop running to its turn cap.
+            let key = (tool_name.to_owned(), arguments.to_string());
+            let attempted = {
+                let mut repeated = self.repeated.lock().expect("repeated calls poisoned");
+                let count = repeated.entry(key).or_insert(0);
+                *count = count.saturating_add(1);
+                *count
+            };
+            if attempted > IDENTICAL_CALLS_PER_TURN {
+                return Ok(Err(identical_call_refusal(shown)));
+            }
             self.tools
                 .dispatch_tool_call(context, request_context, tool_name, &arguments)
                 .await
@@ -255,6 +346,10 @@ where
         self.tools.request_schemas().map(|mut tools| {
             for tool in &mut tools {
                 add_native_actor_schema(&tool.name, &mut tool.schema);
+                let advertised = self.advertised_name(&tool.name).to_owned();
+                if advertised != tool.name {
+                    tool.name = advertised;
+                }
             }
             tools
         })
@@ -264,6 +359,10 @@ where
         let mut tools = self.tools.searchable_catalog();
         for tool in &mut tools {
             add_native_actor_schema(&tool.name, &mut tool.schema);
+            let advertised = self.advertised_name(&tool.name).to_owned();
+            if advertised != tool.name {
+                tool.name = advertised;
+            }
         }
         tools
     }
@@ -273,12 +372,30 @@ where
     }
 
     fn routing_description<'a>(&'a self, tool_name: &'a str) -> Option<ai_toolset::ToolInfo> {
-        self.tools.routing_description(tool_name)
+        match self.listed_name(tool_name) {
+            Some(listed) => self.tools.routing_description(&listed),
+            None => self.tools.routing_description(tool_name),
+        }
     }
 }
 
 /// What the model hears for a call its turn's cancellation stopped.
 const TURN_CANCELLED: &str = "The turn was cancelled; nothing was done.";
+
+/// What a model hears when it repeats one call with identical arguments.
+fn identical_call_refusal(tool_name: &str) -> ai_toolset::ToolCallError {
+    ai_toolset::ToolCallError {
+        internal_error: anyhow::anyhow!(
+            "{tool_name} was called more than {IDENTICAL_CALLS_PER_TURN} times with the same \
+             arguments in one turn"
+        ),
+        description: format!(
+            "You already called {tool_name} twice this turn with the same arguments, and the \
+             result will not change. Do not call it again; act with what you have (write and run \
+             the program for your task) or change the arguments."
+        ),
+    }
+}
 
 fn cancelled_call(tool_name: &str) -> ai_toolset::ToolCallError {
     ai_toolset::ToolCallError {
@@ -545,7 +662,7 @@ struct TurnRouting<'a> {
 /// listing future is deep enough to overflow the turn's own future type.
 fn select_skills<'a>(
     context: &'a ToolServiceContext,
-    owner: &'a MacroUserIdStr<'static>,
+    owner: &'a RoxUserIdStr<'static>,
     request: cognition::domain::RoutingRequest<'a>,
     already_loaded: &'a [uuid::Uuid],
     cancel: &'a CancellationToken,
@@ -662,7 +779,7 @@ async fn drive_turn(
     } else {
         tracing::info_span!(
             "agent.opener",
-            agent.opener.model = opener::MODEL,
+            agent.opener.model = agent::provider_keys::fast_model(),
             agent.opener.outcome = tracing::field::Empty,
             agent.opener.verdict_ms = tracing::field::Empty,
             agent.opener.line_chars = tracing::field::Empty,
@@ -922,6 +1039,7 @@ async fn drive_turn(
         awaiting,
         reviewed_tools,
         remote,
+        repeated: std::sync::Mutex::default(),
     });
     let session = agent_loop
         .session(toolset, Arc::new(tool_context), system_prompt, loop_usage)
@@ -1076,6 +1194,14 @@ fn elapsed_ms(since: tokio::time::Instant) -> u64 {
     u64::try_from(since.elapsed().as_millis()).unwrap_or(u64::MAX)
 }
 
+/// Which language a reply is written in: the reader's, taken from their
+/// latest message. Rox's own guidance is English, so without this the model
+/// answers a Russian prompt in English.
+const LANGUAGE: &str = "\n# Language\nWrite the reply in the language of the user's latest message: a Russian \
+message gets a Russian reply, an English one English, and so on for any other language. This holds even \
+though these instructions are in English, and it applies to your prose only: keep names, ids, code and \
+quoted text as they are.";
+
 /// The turn's system prompt, ordered so the longest possible prefix is
 /// cached: the agent-session preamble (which notes that an opening line may
 /// already be out, see [`opener`]; a session whose replies are read whole is
@@ -1124,7 +1250,10 @@ fn system_prompt(
     // kind (every routine draft) the same instructions, so they join the
     // cached shared block and are read back across sessions.
     if delivery == ReplyDelivery::Unseen {
-        prompt.push_shared(PromptSection::Preamble, unseen::PROMPT);
+        prompt.push_shared(
+            PromptSection::Preamble,
+            &format!("{}{LANGUAGE}", unseen::PROMPT),
+        );
         if let Some(identity) = &identity {
             prompt.push_shared(PromptSection::Identity, identity);
         }
@@ -1134,23 +1263,26 @@ fn system_prompt(
     } else {
         prompt.push_shared(
             PromptSection::Preamble,
-            &prompt::agent_session::PROMPT.to_string(),
+            &format!("{}{LANGUAGE}", prompt::agent_session::PROMPT),
         );
-        prompt.push_shared(PromptSection::MacroPrompt, &tools_prompt.to_string());
+        prompt.push_shared(PromptSection::RoxPrompt, &tools_prompt.to_string());
         if let Some(identity) = &identity {
             prompt.push(PromptSection::Identity, identity);
         }
         if let Some(instructions) = &instructions {
             prompt.push(PromptSection::SessionInstructions, instructions);
         }
-        // An unseen turn has no ContentSearch to look back with.
+        // A turn's own transcript is searched from code mode: `ContentSearch`
+        // is not a tool a code-mode turn is given (the SDK covers it).
         prompt.push(
             PromptSection::SessionNote,
             &format!(
                 "\n<agent_session>\nThis conversation is agent session {session_id}. Once it grows \
                  long, its earlier part is summarized to keep it within your context. To find the exact \
-                 words of anything said earlier, summarized or not, run ContentSearch with \
-                 agentSessionIds [\"{session_id}\"]. ContentSearch remains a direct tool for scoped session-history search.\n</agent_session>"
+                 words of anything said earlier, summarized or not, search this session's transcript \
+                 from ExecuteCode with `macro.search.all(query, {{ agentSessions: \
+                 [macro.agentSessions.byId(\"{session_id}\")] }})`, or read it with \
+                 `macro.agentSessions.byId(\"{session_id}\").foldedLog()`.\n</agent_session>"
             ),
         );
     }
@@ -1196,7 +1328,7 @@ fn routes_documentation(delivery: ReplyDelivery, instructions: Option<&str>) -> 
 /// The owner's memory block, or `None` when it is missing or failed to load.
 async fn fetch_user_memory(
     memory_service: &MemoryServiceImpl<PgMemoryRepo>,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
 ) -> Option<String> {
     match memory_service.get_memory(owner.clone()).await {
         Ok(memory) => memory.map(|memory| memory.to_string()),

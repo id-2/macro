@@ -1,5 +1,5 @@
 use incus_client::{ImageProtocol, ImageRemote, IncusTimeouts};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::str::FromStr;
 
 use super::*;
@@ -137,7 +137,7 @@ fn recorded_limits_and_units_survive_catalog_changes() {
         host: crate::domain::ids::HostId::new(Uuid::nil()),
         state: crate::domain::fakes::state(crate::domain::lifecycle::Phase::Stopped),
         harness_id: None,
-        created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
         created_at: "2026-11-05T10:00:00Z".parse().unwrap(),
         enrolled_at: None,
         setup_completed_at: None,
@@ -246,7 +246,7 @@ fn a_remote_image_names_its_server_and_protocol() {
         host: crate::domain::ids::HostId::new(Uuid::nil()),
         state: crate::domain::fakes::state(crate::domain::lifecycle::Phase::Stopped),
         harness_id: None,
-        created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+        created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
         created_at: "2026-11-05T10:00:00Z".parse().unwrap(),
         enrolled_at: None,
         setup_completed_at: None,

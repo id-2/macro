@@ -1,0 +1,20 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT md5('stream-plan-' || i)::uuid AS \"id!\" FROM generate_series(5200, 20000, 200) i ORDER BY i",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "id!",
+        "type_info": "Uuid"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "4c4534d679734baca22ae467e8b5684fedc9c39f0904e0e9749a7e3316aecd53"
+}

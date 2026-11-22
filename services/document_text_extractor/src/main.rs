@@ -6,8 +6,8 @@ use lambda_runtime::{
     Error, LambdaEvent, run, service_fn,
     tracing::{self},
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_env_var::env_var;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env_var::env_var;
 use model::IncomingEvent;
 use pdfium_render::prelude::*;
 use sqlx::postgres::PgPoolOptions;
@@ -21,7 +21,7 @@ env_var! {
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     tracing::trace!("initiating lambda");
 
@@ -43,7 +43,7 @@ async fn main() -> Result<(), Error> {
 
     tracing::trace!("initialized db client");
 
-    let s3_client = service::s3::S3::new(macro_aws_config::s3_client().await);
+    let s3_client = service::s3::S3::new(rox_aws_config::s3_client().await);
     tracing::trace!("initialized s3 client");
 
     // Set which pdfium binary to use

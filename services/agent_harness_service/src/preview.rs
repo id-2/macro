@@ -18,12 +18,12 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use config::Config;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, PgBotAuthorizationRepo, PgBotAuthorizer,
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, PgBotAuthorizationRepo, PgBotAuthorizer,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_service_urls::ConnectionGatewayUrl;
+use rox_service_urls::ConnectionGatewayUrl;
 use std::{sync::Arc, time::Duration};
 use tokio::net::TcpListener;
 
@@ -34,11 +34,11 @@ pub async fn build(
     shutdown: tokio_util::sync::CancellationToken,
     tasks: tokio_util::task::TaskTracker,
 ) -> Result<Router, rootcause::Report> {
-    let app_url = macro_service_urls::AppServiceUrl::new()?;
-    let control_url = macro_service_urls::PreviewGatewayUrl::new()?;
+    let app_url = rox_service_urls::AppServiceUrl::new()?;
+    let control_url = rox_service_urls::PreviewGatewayUrl::new()?;
     let mut allowed_hosts = Vec::new();
     let mut control_urls = vec![control_url.parse_url()?];
-    if matches!(config.environment, macro_env::Environment::Local) {
+    if matches!(config.environment, rox_env::Environment::Local) {
         control_urls.push(app_url.parse_url()?);
     }
     for url in control_urls {
@@ -47,10 +47,10 @@ pub async fn build(
             .ok_or_else(|| rootcause::report!("preview control URL requires a host"))?;
         allowed_hosts.push(host.to_owned());
     }
-    if matches!(config.environment, macro_env::Environment::Local) {
+    if matches!(config.environment, rox_env::Environment::Local) {
         allowed_hosts.extend(["localhost".to_owned(), "127.0.0.1".to_owned()]);
     }
-    let aws = macro_aws_config::get_macro_aws_config().await;
+    let aws = rox_aws_config::get_macro_aws_config().await;
     let secrets =
         secretsmanager_client::SecretsManager::new(aws_sdk_secretsmanager::Client::new(&aws));
     let access = Arc::new(
@@ -58,9 +58,9 @@ pub async fn build(
             entity_access::outbound::PgAccessRepository::new(pool.clone()),
         ),
     );
-    let auth = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(
-            macro_auth::middleware::decode_jwt::JwtValidationArgs::new_with_secret_manager(
+    let auth = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(
+            rox_auth::middleware::decode_jwt::JwtValidationArgs::new_with_secret_manager(
                 config.environment,
                 &secrets,
             )
@@ -80,10 +80,10 @@ pub async fn build(
     let repository = Arc::new(agent_preview::outbound::postgres::PgPreviewRepository::new(
         pool.clone(),
     ));
-    let replica = macro_uuid::Uuid::now_v7();
+    let replica = rox_uuid::Uuid::now_v7();
     let service = PreviewService::new(
         Settings {
-            local_ssh_fallback: matches!(config.environment, macro_env::Environment::Local),
+            local_ssh_fallback: matches!(config.environment, rox_env::Environment::Local),
             domain: config.preview_domain,
             https_port: config.preview_https_port,
             ssh_host: config.preview_ssh_host,
@@ -94,7 +94,7 @@ pub async fn build(
             host_key: public_key,
             app_origin: app_url.to_string(),
         },
-        Arc::new(adapters::MacroAuthority {
+        Arc::new(adapters::RoxAuthority {
             sessions: agent_session::outbound::postgres::PgAgentSessionRepo::new(
                 pool.clone(),
                 entity_registry_db_utils::OwnedEntityRegistrar::new(
@@ -119,14 +119,14 @@ pub async fn build(
     let control = control::router(ControlState::new(
         service.clone(),
         access,
-        MacroAuthorizationState::new(Arc::new(auth)),
+        RoxAuthorizationState::new(Arc::new(auth)),
     ));
     tracing::info!(
         hosts = ?allowed_hosts,
         "preview control listener ready"
     );
     let mcp = toolset::router(service.clone(), allowed_hosts);
-    let app = control.merge(mcp).layer(macro_cors::cors_layer());
+    let app = control.merge(mcp).layer(rox_cors::cors_layer());
     let app = Router::new()
         .nest("/preview", app)
         .layer(middleware::from_fn_with_state(
@@ -170,7 +170,7 @@ pub async fn build(
         }
     });
     Ok(app.layer(
-        macro_tower_layers::MacroRequestIdAndTracingLayer::new(Duration::from_millis(200))
+        rox_tower_layers::RoxRequestIdAndTracingLayer::new(Duration::from_millis(200))
             .into_inner(),
     ))
 }

@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { pendingWebUpdate } from '@core/util/reloadForNewerBuild';
-import { useTauri } from '@macro/tauri';
+import { useTauri } from '@rox/tauri';
 import { invoke } from '@tauri-apps/api/core';
 import { type Accessor, createMemo } from 'solid-js';
 

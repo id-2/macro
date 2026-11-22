@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ImageContent } from '@block-image/component/ImageContent';
 import { createFileDownload } from '@core/util/createFileDownload';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -45,7 +46,7 @@ export function ImageDetailDocument(props: {
       })}
       <ImageContent
         file={props.data.file}
-        alt={props.data.documentMetadata.documentName || 'Image'}
+        alt={props.data.documentMetadata.documentName || t('drive.imageAlt')}
       />
     </FileDetailLayout>
   );
@@ -59,7 +60,7 @@ export function ImageDetail(props: {
     <FileDetailLoadGate
       documentId={props.documentId}
       entityType="image"
-      label="image"
+      label={t('drive.entityImage')}
       load={loadImageDocument}
     >
       {(data) => (

@@ -4,7 +4,7 @@
 use std::sync::Arc;
 
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashMap;
 use uuid::Uuid;
 
@@ -23,7 +23,7 @@ pub struct AgentDm {
     /// Channel containing the conversation.
     pub channel_id: Uuid,
     /// User whose history, credentials, and permissions the conversation uses.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Persona addressed by every user message in the channel.
     pub bot_id: BotId,
 }
@@ -55,7 +55,7 @@ pub trait AgentDmProfiles: Send + Sync + 'static {
     /// Resolve profiles only for the caller's DMs among these channels.
     async fn for_channels(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         channel_ids: &[Uuid],
     ) -> Result<HashMap<Uuid, AgentDmProfile>, rootcause::Report>;
 }
@@ -65,13 +65,13 @@ pub trait AgentDmRepo: Send + Sync + 'static {
     /// List the caller's durable bindings, including retained history.
     fn for_user(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<AgentDm>, ChannelMutationErr>> + Send;
     /// Create the channel and both memberships atomically, or restore the
     /// existing pair. Concurrent requests must return the same channel.
     fn ensure(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<EnsuredAgentDm, ChannelMutationErr>> + Send;
 }
@@ -82,7 +82,7 @@ pub trait AgentDmAuthorizer: Send + Sync + 'static {
     /// Existing channel membership alone does not grant permission to start a DM.
     fn authorize(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> impl Future<Output = Result<(), ChannelMutationErr>> + Send;
 }
@@ -93,7 +93,7 @@ pub trait AgentDirectMessages: Send + Sync + 'static {
     /// Open the caller's private conversation with an eligible persona.
     async fn get_or_create(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<GetOrCreateChannelResponse, ChannelMutationErr>;
 }
@@ -122,7 +122,7 @@ impl<R: AgentDmRepo, A: AgentDmAuthorizer, E: ChannelEventDispatcher> AgentDirec
 {
     async fn get_or_create(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<GetOrCreateChannelResponse, ChannelMutationErr> {
         // Rechecked even for an existing DM: a former teammate may retain
@@ -154,13 +154,13 @@ impl<R: AgentDmRepo, A: AgentDmAuthorizer, E: ChannelEventDispatcher> AgentDirec
 impl<R: AgentDmRepo> AgentDmRepo for Arc<R> {
     async fn for_user(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<AgentDm>, ChannelMutationErr> {
         (**self).for_user(user_id).await
     }
     async fn ensure(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<EnsuredAgentDm, ChannelMutationErr> {
         (**self).ensure(user_id, bot_id).await

@@ -5,7 +5,7 @@ use std::sync::{Arc, OnceLock};
 use agent_session::domain::model::{AgentSessionId, SessionClaim};
 use agent_session::domain::working_branch::SessionWorkingBranches;
 use cursor_cloud_agents::domain::ports::WorkingBranchReporter;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -13,7 +13,7 @@ mod test;
 pub(super) struct CursorWorkingBranchReporter {
     pub service: Arc<dyn SessionWorkingBranches>,
     pub session: AgentSessionId,
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     pub claim: Arc<OnceLock<SessionClaim>>,
 }
 

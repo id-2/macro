@@ -2,7 +2,7 @@
 
 use crate::domain::{ports::ChannelRealtimePublisher, side_effects::ChannelRealtimeEffect};
 use connection_gateway_client::ConnectionGatewayClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType as GatewayEntityType;
 use serde::Serialize;
 use std::sync::Arc;
@@ -24,7 +24,7 @@ impl ConnectionGatewayChannelRealtimePublisher {
         &self,
         message_type: &'static str,
         payload: T,
-        participants: Vec<MacroUserIdStr<'static>>,
+        participants: Vec<RoxUserIdStr<'static>>,
     ) -> anyhow::Result<()> {
         if participants.is_empty() {
             return Ok(());

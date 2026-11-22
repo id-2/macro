@@ -6,7 +6,7 @@
  */
 import type { ApiDraftOutputBcc } from './apiDraftOutputBcc';
 import type { ApiDraftOutputBodyHtml } from './apiDraftOutputBodyHtml';
-import type { ApiDraftOutputBodyMacro } from './apiDraftOutputBodyMacro';
+import type { ApiDraftOutputBodyRox } from './apiDraftOutputBodyRox';
 import type { ApiDraftOutputBodyText } from './apiDraftOutputBodyText';
 import type { ApiDraftOutputCc } from './apiDraftOutputCc';
 import type { ApiDraftOutputDbId } from './apiDraftOutputDbId';
@@ -27,7 +27,7 @@ export interface ApiDraftOutput {
   /** HTML body (decoded). */
   body_html?: ApiDraftOutputBodyHtml;
   /** Rox body. */
-  body_macro?: ApiDraftOutputBodyMacro;
+  body_rox?: ApiDraftOutputBodyRox;
   /** Plain text body. */
   body_text?: ApiDraftOutputBodyText;
   /** Cc recipients. */

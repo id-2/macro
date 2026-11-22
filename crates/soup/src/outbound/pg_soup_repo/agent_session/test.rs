@@ -1,7 +1,7 @@
 use super::*;
 use item_filters::ast::EntityFilterAst;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 const OWNER: &str = "macro|agent-owner@test.com";
@@ -177,7 +177,7 @@ fn request(
     SimpleSortRequest {
         limit: 10,
         cursor,
-        user_id: MacroUserIdStr::parse_from_str(user).expect("valid user id"),
+        user_id: RoxUserIdStr::parse_from_str(user).expect("valid user id"),
     }
 }
 
@@ -235,7 +235,7 @@ async fn sessions_are_opt_in(pool: PgPool) -> anyhow::Result<()> {
             SimpleSortMethod::UpdatedAt,
             EntityFilterAst::default(),
         )),
-        user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+        user_id: RoxUserIdStr::parse_from_str(OWNER)?,
     };
     assert!(
         cursor_soup(&pool, ast_without_sessions).await?.is_empty(),
@@ -337,7 +337,7 @@ async fn cursor_pages_past_the_first_row(pool: PgPool) -> anyhow::Result<()> {
                     ..EntityFilterAst::default()
                 },
             )),
-            user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+            user_id: RoxUserIdStr::parse_from_str(OWNER)?,
         },
     )
     .await?;
@@ -366,7 +366,7 @@ async fn cursor_pages_past_the_first_row(pool: PgPool) -> anyhow::Result<()> {
                     },
                 },
             )),
-            user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+            user_id: RoxUserIdStr::parse_from_str(OWNER)?,
         },
     )
     .await?;
@@ -387,7 +387,7 @@ async fn by_ids_respects_access(pool: PgPool) -> anyhow::Result<()> {
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+            user_id: RoxUserIdStr::parse_from_str(OWNER)?,
         },
     )
     .await?;
@@ -397,7 +397,7 @@ async fn by_ids_respects_access(pool: PgPool) -> anyhow::Result<()> {
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(MEMBER)?,
+            user_id: RoxUserIdStr::parse_from_str(MEMBER)?,
         },
     )
     .await?;
@@ -452,7 +452,7 @@ async fn hidden_sessions_stay_out_of_broad_lists(pool: PgPool) -> anyhow::Result
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(MEMBER)?,
+            user_id: RoxUserIdStr::parse_from_str(MEMBER)?,
         },
     )
     .await?;
@@ -510,7 +510,7 @@ async fn hidden_dm_contexts_are_omitted_from_home_and_agents_but_open_by_id(
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str(OWNER)?,
+            user_id: RoxUserIdStr::parse_from_str(OWNER)?,
         },
     )
     .await?;
@@ -626,7 +626,7 @@ async fn by_ids_inherits_the_parent_thread_access(pool: PgPool) -> anyhow::Resul
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(STRANGER)?,
+                user_id: RoxUserIdStr::parse_from_str(STRANGER)?,
             },
         )
         .await?;
@@ -650,7 +650,7 @@ async fn by_ids_inherits_the_parent_thread_access(pool: PgPool) -> anyhow::Resul
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(STRANGER)?,
+                user_id: RoxUserIdStr::parse_from_str(STRANGER)?,
             },
         )
         .await?;
@@ -684,7 +684,7 @@ async fn by_ids_inherits_the_parent_thread_access(pool: PgPool) -> anyhow::Resul
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(STRANGER)?,
+                user_id: RoxUserIdStr::parse_from_str(STRANGER)?,
             },
         )
         .await?;
@@ -804,7 +804,7 @@ async fn a_link_share_opens_the_session_by_id(pool: PgPool) -> anyhow::Result<()
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(STRANGER)?,
+                user_id: RoxUserIdStr::parse_from_str(STRANGER)?,
             },
         )
         .await?;

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO crm_email_rule_threads (team_id, user_id, revision, thread_id) VALUES ($1, $2, 1, $3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "546f20022a3bd0e1734fb473b982acf2b2528019d26c252566a81d7eeaf18e54"
+}

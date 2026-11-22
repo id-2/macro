@@ -16,7 +16,7 @@
  * waits 60s and then leaves its change in the tree for the next commit, so
  * nothing is lost.
  */
-import { isoText } from '@macro-inc/muppet/utilities/time';
+import { isoText } from '@rox-one/muppet/utilities/time';
 import type { Ran } from '../../context/shell.ts';
 import { commitLocked, syncMain } from './commit.ts';
 import { branchRef, type Repository } from './repository.ts';

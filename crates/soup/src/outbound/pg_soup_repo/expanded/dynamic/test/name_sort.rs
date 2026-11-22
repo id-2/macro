@@ -92,7 +92,7 @@ async fn flat(
     Ok(expanded_dynamic_cursor_soup_with_projection(
         pool,
         ExpandedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str(&user_id)?,
+            user_id: RoxUserIdStr::parse_from_str(&user_id)?,
             limit,
             cursor,
             exclude_frecency: false,
@@ -112,7 +112,7 @@ async fn grouped(
     Ok(expanded_dynamic_cursor_soup_grouped(
         pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str(&user_id)?,
+            user_id: RoxUserIdStr::parse_from_str(&user_id)?,
             limit,
             cursor,
             exclude_frecency: false,

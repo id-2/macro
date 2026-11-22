@@ -9,13 +9,13 @@
 use super::*;
 use crate::outbound::email_pg_repo::db_types::ThreadPreviewCursorDbRow;
 use crate::outbound::email_pg_repo::dynamic::TeamReadTuning;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 const TEAM_GAMMA_ID: &str = "e0000003-0000-0000-0000-000000000003";
 const TEAM_DELTA_ID: &str = "e0000004-0000-0000-0000-000000000004";
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../fixtures", scripts("email_crm_team_read"))
 )]
 async fn selected_and_all_mail_contributors_keep_the_same_pages(

@@ -10,7 +10,7 @@ use bot_id::BotId;
 use bots::domain::ports::TeamBotRoster;
 use document_storage_service_client::DocumentStorageServiceClient;
 use entity_registry::{EntityRecord, EntityRegistryService, Owner, RegisteredEntityType};
-use macro_authorization::INTERNAL_API_KEY_HEADER;
+use rox_authorization::INTERNAL_API_KEY_HEADER;
 use rootcause::{Report, compat::ReportAsError, prelude::*};
 use teams::domain::owned_entity_cleanup::{
     OwnedEntityCleanup, OwnedEntityRef, TeamDeletionGuard, TeamDeletionOwner,

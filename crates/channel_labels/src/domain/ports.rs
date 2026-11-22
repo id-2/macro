@@ -1,6 +1,6 @@
 //! Ports (trait contracts) for the channel labels domain.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::models::{
@@ -22,7 +22,7 @@ pub trait ChannelLabelsRepo: Send + Sync + 'static {
     fn list_labels(
         &self,
         scope: &ChannelLabelsScope,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<ChannelLabel>, Self::Err>> + Send;
 
     /// One label of the scope, viewer-relative like [`Self::list_labels`].
@@ -30,7 +30,7 @@ pub trait ChannelLabelsRepo: Send + Sync + 'static {
         &self,
         scope: &ChannelLabelsScope,
         label_id: Uuid,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<ChannelLabel>, Self::Err>> + Send;
 
     /// Append a label to the scope's list. `name` is already trimmed and
@@ -44,7 +44,7 @@ pub trait ChannelLabelsRepo: Send + Sync + 'static {
         scope: &ChannelLabelsScope,
         name: &str,
         channel_ids: &[Uuid],
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         rule: Option<&ChannelLabelRule>,
     ) -> impl Future<Output = Result<LabelWriteOutcome, Self::Err>> + Send;
 
@@ -55,7 +55,7 @@ pub trait ChannelLabelsRepo: Send + Sync + 'static {
         scope: &ChannelLabelsScope,
         label_id: Uuid,
         name: &str,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         rule: Option<&ChannelLabelRule>,
     ) -> impl Future<Output = Result<LabelWriteOutcome, Self::Err>> + Send;
 
@@ -68,7 +68,7 @@ pub trait ChannelLabelsRepo: Send + Sync + 'static {
         target: &ChannelLabelsScope,
         label_id: Uuid,
         name: &str,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         rule: Option<&ChannelLabelRule>,
     ) -> impl Future<Output = Result<LabelWriteOutcome, Self::Err>> + Send;
 
@@ -93,7 +93,7 @@ pub trait ChannelLabelsRepo: Send + Sync + 'static {
         scope: &ChannelLabelsScope,
         channel_id: Uuid,
         label_id: Option<Uuid>,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<SetChannelLabelOutcome, Self::Err>> + Send;
 
     /// Preview a validated rule using only the viewer's active channel memberships
@@ -103,7 +103,7 @@ pub trait ChannelLabelsRepo: Send + Sync + 'static {
     fn preview_smart_tag(
         &self,
         scope: &ChannelLabelsScope,
-        viewer: &MacroUserIdStr<'_>,
+        viewer: &RoxUserIdStr<'_>,
         rule: &ChannelLabelRule,
         limit: u16,
     ) -> impl Future<Output = Result<SmartTagPreview, Self::Err>> + Send;

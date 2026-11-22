@@ -30,13 +30,13 @@ use entity_access::{
 };
 use filter_ast::Expr;
 use item_filters::ast::crm_contact::CrmContactLiteral;
-use macro_authorization::{
-    InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
+use rox_authorization::{
+    InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedCredential,
     ValidatedIdentity,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use std::sync::Arc;
 use tower::ServiceExt;
@@ -50,18 +50,18 @@ impl JwtValidator for Credentials {
     fn validate_credential(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, rootcause::Report<RoxAuthorizationError>> {
         let user = match token {
             "owner" => OWNER,
             "member" => MEMBER,
             _ => {
                 return Err(rootcause::Report::new(
-                    MacroAuthorizationError::InvalidCredentials,
+                    RoxAuthorizationError::InvalidCredentials,
                 ));
             }
         };
         Ok(ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -118,7 +118,7 @@ async fn member_access_revocation_reaches_http_search_and_soup(pool: PgPool) -> 
     let access = Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
         pool.clone(),
     )));
-    let viewer = MacroUserIdStr::parse_from_str(MEMBER)?;
+    let viewer = RoxUserIdStr::parse_from_str(MEMBER)?;
     let receipt = CrmTeamReceipt::from_team_receipt(
         access
             .generate_entity_access_receipt::<MemberTeamRole>(
@@ -134,8 +134,8 @@ async fn member_access_revocation_reaches_http_search_and_soup(pool: PgPool) -> 
         service: service.clone(),
         stage_service: Arc::new(()),
         entity_access_service: access.clone(),
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
                 Credentials,
                 InternalAuthConfig {
                     api_key: "fixture-only".into(),
@@ -319,7 +319,7 @@ impl properties::PermissionService for NoPermissions {
     type Err = anyhow::Error;
     async fn mint_view_receipt<'a>(
         &self,
-        _: Option<&'a MacroUserIdStr<'a>>,
+        _: Option<&'a RoxUserIdStr<'a>>,
         _: &str,
         _: entity_access::domain::models::EntityType,
     ) -> Result<properties::domain::model::ViewReceipt, Self::Err> {
@@ -327,7 +327,7 @@ impl properties::PermissionService for NoPermissions {
     }
     async fn mint_edit_receipt<'a>(
         &self,
-        _: &MacroUserIdStr<'a>,
+        _: &RoxUserIdStr<'a>,
         _: &str,
         _: entity_access::domain::models::EntityType,
     ) -> Result<properties::domain::model::EditReceipt, Self::Err> {
@@ -335,7 +335,7 @@ impl properties::PermissionService for NoPermissions {
     }
     async fn grant_permissions_to_task<'a>(
         &self,
-        _: &[MacroUserIdStr<'a>],
+        _: &[RoxUserIdStr<'a>],
         _: &str,
     ) -> Result<(), Self::Err> {
         unreachable!("creation does not grant task access")

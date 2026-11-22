@@ -22,7 +22,7 @@ where
 
     async fn visible_entities(
         &self,
-        viewer: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        viewer: &rox_user_id::user_id::RoxUserIdStr<'_>,
         entities: &[(crate::EntityType, String)],
     ) -> Result<std::collections::HashSet<(crate::EntityType, String)>, Self::Err> {
         let mut visible = self.service.visible_crm_entities(viewer, entities).await?;
@@ -44,7 +44,7 @@ where
         &self,
         entity_type: crate::EntityType,
         entity_id: &str,
-        viewer: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        viewer: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<bool, Self::Err> {
         use entity_access::domain::models::{AccessError, ViewAccessLevel};
         match self
@@ -67,7 +67,7 @@ where
         &self,
         entity_type: crate::EntityType,
         entity_id: &str,
-    ) -> Result<Vec<macro_user_id::user_id::MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<rox_user_id::user_id::RoxUserIdStr<'static>>, Self::Err> {
         match self
             .service
             .get_users_by_entity(entity_id, entity_type)

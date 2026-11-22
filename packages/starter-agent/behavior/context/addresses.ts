@@ -1,8 +1,8 @@
-import type { MacroOpts } from '@macro-inc/sdk';
+import type { RoxOpts } from '@rox-one/sdk';
 import type { Configured } from './startup.ts';
 
 /** A service the SDK talks to. */
-export type ServiceName = keyof NonNullable<MacroOpts['hosts']>;
+export type ServiceName = keyof NonNullable<RoxOpts['hosts']>;
 
 export type Hosts = Partial<Record<ServiceName, string>>;
 

@@ -40,13 +40,13 @@ use github_pull_requests::{
     outbound::pg_github_pull_request_repo::PgGithubPullRequestRepo,
 };
 use loops_client::LoopsClient;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
-use macro_service_urls::{
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
+use rox_service_urls::{
     AppServiceUrl, ConnectionGatewayUrl, DocumentStorageServiceUrl, EmailServiceUrl,
     GoogleOauthAuthorizationUrl, StaticFilePublicUrl, StaticFileServiceUrl,
 };
@@ -92,7 +92,7 @@ use crate::{
     api::{
         self,
         context::{
-            ApiContext, AuthorizationService, MacroApiTokenContext, MacroApiTokenExpirySeconds,
+            ApiContext, AuthorizationService, RoxApiTokenContext, MacroApiTokenExpirySeconds,
             MacroApiTokenIssuer, MacroApiTokenPrivateSecretKey, StripeWebhookSecretKey,
         },
     },
@@ -117,7 +117,7 @@ async fn run_server() -> anyhow::Result<()> {
     let env = Environment::new_or_prod();
 
     // One SDK config is sufficient for every AWS client in this process.
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
     );
@@ -301,7 +301,7 @@ async fn run_server() -> anyhow::Result<()> {
     tracing::trace!("initialized email service client");
 
     let macro_cache_client =
-        macro_cache_client::MacroCache::new(config.redis_uri.to_string().as_str());
+        rox_cache_client::RoxCache::new(config.redis_uri.to_string().as_str());
 
     tracing::trace!("initialized redis client");
 
@@ -317,13 +317,13 @@ async fn run_server() -> anyhow::Result<()> {
     let jwt_args =
         JwtValidationArgs::new_with_secret_manager(config.environment, &secretsmanager_client)
             .await?;
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
 
@@ -334,12 +334,12 @@ async fn run_server() -> anyhow::Result<()> {
         .await
         .context("failed to get multiplexed redis connection")?;
 
-    let notification_queue = macro_queues::NotificationIngressQueue::new();
-    let search_event_queue = macro_queues::SearchEventQueue::new();
-    let link_manager_queue = macro_queues::LinkManagerQueue::new();
-    let email_backfill_queue = macro_queues::EmailBackfillQueue::new();
+    let notification_queue = rox_queues::NotificationIngressQueue::new();
+    let search_event_queue = rox_queues::SearchEventQueue::new();
+    let link_manager_queue = rox_queues::LinkManagerQueue::new();
+    let email_backfill_queue = rox_queues::EmailBackfillQueue::new();
     let ingress_queue = SqsQueue::new(
-        aws_sdk_sqs::Client::new(&macro_aws_config::get_macro_aws_config().await),
+        aws_sdk_sqs::Client::new(&rox_aws_config::get_macro_aws_config().await),
         notification_queue.to_string(),
     );
     let notification_ingress_service = SqsNotificationIngress {
@@ -453,13 +453,13 @@ async fn run_server() -> anyhow::Result<()> {
     let contacts_ingress = Arc::new(SqsContactsIngress {
         queue: SqsContactsQueue::new(
             aws_sdk_sqs::Client::new(&aws_config),
-            macro_queues::ContactsQueue::new().to_string(),
+            rox_queues::ContactsQueue::new().to_string(),
         ),
     });
     let contacts_enqueuer = ContactsIngressEnqueuer::new(contacts_ingress.clone());
     let team_analytics = AnalyticsClientTeamAnalytics::new(analytics_client.clone());
     let event_broker_tracker = TaskTracker::new();
-    let macro_event_broker = MacroEventBrokerService::new(
+    let macro_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
@@ -688,8 +688,8 @@ async fn run_server() -> anyhow::Result<()> {
     // The harness and scheduled-action services validate the fleet-wide
     // internal key, not this service's own inbound key.
     let internal_key = config.service_internal_auth_key.to_string();
-    let harness_url = macro_service_urls::AgentHarnessServiceUrl::new()?.to_string();
-    let scheduled_action_url = macro_service_urls::ScheduledActionServiceUrl::new()?.to_string();
+    let harness_url = rox_service_urls::AgentHarnessServiceUrl::new()?.to_string();
+    let scheduled_action_url = rox_service_urls::ScheduledActionServiceUrl::new()?.to_string();
     let team_owned_entity_cleanup = TeamOwnedEntityCleanupAdapter::new(
         Arc::new(
             passwords::outbound::postgres::PgRepository::new(db.clone())
@@ -766,7 +766,7 @@ async fn run_server() -> anyhow::Result<()> {
         )),
         team_agents::outbound::agent_git_repos::AgentGitRepos::new(
             agent_git::client::AgentGitClient::new(
-                macro_service_urls::AgentGitServiceUrl::new()?.to_string(),
+                rox_service_urls::AgentGitServiceUrl::new()?.to_string(),
                 internal_key.clone(),
             )
             .map_err(|error| anyhow::anyhow!("{error:?}"))?,
@@ -972,11 +972,14 @@ async fn run_server() -> anyhow::Result<()> {
             rate_limit_service: rate_limit,
             event_broker: macro_event_broker.clone(),
             calendar_scope_enabled: config.calendar_scope_enabled,
+            passwordless_return_code: crate::api::context::PasswordlessReturnCode(
+                config.passwordless_return_code,
+            ),
             google_authorization_url,
             account_link_state_key,
             jwt_args,
             authorization_state,
-            token_context: MacroApiTokenContext {
+            token_context: RoxApiTokenContext {
                 issuer: MacroApiTokenIssuer::new()?,
                 macro_api_token_private_key,
                 expiry_seconds: MacroApiTokenExpirySeconds::new()?

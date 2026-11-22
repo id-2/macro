@@ -1,5 +1,5 @@
-use macro_event_broker::{Event, MacroEvent};
-use macro_event_topics::{MacroPropertiesTopic, Topic};
+use rox_event_broker::{Event, RoxEvent};
+use rox_event_topics::{RoxPropertiesTopic, Topic};
 use serde_json::{Value, json};
 
 use super::*;
@@ -21,12 +21,12 @@ fn timestamp(value: &str) -> DateTime<Utc> {
     value.parse().expect("valid timestamp")
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn topic_events(
-    actor_user_id: Option<MacroUserIdStr<'static>>,
+    actor_user_id: Option<RoxUserIdStr<'static>>,
 ) -> Vec<(PropertyTopicEvent, Value)> {
     let actor_json = serde_json::to_value(&actor_user_id).expect("serializable actor");
 
@@ -226,40 +226,40 @@ fn topic_events(
     ]
 }
 
-fn macro_events() -> Vec<(PropertyMacroEvent, &'static str)> {
+fn macro_events() -> Vec<(PropertyRoxEvent, &'static str)> {
     topic_events(Some(user_id("macro|editor@acme.com")))
         .into_iter()
         .map(|(event, _)| match event {
             PropertyTopicEvent::Created(metadata) => (
-                PropertyMacroEvent::created(metadata),
+                PropertyRoxEvent::created(metadata),
                 PROPERTY_DEFINITION_ID,
             ),
             PropertyTopicEvent::Deleted(metadata) => (
-                PropertyMacroEvent::deleted(metadata),
+                PropertyRoxEvent::deleted(metadata),
                 PROPERTY_DEFINITION_ID,
             ),
             PropertyTopicEvent::OptionCreated(metadata) => (
-                PropertyMacroEvent::property_option_created(metadata),
+                PropertyRoxEvent::property_option_created(metadata),
                 PROPERTY_DEFINITION_ID,
             ),
             PropertyTopicEvent::OptionUpdated(metadata) => (
-                PropertyMacroEvent::property_option_updated(metadata),
+                PropertyRoxEvent::property_option_updated(metadata),
                 PROPERTY_DEFINITION_ID,
             ),
             PropertyTopicEvent::OptionDeleted(metadata) => (
-                PropertyMacroEvent::property_option_deleted(metadata),
+                PropertyRoxEvent::property_option_deleted(metadata),
                 PROPERTY_DEFINITION_ID,
             ),
             PropertyTopicEvent::EntityPropertyUpdated(metadata) => (
-                PropertyMacroEvent::entity_property_updated(metadata),
+                PropertyRoxEvent::entity_property_updated(metadata),
                 ENTITY_ID,
             ),
             PropertyTopicEvent::EntityPropertyDeleted(metadata) => (
-                PropertyMacroEvent::entity_property_deleted(metadata),
+                PropertyRoxEvent::entity_property_deleted(metadata),
                 ENTITY_ID,
             ),
             PropertyTopicEvent::EntityPropertiesCleared(metadata) => (
-                PropertyMacroEvent::entity_properties_cleared(metadata),
+                PropertyRoxEvent::entity_properties_cleared(metadata),
                 ENTITY_ID,
             ),
         })
@@ -289,11 +289,11 @@ fn every_variant_round_trips() {
     for (original, expected_key) in macro_events() {
         let payload = serde_json::to_vec(original.event()).expect("serializable event");
         let decoded =
-            PropertyMacroEvent::decode(original.key(), &payload).expect("decodable event");
+            PropertyRoxEvent::decode(original.key(), &payload).expect("decodable event");
 
         assert_eq!(decoded.key(), expected_key);
         assert_eq!(decoded.event(), original.event());
-        assert_eq!(decoded.topic(), MacroPropertiesTopic::TOPIC_STR);
+        assert_eq!(decoded.topic(), RoxPropertiesTopic::TOPIC_STR);
         assert_eq!(decoded.topic(), "macro.properties");
     }
 }

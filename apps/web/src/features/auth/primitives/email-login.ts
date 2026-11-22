@@ -1,3 +1,4 @@
+import { LOCAL_ONLY } from '@core/constant/featureFlags';
 import { isAllowedHandle } from '@core/constant/mailbox-handle';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { createSignal, onCleanup } from 'solid-js';
@@ -15,6 +16,18 @@ const VERIFY_ERRORS = {
   'rate-limited': 'Too many attempts. Wait a minute, then try again.',
   failed: 'Unable to perform verification.',
 } satisfies Record<Exclude<VerifyCodeResult['t'], 'verified'>, string>;
+
+/** One Russian line for a throttled claim or resend, whatever the server said. */
+const RATE_LIMIT_ERROR =
+  'Слишком много попыток. Подождите минуту и попробуйте снова.';
+
+/** Server texts are English and environment-specific; show a Russian line. */
+const sendErrorText = (message: string | undefined) =>
+  /rate[\s_-]?limit/i.test(message ?? '')
+    ? RATE_LIMIT_ERROR
+    : message && message !== 'unable to create user'
+      ? message
+      : 'Не удалось создать учётную запись. Попробуйте другую почту.';
 
 const HANDLE_ERROR =
   'Choose 3–32 lowercase letters, numbers, dots, underscores, or hyphens. Reserved names and consecutive dots are not allowed.';
@@ -44,6 +57,8 @@ export function createEmailLogin(
     initialEmail?: string;
     /** Send the code for `initialEmail` right away (dev persona links). */
     autoStart?: boolean;
+    /** The entry offers only email, so it opens on that step. */
+    startAtEmail?: boolean;
     /** After a verified sign-in, before the session swaps the page. */
     onVerified?: () => void;
     /** A provider sign-in just failed: open on the email step and say why. */
@@ -51,7 +66,9 @@ export function createEmailLogin(
   }
 ) {
   const [step, setStep] = createSignal<LoginStep>(
-    options.initialEmail || options.fallbackNotice ? 'email' : 'choose'
+    options.startAtEmail || options.initialEmail || options.fallbackNotice
+      ? 'email'
+      : 'choose'
   );
   const [email, setEmail] = createSignal(options.initialEmail ?? '');
   const [handle, setHandle] = createSignal('');
@@ -128,6 +145,14 @@ export function createEmailLogin(
       verifiedAttempt = currentAttempt;
     }
     try {
+      // A local instance has no stable passkey origin: the emailed code is the
+      // whole sign-in, so neither a new account nor a returning one is sent to
+      // a passkey step it cannot complete.
+      if (LOCAL_ONLY) {
+        setVerifying(false);
+        await finish();
+        return;
+      }
       if (createdAccount()) {
         setPasskeyKind('enroll');
         setPasskeyError();
@@ -198,8 +223,11 @@ export function createEmailLogin(
           return false;
         case 'redirected':
           return false;
+        case 'rate-limited':
+          setSendError(RATE_LIMIT_ERROR);
+          return false;
         case 'failed':
-          setSendError(result.message);
+          setSendError(sendErrorText(result.message));
           return false;
       }
     } finally {
@@ -286,7 +314,7 @@ export function createEmailLogin(
         setSendError();
         setPasskeyError();
         setStep('email');
-      } else {
+      } else if (!options.startAtEmail) {
         setSendError();
         setStep('choose');
       }

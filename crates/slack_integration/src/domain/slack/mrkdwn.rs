@@ -5,7 +5,7 @@
 
 use std::collections::BTreeMap;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mention_utils::serialize::ExternalLink;
 
 use crate::domain::models::{ConversationId, SlackUserId};
@@ -241,7 +241,7 @@ impl MrkdwnConverter<'_> {
         })
     }
 
-    fn angle(&self, token: &str, user_mentions: &mut Vec<MacroUserIdStr<'static>>) -> Token {
+    fn angle(&self, token: &str, user_mentions: &mut Vec<RoxUserIdStr<'static>>) -> Token {
         let (target, label) = token
             .split_once('|')
             .map_or((token, None), |(a, b)| (a, Some(b)));

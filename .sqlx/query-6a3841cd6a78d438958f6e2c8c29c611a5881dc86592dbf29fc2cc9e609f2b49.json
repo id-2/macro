@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO email_messages (id, thread_id, link_id, is_draft, is_sent, from_contact_id,\n                                    internal_date_ts, mailbox_state)\n        VALUES ('00000000-0000-0000-0000-0000000e0622', $1, $3, true, false,\n                '00000000-0000-0000-0000-0000000c0020', '2025-01-11 10:00:00 +00:00',\n                '{\"provider_missing\": true}'),\n               ('00000000-0000-0000-0000-0000000e0623', $2, $3, true, false,\n                '00000000-0000-0000-0000-0000000c0020', '2025-01-11 10:00:00 +00:00',\n                '{\"provider_missing\": true}')\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6a3841cd6a78d438958f6e2c8c29c611a5881dc86592dbf29fc2cc9e609f2b49"
+}

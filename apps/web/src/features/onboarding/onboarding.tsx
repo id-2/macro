@@ -45,6 +45,7 @@ export function Onboarding(props: { next?: string }) {
           window.location.href = url;
         }}
         onSignedOut={() => navigate('/login', { replace: true })}
+        restart
         renderInviteOffer={(offer, actions) => (
           <InviteOfferPanel
             offer={offer}

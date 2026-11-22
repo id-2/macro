@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use macro_env_var::env_vars;
+use rox_env_var::env_vars;
 
 env_vars! {
     struct DatabaseUrl;
@@ -23,7 +23,7 @@ enum Command {
 #[tokio::main]
 async fn main() -> Result<(), rootcause::Report> {
     let args = Args::parse();
-    macro_entrypoint::MacroEntrypoint::default().init();
+    rox_entrypoint::RoxEntrypoint::default().init();
     let url = DatabaseUrl::new()?;
     let pool = sqlx::postgres::PgPoolOptions::new()
         .max_connections(1)

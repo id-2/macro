@@ -3,7 +3,7 @@ mod test;
 
 use std::{collections::HashSet, fmt};
 
-use macro_user_id::email::Email;
+use rox_user_id::email::Email;
 use serde_json::Value;
 
 const MACRO_EMAIL_DOMAIN: &str = "rox.one";

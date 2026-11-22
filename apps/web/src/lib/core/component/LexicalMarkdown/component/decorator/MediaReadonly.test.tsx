@@ -5,7 +5,7 @@ import {
   $createVideoNode,
   $isImageNode,
   $isVideoNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { fireEvent, render } from '@solidjs/testing-library';
 import { $getNodeByKey, $getRoot } from 'lexical';
 import { createSignal } from 'solid-js';

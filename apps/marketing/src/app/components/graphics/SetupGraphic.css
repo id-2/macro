@@ -264,7 +264,7 @@
 .setup-graphic :is(.supermodule-cylinder, .supermodule-front-cap, .supermodule-back-cap) path {
   fill: var(--setup-silhouette);
 }
-.setup-graphic .supermodule-macro-logo path {
+.setup-graphic .supermodule-rox-logo path {
   fill: var(--color-accent);
   stroke: none;
 }

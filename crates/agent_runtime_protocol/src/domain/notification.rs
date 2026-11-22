@@ -1,5 +1,5 @@
 //! Typed system events. These are facts, never requests from the session owner.
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 
 /// Metadata key authored only by the harness, preserved across ACP transports.

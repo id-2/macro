@@ -5,7 +5,7 @@ mod test;
 
 use std::marker::PhantomData;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ pub enum BotAccessScope {
     /// Resolve access as the verified acting user.
     User {
         /// The verified acting user's identifier.
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         /// The verified acting user's organization identifier, when present.
         user_org_id: Option<i64>,
     },
@@ -44,7 +44,7 @@ pub enum BotAccessScope {
 impl BotAccessScope {
     /// User scope for a caller that knows only the acting user, such as an AI
     /// tool request, which carries no organization context.
-    pub fn user(user_id: MacroUserIdStr<'static>) -> Self {
+    pub fn user(user_id: RoxUserIdStr<'static>) -> Self {
         Self::User {
             user_id,
             user_org_id: None,
@@ -52,7 +52,7 @@ impl BotAccessScope {
     }
 
     /// Returns the verified acting user's identifier for user scope.
-    pub fn user_id(&self) -> Option<&MacroUserIdStr<'static>> {
+    pub fn user_id(&self) -> Option<&RoxUserIdStr<'static>> {
         match self {
             Self::User { user_id, .. } => Some(user_id),
             Self::Team { .. } => None,
@@ -91,7 +91,7 @@ pub enum BotReceiptScope {
     /// Access was resolved as a verified acting user.
     User {
         /// The verified acting user's identifier.
-        acting_user: MacroUserIdStr<'static>,
+        acting_user: RoxUserIdStr<'static>,
     },
     /// Access was resolved from a team's shared access pool.
     Team {
@@ -102,7 +102,7 @@ pub enum BotReceiptScope {
 
 impl BotReceiptScope {
     /// Returns the verified acting user's identifier for user scope.
-    pub fn acting_user_id(&self) -> Option<&MacroUserIdStr<'static>> {
+    pub fn acting_user_id(&self) -> Option<&RoxUserIdStr<'static>> {
         match self {
             Self::User { acting_user } => Some(acting_user),
             Self::Team { .. } | Self::Channel { .. } => None,
@@ -150,7 +150,7 @@ pub struct EntityAudience {
     /// Entities every one of these users can currently access.
     pub entity_ids: Vec<String>,
     /// Users with current access to each of the entities.
-    pub users: Vec<MacroUserIdStr<'static>>,
+    pub users: Vec<RoxUserIdStr<'static>>,
 }
 
 /// The role a user has within a channel.
@@ -473,7 +473,7 @@ impl std::fmt::Display for BotReceiptAuth {
 #[serde(untagged)]
 pub enum EntityAccessAuth {
     /// The user is authenticated
-    Authenticated(MacroUserIdStr<'static>),
+    Authenticated(RoxUserIdStr<'static>),
     /// A bot is authenticated under a specific access scope.
     Bot(BotReceiptAuth),
     /// The user is unauthenticated
@@ -531,7 +531,7 @@ impl<T: RequiredPermission> EntityAccessReceipt<T> {
 
     /// Creates an access receipt for an authenticated user after validating the provided permission.
     pub fn try_new_authenticated_user(
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entity: Entity,
         entity_permission: EntityPermission,
     ) -> Result<EntityAccessReceipt<T>, AccessError> {
@@ -557,7 +557,7 @@ impl<T: RequiredPermission> EntityAccessReceipt<T> {
     }
 
     /// Get the authenticated user or return an authorization error.
-    pub fn get_authenticated_user(&self) -> Result<&MacroUserIdStr<'static>, AccessError> {
+    pub fn get_authenticated_user(&self) -> Result<&RoxUserIdStr<'static>, AccessError> {
         match &self.auth {
             EntityAccessAuth::Authenticated(user) => Ok(user),
             EntityAccessAuth::Bot(_)
@@ -582,7 +582,7 @@ impl<T: RequiredPermission> EntityAccessReceipt<T> {
     }
 
     /// Returns the direct user or verified acting user represented by this receipt.
-    pub fn acting_user_id(&self) -> Option<&MacroUserIdStr<'static>> {
+    pub fn acting_user_id(&self) -> Option<&RoxUserIdStr<'static>> {
         match &self.auth {
             EntityAccessAuth::Authenticated(user_id) => Some(user_id),
             EntityAccessAuth::Bot(bot_auth) => bot_auth.scope().acting_user_id(),
@@ -633,7 +633,7 @@ impl<T: RequiredPermission> EntityAccessReceipt<T> {
     /// existence of the item or that the user actually has the required
     /// permission.
     pub fn dangerously_assert_authenticated_user(
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> EntityAccessReceipt<T> {

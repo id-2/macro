@@ -1,5 +1,5 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import { sanitizeEmailHtml } from '@macro-inc/email-renderer';
+import { sanitizeEmailHtml } from '@rox-one/email-renderer';
 import { authKeys } from '@queries/auth/keys';
 import { emailKeys } from '@queries/email/keys';
 import type {

@@ -23,7 +23,7 @@ use super::{
         TokenRequest, TokenResponse, UpstreamLogin, UpstreamTokens, UserConsent,
     },
     ports::{
-        ClientRegistrationStore, EmailCodeError, EmailCodeProvider, MacroApiTokenMinter,
+        ClientRegistrationStore, EmailCodeError, EmailCodeProvider, RoxApiTokenMinter,
         OAuthProvider, RefreshTokenBindingStore, UpstreamGrantError,
     },
     redirect_uri::{RedirectTrust, RedirectUriPolicy},
@@ -180,7 +180,7 @@ pub struct McpAuthProxyServiceDeps<I> {
     /// The MCP servers tokens may be issued for.
     pub resources: McpResources,
     /// Mints the tokens of the resources that call Rox's APIs directly.
-    pub macro_api_tokens: Arc<dyn MacroApiTokenMinter>,
+    pub macro_api_tokens: Arc<dyn RoxApiTokenMinter>,
 }
 
 /// Domain service backing the MCP OAuth broker.
@@ -194,7 +194,7 @@ pub struct McpAuthProxyServiceImpl<I> {
     redirect_uri_policy: RedirectUriPolicy,
     public_url: String,
     resources: McpResources,
-    macro_api_tokens: Arc<dyn MacroApiTokenMinter>,
+    macro_api_tokens: Arc<dyn RoxApiTokenMinter>,
 }
 
 impl<I> Clone for McpAuthProxyServiceImpl<I> {

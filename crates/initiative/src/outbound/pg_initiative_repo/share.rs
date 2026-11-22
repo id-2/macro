@@ -252,7 +252,7 @@ pub(super) async fn get_team_share_facts(
 
 pub(super) async fn get_team_default_link_share(
     pool: &PgPool,
-    user_id: &macro_user_id::user_id::MacroUserIdStr<'static>,
+    user_id: &rox_user_id::user_id::RoxUserIdStr<'static>,
 ) -> Result<Option<TeamLinkShareDefault>, InitiativeError> {
     share_permission_db_utils::get_team_default_link_share(pool, user_id.as_ref())
         .await

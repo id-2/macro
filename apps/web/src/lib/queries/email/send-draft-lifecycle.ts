@@ -1,7 +1,8 @@
 import { decodeBase64Utf8 } from '@app/features/email-compose/core/decode-base64';
 import type { LocalDraft } from '@app/features/email-compose/core/local-draft';
 import type { DraftFormAttachment } from '@app/features/email-compose/primitives/email-form-state';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
+import { readBodyRox } from './body-rox-compat';
 import {
   draftContactInput,
   type GraphqlSaveEmailDraftArgs,
@@ -149,7 +150,7 @@ export async function restoreSendWorkingCopy(
         bcc: draft.bcc,
         body_html: draft.bodyHtml,
         body_text: draft.bodyText,
-        body_macro: draft.bodyMacro,
+        body_rox: draft.bodyRox,
         replying_to_id:
           draft.replyingToId == null
             ? draft.replyingToId
@@ -207,7 +208,7 @@ export async function restoreSendWorkingCopy(
     providerThreadId: local.content.provider_thread_id,
     bodyHtml: local.content.body_html,
     bodyText: local.content.body_text,
-    bodyMacro: local.content.body_macro,
+    bodyRox: readBodyRox(local.content),
     optimisticBodyHtml: local.content.body_html
       ? decodeBase64Utf8(local.content.body_html)
       : null,

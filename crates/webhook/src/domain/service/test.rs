@@ -8,8 +8,8 @@ use crate::domain::{
     ports::{WebhookError, WebhookRepo, WebhookService, WebhookValidationClient},
 };
 use chrono::Utc;
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker, NoopRoxEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use std::{
     collections::BTreeMap,
@@ -83,7 +83,7 @@ impl WebhookRepo for FakeRepo {
 
     async fn create_webhook(
         &self,
-        created_by_user_id: MacroUserIdStr<'static>,
+        created_by_user_id: RoxUserIdStr<'static>,
         workspace_id: String,
         request: CreateWebhookRequest,
         _signing_secret: String,
@@ -247,7 +247,7 @@ impl WebhookRepo for FakeRepo {
 
     async fn get_user_team_workspace_id(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> Result<Option<String>, Self::Err> {
         let state = self.state.lock().await;
         if state.team_lookup_fails {
@@ -283,8 +283,8 @@ impl TestEventBroker {
     }
 }
 
-impl MacroEventBroker for TestEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for TestEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -365,8 +365,8 @@ impl WebhookValidationClient for FakeValidationClient {
     }
 }
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("user@example.com").unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("user@example.com").unwrap()
 }
 
 fn valid_filters() -> WebhookFilters {
@@ -401,7 +401,7 @@ fn patch_request() -> PatchWebhookRequest {
 }
 
 fn webhook_from_create(
-    created_by_user_id: MacroUserIdStr<'static>,
+    created_by_user_id: RoxUserIdStr<'static>,
     workspace_id: String,
     request: CreateWebhookRequest,
 ) -> Webhook {
@@ -535,7 +535,7 @@ async fn create_with_blank_namespace_is_rejected() {
     let service = WebhookServiceImpl::new(
         FakeRepo::default(),
         FakeValidationClient::default(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     );
     let mut request = create_request();
     request.namespace = " ".to_string();
@@ -548,7 +548,7 @@ async fn create_with_oversized_namespace_is_rejected() {
     let service = WebhookServiceImpl::new(
         FakeRepo::default(),
         FakeValidationClient::default(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     );
     let mut request = create_request();
     request.namespace = "n".repeat(129);
@@ -562,7 +562,7 @@ async fn patch_leaves_namespace_unchanged() {
     let original_namespace = webhook.namespace.clone();
     let repo = FakeRepo::with_webhook(webhook, None).await;
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
 
     let patched = service
         .patch_webhook(caller(), "wh_test".to_string(), patch_request())
@@ -901,7 +901,7 @@ async fn patch_succeeds_when_event_scheduling_fails() {
 async fn get_returns_authorized_webhook() {
     let repo = FakeRepo::with_webhook(existing_webhook(), None).await;
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
 
     let webhook = service
         .get_webhook(caller(), "wh_test".to_string())
@@ -916,7 +916,7 @@ async fn get_fails_not_found_for_missing_id() {
     let service = WebhookServiceImpl::new(
         FakeRepo::default(),
         FakeValidationClient::default(),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     );
 
     let result = service
@@ -932,7 +932,7 @@ async fn get_fails_unauthorized_when_caller_does_not_own_workspace() {
     webhook.workspace_id = "other_workspace".to_string();
     let repo = FakeRepo::with_webhook(webhook, None).await;
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
 
     let result = service.get_webhook(caller(), "wh_test".to_string()).await;
 
@@ -943,7 +943,7 @@ async fn get_fails_unauthorized_when_caller_does_not_own_workspace() {
 async fn list_includes_personal_workspace_webhooks() {
     let repo = FakeRepo::with_webhook(existing_webhook(), None).await;
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
 
     let response = service.list_webhooks(caller()).await.unwrap();
 
@@ -956,7 +956,7 @@ async fn list_includes_team_workspace_webhooks() {
     webhook.workspace_id = "team_workspace".to_string();
     let repo = FakeRepo::with_webhook(webhook, Some("team_workspace".to_string())).await;
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
 
     let response = service.list_webhooks(caller()).await.unwrap();
 
@@ -970,7 +970,7 @@ async fn list_excludes_webhooks_in_unowned_workspaces() {
     // No team membership, so the caller only owns their personal workspace.
     let repo = FakeRepo::with_webhook(webhook, None).await;
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
 
     let response = service.list_webhooks(caller()).await.unwrap();
 
@@ -981,7 +981,7 @@ async fn list_excludes_webhooks_in_unowned_workspaces() {
 async fn invalid_http_endpoint_is_rejected() {
     let repo = FakeRepo::default();
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
     let mut request = create_request();
     request.endpoint_url = "http://example.com/webhook".to_string();
 
@@ -994,7 +994,7 @@ async fn local_addresses_are_allowed_when_policy_permits_them() {
         FakeRepo::default(),
         FakeValidationClient::default(),
         WebhookEndpointSchemePolicy::HttpAndHttps,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     );
 
     for endpoint_url in [
@@ -1020,7 +1020,7 @@ async fn local_addresses_are_allowed_when_policy_permits_them() {
 async fn private_and_link_local_endpoints_are_rejected() {
     let repo = FakeRepo::default();
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
 
     for endpoint_url in [
         "https://localhost/webhook",
@@ -1043,7 +1043,7 @@ async fn private_and_link_local_endpoints_are_rejected() {
 async fn empty_filters_list_is_rejected() {
     let repo = FakeRepo::default();
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
     let mut request = create_request();
     request.filters = Vec::new();
 
@@ -1054,7 +1054,7 @@ async fn empty_filters_list_is_rejected() {
 async fn filter_with_empty_events_is_rejected() {
     let repo = FakeRepo::default();
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
     let mut request = create_request();
     request.filters = vec![WebhookFilter {
         events: Vec::new(),
@@ -1068,7 +1068,7 @@ async fn filter_with_empty_events_is_rejected() {
 async fn filter_with_empty_ids_is_rejected() {
     let repo = FakeRepo::default();
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
     let mut request = create_request();
     request.filters = vec![WebhookFilter {
         events: vec!["file.created".to_string()],
@@ -1082,7 +1082,7 @@ async fn filter_with_empty_ids_is_rejected() {
 async fn filter_without_ids_is_accepted() {
     let repo = FakeRepo::default();
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
 
     let webhook = service
         .create_webhook(caller(), create_request())
@@ -1096,7 +1096,7 @@ async fn filter_without_ids_is_accepted() {
 async fn filter_with_valid_ids_is_accepted() {
     let repo = FakeRepo::default();
     let service =
-        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopMacroEventBroker);
+        WebhookServiceImpl::new(repo, FakeValidationClient::default(), NoopRoxEventBroker);
     let mut request = create_request();
     request.filters = vec![WebhookFilter {
         events: vec!["file.created".to_string()],

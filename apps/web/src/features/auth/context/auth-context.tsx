@@ -28,6 +28,8 @@ export type SendCodeResult =
   | { t: 'signed-in' }
   /** The address belongs to an SSO domain; the page is navigating there. */
   | { t: 'redirected' }
+  /** Too many attempts for this address; say so in the page's language. */
+  | { t: 'rate-limited' }
   | { t: 'failed'; message: string };
 
 export type VerifyCodeResult =

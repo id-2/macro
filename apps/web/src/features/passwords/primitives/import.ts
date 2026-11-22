@@ -5,7 +5,7 @@ import type {
   ParsedImportItem,
 } from '@core/password-import/types';
 import { sleep } from '@core/util/sleep';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { ResultAsync } from 'neverthrow';
 import { createSignal } from 'solid-js';
 import { createStore } from 'solid-js/store';

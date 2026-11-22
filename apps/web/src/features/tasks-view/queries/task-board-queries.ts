@@ -2,7 +2,7 @@ import { createProjectIdentityQuery } from '@app/features/projects/queries/proje
 import type { FacetSelection, SortSelection } from '@app/features/soup';
 import { soupPropertyToProperty } from '@entity/extractors-property/property-helpers';
 import type { TaskEntityWithProperties } from '@entity/types/entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { SYSTEM_PROPERTY_IDS } from '@property/identifiers';
 import type { Property, PropertyApiValues } from '@property/types';
 import { toPropertyDefinitionDomain } from '@property/utils/transforms';

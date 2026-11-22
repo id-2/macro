@@ -6,7 +6,7 @@ use email::domain::mailbox::inbox_sync::{
 };
 use email_api_client::domain::models::{CalendarPart, RateLimitOrigin};
 use email_db_client::attachments::provider::upload::new_email_media_atts;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_email::service::attachment::{AttachmentUploadArgs, AttachmentUploadDestination};
 use models_email::service::link::UserProvider;
 use models_email::service::message::Message;
@@ -67,7 +67,7 @@ fn received_message(link_id: Uuid, thread_db_id: Uuid) -> Message {
         labels: vec![],
         body_text: Some("body".to_string()),
         body_html_sanitized: None,
-        body_macro: None,
+        body_rox: None,
         attachments: vec![],
         attachments_draft: vec![],
         attachments_forwarded: vec![],

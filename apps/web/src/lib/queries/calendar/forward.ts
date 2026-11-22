@@ -1,5 +1,5 @@
 import { thrownResultErrorHasCode, throwOnErr } from '@core/util/result';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { MutationCallbacks } from '@queries/utils';
 import { emailClient } from '@service-email/client';
 import { ForwardCalendarEventErrorCode } from '@service-email/generated/schemas/forwardCalendarEventErrorCode';

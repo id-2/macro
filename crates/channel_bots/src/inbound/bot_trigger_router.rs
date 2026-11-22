@@ -9,7 +9,7 @@ use tracing::Instrument as _;
 use crate::domain::{
     models::BotEvent,
     ports::{AgentResponder, CommentMarks, ConversationAccess, TriggerDetector, UserTimeZones},
-    service::MacroAiHandler,
+    service::RoxAiHandler,
 };
 
 /// Resolves the bot invocations for a committed post and runs their handlers.
@@ -24,7 +24,7 @@ use crate::domain::{
 /// are notified of mentions out of process via the trigger topic and webhooks
 /// instead (see the `agent_trigger` and `webhook` crates).
 pub struct BotTriggerRouter<R, D, Z> {
-    macro_ai: Arc<MacroAiHandler<R, Z>>,
+    macro_ai: Arc<RoxAiHandler<R, Z>>,
     detector: Arc<D>,
 }
 
@@ -76,7 +76,7 @@ where
     ) -> Self {
         Self {
             macro_ai: Arc::new(
-                MacroAiHandler::new(messages, access, responder, time_zones, marks)
+                RoxAiHandler::new(messages, access, responder, time_zones, marks)
                     .with_admission(admission),
             ),
             detector,

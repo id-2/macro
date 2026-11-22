@@ -1,5 +1,5 @@
 use chrono::DateTime;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::report;
 use serde::{Deserialize, Serialize};
 use std::hash::{DefaultHasher, Hasher};
@@ -16,7 +16,7 @@ pub use metadata::{
     CalendarEventJoinRequestMetadata, CalendarEventReminderMetadata, CallStartedMetadata,
     ChannelAccessRequestedMetadata, ChannelInviteMetadata, ChannelMentionMetadata,
     ChannelMessageReactionMetadata, ChannelMessageSendMetadata, ChannelReplyMetadata, ChannelType,
-    ColleagueJoinedMacro, CommentedOnDocumentMetadata, CommonChannelMetadata, ComputerSetupAgent,
+    ColleagueJoinedRox, CommentedOnDocumentMetadata, CommonChannelMetadata, ComputerSetupAgent,
     ComputerSetupMetadata, ComputerSetupOutcome, CrmDiscussionMetadata, CrmDiscussionReason,
     DocumentMentionMetadata, EntityAccessGrantedMetadata, EntityAccessRequestedMetadata,
     ExternalChatMessageMetadata, GithubPrCheckRun, GithubPrCheckRunState, GithubPrComment,
@@ -313,7 +313,7 @@ define_notif_event!(
 impl NotificationTitle for NotifEvent {
     fn format_title(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         match self {
             NotifEvent::ChannelMention(channel_mention_metadata) => {
@@ -389,7 +389,7 @@ impl NotificationTitle for NotifEvent {
 
     fn format_body(
         &self,
-        sender_id: Option<MacroUserIdStr<'_>>,
+        sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         match self {
             NotifEvent::ChannelMention(channel_mention_metadata) => {

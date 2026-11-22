@@ -12,17 +12,17 @@ use crate::domain::ingestion::{
 };
 use crate::domain::ports::WebhookWorkspaceResolver;
 use crate::domain::stream::{StreamCandidateEvent, StreamFeed};
-use crate::topics::DeclaredMacroEvent;
+use crate::topics::DeclaredRoxEvent;
 use kafka_util::{InitialOffset, KafkaEventConsumer, Ungrouped};
-use macro_event_broker::{KafkaConsumerAdapter, MacroEvent as _, MacroEventConsumerService};
+use rox_event_broker::{KafkaConsumerAdapter, RoxEvent as _, RoxEventConsumerService};
 use std::time::Duration;
 
 /// Time allowed for topic metadata lookup.
 const METADATA_TIMEOUT: Duration = Duration::from_secs(10);
 
-type WebhookStreamKafkaAdapter = KafkaConsumerAdapter<Ungrouped, DeclaredMacroEvent>;
+type WebhookStreamKafkaAdapter = KafkaConsumerAdapter<Ungrouped, DeclaredRoxEvent>;
 type WebhookStreamKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, WebhookStreamKafkaAdapter>;
+    RoxEventConsumerService<DeclaredRoxEvent, WebhookStreamKafkaAdapter>;
 
 /// Consume broker events from now onward and publish normalized stream candidates.
 ///
@@ -64,35 +64,35 @@ pub async fn run_webhook_stream_consumer<R: WebhookWorkspaceResolver>(
 /// `None` means the event shape is deliberately not exposed to subscribers,
 /// mirroring webhook ingestion's normalization.
 async fn candidate_from<R: WebhookWorkspaceResolver>(
-    decoded: &DeclaredMacroEvent,
+    decoded: &DeclaredRoxEvent,
     workspace_resolver: &R,
 ) -> Result<Option<StreamCandidateEvent>, WebhookEventIngestionError> {
     match decoded {
-        DeclaredMacroEvent::DocumentMacroEvent(event) => document_stream_candidate(event.event()),
-        DeclaredMacroEvent::ChannelMacroEvent(event) => {
+        DeclaredRoxEvent::DocumentRoxEvent(event) => document_stream_candidate(event.event()),
+        DeclaredRoxEvent::ChannelRoxEvent(event) => {
             channel_stream_candidate(event.event()).map(Some)
         }
-        DeclaredMacroEvent::CallNotificationMacroEvent(event) => {
+        DeclaredRoxEvent::CallNotificationRoxEvent(event) => {
             call_stream_candidate(event.event()).map(Some)
         }
-        DeclaredMacroEvent::MessageMacroEvent(event) => {
+        DeclaredRoxEvent::MessageRoxEvent(event) => {
             message_stream_candidate(event.event()).map(Some)
         }
-        DeclaredMacroEvent::WebhookMacroEvent(event) => {
+        DeclaredRoxEvent::WebhookRoxEvent(event) => {
             webhook_stream_candidate(event.event()).map(Some)
         }
-        DeclaredMacroEvent::AgentSessionMacroEvent(event) => {
+        DeclaredRoxEvent::AgentSessionRoxEvent(event) => {
             agent_trigger_stream_candidate(event.event()).map(Some)
         }
-        DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(event) => {
+        DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(event) => {
             agent_session_lifecycle_stream_candidate(event.event()).map(Some)
         }
-        DeclaredMacroEvent::UserMacroEvent(event) => {
+        DeclaredRoxEvent::UserRoxEvent(event) => {
             let user = user_event_subject(event.event());
             let team_workspace_ids = user_team_workspace_ids(workspace_resolver, user).await;
             user_stream_candidate(event.event(), team_workspace_ids).map(Some)
         }
-        DeclaredMacroEvent::PasswordMacroEvent(event) => {
+        DeclaredRoxEvent::PasswordRoxEvent(event) => {
             password_stream_candidate(event.event()).map(Some)
         }
     }
@@ -105,7 +105,7 @@ async fn candidate_from<R: WebhookWorkspaceResolver>(
 #[tracing::instrument(name = "webhook.stream.resolve_user_teams", skip_all, fields(user_id = %user))]
 async fn user_team_workspace_ids<R: WebhookWorkspaceResolver>(
     workspace_resolver: &R,
-    user: macro_user_id::user_id::MacroUserIdStr<'static>,
+    user: rox_user_id::user_id::RoxUserIdStr<'static>,
 ) -> Vec<String> {
     let personal = user.as_ref().to_string();
     match workspace_resolver.resolve_workspace_ids(vec![user]).await {

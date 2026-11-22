@@ -1,11 +1,11 @@
 //! Recipient filtering models for the notification service.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Result of filtering a recipient.
 pub enum FilteredRecipient<'a> {
     /// Recipient is allowed to receive the notification.
-    Allowed(MacroUserIdStr<'a>),
+    Allowed(RoxUserIdStr<'a>),
     /// Recipient was excluded from receiving the notification.
     Excluded(RecipientExclusion<'a>),
 }
@@ -14,7 +14,7 @@ pub enum FilteredRecipient<'a> {
 #[derive(Debug, Clone)]
 pub struct RecipientExclusion<'a> {
     /// The user who was excluded.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// The reason for exclusion.
     pub reason: ExclusionReason,
 }

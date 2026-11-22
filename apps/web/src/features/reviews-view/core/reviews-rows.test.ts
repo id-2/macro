@@ -1,5 +1,6 @@
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import type { GithubPullRequestEntity } from '@entity';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import { buildReviewsRows } from './reviews-rows';
 
 const now = new Date('2026-10-09T12:00:00');
@@ -8,6 +9,8 @@ const review = (id: string, updatedAt: string, createdAt = updatedAt) =>
 
 const labels = (rows: ReturnType<typeof buildReviewsRows>) =>
   rows.map((row) => (row.kind === 'header' ? `# ${row.label}` : row.id));
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 describe('buildReviewsRows', () => {
   const reviews = [

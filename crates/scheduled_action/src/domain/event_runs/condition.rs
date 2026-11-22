@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 use ai_usage::{AiFeature, UsageContext};
 use jev::domain::{Probability, YesNoClassifier, YesNoQuestion};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::Value;
 
@@ -26,7 +26,7 @@ pub const CONDITION_THRESHOLD: f32 = 0.5;
 pub trait EventContentReader: Send + Sync + 'static {
     fn read(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
     ) -> impl Future<Output = Result<Value, Report>> + Send;
 }
@@ -52,7 +52,7 @@ pub enum ConditionError {
 pub trait EventConditionCheck: Send + Sync + 'static {
     fn check(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
         conditions: &[YesNoQuestion],
     ) -> impl Future<Output = Result<ConditionVerdict, ConditionError>> + Send;
@@ -64,7 +64,7 @@ pub struct NoConditionCheck;
 impl EventConditionCheck for NoConditionCheck {
     async fn check(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &AuthorizedEventRun,
         _: &[YesNoQuestion],
     ) -> Result<ConditionVerdict, ConditionError> {
@@ -76,7 +76,7 @@ impl EventConditionCheck for NoConditionCheck {
 impl<T: EventConditionCheck> EventConditionCheck for Option<T> {
     async fn check(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
         conditions: &[YesNoQuestion],
     ) -> Result<ConditionVerdict, ConditionError> {
@@ -112,7 +112,7 @@ impl<R: EventContentReader, C: YesNoClassifier> EventConditionCheck for Conditio
     ))]
     async fn check(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
         conditions: &[YesNoQuestion],
     ) -> Result<ConditionVerdict, ConditionError> {

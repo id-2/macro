@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { SystemSortOption } from '@app/features/next-soup/soup-view/sort-options';
 import { useListLayout } from '@entity/composed/list-entity/shared';
 import ArrowDownIcon from '@icon/system/regular/arrow-down.svg';
@@ -102,7 +103,7 @@ function CompanyListHeader(props: { class?: string }) {
             activeSort()?.id === 'updated_at' && 'text-ink'
           )}
         >
-          <span class="truncate">Last Interaction</span>
+          <span class="truncate">{t('crm.lastInteraction')}</span>
           <ArrowDownIcon
             class={cn(
               'size-3 shrink-0 transition-transform',

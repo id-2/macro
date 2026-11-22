@@ -8,8 +8,8 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::document::get_user_documents;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::document::get_user_documents;
 use model::response::{GenericErrorResponse, GenericResponse};
 use sqlx::PgPool;
 
@@ -34,7 +34,7 @@ use sqlx::PgPool;
 #[axum::debug_handler(state = crate::api::context::ApiContext)]
 pub async fn get_user_documents_handler(
     State(db): State<PgPool>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Query(params): Query<GetUserDocumentsQueryParams>,
 ) -> impl IntoResponse {
     if let Some(limit) = params.limit

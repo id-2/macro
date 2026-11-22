@@ -7,13 +7,13 @@ version = "0.1.0"
 [features]
 default = []
 # Authenticated HTTP query adapter.
-inbound = ["dep:axum", "dep:macro_authorization", "dep:model-error-response", "dep:utoipa", "database_sql/openapi"]
+inbound = ["dep:axum", "dep:rox_authorization", "dep:model-error-response", "dep:utoipa", "database_sql/openapi"]
 # The SQL agent tools: QueryDatabase and SaveDatabaseQuery.
 ai_tools = ["dep:ai_toolset", "dep:anyhow", "dep:async-trait", "dep:schemars"]
 
 [dependencies]
 axum = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = ["axum"], optional = true }
+rox_authorization = { path = "../rox_authorization", default-features = false, features = ["axum"], optional = true }
 model-error-response = { path = "../model-error-response", optional = true }
 utoipa = { workspace = true, optional = true }
 ai_toolset = { path = "../ai_toolset", optional = true }
@@ -29,7 +29,7 @@ email = { path = "../email", default-features = false }
 entity_access = { path = "../entity_access", default-features = false, features = ["ports"] }
 filter_ast = { path = "../filter_ast" }
 item_filters = { path = "../item_filters", default-features = false }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 models_databases = { path = "../models_databases" }
 models_grouping = { path = "../models_grouping" }
 models_pagination = { path = "../models_pagination" }

@@ -115,8 +115,8 @@ Check both the dropdown and touch-sheet hosts. The desktop Assignee filter
 submenu also navigates with arrows; its Enter selects and closes. Phone filter
 drawers keep their existing searchable checkbox sections.
 
-New accounts are seeded with three sample tasks (`Intro to tasks`, `Advanced task features`,
-`How we use tasks at Rox`).
+New accounts are seeded with three sample tasks (`Введение в задачи`, `Дополнительные возможности задач`,
+`Как мы пользуемся задачами в Rox`).
 
 The Project column shows the linked project's name when one project is assigned,
 and `Project` when empty. Multiple linked projects show an item count.

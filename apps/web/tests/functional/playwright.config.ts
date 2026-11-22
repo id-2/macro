@@ -35,7 +35,7 @@ export default defineConfig({
       MODE: 'development',
       NODE_ENV: 'production',
       FUNCTIONAL_TEST_PORT: String(port),
-      MACRO_DEV_HTTPS: 'false',
+      ROX_DEV_HTTPS: 'false',
       VITE_LOCAL_SERVERS: 'ALL',
       VITE_LOCAL_BACKEND_ORIGIN: 'same-origin',
       VITE_ENABLE_BROWSER_OTEL: 'false',

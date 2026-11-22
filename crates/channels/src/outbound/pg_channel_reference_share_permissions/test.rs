@@ -1,6 +1,6 @@
 use super::*;
 use entity_access_db_utils::{EntityAccessSourceType, insert_entity_access_row};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const PDF_DOCUMENT_ID: &str = "20000000-0000-0000-0000-000000000001";
 const MD_DOCUMENT_ID: &str = "20000000-0000-0000-0000-000000000002";
@@ -25,7 +25,7 @@ async fn document_channel_levels(
         r#"SELECT access_level AS "access_level: AccessLevel" FROM entity_access
         WHERE entity_id = $1 AND entity_type = 'document' AND source_id = $2
             AND source_type = 'channel' AND granted_from_project_id IS NULL"#,
-        macro_uuid::string_to_uuid(document_id).unwrap(),
+        rox_uuid::string_to_uuid(document_id).unwrap(),
         channel_id.to_string(),
     )
     .fetch_optional(pool)

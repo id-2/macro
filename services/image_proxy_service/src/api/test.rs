@@ -6,12 +6,12 @@ use axum::http::header::{AUTHORIZATION, COOKIE};
 use axum::http::{Request, StatusCode};
 use http_body_util::BodyExt;
 use jsonwebtoken::{Algorithm, EncodingKey, Header};
-use macro_auth::middleware::decode_jwt::{JwtValidationArgs, MacroAccessToken};
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::{JwtValidationArgs, RoxAccessToken};
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState,
 };
-use macro_env::Environment;
+use rox_env::Environment;
 use serde_json::{Value, json};
 use tower::ServiceExt;
 
@@ -23,21 +23,21 @@ const TEST_INTERNAL_API_KEY: &str = "test-internal-key";
 const TEST_USER_ID: &str = "macro|image-proxy-test@example.com";
 
 fn test_context() -> ApiContext {
-    let authorization_service = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(JwtValidationArgs::new_testing()),
+    let authorization_service = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(JwtValidationArgs::new_testing()),
         InternalAuthConfig {
             api_key: TEST_INTERNAL_API_KEY.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
 
     ApiContext {
         logo_service: crate::domain::LogoService::new(crate::outbound::FaviconProvider(
             crate::outbound::remote_image::build_http_client().expect("test favicon client"),
         )),
-        authorization_state: MacroAuthorizationState::new(Arc::new(authorization_service)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(authorization_service)),
         environment: Environment::Production,
         http_client: proxy::build_http_client().expect("test HTTP client should build"),
         jwt_validation_args: JwtValidationArgs::new_testing(),
@@ -45,7 +45,7 @@ fn test_context() -> ApiContext {
 }
 
 fn access_token(expiration: usize) -> String {
-    let claims = MacroAccessToken {
+    let claims = RoxAccessToken {
         aud: String::new(),
         exp: expiration,
         tid: "test-tenant".to_string(),
@@ -461,8 +461,8 @@ const MACRO_API_PUBLIC_KEY: &str = include_str!(
 
 /// An agent run's Macro API credential, signing `scope` if any.
 fn agent_credential(scope: Option<&str>) -> String {
-    macro_auth::macro_api_token::encode_macro_api_token(
-        macro_auth::macro_api_token::EncodeMacroApiTokenArgs {
+    rox_auth::macro_api_token::encode_macro_api_token(
+        rox_auth::macro_api_token::EncodeRoxApiTokenArgs {
             fusionauth_id: "fixture".into(),
             macro_user_id: TEST_USER_ID.into(),
             organization_id: None,
@@ -487,15 +487,15 @@ fn agent_credential(scope: Option<&str>) -> String {
 async fn a_scoped_credential_is_refused_every_fetch() {
     let validation = JwtValidationArgs::testing_macro_token("fixture", MACRO_API_PUBLIC_KEY);
     let context = ApiContext {
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
-                MacroAuthJwtValidator::new(validation.clone()),
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
+                RoxAuthJwtValidator::new(validation.clone()),
                 InternalAuthConfig {
                     api_key: TEST_INTERNAL_API_KEY.to_string(),
                     default_user_id: None,
                 },
-                macro_authorization::NoBotAuthorizer,
-                macro_authorization::NoUserApiKeyAuthorizer,
+                rox_authorization::NoBotAuthorizer,
+                rox_authorization::NoUserApiKeyAuthorizer,
             ),
         )),
         jwt_validation_args: validation,
@@ -554,7 +554,7 @@ async fn a_scoped_credential_is_refused_every_fetch() {
                     COOKIE,
                     format!(
                         "{}={}",
-                        macro_auth::credential::access_token_cookie_name(),
+                        rox_auth::credential::access_token_cookie_name(),
                         agent_credential(Some("no_send"))
                     ),
                 )

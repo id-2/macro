@@ -1,7 +1,7 @@
 use ::activity::{Action, activity_id};
 use chrono::{TimeZone as _, Utc};
-use macro_event_broker::Event;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::Event;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use uuid::Uuid;
 
@@ -14,8 +14,8 @@ use crate::domain::models::{DatabaseId, FormResponseId, RowId};
 
 const FORM_ID: &str = "0199b1a2-0000-7000-8000-000000000f01";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn envelope(event: FormTopicEvent) -> Event<FormTopicEvent> {

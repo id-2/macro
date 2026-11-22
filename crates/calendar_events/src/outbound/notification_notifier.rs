@@ -3,7 +3,7 @@
 
 use std::collections::HashSet;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::{CalendarEventJoinRequestMetadata, CalendarEventReminderMetadata};
 use notification::domain::models::SendNotificationRequestBuilder;
@@ -32,7 +32,7 @@ impl<I> NotificationCalendarReminderNotifier<I> {
 impl<I: NotificationIngress> CalendarReminderNotifier for NotificationCalendarReminderNotifier<I> {
     #[tracing::instrument(err, skip_all, fields(event_id = %due.firing.event_id))]
     async fn notify(&self, due: &DueCalendarReminder) -> Result<(), Report> {
-        let owner_id = MacroUserIdStr::parse_from_str(&due.owner_id).map_err(|error| {
+        let owner_id = RoxUserIdStr::parse_from_str(&due.owner_id).map_err(|error| {
             rootcause::report!("calendar reminder owner is not a macro user id: {error}")
                 .into_dynamic()
         })?;
@@ -71,7 +71,7 @@ impl<I: NotificationIngress> CalendarReminderNotifier for NotificationCalendarRe
                     .await
             }
             ReminderDeliveryMethod::Email => {
-                let destination = MacroUserIdStr::try_from_email(&due.email_address)
+                let destination = RoxUserIdStr::try_from_email(&due.email_address)
                     .map_err(|error| rootcause::report!(error).into_dynamic())?;
                 self.ingress
                     .send_notification(request.with_email_destination(&owner_id, destination)?)
@@ -117,8 +117,8 @@ impl<I: NotificationIngress> CalendarJoinRequestNotifier
         event_title: &str,
     ) {
         let (Ok(sharer), Ok(requester)) = (
-            MacroUserIdStr::parse_from_str(sharer_id),
-            MacroUserIdStr::parse_from_str(&request.requester_id),
+            RoxUserIdStr::parse_from_str(sharer_id),
+            RoxUserIdStr::parse_from_str(&request.requester_id),
         ) else {
             tracing::error!("calendar join request parties are not macro user ids");
             return;

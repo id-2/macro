@@ -27,11 +27,12 @@ completed API writes. SDK and Handlebars bundles, the operation catalog and
 the SDK's type declarations come from `crates/code_mode_assets`, generated from
 the public SDK at build time by `packages/code-mode-sdk`. A POST that only reads
 must be listed in the generator's `postReads`, or dry runs skip it.
-The SDK adds `x-macro-sdk-verb` to each generated call from the hand-assigned
+The SDK adds `x-rox-sdk-verb` to each generated call from the hand-assigned
 registry; the header is attached to that call's options before request dispatch.
 
-Every request to an SDK origin carries `x-macro-code-execution: 1`, whatever
-credential it carries. A program can drop it with a raw `fetch`, so a refusal
+Every request to an SDK origin carries `x-rox-code-execution: 1`, whatever
+credential it carries (the earlier `x-macro-code-execution` name stays
+accepted). A program can drop it with a raw `fetch`, so a refusal
 that must hold reads the credential's signed claims too: every code-mode
 credential, public MCP's included, signs an agent or a routine
 (`macro_authorization::is_program_run`), and the header never overrides a

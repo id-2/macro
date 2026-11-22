@@ -34,7 +34,7 @@ export function TasksDetailView(props: {
         : () => source.loadMoreGroup(groupId);
     },
     open: (task) => openTask({ id: task.id, fallbackName: task.name }),
-    onError: () => toast.failure('Unable to open the next or previous task'),
+    onError: () => toast.failure('Не удалось открыть следующую или предыдущую задачу'),
   });
   useListNavigationHotkeys({
     scopeId: panel.splitHotkeyScope,

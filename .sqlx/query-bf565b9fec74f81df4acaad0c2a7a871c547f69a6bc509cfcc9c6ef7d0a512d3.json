@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_labels (id, link_id, provider_label_id, name, message_list_visibility, label_list_visibility, type)\n         VALUES ($1, $2, 'TRASH', 'TRASH', 'Show', 'LabelShow', 'User')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "bf565b9fec74f81df4acaad0c2a7a871c547f69a6bc509cfcc9c6ef7d0a512d3"
+}

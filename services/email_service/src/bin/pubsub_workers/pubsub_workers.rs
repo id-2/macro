@@ -8,10 +8,10 @@ use email_service::outbound::email_api::{
     EmailServiceTokenSource, GmailApi, RateBudget, RedisGmailRequestGate,
 };
 use email_service::util::redis::RedisClient;
-use macro_entrypoint::{MacroEntrypoint, shutdown_signal};
-use macro_env::Environment;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
-use macro_service_urls::{
+use rox_entrypoint::{RoxEntrypoint, shutdown_signal};
+use rox_env::Environment;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
+use rox_service_urls::{
     AuthServiceUrl, ConnectionGatewayUrl, DocumentStorageServiceUrl, StaticFileServiceUrl,
 };
 use notification::domain::service::SqsNotificationIngress;
@@ -45,12 +45,12 @@ fn compose_email_api(
 #[tokio::main]
 #[tracing::instrument(err)]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let env = Environment::new_or_prod();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
 
-    let s3_client = s3_client::S3::new(macro_aws_config::s3_client().await);
+    let s3_client = s3_client::S3::new(rox_aws_config::s3_client().await);
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
@@ -91,20 +91,20 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("could not connect to backfill db")?;
 
-    let gmail_queue_aws_config = macro_aws_config::get_macro_aws_config().await;
+    let gmail_queue_aws_config = rox_aws_config::get_macro_aws_config().await;
 
-    let gmail_inbox_sync_queue = macro_queues::GmailInboxSyncQueue::new();
-    let gmail_inbox_sync_retry_queue = macro_queues::GmailInboxSyncRetryQueue::new();
-    let gmail_ops_queue = macro_queues::GmailOpsQueue::new();
-    let gmail_ops_retry_queue = macro_queues::GmailOpsRetryQueue::new();
-    let backfill_queue = macro_queues::EmailBackfillQueue::new();
-    let crm_cleanup_queue = macro_queues::EmailCrmCleanupQueue::new();
-    let email_scheduled_queue = macro_queues::EmailScheduledQueue::new();
-    let sfs_uploader_queue = macro_queues::SfsUploaderQueue::new();
-    let sfs_delete_queue = macro_queues::SfsDeleteQueue::new();
-    let link_manager_queue = macro_queues::LinkManagerQueue::new();
-    let contacts_queue = macro_queues::ContactsQueue::new();
-    let notification_queue = macro_queues::NotificationIngressQueue::new();
+    let gmail_inbox_sync_queue = rox_queues::GmailInboxSyncQueue::new();
+    let gmail_inbox_sync_retry_queue = rox_queues::GmailInboxSyncRetryQueue::new();
+    let gmail_ops_queue = rox_queues::GmailOpsQueue::new();
+    let gmail_ops_retry_queue = rox_queues::GmailOpsRetryQueue::new();
+    let backfill_queue = rox_queues::EmailBackfillQueue::new();
+    let crm_cleanup_queue = rox_queues::EmailCrmCleanupQueue::new();
+    let email_scheduled_queue = rox_queues::EmailScheduledQueue::new();
+    let sfs_uploader_queue = rox_queues::SfsUploaderQueue::new();
+    let sfs_delete_queue = rox_queues::SfsDeleteQueue::new();
+    let link_manager_queue = rox_queues::LinkManagerQueue::new();
+    let contacts_queue = rox_queues::ContactsQueue::new();
+    let notification_queue = rox_queues::NotificationIngressQueue::new();
 
     let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(&gmail_queue_aws_config))
         .gmail_inbox_sync_queue(&gmail_inbox_sync_queue)
@@ -127,7 +127,7 @@ async fn main() -> anyhow::Result<()> {
         sqs_client.clone(),
         worker_cancellation_token.clone(),
     ));
-    let macro_event_broker = MacroEventBrokerService::new(
+    let macro_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
@@ -436,7 +436,7 @@ async fn main() -> anyhow::Result<()> {
             email::domain::mailbox::watches::MailboxWatchService::new(
                 mailbox_repository.clone(),
                 email_service::outbound::email_api::ProviderMailboxGateway(outlook_api.clone()),
-                macro_service_urls::EmailServiceUrl::new_for_environment(env)?.to_string(),
+                rox_service_urls::EmailServiceUrl::new_for_environment(env)?.to_string(),
             ),
             worker_cancellation_token.clone(),
         ));

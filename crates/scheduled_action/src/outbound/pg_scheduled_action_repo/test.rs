@@ -4,9 +4,9 @@ mod user_cleanup;
 use chrono::{SubsecRound, Utc};
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::Owner;
 use serde_json::json;
 use sqlx::PgPool;
@@ -23,8 +23,8 @@ pub(crate) const USER_A: &str = "macro|sched-a@rox.one";
 pub(crate) const USER_B: &str = "macro|sched-b@rox.one";
 const DAILY_9AM: &str = "0 0 9 * * *";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 pub(crate) fn user_owner(id: &'static str) -> Owner {
@@ -76,7 +76,7 @@ async fn direct_grants(pool: &PgPool, id: Uuid) -> Vec<(String, String, String)>
 }
 
 pub(crate) async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let macro_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
         macro_user_id,
@@ -587,7 +587,7 @@ async fn event_round_trip_and_bookkeeping_does_not_advance_configuration(pool: P
     let filters = EventFilters::try_from(vec![
         EventFilter::new(
             vec![EventName::ChannelMessagePosted],
-            Some(vec![macro_uuid::generate_uuid_v7()]),
+            Some(vec![rox_uuid::generate_uuid_v7()]),
         )
         .unwrap(),
     ])
@@ -662,7 +662,7 @@ async fn lookup_update_and_delete_are_id_scoped(pool: PgPool) {
         repo.delete_action(&id).await.unwrap();
     }
     assert!(
-        repo.get_action(&macro_uuid::generate_uuid_v7())
+        repo.get_action(&rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .is_none()
@@ -898,7 +898,7 @@ async fn database_rejects_invalid_trigger_shapes(pool: PgPool) {
         (None, Some(DAILY_9AM), Some("UTC"), Some(now), None, None, 1),
     ];
     for (trigger_type, schedule, timezone, next_run_at, filters, activated_at, revision) in cases {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let error = sqlx::query!(
             r#"
             INSERT INTO scheduled_action
@@ -936,7 +936,7 @@ async fn database_rejects_external_webhooks_and_unknown_mixed_trigger_kinds(pool
         json!({ "type": "multiple", "triggers": [{ "type": "unknown" }] }),
         json!({ "type": "multiple", "triggers": [] }),
     ] {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let kind = config["type"].as_str().unwrap().to_owned();
         let error = sqlx::query!(
             r#"
@@ -1078,7 +1078,7 @@ async fn once_inside_multiple_is_stored_and_other_shapes_are_rejected(pool: PgPo
             INSERT INTO scheduled_action (id, owner, name, kind, task, trigger_type, trigger_config, next_run_at, enabled)
             VALUES ($1, $2, 'invalid', 'Agent', '{}', $3, $4, NULL, false)
             "#,
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             USER_A,
             kind,
             config,
@@ -1169,7 +1169,7 @@ async fn bot_owner_create_writes_bot_and_sponsor_grants(pool: PgPool) {
 }
 
 const BACKFILL_SQL: &str = include_str!(
-    "../../../../../crates/macro_db_client/migrations/20260929195914_backfill_scheduled_action_owner_grants.sql"
+    "../../../../../crates/rox_db_client/migrations/20260929195914_backfill_scheduled_action_owner_grants.sql"
 );
 
 async fn insert_legacy_action(pool: &PgPool, id: Uuid, owner: &str) {
@@ -1198,7 +1198,7 @@ async fn run_backfill(pool: &PgPool) -> Result<(), sqlx::Error> {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn backfill_owner_grants_is_idempotent_and_fails_closed(pool: PgPool) {
     insert_user(&pool, USER_A).await;
-    let legacy_id = macro_uuid::generate_uuid_v7();
+    let legacy_id = rox_uuid::generate_uuid_v7();
     insert_legacy_action(&pool, legacy_id, USER_A).await;
     sqlx::query!(
         r#"
@@ -1240,7 +1240,7 @@ async fn backfill_owner_grants_is_idempotent_and_fails_closed(pool: PgPool) {
         vec![("user".to_owned(), USER_A.to_owned(), "owner".to_owned())]
     );
 
-    let conflict_id = macro_uuid::generate_uuid_v7();
+    let conflict_id = rox_uuid::generate_uuid_v7();
     insert_legacy_action(&pool, conflict_id, USER_A).await;
     sqlx::query!(
         r#"

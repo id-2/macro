@@ -7,8 +7,9 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import ArrowCounterClockwise from '@icon/system/regular/arrow-counter-clockwise.svg?component-solid';
 import PlugIcon from '@icon/system/regular/plug.svg';
 import { useReauthenticateGithubMutation } from '@queries/auth';
+import { useGithubLinkAvailable } from '@queries/auth/outlook-link';
 import { authServiceClient } from '@service-auth/client';
-import { createSignal, onCleanup, onMount } from 'solid-js';
+import { createEffect, createSignal, onCleanup, onMount } from 'solid-js';
 
 async function checkGithubReauthenticationStatus(): Promise<boolean> {
   const response = await authServiceClient.checkGithubLinkStatus();
@@ -28,6 +29,10 @@ export function GithubReauthenticationPrompt() {
   const [needsReauth, setNeedsReauth] = createSignal(false);
   const [reconnecting, setReconnecting] = createSignal(false);
   const reauthenticateGithub = useReauthenticateGithubMutation();
+  // A deployment with no `github` identity provider (a local stack started
+  // without a real GitHub OAuth app) cannot link or relink, and its status read
+  // only answers "not linked": there is nothing to prompt about there.
+  const githubAvailable = useGithubLinkAvailable();
 
   async function reconnect() {
     if (reconnecting()) return;
@@ -46,15 +51,23 @@ export function GithubReauthenticationPrompt() {
     setReconnecting(false);
   }
 
-  onMount(() => {
+  // Probe once the deployment says it can link GitHub: a stack that cannot
+  // link never asks. Once per mount, as before.
+  let probed = false;
+  createEffect(() => {
+    if (probed || !githubAvailable()) return;
+    probed = true;
     fireAndForget(
       checkGithubReauthenticationStatus().then(setNeedsReauth),
       'github-reauth'
     );
+  });
+
+  onMount(() => {
     if (isNativeMobilePlatform()) return;
 
     async function onPageShow(event: PageTransitionEvent) {
-      if (!event.persisted) return;
+      if (!event.persisted || !githubAvailable()) return;
       try {
         setNeedsReauth(await checkGithubReauthenticationStatus());
       } catch {

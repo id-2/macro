@@ -2,7 +2,7 @@ use std::{collections::HashMap, sync::Arc};
 
 use async_graphql::{Context, dataloader::DataLoader};
 use favorites::domain::ports::FavoritesService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, OwnedEntity};
 use rootcause::markers::{Cloneable, Dynamic};
 use tracing::Instrument;
@@ -15,7 +15,7 @@ pub trait EntityFavoriteEdgeReader: Send + Sync + 'static {
     /// Resolve favorite state for the requested entities.
     fn get_entity_favorites<'a>(
         &'a self,
-        user_id: &'a MacroUserIdStr<'static>,
+        user_id: &'a RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> impl Future<Output = Result<HashMap<Entity<'static>, bool>, rootcause::Report>> + Send + 'a;
 }
@@ -26,7 +26,7 @@ where
 {
     async fn get_entity_favorites(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> Result<HashMap<Entity<'static>, bool>, rootcause::Report> {
         let favorites = self
@@ -51,7 +51,7 @@ pub struct NoOpEntityFavoriteEdgeReader;
 impl EntityFavoriteEdgeReader for NoOpEntityFavoriteEdgeReader {
     async fn get_entity_favorites(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         entities: Vec<Entity<'static>>,
     ) -> Result<HashMap<Entity<'static>, bool>, rootcause::Report> {
         Ok(entities.into_iter().map(|entity| (entity, false)).collect())
@@ -61,14 +61,14 @@ impl EntityFavoriteEdgeReader for NoOpEntityFavoriteEdgeReader {
 /// Request-scoped DataLoader for current-viewer favorite state.
 pub struct EntityFavoriteLoader<R> {
     /// Authenticated viewer whose favorite state is requested.
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     /// Domain-facing reader that resolves favorite state.
     reader: R,
 }
 
 impl<R> EntityFavoriteLoader<R> {
     /// Construct a favorite loader for one authenticated viewer.
-    pub fn new(user_id: MacroUserIdStr<'static>, reader: R) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>, reader: R) -> Self {
         Self { user_id, reader }
     }
 }
@@ -107,7 +107,7 @@ where
 
 /// Build a favorite DataLoader scoped to the authenticated viewer.
 pub fn entity_favorite_loader<R>(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     reader: R,
 ) -> DataLoader<EntityFavoriteLoader<R>>
 where

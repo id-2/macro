@@ -3,7 +3,7 @@ mod notifications;
 
 use super::*;
 use crate::domain::model::ReplyPlacement;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 fn direct_command() -> OpenSession {
     let mut command = chat_open_command();
@@ -12,7 +12,7 @@ fn direct_command() -> OpenSession {
 }
 
 fn conversation(
-    channel: macro_uuid::Uuid,
+    channel: rox_uuid::Uuid,
     command: &OpenSession,
 ) -> agent_session::domain::agent_conversation::AgentConversation {
     agent_session::domain::agent_conversation::AgentConversation {
@@ -56,7 +56,7 @@ async fn quota_denial_finishes_queued_conversation_turns_without_stopping_the_ru
     let _container = open_direct(&service, &containers, session, command.clone()).await;
     let mut queued = Vec::new();
     for _ in 0..2 {
-        let source = macro_uuid::generate_uuid_v7();
+        let source = rox_uuid::generate_uuid_v7();
         mention_origin_mut(&mut command).message_id = source;
         queued.push(source);
         assert_eq!(
@@ -125,7 +125,7 @@ async fn a_message_whose_conversation_was_deleted_is_acknowledged_instead_of_red
             channels::outbound::pg_channels_repo::PgChannelsRepo::new(pool.clone()),
             bots::domain::service::BotServiceImpl::new(
                 bots::outbound::pg_bots_repo::PgBotsRepo::new(pool.clone()),
-                macro_event_broker::NoopMacroEventBroker,
+                rox_event_broker::NoopRoxEventBroker,
                 harnesses::domain::ports::MockHarnessTeamAgents::new(),
             ),
             bots::outbound::pg_bots_repo::PgBotsRepo::new(pool.clone()),
@@ -169,7 +169,7 @@ async fn a_message_whose_conversation_was_deleted_is_acknowledged_instead_of_red
     // Deleted after the trigger published the next message: the session row
     // went with the channel, and every redelivery would be refused alike.
     channels.delete_channel(channel).await.unwrap();
-    mention_origin_mut(&mut command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut command).message_id = rox_uuid::generate_uuid_v7();
     assert!(
         service
             .admit_conversation_message(session, command)
@@ -209,7 +209,7 @@ async fn direct_conversations_share_one_session_queue_in_order_and_answer_in_the
     let container = open_direct(&service, &containers, id, first.clone()).await;
     let agent = container.agent();
     let mut next = first.clone();
-    mention_origin_mut(&mut next).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut next).message_id = rox_uuid::generate_uuid_v7();
     mention_origin_mut(&mut next).thread_id = mention_origin(&next).message_id;
     mention_origin_mut(&mut next).content = "Follow up".to_owned();
     let outcome = service
@@ -364,7 +364,7 @@ async fn a_different_person_cannot_prompt_the_reserved_direct_session() {
     let mut command = direct_command();
     let _container = open_direct(&service, &containers, id, command.clone()).await;
     mention_origin_mut(&mut command).sender = staff_sender();
-    mention_origin_mut(&mut command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut command).message_id = rox_uuid::generate_uuid_v7();
     assert!(matches!(
         service
             .execute(id, HarnessCommand::ConversationMessage(command))
@@ -381,7 +381,7 @@ async fn an_external_persona_conversation_binds_the_connected_runtime_without_sp
     let (service, repo, containers, announcer, runtimes) = harness();
     let id = AgentSessionId::new();
     let mut command = direct_command();
-    command.bot_id = BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    command.bot_id = BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     command.runtime.kind = AgentKind::External;
     command.runtime.harness = "external".to_owned();
     let runtime = ContainerMock::default();
@@ -398,7 +398,7 @@ async fn an_external_persona_conversation_binds_the_connected_runtime_without_sp
         "an external persona types like any other"
     );
 
-    mention_origin_mut(&mut command).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut command).message_id = rox_uuid::generate_uuid_v7();
     assert_eq!(
         service
             .execute(id, HarnessCommand::ConversationMessage(command))
@@ -493,7 +493,7 @@ async fn recovered_messages_dispatch_in_durable_order_even_when_delivered_in_rev
     mention_origin_mut(&mut first).parent = MessageParent::Channel(channel);
     mention_origin_mut(&mut first).content = "First admitted message".into();
     let mut second = first.clone();
-    mention_origin_mut(&mut second).message_id = macro_uuid::generate_uuid_v7();
+    mention_origin_mut(&mut second).message_id = rox_uuid::generate_uuid_v7();
     mention_origin_mut(&mut second).content = "Second admitted message".into();
     journal
         .admit(session, channel, first.clone())
@@ -747,7 +747,7 @@ impl crate::domain::conversation_turns::ConversationTurnStore for FlakyJournal {
     async fn admit(
         &self,
         session: AgentSessionId,
-        channel: macro_uuid::Uuid,
+        channel: rox_uuid::Uuid,
         command: OpenSession,
     ) -> agent_session::domain::error::Result<crate::domain::conversation_turns::ConversationTurn>
     {
@@ -755,7 +755,7 @@ impl crate::domain::conversation_turns::ConversationTurnStore for FlakyJournal {
     }
     async fn get(
         &self,
-        source: macro_uuid::Uuid,
+        source: rox_uuid::Uuid,
         bot: BotId,
     ) -> agent_session::domain::error::Result<
         Option<crate::domain::conversation_turns::ConversationTurn>,
@@ -772,7 +772,7 @@ impl crate::domain::conversation_turns::ConversationTurnStore for FlakyJournal {
     }
     async fn retry(
         &self,
-        source: macro_uuid::Uuid,
+        source: rox_uuid::Uuid,
         bot: BotId,
         expected: AgentActionId,
     ) -> agent_session::domain::error::Result<bool> {
@@ -860,7 +860,7 @@ impl crate::domain::conversation_turns::ConversationTurnStore for FlakyJournal {
     }
     async fn for_conversation(
         &self,
-        channel: macro_uuid::Uuid,
+        channel: rox_uuid::Uuid,
         bot: BotId,
         recent: u16,
     ) -> agent_session::domain::error::Result<
@@ -973,7 +973,7 @@ async fn two_queued_behind_a_running_turn(
     let container = open_direct(&service, &containers, session, command.clone()).await;
     let queue = |content: &str| {
         let mut queued = command.clone();
-        let message_id = macro_uuid::generate_uuid_v7();
+        let message_id = rox_uuid::generate_uuid_v7();
         mention_origin_mut(&mut queued).message_id = message_id;
         mention_origin_mut(&mut queued).thread_id = message_id;
         mention_origin_mut(&mut queued).content = content.to_owned();
@@ -1103,7 +1103,7 @@ async fn an_open_conversation_answers_while_another_one_bootstraps(pool: sqlx::P
         .unwrap()
         .expect("an idle replica leases a bootstrap");
     let mut next = command.clone();
-    let message_id = macro_uuid::generate_uuid_v7();
+    let message_id = rox_uuid::generate_uuid_v7();
     mention_origin_mut(&mut next).message_id = message_id;
     mention_origin_mut(&mut next).thread_id = message_id;
     mention_origin_mut(&mut next).content = "Asked during the bootstrap".to_owned();

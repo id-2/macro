@@ -5,7 +5,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 
-use macro_cache_client::MacroCache;
+use rox_cache_client::RoxCache;
 use tower_cookies::Cookies;
 use tracing::field::Empty;
 
@@ -116,7 +116,7 @@ impl IntoResponse for RedeemError {
     fields(outcome = Empty, code_restored = Empty)
 )]
 async fn redeem_session_code<E: std::fmt::Debug>(
-    cache: &MacroCache,
+    cache: &RoxCache,
     session_code: &str,
     refresh: impl AsyncFnOnce(&str) -> Result<(String, String), E>,
 ) -> Result<(String, String), RedeemError> {

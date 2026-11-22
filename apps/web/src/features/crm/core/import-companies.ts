@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { err, ok, type Result } from 'neverthrow';
 import { match } from 'ts-pattern';
 
@@ -41,16 +42,16 @@ export function companyImportMessage(failure: CompanyImportFailure): string {
   return match(failure)
     .with(
       { kind: 'no-domain-column' },
-      () => 'Include a Domain column, with domains like acme.com.'
+      () => t('crm.includeDomainColumn')
     )
     .with(
       { kind: 'no-companies' },
-      () => 'No rows have a domain like acme.com.'
+      () => t('crm.noRowsWithDomain')
     )
     .with(
       { kind: 'too-many-rows' },
       () =>
-        `Import up to ${MAX_COMPANY_IMPORT_ROWS.toLocaleString('en-US')} companies at a time.`
+        t('crm.importTooManyRows', { count: MAX_COMPANY_IMPORT_ROWS })
     )
     .exhaustive();
 }

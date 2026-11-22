@@ -6,8 +6,8 @@ import type {
   WebhookScope,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 
 /**
@@ -22,11 +22,11 @@ import { User } from '../users/user';
  * The signing secret is only ever returned once, from {@link create}; it's
  * exposed there as {@link Webhook.signingSecret}. Save it — patches, gets,
  * and `byId` handles never carry it again — and pass it to
- * `MacroOpts.webhookSecret` so `macro.events.webhook()` can verify
- * deliveries. Live SSE via `macro.events.listen()` does not use a
+ * `RoxOpts.webhookSecret` so `rox.events.webhook()` can verify
+ * deliveries. Live SSE via `rox.events.listen()` does not use a
  * persisted webhook or signing secret.
  */
-export class Webhook extends MacroEntity<WebhookRecord> {
+export class Webhook extends RoxEntity<WebhookRecord> {
   /**
    * The signing secret used to verify deliveries, present only on the handle
    * returned by {@link create}. `undefined` for `byId` and listed handles.
@@ -34,7 +34,7 @@ export class Webhook extends MacroEntity<WebhookRecord> {
   readonly signingSecret?: string;
 
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     id: string,
     seed?: WebhookRecord,
     signingSecret?: string,
@@ -53,7 +53,7 @@ export class Webhook extends MacroEntity<WebhookRecord> {
 
   /** Register a webhook. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: {
       url: string;
       namespace: string;
@@ -79,12 +79,12 @@ export class Webhook extends MacroEntity<WebhookRecord> {
   }
 
   /** A handle to a webhook by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Webhook {
+  static byId(client: RoxClient, id: string): Webhook {
     return new Webhook(client, id);
   }
 
   /** Wrap an already-loaded record. */
-  static fromRecord(client: MacroClient, record: WebhookRecord): Webhook {
+  static fromRecord(client: RoxClient, record: WebhookRecord): Webhook {
     return new Webhook(client, record.id, record);
   }
 

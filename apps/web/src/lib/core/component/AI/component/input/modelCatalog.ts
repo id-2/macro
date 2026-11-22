@@ -115,25 +115,51 @@ export function modelProviderLabel(option: CatalogModelOption): string {
 }
 
 /**
- * Auto, then flagship choices, followed by Gemini. Prefer the base model over effort/speed
- * variants; every other variant remains in its provider's section. Include
- * suggested choices in provider groups when building the complete catalog.
+ * What the suggested catalog may keep of this choice. Gemini 3.8 Flash
+ * returns an empty exclusion, so the home picker never lists that name.
+ */
+export function suggestedCatalogExclusion(
+  option: CatalogModelOption
+): CatalogModelOption[] {
+  const id = option.id.trim().toLowerCase();
+  const bare = id.replace(/^[\w.-]+\//, '');
+  if (
+    bare === 'gemini-3.8-flash' ||
+    id.endsWith('/gemini-3.8-flash') ||
+    option.label.trim().toLowerCase() === 'gemini 3.8 flash'
+  ) {
+    return [];
+  }
+  return [option];
+}
+
+/**
+ * Rox first, then Auto and the other flagship choices. Gemini 3.8 Flash is
+ * never suggested. Prefer the base model over effort or speed variants; every
+ * other variant remains in its provider's section. Include suggested choices
+ * in provider groups when building the complete catalog.
  */
 export function buildModelCatalog(
   options: readonly CatalogModelOption[],
   includeSuggested = false
 ): ModelCatalog {
+  const offered = options.flatMap(suggestedCatalogExclusion);
   const frontierPatterns = [
     /^auto$/i,
     /^(?:claude[ -])?opus[ -]5[.-]5(?:$|[ -])/i,
     /^(?:claude[ -])?sonnet[ -]5[.-]5(?:$|[ -])/i,
     /^(?:gpt[ -]\d+(?:\.\d+)?[ -])?sol(?:$|[ -])|^gpt[ -]5\.6(?:[ -]sol)?(?:$|[ -](?:high|medium|low|fast)\b)/i,
     /^(?:gpt[ -]\d+(?:\.\d+)?[ -])?astra(?:$|[ -])/i,
-    /^gemini\b/i,
   ];
   const frontier: CatalogModelOption[] = [];
+  const rox = offered.find(
+    (option) =>
+      option.id === 'groq/gpt-oss-120b' || /^rox\b/i.test(option.label)
+  );
   for (const pattern of frontierPatterns) {
-    const candidates = options.filter((option) => pattern.test(option.label));
+    const candidates = offered.filter((option) =>
+      pattern.test(option.label)
+    );
     const base = candidates.find(
       (option) => !/\b(high|medium|low|fast|thinking|max)\b/i.test(option.label)
     );
@@ -143,7 +169,7 @@ export function buildModelCatalog(
   }
   const frontierIds = new Set(frontier.map((option) => option.id));
   const providers: ModelProviderGroup[] = [];
-  for (const option of options) {
+  for (const option of offered) {
     if (!includeSuggested && frontierIds.has(option.id)) continue;
     const label = modelProviderLabel(option);
     const provider = providers.find((candidate) => candidate.label === label);

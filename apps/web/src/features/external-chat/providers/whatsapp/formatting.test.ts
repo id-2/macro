@@ -3,8 +3,8 @@ import {
   $convertFromMarkdownString,
   $convertToMarkdownString,
 } from '@lexical/markdown';
-import { SupportedNodeTypes } from '@macro-inc/lexical-core/node-list';
-import { ALL_TRANSFORMERS } from '@macro-inc/lexical-core/transformers';
+import { SupportedNodeTypes } from '@rox-one/lexical-core/node-list';
+import { ALL_TRANSFORMERS } from '@rox-one/lexical-core/transformers';
 import {
   $getRoot,
   $isElementNode,

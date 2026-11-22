@@ -1,5 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import {
+  interfaceLanguageReady,
+  setInterfaceLanguage,
+} from '@app/lib/i18n';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { formatDate, formatTimeRange } from './formatting';
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 describe('formatDate', () => {
   it('shows a day as its short month, day and year', () => {
@@ -45,5 +51,28 @@ describe('formatTimeRange', () => {
         end: new Date(2026, 9, 13, 17),
       }).replaceAll('\u202f', ' ')
     ).toBe('Oct 9, 9:00 AM\u2009–\u2009Oct 13, 5:00 PM');
+  });
+});
+
+describe('in Russian', () => {
+  beforeAll(async () => {
+    setInterfaceLanguage('ru');
+    await interfaceLanguageReady(5000);
+  });
+
+  afterAll(() => setInterfaceLanguage('en'));
+
+  it('writes the month in Russian', () => {
+    expect(formatDate(new Date(2025, 2, 14))).toBe('14 мар. 2025 г.');
+  });
+
+  it('writes the clock in 24-hour time', () => {
+    expect(
+      formatTimeRange({
+        allDay: false,
+        start: new Date(2026, 9, 9, 9),
+        end: new Date(2026, 9, 9, 17),
+      })
+    ).toBe('9 окт., 09:00—17:00');
   });
 });

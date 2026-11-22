@@ -1,5 +1,5 @@
 use anyhow::Context;
-use macro_auth::macro_api_token::{EncodeMacroApiTokenArgs, encode_macro_api_token};
+use rox_auth::macro_api_token::{EncodeRoxApiTokenArgs, encode_macro_api_token};
 
 use crate::{LocalE2eConfig, SeedUser};
 
@@ -93,7 +93,7 @@ pub fn encode_local_jwt_claims_with(
             .unwrap_or(DEFAULT_EXPIRY_SECONDS),
     };
 
-    encode_macro_api_token(EncodeMacroApiTokenArgs {
+    encode_macro_api_token(EncodeRoxApiTokenArgs {
         agent_correlation_id: None,
         agent_session_id: None,
         agent_id: None,

@@ -12,10 +12,10 @@ use axum::{
     },
 };
 use bot_id::BotId;
-use macro_auth::middleware::decode_jwt::{JwtToken, JwtValidationArgs, handler};
+use rox_auth::middleware::decode_jwt::{JwtToken, JwtValidationArgs, handler};
 
 use crate::domain::access_token_clients::AccessTokenClients;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Validated Rox JWT from the `Authorization: Bearer` header.
 #[derive(Clone)]
@@ -116,7 +116,7 @@ fn unauthorized_response(request: &Request<Body>, error: Option<&str>) -> Respon
 }
 
 /// Validates an existing user API key or `Authorization: Bearer <token>` and stores the authenticated
-/// [`MacroUserIdStr`], its [`McpAuthMethod`], and its [`ToolCaller`] in the
+/// [`RoxUserIdStr`], its [`McpAuthMethod`], and its [`ToolCaller`] in the
 /// request extensions. Every authenticated request carries a caller:
 /// - a Rox API token signed for an agent (only key holders such as the
 ///   agent harness's egress sign the claim, so a client cannot name a bot) is
@@ -133,7 +133,8 @@ pub async fn validate_bearer(
     if let Some(keys) = &auth.user_api_keys
         && let Some(key) = request
             .headers()
-            .get("x-macro-user-api-key")
+            .get("x-rox-user-api-key")
+            .or_else(|| request.headers().get("x-macro-user-api-key"))
             .and_then(|value| value.to_str().ok())
         && let Some(user_id) = keys.user(key).await
     {
@@ -166,7 +167,7 @@ pub async fn validate_bearer(
     // A code-mode credential signed with its session's scope is checked per
     // request path; MCP calls tools at one path and has no session to scope
     // their own credentials to, so it accepts none of them.
-    if let JwtToken::MacroApiToken(api) = &jwt_token
+    if let JwtToken::RoxApiToken(api) = &jwt_token
         && api.agent_scope.is_some()
     {
         tracing::warn!(
@@ -178,7 +179,7 @@ pub async fn validate_bearer(
         *response.status_mut() = StatusCode::FORBIDDEN;
         return response;
     }
-    if let JwtToken::MacroApiToken(api) = &jwt_token
+    if let JwtToken::RoxApiToken(api) = &jwt_token
         && api.agent_id.is_some()
         && let Some(session) = api.agent_session_id
     {
@@ -187,7 +188,7 @@ pub async fn validate_bearer(
             .insert(ManagedAgentSession(session));
     }
     let (user_id, auth_method, caller) = match jwt_token {
-        JwtToken::MacroAccessToken(access) => {
+        JwtToken::RoxAccessToken(access) => {
             let name = match auth.clients.client_name(&token).await {
                 Ok(name) => name,
                 Err(error) => {
@@ -203,7 +204,7 @@ pub async fn validate_bearer(
                 ToolCaller::McpClient { name },
             )
         }
-        JwtToken::MacroApiToken(api) => (
+        JwtToken::RoxApiToken(api) => (
             api.macro_user_id,
             McpAuthMethod::ApiKey,
             match api.agent_id {
@@ -214,7 +215,7 @@ pub async fn validate_bearer(
     };
     tracing::Span::current().record("caller", tracing::field::debug(&caller));
 
-    let user_id = match MacroUserIdStr::try_from(user_id) {
+    let user_id = match RoxUserIdStr::try_from(user_id) {
         Ok(user_id) => user_id,
         Err(error) => {
             tracing::warn!(error=?error, "MCP bearer token contained invalid macro user id");

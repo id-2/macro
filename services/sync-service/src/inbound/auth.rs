@@ -193,7 +193,7 @@ where
     type Rejection = StatusCode;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        use macro_sync_service_jwt::session::{SessionIdentity, SessionKind};
+        use rox_sync_service_jwt::session::{SessionIdentity, SessionKind};
         let secrets = Secrets::from_ref(state);
         let Path(params) = Path::<HashMap<String, String>>::from_request_parts(parts, state)
             .await

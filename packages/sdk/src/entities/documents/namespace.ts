@@ -1,6 +1,6 @@
 import type { CreateDocumentRequest } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { rejectUnknownOptions } from '../../utils/options';
 import type { EmailAttachment } from '../email/attachment';
 import type { Project } from '../projects/project';
@@ -51,7 +51,7 @@ function toBlob(content: FileContent): Blob {
  *
  * ## New spreadsheets
  *
- * `createSpreadsheet` saves the spreadsheet before it returns, so it exists even when a later step of the program throws. Keep its id across that failure: fill it inside `try`/`catch` and return `{ data: { spreadsheet: sheet, error } }` (the handle serializes as its `id` and `url`). To retry, reopen it with `macro.documents.spreadsheet(macro.documents.byId(id))`; never search recent documents for it or create another.
+ * `createSpreadsheet` saves the spreadsheet before it returns, so it exists even when a later step of the program throws. Keep its id across that failure: fill it inside `try`/`catch` and return `{ data: { spreadsheet: sheet, error } }` (the handle serializes as its `id` and `url`). To retry, reopen it with `rox.documents.spreadsheet(rox.documents.byId(id))`; never search recent documents for it or create another.
  *
  * ## Linking Rox items inside document content
  *
@@ -133,7 +133,7 @@ export class DocumentNamespace {
    * @example Upload a generated CSV and share it in a channel.
    * ```js
    * const rows = [['name', 'amount'], ['Acme', 1200]];
-   * const file = await macro.documents.upload({
+   * const file = await rox.documents.upload({
    *   name: 'invoices.csv',
    *   content: rows.map((row) => row.join(',')).join('\n'),
    * });
@@ -213,7 +213,7 @@ export class DocumentNamespace {
     };
   }
 
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to a document by id. Details load on first access. */
   byId(id: string): Document {
@@ -263,7 +263,7 @@ export class DocumentNamespace {
    *
    * @example Create and fill a budget, keeping the spreadsheet if a step fails.
    * ```js
-   * const sheet = await macro.documents.createSpreadsheet({ name: 'Q4 budget' });
+   * const sheet = await rox.documents.createSpreadsheet({ name: 'Q4 budget' });
    * try {
    *   const { revision, sheets } = await sheet.read();
    *   await sheet.applyEdits(
@@ -329,7 +329,7 @@ export class DocumentNamespace {
    * a skill mention or of a search result:
    *
    * ```js
-   * const skill = macro.documents.byId(skillId);
+   * const skill = rox.documents.byId(skillId);
    * const instructions = await skill.content();
    * ```
    *
@@ -362,7 +362,7 @@ export class DocumentNamespace {
    * updated first, then built-in skills.
    *
    * ```js
-   * const [match] = await macro.documents.skills({ query: 'deploy' });
+   * const [match] = await rox.documents.skills({ query: 'deploy' });
    * const instructions = match && (await match.skill.content());
    * ```
    *

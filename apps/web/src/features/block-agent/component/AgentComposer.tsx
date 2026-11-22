@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { SpeedSelector } from '@core/component/AI/component/input/SpeedSelector';
 import { catalogModelLabel } from '@core/component/AI/constant/model-label';
 import { nativeSpeeds, resolveSpeed } from '@core/component/AI/constant/speed';
@@ -118,7 +119,7 @@ export function AgentComposer(props: {
       toast.failure(
         error instanceof Error
           ? error.message
-          : 'The model settings could not be changed'
+          : t('agentChat.modelSettingsFailed')
       );
     } finally {
       setConfiguring(false);
@@ -208,7 +209,7 @@ export function AgentComposer(props: {
         await selectModel(meta.model, { configId: tiers.id, value: tier });
       } catch {
         persistedDraft.setDraft(markdown);
-        toast.failure('The speed setting could not be applied. Please retry.');
+        toast.failure(t('agentChat.speedSettingFailed'));
         return;
       } finally {
         setConfiguring(false);
@@ -226,7 +227,10 @@ export function AgentComposer(props: {
       .filter((part) => part.length > 0)
       .join('\n\n');
     fireAndForget(
-      act(promptActionOf(prompt, attachments), 'The message could not be sent'),
+      act(
+        promptActionOf(prompt, attachments),
+        t('agentChat.messageSendFailed')
+      ),
       'agent-composer'
     );
     attachmentTracker.clearAttachments();
@@ -291,14 +295,14 @@ export function AgentComposer(props: {
         </div>
       </Show>
       <Show when={resuming()}>
-        <ComposerNotice text="Waking the agent's sandbox…" active />
+        <ComposerNotice text={t('agentChat.wakingSandbox')} active />
       </Show>
       <Show when={pendingElicitation()}>
         <ComposerNotice
           text={
             interactions.canAnswer()
-              ? 'The agent is waiting for your answer above. Messages sent now are queued.'
-              : 'The agent is waiting for an editor to answer above. Messages sent now are queued.'
+              ? t('agentChat.waitingAnswerQueued')
+              : t('agentChat.waitingEditorQueued')
           }
         />
       </Show>
@@ -338,7 +342,7 @@ export function AgentComposer(props: {
         }
         onStop={() =>
           fireAndForget(
-            act({ type: 'stop' }, 'The agent could not be stopped'),
+            act({ type: 'stop' }, t('agentChat.stopAgentFailed')),
             'agent-composer'
           )
         }

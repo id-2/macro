@@ -10,7 +10,7 @@ use entity_mutation::{
     DeleteEntityPermanently, EntityMutationEffect, EntityMutationErrorCode, RenameEntity,
     UpdateEntitySharePolicy,
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use model_entity::Entity;
 use models_permissions::share_permission::UpdateSharePermissionRequestV2;
 
@@ -95,7 +95,7 @@ where
     Sm: CallSummarizer,
     V: VoipPushSender,
     Vr: VoiceRepository,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: CallService,
 {
     type Receipt = EditAccessLevel;
@@ -132,7 +132,7 @@ where
     Sm: CallSummarizer,
     V: VoipPushSender,
     Vr: VoiceRepository,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: CallService,
 {
     type Receipt = EditAccessLevel;
@@ -169,7 +169,7 @@ where
     Sm: CallSummarizer,
     V: VoipPushSender,
     Vr: VoiceRepository,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     Self: CallService,
 {
     type Receipt = EditAccessLevel;

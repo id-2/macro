@@ -6,9 +6,9 @@ use entity_access::domain::models::{
     AccessError, AccessLevel, BotAccessScope, BotId, CallChannelInfo, EntityAccessReceipt,
     EntityPermission, EntityType, RequiredPermission, TeamRole, UserTeamInfo, ViewAccessLevel,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use models_pagination::{Query, SimpleSortMethod};
 use serde_json::json;
@@ -628,7 +628,7 @@ impl FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -648,7 +648,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -657,7 +657,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -676,7 +676,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -703,7 +703,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -714,7 +714,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unreachable!("by-source lookups do not list entity users")
     }
 
@@ -734,7 +734,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unreachable!("by-source lookups do not resolve user teams")
     }
@@ -746,7 +746,7 @@ const PULL_REQUEST_KEY: &str = "macro/app/pull/42";
 
 fn caller_user(user_id: &str) -> ForeignEntityLookupCaller {
     ForeignEntityLookupCaller::User(
-        MacroUserIdStr::try_from(user_id.to_string()).expect("test user id should parse"),
+        RoxUserIdStr::try_from(user_id.to_string()).expect("test user id should parse"),
     )
 }
 

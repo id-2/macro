@@ -1,7 +1,7 @@
 import type { MediaItem } from '@channel/Media/media-items';
 import { MediaPreview } from '@channel/Message/MediaPreview';
 import { staticFileSizedUrl } from '@core/constant/servers';
-import { constrainImageDimensions } from '@macro-inc/lexical-core/utils/media';
+import { constrainImageDimensions } from '@rox-one/lexical-core/utils/media';
 import MicrophoneIcon from '@phosphor/microphone.svg';
 import { createMemo, createSignal, For, Match, Show, Switch } from 'solid-js';
 import { formatDuration } from '../core/rich';

@@ -5,7 +5,7 @@ import {
 } from '@app/lib/split-router';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isTauri } from '@core/util/platform';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { FrontendEvent } from './generated/native-diagnostics';
 import { recordNativeDiagnostic } from './native-diagnostics';
 

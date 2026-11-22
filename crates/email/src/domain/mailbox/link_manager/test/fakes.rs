@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::message_labels::gmail_ops::GmailOpsLinks;
-use macro_event_broker::{EventBrokerError, MacroEvent};
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_event_broker::{EventBrokerError, RoxEvent};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use std::sync::{Arc, Mutex};
 
 pub(super) const LINK: Uuid = Uuid::from_u128(1);
@@ -53,7 +53,7 @@ pub(super) fn service() -> (LinkManagerService<Fake, Fake, Fake, Fake, Fake, Fak
         notified_at: None,
         link: Some(Link {
             id: LINK,
-            macro_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+            macro_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
             fusionauth_user_id: "credential-owner".into(),
             email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
             provider: models_email::service::link::UserProvider::Gmail,
@@ -154,8 +154,8 @@ impl LinkManagerNotifications for Fake {
         Ok(())
     }
 }
-impl MacroEventBroker for Fake {
-    fn send_event<T: MacroEvent + ?Sized>(
+impl RoxEventBroker for Fake {
+    fn send_event<T: RoxEvent + ?Sized>(
         &self,
         event: &T,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

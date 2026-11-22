@@ -61,7 +61,7 @@ impl S3DocumentFiles {
         expected: &[FileType],
         kind: &str,
     ) -> anyhow::Result<Vec<u8>> {
-        let document = macro_db_client::document::get_basic_document(&self.db, document_id)
+        let document = rox_db_client::document::get_basic_document(&self.db, document_id)
             .await
             .context("loading the document")?;
         anyhow::ensure!(
@@ -71,7 +71,7 @@ impl S3DocumentFiles {
             "the document is not a {kind}"
         );
         let (version, _) =
-            macro_db_client::document::get_latest_document_version_id(&self.db, document_id)
+            rox_db_client::document::get_latest_document_version_id(&self.db, document_id)
                 .await
                 .context("finding the latest version")?;
         let key = build_cloud_storage_bucket_document_key(&document.owner, document_id, version);
@@ -87,7 +87,7 @@ impl WordDocumentFiles for S3DocumentFiles {
     /// storage service's export zips them.
     #[tracing::instrument(err, skip(self), fields(part_count))]
     async fn original(&self, document_id: &str) -> anyhow::Result<Option<Vec<u8>>> {
-        let mut parts = macro_db_client::document::get_document_bom(self.db.clone(), document_id)
+        let mut parts = rox_db_client::document::get_document_bom(self.db.clone(), document_id)
             .await
             .context("loading the Word document's parts")?;
         tracing::Span::current().record("part_count", parts.len());
@@ -130,7 +130,7 @@ impl PresentationFiles for S3DocumentFiles {
 
     #[tracing::instrument(err, skip(self, bytes), fields(bytes = bytes.len()))]
     async fn write(&self, document_id: &str, bytes: Vec<u8>) -> anyhow::Result<()> {
-        let saved = macro_db_client::document::save_document(
+        let saved = rox_db_client::document::save_document(
             &self.db,
             document_id,
             FileType::Pptx,
@@ -156,7 +156,7 @@ impl PresentationFiles for S3DocumentFiles {
             .await;
         if let Err(error) = upload {
             // Never leave a version that has no file behind.
-            if let Err(cleanup) = macro_db_client::document::delete_document_version(
+            if let Err(cleanup) = rox_db_client::document::delete_document_version(
                 &self.db,
                 document_id,
                 saved.document_version_id,

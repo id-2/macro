@@ -3,7 +3,7 @@ import type { PipelineEntry as PipelineEntryRecord } from '../generated/storage/
 import { Company } from '../src/entities/crm/company';
 import { Contact } from '../src/entities/crm/contact';
 import { Document } from '../src/entities/documents/document';
-import { Macro, PipelineEntry } from '../src/macro';
+import { Macro, PipelineEntry } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {

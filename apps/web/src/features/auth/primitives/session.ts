@@ -6,7 +6,7 @@ import type { AuthContext } from '../context/auth-context';
  *
  * The code does not always arrive with the first render. The desktop app is
  * already parked on the signed-out route when the hosted flow hands back
- * `macro:///welcome?token=...`, so the deep link is a query-only navigation
+ * `rox:///welcome?token=...`, so the deep link is a query-only navigation
  * that leaves this view mounted — reading the code once at setup would miss
  * it and leave the app signed out. Each code is redeemed at most once.
  */

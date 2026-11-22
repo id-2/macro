@@ -45,11 +45,11 @@ graphql_registered_work = { path = "../graphql_registered_work" }
 graphql_scheduled_action = { path = "../graphql_scheduled_action" }
 graphql_soup = { path = "../graphql_soup" }
 graphql_work_feed = { path = "../graphql_work_feed" }
-macro_authorization = { path = "../macro_authorization", features = [
+rox_authorization = { path = "../rox_authorization", features = [
   "axum",
   "outbound",
 ] }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 model_notifications = { path = "../model_notifications" }
 notification = { path = "../notification" }
@@ -73,7 +73,7 @@ bot_id = { path = "../bot_id" }
 crm = { path = "../crm", default-features = false, features = ["ports"] }
 databases = { path = "../databases", default-features = false, features = ["ports"] }
 databases_sql = { path = "../databases_sql" }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 models_databases = { path = "../models_databases" }
 attention_feed = { path = "../attention_feed", features = ["inbound"] }
 notification_inbox = { path = "../notification_inbox" }

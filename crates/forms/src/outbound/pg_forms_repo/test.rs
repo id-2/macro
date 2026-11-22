@@ -1,7 +1,7 @@
 use activity::domain::ports::EntityActivityReads;
 use chrono::TimeZone;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::views::{
     Conjunction, FilterCondition, FilterGroup, FilterNode, FilterTest, PresenceOperator,
 };
@@ -29,8 +29,8 @@ use crate::domain::sharing::FormSharingRepo;
 const OWNER: &str = "macro|owner@forms-repo.test";
 const RESPONDENT: &str = "macro|respondent@forms-repo.test";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 fn at(hour: u32) -> DateTime<Utc> {

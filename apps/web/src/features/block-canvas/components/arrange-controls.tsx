@@ -6,7 +6,7 @@ import AlignRight from '@icon/system/regular/align-right-simple.svg';
 import AlignTop from '@icon/system/regular/align-top-simple.svg';
 import ArrowsHorizontal from '@icon/system/regular/arrows-horizontal.svg';
 import ArrowsVertical from '@icon/system/regular/arrows-vertical.svg';
-import type { Alignment } from '@macro-inc/graphics';
+import type { Alignment } from '@rox-one/graphics';
 import { ButtonGroup } from '@ui';
 import { For, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';

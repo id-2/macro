@@ -20,7 +20,7 @@ use entity_access::{
 pub use git_patch::wire::{
     ChangedFileDto, ChangesetDto, ChangesetSourceDto, FileChangeKindDto, GitRefDto,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -34,7 +34,7 @@ use crate::domain::{
 pub struct GithubPullRequestChangesRouterState<S, AccessSvc, Auth> {
     service: Arc<S>,
     access_service: Arc<AccessSvc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, AccessSvc, Auth> Clone for GithubPullRequestChangesRouterState<S, AccessSvc, Auth> {
@@ -56,7 +56,7 @@ where
     pub fn new(
         service: Arc<S>,
         access_service: Arc<AccessSvc>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -75,7 +75,7 @@ impl<S, AccessSvc, Auth> FromRef<GithubPullRequestChangesRouterState<S, AccessSv
 }
 
 impl<S, AccessSvc, Auth> FromRef<GithubPullRequestChangesRouterState<S, AccessSvc, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &GithubPullRequestChangesRouterState<S, AccessSvc, Auth>) -> Self {
         state.authorization_state.clone()
@@ -93,7 +93,7 @@ pub fn github_pull_request_changes_router<S, AccessSvc, Auth, T>(
 where
     S: GithubPullRequestChanges,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -164,7 +164,7 @@ pub async fn get_github_pull_request_changes_handler<S, AccessSvc, Auth>(
 where
     S: GithubPullRequestChanges,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     match state.service.changes(access.entity_access_receipt).await {
         Ok(changeset) => Ok(Json(GithubPullRequestChangesResponse {
@@ -210,7 +210,7 @@ pub async fn get_github_pull_request_changes_patch_handler<S, AccessSvc, Auth>(
 where
     S: GithubPullRequestChanges,
     AccessSvc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let patch = state
         .service

@@ -1,4 +1,4 @@
-import { composeImageMarkdown } from '@macro-inc/lexical-core/utils/image-markdown';
+import { composeImageMarkdown } from '@rox-one/lexical-core/utils/image-markdown';
 import { OpenAPIRoute } from 'chanfana';
 import type { Context } from 'hono';
 import { z } from 'zod';

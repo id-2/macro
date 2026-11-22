@@ -22,7 +22,7 @@ use crate::domain::{
     model::{AgentSessionId, UpstreamCall},
     ports::ActorMcpTransport,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 use std::collections::HashMap;
 use std::future::Future;
@@ -74,7 +74,7 @@ impl BudgetPolicy {
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct BudgetLane {
     /// The account whose quota the calls spend.
-    pub account: MacroUserIdStr<'static>,
+    pub account: RoxUserIdStr<'static>,
     /// The upstream's URL and the scope headers that name the app behind a
     /// shared endpoint (Pipedream's app slug), never its credential.
     pub upstream: String,
@@ -84,7 +84,7 @@ pub struct BudgetLane {
 
 impl BudgetLane {
     /// The lane `upstream`'s calls as `account` share.
-    pub fn of(account: MacroUserIdStr<'static>, upstream: &UpstreamCall) -> Self {
+    pub fn of(account: RoxUserIdStr<'static>, upstream: &UpstreamCall) -> Self {
         let mut key = upstream.url().to_string();
         for (name, value) in upstream.scope_headers() {
             key.push('\n');
@@ -324,7 +324,7 @@ impl ActorMcpTransport for BudgetedMcpTransport {
     async fn exchange(
         &self,
         session: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         upstream: UpstreamCall,
         request: Value,
     ) -> Result<Value, EgressError> {

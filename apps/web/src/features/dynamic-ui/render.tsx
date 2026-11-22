@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createMemo, ErrorBoundary, For, type JSX, Suspense } from 'solid-js';
 import { match } from 'ts-pattern';
 import { Col, Row, View } from './core/Layout';

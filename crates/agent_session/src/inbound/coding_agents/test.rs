@@ -1,8 +1,8 @@
 use super::*;
 use axum::body::{Body, to_bytes};
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalAuthConfig, JwtValidator,
-    MacroAuthorizationError, MacroAuthorizationServiceImpl, NoBotAuthorizer,
+    RoxAuthorizationError, RoxAuthorizationServiceImpl, NoBotAuthorizer,
     NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
 use rootcause::Report;
@@ -21,9 +21,9 @@ impl JwtValidator for UserCredentials {
     fn validate_credential(
         &self,
         _: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -86,7 +86,7 @@ struct ServiceSpy {
 impl CodingAgentService for ServiceSpy {
     fn list_updates(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<
         Box<
             dyn Future<Output = Result<crate::domain::updates::AgentUpdates, CodingAgentError>>
@@ -116,7 +116,7 @@ impl CodingAgentService for ServiceSpy {
 
     fn list(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<CodingAgent>, CodingAgentError>> + Send + '_>> {
         Box::pin(async move {
             self.seen.lock().unwrap().push(json!({"user_id":user_id}));
@@ -149,7 +149,7 @@ impl CodingAgentService for ServiceSpy {
 fn app(service: Arc<ServiceSpy>) -> Router {
     coding_agents_router(CodingAgentsState::new(
         service,
-        MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
+        RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
             UserCredentials,
             InternalAuthConfig {
                 api_key: KEY.into(),

@@ -3,10 +3,10 @@ use ::activity::Actor;
 use ::activity::EntityType;
 use bot_id::BotId;
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 
 use super::*;
 use crate::domain::broker_events::{
@@ -15,8 +15,8 @@ use crate::domain::broker_events::{
 use crate::domain::models::ChannelType;
 use messages::domain::events::MessagePostedMetadata;
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn envelope(event: ChannelTopicEvent) -> Event<ChannelTopicEvent> {

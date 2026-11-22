@@ -106,7 +106,7 @@ call carries the wake id as `X-Macro-Agent-Session-Id`.
 
 ## Telemetry
 
-`@macro-inc/observability/server` exports OTLP when the computer sets the
+`@rox-one/observability/server` exports OTLP when the computer sets the
 standard `OTEL_EXPORTER_OTLP_*` variables. The start is an `agent.start`
 span from the process's start to a healthy boot, with a child per step, in
 the computer's setup trace when the image passes `MACRO_SETUP_TRACEPARENT`;

@@ -1,13 +1,13 @@
-import { SettingsSelect } from '@app/features/settings/components/settings-select';
 import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import CaretDownIcon from '@icon/system/regular/caret-down.svg';
 import CheckCircleIcon from '@icon/system/regular/check-circle.svg';
 import SpinnerIcon from '@icon/system/regular/spinner-gap.svg';
-import type { RoxdStatus } from '@macro/tauri/roxd';
+import type { RoxdDetectedAgent, RoxdStatus } from '@rox/tauri/roxd';
 import { Button, cn, ToggleSwitch } from '@ui';
 import {
   createSignal,
+  For,
   Match,
   onCleanup,
   onMount,
@@ -54,7 +54,7 @@ export function LocalRuntimeSetupPanel(props: {
   const [optionsOpen, setOptionsOpen] = createSignal(false);
   const [agentId, setAgentId] = createSignal<string>();
   const [workspace, setWorkspace] = createSignal(props.defaultWorkspace ?? '');
-  const [fullAccess, setFullAccess] = createSignal(false);
+  const [fullAccess, setFullAccess] = createSignal(true);
 
   const choices = (): SetupChoices => ({
     agentId: agentId() ?? setup.agents()?.[0]?.id,
@@ -233,22 +233,14 @@ export function LocalRuntimeSetupPanel(props: {
 
         <Match when={setup.state().kind === 'idle'}>
           <div class="flex flex-col gap-3">
-            <Show when={chosenAgent()}>
-              {(agent) => (
-                <p class="text-sm text-ink">
-                  {t('localRuntime.found', { agent: agent().name })}
-                </p>
-              )}
-            </Show>
+            <AgentChoices
+              agents={setup.agents() ?? []}
+              agentId={choices().agentId}
+              onAgent={setAgentId}
+            />
             <SetupOptions
               open={optionsOpen()}
               onToggle={() => setOptionsOpen(!optionsOpen())}
-              agents={(setup.agents() ?? []).map((agent) => ({
-                id: agent.id,
-                name: agent.name,
-              }))}
-              agentId={choices().agentId}
-              onAgent={setAgentId}
               needsInstall={chosenAgent()?.needs_install === true}
               workspace={workspace()}
               onWorkspace={setWorkspace}
@@ -295,12 +287,63 @@ export function LocalRuntimeSetupPanel(props: {
   );
 }
 
+/**
+ * The agents actually installed on this computer, each with the command that
+ * starts it and where it keeps its own settings. Choosing one is the whole
+ * decision; nothing else is offered that is not on the machine.
+ */
+function AgentChoices(props: {
+  agents: RoxdDetectedAgent[];
+  agentId: string | undefined;
+  onAgent: (id: string) => void;
+}) {
+  return (
+    <div class="flex flex-col gap-2" role="radiogroup" aria-label={t('localRuntime.agentLabel')}>
+      <For each={props.agents}>
+        {(agent) => {
+          const selected = () => props.agentId === agent.id;
+          return (
+            <button
+              type="button"
+              role="radio"
+              aria-checked={selected()}
+              class={cn(
+                'flex w-full flex-col gap-1 rounded-lg border p-3 text-left',
+                selected()
+                  ? 'border-accent bg-accent/5'
+                  : 'border-edge-muted not-touch:hover:border-edge'
+              )}
+              onClick={() => props.onAgent(agent.id)}
+            >
+              <span class="flex items-center gap-2 text-sm font-medium text-ink">
+                {agent.name}
+                <Show when={agent.needs_install}>
+                  <span class="rounded-full bg-ink/6 px-2 py-0.5 text-[11px] font-normal text-ink-muted">
+                    {t('localRuntime.needsConnector')}
+                  </span>
+                </Show>
+              </span>
+              <span class="truncate font-mono text-xs text-ink-muted">
+                {agent.command}
+              </span>
+              <Show when={agent.config_path}>
+                {(path) => (
+                  <span class="truncate font-mono text-xs text-ink-extra-muted">
+                    {path()}
+                  </span>
+                )}
+              </Show>
+            </button>
+          );
+        }}
+      </For>
+    </div>
+  );
+}
+
 function SetupOptions(props: {
   open: boolean;
   onToggle: () => void;
-  agents: { id: string; name: string }[];
-  agentId: string | undefined;
-  onAgent: (id: string) => void;
   needsInstall: boolean;
   workspace: string;
   onWorkspace: (value: string) => void;
@@ -323,19 +366,6 @@ function SetupOptions(props: {
       </button>
       <Show when={props.open}>
         <div class="flex flex-col gap-4">
-          <Show when={props.agents.length > 1}>
-            <div class="flex w-full max-w-72 flex-col gap-1.5">
-              <span class="text-xs font-medium text-ink">
-                {t('localRuntime.agentLabel')}
-              </span>
-              <SettingsSelect
-                label={t('localRuntime.agentLabel')}
-                options={props.agents}
-                value={props.agentId}
-                onChange={props.onAgent}
-              />
-            </div>
-          </Show>
           <div class="flex w-full max-w-72 flex-col gap-1.5">
             <label
               for="local-runtime-workspace"

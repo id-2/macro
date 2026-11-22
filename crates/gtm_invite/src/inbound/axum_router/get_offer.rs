@@ -1,7 +1,7 @@
 //! Handler for `GET /gtm-invite/offer`.
 
 use axum::{Json, extract::State};
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 
 use super::GtmInviteRouterState;
 use super::dto::{GtmInviteOffer, GtmInviteOfferStatus};
@@ -22,9 +22,9 @@ use crate::domain::ports::GtmInviteService;
     )
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: GtmInviteService, R, Auth: MacroAuthorizationService>(
+pub async fn handler<T: GtmInviteService, R, Auth: RoxAuthorizationService>(
     State(state): State<GtmInviteRouterState<T, R, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<GtmInviteOfferStatus>, GtmInviteError> {
     let user = &authorization.authorization.user.macro_user_id;
     let link = state.service.active_offer_for_user(user).await?;

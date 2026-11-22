@@ -10,12 +10,12 @@ use axum::{
 };
 use chrono::{TimeZone, Utc};
 use http_body_util::BodyExt;
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalAuthConfig, JwtValidator,
-    MacroAuthorizationError, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+    RoxAuthorizationError, RoxAuthorizationServiceImpl, RoxAuthorizationState,
     ValidatedIdentity,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::Base64Str;
 use rootcause::Report;
 use tower::ServiceExt;
@@ -79,7 +79,7 @@ impl ChannelListService for FakeChannelListService {
         Ok(self.channels.iter().take(limit).cloned().collect())
     }
 
-    async fn get_activities(&self, user_id: MacroUserIdStr<'_>) -> Result<Vec<Activity>, Report> {
+    async fn get_activities(&self, user_id: RoxUserIdStr<'_>) -> Result<Vec<Activity>, Report> {
         self.tracker
             .record(ServiceCall::GetActivities(user_id.to_string()));
         Ok(Vec::new())
@@ -101,7 +101,7 @@ impl ChannelListService for FakeChannelListService {
 
     async fn get_names(
         &self,
-        _names: HashSet<MacroUserIdStr<'_>>,
+        _names: HashSet<RoxUserIdStr<'_>>,
     ) -> Result<Vec<UserName>, Report> {
         Ok(Vec::new())
     }
@@ -114,10 +114,10 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         match jwt {
-            VALID_BEARER_TOKEN => Ok(macro_authorization::ValidatedCredential {
-                origin: macro_authorization::CredentialOrigin::Session,
+            VALID_BEARER_TOKEN => Ok(rox_authorization::ValidatedCredential {
+                origin: rox_authorization::CredentialOrigin::Session,
                 identity: ValidatedIdentity {
                     agent_id: None,
                     agent_via: None,
@@ -128,8 +128,8 @@ impl JwtValidator for FakeJwtValidator {
                     permissions: None,
                 },
             }),
-            EXPIRED_BEARER_TOKEN => Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            EXPIRED_BEARER_TOKEN => Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 }
@@ -143,18 +143,18 @@ fn test_router_with_channels(
         tracker: tracker.clone(),
         channels,
     };
-    let authorization_service = MacroAuthorizationServiceImpl::new(
+    let authorization_service = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: VALID_INTERNAL_KEY.to_string(),
             default_user_id: default_user_id.map(str::to_owned),
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
     let state = ChannelListRouterState::new(
         list_service,
-        MacroAuthorizationState::new(Arc::new(authorization_service)),
+        RoxAuthorizationState::new(Arc::new(authorization_service)),
     );
 
     (channel_list_router::<_, _, ()>(state), tracker)
@@ -227,7 +227,7 @@ fn list_channel(id: Uuid, updated_at_seconds: i64) -> ChannelWithLatest {
                 auto_join_team: false,
                 created_at: timestamp,
                 updated_at: timestamp,
-                owner_id: MacroUserIdStr::try_from(BEARER_USER_ID.to_string()).unwrap(),
+                owner_id: RoxUserIdStr::try_from(BEARER_USER_ID.to_string()).unwrap(),
             },
             participants: Vec::new(),
             is_participant: true,

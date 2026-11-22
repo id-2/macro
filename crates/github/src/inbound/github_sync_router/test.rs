@@ -9,14 +9,14 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_service_urls::AppServiceUrl;
-use macro_user_id::{
+use rox_service_urls::AppServiceUrl;
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_user::UserContext;
 use rootcause::Report;
@@ -37,10 +37,10 @@ const USER_ID: &str = "macro|github-installer@example.com";
 #[derive(Clone)]
 struct TestAuthorizationService;
 
-impl MacroAuthorizationService for TestAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for TestAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(UserContext {
@@ -54,18 +54,18 @@ impl MacroAuthorizationService for TestAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -77,7 +77,7 @@ struct TestEntityAccessService {
 impl EntityAccessService for TestEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -97,7 +97,7 @@ impl EntityAccessService for TestEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -106,7 +106,7 @@ impl EntityAccessService for TestEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -125,7 +125,7 @@ impl EntityAccessService for TestEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -135,7 +135,7 @@ impl EntityAccessService for TestEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -146,7 +146,7 @@ impl EntityAccessService for TestEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
 
@@ -166,7 +166,7 @@ impl EntityAccessService for TestEntityAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         Ok(self.team_id.map(|team_id| UserTeamInfo {
             team_id,
@@ -230,7 +230,7 @@ impl GithubSyncService for MockGithubSyncService {
 
     async fn begin_installation_setup(
         &self,
-        macro_user_id: &MacroUserIdStr<'_>,
+        macro_user_id: &RoxUserIdStr<'_>,
         team_id: Option<Uuid>,
     ) -> Result<String, GithubError> {
         self.begin_calls.lock().unwrap().push(BeginCall {
@@ -285,7 +285,7 @@ fn mock_router_with_team(team_id: Option<Uuid>) -> (Router, Arc<MockGithubSyncSe
     let router = github_sync_router(GithubSyncRouterState {
         service: service.clone(),
         entity_access_service: Arc::new(TestEntityAccessService { team_id }),
-        authorization_state: MacroAuthorizationState::new(Arc::new(TestAuthorizationService)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(TestAuthorizationService)),
     });
     (router, service)
 }
@@ -307,7 +307,7 @@ fn authenticated_request(uri: &str) -> Request<axum::body::Body> {
 
 fn callback_state(team_id: Option<Uuid>) -> String {
     let state = InstallationState {
-        macro_user_id: MacroUserIdStr::try_from(USER_ID.to_string()).unwrap(),
+        macro_user_id: RoxUserIdStr::try_from(USER_ID.to_string()).unwrap(),
         team_id,
         exp: i64::MAX,
     };

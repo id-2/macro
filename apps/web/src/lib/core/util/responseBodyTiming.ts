@@ -1,4 +1,4 @@
-import type { Span } from '@macro-inc/observability';
+import type { Span } from '@rox-one/observability';
 
 /** How a response body ended, recorded as `<prefix>.body_outcome`. */
 export type ResponseBodyOutcome =

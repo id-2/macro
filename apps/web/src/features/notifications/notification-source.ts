@@ -2,7 +2,7 @@ import { ENABLE_DOCUMENT_MENTION_NOTIFICATIONS } from '@core/constant/featureFla
 import type { Entity } from '@core/types';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { muteItemForRef } from '@entity/utils/notification';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   currentQueryAccount,
   isCurrentQueryAccount,

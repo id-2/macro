@@ -33,10 +33,10 @@ it('opens a searchable documentation sidebar on click and restores focus on Esca
   fireEvent.click(toggle);
   const nav = screen.getByRole('navigation', { name: 'Main navigation' });
   const search = within(nav).getByRole('searchbox');
-  fireEvent.input(search, { target: { value: 'Add Macro MCP' } });
+  fireEvent.input(search, { target: { value: 'Add Rox MCP' } });
   expect(
     (
-      await within(nav).findByRole('link', { name: /Add Macro MCP/ })
+      await within(nav).findByRole('link', { name: /Add Rox MCP/ })
     ).getAttribute('href')
   ).toBe('/docs/AI/mcp/overview');
   expect(

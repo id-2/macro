@@ -1,7 +1,7 @@
 use crate::domain::{
     models::{CatalogEntry, ConnectionProvider, ConnectorOverlay, PipedreamConnection},
     ports::{
-        ConnectionStore, ConnectorDirectory, ConnectorOverlays, MacroConnect, PipedreamConnect,
+        ConnectionStore, ConnectorDirectory, ConnectorOverlays, RoxConnect, PipedreamConnect,
     },
     service::{
         catalog::browse_catalog,
@@ -18,8 +18,8 @@ use axum::{
     response::IntoResponse,
     routing::{delete, get, post, put},
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
@@ -48,7 +48,7 @@ pub type PipedreamDisconnectedHook = PipedreamAuthCompletedHook;
 pub struct PipedreamRouterState<S, P, Auth> {
     store: Arc<S>,
     pipedream: Option<Arc<P>>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
     on_auth_completed: Option<PipedreamAuthCompletedHook>,
     on_disconnected: Option<PipedreamDisconnectedHook>,
 }
@@ -65,7 +65,7 @@ impl<S, P, Auth> Clone for PipedreamRouterState<S, P, Auth> {
     }
 }
 
-impl<S, P, Auth> FromRef<PipedreamRouterState<S, P, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, P, Auth> FromRef<PipedreamRouterState<S, P, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &PipedreamRouterState<S, P, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -74,8 +74,8 @@ impl<S, P, Auth> FromRef<PipedreamRouterState<S, P, Auth>> for MacroAuthorizatio
 impl<S, P, Auth> PipedreamRouterState<S, P, Auth>
 where
     S: ConnectionStore,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
 {
     /// Create a new router state from a server store, the Pipedream client
     /// (None when the deployment has no Pipedream configured), and
@@ -83,7 +83,7 @@ where
     pub fn new(
         store: S,
         pipedream: Option<Arc<P>>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             store: Arc::new(store),
@@ -120,10 +120,10 @@ where
     }
 
     /// Whether `user_id` is on Rox Connect alone (see
-    /// [`MacroConnect::connect_only`]).
+    /// [`RoxConnect::connect_only`]).
     async fn connect_only(
         &self,
-        user_id: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        user_id: &rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> bool {
         match &self.pipedream {
             Some(backends) => backends.connect_only(user_id).await,
@@ -139,8 +139,8 @@ pub fn pipedream_mcp_router<S, P, Auth, Global>(
 ) -> Router<Global>
 where
     S: ConnectionStore + ConnectorOverlays,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
     Global: Send + Sync,
 {
@@ -566,12 +566,12 @@ impl IntoResponse for PipedreamHandlerErr {
 #[tracing::instrument(skip_all, err)]
 pub async fn list_connections<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<PipedreamConnectionResponse>>, PipedreamHandlerErr>
 where
     S: ConnectionStore,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -610,13 +610,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn update_connection<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<PipedreamUpdateRequest>,
 ) -> Result<Json<PipedreamConnectionResponse>, PipedreamHandlerErr>
 where
     S: ConnectionStore,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -659,13 +659,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn delete_connection<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(params): Query<PipedreamDeleteParams>,
 ) -> Result<StatusCode, PipedreamHandlerErr>
 where
     S: ConnectionStore,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -708,13 +708,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn create_connect_token<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     body: Option<Json<PipedreamTokenRequest>>,
 ) -> Result<Json<PipedreamTokenResponse>, PipedreamHandlerErr>
 where
     S: ConnectionStore + ConnectorOverlays,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
 {
     let user = &authorization.authorization.user;
     let pipedream = state.pipedream()?;
@@ -771,13 +771,13 @@ where
 #[tracing::instrument(skip_all, err, fields(connector.app_slug = %body.app_slug))]
 pub async fn complete_connect<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<PipedreamConnectCompleteRequest>,
 ) -> Result<Json<PipedreamConnectionResponse>, PipedreamHandlerErr>
 where
     S: ConnectionStore + ConnectorOverlays,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -823,13 +823,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn complete_connection<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<PipedreamCompleteRequest>,
 ) -> Result<Json<PipedreamConnectionResponse>, PipedreamHandlerErr>
 where
     S: ConnectionStore + ConnectorOverlays,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -879,13 +879,13 @@ where
 #[tracing::instrument(skip_all, err, fields(connector.app_slug = %body.app_slug))]
 pub async fn recover_connection<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(body): Json<PipedreamRecoverRequest>,
 ) -> Result<Json<PipedreamConnectionResponse>, PipedreamHandlerErr>
 where
     S: ConnectionStore + ConnectorOverlays,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
     anyhow::Error: From<S::Err>,
 {
     let user = &authorization.authorization.user;
@@ -930,13 +930,13 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn browse_catalog_handler<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(params): Query<PipedreamCatalogParams>,
 ) -> Result<Json<PipedreamCatalogResponse>, PipedreamHandlerErr>
 where
     S: ConnectionStore,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
 {
     // Connect's catalog for a user on Connect alone (see the directory).
     let page = browse_catalog(
@@ -972,12 +972,12 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn list_overlays<S, P, Auth>(
     State(state): State<PipedreamRouterState<S, P, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<PipedreamOverlayResponse>>, PipedreamHandlerErr>
 where
     S: ConnectionStore + ConnectorOverlays,
-    P: PipedreamConnect + ConnectorDirectory + MacroConnect,
-    Auth: MacroAuthorizationService,
+    P: PipedreamConnect + ConnectorDirectory + RoxConnect,
+    Auth: RoxAuthorizationService,
 {
     let mut overlays = state.store.overlays().await?;
     // Connect serves its apps to a user on Connect alone, overlaid or not.

@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{PgPool, Pool, Postgres};
 
 const LINK_ID: &str = "00000000-0000-0000-0000-000000000001";

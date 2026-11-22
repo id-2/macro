@@ -26,7 +26,7 @@ mod process;
 
 use anyhow::Context;
 use futures::stream::{self, StreamExt};
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::postgres::PgPoolOptions;
 
 /// What the per-link count means in log lines, per mode.
@@ -42,7 +42,7 @@ fn mode_noun(mode: config::BackfillMode) -> &'static str {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     println!("Loading configuration...");
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = config::Config::from_env().context("Failed to load configuration")?;
 
     println!("Connecting to the database...");

@@ -10,6 +10,7 @@ fn only_end_to_end_headers_cross_the_forwarder() {
     headers.append("x-hop", HeaderValue::from_static("local"));
     headers.append("keep-alive", HeaderValue::from_static("timeout=5"));
     headers.append("x-macro-code-execution", HeaderValue::from_static("0"));
+    headers.append("x-rox-code-execution", HeaderValue::from_static("0"));
     headers.append(
         "traceparent",
         HeaderValue::from_static("00-forged-forged-01"),

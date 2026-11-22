@@ -1,5 +1,5 @@
 import { setSubscriptionCacheTrace } from '@graphql-cache/exchange/subscription-cache-trace';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { createRequest, type Exchange } from '@urql/core';
 import { pipe, tap } from 'wonka';
 import {

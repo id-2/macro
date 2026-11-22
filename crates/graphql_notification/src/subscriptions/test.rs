@@ -5,7 +5,7 @@ use std::{
 
 use async_graphql::{EmptyMutation, Object, Schema};
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::{
     NotifEvent, RoutineRunFinishedMetadata, RoutineRunOutcome, TaskAssignedMetadata,
@@ -40,7 +40,7 @@ impl WebSocketNotificationSubscriptionService<NotificationSubscriptionUpdate<Not
 {
     fn subscribe(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> WebSocketNotificationSubscription<NotificationSubscriptionUpdate<NotifEvent>> {
         self.subscriptions
             .lock()
@@ -66,7 +66,7 @@ fn subscription(
 }
 
 fn task_assignment(
-    owner_id: MacroUserIdStr<'static>,
+    owner_id: RoxUserIdStr<'static>,
     notification_id: uuid::Uuid,
 ) -> UserNotificationRow<NotifEvent> {
     UserNotificationRow {
@@ -84,7 +84,7 @@ fn task_assignment(
             task_id: "task-1".to_string(),
             task_name: Some("Test task".to_string()),
             sub_type: None,
-            assigned_by: MacroUserIdStr::parse_from_str("macro|assigner@example.com").unwrap(),
+            assigned_by: RoxUserIdStr::parse_from_str("macro|assigner@example.com").unwrap(),
             sender_profile_picture_url: None,
         }),
         sender_id: None,
@@ -93,7 +93,7 @@ fn task_assignment(
 
 #[tokio::test]
 async fn notification_updates_streams_new_notifications() {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -144,7 +144,7 @@ async fn notification_updates_streams_new_notifications() {
 
 #[tokio::test]
 async fn routine_run_notifications_stream_as_outside_soup() {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -206,7 +206,7 @@ async fn routine_run_notifications_stream_as_outside_soup() {
 
 #[tokio::test]
 async fn notification_updates_streams_updated_notifications() {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -245,7 +245,7 @@ async fn notification_updates_streams_updated_notifications() {
 
 #[tokio::test]
 async fn notification_updates_streams_cache_deletions() {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::Closed);
     let service = TestSubscriptionService {
         subscriptions: Mutex::new(VecDeque::from([subscription])),
@@ -289,7 +289,7 @@ async fn notification_updates_streams_cache_deletions() {
 
 #[tokio::test]
 async fn notification_updates_reports_slow_consumers() {
-    let user_id = MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap();
     let (sender, subscription) = subscription(WebSocketNotificationSubscriptionExit::SlowConsumer);
     drop(sender);
     let service = TestSubscriptionService {

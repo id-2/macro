@@ -6,8 +6,8 @@ use item_filters::ast::{
     channel::{ChannelLiteral, ChannelThreadLiteral},
 };
 #[cfg(any(feature = "list", feature = "outbound"))]
-use macro_user_id::email::ReadEmailParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::email::ReadEmailParts;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{CreatedAt, CursorVal, Identify, SortOn};
 #[cfg(feature = "list")]
 use models_pagination::{Query, SimpleSortMethod};
@@ -497,9 +497,9 @@ pub struct GetChannelsHistoryResponse {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CreateWelcomeMessageRequest {
     /// User id the welcome message is from/for.
-    pub welcome_user_id: MacroUserIdStr<'static>,
+    pub welcome_user_id: RoxUserIdStr<'static>,
     /// User id to send the welcome message to.
-    pub to_user_id: MacroUserIdStr<'static>,
+    pub to_user_id: RoxUserIdStr<'static>,
 }
 
 /// Channel message response used by search indexing.
@@ -593,7 +593,7 @@ pub struct CreateChannelRequest {
     pub auto_join_team: bool,
     /// Participants to add, excluding the owner.
     #[cfg_attr(feature = "inbound", schema(value_type = HashSet<String>))]
-    pub participants: HashSet<MacroUserIdStr<'static>>,
+    pub participants: HashSet<RoxUserIdStr<'static>>,
 }
 
 /// Persisted channel data returned by channel creation.
@@ -602,7 +602,7 @@ pub struct CreatedChannel {
     /// Created channel id.
     pub id: Uuid,
     /// All active user participants added during creation.
-    pub participant_user_ids: Vec<MacroUserIdStr<'static>>,
+    pub participant_user_ids: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Response containing a channel's reusable join code.
@@ -636,7 +636,7 @@ pub struct GetOrCreateDmRequest {
 pub struct GetOrCreatePrivateRequest {
     /// Recipient user ids.
     #[cfg_attr(feature = "inbound", schema(value_type = HashSet<String>))]
-    pub recipients: HashSet<MacroUserIdStr<'static>>,
+    pub recipients: HashSet<RoxUserIdStr<'static>>,
 }
 
 /// Response for get-or-create channel operations.
@@ -870,7 +870,7 @@ pub struct ShareWithChannelRequest {
 pub struct AddParticipantsRequest {
     /// User ids to add.
     #[cfg_attr(feature = "inbound", schema(value_type = HashSet<String>))]
-    pub participants: HashSet<MacroUserIdStr<'static>>,
+    pub participants: HashSet<RoxUserIdStr<'static>>,
 }
 
 /// Request to remove participants.
@@ -1013,7 +1013,7 @@ pub struct WithChannelId {
 #[derive(Debug, Deserialize)]
 pub struct UserName {
     /// Rox user id.
-    pub id: MacroUserIdStr<'static>,
+    pub id: RoxUserIdStr<'static>,
     /// First name, if present.
     pub first_name: Option<String>,
     /// Last name, if present.
@@ -1039,11 +1039,11 @@ impl UserName {
 
 /// Lookup from Rox user id to display name.
 #[cfg(any(feature = "list", feature = "outbound"))]
-pub(crate) type NameLookup = HashMap<MacroUserIdStr<'static>, String>;
+pub(crate) type NameLookup = HashMap<RoxUserIdStr<'static>, String>;
 
 /// Produce the human-readable fallback for a Rox user id.
 #[cfg(any(feature = "list", feature = "outbound"))]
-pub(crate) fn fallback_user_name(user_id: &MacroUserIdStr<'_>) -> String {
+pub(crate) fn fallback_user_name(user_id: &RoxUserIdStr<'_>) -> String {
     user_id.email_part().local_part().to_string()
 }
 
@@ -1052,7 +1052,7 @@ pub(crate) fn fallback_user_name(user_id: &MacroUserIdStr<'_>) -> String {
 #[derive(Debug)]
 pub struct GetChannelsRequest {
     /// Requesting user id.
-    pub macro_id: MacroUserIdStr<'static>,
+    pub macro_id: RoxUserIdStr<'static>,
     /// Optional result limit.
     pub limit: Option<u32>,
     /// Whether aggregate frecency should be loaded for the returned channels.
@@ -1077,7 +1077,7 @@ impl GetChannelsRequest {
 #[cfg(feature = "list")]
 #[derive(Debug)]
 pub struct GetChannelsParams {
-    macro_id: MacroUserIdStr<'static>,
+    macro_id: RoxUserIdStr<'static>,
     limit: Option<u32>,
     query: Query<Uuid, SimpleSortMethod, LiteralTree<ChannelLiteral>>,
 }
@@ -1164,7 +1164,7 @@ impl MessageParent {
 #[derive(Debug)]
 pub struct GetThreadReplyRowsRequest {
     /// Requesting user id.
-    pub macro_id: MacroUserIdStr<'static>,
+    pub macro_id: RoxUserIdStr<'static>,
     /// Optional result limit.
     pub limit: Option<u32>,
     /// Cursor, sort, and channel-thread-level filter.
@@ -1187,7 +1187,7 @@ impl GetThreadReplyRowsRequest {
 #[cfg(feature = "list")]
 #[derive(Debug)]
 pub struct GetThreadReplyRowsParams {
-    macro_id: MacroUserIdStr<'static>,
+    macro_id: RoxUserIdStr<'static>,
     limit: Option<u32>,
     query: Query<Uuid, SimpleSortMethod, LiteralTree<ChannelThreadLiteral>>,
 }
@@ -1195,7 +1195,7 @@ pub struct GetThreadReplyRowsParams {
 #[cfg(feature = "list")]
 impl GetThreadReplyRowsParams {
     /// Requesting user id.
-    pub fn user(&self) -> &MacroUserIdStr<'static> {
+    pub fn user(&self) -> &RoxUserIdStr<'static> {
         &self.macro_id
     }
 
@@ -1213,7 +1213,7 @@ impl GetThreadReplyRowsParams {
 #[cfg(feature = "list")]
 impl GetChannelsParams {
     /// Requesting user id.
-    pub fn user(&self) -> &MacroUserIdStr<'static> {
+    pub fn user(&self) -> &RoxUserIdStr<'static> {
         &self.macro_id
     }
 
@@ -1263,7 +1263,7 @@ pub struct ChannelListItem {
     /// Update timestamp.
     pub updated_at: DateTime<Utc>,
     /// Channel owner user id.
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
 }
 
 /// Latest-message bundle for channel list results.

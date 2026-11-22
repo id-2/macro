@@ -2,7 +2,7 @@
 
 use agent_fold::domain::{model::FoldedMessage, ports::FoldedMessageRepo};
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use rootcause::Report;
 
 use super::{AgentSessionSearchMetadata, AgentSessionSearchMetadataRepo};

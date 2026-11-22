@@ -23,9 +23,9 @@ use entity_access::{
     domain::{models::*, service::EntityAccessServiceImpl},
     outbound::PgAccessRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use properties::PropertiesPgRepo;
 use sqlx::PgPool;
 use std::sync::Arc;
@@ -34,7 +34,7 @@ use uuid::Uuid;
 const OWNER: &str = "macro|workflow-owner@rox.one";
 const MEMBER: &str = "macro|workflow-member@rox.one";
 type Access = EntityAccessServiceImpl<PgAccessRepository>;
-type DatabaseService = PgDatabasesService<NoOpTableEventPublisher, NoopMacroEventBroker, Access>;
+type DatabaseService = PgDatabasesService<NoOpTableEventPublisher, NoopRoxEventBroker, Access>;
 type Pipelines = PipelineServiceImpl<
     PgPipelineRepo<PgCellStore<PropertiesPgRepo>>,
     DatabaseService,
@@ -90,7 +90,7 @@ impl StageDefinitionStore for Stages {
 
 fn viewer(id: &str) -> Viewer {
     Viewer {
-        user_id: MacroUserIdStr::parse_from_str(id).unwrap().into_owned(),
+        user_id: RoxUserIdStr::parse_from_str(id).unwrap().into_owned(),
         acting_bot: Some(bot_id::MACRO_AI_BOT_ID),
     }
 }
@@ -192,7 +192,7 @@ async fn fixture(pool: &PgPool) -> Fixture {
         pool.clone(),
         access.clone(),
         NoOpTableEventPublisher,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     ));
     let pipelines = Arc::new(Pipelines::new(
         PgPipelineRepo::new(

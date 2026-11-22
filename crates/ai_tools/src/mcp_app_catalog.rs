@@ -6,8 +6,8 @@ use std::sync::Arc;
 
 use anyhow::Context;
 use bots::domain::ports::{BotError, McpAppCatalog};
-use macro_env::Environment;
-use macro_env_var::maybe_env_var;
+use rox_env::Environment;
+use rox_env_var::maybe_env_var;
 use pipedream_mcp::domain::ports::ConnectRollout;
 use pipedream_mcp::outbound::api::{
     DEFAULT_API_URL, DEFAULT_MCP_URL, PipedreamClient, PipedreamConfig,
@@ -48,14 +48,14 @@ pub fn connect_adapter(customer_key: Option<&str>) -> anyhow::Result<Option<Arc<
     let Some(customer_key) = customer_key.filter(|key| !key.is_empty()) else {
         return Ok(None);
     };
-    let public_url = macro_service_urls::CognitionPublicUrl::new()?;
+    let public_url = rox_service_urls::CognitionPublicUrl::new()?;
     let callback_url = url::Url::parse(&format!(
         "{}/pipedream/mcp/connect/callback",
         public_url.as_str().trim_end_matches('/')
     ))
     .context("Connect callback is not a URL")?;
     let adapter = ConnectAdapter::new(ConnectConfig {
-        api_url: macro_service_urls::ConnectApiUrl::new()?.to_string(),
+        api_url: rox_service_urls::ConnectApiUrl::new()?.to_string(),
         customer_key: customer_key.to_owned(),
         callback_url,
     })

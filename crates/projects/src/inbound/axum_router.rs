@@ -25,7 +25,7 @@ use axum::{
 };
 use entity_access::domain::ports::EntityAccessService;
 use entity_registry::NonUserOwners;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model::response::GenericErrorResponse;
 use serde::Deserialize;
 
@@ -52,7 +52,7 @@ pub struct ProjectRouterState<T, Svc, Auth> {
     /// Entity access service used by access extractors.
     pub access_service: Arc<Svc>,
     /// Request authorization state.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
     /// Whether a team bot with no acting user may own what it creates.
     pub non_user_owners: NonUserOwners,
 }
@@ -75,7 +75,7 @@ impl<T, Svc, Auth> FromRef<ProjectRouterState<T, Svc, Auth>> for Arc<Svc> {
     }
 }
 
-impl<T, Svc, Auth> FromRef<ProjectRouterState<T, Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Svc, Auth> FromRef<ProjectRouterState<T, Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ProjectRouterState<T, Svc, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -128,7 +128,7 @@ pub fn projects_router<T, Svc, Auth, S>(state: ProjectRouterState<T, Svc, Auth>)
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     let project_routes = Router::new()
@@ -200,7 +200,7 @@ pub fn internal_upload_router<T, Svc, Auth, S>(state: ProjectRouterState<T, Svc,
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()
@@ -227,7 +227,7 @@ async fn ensure_project_exists<T, Svc, Auth>(
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let project = state.service.internal_get_basic_project(&id).await?;
     request.extensions_mut().insert(project);

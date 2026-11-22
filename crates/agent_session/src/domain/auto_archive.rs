@@ -9,8 +9,8 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::{
     EntityAccessReceipt, EntityType, OwnerAccessLevel, RequiredPermission, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::error::{AgentSessionError, Result};
 use super::model::{AgentSessionId, ArchiveCause};
@@ -73,13 +73,13 @@ pub trait AutoArchiveRepo: Send + Sync + 'static {
     /// The user's defaults; a user who never chose has every trigger off.
     fn user_auto_archive_preferences(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<AutoArchivePreferences>> + Send;
 
     /// Replace the user's defaults.
     fn set_user_auto_archive_preferences(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         preferences: AutoArchivePreferences,
     ) -> impl Future<Output = Result<()>> + Send;
 
@@ -119,13 +119,13 @@ pub trait AutoArchive: Send + Sync + 'static {
     /// The caller's defaults.
     fn preferences(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<AutoArchivePreferences>> + Send;
 
     /// Replace the caller's defaults.
     fn set_preferences(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         preferences: AutoArchivePreferences,
     ) -> impl Future<Output = Result<()>> + Send;
 
@@ -193,13 +193,13 @@ where
     R: AutoArchiveRepo,
     Rt: AgentSessionRealtime + Send + Sync + 'static,
 {
-    async fn preferences(&self, user: &MacroUserIdStr<'static>) -> Result<AutoArchivePreferences> {
+    async fn preferences(&self, user: &RoxUserIdStr<'static>) -> Result<AutoArchivePreferences> {
         self.repo.user_auto_archive_preferences(user).await
     }
 
     async fn set_preferences(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         preferences: AutoArchivePreferences,
     ) -> Result<()> {
         self.repo

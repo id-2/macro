@@ -10,7 +10,7 @@ mod orphans;
 #[cfg(test)]
 mod test;
 
-/// The released-attachment queue in MacroDB.
+/// The released-attachment queue in RoxDB.
 #[derive(Clone)]
 pub struct PgReleasedAttachmentRepo {
     pool: PgPool,
@@ -360,7 +360,7 @@ async fn trash(
 
     let entity_ids: Vec<uuid::Uuid> = document_ids
         .iter()
-        .filter_map(|id| macro_uuid::string_to_uuid(id).ok())
+        .filter_map(|id| rox_uuid::string_to_uuid(id).ok())
         .collect();
     entity_registry_db_utils::mark_deleted_many(transaction, &entity_ids, chrono::Utc::now())
         .await

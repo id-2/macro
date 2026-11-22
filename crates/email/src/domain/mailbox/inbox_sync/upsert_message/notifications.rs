@@ -18,7 +18,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     // notify user of new messages
     send_notifications(ctx, link, new_message_provider_id).await?;
@@ -39,7 +39,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     if !ctx.features.notifications_enabled {
         return Ok(());
@@ -91,7 +91,7 @@ where
     });
 
     let sender_id =
-        sender_contact.and_then(|contact| MacroUserIdStr::try_from_email(&contact.email).ok());
+        sender_contact.and_then(|contact| RoxUserIdStr::try_from_email(&contact.email).ok());
 
     let notification = InboxSyncNotification {
         sender,
@@ -138,10 +138,10 @@ where
 
 /// Split recipients so only `@rox.one` users are on the APNS path.
 fn partition_email_push_recipients(
-    recipient_ids: HashSet<MacroUserIdStr<'static>>,
+    recipient_ids: HashSet<RoxUserIdStr<'static>>,
 ) -> (
-    HashSet<MacroUserIdStr<'static>>,
-    HashSet<MacroUserIdStr<'static>>,
+    HashSet<RoxUserIdStr<'static>>,
+    HashSet<RoxUserIdStr<'static>>,
 ) {
     recipient_ids
         .into_iter()
@@ -176,7 +176,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     let query = PreviewCursorQuery {
         view: PreviewView::StandardLabel(PreviewViewStandardLabel::Inbox),
@@ -215,7 +215,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     if thread_in_inbox(ctx, link, signal_filter(thread_id)).await? {
         return Ok(Some(NewEmailTier::Signal));
@@ -239,7 +239,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     let new_message = ctx
         .repository
@@ -266,13 +266,13 @@ where
 }
 /// Select the owner and valid delegated primaries for notification delivery.
 pub fn build_notification_recipients(
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     primaries: Vec<String>,
-) -> HashSet<MacroUserIdStr<'static>> {
+) -> HashSet<RoxUserIdStr<'static>> {
     let mut recipient_ids = HashSet::from([owner.clone()]);
 
     for primary in primaries {
-        match MacroUserIdStr::try_from(primary) {
+        match RoxUserIdStr::try_from(primary) {
             Ok(id) => {
                 recipient_ids.insert(id);
             }

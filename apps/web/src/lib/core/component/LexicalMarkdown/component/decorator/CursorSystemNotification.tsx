@@ -19,7 +19,7 @@ import GitBranchIcon from '@icon/system/regular/git-branch.svg';
 import GitCommitIcon from '@icon/system/regular/git-commit.svg';
 import TimerIcon from '@icon/system/regular/timer.svg';
 import XCircleIcon from '@icon/system/regular/x-circle.svg';
-import type { CursorSystemNotificationDecoratorProps } from '@macro-inc/lexical-core';
+import type { CursorSystemNotificationDecoratorProps } from '@rox-one/lexical-core';
 import GithubLogoIcon from '@phosphor/github-logo.svg';
 import SlackLogoIcon from '@phosphor/slack-logo.svg';
 import { cn } from '@ui/utils/classname';

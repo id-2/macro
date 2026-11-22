@@ -17,7 +17,7 @@ runs:
       with:
         sparse-checkout: |
           .github/
-          crates/macro_db_client
+          crates/rox_db_client
 
     - name: Get database URL from Secrets Manager
       id: get-db-url
@@ -51,7 +51,7 @@ runs:
 
     - name: Check that every migration is applied
       shell: bash
-      working-directory: crates/macro_db_client
+      working-directory: crates/rox_db_client
       env:
         DATABASE_URL: ${{ steps.get-db-url.outputs.database_url }}
         ENVIRONMENT: ${{ inputs.environment }}

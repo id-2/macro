@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import type { GenerationSource } from '../context/suggestions-source';
 import { type RefreshState, refreshState } from '../core/generation';

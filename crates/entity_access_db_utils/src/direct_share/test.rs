@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 #[sqlx::test(
@@ -18,9 +18,9 @@ async fn project_grant_skips_legacy_children_and_preserves_modern_grants(pool: P
     let mut tx = pool.begin().await.unwrap();
     set(
         &mut tx,
-        &macro_uuid::Uuid::from_u128(0x20000000000000000000000000000001),
+        &rox_uuid::Uuid::from_u128(0x20000000000000000000000000000001),
         EntityType::Project,
-        &MacroUserIdStr::parse_from_str("macro|reader@example.com").unwrap(),
+        &RoxUserIdStr::parse_from_str("macro|reader@example.com").unwrap(),
         Some(AccessLevel::Comment),
         true,
     )
@@ -42,7 +42,7 @@ async fn project_grant_skips_legacy_children_and_preserves_modern_grants(pool: P
             .all(|grant| grant.access_level == AccessLevel::Comment)
     );
     assert!(grants.iter().any(|grant| grant.entity_id
-        == macro_uuid::Uuid::from_u128(0x20000000000000000000000000000002)
+        == rox_uuid::Uuid::from_u128(0x20000000000000000000000000000002)
         && grant.entity_type == "document"));
 }
 
@@ -67,7 +67,7 @@ async fn a_computer_harness_has_no_direct_sharing_facts(pool: PgPool) {
     assert!(
         facts(
             &mut tx,
-            &macro_uuid::Uuid::from_u128(0xa1),
+            &rox_uuid::Uuid::from_u128(0xa1),
             EntityType::Harness,
         )
         .await
@@ -77,7 +77,7 @@ async fn a_computer_harness_has_no_direct_sharing_facts(pool: PgPool) {
     assert!(
         facts(
             &mut tx,
-            &macro_uuid::Uuid::from_u128(0xa2),
+            &rox_uuid::Uuid::from_u128(0xa2),
             EntityType::Harness,
         )
         .await

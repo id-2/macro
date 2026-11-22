@@ -19,7 +19,7 @@ import {
 } from './WaitingForWifiUpdateDialog';
 
 vi.mock('@tauri-apps/api/core', () => ({ invoke: vi.fn() }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: vi.fn() },
 }));
 // The phone drawer never finishes its transitions in jsdom; the desktop

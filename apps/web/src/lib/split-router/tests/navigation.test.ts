@@ -1,4 +1,4 @@
-import { simulate, step } from '@macro-inc/machine';
+import { simulate, step } from '@rox-one/machine';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   runMiddleware,

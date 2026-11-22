@@ -1,0 +1,31 @@
+# syntax=docker/dockerfile:1
+# One-service build for the local stack: rebuilds a single Rust binary and
+# leaves it in /app/out, reusing the same BuildKit cache as Dockerfile.dev.
+FROM rust:1.94 AS chef
+ENV SQLX_OFFLINE=true
+ENV CARGO_PROFILE_DEV_DEBUG=0
+WORKDIR /app
+
+FROM chef AS builder
+ARG CARGO_BUILD_JOBS=0
+# Pin the installed patch release so the pinned 1.94.0 toolchain in
+# rust-toolchain.toml is not re-downloaded on every build.
+ENV RUSTUP_TOOLCHAIN=1.94.1-aarch64-unknown-linux-gnu
+ARG BIN=document_storage_service
+ENV CODE_MODE_ASSETS_DIR=/app/static_assets/code-mode-assets
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends cmake pkg-config perl libssl-dev clang libclang-dev protobuf-compiler nasm libzstd-dev \
+    && rm -rf /var/lib/apt/lists/*
+COPY . .
+RUN --mount=type=cache,target=/usr/local/cargo/registry,sharing=shared \
+    --mount=type=cache,target=/usr/local/cargo/git/db,sharing=shared \
+    --mount=type=cache,target=/app/target,id=rust-target-dev-debug,sharing=locked \
+    jobs="${CARGO_BUILD_JOBS:-0}" \
+    && if [ -z "${jobs}" ] || [ "${jobs}" = "0" ]; then jobs="$(nproc)"; fi \
+    && cargo build -j "${jobs}" --bin "${BIN}" \
+        --features authentication_service/no_rate_limit,search_processing_service/no_pdf \
+    && mkdir -p /app/out \
+    && cp "/app/target/debug/${BIN}" /app/out/
+
+FROM scratch AS out
+COPY --from=builder /app/out/ /app/out/

@@ -11,7 +11,7 @@ struct Classifier {
 impl InferredTriggerClassifier for Classifier {
     async fn expects_response(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'static>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'static>,
         thread: &[TranscriptMessage],
     ) -> anyhow::Result<bool> {
         self.calls.lock().unwrap().push(thread.to_vec());

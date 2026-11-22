@@ -30,6 +30,48 @@ mod test;
 /// How often the serving core's liveness is re-checked once running.
 const DAEMON_WATCH: Duration = Duration::from_secs(5);
 
+/// Where the embedding app's own session lives, when it differs from the
+/// config file's deployment. Every field is optional; a plain restart of an
+/// already configured daemon passes none of them.
+#[derive(Debug, Clone, Default)]
+pub struct DeploymentUrls {
+    /// Base URL of the agent-harness service.
+    pub api: Option<String>,
+    /// Base URL of the storage service.
+    pub storage: Option<String>,
+    /// Base URL of the web app.
+    pub web: Option<String>,
+}
+
+impl DeploymentUrls {
+    /// Whether any URL was given.
+    fn any(&self) -> bool {
+        self.api.is_some() || self.storage.is_some() || self.web.is_some()
+    }
+
+    /// The values that pass validation: absolute http(s) URLs.
+    fn valid(&self) -> rootcause::Result<DeploymentUrls> {
+        let check = |name: &str, url: &Option<String>| -> rootcause::Result<Option<String>> {
+            match url {
+                None => Ok(None),
+                Some(url) => {
+                    let url = url.trim();
+                    if url.starts_with("http://") || url.starts_with("https://") {
+                        Ok(Some(url.trim_end_matches('/').to_owned()))
+                    } else {
+                        rootcause::bail!("{name} must be an http or https URL, got `{url}`")
+                    }
+                }
+            }
+        };
+        Ok(DeploymentUrls {
+            api: check("api_url", &self.api)?,
+            storage: check("storage_url", &self.storage)?,
+            web: check("web_url", &self.web)?,
+        })
+    }
+}
+
 /// Everything `roxd service` accepts. Runtime settings (name, ownership,
 /// permission bypass) are set on the web, never here.
 pub struct ServiceOptions {
@@ -44,12 +86,18 @@ pub struct ServiceOptions {
     pub agent: Option<String>,
     /// Workspace directory sessions run in; created when missing.
     pub workspace: Option<PathBuf>,
+    /// The embedding app's deployment, overriding the config file.
+    pub deployment: DeploymentUrls,
+    /// The signed-in user's Rox API token, when the embedder has one. The
+    /// daemon approves its own pairing code with it instead of waiting for
+    /// the app's web page to confirm the code.
+    pub approval_token: Option<String>,
 }
 
 impl ServiceOptions {
     /// Whether any setup flag was passed, i.e. the config should be (re)written.
     fn wants_setup(&self) -> bool {
-        self.agent.is_some() || self.workspace.is_some()
+        self.agent.is_some() || self.workspace.is_some() || self.deployment.any()
     }
 }
 
@@ -72,10 +120,15 @@ enum Event {
     AdapterInstalled { package: &'static str },
     /// A pairing is open and waiting for web approval.
     Pairing {
+        pairing_id: String,
         code: String,
         url: String,
         expires_at: chrono::DateTime<chrono::Utc>,
     },
+    /// The daemon is confirming the open code with the embedder's session.
+    Approving { pairing_id: String, code: String },
+    /// That confirmation failed; the code stays open for the web approval.
+    ApprovalFailed { code: String, message: String },
     /// The pairing was approved and the credential persisted.
     Paired { harness_id: String },
     /// The serving core is up on the stored credential.
@@ -152,7 +205,8 @@ async fn start(selection: &ConfigSelection, options: &ServiceOptions) -> rootcau
     }
     if options.wants_setup() {
         let agent = options.agent.as_deref().map(installed_agent).transpose()?;
-        configure(path, options, agent)?;
+        let deployment = options.deployment.valid()?;
+        configure(path, options, agent, &deployment)?;
     }
 
     let config = Config::load(path)?;
@@ -189,7 +243,7 @@ async fn start(selection: &ConfigSelection, options: &ServiceOptions) -> rootcau
         .filter(HarnessCredentials::is_valid)
     {
         Some(credentials) => credentials,
-        None => pair(selection, &config).await?,
+        None => pair(selection, &config, options.approval_token.as_deref()).await?,
     };
     // Pairing persisted into the file; serve what is actually on disk.
     let config = Config::load(path)?;
@@ -206,21 +260,53 @@ async fn start(selection: &ConfigSelection, options: &ServiceOptions) -> rootcau
 async fn pair(
     selection: &ConfigSelection,
     config: &Config,
+    approval_token: Option<&str>,
 ) -> rootcause::Result<HarnessCredentials> {
     let client = PairingClient::new(config);
     let created = client
         .start(selection.pairing_name(&machine_name()))
         .await?;
     emit(&Event::Pairing {
+        pairing_id: created.pairing_id.to_string(),
         code: created.code.clone(),
         url: config.macro_api.pairing_approval_url(&created.code),
         expires_at: created.expires_at,
     });
+    // The embedding app is already signed in: confirm the code with its own
+    // session instead of leaving it for the web page, which may never open.
+    let mut approval_error = match approval_token {
+        Some(token) => {
+            emit(&Event::Approving {
+                pairing_id: created.pairing_id.to_string(),
+                code: created.code.clone(),
+            });
+            match client.approve(&created.code, token).await {
+                Ok(()) => None,
+                Err(error) => {
+                    let message = error.to_string();
+                    emit(&Event::ApprovalFailed {
+                        code: created.code.clone(),
+                        message: message.clone(),
+                    });
+                    Some(message)
+                }
+            }
+        }
+        None => None,
+    };
     let interval = Duration::from_secs(created.poll_interval_seconds.max(1));
     loop {
         tokio::time::sleep(interval).await;
         if created.expires_at <= chrono::Utc::now() {
             rootcause::bail!("the pairing code expired before it was approved");
+        }
+        // A failed confirmation is retried each poll: the credential may be
+        // transiently unreachable, and the code stays valid for minutes.
+        if let (Some(token), Some(_)) = (approval_token, approval_error.as_ref()) {
+            match client.approve(&created.code, token).await {
+                Ok(()) => approval_error = None,
+                Err(error) => approval_error = Some(error.to_string()),
+            }
         }
         match client
             .claim(created.pairing_id, &created.device_secret)
@@ -240,11 +326,13 @@ async fn pair(
 }
 
 /// Create or edit the config from setup flags, comment-preservingly.
-/// `agent` is the resolved launch for `options.agent`, when one was named.
+/// `agent` is the resolved launch for `options.agent`, when one was named;
+/// `deployment` is where the embedding app's own session lives.
 pub(crate) fn configure(
     path: &Path,
     options: &ServiceOptions,
     agent: Option<DetectedAgent>,
+    deployment: &DeploymentUrls,
 ) -> rootcause::Result<()> {
     if let Some(workspace) = &options.workspace {
         std::fs::create_dir_all(workspace).context(format!(
@@ -267,7 +355,10 @@ pub(crate) fn configure(
             .workspace
             .as_deref()
             .ok_or_else(|| rootcause::report!("creating a config needs --workspace"))?;
-        return ConfigForm::create(path, agent, workspace);
+        ConfigForm::create(path, agent, workspace)?;
+        let mut form = ConfigForm::load(path)?;
+        apply_deployment(&mut form, deployment);
+        return form.save();
     }
     let mut form = ConfigForm::load(path)?;
     form.drop_retired_settings();
@@ -278,7 +369,18 @@ pub(crate) fn configure(
         form.apply_text(Setting::Workspace, &workspace.to_string_lossy())
             .map_err(|message| rootcause::report!("{message}"))?;
     }
+    apply_deployment(&mut form, deployment);
     form.save()
+}
+
+/// Write the deployment URLs the embedder gave, leaving the file's own
+/// values for any it did not.
+fn apply_deployment(form: &mut ConfigForm, deployment: &DeploymentUrls) {
+    if let (Some(api), Some(storage), Some(web)) =
+        (&deployment.api, &deployment.storage, &deployment.web)
+    {
+        form.set_deployment_urls(api, storage, web);
+    }
 }
 
 pub(crate) fn installed_agent(id: &str) -> rootcause::Result<DetectedAgent> {
@@ -341,6 +443,11 @@ struct DetectedAgentReport {
     id: &'static str,
     /// Human-readable name.
     name: &'static str,
+    /// The command that starts this agent, resolved on this machine.
+    command: String,
+    /// Where the agent keeps its own settings and credentials, when it has
+    /// an established location.
+    config_path: Option<String>,
     /// Short explanation for adapter-backed launchers.
     note: Option<&'static str>,
     /// Whether selecting this agent still downloads an ACP adapter first.
@@ -355,6 +462,9 @@ pub fn detect_agents_json() -> String {
         .map(|agent| DetectedAgentReport {
             id: agent.kind.id(),
             name: agent.name,
+            command: agent_catalog::launch_command(&agent, &commands),
+            config_path: agent_catalog::config_dir(agent.kind)
+                .map(|path| path.display().to_string()),
             note: agent.note,
             needs_install: agent.pending_install().is_some(),
         })

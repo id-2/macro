@@ -18,9 +18,9 @@ use entity_access::domain::models::{OwnerAccessLevel, ViewAccessLevel};
 use entity_access::{
     domain::ports::EntityAccessService, inbound::axum_extractors::ExternalChatAccessLevelExtractor,
 };
-use macro_authorization::{
-    CredentialAttribution, CredentialOrigin, MacroAuthorizationExtractor,
-    MacroAuthorizationService, MacroAuthorizationState, MacroUserAuthentication, UserOnly,
+use rox_authorization::{
+    CredentialAttribution, CredentialOrigin, RoxAuthorizationExtractor,
+    RoxAuthorizationService, RoxAuthorizationState, RoxUserAuthentication, UserOnly,
     is_agent_run,
 };
 use models_permissions::share_permission::{SharePermissionV2, UpdateSharePermissionRequestV2};
@@ -35,7 +35,7 @@ pub struct ExternalChatRouterState<P, Eas, Auth> {
     /// Standard chat receipt provider.
     pub entity_access_service: Arc<Eas>,
     /// Standard authentication provider.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<P, Eas, Auth> Clone for ExternalChatRouterState<P, Eas, Auth> {
@@ -55,7 +55,7 @@ impl<P, Eas, Auth> FromRef<ExternalChatRouterState<P, Eas, Auth>> for Arc<Eas> {
 }
 
 impl<P, Eas, Auth> FromRef<ExternalChatRouterState<P, Eas, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &ExternalChatRouterState<P, Eas, Auth>) -> Self {
         state.authorization_state.clone()
@@ -131,10 +131,10 @@ pub fn refuse_unconfirmed_program_send(
 }
 
 /// Who is acting, from how the caller authenticated.
-pub fn authority(user: &MacroUserAuthentication) -> SendAuthority {
+pub fn authority(user: &RoxUserAuthentication) -> SendAuthority {
     match user.origin {
-        CredentialOrigin::MacroApiJwt
-        | CredentialOrigin::ScopedMacroApiJwt
+        CredentialOrigin::RoxApiJwt
+        | CredentialOrigin::ScopedRoxApiJwt
         | CredentialOrigin::UserApiKey
         | CredentialOrigin::AccountManager(_) => SendAuthority::UserApiToken,
         CredentialOrigin::Session if user.agent_id.is_none() => SendAuthority::Human,
@@ -167,7 +167,7 @@ pub fn external_chats_router<P, Eas, Auth, S>(
 where
     P: ChatProvider,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     no_store(
@@ -207,9 +207,9 @@ where
 
 /// List external chats the caller can view, including without a provider account.
 #[utoipa::path(get, tag = "whatsapp_linked::inbound::router", path = "/external-chats", operation_id = "external_chats", responses((status = 200, body = Vec<ExternalChatSummary>)))]
-pub async fn list<P: ChatProvider, Eas, Auth: MacroAuthorizationService>(
+pub async fn list<P: ChatProvider, Eas, Auth: RoxAuthorizationService>(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
 ) -> Result<Json<Vec<ExternalChatSummary>>, ApiError> {
     Ok(Json(
         state
@@ -221,9 +221,9 @@ pub async fn list<P: ChatProvider, Eas, Auth: MacroAuthorizationService>(
 
 /// Add one of the caller's provider chats as their own external chat.
 #[utoipa::path(post, tag = "whatsapp_linked::inbound::router", path = "/external-chats", operation_id = "external_chat_add", request_body = AddChat, responses((status = 200, body = AddedChat)))]
-pub async fn add<P: ChatProvider, Eas, Auth: MacroAuthorizationService>(
+pub async fn add<P: ChatProvider, Eas, Auth: RoxAuthorizationService>(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     Json(body): Json<AddChat>,
 ) -> Result<Json<AddedChat>, ApiError> {
     let chat = state
@@ -239,7 +239,7 @@ pub async fn add<P: ChatProvider, Eas, Auth: MacroAuthorizationService>(
 
 /// An external chat the caller can read.
 #[utoipa::path(get, tag = "whatsapp_linked::inbound::router", path = "/external-chats/{chat_id}", operation_id = "external_chat", params(("chat_id" = Uuid, Path)), responses((status = 200, body = ExternalChatDetail)))]
-pub async fn chat<P: ChatProvider, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn chat<P: ChatProvider, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
 ) -> Result<Json<ExternalChatDetail>, ApiError> {
@@ -250,9 +250,9 @@ pub async fn chat<P: ChatProvider, Eas: EntityAccessService, Auth: MacroAuthoriz
 
 /// Stop syncing the chat, locally. Owner only, in their own session.
 #[utoipa::path(delete, tag = "whatsapp_linked::inbound::router", path = "/external-chats/{chat_id}", operation_id = "external_chat_remove", params(("chat_id" = Uuid, Path)), responses((status = 204)))]
-pub async fn remove<P: ChatProvider, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn remove<P: ChatProvider, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     access: ExternalChatAccessLevelExtractor<OwnerAccessLevel, Eas, Auth>,
 ) -> Result<StatusCode, ApiError> {
     state
@@ -280,7 +280,7 @@ pub struct TimelineQuery {
 pub async fn messages<
     P: ChatProvider,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
@@ -305,7 +305,7 @@ pub struct MessagePath {
 
 /// One message of the timeline, as the timeline shows it.
 #[utoipa::path(get, tag = "whatsapp_linked::inbound::router", path = "/external-chats/{chat_id}/messages/{message_id}", operation_id = "external_chat_message", params(("chat_id" = Uuid, Path), ("message_id" = Uuid, Path)), responses((status = 200, body = ExternalChatMessage)))]
-pub async fn message<P: ChatProvider, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn message<P: ChatProvider, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
     Path(path): Path<MessagePath>,
@@ -323,7 +323,7 @@ pub async fn message<P: ChatProvider, Eas: EntityAccessService, Auth: MacroAutho
 pub async fn message_attachments<
     P: ChatProvider,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
@@ -342,7 +342,7 @@ pub async fn message_attachments<
 pub async fn mark_read<
     P: ChatProvider,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
@@ -360,7 +360,7 @@ pub async fn mark_read<
 pub async fn permissions<
     P: ChatProvider,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
@@ -378,10 +378,10 @@ pub async fn permissions<
 pub async fn update_permissions<
     P: ChatProvider,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     access: ExternalChatAccessLevelExtractor<OwnerAccessLevel, Eas, Auth>,
     Json(body): Json<UpdateSharePermissionRequestV2>,
 ) -> Result<StatusCode, ApiError> {
@@ -401,7 +401,7 @@ pub async fn update_permissions<
 pub async fn open_sends<
     P: ChatProvider,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
@@ -416,9 +416,9 @@ pub async fn open_sends<
 
 /// Send to the chat from the caller's own provider account (one request per second per user).
 #[utoipa::path(post, tag = "whatsapp_linked::inbound::router", path = "/external-chats/{chat_id}/sends", operation_id = "external_chat_send", params(("chat_id" = Uuid, Path)), request_body = SendReply, responses((status = 200, body = SendProgress), (status = 403, description = "An agent's program sent without userConfirmation (code confirmation_required), or the caller may not send"), (status = 429, description = "One send request per second per user; Retry-After: 1")))]
-pub async fn send<P: ChatProvider, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn send<P: ChatProvider, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
     headers: axum::http::HeaderMap,
     Json(body): Json<SendReply>,
@@ -451,9 +451,9 @@ pub struct UploadRequest {
 
 /// Stage one attachment for a later media send in this chat.
 #[utoipa::path(post, tag = "whatsapp_linked::inbound::router", path = "/external-chats/{chat_id}/attachments", operation_id = "external_chat_upload", params(("chat_id" = Uuid, Path)), request_body(content = UploadRequest, content_type = "multipart/form-data"), responses((status = 200, body = UploadedAttachment)))]
-pub async fn upload<P: ChatProvider, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
+pub async fn upload<P: ChatProvider, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
-    auth: MacroAuthorizationExtractor<Auth, UserOnly>,
+    auth: RoxAuthorizationExtractor<Auth, UserOnly>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,
     mut input: Multipart,
 ) -> Result<Json<UploadedAttachment>, ApiError> {
@@ -497,7 +497,7 @@ pub async fn upload<P: ChatProvider, Eas: EntityAccessService, Auth: MacroAuthor
 pub async fn delivery<
     P: ChatProvider,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ExternalChatRouterState<P, Eas, Auth>>,
     access: ExternalChatAccessLevelExtractor<ViewAccessLevel, Eas, Auth>,

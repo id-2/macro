@@ -1,4 +1,5 @@
 /** Top-aligned agent messages with end-following for overflowing transcripts. */
+import { t } from '@app/lib/i18n';
 import { ScrollToBottomOverlay } from '@channel/Channel/ScrollToBottomOverlay';
 import {
   ThreadList,
@@ -80,8 +81,8 @@ export function Transcript(props: { searchTarget?: AgentMessageTarget }) {
   // What the wait is: the prompt still on the wire, or the agent at work.
   const workingLabel = () =>
     match(turn())
-      .with('starting', () => 'Sending')
-      .otherwise(() => 'Working');
+      .with('starting', () => t('agentChat.sending'))
+      .otherwise(() => t('agentChat.working'));
   const eventsById = createMemo(
     () =>
       new Map(

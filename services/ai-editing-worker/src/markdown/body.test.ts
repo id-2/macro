@@ -1,7 +1,7 @@
-import { LoroManager } from '@macro-inc/collaboration/collab/manager';
-import { createNoopLiveSyncSource } from '@macro-inc/collaboration/collab/source';
-import { MARKDOWN_LORO_SCHEMA } from '@macro-inc/lexical-core/markdown-loro-schema';
-import { markdownToLoroSnapshot } from '@macro-inc/lexical-core/markdown-loro-snapshot';
+import { LoroManager } from '@rox-one/collaboration/collab/manager';
+import { createNoopLiveSyncSource } from '@rox-one/collaboration/collab/source';
+import { MARKDOWN_LORO_SCHEMA } from '@rox-one/lexical-core/markdown-loro-schema';
+import { markdownToLoroSnapshot } from '@rox-one/lexical-core/markdown-loro-snapshot';
 import { LoroDoc } from 'loro-crdt';
 import { describe, expect, it } from 'vitest';
 import { applyCommentMarkChange } from '../comment-mark/run';

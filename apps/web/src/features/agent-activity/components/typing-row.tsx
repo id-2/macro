@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ActivityLine } from '@app/features/block-agent/ui';
 import { Button } from '@ui';
 import { type JSX, type ParentProps, Show } from 'solid-js';
@@ -39,7 +40,7 @@ export function TypingRow(
                 disabled={props.stopping}
                 onClick={() => stop()()}
               >
-                Stop
+                {t('agentChat.stop')}
               </Button>
             )}
           </Show>

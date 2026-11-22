@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useListLayout } from '@entity/composed/list-entity/shared';
 import ArrowDownIcon from '@icon/system/regular/arrow-down.svg';
 import { cn } from '@ui/utils/classname';
@@ -29,22 +30,22 @@ export function ResponsiveContactListHeader(props: { class?: string }) {
       >
         <div style={{ 'grid-area': 'indicator' }} />
         <div style={{ 'grid-area': 'content' }} class="truncate">
-          Person
+          {t('crm.person')}
         </div>
         <div style={{ 'grid-area': 'company' }} class="truncate">
-          Company
+          {t('crm.company')}
         </div>
         <div style={{ 'grid-area': 'timestamp' }} class="flex min-w-0">
           <button
             type="button"
             onClick={sortByInteraction}
-            title="Most recent email interaction, incoming or outgoing"
+            title={t('crm.mostRecentEmailInteraction')}
             class={cn(
               'flex items-center gap-1 min-w-0 w-full h-full justify-end hover:text-ink transition-colors',
               sortedByInteraction() && 'text-ink'
             )}
           >
-            <span class="truncate">Last contacted</span>
+            <span class="truncate">{t('crm.lastContacted')}</span>
             <ArrowDownIcon
               class={cn(
                 'size-3 shrink-0 transition-transform',

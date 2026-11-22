@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 import type {
   SheetChart,
   SheetDrawing,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import { strFromU8, strToU8, unzipSync } from 'fflate';
 import { describe, expect, it } from 'vitest';
 import { type ChartReader, chartData } from './chart-data';

@@ -13,7 +13,7 @@
 //!
 //! The merged map is written to a per-instance generated env file consumed by
 //! docker compose both for `${VAR}` interpolation (`--env-file`) and for
-//! injection into containers (via the `MACRO_ENV_FILE` indirection in the
+//! injection into containers (via the `ROX_ENV_FILE` indirection in the
 //! `x-common-env` anchor).
 
 use std::collections::BTreeMap;

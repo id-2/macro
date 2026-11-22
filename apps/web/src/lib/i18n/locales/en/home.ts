@@ -1,0 +1,17 @@
+export default {
+  filterHome: 'Filter Home',
+  homeFilters: 'Home filters',
+  newChat: 'New chat',
+  dismissWorkspaceSetup: 'Dismiss workspace setup',
+  read: 'Read',
+  all: 'All',
+  type: 'Type',
+  status: 'Status',
+  someone: 'Someone',
+  you: 'You',
+  threadIn: ' in ',
+  mentionedYouOn: ' mentioned you on ',
+  repliedOn: ' replied on ',
+  askedToJoin: ' asked to join ',
+  commentedOn: ' commented on ',
+};

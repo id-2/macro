@@ -8,7 +8,7 @@ use models_search_cursor::SearchCursorOption;
 async fn org_filter_matches_no_channel_names() {
     let db = sqlx::PgPool::connect_lazy("postgres://unused@localhost:1/unused")
         .expect("a lazy pool needs no server");
-    let user_id = MacroUserId::parse_from_str("macro|member@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|member@test.com")
         .unwrap()
         .lowercase();
     let filters = ChannelFilters {

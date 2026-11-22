@@ -7,8 +7,8 @@ version = "0.1.0"
 [dependencies]
 anyhow = { workspace = true }
 entity_access_db_utils = { path = "../entity_access_db_utils" }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid" }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid" }
 model-entity = { path = "../model-entity" }
 model_owner = { path = "../model_owner" }
 models_permissions = { path = "../models_permissions" }
@@ -18,4 +18,4 @@ thiserror = { workspace = true }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }

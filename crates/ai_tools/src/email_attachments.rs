@@ -21,7 +21,7 @@ use email::domain::{
 };
 use email::outbound::S3DraftAttachmentStorage;
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
-use macro_env_var::maybe_env_var;
+use rox_env_var::maybe_env_var;
 use model::document::{ContentType, FileType};
 
 maybe_env_var! {
@@ -113,7 +113,7 @@ impl<D: DocumentService> DraftAttachmentSource for DocumentAttachmentSource<D> {
             // The location is browser-facing; a server-side fetch on the
             // local stack must reach LocalStack directly (a no-op elsewhere).
             LocationResponseV3::PresignedUrl { presigned_url, .. } => {
-                macro_aws_config::transform_aws_url_for_internal_fetch(&presigned_url)
+                rox_aws_config::transform_aws_url_for_internal_fetch(&presigned_url)
             }
             LocationResponseV3::PresignedUrls { .. }
             | LocationResponseV3::SyncServiceContent { .. } => {
@@ -204,7 +204,7 @@ where
         tracing::warn!("ATTACHMENT_BUCKET is not set; SendEmail attachments are disabled");
         return Arc::new(NoOpEmailAttachmentSender(email_service));
     };
-    let storage = S3DraftAttachmentStorage::new(macro_aws_config::s3_client().await, bucket);
+    let storage = S3DraftAttachmentStorage::new(rox_aws_config::s3_client().await, bucket);
     Arc::new(DraftAttachmentSender::new(
         email_service,
         repo,

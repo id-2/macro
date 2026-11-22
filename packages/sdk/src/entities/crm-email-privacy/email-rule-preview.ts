@@ -1,6 +1,6 @@
 import type { EmailPreviewView } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 
 /** Counts concern this member's mailbox copies, never team-wide conversations. */
 export type CrmEmailPreviewState = {
@@ -37,19 +37,19 @@ export class CrmEmailRulePreview {
   private readVersion = 0;
 
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     readonly id: string,
     private snapshot?: CrmEmailPreviewState,
   ) {}
 
   /** Reconstruct a handle; a subsequent read verifies it is still current. */
-  static byId(client: MacroClient, id: string): CrmEmailRulePreview {
+  static byId(client: RoxClient, id: string): CrmEmailRulePreview {
     return new CrmEmailRulePreview(client, id);
   }
 
   /** @internal Preserve the preview identity and the response already received. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     record: EmailPreviewView,
   ): CrmEmailRulePreview {
     return new CrmEmailRulePreview(
@@ -70,7 +70,7 @@ export class CrmEmailRulePreview {
     const record = unwrap(await this.client.storage.getCrmEmailRulePreview());
     if (!record || record.preview_id !== this.id) {
       if (version === this.readVersion) this.snapshot = undefined;
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         'Email rule preview was replaced or is unavailable.',
       );
     }

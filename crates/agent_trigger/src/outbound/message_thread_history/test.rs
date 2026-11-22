@@ -11,7 +11,7 @@ struct Authorizer {
 impl InvocationAuthorizer for Authorizer {
     async fn capability(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> std::result::Result<EntityAccessReceipt<MessageWrite>, AccessError> {
         if !self.allowed {
@@ -50,8 +50,8 @@ const NAMED: People = People {
     name: Some("Ada Lovelace"),
 };
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("history@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("history@example.com").unwrap()
 }
 fn parent() -> MessageParent {
     MessageParent::parse("document", "origin").unwrap()

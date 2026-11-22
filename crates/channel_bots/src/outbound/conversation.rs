@@ -5,7 +5,7 @@ use entity_access::domain::{
     models::{BotAccessScope, EntityAccessReceipt},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     events::MessagePostedMetadata,
     models::MessageParent,
@@ -21,7 +21,7 @@ pub struct EntityAccessConversation<A>(pub Arc<A>);
 impl<A: EntityAccessService> ConversationAccess for EntityAccessConversation<A> {
     async fn user_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>, rootcause::Report> {
         Ok(self
@@ -37,7 +37,7 @@ impl<A: EntityAccessService> ConversationAccess for EntityAccessConversation<A> 
 
     async fn bot_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>, rootcause::Report> {
         Ok(self

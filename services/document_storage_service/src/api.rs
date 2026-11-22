@@ -7,8 +7,8 @@ use axum::http::Method;
 use axum::middleware::Next;
 use axum::response::IntoResponse as _;
 use github::inbound::github_sync_router::GithubSyncRouterState;
-use macro_axum_utils::compose_layers;
-use macro_tower_layers::MacroRequestIdAndTracingLayer;
+use rox_axum_utils::compose_layers;
+use rox_tower_layers::RoxRequestIdAndTracingLayer;
 use model::version::{ServiceNameState, VersionedApiServiceName, validate_api_version};
 use search_service::SearchHandlerState;
 use std::time::Duration;
@@ -48,7 +48,14 @@ mod threads;
 
 // Constants
 // auth based constants
-pub const MACRO_INTERNAL_USER_ID: &str = "macro|INTERNAL@rox.one";
+pub const MACRO_INTERNAL_USER_ID: &str = "rox|INTERNAL@rox.one";
+
+/// True for the internal service account id under either supported prefix.
+pub(crate) fn is_internal_user_id(user_id: &str) -> bool {
+    user_id.is_empty()
+        || rox_user_id::user_id::strip_user_id_prefix(user_id)
+            .eq_ignore_ascii_case("INTERNAL@rox.one")
+}
 
 pub(crate) async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
     let sync_sessions = state.sync_sessions.clone();
@@ -63,7 +70,7 @@ pub(crate) async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
         ))
         .layer(
             ServiceBuilder::new()
-                .layer(MacroRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
+                .layer(RoxRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
                 .layer(axum::middleware::from_fn_with_state(
                     ServiceNameState {
                         service_name: VersionedApiServiceName::DocumentStorageService,
@@ -71,19 +78,30 @@ pub(crate) async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
                     validate_api_version,
                 ))
                 .layer(
-                    macro_cors::cors_layer_with_headers(vec![
+                    rox_cors::cors_layer_with_headers(vec![
                         // The vault's CSRF marker under its current name and
                         // the one clients sent before the rename.
                         axum::http::HeaderName::from_static("x-rox-passwords"),
                         axum::http::HeaderName::from_static("x-macro-passwords"),
+                        // The user API key under its current name and the one
+                        // older SDK builds send.
+                        axum::http::HeaderName::from_static("x-rox-user-api-key"),
+                        axum::http::HeaderName::from_static("x-macro-user-api-key"),
                         axum::http::HeaderName::from_static(middleware::crm_access::REQUEST_HEADER),
                         axum::http::HeaderName::from_static(
+                            middleware::crm_access::LEGACY_REQUEST_HEADER,
+                        ),
+                        axum::http::HeaderName::from_static(
                             complete_graph::MAIL_CACHE_PROFILE_HEADER,
+                        ),
+                        axum::http::HeaderName::from_static(
+                            complete_graph::LEGACY_MAIL_CACHE_PROFILE_HEADER,
                         ),
                     ])
                     .expose_headers([
                         axum::http::header::RETRY_AFTER,
                         axum::http::HeaderName::from_static(middleware::crm_access::HEADER),
+                        axum::http::HeaderName::from_static(middleware::crm_access::LEGACY_HEADER),
                     ]),
                 )
                 .layer(CompressionLayer::new().gzip(true)),
@@ -106,7 +124,7 @@ pub(crate) async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
     let shutdown_sessions = sync_sessions.clone();
     let result = axum::serve(listener, app.into_make_service())
         .with_graceful_shutdown(async move {
-            macro_entrypoint::shutdown_signal().await;
+            rox_entrypoint::shutdown_signal().await;
             shutdown_sessions.cancel();
         })
         .await
@@ -139,7 +157,7 @@ fn refuse_programs<S: Clone + Send + Sync + 'static>(
             let authorization = authorization.clone();
             async move {
                 let (request, program) =
-                    macro_authorization::request_is_program(request, &authorization).await;
+                    rox_authorization::request_is_program(request, &authorization).await;
                 if program {
                     tracing::warn!("refused GraphQL to a program");
                     return (
@@ -164,7 +182,7 @@ fn hide_sign_in_emails_from_programs<S: Clone + Send + Sync + 'static>(
 ) -> Router<S> {
     let authorization = state.authorization_state.clone();
     router.layer(axum::middleware::from_fn(move |request, next| {
-        macro_authorization::rewrite_program_json(
+        rox_authorization::rewrite_program_json(
             authorization.clone(),
             request,
             next,
@@ -227,13 +245,13 @@ fn api_router(state: ApiContext) -> Router {
                     state.documents_state.clone(),
                 ))
                 .layer(ServiceBuilder::new().layer(axum::middleware::from_fn(
-                    macro_middleware::connection_drop_prevention_handler,
+                    rox_middleware::connection_drop_prevention_handler,
                 ))),
         )
         .nest(
             "/history",
             history::router().layer(compose_layers![
-                axum::middleware::from_fn(macro_middleware::connection_drop_prevention_handler),
+                axum::middleware::from_fn(rox_middleware::connection_drop_prevention_handler),
                 CompressionLayer::new(),
             ]),
         )
@@ -242,19 +260,19 @@ fn api_router(state: ApiContext) -> Router {
         .nest(
             "/threads",
             threads::router(state.clone()).layer(axum::middleware::from_fn(
-                macro_middleware::connection_drop_prevention_handler,
+                rox_middleware::connection_drop_prevention_handler,
             )),
         )
         .nest(
             "/user_document_view_location",
             user_document_view_location::router(state.clone()).layer(axum::middleware::from_fn(
-                macro_middleware::connection_drop_prevention_handler,
+                rox_middleware::connection_drop_prevention_handler,
             )),
         )
         .nest(
             "/pins",
             pins::router().layer(axum::middleware::from_fn(
-                macro_middleware::connection_drop_prevention_handler,
+                rox_middleware::connection_drop_prevention_handler,
             )),
         )
         .nest(
@@ -285,7 +303,7 @@ fn api_router(state: ApiContext) -> Router {
         .nest(
             "/annotations",
             annotations::router(state.clone()).layer(axum::middleware::from_fn(
-                macro_middleware::connection_drop_prevention_handler,
+                rox_middleware::connection_drop_prevention_handler,
             )),
         )
         .nest(
@@ -515,7 +533,7 @@ fn api_router(state: ApiContext) -> Router {
                     ),
                 )
                 .layer(ServiceBuilder::new().layer(axum::middleware::from_fn(
-                    macro_middleware::connection_drop_prevention_handler,
+                    rox_middleware::connection_drop_prevention_handler,
                 ))),
         )
         .nest("/recents", recents::router())

@@ -15,4 +15,6 @@ export type CalendarProvider =
 export const CalendarProvider = {
   google: 'google',
   outlook: 'outlook',
+  /** A calendar Rox keeps itself, with no external calendar service behind it. */
+  rox: 'rox',
 } as const;

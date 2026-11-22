@@ -1,6 +1,6 @@
 import { makePersistedState } from '@app/lib/persistence';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { ResultAsync } from 'neverthrow';
 import { createSignal, untrack } from 'solid-js';
 import { z } from 'zod';
@@ -14,7 +14,9 @@ import { formatMessage, lookupMessage, pluralForm } from './dictionary';
 import { browserLanguage, DEFAULT_LANGUAGE, Language } from './languages';
 import en from './locales/en';
 
-const STORAGE_KEY = 'interface-language-v1';
+// v2: everyone starts in Russian once, whatever the browser or an older build
+// saved; a deliberate choice in settings still persists from then on.
+const STORAGE_KEY = 'interface-language-v2';
 
 const storedLanguageSchema = z.enum(Language);
 
@@ -51,8 +53,8 @@ const TRANSLATIONS: Record<
 const browserLocale = navigator.language || DEFAULT_LANGUAGE;
 
 /**
- * The browser's preferred language when the interface is offered in it. The
- * interface starts in it until the person or their team picks one.
+ * Always unset. The interface does not copy the browser, so it starts in
+ * Russian until the person picks another language in this app.
  */
 export const browserInterfaceLanguage = browserLanguage(
   navigator.languages?.length ? navigator.languages : [browserLocale]
@@ -61,7 +63,7 @@ export const browserInterfaceLanguage = browserLanguage(
 // Remembered on the device so the next launch starts in the same language
 // before the account's setting has loaded.
 const [language, setLanguage] = makePersistedState(
-  createSignal<Language>(browserInterfaceLanguage ?? DEFAULT_LANGUAGE),
+  createSignal<Language>(DEFAULT_LANGUAGE),
   {
     storages: {
       restore: () => {

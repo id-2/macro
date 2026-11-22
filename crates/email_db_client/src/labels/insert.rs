@@ -185,7 +185,7 @@ pub async fn insert_label(
     mut service_label: service::label::Label,
 ) -> anyhow::Result<service::label::Label> {
     if service_label.id.is_none() {
-        service_label.id = Some(macro_uuid::generate_uuid_v7());
+        service_label.id = Some(rox_uuid::generate_uuid_v7());
     }
 
     // Convert to DB model

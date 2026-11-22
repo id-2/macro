@@ -6,51 +6,40 @@ import {
   readRedirectParam,
 } from './post-auth-target';
 
-const newUser = {
-  tutorialComplete: false,
-  isAgent: false,
-  onboardsOnThisDevice: true,
-};
+const newUser = { tutorialComplete: false, isAgent: false };
 const returningUser = { ...newUser, tutorialComplete: true };
 
 describe('postAuthTarget', () => {
-  it('sends a new invitee to the team invite before onboarding', () => {
+  it('sends a new invitee to the team invite', () => {
     expect(
       postAuthTarget({ ...newUser, redirect: '/team-invite?id=abc' })
     ).toEqual({ t: 'navigate', to: '/team-invite?id=abc' });
   });
 
-  it('sends a new invitee to a channel invite before onboarding', () => {
+  it.each([newUser, returningUser])(
+    'enters the app with no deep link, whatever the tutorial flag says',
+    (user) => {
+      expect(postAuthTarget({ ...user, redirect: undefined })).toEqual({
+        t: 'navigate',
+        to: '/',
+      });
+    }
+  );
+
+  it.each([newUser, returningUser])(
+    'returns to the deep link for %o',
+    (user) => {
+      expect(postAuthTarget({ ...user, redirect: '/meet/new' })).toEqual({
+        t: 'navigate',
+        to: '/meet/new',
+      });
+    }
+  );
+
+  it('keeps a path that only looks like an invite', () => {
     expect(
-      postAuthTarget({ ...newUser, redirect: '/channel-invite?id=abc' })
-    ).toEqual({ t: 'navigate', to: '/channel-invite?id=abc' });
-  });
-
-  it('carries any other deep link through onboarding as next', () => {
-    expect(postAuthTarget({ ...newUser, redirect: '/meet/new' })).toEqual({
-      t: 'onboarding',
-      next: '/meet/new',
-    });
-  });
-
-  it('onboards without a deep link', () => {
-    expect(postAuthTarget({ ...newUser, redirect: undefined })).toEqual({
-      t: 'onboarding',
-      next: undefined,
-    });
-  });
-
-  it('returns an onboarded user to the deep link', () => {
-    expect(
-      postAuthTarget({ ...returningUser, redirect: '/team-invite?id=abc' })
-    ).toEqual({ t: 'navigate', to: '/team-invite?id=abc' });
-  });
-
-  it('lands an onboarded user on Home without a deep link', () => {
-    expect(postAuthTarget({ ...returningUser, redirect: undefined })).toEqual({
-      t: 'navigate',
-      to: '/',
-    });
+      postAuthTarget({ ...newUser, redirect: '/team-invites-archive' })
+    ).toEqual({ t: 'navigate', to: '/team-invites-archive' });
   });
 
   it.each<[unknown]>([
@@ -66,22 +55,6 @@ describe('postAuthTarget', () => {
     });
   });
 
-  it('does not treat a lookalike path as an invite', () => {
-    expect(
-      postAuthTarget({ ...newUser, redirect: '/team-invites-archive' })
-    ).toEqual({ t: 'onboarding', next: '/team-invites-archive' });
-  });
-
-  it('skips desktop onboarding on mobile and honors the deep link', () => {
-    expect(
-      postAuthTarget({
-        ...newUser,
-        onboardsOnThisDevice: false,
-        redirect: '/meet/new',
-      })
-    ).toEqual({ t: 'navigate', to: '/meet/new' });
-  });
-
   it('sends an agent that has not finished setup to agent setup', () => {
     expect(
       postAuthTarget({
@@ -90,6 +63,17 @@ describe('postAuthTarget', () => {
         redirect: '/team-invite?id=abc',
       })
     ).toEqual({ t: 'navigate', to: AGENT_SETUP_PATH });
+  });
+
+  it('does not divert an agent that already has its token', () => {
+    expect(
+      postAuthTarget({
+        ...newUser,
+        tutorialComplete: true,
+        isAgent: true,
+        redirect: undefined,
+      })
+    ).toEqual({ t: 'navigate', to: '/' });
   });
 });
 
@@ -106,8 +90,8 @@ describe('desktopAuthCallbackUrl', () => {
     'carries a redirect through the auth service (double decode: %o)',
     (doubleDecode) => {
       const redirect = '/team-invite?id=abc&source=email';
-      const callback = desktopAuthCallbackUrl('macro:///login', redirect);
-      expect(callback.startsWith('macro:///login?redirect=')).toBe(true);
+      const callback = desktopAuthCallbackUrl('rox:///login', redirect);
+      expect(callback.startsWith('rox:///login?redirect=')).toBe(true);
       expect(redirectAfterAuthService(callback, doubleDecode)).toBe(redirect);
     }
   );
@@ -115,8 +99,8 @@ describe('desktopAuthCallbackUrl', () => {
   it.each<[unknown]>([[null], ['https://evil.example'], ['//evil.example']])(
     'leaves the callback alone for %o',
     (redirect) => {
-      expect(desktopAuthCallbackUrl('macro:///login', redirect)).toBe(
-        'macro:///login'
+      expect(desktopAuthCallbackUrl('rox:///login', redirect)).toBe(
+        'rox:///login'
       );
     }
   );

@@ -1,11 +1,11 @@
 use super::*;
 use crate::domain::channel_agents::{ChannelAgent, ChannelAgentKind, ChannelAgentRepo};
 use crate::domain::ports::ChannelRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|agent-dm@example.com".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|agent-dm@example.com".to_owned()).unwrap()
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
@@ -31,7 +31,7 @@ async fn other_people_and_bots_cannot_be_added_to_a_persona_dm(pool: PgPool) {
     }
     assert_eq!(repo.for_user(user()).await.unwrap(), vec![dm]);
     assert!(
-        repo.for_user(MacroUserIdStr::try_from_email("teammate@example.com").unwrap())
+        repo.for_user(RoxUserIdStr::try_from_email("teammate@example.com").unwrap())
             .await
             .unwrap()
             .is_empty()
@@ -89,7 +89,7 @@ async fn concurrent_opens_create_one_channel_and_two_memberships(pool: PgPool) {
 async fn conversations_are_isolated_by_both_user_and_persona(pool: PgPool) {
     let repo = PgChannelsRepo::new(pool);
     let first = repo.ensure(user(), bot_id::MACRO_NEW_BOT_ID).await.unwrap();
-    let other_user = MacroUserIdStr::try_from("macro|someone-else@example.com".to_owned()).unwrap();
+    let other_user = RoxUserIdStr::try_from("macro|someone-else@example.com".to_owned()).unwrap();
     let second = repo
         .ensure(other_user, bot_id::MACRO_NEW_BOT_ID)
         .await
@@ -166,7 +166,7 @@ async fn only_a_persona_dm_is_a_direct_agent_conversation(pool: PgPool) {
     );
     assert!(
         !repo
-            .is_direct_agent_conversation(macro_uuid::generate_uuid_v7())
+            .is_direct_agent_conversation(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
     );

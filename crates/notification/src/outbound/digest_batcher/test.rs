@@ -41,12 +41,12 @@ async fn cleanup_prefix(conn: &mut MultiplexedConnection, prefix: &str) {
     }
 }
 
-fn test_user(suffix: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|test_{}@example.com", suffix)).unwrap()
+fn test_user(suffix: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|test_{}@example.com", suffix)).unwrap()
 }
 
 fn create_test_notification(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     message: &str,
 ) -> UserNotificationRow<serde_json::Value> {
     let notification = TestNotification {
@@ -73,7 +73,7 @@ fn create_test_notification(
 /// Creates a notification with raw metadata (no TaggedContent wrapper),
 /// matching how production code stores via `inner_store_batch` and `mark_message_as_failed`.
 fn create_raw_test_notification(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     message: &str,
 ) -> UserNotificationRow<serde_json::Value> {
     let notification = TestNotification {

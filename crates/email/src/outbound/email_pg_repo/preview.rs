@@ -6,7 +6,7 @@ use doppleganger::{Doppleganger, Mirror};
 use either::Either;
 use filter_ast::Expr;
 use item_filters::ast::email::EmailLiteral;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use std::sync::Arc;
 use uuid::Uuid;
@@ -17,7 +17,7 @@ use super::db_types::{AttachmentDbRow, LabelDbRow, ThreadPreviewCursorDbRow};
 pub(super) async fn previews_for_view_cursor(
     pool: &PgPool,
     query: PreviewCursorQuery,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 ) -> Result<Vec<EmailThreadPreview>, sqlx::Error> {
     let PreviewCursorQuery {
         view,

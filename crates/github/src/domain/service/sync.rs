@@ -17,7 +17,7 @@ use crate::domain::{
         GithubInstallationAccessToken, GithubInstallationSetupAction, GithubKey,
         GithubPullRequestDetails, GithubPullRequestLabel, GithubPullRequestReview,
         GithubPullRequestReviewState, GithubPullRequestStatus, GithubPullRequestUser,
-        GithubWebhookEventType, GithubWebhookReceived, InstallationState, MacroTaskId,
+        GithubWebhookEventType, GithubWebhookReceived, InstallationState, RoxTaskId,
         ResolvedTeamTaskReference, TeamTaskReference, ValidatedGithubWebhookEvent, latest_reviews,
         sign_installation_state, verify_installation_state,
     },
@@ -33,7 +33,7 @@ use github_pull_requests::domain::{
     models::UpsertGithubPullRequest, ports::GithubPullRequestService,
 };
 use hmac::{Hmac, Mac};
-use macro_env_var::maybe_env_vars;
+use rox_env_var::maybe_env_vars;
 use notification::domain::service::NotificationIngress;
 use sha2::Sha256;
 use std::{
@@ -155,7 +155,7 @@ struct ResolvedTasks {
     /// Markdown links for resolved tasks (used for PR comments).
     task_links: Vec<String>,
     /// Task IDs that were validated as actual task documents.
-    validated_task_ids: Vec<MacroTaskId>,
+    validated_task_ids: Vec<RoxTaskId>,
 }
 
 /// Result of creating or refreshing one source-scoped PR foreign entity row.
@@ -669,8 +669,8 @@ impl<
         &self,
         event: &ValidatedGithubWebhookEvent,
         text: &str,
-    ) -> Vec<MacroTaskId> {
-        let mut task_ids = MacroTaskId::extract_from_text(text);
+    ) -> Vec<RoxTaskId> {
+        let mut task_ids = RoxTaskId::extract_from_text(text);
         let legacy_task_id_count = task_ids.len();
         let team_task_refs = TeamTaskReference::extract_from_text(text);
 
@@ -753,7 +753,7 @@ impl<
     /// Resolve task IDs to documents, returning doc IDs and markdown links
     /// for all tasks that are actually task-type documents.
     #[tracing::instrument(skip(self, task_ids))]
-    async fn resolve_tasks(&self, task_ids: &[MacroTaskId]) -> ResolvedTasks {
+    async fn resolve_tasks(&self, task_ids: &[RoxTaskId]) -> ResolvedTasks {
         tracing::trace!(
             task_id_count = task_ids.len(),
             "resolving task IDs to documents"
@@ -1049,7 +1049,7 @@ impl<
     #[tracing::instrument(skip(self), fields(macro_user_id = %macro_user_id), err)]
     async fn begin_installation_setup(
         &self,
-        macro_user_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_user_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
         team_id: Option<uuid::Uuid>,
     ) -> Result<String, GithubError> {
         if let Some(team_id) = team_id {
@@ -1064,7 +1064,7 @@ impl<
         }
 
         let state = InstallationState {
-            macro_user_id: macro_user_id::user_id::MacroUserIdStr::try_from(
+            macro_user_id: rox_user_id::user_id::RoxUserIdStr::try_from(
                 macro_user_id.as_ref().to_string(),
             )
             .map_err(|error| GithubError::Internal(error.into()))?,
@@ -1201,7 +1201,7 @@ impl<
     }
 }
 
-fn dedupe_task_ids(task_ids: Vec<MacroTaskId>) -> Vec<MacroTaskId> {
+fn dedupe_task_ids(task_ids: Vec<RoxTaskId>) -> Vec<RoxTaskId> {
     let mut seen = HashSet::new();
     let mut deduped = Vec::new();
 
@@ -1216,10 +1216,10 @@ fn dedupe_task_ids(task_ids: Vec<MacroTaskId>) -> Vec<MacroTaskId> {
 
 /// Creates a macro task comment given the document name and id
 fn create_macro_task_comment_link(name: &str, id: &str) -> String {
-    let url = match macro_env::Environment::new_or_prod() {
-        macro_env::Environment::Production => "https://rox.one/app/task",
-        macro_env::Environment::Develop => "https://dev.rox.one/app/task",
-        macro_env::Environment::Local => {
+    let url = match rox_env::Environment::new_or_prod() {
+        rox_env::Environment::Production => "https://rox.one/app/task",
+        rox_env::Environment::Develop => "https://dev.rox.one/app/task",
+        rox_env::Environment::Local => {
             let port = FrontendPort::new()
                 .map(|port| port.to_string())
                 .unwrap_or_else(|| "3000".to_string());

@@ -4,7 +4,7 @@ import { useUserId } from '@core/context/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { thrownResultErrorHasCode } from '@core/util/result';
 import type { ChannelEntity } from '@entity';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { markChannelsAsRead } from '@notifications/notification-helpers';
 import {
   useCreateChannelLabelMutation,

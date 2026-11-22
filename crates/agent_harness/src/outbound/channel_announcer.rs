@@ -31,7 +31,7 @@ use lexical_client::parse_markdown::{
     AgentChatReply, AgentChatReplyBody, AgentConnectionChip, AgentConnectionPrompt,
     AgentReplySegment,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MessageCommands,
     models::{
@@ -329,7 +329,7 @@ impl<Access: EntityAccessService> MessageAnnouncer<Access> {
     async fn bot_write(
         &self,
         bot_id: BotId,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>> {
         self.access

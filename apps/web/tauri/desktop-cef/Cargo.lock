@@ -285,7 +285,7 @@ dependencies = [
  "libc",
  "log",
  "logger",
- "macro_bundle_updater_plugin",
+ "rox_bundle_updater_plugin",
  "mime_guess",
  "navigation_plugin",
  "nom 8.0.0",
@@ -1036,7 +1036,7 @@ dependencies = [
  "chrono",
  "database_sql",
  "lru",
- "macro_user_id",
+ "rox_user_id",
  "maybe_send",
  "miniz_oxide 0.8.9",
  "postcard",
@@ -3442,7 +3442,7 @@ dependencies = [
  "document_sub_type",
  "filter_ast",
  "item_filters",
- "macro_user_id",
+ "rox_user_id",
  "model_file_type",
  "model_owner",
  "notification_state",
@@ -4221,7 +4221,7 @@ dependencies = [
  "document_sub_type",
  "either",
  "filter_ast",
- "macro_user_id",
+ "rox_user_id",
  "model_file_type",
  "model_owner",
  "nom 8.0.0",
@@ -4739,7 +4739,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "macro-desktop-cef"
+name = "rox-desktop-cef"
 version = "0.1.0"
 dependencies = [
  "app",
@@ -4749,7 +4749,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "macro_bundle_updater_plugin"
+name = "rox_bundle_updater_plugin"
 version = "0.1.0"
 dependencies = [
  "digest 0.10.7",
@@ -4776,7 +4776,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "macro_user_id"
+name = "rox_user_id"
 version = "0.1.0"
 dependencies = [
  "cowlike",
@@ -4789,7 +4789,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "macro_uuid"
+name = "rox_uuid"
 version = "0.1.0"
 dependencies = [
  "anyhow",
@@ -4968,7 +4968,7 @@ name = "model_owner"
 version = "0.1.0"
 dependencies = [
  "bot_id",
- "macro_user_id",
+ "rox_user_id",
  "serde",
  "thiserror 2.0.21",
  "uuid",
@@ -4980,8 +4980,8 @@ version = "0.1.0"
 dependencies = [
  "chrono",
  "fractional_index",
- "macro_user_id",
- "macro_uuid",
+ "rox_user_id",
+ "rox_uuid",
  "nom 8.0.0",
  "serde",
  "specta",

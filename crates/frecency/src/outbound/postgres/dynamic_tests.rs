@@ -9,8 +9,8 @@ use item_filters::{
     ChatFilters, DocumentFilters, EntityFilters, NotificationFilters, ProjectFilters, TaskFilters,
     ast::EntityFilterAst,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use std::collections::VecDeque;
 use std::sync::Arc;
@@ -28,7 +28,7 @@ async fn pull_request_filters_fail_explicitly_before_database_access() {
     };
     let result = storage
         .get_top_entities(FrecencyPageRequest {
-            user_id: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+            user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
             from_score: None,
             limit: 10,
             filters: Some(filter),
@@ -45,7 +45,7 @@ async fn date_literals_match_nothing_and_preserve_negation(pool: PgPool) {
     use item_filters::ast::properties::{DateRange, PropertiesLiteral, PropertyMatchValue};
 
     let storage = FrecencyPgStorage::new(pool.clone());
-    let user = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
     let id = Uuid::from_u128(1);
     storage
         .set_aggregate(AggregateFrecency {
@@ -96,7 +96,7 @@ async fn date_literals_match_nothing_and_preserve_negation(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_by_document_ids(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Create test UUIDs
     let doc_id_1 = Uuid::new_v4();
@@ -158,7 +158,7 @@ async fn test_dynamic_filter_by_document_ids(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_by_chat_ids(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     let chat_id_1 = Uuid::new_v4();
     let chat_id_2 = Uuid::new_v4();
@@ -217,7 +217,7 @@ async fn test_dynamic_filter_by_chat_ids(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_by_project_ids(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     let parent_project_id = Uuid::new_v4();
     let child_project_id = Uuid::new_v4();
@@ -315,7 +315,7 @@ async fn test_dynamic_filter_by_project_ids(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_by_project_ids_include_root(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     let parent_project_id = Uuid::new_v4();
     let child_project_id = Uuid::new_v4();
@@ -414,7 +414,7 @@ async fn test_dynamic_filter_by_project_ids_include_root(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_multiple_document_ids(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     let doc_id_1 = Uuid::new_v4();
     let doc_id_2 = Uuid::new_v4();
@@ -474,7 +474,7 @@ async fn test_dynamic_filter_multiple_document_ids(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_mixed_entity_types(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     let doc_id_1 = Uuid::new_v4();
     let chat_id_1 = Uuid::new_v4();
@@ -542,7 +542,7 @@ async fn test_dynamic_filter_mixed_entity_types(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_with_from_score_pagination(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     let doc_id_1 = Uuid::new_v4();
     let doc_id_2 = Uuid::new_v4();
@@ -613,7 +613,7 @@ async fn test_dynamic_filter_with_from_score_pagination(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_no_matches(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     let doc_id_1 = Uuid::new_v4();
     let non_existent_id = Uuid::new_v4();
@@ -661,7 +661,7 @@ async fn test_dynamic_filter_no_matches(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_document_notification_done(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     let doc_id_1 = Uuid::new_v4();
     let doc_id_2 = Uuid::new_v4();
@@ -761,7 +761,7 @@ async fn test_dynamic_filter_document_notification_done(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_document_task_include_cbm_atm_nc(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let test_user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Ensure owner row exists for foreign keys from Document.owner.
     let macro_user_uuid = Uuid::new_v4();
@@ -916,7 +916,7 @@ async fn test_dynamic_filter_document_task_include_cbm_atm_nc(pool: PgPool) {
     assert_eq!(results[0].id.entity.entity_id, matching_task_id.to_string());
 }
 
-async fn setup_date_filter_user(pool: &PgPool, user_id: &MacroUserIdStr<'_>) {
+async fn setup_date_filter_user(pool: &PgPool, user_id: &RoxUserIdStr<'_>) {
     let macro_user_uuid = Uuid::new_v4();
     sqlx::query(
         r#"
@@ -972,7 +972,7 @@ async fn insert_doc_with_timestamps(
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_document_date_created_at_gt(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
     setup_date_filter_user(&pool, &user_id).await;
 
     let doc_early = Uuid::new_v4();
@@ -1074,7 +1074,7 @@ async fn test_dynamic_filter_document_date_created_at_gt(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_document_date_created_at_lt(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
     setup_date_filter_user(&pool, &user_id).await;
 
     let doc_early = Uuid::new_v4();
@@ -1171,7 +1171,7 @@ async fn test_dynamic_filter_document_date_created_at_lt(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_document_date_updated_at_gt(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
     setup_date_filter_user(&pool, &user_id).await;
 
     let doc_early = Uuid::new_v4();
@@ -1274,7 +1274,7 @@ async fn test_dynamic_filter_document_date_updated_at_gt(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_dynamic_filter_document_date_updated_at_lt(pool: PgPool) {
     let storage = FrecencyPgStorage::new(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
     setup_date_filter_user(&pool, &user_id).await;
 
     let doc_early = Uuid::new_v4();
@@ -1377,7 +1377,7 @@ async fn test_dynamic_filter_document_crm_literals(pool: PgPool) {
     };
 
     let storage = FrecencyPgStorage::new(pool.clone());
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
     let associated = Uuid::new_v4();
     let attachment = Uuid::new_v4();
     let unrelated = Uuid::new_v4();

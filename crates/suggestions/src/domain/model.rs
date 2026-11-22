@@ -2,7 +2,7 @@
 //! generation sessions.
 
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -213,7 +213,7 @@ pub struct StoredRun {
     /// The suggestion it runs.
     pub suggestion: Uuid,
     /// Whose.
-    pub user: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub user: rox_user_id::user_id::RoxUserIdStr<'static>,
     /// The agent it runs as.
     pub agent: Uuid,
     /// Its first prompt's action.
@@ -825,7 +825,7 @@ pub struct GenerationSession {
     /// The generation it is part of.
     pub generation: Uuid,
     /// Whose it is.
-    pub user: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub user: rox_user_id::user_id::RoxUserIdStr<'static>,
     /// What it may write.
     pub kind: SessionKind,
     /// The surfaces a routines session suggests for, by wire name; empty
@@ -913,7 +913,7 @@ pub struct OpenTarget {
     /// The suggestion.
     pub suggestion: Uuid,
     /// Whose it is.
-    pub user: macro_user_id::user_id::MacroUserIdStr<'static>,
+    pub user: rox_user_id::user_id::RoxUserIdStr<'static>,
     /// When it was first proposed.
     pub created_at: DateTime<Utc>,
     /// Whether it is an entity suggestion asking for a reply.

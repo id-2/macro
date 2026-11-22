@@ -5,7 +5,7 @@ import type {
   AgentSessionResponse,
   ExecutionRecord,
 } from '../generated/agent-harness/types.gen';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 const sessionId = '0198a4cc-e138-7670-a308-a6b766602700';
@@ -168,7 +168,7 @@ describe('AgentSession', () => {
           .status(),
     ]) {
       await expect(read()).rejects.toMatchObject({
-        name: 'MacroForbiddenError',
+        name: 'RoxForbiddenError',
         status: 403,
         data: { message: 'Forbidden' },
       });
@@ -503,7 +503,7 @@ describe('AgentSession', () => {
         repoUrl: 'https://github.com/macro-inc/macro',
       }),
     ).rejects.toMatchObject({
-      name: 'MacroApiError',
+      name: 'RoxApiError',
       status: 422,
       message:
         'Rox API error 422: repoUrl needs a Cursor coding agent; choose a Cursor agent persona or omit repoUrl',

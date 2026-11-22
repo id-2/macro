@@ -13,7 +13,7 @@ use axum::{
     response::IntoResponse,
 };
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::document::response::DocumentResponseMetadata;
 use model::{
     document::{DocumentBasic, FileType, FileTypeExt},
@@ -55,7 +55,7 @@ pub struct Params {
 pub async fn handler(
     _access: DocumentAccessExtractor<EditAccessLevel, EntityAccessService, AuthorizationService>,
     State(state): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     document_context: Extension<DocumentBasic>,
     Path(Params { document_id }): Path<Params>,
     mut multipart: Multipart,
@@ -101,7 +101,7 @@ pub async fn handler(
         }
     };
 
-    let document = match macro_db_client::document::save_document(
+    let document = match rox_db_client::document::save_document(
         &state.db,
         &document_id,
         file_type,

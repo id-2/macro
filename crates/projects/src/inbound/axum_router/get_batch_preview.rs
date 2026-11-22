@@ -2,8 +2,8 @@
 
 use axum::{Json, extract::State};
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    MacroAuthorizationService, OptionalMacroAuthorizationExtractor, UserOrInternalService,
+use rox_authorization::{
+    RoxAuthorizationService, OptionalRoxAuthorizationExtractor, UserOrInternalService,
 };
 use model::project::{
     request::GetBatchProjectPreviewRequest, response::GetBatchProjectPreviewResponse,
@@ -31,13 +31,13 @@ use crate::domain::{models::ProjectError, ports::ProjectService};
 )]
 pub async fn get_batch_preview_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: OptionalMacroAuthorizationExtractor<Auth, UserOrInternalService>,
+    user: OptionalRoxAuthorizationExtractor<Auth, UserOrInternalService>,
     Json(request): Json<GetBatchProjectPreviewRequest>,
 ) -> Result<Json<GetBatchProjectPreviewResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     if let Some(actor) = user.acting_entity() {
         tracing::Span::current().record("actor", tracing::field::display(actor));

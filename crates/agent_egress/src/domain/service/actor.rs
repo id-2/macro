@@ -8,7 +8,7 @@ use crate::domain::model::{
 };
 use agent_session::domain::model::TurnPrompter;
 use ai_toolset::actor::{ToolActor, add_actor_schema};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use tracing::Instrument as _;
 
@@ -112,7 +112,7 @@ where
     async fn resolve_upstream(
         &self,
         grant: &SessionGrant,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         destination: &McpDestination,
         listing: bool,
     ) -> Result<Result<UpstreamCall, String>, EgressError> {
@@ -165,7 +165,7 @@ where
     async fn exchange_as(
         &self,
         grant: &SessionGrant,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         destination: &McpDestination,
         request: Value,
     ) -> Result<Value, EgressError> {
@@ -233,7 +233,7 @@ where
     async fn hold_owner_call(
         &self,
         grant: &SessionGrant,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         destination: &McpDestination,
         request: &Value,
     ) -> Result<Option<String>, EgressError> {
@@ -288,7 +288,7 @@ const RATE_LIMITED: &str = "The app is rate limiting the selected account; this 
 async fn traced_exchange(
     transport: &dyn crate::domain::ports::ActorMcpTransport,
     session: crate::domain::model::AgentSessionId,
-    actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+    actor: rox_user_id::user_id::RoxUserIdStr<'static>,
     upstream: UpstreamCall,
     destination: &McpDestination,
     request: Value,
@@ -371,7 +371,7 @@ const UNKNOWN_OUTCOME: &str = "The selected account's tool could not complete. I
 async fn exchange_result(
     transport: &dyn crate::domain::ports::ActorMcpTransport,
     session: crate::domain::model::AgentSessionId,
-    actor: macro_user_id::user_id::MacroUserIdStr<'static>,
+    actor: rox_user_id::user_id::RoxUserIdStr<'static>,
     upstream: UpstreamCall,
     destination: &McpDestination,
     request: Value,

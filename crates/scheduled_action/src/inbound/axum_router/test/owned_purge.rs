@@ -28,7 +28,7 @@ async fn purge_internally(app: &Router, uri: &str) -> StatusCode {
     purge(
         app,
         uri,
-        &[(macro_authorization::INTERNAL_API_KEY_HEADER, INTERNAL_KEY)],
+        &[(rox_authorization::INTERNAL_API_KEY_HEADER, INTERNAL_KEY)],
     )
     .await
 }
@@ -88,7 +88,7 @@ async fn only_the_internal_key_may_purge() {
         vec![],
         vec![("authorization", "Bearer owner")],
         vec![(BOT_TOKEN_HEADER, BOT_TOKEN), (BOT_SCOPE_HEADER, "team")],
-        vec![(macro_authorization::INTERNAL_API_KEY_HEADER, "bad-key")],
+        vec![(rox_authorization::INTERNAL_API_KEY_HEADER, "bad-key")],
     ] {
         let status = purge(&app, &uri, &headers).await;
         assert!(status.is_client_error(), "{headers:?} answered {status}");

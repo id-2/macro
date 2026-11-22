@@ -10,8 +10,8 @@ use axum::{
     routing::get,
 };
 use chrono::{DateTime, Utc};
-use macro_authorization::{
-    ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
@@ -22,7 +22,7 @@ use crate::domain::{ports::ActivityReads, service::ActivityReadService};
 /// Router state: the activity read service and caller authentication.
 pub struct ActivityRouterState<R: ActivityReads, Auth> {
     service: Arc<ActivityReadService<R>>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<R: ActivityReads, Auth> Clone for ActivityRouterState<R, Auth> {
@@ -38,7 +38,7 @@ impl<R: ActivityReads, Auth> ActivityRouterState<R, Auth> {
     /// Compose the read service with the host's authorization.
     pub fn new(
         service: Arc<ActivityReadService<R>>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -48,7 +48,7 @@ impl<R: ActivityReads, Auth> ActivityRouterState<R, Auth> {
 }
 
 impl<R: ActivityReads, Auth> FromRef<ActivityRouterState<R, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &ActivityRouterState<R, Auth>) -> Self {
         state.authorization.clone()
@@ -59,7 +59,7 @@ impl<R: ActivityReads, Auth> FromRef<ActivityRouterState<R, Auth>>
 pub fn activity_router<R, Auth, S>(state: ActivityRouterState<R, Auth>) -> Router<S>
 where
     R: ActivityReads + Send + Sync + 'static,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + Clone + 'static,
 {
     Router::new()
@@ -103,12 +103,12 @@ pub struct ActivityErrorBody {
 #[tracing::instrument(skip_all, fields(actor = %user.acting_entity(), from = %range.from, to = %range.to))]
 pub async fn read_activity_handler<R, Auth>(
     State(state): State<ActivityRouterState<R, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, ActingUser>,
+    user: RoxAuthorizationExtractor<Auth, ActingUser>,
     Query(range): Query<ActivityRangeParams>,
 ) -> Response
 where
     R: ActivityReads,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let subject = &user.authorization.user.macro_user_id;
 

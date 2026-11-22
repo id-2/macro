@@ -1,13 +1,13 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { type ProfilePicture, toProfilePicture } from './profile-picture';
 import { User } from './user';
 
 /**
- * @routing Use when looking up people or their profiles; not team membership, or changing the user's own profile (`macro.me`).
+ * @routing Use when looking up people or their profiles; not team membership, or changing the user's own profile (`rox.me`).
  */
 export class UserNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** A handle to a user by id. */
   byId(id: string): User {
@@ -28,7 +28,7 @@ export class UserNamespace {
    * a picture are absent from the map.
    *
    * @example
-   * const pictures = await macro.users.profilePictures(teammates);
+   * const pictures = await rox.users.profilePictures(teammates);
    * const mine = pictures.get(teammates[0]);
    *
    * @readonly

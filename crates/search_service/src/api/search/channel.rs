@@ -15,8 +15,8 @@ use axum::{
     routing::post,
 };
 use channels::domain::models::ChannelHistoryInfo;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::user_id::MacroUserId;
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::user_id::RoxUserId;
 use models_search::MatchType;
 use models_search::channel::{
     ChannelMessageSearchResponseItem, ChannelNameSearchRequest, ChannelNameSearchResponse,
@@ -316,7 +316,7 @@ pub fn router() -> Router<SearchHandlerState> {
 /// Internal viewer-aware channel name search used by AI NameSearch.
 pub async fn name_handler(
     State(ctx): State<SearchHandlerState>,
-    authorization: MacroAuthorizationExtractor<SearchAuthorizationService, InternalOnly>,
+    authorization: RoxAuthorizationExtractor<SearchAuthorizationService, InternalOnly>,
     extract::Query(query_params): extract::Query<SearchPaginationParams>,
     extract::Json(req): extract::Json<ChannelNameSearchRequest>,
 ) -> Result<Json<ChannelNameSearchResponse>, SearchError> {
@@ -334,7 +334,7 @@ pub async fn name_handler(
         return Err(SearchError::InvalidPageSize);
     }
 
-    let user_id = MacroUserId::parse_from_str(&user_context.user_id)
+    let user_id = RoxUserId::parse_from_str(&user_context.user_id)
         .map_err(|_| SearchError::InvalidUserId(user_context.user_id.clone()))?
         .lowercase();
     let filters = item_filters::ChannelFilters::default();
@@ -393,7 +393,7 @@ pub async fn name_handler(
 )]
 pub async fn handler(
     State(ctx): State<SearchHandlerState>,
-    authorization: MacroAuthorizationExtractor<SearchAuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<SearchAuthorizationService, UserOrInternal>,
     extract::Query(query_params): extract::Query<SearchPaginationParams>,
     extract::Json(req): extract::Json<ChannelSearchRequest>,
 ) -> Result<Json<ChannelSearchResponse>, SearchError> {
@@ -406,7 +406,7 @@ pub async fn handler(
     if user_id.is_empty() {
         return Err(SearchError::NoUserId);
     }
-    let user_id = MacroUserId::parse_from_str(&user_id)
+    let user_id = RoxUserId::parse_from_str(&user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?
         .lowercase();
 

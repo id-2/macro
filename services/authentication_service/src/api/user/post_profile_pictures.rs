@@ -7,8 +7,8 @@ use axum::{
 
 use crate::api::context::{ApiContext, AuthorizationService};
 
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::user::update_profile_picture::get_profile_pictures;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::user::update_profile_picture::get_profile_pictures;
 use model::response::ErrorResponse;
 use model::user::ProfilePictures;
 use utoipa::ToSchema;
@@ -32,7 +32,7 @@ pub struct GetProfilePicturesRequestBody {
 #[tracing::instrument(skip(ctx, _authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    _authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     extract::Json(req): extract::Json<GetProfilePicturesRequestBody>,
 ) -> Result<Response, Response> {
     let user_id_list = req.user_id_list;

@@ -20,7 +20,7 @@ use channel_sender::ChannelSender;
 use entity_access::domain::models::{
     AdminParticipantRole, EntityAccessReceipt, EntityType, MemberParticipantRole,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{CreatedAt, PaginateOn, Query};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -76,7 +76,7 @@ impl ChannelReferenceSharePermissions for NoopChannelReferenceSharePermissions {
 
     async fn update_channel_share_permissions_for_referenced_items(
         &self,
-        _actor: MacroUserIdStr<'static>,
+        _actor: RoxUserIdStr<'static>,
         _channel_id: Uuid,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<ReferenceShareResult>, Self::Err> {
@@ -154,17 +154,17 @@ impl<R, E, P, F> ChannelServiceImpl<R, E, P, F> {
     }
 }
 
-fn require_user_actor(actor: &Sender) -> Result<MacroUserIdStr<'static>, ChannelMutationErr> {
+fn require_user_actor(actor: &Sender) -> Result<RoxUserIdStr<'static>, ChannelMutationErr> {
     actor
         .as_user()
         .cloned()
         .ok_or_else(|| ChannelMutationErr::BadRequest("authenticated user required".to_string()))
 }
 
-fn participant_ids(participants: &[ChannelParticipant]) -> Vec<MacroUserIdStr<'static>> {
+fn participant_ids(participants: &[ChannelParticipant]) -> Vec<RoxUserIdStr<'static>> {
     participants
         .iter()
-        .filter_map(|p| MacroUserIdStr::try_from(p.user_id.clone()).ok())
+        .filter_map(|p| RoxUserIdStr::try_from(p.user_id.clone()).ok())
         .collect()
 }
 
@@ -190,7 +190,7 @@ where
     #[tracing::instrument(err, skip(self, req))]
     async fn create_system_channel(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         req: crate::domain::models::CreateChannelRequest,
     ) -> Result<crate::domain::models::CreateChannelResponse, ChannelMutationErr> {
         self.create_channel_on_behalf(owner, bot_id::MACRO_SYSTEM_BOT_ID, req)
@@ -200,7 +200,7 @@ where
     #[tracing::instrument(err, skip(self, req))]
     async fn create_channel_on_behalf(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         actor: BotId,
         req: crate::domain::models::CreateChannelRequest,
     ) -> Result<crate::domain::models::CreateChannelResponse, ChannelMutationErr> {
@@ -210,9 +210,9 @@ where
 
     async fn create_owned_channel(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         activity_actor: Sender,
-        on_behalf_of: Option<MacroUserIdStr<'static>>,
+        on_behalf_of: Option<RoxUserIdStr<'static>>,
         req: crate::domain::models::CreateChannelRequest,
     ) -> Result<crate::domain::models::CreateChannelResponse, ChannelMutationErr> {
         if req.auto_join_team && req.channel_type != ChannelType::Team {
@@ -638,7 +638,7 @@ where
             removed_user_ids: req
                 .participants
                 .into_iter()
-                .filter_map(|id| MacroUserIdStr::try_from(id).ok())
+                .filter_map(|id| RoxUserIdStr::try_from(id).ok())
                 .collect(),
         });
         Ok(())
@@ -766,7 +766,7 @@ where
         // toward the minimum-membership guard.
         let user_participant_count = participants
             .iter()
-            .filter(|participant| MacroUserIdStr::try_from(participant.user_id.as_str()).is_ok())
+            .filter(|participant| RoxUserIdStr::try_from(participant.user_id.as_str()).is_ok())
             .count();
         match (info.channel_type, user_participant_count) {
             (ChannelType::Private, 2) | (ChannelType::DirectMessage, _) => {
@@ -800,7 +800,7 @@ where
     async fn ensure_one_dm(
         &self,
         pair: DmPair,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> Result<GetOrCreateChannelResponse, ChannelMutationErr> {
         let participant_user_ids = vec![pair.lo().clone(), pair.hi().clone()];
         let ensured = self
@@ -830,7 +830,7 @@ where
 
     async fn create_channel_record<'a>(
         &self,
-        owner_id: MacroUserIdStr<'a>,
+        owner_id: RoxUserIdStr<'a>,
         org_id: Option<i64>,
         req: crate::domain::models::CreateChannelRequest,
     ) -> Result<crate::domain::models::CreatedChannel, ChannelMutationErr> {
@@ -843,7 +843,7 @@ where
     async fn get_or_create_channel(
         &self,
         existing_channel_id: Option<Uuid>,
-        owner_id: MacroUserIdStr<'static>,
+        owner_id: RoxUserIdStr<'static>,
         org_id: Option<i64>,
         create_req: crate::domain::models::CreateChannelRequest,
     ) -> Result<GetOrCreateChannelResponse, ChannelMutationErr> {
@@ -997,8 +997,8 @@ where
     #[tracing::instrument(err, skip_all, fields(user_count = user_ids.len()))]
     async fn get_user_display_names(
         &self,
-        user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> Result<HashMap<MacroUserIdStr<'static>, String>, ChannelMessagesErr> {
+        user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> Result<HashMap<RoxUserIdStr<'static>, String>, ChannelMessagesErr> {
         let names = self
             .repo
             .get_user_display_names(&user_ids)
@@ -1012,7 +1012,7 @@ where
     async fn get_channel_metadata(
         &self,
         channel_id: Uuid,
-        viewer_user_id: MacroUserIdStr<'static>,
+        viewer_user_id: RoxUserIdStr<'static>,
     ) -> Result<ChannelMetadata, ChannelMessagesErr> {
         let metadata = self
             .repo
@@ -1026,7 +1026,7 @@ where
     #[tracing::instrument(err, skip(self, channel_ids))]
     async fn batch_get_channel_previews(
         &self,
-        viewer_user_id: MacroUserIdStr<'static>,
+        viewer_user_id: RoxUserIdStr<'static>,
         org_id: Option<i64>,
         channel_ids: Vec<String>,
     ) -> Result<Vec<ChannelPreview>, ChannelMessagesErr> {
@@ -1187,7 +1187,7 @@ where
 
     async fn create_system_channel(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         req: crate::domain::models::CreateChannelRequest,
     ) -> Result<crate::domain::models::CreateChannelResponse, ChannelMutationErr> {
         ChannelServiceImpl::create_system_channel(self, owner, req).await
@@ -1195,7 +1195,7 @@ where
 
     async fn create_channel_on_behalf(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         actor: BotId,
         req: crate::domain::models::CreateChannelRequest,
     ) -> Result<crate::domain::models::CreateChannelResponse, ChannelMutationErr> {
@@ -1206,7 +1206,7 @@ where
     async fn auto_join_by_team_id(
         &self,
         team_id: &Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<(), ChannelMutationErr> {
         self.repo
             .auto_join_by_team_id(team_id, user_id)
@@ -1218,7 +1218,7 @@ where
     async fn leave_by_team_id(
         &self,
         team_id: &Uuid,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<Uuid>, ChannelMutationErr> {
         self.repo
             .leave_by_team_id(team_id, user_id)
@@ -1229,7 +1229,7 @@ where
     #[tracing::instrument(err, skip(self, user_id, channel_ids))]
     async fn restore_by_channel_ids(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         channel_ids: &[Uuid],
     ) -> Result<(), ChannelMutationErr> {
         self.repo
@@ -1260,7 +1260,7 @@ where
 
     async fn share_referenced_items_with_channel(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         channel_id: Uuid,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<ReferenceShareResult>, ChannelMutationErr> {

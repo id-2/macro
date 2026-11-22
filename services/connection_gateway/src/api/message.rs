@@ -13,7 +13,7 @@ use connection_gateway_models::{
     BatchSendMessageBody, BatchSendUniqueMessagesBody, SendMessageBody, SendMessageResponse,
 };
 use futures::future::try_join_all;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model_entity::Entity;
 
 pub fn router<S>(state: AppState) -> Router<S>
@@ -53,7 +53,7 @@ where
     err(Debug)
 )]
 pub async fn broadcast_message_handler(
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     State(ctx): State<AppState>,
     Json(body): Json<SendMessageBody>,
 ) -> Result<StatusCode, (StatusCode, String)> {
@@ -90,7 +90,7 @@ pub async fn broadcast_message_handler(
 #[tracing::instrument(skip(_internal_authorization, ctx))]
 #[axum::debug_handler(state = AppState)]
 pub async fn send_message_handler(
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     State(ctx): State<AppState>,
     Path(entity): Path<Entity<'static>>,
     Json(body): Json<SendMessageBody>,
@@ -135,7 +135,7 @@ pub async fn send_message_handler(
     err(Debug)
 )]
 pub async fn batch_send_message_handler(
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     State(ctx): State<AppState>,
     Json(body): Json<BatchSendMessageBody<'static>>,
 ) -> Result<(StatusCode, JsonResponse<SendMessageResponse>), (StatusCode, String)> {
@@ -187,7 +187,7 @@ pub async fn batch_send_message_handler(
 )]
 #[axum::debug_handler(state = AppState)]
 pub async fn batch_send_unique_messages_handler(
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     State(ctx): State<AppState>,
     Json(body): Json<BatchSendUniqueMessagesBody>,
 ) -> Result<(StatusCode, JsonResponse<SendMessageResponse>), (StatusCode, String)> {

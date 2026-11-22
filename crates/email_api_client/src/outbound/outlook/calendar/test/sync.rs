@@ -1,8 +1,8 @@
 use super::mutations::{IssuedToken, NoOpenClients, OWNER, connected_mailbox, linked_mailbox};
 use super::*;
 use calendar_events::outbound::pg::PgCalendarRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
 use wiremock::matchers::query_param_is_missing;
@@ -616,7 +616,7 @@ async fn published_hints(pool: &PgPool) -> Vec<bool> {
     let hints = TeamHints::default();
     let relay = CalendarProjectionRelay::new(
         PgCalendarRepository::new(pool.clone()),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         hints.clone(),
     );
     while relay.run_once().await.unwrap() {}

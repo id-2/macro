@@ -6,7 +6,7 @@ import type {
   UsageRequest,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { User } from '../users/user';
 
 export type {
@@ -19,7 +19,7 @@ export type {
 /**
  * Shared cognition endpoints, charged to the authenticated acting user.
  *
- * @routing Use when asking a model to answer named yes/no questions or fill a JSON Schema from content you supply, or when reading AI usage; not generating images (`macro.images`) or answering the user yourself.
+ * @routing Use when asking a model to answer named yes/no questions or fill a JSON Schema from content you supply, or when reading AI usage; not generating images (`rox.images`) or answering the user yourself.
  */
 export class AiNamespace {
   /**
@@ -38,7 +38,7 @@ export class AiNamespace {
     );
   }
 
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Generate an answer matching a JSON Schema. Set toolset to { type: 'none' }

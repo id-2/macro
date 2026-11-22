@@ -8,6 +8,7 @@ import { DebugSuspense } from '@channel/DebugSuspense';
 import { DragDropWrapper } from '@core/component/AI/component/DragDrop';
 import { ChatInputProvider } from '@core/component/AI/context';
 import { lazyNamed } from '@core/util/lazyNamed';
+import { t } from '@app/lib/i18n';
 import { Show } from 'solid-js';
 import { HomeAgentComposer } from '../home-agent-composer';
 import { HomeSectionBoundary } from '../home-section-boundary';
@@ -18,6 +19,13 @@ const HomePriorities = lazyNamed(
   'HomePriorities'
 );
 
+const homeHeadingFont = `
+.home-chat-start .greeting-text {
+  font-family: Spectral, "Iowan Old Style", Palatino, serif;
+  font-style: italic;
+  font-weight: 400;
+}
+`;
 /** Desktop Home's idle pane: the agent composer, and the priorities when suggestions are on. */
 export function HomeChatStart() {
   const shell = useViewShell();
@@ -28,10 +36,11 @@ export function HomeChatStart() {
     <ChatInputProvider>
       <Show when={showHomeTopBar()}>
         <ViewShell.TopBar>
-          <ViewSidebar.Title caret={false}>Home</ViewSidebar.Title>
+          <ViewSidebar.Title caret={false}>{t('nav.home')}</ViewSidebar.Title>
         </ViewShell.TopBar>
       </Show>
-      <DragDropWrapper class="relative min-h-0 min-w-0 flex-1 overflow-y-auto px-6">
+      <style>{homeHeadingFont}</style>
+      <DragDropWrapper class="home-chat-start relative min-h-0 min-w-0 flex-1 overflow-y-auto px-6">
         <div class="flex h-full min-h-0 min-w-0 flex-col">
           {/*
             Agents new conversation sits under ViewShell.TopBar (h-12) and

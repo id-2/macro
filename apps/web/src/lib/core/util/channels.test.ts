@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { contactRefreshRevision } from '@queries/contacts/refresh';
 import { beforeEach, expect, it, onTestFinished, vi } from 'vitest';
 import { useSendMessageToPeople } from './channels';

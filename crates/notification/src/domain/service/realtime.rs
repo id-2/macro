@@ -6,7 +6,7 @@ mod test;
 use std::{borrow::Cow, num::NonZeroUsize, sync::Arc, time::Duration};
 
 use broadcast::{BroadcastManager, GlobalSpawner};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::prelude::{Report, ResultExt as _};
 use tokio_retry::{Retry, strategy::ExponentialBackoff};
 
@@ -43,7 +43,7 @@ where
 {
     consumer: C,
     broadcasts:
-        BroadcastManager<GlobalSpawner, MacroUserIdStr<'static>, NotificationSubscriptionUpdate<T>>,
+        BroadcastManager<GlobalSpawner, RoxUserIdStr<'static>, NotificationSubscriptionUpdate<T>>,
 }
 
 impl<C, T> WebSocketNotificationConsumerService<C, T>
@@ -66,7 +66,7 @@ where
     #[must_use]
     pub fn subscribe(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> WebSocketNotificationSubscription<NotificationSubscriptionUpdate<T>> {
         let (receiver, broadcast_exit_reason) = self
             .broadcasts
@@ -94,7 +94,7 @@ where
     /// Publishes one update to every active subscriber for `user_id`.
     fn publish_update(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         update: NotificationSubscriptionUpdate<T>,
     ) {
         match self.broadcasts.publish(user_id, update) {
@@ -171,7 +171,7 @@ where
 {
     fn subscribe(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> WebSocketNotificationSubscription<NotificationSubscriptionUpdate<T>> {
         WebSocketNotificationConsumerService::subscribe(self, user_id)
     }

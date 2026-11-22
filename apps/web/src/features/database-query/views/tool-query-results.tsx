@@ -1,7 +1,7 @@
 import {
   DATABASE_QUERY_CHART_MODES,
   type DatabaseQueryDisplayMode,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import { Select } from '@ui/components/Select';
 import { createMemo, createSignal, Show } from 'solid-js';
 import { match, P } from 'ts-pattern';

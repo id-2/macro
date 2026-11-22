@@ -30,7 +30,7 @@ resource-row transaction.
   `shared_entity_registry`.
 - Used by: `crates/ai_tools`, `crates/memory`, `crates/projects`,
   `crates/agent_session`, `crates/chat`, `crates/documents`,
-  `crates/macro_db_client`, and services that create owned entities
+  `crates/rox_db_client`, and services that create owned entities
   (`document_storage_service`, `agent_harness_service`, `scheduled_action`).
 
 ## Recipes

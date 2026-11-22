@@ -1,13 +1,13 @@
 use crate::domain::ports::{ContactsBackfillOutboxRepo, ContactsRepository};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use sqlx::types::Uuid;
 
 use super::DbContactsRepository;
 
-fn mid(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_owned()).unwrap()
+fn mid(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_owned()).unwrap()
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
@@ -105,7 +105,7 @@ async fn test_get_contacts_reads_both_columns_once(pool: PgPool) -> sqlx::Result
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn test_create_connections_batch(pool: PgPool) -> sqlx::Result<()> {
-    let connections: Vec<(MacroUserIdStr<'static>, MacroUserIdStr<'static>)> = (0..8)
+    let connections: Vec<(RoxUserIdStr<'static>, RoxUserIdStr<'static>)> = (0..8)
         .map(|i| {
             (
                 mid("macro|user0@test.com"),

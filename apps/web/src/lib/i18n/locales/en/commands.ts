@@ -36,4 +36,6 @@ export default {
   focusSplitDown: 'Focus split down',
   focusSplitUp: 'Focus split up',
   createEventFromEmail: 'Create event from email',
+  hotkeyDebugger: 'Open hotkey debugger',
+  showKeyboardShortcuts: 'Show keyboard shortcuts',
 };

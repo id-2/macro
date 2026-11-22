@@ -3,8 +3,8 @@
 use std::{sync::Arc, time::Duration};
 
 use document_storage_service_client::DocumentStorageServiceClient;
-use macro_authorization::INTERNAL_API_KEY_HEADER;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::INTERNAL_API_KEY_HEADER;
+use rox_user_id::user_id::RoxUserIdStr;
 use onboarding::domain::ports::OnboardingRepo;
 use rootcause::{
     Report,
@@ -72,7 +72,7 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionAdapter<T, O> {
         &self,
         base: &str,
         resource: &str,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<(), Report> {
         let url = format!(
             "{}/{resource}/user/{}",
@@ -97,18 +97,18 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionAdapter<T, O> {
 }
 
 impl<T: TeamService, O: OnboardingRepo> UserDeletionGateway for UserDeletionAdapter<T, O> {
-    async fn delete_scheduled_actions(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn delete_scheduled_actions(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.delete_owned(&self.scheduled_action_url, "scheduled-actions", user)
             .await
     }
 
-    async fn delete_agent_sessions(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn delete_agent_sessions(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.delete_owned(&self.harness_url, "agent-sessions", user)
             .await
     }
 
     #[tracing::instrument(skip(self, user), fields(user = %user), err)]
-    async fn leave_teams(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn leave_teams(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.teams
             .remove_user_from_all_teams(user)
             .await
@@ -118,7 +118,7 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionGateway for UserDeletionAdap
     }
 
     #[tracing::instrument(skip(self, user), fields(user = %user), err)]
-    async fn delete_items(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn delete_items(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.documents
             .delete_all_user_items(user.as_ref())
             .await
@@ -128,7 +128,7 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionGateway for UserDeletionAdap
     }
 
     #[tracing::instrument(skip(self, user), fields(user = %user), err)]
-    async fn delete_onboarding(&self, user: &MacroUserIdStr<'static>) -> Result<(), Report> {
+    async fn delete_onboarding(&self, user: &RoxUserIdStr<'static>) -> Result<(), Report> {
         self.onboarding
             .delete_row(user)
             .await
@@ -140,11 +140,11 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionGateway for UserDeletionAdap
     #[tracing::instrument(skip(self, user), fields(user = %user), err)]
     async fn delete_profile(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         account: &Uuid,
     ) -> Result<(), Report> {
         let deleted =
-            macro_db_client::user::delete_user::delete_user(&self.db, user.as_ref(), account)
+            rox_db_client::user::delete_user::delete_user(&self.db, user.as_ref(), account)
                 .await
                 .context("failed to delete user profile")?;
         tracing::info!(organization_id = ?deleted.organization_id, "deleted user profile row");
@@ -154,7 +154,7 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionGateway for UserDeletionAdap
     #[tracing::instrument(skip(self), err)]
     async fn delete_billing_customer(&self, account: &Uuid) -> Result<(), Report> {
         let customer_id =
-            match macro_db_client::macro_user::get_macro_user(&self.db, &account.to_string()).await
+            match rox_db_client::macro_user::get_macro_user(&self.db, &account.to_string()).await
             {
                 Ok(account) => account.stripe_customer_id,
                 // A retry after the account row is gone has nothing left to delete.
@@ -208,7 +208,7 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionGateway for UserDeletionAdap
 
     #[tracing::instrument(skip(self), err)]
     async fn delete_account(&self, account: &Uuid) -> Result<(), Report> {
-        macro_db_client::macro_user::delete_macro_user(&self.db, account)
+        rox_db_client::macro_user::delete_macro_user(&self.db, account)
             .await
             .into_rootcause()
             .context("failed to delete macro user")?;

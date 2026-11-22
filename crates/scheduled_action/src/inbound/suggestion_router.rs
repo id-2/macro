@@ -6,10 +6,10 @@ use axum::http::StatusCode;
 use axum::routing::{get, post};
 use axum::{Json, Router};
 use entity_registry::{CreationPrincipalExtractor, NonUserOwners};
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use routine_program::Surface;
 use serde::Deserialize;
 use utoipa::IntoParams;
@@ -25,7 +25,7 @@ mod test;
 
 pub struct RoutineSuggestionRouterState<S, Auth> {
     pub service: Arc<S>,
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for RoutineSuggestionRouterState<S, Auth> {
@@ -37,7 +37,7 @@ impl<S, Auth> Clone for RoutineSuggestionRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<RoutineSuggestionRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<RoutineSuggestionRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &RoutineSuggestionRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -56,7 +56,7 @@ pub fn routine_suggestion_router<S, Auth, St>(
 ) -> Router<St>
 where
     S: RoutineSuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     St: Send + Sync,
 {
     Router::new()
@@ -103,12 +103,12 @@ pub struct SuggestionsQuery {
 )]
 pub async fn list_suggestions<S, Auth>(
     State(state): State<RoutineSuggestionRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(query): Query<SuggestionsQuery>,
 ) -> Result<Json<RoutineSuggestions>, ScheduledActionApiError>
 where
     S: RoutineSuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let suggestions = state
         .service
@@ -132,12 +132,12 @@ where
 )]
 pub async fn dismiss_suggestion<S, Auth>(
     State(state): State<RoutineSuggestionRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(id): Path<Uuid>,
 ) -> Result<StatusCode, ScheduledActionApiError>
 where
     S: RoutineSuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service
@@ -170,7 +170,7 @@ pub async fn suggest_routine<S, Auth>(
 ) -> Result<Json<SuggestOutcome>, ScheduledActionApiError>
 where
     S: RoutineSuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = body.map_err(ScheduledActionApiError::InvalidRequest)?;
     // The code-mode invocation the credential names, already validated
@@ -204,7 +204,7 @@ pub async fn review_suggestions<S, Auth>(
 ) -> Result<Json<SuggestionReview>, ScheduledActionApiError>
 where
     S: RoutineSuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let correlation = agent_correlation::context::current();
     Ok(Json(state.service.review(&principal, correlation).await?))
@@ -235,7 +235,7 @@ pub async fn retire_suggestion<S, Auth>(
 ) -> Result<Json<SuggestOutcome>, ScheduledActionApiError>
 where
     S: RoutineSuggestionApi,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Json(request) = body.map_err(ScheduledActionApiError::InvalidRequest)?;
     let correlation = agent_correlation::context::current();

@@ -10,7 +10,7 @@ import type { ApiAttachmentForwarded } from './apiAttachmentForwarded';
 import type { ApiContactInfo } from './apiContactInfo';
 import type { ApiMessageAttachment } from './apiMessageAttachment';
 import type { ApiMessageBodyHtmlSanitized } from './apiMessageBodyHtmlSanitized';
-import type { ApiMessageBodyMacro } from './apiMessageBodyMacro';
+import type { ApiMessageBodyRox } from './apiMessageBodyRox';
 import type { ApiMessageBodyReplyless } from './apiMessageBodyReplyless';
 import type { ApiMessageBodyText } from './apiMessageBodyText';
 import type { ApiMessageFrom } from './apiMessageFrom';
@@ -39,7 +39,7 @@ export interface ApiMessage {
   attachments_forwarded: ApiAttachmentForwarded[];
   bcc: ApiContactInfo[];
   body_html_sanitized?: ApiMessageBodyHtmlSanitized;
-  body_macro?: ApiMessageBodyMacro;
+  body_rox?: ApiMessageBodyRox;
   body_replyless?: ApiMessageBodyReplyless;
   body_text?: ApiMessageBodyText;
   calendar_invitations?: CalendarInvitation[];

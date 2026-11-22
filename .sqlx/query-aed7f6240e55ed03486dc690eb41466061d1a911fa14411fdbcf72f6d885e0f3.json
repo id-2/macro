@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "EXPLAIN (FORMAT JSON)\n        SELECT DISTINCT ON (l.id, m.thread_id) l.id, m.thread_id\n        FROM email_messages m\n        JOIN email_effective_message_labels ml ON m.id = ml.message_id\n        JOIN email_labels l ON ml.label_id = l.id\n        WHERE m.thread_id = ANY($1)",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "QUERY PLAN",
+        "type_info": "Json"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "UuidArray"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "aed7f6240e55ed03486dc690eb41466061d1a911fa14411fdbcf72f6d885e0f3"
+}

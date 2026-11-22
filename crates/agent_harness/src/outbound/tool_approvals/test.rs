@@ -14,7 +14,7 @@ use agent_session::domain::events::{
 use agent_session::domain::service::MockAgentSessionService;
 use agent_session::testing::RecordingLifecyclePublisher;
 use bot_id::BotId;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use super::*;
 use crate::domain::notifications::PlannedNotification;
@@ -28,7 +28,7 @@ impl ToolApprovalAnswers for RecordingReleases {
         _session: AgentSessionId,
         _id: ToolApprovalId,
         _answer: ApprovalAnswer,
-        _by: &MacroUserIdStr<'static>,
+        _by: &RoxUserIdStr<'static>,
     ) -> Result<ToolApproval, ToolApprovalError> {
         unimplemented!("releases only")
     }
@@ -45,7 +45,7 @@ fn identity(session: AgentSessionId) -> SessionIdentity {
         session_name: "Session".to_owned(),
         bot_id: BotId::new_from_uuid(Uuid::from_u128(1)),
         bot_name: "Rox".to_owned(),
-        owner_id: MacroUserIdStr::try_from_email("owner@rox.one").unwrap(),
+        owner_id: RoxUserIdStr::try_from_email("owner@rox.one").unwrap(),
         origin: None,
         audience: Vec::new(),
         source: agent_session::domain::model::SessionSource::User,
@@ -117,8 +117,8 @@ fn approval(session: AgentSessionId, status: ToolApprovalStatus) -> ToolApproval
         session,
         turn_action_id: AgentActionId::mint(),
         request_id: serde_json::json!(1),
-        owner: MacroUserIdStr::try_from_email("owner@rox.one").unwrap(),
-        requested_by: Some(MacroUserIdStr::try_from_email("asker@rox.one").unwrap()),
+        owner: RoxUserIdStr::try_from_email("owner@rox.one").unwrap(),
+        requested_by: Some(RoxUserIdStr::try_from_email("asker@rox.one").unwrap()),
         server_slug: "macro".to_owned(),
         server_name: "Rox".to_owned(),
         tool_name: "ListEmails".to_owned(),

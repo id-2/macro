@@ -1,9 +1,9 @@
 use ::activity::Action;
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 
 use super::*;
 use crate::domain::events::{CallRecordDeletedMetadata, CallStartedMetadata};
@@ -87,7 +87,7 @@ fn call_started_yields_channel_and_call_activities() {
         CallTopicEvent::Started(CallStartedMetadata {
             call_id,
             channel_id: Some(channel_id),
-            created_by: MacroUserIdStr::try_from("macro|rahul@example.com".to_string()).unwrap(),
+            created_by: RoxUserIdStr::try_from("macro|rahul@example.com".to_string()).unwrap(),
             created_at,
             recording_enabled: false,
         }),

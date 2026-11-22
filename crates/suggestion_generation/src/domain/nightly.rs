@@ -16,7 +16,7 @@
 //! again at once, for the next attempt.
 
 use chrono::{DateTime, TimeDelta, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::model::AudienceMember;
 use super::night;
@@ -125,7 +125,7 @@ impl NightlyOutcome {
     /// none takes them out of the rotation until they are seen again.
     pub fn next_run(
         self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: chrono_tz::Tz,
         now: DateTime<Utc>,
     ) -> Option<DateTime<Utc>> {

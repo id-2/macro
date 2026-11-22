@@ -14,8 +14,8 @@ use item_filters::ast::{
     EntityFilterAst, calendar_event::CalendarEventLiteral, chat::ChatLiteral,
     document::DocumentLiteral, initiative::InitiativeLiteral, project::ProjectLiteral,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::{GroupByField, GroupingConfig};
 use models_pagination::Identify;
 use models_pagination::{CursorWithValAndFilter, Query, SimpleSortMethod, SortOn};
@@ -32,8 +32,8 @@ fn filters() -> EntityFilterAst {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user-1@test.com").unwrap()
 }
 
 #[sqlx::test(
@@ -352,7 +352,7 @@ async fn listings_and_per_row_gates_agree_on_every_access_path(pool: PgPool) -> 
     assert_eq!(all_ids.len(), 18);
 
     for (viewer, expected) in cases {
-        let user_id = MacroUserIdStr::parse_from_str(viewer)?;
+        let user_id = RoxUserIdStr::parse_from_str(viewer)?;
         let listed = expanded_dynamic_cursor_soup(
             &pool,
             ExpandedDynamicCursorArgs {

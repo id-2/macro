@@ -4,8 +4,8 @@
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use sqlx::PgPool;
 
 use crate::domain::drafts::Draft;
@@ -34,7 +34,7 @@ impl DraftHandBacks for PgDraftHandBacks {
     async fn begin(
         &self,
         session: Uuid,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: bot_id::BotId,
     ) -> Result<()> {
         sqlx::query!(
@@ -52,7 +52,7 @@ impl DraftHandBacks for PgDraftHandBacks {
     async fn record(
         &self,
         session: Uuid,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         check: &RoutineCheck,
         created: &[CreatedItem],
     ) -> Result<bool> {
@@ -144,7 +144,7 @@ impl DraftHandBacks for PgDraftHandBacks {
 fn stale_draft(session: Uuid, owner: String, agent: Uuid) -> Option<StaleDraft> {
     Some(StaleDraft {
         session,
-        owner: MacroUserIdStr::try_from(owner).ok()?,
+        owner: RoxUserIdStr::try_from(owner).ok()?,
         agent: bot_id::BotId::new_from_uuid(agent),
     })
 }
@@ -273,7 +273,7 @@ impl DraftJobStore for PgDraftHandBacks {
 
     async fn started(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         client_id: Uuid,
     ) -> Result<Option<DraftJob>> {
         let row = sqlx::query!(
@@ -349,7 +349,7 @@ impl DraftJobStore for PgDraftHandBacks {
         })
     }
 
-    async fn jobs(&self, owner: &MacroUserIdStr<'static>, limit: u16) -> Result<Vec<DraftJob>> {
+    async fn jobs(&self, owner: &RoxUserIdStr<'static>, limit: u16) -> Result<Vec<DraftJob>> {
         let rows = sqlx::query!(
             r#"
             SELECT session_id, request, progress, created_at, state, result, finished_at
@@ -382,7 +382,7 @@ impl DraftJobStore for PgDraftHandBacks {
 
     async fn job(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: Uuid,
     ) -> Result<Option<DraftJob>> {
         let row = sqlx::query!(
@@ -412,7 +412,7 @@ impl DraftJobStore for PgDraftHandBacks {
 
     async fn cancel_job(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: Uuid,
     ) -> Result<Option<CancelledJob>> {
         // A finished job keeps its finish time, which says so.

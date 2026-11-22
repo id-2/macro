@@ -2,7 +2,7 @@ import {
   insertShapesCommand,
   nextPresentOrder,
   type Point,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { createSignal, onCleanup } from 'solid-js';
 import type {
   CanvasAsset,

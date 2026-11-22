@@ -10,7 +10,7 @@ import type {
 } from '../../../generated/storage/types.gen';
 import { type RichMessage, toBody } from '../../mentions';
 import { iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { AgentConversation } from '../agent-sessions/conversation';
 import { Bot } from '../bots/bot';
 import { CallRecord } from '../calls/call-record';
@@ -183,7 +183,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
   }
 
   /** A handle to a channel by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Channel {
+  static byId(client: RoxClient, id: string): Channel {
     return new Channel(client, id);
   }
 
@@ -193,7 +193,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
    * unnamed private channels; those are named after the members, so they load.
    */
   static fromListing(
-    client: MacroClient,
+    client: RoxClient,
     record: ApiChannelWithLatest,
   ): Channel {
     const named =
@@ -205,7 +205,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
   }
 
   /** Open (creating if needed) the DM channel with a user. */
-  static async dm(client: MacroClient, recipient: User): Promise<Channel> {
+  static async dm(client: RoxClient, recipient: User): Promise<Channel> {
     const { channel_id } = unwrap(
       await client.storage.getOrCreateDm({
         body: { recipient_id: recipient.id },
@@ -216,7 +216,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
 
   /** Open (creating if needed) the group direct message with exactly these people, excluding the caller. */
   static async private(
-    client: MacroClient,
+    client: RoxClient,
     recipients: User[],
   ): Promise<Channel> {
     const { channel_id } = unwrap(
@@ -229,7 +229,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
 
   /** Create a channel. The caller becomes the owner. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: {
       type: ChannelType;
       name?: string;
@@ -262,8 +262,8 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
    * Post a message; pass `silent: true` for a routine update that should
    * notify nobody. Plain text, or a rich body composed with `msg`.
    * `images` attaches static images, such as one from
-   * `macro.images.generate()`, below the text; `documents` attaches Macro
-   * documents as file chips, such as a file from `macro.documents.upload()`.
+   * `rox.images.generate()`, below the text; `documents` attaches Macro
+   * documents as file chips, such as a file from `rox.documents.upload()`.
    * `silent` sends no push, email or inbox entry to anyone, mentioned people
    * included; the message still appears in the channel.
    *
@@ -273,7 +273,7 @@ export class Channel extends PropertiedEntity<ChannelDetail> {
    *
    * @example Share a generated CSV.
    * ```js
-   * const file = await macro.documents.upload({ name: 'q3.csv', content: csv });
+   * const file = await rox.documents.upload({ name: 'q3.csv', content: csv });
    * await channel.send('Q3 numbers attached.', { documents: [file] });
    * ```
    *

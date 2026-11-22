@@ -1,7 +1,7 @@
 use super::*;
 use crate::outbound::pg_access_repo::queries::get_user_source_ids;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -171,8 +171,8 @@ fn anonymous() -> SourceIds {
 }
 
 #[cfg(feature = "explain_binary")]
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
@@ -278,7 +278,7 @@ async fn team_grant_resolves_through_user_source_ids(pool: PgPool) -> anyhow::Re
     )
     .await?;
 
-    let requester = MacroUserIdStr::parse_from_str(GRANTEE).expect("valid requester id");
+    let requester = RoxUserIdStr::parse_from_str(GRANTEE).expect("valid requester id");
     let source_ids = get_user_source_ids(&pool, Some(&*requester)).await?;
     let access = get_initiative_access(&pool, &initiative_id, &source_ids).await?;
 

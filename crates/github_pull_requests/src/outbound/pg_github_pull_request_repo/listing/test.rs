@@ -18,7 +18,7 @@ use item_filters::ast::{
         GithubPullRequestLiteral, GithubPullRequestReviewStatus, GithubPullRequestState,
     },
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_pagination::{Cursor, CursorVal, Query, SimpleSortMethod};
 use serde_json::json;
 use sqlx::PgPool;

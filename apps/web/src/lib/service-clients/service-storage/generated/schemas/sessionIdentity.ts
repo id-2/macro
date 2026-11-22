@@ -6,7 +6,7 @@
  */
 
 import type { BotId } from './botId';
-import type { MacroUserIdStr } from './macroUserIdStr';
+import type { RoxUserIdStr } from './roxUserIdStr';
 import type { SessionIdentityOrigin } from './sessionIdentityOrigin';
 import type { SessionSource } from './sessionSource';
 
@@ -18,14 +18,14 @@ export interface SessionIdentity {
   /** Everyone with a stake in what happens next: the owner plus every user
 who has prompted or answered this session. Resolved by the emitter so
 a consumer fanning out never has to read the session's log. */
-  audience?: MacroUserIdStr[];
+  audience?: RoxUserIdStr[];
   /** Bot the session runs for. */
   bot_id: BotId;
   /** The bot's display name at the time of the event. */
   bot_name: string;
   origin?: SessionIdentityOrigin;
   /** User who owns the session. */
-  owner_id: MacroUserIdStr;
+  owner_id: RoxUserIdStr;
   /** The session. */
   session_id: string;
   /** User-facing session name at the time of the event. */

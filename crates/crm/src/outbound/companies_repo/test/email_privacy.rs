@@ -10,7 +10,7 @@ use crate::domain::companies_repo::CompaniesRepository;
 use crate::domain::email_privacy::{EmailBlockScope, EmailPrivacyChange, EmailPrivacyRepository};
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -53,7 +53,7 @@ async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
     let error = tokio::time::timeout(
         std::time::Duration::from_secs(10),
         sqlx::raw_sql(include_str!(
-            "../../../../../macro_db_client/migrations/20261106021950_crm_email_contribution.up.sql"
+            "../../../../../rox_db_client/migrations/20261106021950_crm_email_contribution.up.sql"
         ))
         .execute(&mut *cutover),
     )
@@ -145,15 +145,15 @@ async fn rollout_and_rollback_preserve_records_and_do_not_inherit_consent(
     }
 
     sqlx::raw_sql(include_str!(
-        "../../../../../macro_db_client/migrations/20261106031523_crm_email_backfill_trace_context.down.sql"
+        "../../../../../rox_db_client/migrations/20261106031523_crm_email_backfill_trace_context.down.sql"
     )).execute(&pool).await?;
     sqlx::raw_sql(include_str!(
-        "../../../../../macro_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.down.sql"
+        "../../../../../rox_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.down.sql"
     ))
     .execute(&pool)
     .await?;
     sqlx::raw_sql(include_str!(
-        "../../../../../macro_db_client/migrations/20261106021950_crm_email_contribution.down.sql"
+        "../../../../../rox_db_client/migrations/20261106021950_crm_email_contribution.down.sql"
     ))
     .execute(&pool)
     .await?;
@@ -177,14 +177,14 @@ async fn mailbox_lifecycle_migration_times_out_without_blocking_writers(
     // Only this disposable test database is changed; production migrations
     // and previously applied development migration histories stay untouched.
     sqlx::raw_sql(include_str!(
-        "../../../../../macro_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.down.sql"
+        "../../../../../rox_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.down.sql"
     )).execute(&pool).await?;
     let mut writer = pool.begin().await?;
     sqlx::raw_sql("LOCK TABLE email_links IN ROW EXCLUSIVE MODE")
         .execute(&mut *writer)
         .await?;
     let migration = include_str!(
-        "../../../../../macro_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.up.sql"
+        "../../../../../rox_db_client/migrations/20261106023717_crm_consent_mailbox_lifecycle.up.sql"
     );
     let mut deploy = pool.begin().await?;
     let error = tokio::time::timeout(

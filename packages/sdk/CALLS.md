@@ -2,9 +2,9 @@
 
 The SDK’s `calls/node` and `calls/browser` entry points connect call handles to a
 real LiveKit room. Install
-`@macro-inc/sdk` and one runtime peer: `@livekit/rtc-node` for Node or Bun, or
+`@rox-one/sdk` and one runtime peer: `@livekit/rtc-node` for Node or Bun, or
 `livekit-client` for browsers. The core SDK grants access and issues the room
-token as `CallConnection` (import it from `@macro-inc/sdk`); the helpers do not store or log it.
+token as `CallConnection` (import it from `@rox-one/sdk`); the helpers do not store or log it.
 
 The call helpers use `@opentelemetry/api` for `call.sdk.*` spans. Tracing is a
 no-op until the host installs an OpenTelemetry tracer provider.
@@ -12,26 +12,26 @@ no-op until the host installs an OpenTelemetry tracer provider.
 
 ## Install
 
-Call helpers ship with `@macro-inc/sdk`. Add only the LiveKit client for your runtime:
+Call helpers ship with `@rox-one/sdk`. Add only the LiveKit client for your runtime:
 
 ```sh
-npm install @macro-inc/sdk @livekit/rtc-node # Node
-npm install @macro-inc/sdk livekit-client    # browser
+npm install @rox-one/sdk @livekit/rtc-node # Node
+npm install @rox-one/sdk livekit-client    # browser
 ```
 
-The core `@macro-inc/sdk` import does not load LiveKit or the room helpers. The
+The core `@rox-one/sdk` import does not load LiveKit or the room helpers. The
 helper files ship in the SDK tarball, but only the selected entry point enters
 your application bundle. Keep calls on demand in a browser with code splitting:
 
 ```ts
-const { connectRoom } = await import('@macro-inc/sdk/calls/browser');
+const { connectRoom } = await import('@rox-one/sdk/calls/browser');
 ```
 
 ## Voice agent (Node or Bun)
 
 ```ts
-import { Rox } from '@macro-inc/sdk';
-import { connectRoom } from '@macro-inc/sdk/calls/node';
+import { Rox } from '@rox-one/sdk';
+import { connectRoom } from '@rox-one/sdk/calls/node';
 
 const macro = new Rox();
 const call = await macro.channels.byId(channelId).activeCall();
@@ -62,7 +62,7 @@ I420 or RGBA frames. The helper publishes them as a screen share and closes
 the track when the stream ends or `stop()` is called.
 
 ```ts
-import { publishScreen } from '@macro-inc/sdk/calls/node';
+import { publishScreen } from '@rox-one/sdk/calls/node';
 
 const share = await publishScreen(room, frames, { fps: 15 });
 // frames: AsyncIterable<{ data: Uint8Array; width: number; height: number;
@@ -75,7 +75,7 @@ In a browser, pass a `MediaStream` or omit it to open the browser's display
 picker. Its audio track, when present, is published as screen-share audio.
 
 ```ts
-import { publishScreen } from '@macro-inc/sdk/calls/browser';
+import { publishScreen } from '@rox-one/sdk/calls/browser';
 
 const share = await publishScreen(room);
 await share.stopped; // resolves after the picker track ends or stop() completes

@@ -62,7 +62,7 @@ export function EmailDetailView(props: {
         )) ||
       (props.thread.fallbackName &&
         displaySubject(props.thread.fallbackName)) ||
-      'Email'
+      'Почта'
     );
   };
   useSplitDisplayName(title);

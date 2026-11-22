@@ -1,8 +1,8 @@
 use std::sync::Arc;
 
-use macro_event_broker::{GlobalSpawner, KafkaEventPublisher, MacroEventBrokerService};
+use rox_event_broker::{GlobalSpawner, KafkaEventPublisher, RoxEventBrokerService};
 
-pub type PollerEventBroker = MacroEventBrokerService<KafkaEventPublisher, GlobalSpawner>;
+pub type PollerEventBroker = RoxEventBrokerService<KafkaEventPublisher, GlobalSpawner>;
 
 #[derive(Clone)]
 pub struct Context {

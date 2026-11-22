@@ -648,7 +648,7 @@ async fn staff_inbox_notifications_keep_both_partitions_without_realtime_or_apns
     {
         let mut s = fake.0.lock().unwrap();
         s.link.as_mut().unwrap().macro_id =
-            MacroUserIdStr::try_from("macro|staff@rox.one".to_owned()).unwrap();
+            RoxUserIdStr::try_from("macro|staff@rox.one".to_owned()).unwrap();
         s.message = None;
         s.import.previews.extend([false, true]);
         s.import.primaries = vec!["macro|delegate@example.com".into()];

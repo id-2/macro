@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { canonicalPipedreamSlug } from '@core/pipedream/slugs';
 import { fireAndForget } from '@core/util/fireAndForget';
 import SearchIcon from '@icon/system/regular/magnifying-glass.svg';
@@ -54,14 +55,14 @@ export function ToolsStep(props: { onContinue: () => void }) {
         <SearchIcon aria-hidden="true" class="size-5 shrink-0 text-ink/35" />
         <input
           type="search"
-          aria-label="Search integrations and MCPs"
-          placeholder="Search integrations and MCPs"
+          aria-label={t('onboarding.searchIntegrations')}
+          placeholder={t('onboarding.searchIntegrations')}
           value={catalog.search()}
           onInput={(event) => catalog.setSearch(event.currentTarget.value)}
           class="min-w-0 flex-1 bg-transparent text-base outline-none placeholder:text-ink-placeholder"
         />
       </label>
-      <div role="region" aria-label="Available integrations" class="px-1 py-1">
+      <div role="region" aria-label={t('onboarding.availableIntegrations')} class="px-1 py-1">
         <div class="grid grid-cols-3 gap-x-2 gap-y-5 sm:grid-cols-4">
           <For each={entries()}>
             {(tool) => (
@@ -84,9 +85,9 @@ export function ToolsStep(props: { onContinue: () => void }) {
           )}
         >
           <p role="alert" class="py-4 text-center text-sm text-ink-muted">
-            Couldn't check some connections.{' '}
+            {t('onboarding.connectionsCheckFailed')}{' '}
             <button type="button" class="underline" onClick={connected.retry}>
-              Retry connection status
+              {t('onboarding.retryConnectionStatus')}
             </button>
           </p>
         </Show>
@@ -97,27 +98,27 @@ export function ToolsStep(props: { onContinue: () => void }) {
           }
         >
           <p class="py-4 text-center text-sm text-ink-muted">
-            GitHub account linked. Choose repositories to sync with Rox.{' '}
+            {t('onboarding.githubLinked')}{' '}
             <button
               type="button"
               class="underline"
               onClick={context.configureGithubRepositories}
             >
-              Configure GitHub repositories
+              {t('onboarding.configureGithubRepositories')}
             </button>
           </p>
         </Show>
         <Show when={catalog.failed()}>
           <p role="alert" class="py-6 text-center text-sm text-ink-muted">
-            Couldn't load integrations.{' '}
+            {t('onboarding.integrationsLoadFailed')}{' '}
             <button type="button" class="underline" onClick={catalog.retry}>
-              Try again
+              {t('onboarding.retry')}
             </button>
           </p>
         </Show>
         <Show when={catalog.fetching()}>
           <p role="status" class="py-6 text-center text-sm text-ink-muted">
-            Loading integrations…
+            {t('onboarding.loadingIntegrations')}
           </p>
         </Show>
         <Show

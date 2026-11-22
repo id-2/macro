@@ -2,6 +2,7 @@ import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import { t } from '@app/lib/i18n';
 import { globalSplitManager } from '@app/signal/splitLayout';
 import { SidebarOpenInSplitMenu } from '@components/app/app-sidebar/sidebar';
+import { MenuItem } from '@core/component/ContextMenu';
 import { UserIcon } from '@core/component/UserIcon';
 import { useSettingsState } from '@core/constant/SettingsState';
 import { useSettingsTabAvailable } from '@core/constant/settingsTabsConfig';
@@ -12,8 +13,10 @@ import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import DeviceMobileDownloadIcon from '@icon/device-mobile-download.svg';
 import GearFillIcon from '@icon/system/fill/gear-fill.svg';
 import GearIcon from '@icon/system/regular/gear.svg';
+import UserRoundIcon from '@icon/system/regular/user.svg';
 import { isRealNamePart, useOwnUserName } from '@queries/auth/user-name-self';
 import { Button, cn, pressHandlers } from '@ui';
+import { useNavigate } from '@solidjs/router';
 import { createMemo, Show } from 'solid-js';
 import { useAppUpdate } from './app-update';
 import { HelpMenu } from './help-menu';
@@ -96,6 +99,7 @@ export const FooterActions = (props: {
   const userId = useUserId();
   const email = useEmail();
   const userName = useOwnUserName();
+  const navigate = useNavigate();
 
   // Prefer the user's real name (first/last); fall back to their email.
   const accountName = createMemo(() => {
@@ -136,6 +140,13 @@ export const FooterActions = (props: {
         onOpenNewSplit={() => openSettingsInSplit(currentTab())}
         onOpenChange={props.onMenuOpenChange}
         triggerClass="size-10"
+        additionalActions={
+          <MenuItem
+            text="Аккаунт"
+            icon={UserRoundIcon}
+            onClick={() => navigate('/account')}
+          />
+        }
       >
         <Button
           aria-label={t('nav.settings')}

@@ -64,7 +64,7 @@ function Columns(props: {
   return (
     <KanbanBoard.Columns
       endColumn={props.endColumn}
-      aria-label={props['aria-label'] ?? 'Task board'}
+      aria-label={props['aria-label'] ?? 'Доска задач'}
     >
       {(column) => (
         <Show when={columnsById().get(column().id)}>
@@ -131,21 +131,21 @@ function HiddenColumns(props: {
   onReveal(): void;
 }) {
   return (
-    <KanbanBoard.ColumnPlaceholder aria-label="Hidden columns">
+    <KanbanBoard.ColumnPlaceholder aria-label="Скрытые столбцы">
       <div aria-hidden="true" class="h-20 w-32 shrink-0 text-ink-extra-muted">
         <EmptyStateNoFilterMatchGraphic class="size-full" />
       </div>
       <h2
         class="text-sm font-medium"
         title={
-          props.partial ? `At least ${props.count} hidden columns` : undefined
+          props.partial ? `Не меньше ${props.count} скрытых столбцов` : undefined
         }
       >
         {props.count}
-        {props.partial ? '+' : ''} hidden
+        {props.partial ? '+' : ''} скрыто
       </h2>
       <Button size="sm" variant="secondary" onClick={props.onReveal}>
-        Reveal hidden columns
+        Показать скрытые столбцы
       </Button>
     </KanbanBoard.ColumnPlaceholder>
   );

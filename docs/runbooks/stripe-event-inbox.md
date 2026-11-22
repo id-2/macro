@@ -72,7 +72,7 @@ WHERE state <> 'idle' GROUP BY consumer, state;
 ## Rolling back
 
 - Revert the code, but **keep the migration file**
-  (`crates/macro_db_client/migrations/*_stripe_event_inbox.sql`). Prod runs
+  (`crates/rox_db_client/migrations/*_stripe_event_inbox.sql`). Prod runs
   `cargo sqlx migrate run` without `--ignore-missing`, so a release missing an
   applied migration fails `migrate-db`, and that blocks every later deploy.
 - While rolled back, the old webhook handler applies each event directly and
@@ -120,7 +120,7 @@ Premium). The `personal_plan` dead-letter monitor pages on-call. Recover:
 
    `INTERNAL_API_KEY` is the value of that key in the authentication-service
    Doppler config of the environment; the base URL is `AuthServiceUrl`
-   (`crates/macro_service_urls`), `https://dev-gateway.rox.one/auth` on dev.
+   (`crates/rox_service_urls`), `https://dev-gateway.rox.one/auth` on dev.
 4. Check the dead count is gone: the `stripe inbox dead cursors` log stops
    and the monitor recovers within 30 minutes.
 

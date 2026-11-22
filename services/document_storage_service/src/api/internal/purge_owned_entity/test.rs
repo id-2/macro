@@ -13,10 +13,10 @@ use axum::{
 use bot_id::BotId;
 use entity_registry::{OwnedPurgeOutcome, Owner, PurgeOwnedEntity};
 use jsonwebtoken::{Algorithm, EncodingKey, Header};
-use macro_auth::middleware::decode_jwt::{JwtValidationArgs, MacroAccessToken};
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer,
+use rox_auth::middleware::decode_jwt::{JwtValidationArgs, RoxAccessToken};
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer,
 };
 use rootcause::Report;
 use tower::ServiceExt;
@@ -103,9 +103,9 @@ impl Services {
                 self.chats.clone(),
                 self.projects.clone(),
             ),
-            authorization: MacroAuthorizationState::new(Arc::new(
-                MacroAuthorizationServiceImpl::new(
-                    MacroAuthJwtValidator::new(JwtValidationArgs::new_testing()),
+            authorization: RoxAuthorizationState::new(Arc::new(
+                RoxAuthorizationServiceImpl::new(
+                    RoxAuthJwtValidator::new(JwtValidationArgs::new_testing()),
                     InternalAuthConfig {
                         api_key: INTERNAL_KEY.into(),
                         default_user_id: None,
@@ -128,7 +128,7 @@ impl Services {
 #[derive(Clone, FromRef)]
 struct TestState {
     purge: OwnedPurgeState<FakePurger, FakePurger, FakePurger>,
-    authorization: MacroAuthorizationState<AuthorizationService>,
+    authorization: RoxAuthorizationState<AuthorizationService>,
 }
 
 fn team_owner() -> Owner {
@@ -148,7 +148,7 @@ fn user_access_token() -> String {
         .unwrap()
         .as_secs() as usize
         + 3_600;
-    let claims = MacroAccessToken {
+    let claims = RoxAccessToken {
         aud: String::new(),
         exp: expires_in_an_hour,
         tid: "test-tenant".into(),

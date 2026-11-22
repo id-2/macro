@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   ListFilterCountBadge,
   ListFilterDropdown,
@@ -21,7 +22,7 @@ export function DriveFilterMenu(
     scopeId: panel.splitHotkeyScope,
     enabled: panel.isPanelActive,
     filter: {
-      description: 'Filter files',
+      description: t('drive.filterFiles'),
 
       run: () => {
         setOpen(true);
@@ -36,7 +37,7 @@ export function DriveFilterMenu(
       <ListFilterDropdown
         grouped={props.grouped}
         size={props.size}
-        label="Filter files"
+        label={t('drive.filterFiles')}
         open={open()}
         onOpenChange={setOpen}
         groups={filters.groups()}

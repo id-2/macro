@@ -107,10 +107,11 @@ pub(crate) fn maybe_handle_share_deep_link(handle: &AppHandle, url: &Url) -> boo
     ShareTargetPlatformImpl::maybe_handle_share_deep_link(handle, url)
 }
 
-/// True when `url` is a share deep link (`macro://share/...`) handled natively
-/// by the iOS Share Extension rather than routed to the SPA router.
+/// True when `url` is a share deep link (`rox://share/...`, or the legacy
+/// `macro://share/...`) handled natively by the iOS Share Extension rather than
+/// routed to the SPA router.
 pub(crate) fn is_share_deep_link(url: &Url) -> bool {
-    url.scheme() == crate::APP_SCHEME && url.host_str() == Some("share")
+    crate::is_app_scheme(url) && url.host_str() == Some("share")
 }
 
 #[cfg(test)]

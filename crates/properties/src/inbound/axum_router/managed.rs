@@ -1,5 +1,5 @@
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::PropertyOwner;
 use models_properties::api::CreatePropertyScope;
 use uuid::Uuid;
@@ -25,7 +25,7 @@ impl<S: PropertiesService, A: EntityAccessService, Auth> PropertiesRouterState<S
     pub(super) async fn reject_managed_definition(
         &self,
         definition_id: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         team: Option<&TeamReceipt>,
     ) -> Result<(), PropertiesErr> {
         let definition = match self

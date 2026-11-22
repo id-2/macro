@@ -10,8 +10,8 @@ use super::*;
 
 const TEAM: Uuid = Uuid::from_u128(0x1111_1111_1111_1111_1111_1111_1111_1111);
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 fn announce(candidates: &[&str]) -> AnnounceJoin {
@@ -49,7 +49,7 @@ impl JoinAnnouncementRepository for FakeRepository {
     async fn claim(
         &self,
         _team_id: Uuid,
-        candidates: &[MacroUserIdStr<'static>],
+        candidates: &[RoxUserIdStr<'static>],
         team_limit: u32,
     ) -> Result<Vec<ClaimedJoinEmail>, Report<JoinAnnouncementError>> {
         self.claim_calls.lock().unwrap().push(
@@ -79,7 +79,7 @@ impl JoinAnnouncementRepository for FakeRepository {
     async fn release(
         &self,
         _team_id: Uuid,
-        recipient: &MacroUserIdStr<'_>,
+        recipient: &RoxUserIdStr<'_>,
     ) -> Result<(), Report<JoinAnnouncementError>> {
         self.claimed.lock().unwrap().remove(recipient.email_str());
         self.released

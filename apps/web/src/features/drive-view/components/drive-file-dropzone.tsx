@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { FileDropOverlay } from '@core/component/FileDropOverlay';
 import { fileFolderDrop } from '@core/directive/fileFolderDrop';
 import { createSignal, type ParentProps, Show } from 'solid-js';
@@ -27,7 +28,7 @@ export function DriveFileDropzone(
     >
       <Show when={dragging()}>
         <FileDropOverlay>
-          Drop files here to add them to this location
+          {t('drive.dropFilesHere')}
         </FileDropOverlay>
       </Show>
       {props.children}

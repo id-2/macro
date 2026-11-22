@@ -1,8 +1,8 @@
-use macro_event_broker::{
-    EventBrokerError, MacroEventCollection as _, MessageParts, MessageWrapper,
+use rox_event_broker::{
+    EventBrokerError, RoxEventCollection as _, MessageParts, MessageWrapper,
 };
 
-use super::DeclaredMacroEvent;
+use super::DeclaredRoxEvent;
 
 struct TestMessage {
     payload: Vec<u8>,
@@ -24,12 +24,12 @@ impl MessageParts for TestMessage {
 
 #[test]
 fn assigns_only_the_typed_soup_topic() {
-    assert_eq!(DeclaredMacroEvent::topics(), ["macro.soup"]);
+    assert_eq!(DeclaredRoxEvent::topics(), ["macro.soup"]);
 }
 
 #[test]
 fn declared_topic_decoder_rejects_unsupported_schema_versions() {
-    let message = MessageWrapper::<_, DeclaredMacroEvent>::new(TestMessage {
+    let message = MessageWrapper::<_, DeclaredRoxEvent>::new(TestMessage {
         payload: serde_json::to_vec(&serde_json::json!({
             "event_id": "00000000-0000-0000-0000-000000000001",
             "schema_version": 1,

@@ -13,7 +13,7 @@ import { RuntimeSetupSteps } from './components/runtime-setup-steps';
 import { ChoiceRow, SettingsPage, SettingsSurface } from './primitives';
 
 const PAIRING_ERROR_FALLBACK =
-  'This pairing code is invalid, expired, or already claimed.';
+  'Этот код сопряжения недействителен, истёк или уже использован.';
 
 type HarnessShare = 'Private' | 'Team';
 
@@ -26,6 +26,13 @@ function expiresInMinutes(expiresAt: string): number {
     0,
     Math.round((new Date(expiresAt).getTime() - Date.now()) / 60_000)
   );
+}
+function ruMinutes(count: number): string {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return 'минуту';
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return 'минуты';
+  return 'минут';
 }
 
 /**
@@ -103,7 +110,7 @@ export function RuntimePairingPage(props: {
         teamId: share() === 'Team' ? currentTeamId() : undefined,
       });
       setApproved(true);
-      toast.success('Machine connected');
+      toast.success('Машина подключена');
     } catch (error) {
       setApproveError(failureMessage(error, PAIRING_ERROR_FALLBACK));
     }
@@ -111,9 +118,9 @@ export function RuntimePairingPage(props: {
 
   return (
     <SettingsPage
-      title={approved() ? 'Machine connected' : 'New machine'}
+      title={approved() ? 'Машина подключена' : 'Новая машина'}
       showTitleInSheet
-      description="Connect an agent running on your own machine."
+      description="Подключите агента, который работает на вашей машине."
       actions={
         <Button
           variant="ghost"
@@ -122,16 +129,16 @@ export function RuntimePairingPage(props: {
           onClick={props.onClose}
         >
           <ArrowLeftIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-          Back
+          Назад
         </Button>
       }
     >
-      <section aria-label="New machine">
+      <section aria-label="Новая машина">
         <SettingsSurface class="@container p-6">
           <Switch>
             <Match when={approved()}>
               <p class="text-sm leading-5 text-ink-muted">
-                Machine connected. roxd will finish pairing automatically.
+                Машина подключена. roxd завершит сопряжение сам.
               </p>
             </Match>
 
@@ -146,7 +153,7 @@ export function RuntimePairingPage(props: {
                       size="sm"
                       onClick={tryAnotherCode}
                     >
-                      Try another code
+                      Другой код
                     </Button>
                   </div>
                 </div>
@@ -161,30 +168,30 @@ export function RuntimePairingPage(props: {
                       {pairing().code}
                     </div>
                     <p class="text-xs text-ink-muted">
-                      Confirm this matches the code roxd printed.
+                      Убедитесь, что код совпадает с тем, что показал roxd.
                     </p>
                   </div>
 
                   <div class="flex flex-col gap-0.5 text-xs text-ink-muted">
                     <span>
-                      Requested name:{' '}
+                      Запрошенное имя:{' '}
                       <span class="text-ink">{pairing().requested_name}</span>
                     </span>
                     <Show when={pairing().host}>
                       {(host) => (
                         <span>
-                          Host: <span class="text-ink">{host()}</span>
+                          Хост: <span class="text-ink">{host()}</span>
                         </span>
                       )}
                     </Show>
                     <span>
-                      Expires in {expiresInMinutes(pairing().expires_at)}{' '}
-                      minutes
+                      Истекает через {expiresInMinutes(pairing().expires_at)}{' '}
+                      {ruMinutes(expiresInMinutes(pairing().expires_at))}
                     </span>
                   </div>
 
                   <label class="flex flex-col gap-1.5">
-                    <span class="text-xs font-medium text-ink">Name</span>
+                    <span class="text-xs font-medium text-ink">Имя</span>
                     <input
                       class="settings-input w-full"
                       value={name()}
@@ -196,24 +203,24 @@ export function RuntimePairingPage(props: {
                   </label>
 
                   <fieldset class="grid grid-cols-1 gap-2 @min-[440px]:grid-cols-2">
-                    <legend class="sr-only">Share</legend>
+                    <legend class="sr-only">Доступ</legend>
                     <ChoiceRow
                       name="harness-share"
                       value="private"
                       checked={share() === 'Private'}
-                      title="Private"
-                      description="Only you can run agents on this machine."
+                      title="Личный"
+                      description="Только вы можете запускать агентов на этой машине."
                       onChange={() => setShare('Private')}
                     />
                     <ChoiceRow
                       name="harness-share"
                       value="team"
                       checked={share() === 'Team'}
-                      title="Team"
+                      title="Команда"
                       description={
                         canShareWithTeam()
-                          ? 'Your team can run agents on this machine.'
-                          : 'Create or join a team before sharing machines.'
+                          ? 'Ваша команда может запускать агентов на этой машине.'
+                          : 'Создайте команду или присоединитесь к ней, прежде чем делиться машинами.'
                       }
                       disabled={!canShareWithTeam()}
                       onChange={() => setShare('Team')}
@@ -227,18 +234,20 @@ export function RuntimePairingPage(props: {
                     >
                       <Checkbox.Control />
                       <Checkbox.Label>
-                        Allow bypassing permission requests
+                        Разрешить обход запросов разрешений
                       </Checkbox.Label>
                     </Checkbox>
                     <p class="text-xs text-ink-muted">
-                      When off, every agent on this machine must ask for
-                      permission. You can change this later in Machines.
+                      Если выключено, каждый агент на этой машине должен
+                      спрашивать разрешение. Позже это можно изменить в разделе
+                      «Машины».
                     </p>
                     <Show when={allowPermissionBypass()}>
                       <p class="text-xs text-negative" role="alert">
-                        Agents can run commands and edit files on this machine
-                        without approval. Only enable this if you trust everyone
-                        who can create agents on this machine.
+                        Агенты смогут выполнять команды и изменять файлы на этой
+                        машине без подтверждения. Включайте, только если
+                        доверяете всем, кто может создавать агентов на этой
+                        машине.
                       </p>
                     </Show>
                   </div>
@@ -247,7 +256,7 @@ export function RuntimePairingPage(props: {
             </Match>
 
             <Match when={committedCode()}>
-              <p class="text-sm text-ink-muted">Looking up pairing code…</p>
+              <p class="text-sm text-ink-muted">Ищем код сопряжения…</p>
             </Match>
 
             <Match when>
@@ -257,7 +266,7 @@ export function RuntimePairingPage(props: {
                     for="harness-pairing-code"
                     class="text-xs font-medium text-ink"
                   >
-                    Pairing code
+                    Код сопряжения
                   </label>
                   <div class="flex min-w-0 items-center gap-2 rounded-lg border border-edge-muted bg-ink/[0.025] px-3 py-2">
                     <input
@@ -280,8 +289,8 @@ export function RuntimePairingPage(props: {
                     id="harness-pairing-code-help"
                     class="text-xs text-ink-extra-muted"
                   >
-                    Already configured? Press <kbd>p</kbd> in roxd to get a
-                    new code.
+                    Уже настроено? Нажмите <kbd>p</kbd> в roxd, чтобы получить
+                    новый код.
                   </p>
                 </div>
               </RuntimeSetupSteps>
@@ -296,7 +305,7 @@ export function RuntimePairingPage(props: {
                   size="sm"
                   onClick={props.onClose}
                 >
-                  Done
+                  Готово
                 </Button>
               </Match>
               <Match when={errorMessage()}>
@@ -306,7 +315,7 @@ export function RuntimePairingPage(props: {
                   size="sm"
                   onClick={props.onClose}
                 >
-                  Close
+                  Закрыть
                 </Button>
               </Match>
               <Match when={pairingData()}>
@@ -317,7 +326,7 @@ export function RuntimePairingPage(props: {
                   disabled={approveMutation.isPending}
                   onClick={props.onClose}
                 >
-                  Cancel
+                  Отмена
                 </Button>
                 <Button
                   type="button"
@@ -326,7 +335,7 @@ export function RuntimePairingPage(props: {
                   disabled={!canApprove()}
                   onClick={() => fireAndForget(approve(), 'runtime-pairing')}
                 >
-                  {approveMutation.isPending ? 'Approving…' : 'Approve'}
+                  {approveMutation.isPending ? 'Подтверждение…' : 'Подтвердить'}
                 </Button>
               </Match>
               <Match when={committedCode()}>
@@ -336,7 +345,7 @@ export function RuntimePairingPage(props: {
                   size="sm"
                   onClick={props.onClose}
                 >
-                  Cancel
+                  Отмена
                 </Button>
               </Match>
               <Match when>
@@ -346,7 +355,7 @@ export function RuntimePairingPage(props: {
                   size="sm"
                   onClick={props.onClose}
                 >
-                  Cancel
+                  Отмена
                 </Button>
                 <Button
                   type="button"
@@ -355,7 +364,7 @@ export function RuntimePairingPage(props: {
                   disabled={codeInput().trim().length === 0}
                   onClick={lookUp}
                 >
-                  Look up
+                  Найти
                 </Button>
               </Match>
             </Switch>

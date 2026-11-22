@@ -1,5 +1,5 @@
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 
 /** The caller's referral code and the signup link that carries it. */
 export interface ReferralLink {
@@ -17,7 +17,7 @@ export interface ReferralLink {
  * @routing Use when sharing the user's referral link or inviting people to join Macro; not team membership.
  */
 export class ReferralNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * The caller's referral link, to share wherever the user wants.
@@ -48,7 +48,7 @@ export class ReferralNamespace {
    */
   async invite(email: string): Promise<void> {
     const recipient = email.trim();
-    if (!recipient) throw new MacroError('invite needs an email address');
+    if (!recipient) throw new RoxError('invite needs an email address');
     unwrap(await this.client.auth.sendReferralCode({ body: { recipient } }));
   }
 }

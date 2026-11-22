@@ -59,7 +59,7 @@ fn an_agent_can_deny_a_held_call() {
 #[test]
 fn both_agent_run_markers_refuse_approvals_but_allow_denial_and_cancellation() {
     let execution_headers = HeaderMap::from_iter([(
-        axum::http::HeaderName::from_static(macro_authorization::CODE_EXECUTION_HEADER),
+        axum::http::HeaderName::from_static(rox_authorization::CODE_EXECUTION_HEADER),
         axum::http::HeaderValue::from_static("execution"),
     )]);
 
@@ -99,12 +99,12 @@ fn a_person_can_approve_or_remember_a_held_call() {
 /// `agent_id`; the token alone must refuse its approval.
 #[test]
 fn a_routine_owner_token_cannot_approve_a_held_call_without_the_marker() {
-    let routine_step = macro_authorization::MacroUserAuthentication {
-        origin: macro_authorization::CredentialOrigin::MacroApiJwt,
+    let routine_step = rox_authorization::RoxUserAuthentication {
+        origin: rox_authorization::CredentialOrigin::RoxApiJwt,
         agent_id: None,
         agent_via: None,
         routine_id: Some(Uuid::from_u128(0x7001)),
-        macro_user_id: macro_user_id::user_id::MacroUserIdStr::try_from_email("owner@example.com")
+        macro_user_id: rox_user_id::user_id::RoxUserIdStr::try_from_email("owner@example.com")
             .unwrap(),
         user_context: Default::default(),
     };

@@ -2,14 +2,14 @@
 //! other people's clients the picture changed.
 
 use axum::{Json, http::StatusCode};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::response::ErrorResponse;
 use rate_limit::domain::{
     models::{RateLimitConfig, RateLimitExceeded, RateLimitKey, RateLimitResult},
     ports::RateLimitService,
 };
-use user_events::{UserMacroEvent, UserPictureChangedMetadata};
+use user_events::{UserRoxEvent, UserPictureChangedMetadata};
 
 use crate::api::{context::ApiContext, middleware::rate_limit::RATE_LIMIT_ENABLED};
 
@@ -71,7 +71,7 @@ pub(super) async fn throttle_set(ctx: &ApiContext, user_id: &str) -> Result<(), 
 
 /// Event metadata for a new picture. An empty url means it was removed.
 pub(super) fn picture_changed_metadata(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     file_id: Option<String>,
     url: &str,
 ) -> UserPictureChangedMetadata {
@@ -95,7 +95,7 @@ pub(super) fn publish_picture_changed(ctx: &ApiContext, metadata: UserPictureCha
     let user_id = metadata.user_id.to_string();
     let file_id = metadata.file_id.clone();
     let removed = metadata.url.is_none();
-    let event = UserMacroEvent::picture_changed(metadata);
+    let event = UserRoxEvent::picture_changed(metadata);
     if let Err(error) = ctx.event_broker.send_event(&event) {
         tracing::warn!(
             error = ?error,

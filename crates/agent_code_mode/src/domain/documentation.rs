@@ -1,6 +1,6 @@
 //! Bounded SDK documentation selection through the shared cognition service.
 use cognition::domain::{Answer, BatchedOutcome, Cognition, RoutingRequest, decide_in_batches};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -264,7 +264,7 @@ impl Ranking<'_> {
 /// of 32. Entities whose call fails or misses the deadline are not ranked; the
 /// rest still are.
 async fn rank_entities<'a>(
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     request: RoutingRequest<'_>,
     docs: &'a [SdkDocumentation],
     cognition: Option<&Arc<dyn Cognition>>,
@@ -325,7 +325,7 @@ async fn rank_entities<'a>(
 /// an exact tokenizer count.
 #[tracing::instrument(skip_all, fields(guidance = ?guidance, batches = tracing::field::Empty, selected = tracing::field::Empty, bytes = tracing::field::Empty, selection_status = tracing::field::Empty, selected_entities = tracing::field::Empty))]
 pub async fn select_documentation(
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     request: RoutingRequest<'_>,
     cognition: Option<&Arc<dyn Cognition>>,
     guidance: Guidance,
@@ -408,7 +408,7 @@ pub struct TaskDocumentation {
 /// entity's index and guide; its attached skill comes on top.
 #[tracing::instrument(name = "code_mode.task_documentation", skip_all, fields(batches = tracing::field::Empty, selected = tracing::field::Empty, omitted = tracing::field::Empty, bytes = tracing::field::Empty, selection_status = tracing::field::Empty, selected_entities = tracing::field::Empty))]
 pub async fn documentation_for_task(
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     task: &str,
     cognition: Option<&Arc<dyn Cognition>>,
     cancel: &CancellationToken,
@@ -427,10 +427,20 @@ pub async fn documentation_for_task(
         cancel,
     )
     .await;
+    // Selection is a convenience, not a dependency: no cognition, a timeout or
+    // a provider error must still hand the agent usable, pre-recorded help.
+    // The catalog is compiled in, so this path never fails and never leaves the
+    // model without the entity indexes it asked for.
+    let degraded = ranking.status != SelectionStatus::Selected || ranking.entities.is_empty();
+    let selected: Vec<&SdkDocumentation> = if degraded {
+        docs.iter().collect()
+    } else {
+        ranking.entities.clone()
+    };
     let mut bytes = 0;
     let mut entities = Vec::new();
     let mut omitted = Vec::new();
-    for doc in ranking.entities {
+    for doc in selected {
         let size = documentation_size(doc);
         if bytes + size <= DOCUMENTATION_BYTES {
             bytes += size;

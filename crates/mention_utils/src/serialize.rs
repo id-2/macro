@@ -1,5 +1,5 @@
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Serialize;
 
 #[cfg(test)]
@@ -13,7 +13,7 @@ struct UserMention<'a> {
 }
 
 /// Serialize a Rox user as an in-app user mention node.
-pub fn user_mention(user_id: &MacroUserIdStr<'_>) -> Result<String, serde_json::Error> {
+pub fn user_mention(user_id: &RoxUserIdStr<'_>) -> Result<String, serde_json::Error> {
     let payload = tag_json(&UserMention {
         user_id: user_id.as_ref(),
         email: user_id.email_str(),

@@ -11,9 +11,9 @@ aws-sdk-s3 = { workspace = true }
 base64 = { workspace = true }
 image = { workspace = true }
 lambda_runtime = { workspace = true }
-macro_aws_config = { path = "../../crates/macro_aws_config", features = ["s3"] }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env_var = { path = "../../crates/macro_env_var" }
+rox_aws_config = { path = "../../crates/rox_aws_config", features = ["s3"] }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env_var = { path = "../../crates/rox_env_var" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 serde_urlencoded = { workspace = true }

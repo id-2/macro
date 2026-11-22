@@ -38,7 +38,7 @@ where
     /// thread's alias requires independent access to its entire inbox.
     pub(crate) async fn resolve_thread_read_id_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         thread_id: Uuid,
     ) -> Result<Uuid, EmailErr> {
         let inboxes = self
@@ -379,7 +379,7 @@ where
     /// Fetch Mail projection data for authorized threads in one repository batch.
     pub(crate) async fn get_email_thread_mail_projections_impl(
         &self,
-        viewer: macro_user_id::user_id::MacroUserIdStr<'static>,
+        viewer: rox_user_id::user_id::RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
     ) -> Result<HashMap<Uuid, EmailThreadMailProjection>, EmailErr> {
         let thread_ids = email_thread_ids_from_receipts(receipts)?;
@@ -554,7 +554,7 @@ fn parsed_message_from_row(
         body_parsed,
         body_text: row.body_text,
         body_html_sanitized: row.body_html_sanitized,
-        body_macro: row.body_macro,
+        body_rox: row.body_rox,
         body_replyless,
         internal_date_ts: row.internal_date_ts,
         sent_at: row.sent_at,

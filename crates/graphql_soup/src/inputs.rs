@@ -2,7 +2,7 @@ use async_graphql::{Enum, ID};
 use graphql_common::{GraphqlPropertyEntityType, parse_id};
 use graphql_soup_filter_input::GraphqlEntityFilterAst;
 use item_filters::ast::{EntityFilterAst, properties::PropertyEntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::{GroupByField, GroupingConfig};
 
 /// Caller-defined property date-range inputs.
@@ -121,7 +121,7 @@ impl GroupedSoupInput {
     /// Convert this value into the grouped Soup domain request.
     pub(crate) fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        macro_user_id: RoxUserIdStr<'static>,
     ) -> async_graphql::Result<GroupedSortRequest<'static>> {
         match self {
             Self::Initial(input) => input.into_request(macro_user_id),
@@ -134,7 +134,7 @@ impl GroupedSoupInitialInput {
     /// Convert an initial input into the grouped Soup domain request.
     fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        macro_user_id: RoxUserIdStr<'static>,
     ) -> async_graphql::Result<GroupedSortRequest<'static>> {
         let filters = self
             .filters
@@ -166,7 +166,7 @@ impl GroupedSoupContinuationInput {
     /// Decode a bin cursor into the grouped Soup domain request.
     fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        macro_user_id: RoxUserIdStr<'static>,
     ) -> async_graphql::Result<GroupedSortRequest<'static>> {
         Ok(GroupedSortRequest::continue_from(
             macro_user_id,
@@ -265,7 +265,7 @@ impl SoupInput {
     /// Convert this value into the request representation.
     pub(crate) fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        macro_user_id: RoxUserIdStr<'static>,
         link_ids: Vec<Uuid>,
     ) -> async_graphql::Result<SoupRequest<EntityFilterAst>> {
         match self {
@@ -279,7 +279,7 @@ impl SoupInitialInput {
     /// Convert an initial input into the request representation.
     fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        macro_user_id: RoxUserIdStr<'static>,
         link_ids: Vec<Uuid>,
     ) -> async_graphql::Result<SoupRequest<EntityFilterAst>> {
         let filter = self
@@ -327,7 +327,7 @@ impl SoupContinuationInput {
     /// Decode a cursor continuation into the request representation.
     fn into_request(
         self,
-        macro_user_id: MacroUserIdStr<'static>,
+        macro_user_id: RoxUserIdStr<'static>,
         link_ids: Vec<Uuid>,
     ) -> async_graphql::Result<SoupRequest<EntityFilterAst>> {
         let cursor = Base64Str::<SoupContinuationCursor>::new_from_string(self.cursor)

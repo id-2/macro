@@ -1,6 +1,7 @@
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { createSignal, type ParentProps } from 'solid-js';
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, expect, it, vi } from 'vitest';
 import { DriveCreateMenu } from './drive-create-menu';
 
 const host = vi.hoisted(() => ({
@@ -66,6 +67,8 @@ async function openMenu() {
   );
   return screen.findByRole('menu');
 }
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 it('names the open folder as the destination', async () => {
   const menu = await openMenu();

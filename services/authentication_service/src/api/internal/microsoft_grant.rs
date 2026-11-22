@@ -6,7 +6,7 @@ use axum::{
     http::{StatusCode, header},
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use uuid::Uuid;
 
 #[derive(serde::Deserialize)]
@@ -17,7 +17,7 @@ pub struct GrantRequest {
 
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Query(request): Query<GrantRequest>,
 ) -> Response {
     let Some(service) = ctx.microsoft_auth else {

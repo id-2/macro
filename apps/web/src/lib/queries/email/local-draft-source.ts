@@ -4,7 +4,7 @@ import type {
   QueryState,
 } from '@app/features/next-soup/filters/filter-store/types';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   type Accessor,
   createEffect,

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_mailbox_drafts\n            (message_id, link_id, generation, actor_id, desired_content, state)\n            VALUES ($1, $2, 1, 'macro|mail@example.com', '{}'::jsonb, 'synced')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "9ae6445e41df06683430a851579685145e1de9bf62862c71fbbdce04a3364ab3"
+}

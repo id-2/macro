@@ -362,7 +362,7 @@ async fn a_calendar_write_refused_before_the_provider_cancels_the_fresh_meeting(
         )
         .await
         .unwrap_err();
-        assert!(matches!(error, MacroCallEventError::Calendar(_)));
+        assert!(matches!(error, RoxCallEventError::Calendar(_)));
         assert_eq!(
             *links.cancelled.lock().unwrap(),
             vec![("macro|owner@example.com".to_string(), Uuid::from_u128(42))]
@@ -392,7 +392,7 @@ async fn an_event_that_may_have_reached_the_provider_keeps_its_meeting() {
         )
         .await
         .unwrap_err();
-        assert!(matches!(error, MacroCallEventError::Calendar(_)));
+        assert!(matches!(error, RoxCallEventError::Calendar(_)));
         assert!(links.cancelled.lock().unwrap().is_empty());
     }
 }
@@ -417,7 +417,7 @@ async fn a_failed_meeting_writes_nothing_to_the_calendar() {
     .unwrap_err();
     assert!(matches!(
         error,
-        MacroCallEventError::MeetingLink(MeetingLinkError::Failed(_))
+        RoxCallEventError::MeetingLink(MeetingLinkError::Failed(_))
     ));
     assert!(mutations.created.lock().unwrap().is_empty());
 }
@@ -449,7 +449,7 @@ async fn out_of_office_and_provider_conferencing_are_refused_before_minting() {
         .unwrap_err();
         assert!(matches!(
             error,
-            MacroCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
+            RoxCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
         ));
     }
     assert!(links.requests.lock().unwrap().is_empty());
@@ -472,7 +472,7 @@ async fn an_unwired_host_refuses_the_call_without_touching_the_calendar() {
     .unwrap_err();
     assert!(matches!(
         error,
-        MacroCallEventError::MeetingLink(MeetingLinkError::Unavailable)
+        RoxCallEventError::MeetingLink(MeetingLinkError::Unavailable)
     ));
     assert!(mutations.created.lock().unwrap().is_empty());
 }
@@ -646,7 +646,7 @@ async fn retrying_a_finished_switch_writes_nothing() {
 
     assert!(matches!(
         error,
-        MacroCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
+        RoxCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
     ));
     assert!(links.requests.lock().unwrap().is_empty());
     assert!(mutations.updated.lock().unwrap().is_empty());
@@ -711,7 +711,7 @@ async fn a_switch_refused_before_the_provider_cancels_the_fresh_meeting() {
         .await
         .unwrap_err();
 
-        assert!(matches!(error, MacroCallEventError::Calendar(_)));
+        assert!(matches!(error, RoxCallEventError::Calendar(_)));
         assert_eq!(
             *links.cancelled.lock().unwrap(),
             vec![("macro|owner@example.com".to_string(), Uuid::from_u128(42))]
@@ -761,7 +761,7 @@ async fn a_failed_mint_leaves_the_event_untouched() {
     .await
     .unwrap_err();
 
-    assert!(matches!(error, MacroCallEventError::MeetingLink(_)));
+    assert!(matches!(error, RoxCallEventError::MeetingLink(_)));
     assert!(mutations.updated.lock().unwrap().is_empty());
 }
 
@@ -787,7 +787,7 @@ async fn switching_refuses_an_explicit_provider_conference() {
 
     assert!(matches!(
         error,
-        MacroCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
+        RoxCallEventError::Calendar(CalendarMutationError::InvalidInput(_))
     ));
     assert!(links.requests.lock().unwrap().is_empty());
 }

@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_threads SET is_signal = TRUE",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "32c51fe3109ada4e48a910a0e7d73b32079d688af1497d676c458228744b78ae"
+}

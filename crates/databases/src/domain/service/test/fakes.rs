@@ -430,7 +430,7 @@ impl DatabasesRepo for FakeRepo {
         &self,
         database_id: Option<DatabaseId>,
         definition: &QueryDefinition,
-        created_by: &MacroUserIdStr<'_>,
+        created_by: &RoxUserIdStr<'_>,
     ) -> Result<SavedQuery, FakeError> {
         let saved = SavedQuery {
             id: QueryId::new(),
@@ -754,7 +754,7 @@ impl TableEventPublisher for FakeEvents {
     async fn awareness(
         &self,
         database_id: DatabaseId,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         can_edit: bool,
         state: &Awareness,
     ) -> Result<(), FakeError> {
@@ -809,8 +809,8 @@ impl AccessDirectory for FakeAccess {
 #[derive(Clone)]
 pub(super) struct RecordingBroker(pub(super) Shared);
 
-impl MacroEventBroker for RecordingBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

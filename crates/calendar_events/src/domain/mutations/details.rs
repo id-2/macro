@@ -11,7 +11,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     /// Refuse a guest the organizer does not let modify the event any change
@@ -55,7 +55,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(skip(self, requester_id), err)]

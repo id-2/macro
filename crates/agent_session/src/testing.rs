@@ -22,8 +22,8 @@ use crate::domain::ports::{
 use agent_client_protocol::schema::v1::SessionId;
 use agent_runtime_protocol::domain::schema::v0::ToServerMessage;
 use bots::domain::models::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use std::collections::HashMap;
 use std::num::NonZeroUsize;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -72,7 +72,7 @@ pub struct InMemoryAgentSessionRepo {
     egress_token_hashes: Arc<Mutex<HashMap<String, AgentSessionId>>>,
     logs: Arc<Mutex<HashMap<AgentSessionId, Vec<StoredAgentSessionLog>>>>,
     log_transaction: Arc<Mutex<()>>,
-    history_boundaries: Arc<Mutex<HashMap<AgentSessionId, macro_uuid::Uuid>>>,
+    history_boundaries: Arc<Mutex<HashMap<AgentSessionId, rox_uuid::Uuid>>>,
     turn_states: Arc<Mutex<HashMap<AgentSessionId, agent_fold::domain::model::TurnState>>>,
     /// Sessions whose turn was open when they last disconnected.
     interrupted_turns: Arc<Mutex<std::collections::HashSet<AgentSessionId>>>,
@@ -91,7 +91,7 @@ pub struct InMemoryAgentSessionRepo {
     /// Session -> who prompted its turn, mirroring the `turn_*` columns.
     turn_prompters: Arc<Mutex<HashMap<AgentSessionId, TurnPrompter>>>,
     /// People who prompted each session directly, in the order they did.
-    followers: Arc<Mutex<HashMap<AgentSessionId, Vec<MacroUserIdStr<'static>>>>>,
+    followers: Arc<Mutex<HashMap<AgentSessionId, Vec<RoxUserIdStr<'static>>>>>,
     /// Sessions an agent conversation sends its messages to, mirroring the
     /// current rows of `agent_conversation_sessions`.
     conversation_sessions: Arc<Mutex<std::collections::HashSet<AgentSessionId>>>,
@@ -132,7 +132,7 @@ impl InMemoryAgentSessionRepo {
 
     /// Who prompted `session` directly, in the order they first did.
     #[must_use]
-    pub fn followers(&self, session: AgentSessionId) -> Vec<MacroUserIdStr<'static>> {
+    pub fn followers(&self, session: AgentSessionId) -> Vec<RoxUserIdStr<'static>> {
         self.followers
             .lock()
             .expect("followers poisoned")
@@ -201,7 +201,7 @@ impl InMemoryAgentSessionRepo {
                 now.max(last.created_at + chrono::Duration::microseconds(1))
             });
             rows.push(StoredAgentSessionLog {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 created_at,
                 entry,
             });
@@ -265,7 +265,7 @@ impl AgentSessionRepo for InMemoryAgentSessionRepo {
 
     async fn preview(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         ids: &[AgentSessionId],
     ) -> Result<Vec<SessionPreviewCandidate>> {
         // No `entity_access` rows to consult here: the owner is the one grant
@@ -401,7 +401,7 @@ impl AgentSessionRepo for InMemoryAgentSessionRepo {
 
     async fn recent_for_owner(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         limit: NonZeroUsize,
     ) -> Result<Vec<AgentSession>> {
         let mut found: Vec<AgentSession> = self
@@ -467,7 +467,7 @@ impl AgentSessionRepo for InMemoryAgentSessionRepo {
         Ok(())
     }
 
-    async fn add_follower(&self, id: AgentSessionId, user: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn add_follower(&self, id: AgentSessionId, user: &RoxUserIdStr<'static>) -> Result<()> {
         self.get(id).await?;
         let mut followers = self.followers.lock().expect("followers poisoned");
         let session = followers.entry(id).or_default();
@@ -655,7 +655,7 @@ impl AgentSessionRepo for InMemoryAgentSessionRepo {
         Ok(())
     }
 
-    async fn user_sandbox_size(&self, user_id: &MacroUserIdStr<'static>) -> Result<SandboxSize> {
+    async fn user_sandbox_size(&self, user_id: &RoxUserIdStr<'static>) -> Result<SandboxSize> {
         Ok(self
             .user_sizes
             .lock()
@@ -667,7 +667,7 @@ impl AgentSessionRepo for InMemoryAgentSessionRepo {
 
     async fn set_user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         size: SandboxSize,
     ) -> Result<()> {
         self.user_sizes
@@ -679,7 +679,7 @@ impl AgentSessionRepo for InMemoryAgentSessionRepo {
 
     async fn user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<CodingPreferences> {
         Ok(self
             .user_coding_preferences
@@ -692,7 +692,7 @@ impl AgentSessionRepo for InMemoryAgentSessionRepo {
 
     async fn set_user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         preferences: CodingPreferences,
     ) -> Result<()> {
         self.user_coding_preferences
@@ -876,7 +876,7 @@ impl InMemoryAgentSessionRepo {
         };
         let session_id = log.agent_session_id;
         let stored = StoredAgentSessionLog {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             created_at: chrono::Utc::now(),
             entry: log,
         };
@@ -982,9 +982,9 @@ impl AgentSessionLogRepo for InMemoryAgentSessionRepo {
     async fn participants(
         &self,
         agent_session_id: AgentSessionId,
-    ) -> Result<Vec<MacroUserIdStr<'static>>> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>> {
         let logs = self.logs.lock().unwrap();
-        let mut users: Vec<MacroUserIdStr<'static>> = Vec::new();
+        let mut users: Vec<RoxUserIdStr<'static>> = Vec::new();
         for user in logs
             .get(&agent_session_id)
             .into_iter()
@@ -1180,7 +1180,7 @@ pub fn test_agent_session(id: AgentSessionId) -> AgentSession {
         name: DEFAULT_AGENT_SESSION_NAME.to_owned(),
         archived: None,
         owner_id: model_owner::Owner::User(
-            macro_user_id::user_id::MacroUserIdStr::try_from_email("owner@example.com")
+            rox_user_id::user_id::RoxUserIdStr::try_from_email("owner@example.com")
                 .expect("valid macro user id"),
         ),
         thread_id: None,
@@ -1343,7 +1343,7 @@ impl crate::domain::pull_request::SessionPullRequestRepo for InMemoryAgentSessio
     async fn record_pull_request(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         url: &str,
         claim: Option<SessionClaim>,
     ) -> Result<bool> {

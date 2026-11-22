@@ -25,7 +25,7 @@ use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, EntityAccessAuth, EntityAccessReceipt, EntityPermission,
     OwnerAccessLevel, RequiredPermission, ViewAccessLevel,
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::service::property_value::PropertyValue;
 use models_properties::shared::DataType;
@@ -34,7 +34,7 @@ use uuid::Uuid;
 
 use crate::domain::catalog::{self, TableEntry, takes_options};
 use crate::domain::events::{
-    self, DatabaseCreatedMetadata, DatabaseMacroEvent, DatabasePurgedMetadata,
+    self, DatabaseCreatedMetadata, DatabaseRoxEvent, DatabasePurgedMetadata,
     DatabaseRenamedMetadata, DatabaseRestoredMetadata, DatabaseTablesChangedMetadata,
     DatabaseTrashedMetadata, TableVersionChange,
 };
@@ -240,7 +240,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     /// Create a databases service from its port implementations.
     pub fn new(
@@ -263,7 +263,7 @@ where
 
     /// Publish one domain event. The write it describes already committed,
     /// so a broker failure is logged rather than surfaced.
-    fn emit(&self, event: DatabaseMacroEvent) {
+    fn emit(&self, event: DatabaseRoxEvent) {
         if let Err(error) = self.broker.send_event(&event) {
             tracing::warn!(error = ?error, "failed to publish database event");
         }
@@ -411,7 +411,7 @@ where
         }
         for (database_id, mut tables) in changed_by_database {
             tables.sort_by_key(|change| change.table_id);
-            self.emit(DatabaseMacroEvent::tables_changed(
+            self.emit(DatabaseRoxEvent::tables_changed(
                 DatabaseTablesChangedMetadata {
                     database_id,
                     attribution: attribution.clone(),
@@ -532,7 +532,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     #[tracing::instrument(skip(self), err)]
     async fn create_database(&self, command: CreateDatabase) -> Result<Database, DatabaseError> {
@@ -549,7 +549,7 @@ where
             .create_database(&command, first_table)
             .await
             .map_err(repository_error)?;
-        self.emit(DatabaseMacroEvent::created(DatabaseCreatedMetadata {
+        self.emit(DatabaseRoxEvent::created(DatabaseCreatedMetadata {
             database_id: database.id,
             owner: command.owner_id.clone(),
             name: database.name.clone(),
@@ -577,7 +577,7 @@ where
         {
             return Err(DatabaseError::NotFound);
         }
-        self.emit(DatabaseMacroEvent::renamed(DatabaseRenamedMetadata {
+        self.emit(DatabaseRoxEvent::renamed(DatabaseRenamedMetadata {
             database_id: database.id,
             attribution: receipt_attribution(&receipt),
             name: name.clone(),
@@ -618,7 +618,7 @@ where
             .await
             .map_err(repository_error)?
         {
-            self.emit(DatabaseMacroEvent::new(
+            self.emit(DatabaseRoxEvent::new(
                 database.id.to_string(),
                 events::DatabaseTopicEvent::AppearanceChanged {
                     database_id: database.id,
@@ -653,7 +653,7 @@ where
         {
             return Err(DatabaseError::NotFound);
         }
-        self.emit(DatabaseMacroEvent::trashed(DatabaseTrashedMetadata {
+        self.emit(DatabaseRoxEvent::trashed(DatabaseTrashedMetadata {
             database_id: database.id,
             attribution: receipt_attribution(&receipt),
         }));
@@ -677,7 +677,7 @@ where
         {
             return Err(DatabaseError::NotFound);
         }
-        self.emit(DatabaseMacroEvent::restored(DatabaseRestoredMetadata {
+        self.emit(DatabaseRoxEvent::restored(DatabaseRestoredMetadata {
             database_id: database.id,
             attribution: receipt_attribution(&receipt),
         }));
@@ -696,7 +696,7 @@ where
             .delete_database(database.id)
             .await
             .map_err(repository_error)?;
-        self.emit(DatabaseMacroEvent::purged(DatabasePurgedMetadata {
+        self.emit(DatabaseRoxEvent::purged(DatabasePurgedMetadata {
             database_id: database.id,
         }));
         Ok(())

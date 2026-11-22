@@ -1,4 +1,5 @@
 import { invalidateInvitationScheduling } from '@queries/calendar/invitations';
+import { readBodyRox } from '@queries/email/body-rox-compat';
 import { isListedLocalDraft } from '@queries/email/local-draft-entities';
 import { createLocalDraftSource } from '@queries/email/local-draft-source';
 import { localDraftMessage } from '@queries/email/local-drafts';
@@ -55,7 +56,7 @@ export function toEmailThread(thread: ApiThread): EmailThread {
         photo_url: contact.photo_url,
       })),
       body_html_sanitized: message.body_html_sanitized,
-      body_macro: message.body_macro,
+      body_rox: readBodyRox(message),
       body_replyless: message.body_replyless,
       body_text: message.body_text,
       cc: message.cc.map((contact) => ({

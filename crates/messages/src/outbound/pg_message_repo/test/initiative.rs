@@ -47,7 +47,7 @@ fn input(content: &str, root: Option<Uuid>) -> PostMessage {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn project_discussions_use_shared_parent_lifecycle_checks(pool: PgPool) {
     setup(&pool).await;
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     create_project(&pool, id).await;
     let repo = PgMessageRepository::new(pool.clone())
         .with_initiatives(InitiativeLookup::new(PgInitiativeRepo::new(pool.clone())));
@@ -63,7 +63,7 @@ async fn project_discussions_use_shared_parent_lifecycle_checks(pool: PgPool) {
     });
     reply_input.attachments.push(NewAttachment {
         entity_type: "static_image".into(),
-        entity_id: macro_uuid::generate_uuid_v7().to_string(),
+        entity_id: rox_uuid::generate_uuid_v7().to_string(),
         width: None,
         height: None,
     });
@@ -175,8 +175,8 @@ async fn initiative_threads_reject_cross_parent_replies_and_thread_deletion_hide
     pool: PgPool,
 ) {
     setup(&pool).await;
-    let first = macro_uuid::generate_uuid_v7();
-    let second = macro_uuid::generate_uuid_v7();
+    let first = rox_uuid::generate_uuid_v7();
+    let second = rox_uuid::generate_uuid_v7();
     create_project(&pool, first).await;
     create_project(&pool, second).await;
     let repo = PgMessageRepository::new(pool.clone())

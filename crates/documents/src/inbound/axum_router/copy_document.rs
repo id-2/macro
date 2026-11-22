@@ -7,7 +7,7 @@ use axum::{
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
 use entity_registry::CreationPrincipalExtractor;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model::document::{DocumentBasic, FileTypeExt};
 use models_permissions::share_permission::access_level::ViewAccessLevel;
 
@@ -43,7 +43,7 @@ use crate::domain::ports::DocumentService;
 pub async fn copy_document_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     CreationPrincipalExtractor { principal, .. }: CreationPrincipalExtractor<Auth>,
     access: DocumentAccessExtractor<ViewAccessLevel, Svc, Auth>,

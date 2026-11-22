@@ -2,7 +2,7 @@ use std::sync::Mutex;
 
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 use crate::domain::error::Result;
@@ -21,14 +21,14 @@ impl WorkRegistrations for ScriptedSweeps {
     async fn register(
         &self,
         _access: &EntityAccessReceipt<EditAccessLevel>,
-        _account: &MacroUserIdStr<'static>,
+        _account: &RoxUserIdStr<'static>,
     ) -> Result<WorkRegistration> {
         Err(crate::domain::error::AgentSessionError::Forbidden)
     }
 
     async fn unregister(
         &self,
-        _account: &MacroUserIdStr<'static>,
+        _account: &RoxUserIdStr<'static>,
         _session: AgentSessionId,
     ) -> Result<()> {
         Ok(())
@@ -36,16 +36,16 @@ impl WorkRegistrations for ScriptedSweeps {
 
     async fn visible_registrations(
         &self,
-        _viewer: &MacroUserIdStr<'static>,
-        _accounts: &[MacroUserIdStr<'static>],
+        _viewer: &RoxUserIdStr<'static>,
+        _accounts: &[RoxUserIdStr<'static>],
     ) -> Result<Vec<WorkRegistration>> {
         Ok(Vec::new())
     }
 
     async fn changes(
         &self,
-        _viewer: &MacroUserIdStr<'static>,
-        _accounts: &[MacroUserIdStr<'static>],
+        _viewer: &RoxUserIdStr<'static>,
+        _accounts: &[RoxUserIdStr<'static>],
         _sessions: &[AgentSessionId],
         _ended_after: DateTime<Utc>,
     ) -> Result<WorkRegistrationChanges> {

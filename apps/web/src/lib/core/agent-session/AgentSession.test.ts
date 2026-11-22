@@ -107,7 +107,7 @@ const telemetry = vi.hoisted(() => ({
   /** The span whose `run` is on the stack, if any. */
   active: undefined as RecordedSpan | undefined,
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: (name: string) => {
       const record: RecordedSpan = { name, attributes: {}, ends: 0 };

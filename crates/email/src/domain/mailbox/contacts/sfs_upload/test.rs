@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::UserProvider;
 use std::io::Write;
 use std::sync::{Arc, Mutex};
@@ -97,7 +97,7 @@ fn setup() -> (SfsPhotoUploadService<Fake, Fake, Fake, Fake>, Fake) {
         uploaded: Some((UPLOADED_SOURCE.into(), DESTINATION.into())),
         link: Some(Link {
             id: LINK,
-            macro_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+            macro_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
             fusionauth_user_id: "owner".into(),
             email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
             provider: UserProvider::Gmail,

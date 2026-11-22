@@ -14,9 +14,9 @@ use axum::{
     routing::{get, post},
 };
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_authorization::{
-    CredentialOrigin, InternalAuthConfig, JwtValidator, MacroAuthorizationError,
-    MacroAuthorizationServiceImpl, MacroAuthorizationState, NoBotAuthorizer,
+use rox_authorization::{
+    CredentialOrigin, InternalAuthConfig, JwtValidator, RoxAuthorizationError,
+    RoxAuthorizationServiceImpl, RoxAuthorizationState, NoBotAuthorizer,
     NoUserApiKeyAuthorizer, ValidatedCredential, ValidatedIdentity,
 };
 use serde_json::{Value, json};
@@ -31,7 +31,7 @@ const AGENT: Uuid = Uuid::from_u128(42);
 struct Rollout(Arc<AtomicBool>);
 #[async_trait::async_trait]
 impl SelectiveEmailGate for Rollout {
-    async fn enabled_for(&self, _: macro_user_id::user_id::MacroUserIdStr<'_>) -> bool {
+    async fn enabled_for(&self, _: rox_user_id::user_id::RoxUserIdStr<'_>) -> bool {
         self.0.load(Ordering::SeqCst)
     }
 }
@@ -41,15 +41,15 @@ impl JwtValidator for Credential {
     fn validate_credential(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, rootcause::Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, rootcause::Report<RoxAuthorizationError>> {
         if !matches!(token, "owner" | "agent") {
             return Err(rootcause::Report::new(
-                MacroAuthorizationError::InvalidCredentials,
+                RoxAuthorizationError::InvalidCredentials,
             ));
         }
         Ok(ValidatedCredential {
             origin: if token == "agent" {
-                CredentialOrigin::MacroApiJwt
+                CredentialOrigin::RoxApiJwt
             } else {
                 CredentialOrigin::Session
             },
@@ -78,8 +78,8 @@ fn app(pool: &PgPool, rollout: Arc<AtomicBool>) -> Router {
         entity_access_service: Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
             pool.clone(),
         ))),
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
                 Credential,
                 InternalAuthConfig {
                     api_key: "fixture-only".into(),

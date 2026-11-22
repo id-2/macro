@@ -20,7 +20,7 @@ chrono = { workspace = true }
 chrono-tz = { workspace = true }
 futures = { workspace = true }
 lexical_client = { path = "../lexical_client" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 messages = { path = "../messages", features = ["ports"] }
 prompt = { path = "../prompt" }
 rootcause = { workspace = true }

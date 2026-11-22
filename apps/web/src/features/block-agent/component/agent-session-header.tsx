@@ -1,5 +1,6 @@
 import type { BlockTool } from '@components/app/block-tool';
 import type { FileOperation } from '@components/app/split-layout/components/SplitFileMenu';
+import { t } from '@app/lib/i18n';
 import { Permissions } from '@core/component/SharePermissions';
 import { useShareModal } from '@core/component/TopBar/shareModal';
 import { openExternalUrl } from '@core/util/url';
@@ -32,7 +33,9 @@ export function agentSessionFileOperations(
     ...(permissions === Permissions.OWNER
       ? [
           {
-            label: archived ? 'Unarchive' : 'Archive',
+            label: archived
+              ? t('entityActions.unarchive')
+              : t('entityActions.archive'),
             icon: TrayIcon,
             action: setArchived,
           },
@@ -43,7 +46,7 @@ export function agentSessionFileOperations(
     ...(repositoryUrl
       ? [
           {
-            label: 'Open repository',
+            label: t('agentChat.openRepository'),
             icon: GitBranch,
             action: () => openExternalUrl(repositoryUrl),
           },
@@ -59,7 +62,9 @@ export function agentSessionTitle(
 ): string {
   const name = session?.name;
   if (name && name !== 'Agent Session') return name;
-  return transcriptTitle ?? name ?? sessionHarnessTitle(session ?? {});
+  if (transcriptTitle) return transcriptTitle;
+  if (!name) return sessionHarnessTitle(session ?? {});
+  return t('agentChat.defaultTitle');
 }
 
 /** What both agent session headers show and act on. */
@@ -131,8 +136,10 @@ export function useAgentSessionHeader(props: {
     openExternally: {
       label: () => {
         const provider = props.session()?.external?.provider;
-        if (!provider) return 'Open externally';
-        return `Open in ${provider.charAt(0).toUpperCase()}${provider.slice(1)}`;
+        if (!provider) return t('agentChat.openExternally');
+        return t('agentChat.openIn', {
+          provider: provider.charAt(0).toUpperCase() + provider.slice(1),
+        });
       },
       icon: ArrowSquareOut,
       action: () => {
@@ -142,7 +149,7 @@ export function useAgentSessionHeader(props: {
       condition: () => Boolean(props.session()?.external?.url),
     },
     share: {
-      label: 'Share',
+      label: t('agentChat.share'),
       icon: ShareIcon,
       action: openShare,
       condition: () => Boolean(entity()),

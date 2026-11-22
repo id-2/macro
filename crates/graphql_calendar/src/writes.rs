@@ -2,13 +2,13 @@ use std::{future::Future, pin::Pin, sync::Arc};
 
 use calendar_events::domain::{
     changes::{CalendarChangeQueryService, CalendarEventChange},
-    meeting_links::MacroCallEventError,
+    meeting_links::RoxCallEventError,
     models::{
         AttendeeResponseStatus, CalendarAttendeeInput, CalendarEvent, CalendarEventDraft,
         CalendarEventPatch,
     },
     ports::{
-        CalendarDeletionScope, CalendarMacroCallService, CalendarMutationError,
+        CalendarDeletionScope, CalendarRoxCallService, CalendarMutationError,
         CalendarMutationService, CalendarRsvpScope, CalendarUpdateScope,
     },
 };
@@ -36,7 +36,7 @@ pub(crate) trait CalendarGraphqlWrites: Send + Sync {
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> WriteFuture<'_, CalendarEvent, MacroCallEventError>;
+    ) -> WriteFuture<'_, CalendarEvent, RoxCallEventError>;
 
     fn update_event(
         &self,
@@ -93,7 +93,7 @@ impl CalendarGraphqlMutationContext {
     /// mutation answers with the state its write committed.
     pub fn new<M, C>(mutations: Arc<M>, committed_changes: Arc<C>) -> Self
     where
-        M: CalendarMutationService + CalendarMacroCallService,
+        M: CalendarMutationService + CalendarRoxCallService,
         C: CalendarChangeQueryService,
     {
         Self {
@@ -112,7 +112,7 @@ struct ServiceWrites<M, C> {
 
 impl<M, C> CalendarGraphqlWrites for ServiceWrites<M, C>
 where
-    M: CalendarMutationService + CalendarMacroCallService,
+    M: CalendarMutationService + CalendarRoxCallService,
     C: CalendarChangeQueryService,
 {
     fn create_event(
@@ -135,7 +135,7 @@ where
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> WriteFuture<'_, CalendarEvent, MacroCallEventError> {
+    ) -> WriteFuture<'_, CalendarEvent, RoxCallEventError> {
         Box::pin(async move {
             self.mutations
                 .create_event_with_macro_call(&viewer, email_link_id, calendar_id, draft)

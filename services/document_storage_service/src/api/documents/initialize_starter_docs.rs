@@ -14,8 +14,8 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use favorites::domain::ports::{FavoriteView, FavoritesService};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document_storage_service_internal::{
     InitializeStarterDocsResponse, StarterDocHowToGuide,
 };
@@ -30,7 +30,7 @@ use system_properties::{PriorityOption, StatusOption, SystemPropertyKey};
 
 /// Also the name `get_starter_docs` resolves the guide by, so the two stay in
 /// sync from one definition.
-pub(in crate::api) const HOW_TO_GUIDE_NAME: &str = "Rox how to guide";
+pub(in crate::api) const HOW_TO_GUIDE_NAME: &str = "Как устроен Rox";
 const HOW_TO_GUIDE_TEMPLATE: &str = include_str!("./template/macro_how_to_guide.md");
 
 /// A starter task the templates can mention. Mention tags embed the target's
@@ -51,21 +51,21 @@ struct StarterTask {
 
 const STARTER_TASKS: [StarterTask; 3] = [
     StarterTask {
-        name: "Intro to tasks",
+        name: "Введение в задачи",
         template: include_str!("./template/learn_about_tasks.md"),
         id_placeholder: "LEARN_ABOUT_TASKS_ID",
         name_placeholder: "LEARN_ABOUT_TASKS_NAME",
         priority: PriorityOption::High,
     },
     StarterTask {
-        name: "Advanced task features",
+        name: "Дополнительные возможности задач",
         template: include_str!("./template/advanced_task_features.md"),
         id_placeholder: "ADVANCED_TASK_FEATURES_ID",
         name_placeholder: "ADVANCED_TASK_FEATURES_NAME",
         priority: PriorityOption::Medium,
     },
     StarterTask {
-        name: "How we use tasks at Rox",
+        name: "Как мы пользуемся задачами в Rox",
         template: include_str!("./template/how_we_use_tasks.md"),
         id_placeholder: "HOW_WE_USE_TASKS_ID",
         name_placeholder: "HOW_WE_USE_TASKS_NAME",
@@ -97,7 +97,7 @@ const STARTER_DOC_ID_NAMESPACE: uuid::Uuid =
 /// duplicate webhook delivery — computes the same id, so the primary key
 /// dedupes creation instead of a rerun seeding a document twice.
 pub(in crate::api) fn starter_doc_id(
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     document_name: &str,
 ) -> uuid::Uuid {
     uuid::Uuid::new_v5(
@@ -112,7 +112,7 @@ pub(in crate::api) fn starter_doc_id(
 /// rerun that got this far before failing) is reused, never duplicated.
 async fn resolve_docs_tag(
     state: &ApiContext,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
 ) -> Option<(uuid::Uuid, uuid::Uuid)> {
     let tag_set = state
         .properties_service
@@ -167,7 +167,7 @@ fn internal_error(message: &str) -> Response {
 #[tracing::instrument(skip(state, user_context), fields(user_id=?user_context.authorization.user.macro_user_id))]
 pub async fn handler(
     State(state): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, Response> {
     tracing::info!("initialize starter docs");
 

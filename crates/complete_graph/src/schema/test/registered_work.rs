@@ -25,7 +25,7 @@ fn session() -> AgentSessionId {
 fn registration() -> WorkRegistration {
     WorkRegistration {
         id: WorkRegistrationId::new_from_uuid(REGISTRATION_ID),
-        account_id: MacroUserIdStr::parse_from_str(ACCOUNT).unwrap(),
+        account_id: RoxUserIdStr::parse_from_str(ACCOUNT).unwrap(),
         session: session(),
         registered_at: Utc::now(),
     }
@@ -43,8 +43,8 @@ struct FixedRegistrations {
 impl RegisteredWorkGraphqlService for FixedRegistrations {
     fn visible_registrations<'a>(
         &'a self,
-        _viewer: &'a MacroUserIdStr<'static>,
-        accounts: &'a [MacroUserIdStr<'static>],
+        _viewer: &'a RoxUserIdStr<'static>,
+        accounts: &'a [RoxUserIdStr<'static>],
     ) -> BoxFuture<'a, Result<Vec<WorkRegistration>, AgentSessionError>> {
         self.read_accounts.lock().unwrap().push(
             accounts
@@ -57,8 +57,8 @@ impl RegisteredWorkGraphqlService for FixedRegistrations {
 
     fn changes<'a>(
         &'a self,
-        _viewer: &'a MacroUserIdStr<'static>,
-        _accounts: &'a [MacroUserIdStr<'static>],
+        _viewer: &'a RoxUserIdStr<'static>,
+        _accounts: &'a [RoxUserIdStr<'static>],
         sessions: &'a [AgentSessionId],
         _ended_after: DateTime<Utc>,
     ) -> BoxFuture<'a, Result<WorkRegistrationChanges, AgentSessionError>> {
@@ -88,7 +88,7 @@ impl ManualPatches {
 impl SoupRealtimeSubscriptionService for ManualPatches {
     fn subscribe(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
     ) -> tokio::sync::mpsc::Receiver<Patch<Entity<'static>>> {
         let (sender, receiver) = tokio::sync::mpsc::channel(8);
         *self.0.lock().unwrap() = Some(sender);
@@ -107,8 +107,8 @@ const SUBSCRIPTION: &str = r#"subscription { registeredWorkUpdates(accountIds: [
     ... on GraphqlRegisteredWorkInvalidate { refresh }
 } }"#;
 
-fn viewer_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap()
+fn viewer_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap()
 }
 
 fn loader(items: Vec<SoupItem<()>>) -> graphql_soup::AgentSessionEntityLoader {

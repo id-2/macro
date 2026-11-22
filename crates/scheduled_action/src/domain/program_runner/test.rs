@@ -4,7 +4,7 @@ use std::sync::Mutex;
 use bots::domain::models::AgentMcpServer;
 use chrono::{TimeZone, Utc};
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model_entity::EntityType;
 use model_owner::Owner;
 use rootcause::Report;
@@ -50,7 +50,7 @@ impl RoutineAgents for Agents {
 
     async fn run(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         handle: &ExecutionHandle,
         prompt: String,
         context: Option<TriggerContext>,
@@ -62,7 +62,7 @@ impl RoutineAgents for Agents {
         Ok(())
     }
 
-    async fn cancel(&self, _: &MacroUserIdStr<'static>, _: &ExecutionHandle) -> Result<()> {
+    async fn cancel(&self, _: &RoxUserIdStr<'static>, _: &ExecutionHandle) -> Result<()> {
         *self.cancelled.lock().unwrap() += 1;
         Ok(())
     }
@@ -78,7 +78,7 @@ pub(crate) struct Content(
 impl EventContentReader for Content {
     async fn read(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &AuthorizedEventRun,
     ) -> std::result::Result<Value, Report> {
         self.0
@@ -90,7 +90,7 @@ impl EventContentReader for Content {
 impl RoutineEventReader for Content {
     async fn read_event(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &AuthorizedEventRun,
     ) -> std::result::Result<RoutineEvent, Report> {
         self.1
@@ -128,7 +128,7 @@ fn email() -> Value {
 pub(crate) fn action(task: Value) -> ScheduledAction {
     ScheduledAction {
         id: Some(generate_uuid_v7()),
-        owner: Owner::User(MacroUserIdStr::parse_from_str(OWNER).unwrap()),
+        owner: Owner::User(RoxUserIdStr::parse_from_str(OWNER).unwrap()),
         name: "routine".into(),
         trigger: serde_json::from_value(json!({
             "type": "events", "filters": [{ "events": ["email.message_received"] }],
@@ -167,7 +167,7 @@ pub(crate) fn email_run(action: &ScheduledAction) -> AuthorizedEventRun {
     AuthorizedEventRun {
         access: EventAccessCapability::EmailThread(
             EntityAccessReceipt::<ViewAccessLevel>::dangerously_assert_authenticated_user(
-                MacroUserIdStr::parse_from_str(OWNER).unwrap(),
+                RoxUserIdStr::parse_from_str(OWNER).unwrap(),
                 &event.entity_id().unwrap().to_string(),
                 EntityType::EmailThread,
             ),
@@ -286,8 +286,8 @@ async fn an_unreadable_trigger_fails_before_any_step() {
     assert!(handle.steps.is_empty());
 }
 
-fn dana() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|dana@example.com").unwrap()
+fn dana() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|dana@example.com").unwrap()
 }
 
 fn dana_in_context() -> ContextPerson {
@@ -599,11 +599,11 @@ impl RoutineCode for Code {
         Ok(Vec::new())
     }
 
-    async fn owner_time_zone(&self, _: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn owner_time_zone(&self, _: &RoxUserIdStr<'static>) -> Option<String> {
         Some("Europe/Paris".into())
     }
 
-    async fn run(&self, _: &MacroUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
+    async fn run(&self, _: &RoxUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
         self.runs.lock().unwrap().push(CodeCall {
             title: run.step.title.clone(),
             context: run.context.clone(),
@@ -626,7 +626,7 @@ impl RoutineCode for Code {
 
     async fn reference(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
     ) -> std::result::Result<String, crate::domain::ports::CodeUnavailable> {
         Ok(String::new())
@@ -638,7 +638,7 @@ impl RoutineCode for Code {
 
     async fn rewrite(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &routine_program::CodeStep,
         _: &str,
         _: &[String],

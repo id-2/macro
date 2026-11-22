@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO crm_email_rule_domains (team_id, user_id, revision, domain) VALUES ($1, $2, 1, 'client.example')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "985e5393e19f987dca0b0c3f4386f4e3d1d480ab468439189031185c5fd3f1ac"
+}

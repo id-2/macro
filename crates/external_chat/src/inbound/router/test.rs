@@ -23,12 +23,12 @@ fn verified_owner_api_credentials_remain_distinct_from_sessions_and_bots() {
             SendAuthority::Automation,
         ),
         (
-            CredentialOrigin::MacroApiJwt,
+            CredentialOrigin::RoxApiJwt,
             None,
             SendAuthority::UserApiToken,
         ),
         (
-            CredentialOrigin::MacroApiJwt,
+            CredentialOrigin::RoxApiJwt,
             agent(),
             SendAuthority::UserApiToken,
         ),
@@ -41,7 +41,7 @@ fn verified_owner_api_credentials_remain_distinct_from_sessions_and_bots() {
         (CredentialOrigin::Harness, None, SendAuthority::Automation),
         (CredentialOrigin::Internal, None, SendAuthority::Automation),
     ] {
-        let user = MacroUserAuthentication {
+        let user = RoxUserAuthentication {
             origin: origin.clone(),
             agent_id,
             agent_via: None,
@@ -59,7 +59,7 @@ fn verified_owner_api_credentials_remain_distinct_from_sessions_and_bots() {
 #[test]
 fn an_agents_program_sends_only_with_the_users_quoted_approval() {
     use axum::http::HeaderMap;
-    use macro_authorization::{CODE_EXECUTION_HEADER, CredentialAttribution};
+    use rox_authorization::{CODE_EXECUTION_HEADER, CredentialAttribution};
 
     let refused = |result: Result<(), ApiError>| {
         result

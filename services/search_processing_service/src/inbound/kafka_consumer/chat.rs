@@ -1,7 +1,7 @@
 //! Maps chat lifecycle events to search-index actions and processes them.
 
-use ::chat::domain::events::{ChatMacroEvent, ChatTopicEvent};
-use macro_event_broker::MacroEvent as _;
+use ::chat::domain::events::{ChatRoxEvent, ChatTopicEvent};
+use rox_event_broker::RoxEvent as _;
 use opensearch_client::OpensearchClient;
 use sqlx::PgPool;
 
@@ -108,7 +108,7 @@ async fn process_chat_index_action(
 pub(super) async fn process_chat_event(
     db: &PgPool,
     opensearch_client: &OpensearchClient,
-    event: &ChatMacroEvent,
+    event: &ChatRoxEvent,
     partition: i32,
     offset: i64,
 ) -> EventOutcome {

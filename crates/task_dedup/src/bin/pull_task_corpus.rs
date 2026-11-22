@@ -45,8 +45,8 @@ use clap::Parser;
 use futures::StreamExt;
 use lexical_client::LexicalClient;
 use lexical_client::parse_markdown::MarkdownTarget;
-use macro_env_var::env_var;
-use macro_service_urls::LexicalServiceUrl;
+use rox_env_var::env_var;
+use rox_service_urls::LexicalServiceUrl;
 use secretsmanager_client::{SecretManager, SecretsManager};
 use serde_json::json;
 use sqlx::PgPool;
@@ -106,9 +106,9 @@ impl Env {
 
     fn lexical_service_url(self) -> Result<String> {
         let environment = match self {
-            Env::Local => macro_service_urls::macro_env::Environment::Local,
-            Env::Dev => macro_service_urls::macro_env::Environment::Develop,
-            Env::Prod => macro_service_urls::macro_env::Environment::Production,
+            Env::Local => rox_service_urls::rox_env::Environment::Local,
+            Env::Dev => rox_service_urls::rox_env::Environment::Develop,
+            Env::Prod => rox_service_urls::rox_env::Environment::Production,
         };
         Ok(LexicalServiceUrl::new_for_environment(environment)?.to_string())
     }
@@ -167,11 +167,14 @@ fn fnv1a(text: &str) -> u64 {
 }
 
 /// Maps one real `…@rox.one` token to a fictitious one, preserving a leading
-/// `macro|` prefix when present. The mapping is stable per local part.
+/// user id prefix when present. The mapping is stable per local part.
 fn fake_for(token: &str) -> String {
-    let (prefix, rest) = match token.strip_prefix("macro|") {
-        Some(rest) => ("macro|", rest),
-        None => ("", token),
+    let (prefix, rest) = if let Some(rest) = token.strip_prefix("macro|") {
+        ("macro|", rest)
+    } else if let Some(rest) = token.strip_prefix("rox|") {
+        ("rox|", rest)
+    } else {
+        ("", token)
     };
     let local = rest.split('@').next().unwrap_or(rest);
     let name = FAKE_NAMES[(fnv1a(local) % FAKE_NAMES.len() as u64) as usize];
@@ -603,7 +606,7 @@ async fn resolve_internal_api_secret_key(env: Env) -> Result<String> {
     // SAFETY: runs once at startup before other threads read the env.
     unsafe { std::env::remove_var("LOCAL_AWS_URL") };
     let secrets = SecretsManager::new(aws_sdk_secretsmanager::Client::new(
-        &macro_aws_config::get_macro_aws_config().await,
+        &rox_aws_config::get_macro_aws_config().await,
     ));
     let key = secrets
         .get_secret_value(format!(

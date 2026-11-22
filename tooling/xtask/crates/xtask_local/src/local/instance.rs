@@ -1,17 +1,17 @@
 //! Per-instance isolation: names, networks, volumes, and host ports.
 //!
-//! The default instance is named `macro` and keeps the exact resource names
-//! and host ports the repo uses today, so existing worktrees and muscle memory
-//! are untouched. A named instance (`--instance agent-a`) derives a disjoint
-//! set of project name, networks, and volumes. Its port window and Docker
-//! subnet come from [`super::allocator`], so concurrent stacks can't collide.
+//! The default instance is named `rox` and owns the plain `rox` Compose
+//! project and the fixed host ports. A named instance (`--instance agent-a`)
+//! derives a disjoint set of project name, networks, and volumes. Its port
+//! window and Docker subnet come from [`super::allocator`], so concurrent
+//! stacks can't collide.
 
 use anyhow::{Context, Result, bail};
 pub use xtask_ports::Port;
 
 use super::{allocator, repo_root};
 
-/// The reserved default instance name. Maps to today's frozen `macro` Compose
+/// The reserved default instance name. Maps to the frozen `rox` Compose
 /// project and the fixed base ports.
 pub const DEFAULT_NAME: &str = xtask_ports::DEFAULT_INSTANCE;
 
@@ -85,7 +85,7 @@ impl Instance {
         let project_name = if name.as_str() == DEFAULT_NAME {
             DEFAULT_NAME.to_string()
         } else {
-            format!("macro-{}", name.0)
+            format!("rox-{}", name.0)
         };
         let port_base = port_base.unwrap_or_else(|| xtask_ports::hashed_window(name.as_str()));
         Ok(Instance {
@@ -153,7 +153,7 @@ impl Instance {
 
     /// The networks this instance creates itself, each with the subnet its
     /// allocation assigns. The default instance's `services` and `auth-internal`
-    /// stay Compose-managed: the machine-wide collectors share `macro_services`.
+    /// stay Compose-managed: the machine-wide collectors share `rox_services`.
     pub fn networks(&self) -> Vec<(String, Option<String>)> {
         let mut names = vec![self.network_databases(), self.network_auth()];
         if !self.is_default() {
@@ -173,19 +173,19 @@ impl Instance {
     }
 
     pub fn volume_postgres(&self) -> String {
-        self.suffixed_underscore("macro_postgres_data")
+        self.suffixed_underscore("rox_postgres_data")
     }
 
     pub fn volume_redis(&self) -> String {
-        self.suffixed_underscore("macro_redis_data")
+        self.suffixed_underscore("rox_redis_data")
     }
 
     pub fn volume_opensearch(&self) -> String {
-        self.suffixed_underscore("macro_opensearch_data")
+        self.suffixed_underscore("rox_opensearch_data")
     }
 
     pub fn volume_kafka(&self) -> String {
-        self.suffixed_underscore("macro_kafka_data")
+        self.suffixed_underscore("rox_kafka_data")
     }
 
     pub fn volume_fusionauth_db(&self) -> String {

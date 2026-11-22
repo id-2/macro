@@ -27,12 +27,12 @@ use email::{
 use email_api_client::GmailApiClientRepository;
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use static_file_service_client::StaticFileServiceClient;
 use std::sync::Arc;
 use system_properties::{PgSystemPropertiesRepository, SystemPropertiesServiceImpl};
@@ -57,7 +57,7 @@ pub(crate) struct ApiDependencies {
     pub dss_client: DocumentStorageServiceClient,
     pub connection_gateway_client: connection_gateway_client::client::ConnectionGatewayClient,
     pub jwt_args: JwtValidationArgs,
-    pub macro_event_broker: MacroEventBrokerService<KafkaEventPublisher, TaskTracker>,
+    pub macro_event_broker: RoxEventBrokerService<KafkaEventPublisher, TaskTracker>,
 }
 
 /// Wires the services for the production listener.
@@ -84,13 +84,13 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
         PgSystemPropertiesRepository::new(db.clone()),
     ));
 
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
-            default_user_id: Some("macro|INTERNAL@rox.one".to_string()),
+            default_user_id: Some("rox|INTERNAL@rox.one".to_string()),
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
 
@@ -251,7 +251,7 @@ pub(crate) async fn api_context(deps: ApiDependencies) -> anyhow::Result<ApiCont
         provider: crate::outbound::inbox_connection::GoogleConnectionProvider {
             gmail: email_api.clone(),
             auth: auth_service_client.clone(),
-            token_info_url: macro_service_urls::GoogleOauthTokenInfoUrl::new()?,
+            token_info_url: rox_service_urls::GoogleOauthTokenInfoUrl::new()?,
         },
         grants: crate::outbound::inbox_connection::GoogleConnectionGrants {
             db: db.clone(),

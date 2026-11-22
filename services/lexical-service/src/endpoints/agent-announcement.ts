@@ -1,17 +1,17 @@
-import type { View_Serialize as View } from "@macro-inc/lexical-core/generated/dynamic-ui";
-import { AGENT_ACTIVITY_STATUSES } from "@macro-inc/lexical-core/nodes/AgentActivityNode";
-import { CONNECT_APP_TARGETS } from "@macro-inc/lexical-core/nodes/ConnectAppNode";
+import type { View_Serialize as View } from "@rox-one/lexical-core/generated/dynamic-ui";
+import { AGENT_ACTIVITY_STATUSES } from "@rox-one/lexical-core/nodes/AgentActivityNode";
+import { CONNECT_APP_TARGETS } from "@rox-one/lexical-core/nodes/ConnectAppNode";
 import {
 	MAGIC_CHIP_AUTHORS,
 	MAGIC_CHIP_STATUSES,
-} from "@macro-inc/lexical-core/nodes/MagicChipNode";
+} from "@rox-one/lexical-core/nodes/MagicChipNode";
 import {
 	REPLY_TARGET_PARENT_TYPES,
 	type ReplyTargetParent,
-} from "@macro-inc/lexical-core/nodes/ReplyTargetNode";
-import { composeAgentSessionAnnouncement } from "@macro-inc/lexical-core/utils/agent-announcement";
-import { composeAgentChatReply } from "@macro-inc/lexical-core/utils/agent-chat-reply";
-import { composeAgentConnectionPrompt } from "@macro-inc/lexical-core/utils/agent-connection-prompt";
+} from "@rox-one/lexical-core/nodes/ReplyTargetNode";
+import { composeAgentSessionAnnouncement } from "@rox-one/lexical-core/utils/agent-announcement";
+import { composeAgentChatReply } from "@rox-one/lexical-core/utils/agent-chat-reply";
+import { composeAgentConnectionPrompt } from "@rox-one/lexical-core/utils/agent-connection-prompt";
 import { OpenAPIRoute } from "chanfana";
 import type { Context } from "hono";
 import { z } from "zod";

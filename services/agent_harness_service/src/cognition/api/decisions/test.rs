@@ -7,8 +7,8 @@ use jev::domain::{
     Probability, YesNoClassifier, YesNoQuestion,
     decisions::{DecisionService, DecisionServiceImpl},
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use std::sync::{Arc, Mutex};
 use tower::ServiceExt;
@@ -24,7 +24,7 @@ struct Decisions(Mutex<Vec<(String, Value)>>);
 impl DecisionService for Decisions {
     async fn decide(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: DecisionRequest,
     ) -> Result<DecisionResponse, DecisionError> {
         self.0

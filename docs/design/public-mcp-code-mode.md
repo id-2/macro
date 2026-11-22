@@ -85,7 +85,7 @@ pub trait UserCodeMode: Send + Sync + 'static {
     /// Execute as the authenticated user; no session, journal or reviews.
     async fn execute(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         request: ExecuteRequest,
         cancel: CancellationToken,
     ) -> Result<UserExecutionReceipt, CodeModeError>;

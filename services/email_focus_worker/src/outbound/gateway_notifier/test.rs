@@ -1,6 +1,6 @@
 use std::collections::BTreeSet;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use tokio::{sync::mpsc, time::Instant};
 use wiremock::{Mock, MockServer, ResponseTemplate, matchers};
@@ -13,13 +13,13 @@ struct FakeDelivery {
 }
 
 impl FocusDelivery for FakeDelivery {
-    async fn deliver(&self, _owner: &MacroUserIdStr<'static>, link_id: Uuid) {
+    async fn deliver(&self, _owner: &RoxUserIdStr<'static>, link_id: Uuid) {
         self.pushes.send((link_id, Instant::now())).unwrap();
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@acme.example").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@acme.example").unwrap()
 }
 
 fn notifier() -> (
@@ -150,7 +150,7 @@ async fn a_push_reaches_the_owner_and_delegates_as_one_refresh_email(pool: Pool<
         pool,
     );
 
-    let holder = MacroUserIdStr::try_from_email("other@elsewhere.example").unwrap();
+    let holder = RoxUserIdStr::try_from_email("other@elsewhere.example").unwrap();
     delivery.deliver(&holder, DELEGATED_LINK).await;
 
     let requests = gateway.received_requests().await.unwrap();

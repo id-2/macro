@@ -220,6 +220,12 @@ impl LocalEnv {
             "OVERRIDE_STATIC_FILE_PUBLIC_URL".into(),
             self.static_file_public_url.clone(),
         );
+        // Returning the sign-in code in the response would let anyone who
+        // types a known address in take that person's session without the
+        // mailbox, so a local stack keeps the product's behavior by default.
+        // A developer who cannot read Mailpit opts in per run:
+        // `PASSWORDLESS_RETURN_CODE=true just run_local`.
+        env.insert("PASSWORDLESS_RETURN_CODE".into(), "false".into());
         // Pipedream's hosted Connect UI refuses to be opened from an origin
         // outside this list, and document_cognition's own local default only
         // names port 3000 - a named instance's frontend lives on a derived
@@ -332,7 +338,7 @@ struct InfraEnv {
 impl InfraEnv {
     fn local(browser_origin: &str) -> Self {
         InfraEnv {
-            database_url: "postgres://user:password@postgres:5432/macrodb".into(),
+            database_url: "postgres://user:password@postgres:5432/roxdb".into(),
             redis_uri: "redis://redis:6379".into(),
             opensearch_url: "http://search:9200".into(),
             local_aws_url: "http://localstack:4566".into(),
@@ -789,7 +795,7 @@ impl FusionAuthEnv {
             "FUSIONAUTH_API_KEY".into(),
             identity::FUSIONAUTH_API_KEY.into(),
         );
-        // Canonical name read by auth_service (MacroConfig serde field) + seed_cli.
+        // Canonical name read by auth_service (RoxConfig serde field) + seed_cli.
         env.insert(
             "FUSIONAUTH_API_KEY_SECRET_KEY".into(),
             identity::FUSIONAUTH_API_KEY.into(),
@@ -853,8 +859,8 @@ impl BootStubEnv {
         env.insert("PUSHES_PER_MINUTE".into(), "30".into());
         // email_service / connection_gateway open their own Postgres pool.
         env.insert(
-            "MACRO_DB_URL".into(),
-            "postgres://user:password@postgres:5432/macrodb".into(),
+            "ROX_DB_URL".into(),
+            "postgres://user:password@postgres:5432/roxdb".into(),
         );
         // The harness requires Pipedream credentials even when integrations
         // are unused. Real credentials can override these boot placeholders.
@@ -878,7 +884,7 @@ impl BootStubEnv {
         env.insert("PIPEDREAM_WEBHOOK_SECRET".into(), "local".into());
         // search_processing_service; the local cluster has the security plugin
         // disabled so these are accepted but ignored (same as opensearch.rs).
-        env.insert("OPENSEARCH_USERNAME".into(), "macrouser".into());
+        env.insert("OPENSEARCH_USERNAME".into(), "roxuser".into());
         env.insert("OPENSEARCH_PASSWORD".into(), "local".into());
         // Local document URLs use the instance endpoint supplied by InfraEnv;
         // signing is skipped by the `is_local_aws()` branch.

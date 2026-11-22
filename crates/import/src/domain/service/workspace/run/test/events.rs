@@ -23,7 +23,7 @@ fn notifying_repo(pool: &PgPool, sessions: &Arc<Sessions>) -> PgImportRepo {
 /// planned, and the run still `running`.
 async fn presented_while_planning(
     pool: &PgPool,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
 ) -> (Uuid, AgentSessionId, Vec<Uuid>) {
     let (review, rows) = approved_plan(pool, owner).await;
     let session = sqlx::query_scalar!(

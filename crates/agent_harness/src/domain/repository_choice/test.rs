@@ -15,7 +15,7 @@ struct StubRepositories(Vec<String>);
 impl ReachableRepositories for StubRepositories {
     async fn for_user(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> crate::domain::error::Result<Vec<crate::domain::model::ReachableRepository>> {
         assert_eq!(user, &owner());
         Ok(self
@@ -37,7 +37,7 @@ struct Admission {
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         assert_eq!(user, &owner());
@@ -55,7 +55,7 @@ struct Model {
 impl RepositoryChoiceModel for Model {
     async fn decide(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         prompt: &str,
         candidates: &[String],
         _recent: &[AgentSession],
@@ -71,8 +71,8 @@ impl RepositoryChoiceModel for Model {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@rox.one".to_owned()).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@rox.one".to_owned()).unwrap()
 }
 
 fn admission(result: Result<(), AiAdmissionError>) -> Arc<Admission> {

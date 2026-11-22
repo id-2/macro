@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import CheckIcon from '@icon/system/regular/check.svg';
 import LinkIcon from '@icon/system/regular/link.svg';
 import { Button } from '@ui';
@@ -21,32 +22,37 @@ export function OnTeamPanel(props: {
         <span class="flex size-10 items-center justify-center rounded-full bg-success-bg text-success">
           <CheckIcon class="size-5" />
         </span>
-        <p class="text-sm font-medium text-ink">You're on {props.name}</p>
+        <p class="text-sm font-medium text-ink">
+          {t('onboarding.onTeam', { name: props.name })}
+        </p>
         {/* Copy must stay true for auto-join, invite-accept, and the
             optimistic mid-create flash alike. */}
         <Show
           when={(props.invited ?? 0) > 0}
           fallback={
             <p class="max-w-xs text-xs text-ink-muted leading-snug">
-              Your team is set up — everything your teammates bring into Rox
-              is shared with you.
+              {t('onboarding.teamReady')}
             </p>
           }
         >
           <p class="max-w-xs text-xs text-ink-muted leading-snug">
             {props.invited === 1
-              ? 'Invite sent. Give your teammate a heads-up: send them the invite link in Slack or a text so they know to look for the email.'
-              : `Invites sent to ${props.invited} teammates. Give them a heads-up: send the invite link in Slack or a text so they know to look for the email.`}
+              ? t('onboarding.inviteSent')
+              : t('onboarding.invitesSent', { count: props.invited ?? 0 })}
           </p>
         </Show>
       </div>
       <ContinueButton
-        label={props.finishing ? 'Opening your workspace…' : 'Continue'}
+        label={
+          props.finishing
+            ? t('onboarding.openingWorkspace')
+            : t('onboarding.continue')
+        }
         disabled={props.finishing}
         onClick={props.onContinue}
         secondary={
           <SecondaryButton
-            label="Copy invite link"
+            label={t('onboarding.copyInviteLink')}
             icon={<LinkIcon class="size-5 shrink-0" aria-hidden="true" />}
             disabled={props.copyingLink || props.finishing}
             onClick={props.onCopyLink}
@@ -100,9 +106,9 @@ export function TeamStatus(props: { message: string }) {
 export function TeamLoadError(props: { onRetry: () => void }) {
   return (
     <p role="alert" class="text-center text-sm text-ink-muted">
-      Couldn't load your team.{' '}
+      {t('onboarding.teamLoadFailed')}{' '}
       <button type="button" class="underline" onClick={props.onRetry}>
-        Try again
+        {t('onboarding.retry')}
       </button>
     </p>
   );

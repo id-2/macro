@@ -2,7 +2,7 @@ use crate::domain::{
     email_policy_api::SelectiveEmailGate, email_rules::SELECTIVE_EMAIL_CONTRIBUTION_FLAG,
 };
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Caller-scoped remote rollout. Missing or failed flags keep authoring off.
 pub struct FlaggedSelectiveEmail<F>(pub F);
@@ -15,7 +15,7 @@ impl<F> std::fmt::Debug for FlaggedSelectiveEmail<F> {
 #[async_trait::async_trait]
 impl<F: FeatureFlags + Send + Sync> SelectiveEmailGate for FlaggedSelectiveEmail<F> {
     #[tracing::instrument(name = "crm.email_policy.availability", skip_all)]
-    async fn enabled_for(&self, user: MacroUserIdStr<'_>) -> bool {
+    async fn enabled_for(&self, user: RoxUserIdStr<'_>) -> bool {
         match self.0.load(&user).await {
             Ok(flags) => flags.is_enabled(SELECTIVE_EMAIL_CONTRIBUTION_FLAG),
             Err(error) => {

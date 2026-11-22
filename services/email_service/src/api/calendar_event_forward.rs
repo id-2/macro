@@ -15,7 +15,7 @@ use email::domain::{
     models::ContactInfo,
 };
 use email::inbound::axum::send_router::{PROGRAM_SEND_REFUSAL, refuse_program_send};
-use macro_authorization::{CredentialAttribution, MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{CredentialAttribution, RoxAuthorizationExtractor, UserOrInternal};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -159,7 +159,7 @@ fn refuse_program_forward(
     ))]
 pub(crate) async fn handler(
     State(state): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(event_id): Path<Uuid>,
     headers: HeaderMap,
     Json(request): Json<ForwardCalendarEventRequest>,

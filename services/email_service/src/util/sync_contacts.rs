@@ -3,12 +3,12 @@ use crate::pubsub::util::publish_email_event;
 use anyhow::{Context, anyhow};
 use contacts::domain::{models::messages::ContactConnection, ports::ContactsIngress};
 use email::domain::events::{
-    EmailMacroEvent, ThreadsReindexReason, ThreadsReindexRequestedMetadata,
+    EmailRoxEvent, ThreadsReindexReason, ThreadsReindexRequestedMetadata,
 };
 use email_api_client::domain::models::EmailApiError;
 use futures::{StreamExt, stream};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::contact::{Contact, ContactList};
 use models_email::service::link::Link;
 use models_email::service::pubsub::SFSUploaderMessage;
@@ -23,7 +23,7 @@ use uuid::Uuid;
 mod test;
 
 /// Syncs user's contacts with gmail
-pub async fn sync_contacts<B: MacroEventBroker, I: ContactsIngress>(
+pub async fn sync_contacts<B: RoxEventBroker, I: ContactsIngress>(
     link: &Link,
     db: &PgPool,
     email_api: &GmailApi,
@@ -82,7 +82,7 @@ fn address_book_connections(link: &Link, contacts: &[Contact]) -> Vec<ContactCon
                 && !email_utils::is_generic_email(email)
                 && seen.insert(email.clone())
         })
-        .filter_map(|email| match MacroUserIdStr::try_from_email(&email) {
+        .filter_map(|email| match RoxUserIdStr::try_from_email(&email) {
             Ok(contact) => Some(ContactConnection::new(link.macro_id.clone(), contact)),
             Err(error) => {
                 // One malformed address must not drop the rest of the address book.
@@ -256,7 +256,7 @@ async fn list_contacts_once(
 }
 
 /// Handles processing (SFS uploads) and database storage for a list of contacts.
-async fn process_and_store_contacts<B: MacroEventBroker>(
+async fn process_and_store_contacts<B: RoxEventBroker>(
     db: &PgPool,
     sqs_client: &SQS,
     macro_event_broker: &B,
@@ -345,7 +345,7 @@ async fn process_and_store_contacts<B: MacroEventBroker>(
 const REINDEX_BATCH_SIZE: usize = 50;
 
 #[tracing::instrument(skip(db, macro_event_broker, link, changed_contact_ids))]
-async fn reindex_threads_for_changed_contacts<B: MacroEventBroker>(
+async fn reindex_threads_for_changed_contacts<B: RoxEventBroker>(
     db: &PgPool,
     macro_event_broker: &B,
     link: &Link,
@@ -378,16 +378,16 @@ async fn reindex_threads_for_changed_contacts<B: MacroEventBroker>(
     publish_thread_reindex_batches(macro_event_broker, link.id, &link.macro_id, &thread_ids);
 }
 
-fn publish_thread_reindex_batches<B: MacroEventBroker>(
+fn publish_thread_reindex_batches<B: RoxEventBroker>(
     macro_event_broker: &B,
     link_id: Uuid,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     thread_ids: &[Uuid],
 ) {
     for thread_ids in thread_ids.chunks(REINDEX_BATCH_SIZE) {
         publish_email_event(
             macro_event_broker,
-            &EmailMacroEvent::threads_reindex_requested(ThreadsReindexRequestedMetadata {
+            &EmailRoxEvent::threads_reindex_requested(ThreadsReindexRequestedMetadata {
                 link_id,
                 owner: owner.clone(),
                 thread_ids: thread_ids.to_vec(),

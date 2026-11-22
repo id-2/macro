@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import type { CommentOnDocumentTextData } from '../../../generated/storage/types.gen';
-import { MacroApiError } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxApiError } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Document } from './document';
 import { CommentQuoteNotPlacedError } from './text-comment';
 
@@ -22,7 +22,7 @@ type CommentRequest = Pick<CommentOnDocumentTextData, 'path' | 'body'>;
 
 function clientAnswering(
   answer: (body: CommentOnDocumentTextData['body']) => unknown,
-): { client: MacroClient; requests: CommentRequest[] } {
+): { client: RoxClient; requests: CommentRequest[] } {
   const requests: CommentRequest[] = [];
   const client = {
     storage: {
@@ -31,7 +31,7 @@ function clientAnswering(
         return answer(request.body);
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, requests };
 }
 
@@ -96,8 +96,8 @@ describe('document.commentOnText', () => {
       .commentOnText('Is this right?', { quote: 'total' })
       .catch((error: unknown) => error);
 
-    expect(thrown).toBeInstanceOf(MacroApiError);
+    expect(thrown).toBeInstanceOf(RoxApiError);
     expect(thrown).not.toBeInstanceOf(CommentQuoteNotPlacedError);
-    expect((thrown as MacroApiError).status).toBe(400);
+    expect((thrown as RoxApiError).status).toBe(400);
   });
 });

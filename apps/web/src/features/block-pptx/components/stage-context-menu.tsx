@@ -48,7 +48,7 @@ import TableIcon from '@icon/system/regular/table.svg';
 import TextAa from '@icon/system/regular/text-aa.svg';
 import Trash from '@icon/system/regular/trash.svg';
 import { ContextMenu } from '@kobalte/core/context-menu';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { For, type JSX, Match, Show, Switch } from 'solid-js';
 import type { Swatch } from '../core/palette';
 import type { AlignMode } from '../core/selection';

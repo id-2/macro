@@ -10,8 +10,8 @@ use channel_sender::ChannelSender;
 use channels::domain::broker_events::ChannelMessagePostedMetadata;
 use channels::domain::models::ChannelType;
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::events::MessagePostedMetadata;
 use messages::domain::models::MessageParent;
 use trigger_context::{
@@ -56,8 +56,8 @@ fn links() -> StaticFileLinks {
     StaticFileLinks::new("https://static.example/")
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("asker@rox.one").expect("a valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("asker@rox.one").expect("a valid user id")
 }
 
 /// A channel post in the channel-only shape channel triggers travel in.
@@ -197,7 +197,7 @@ fn an_unattributed_bot_mention_is_skipped() {
 
 #[test]
 fn any_user_mention_can_open_a_managed_agent() {
-    let user = MacroUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
+    let user = RoxUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
 
     assert!(matches!(
         route_agent_trigger(
@@ -509,7 +509,7 @@ fn task_discussion_followups_keep_the_managed_and_external_session_origin() {
 
 #[test]
 fn any_user_can_follow_up_to_their_cursor_session() {
-    let user = MacroUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
+    let user = RoxUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
     assert!(matches!(
         route_agent_trigger(
             channel_message_from(bot_id::CURSOR_BOT_ID, ChannelSender::new_from_user(user)),
@@ -523,7 +523,7 @@ fn any_user_can_follow_up_to_their_cursor_session() {
 /// Managed sessions accept follow-ups from channel users regardless of email domain.
 #[test]
 fn any_user_can_follow_up_to_a_coder_session() {
-    let user = MacroUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
+    let user = RoxUserIdStr::try_from_email("asker@example.com").expect("a valid user id");
     let routed = route_agent_trigger(
         channel_message_from(MACRO_CODER_BOT_ID, ChannelSender::new_from_user(user)),
         runtime(AgentKind::SandboxedCoder),

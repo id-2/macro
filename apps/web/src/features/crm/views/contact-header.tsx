@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ListSkeleton } from '@app/components/view-shell/ListSkeleton';
 import { InlineTitleEditor } from '@core/component/InlineTitleEditor';
 import { formatDateAndTime, formatRelativeTimestamp } from '@entity';
@@ -21,8 +22,8 @@ function TitleEditor(props: { contact: CrmContactResponse }) {
       // Nameless contacts display their email; committing it unchanged
       // is a no-op rather than a save.
       value={props.contact.name ?? props.contact.email ?? ''}
-      placeholder="Contact"
-      ariaLabel="Contact name"
+      placeholder={t('crm.contact')}
+      ariaLabel={t('crm.contactNameLabel')}
       class="w-full text-2xl"
       onRename={(name) =>
         renameMutation.mutate({

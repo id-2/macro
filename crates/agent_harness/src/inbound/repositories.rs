@@ -15,8 +15,8 @@ use axum::extract::{FromRef, Json, Query, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::get;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -87,7 +87,7 @@ pub struct AgentRepositoryBranchesResponse {
 pub struct AgentRepositoriesRouterState<Auth> {
     repositories: Arc<dyn ReachableRepositories>,
     branches: Arc<dyn RepositoryBranches>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Auth> AgentRepositoriesRouterState<Auth> {
@@ -95,7 +95,7 @@ impl<Auth> AgentRepositoriesRouterState<Auth> {
     pub fn new(
         repositories: Arc<dyn ReachableRepositories>,
         branches: Arc<dyn RepositoryBranches>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             repositories,
@@ -115,7 +115,7 @@ impl<Auth> Clone for AgentRepositoriesRouterState<Auth> {
     }
 }
 
-impl<Auth> FromRef<AgentRepositoriesRouterState<Auth>> for MacroAuthorizationState<Auth> {
+impl<Auth> FromRef<AgentRepositoriesRouterState<Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &AgentRepositoriesRouterState<Auth>) -> Self {
         state.authorization.clone()
     }
@@ -124,7 +124,7 @@ impl<Auth> FromRef<AgentRepositoriesRouterState<Auth>> for MacroAuthorizationSta
 /// Build `GET /agent-repositories`.
 pub fn agent_repositories_router<Auth, S>(state: AgentRepositoriesRouterState<Auth>) -> Router<S>
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -154,10 +154,10 @@ where
 )]
 pub async fn list_agent_repositories_handler<Auth>(
     State(state): State<AgentRepositoriesRouterState<Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOnly>,
 ) -> Response
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     match state
         .repositories
@@ -202,11 +202,11 @@ where
 )]
 pub async fn list_agent_repository_branches_handler<Auth>(
     State(state): State<AgentRepositoriesRouterState<Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOnly>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(query): Query<AgentRepositoryBranchesQuery>,
 ) -> Response
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let Some(repository) = RepoSlug::parse_github_url(&query.repo_url) else {
         return (

@@ -5,8 +5,8 @@ mod test;
 
 use std::time::Duration;
 
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 use uuid::Uuid;
 
@@ -65,7 +65,7 @@ where
                     .record("notification_id", tracing::field::display(notification_id));
                 let user_ids = user_ids
                     .into_iter()
-                    .filter_map(|user_id| match MacroUserIdStr::parse_from_str(&user_id) {
+                    .filter_map(|user_id| match RoxUserIdStr::parse_from_str(&user_id) {
                         Ok(user_id) => Some(user_id.into_owned()),
                         Err(_) => {
                             // User IDs contain email addresses; don't include invalid

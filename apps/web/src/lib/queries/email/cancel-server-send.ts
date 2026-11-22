@@ -46,7 +46,7 @@ export async function cancelServerEmailSend(row: ServerEmailSend) {
         providerId: message.providerId,
         bodyHtml: message.bodyHtmlSanitized,
         bodyText: message.bodyText,
-        bodyMacro: message.bodyMacro,
+        bodyRox: message.bodyRox,
         optimisticBodyHtml: message.bodyHtmlSanitized
           ? decodeBase64Utf8(message.bodyHtmlSanitized)
           : null,

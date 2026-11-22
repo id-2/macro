@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { QUERY_FILTERS_BASE } from '@app/features/next-soup/filters/query-filters';
 import { throwOnErr } from '@core/util/result';
 import { type CrmCompanyEntity, isCrmCompanyEntity } from '@entity';
@@ -34,7 +35,7 @@ export async function fetchCrmExportCompanies(
     onProgress(companies.size);
     cursor = page.next_cursor ?? null;
     if (cursor && cursors.has(cursor))
-      throw new Error('Export pagination did not advance. Please retry.');
+      throw new Error(t('crm.exportPaginationFailed'));
     if (cursor) cursors.add(cursor);
   } while (cursor);
   return [...companies.values()];

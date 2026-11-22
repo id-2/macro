@@ -1,5 +1,5 @@
 use http::{HeaderMap, Method, StatusCode};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::models::PipedreamConnection;
 use pipedream_mcp::domain::ports::{ConnectedAppProxy, ConnectionStore, ProxyResponse};
 use serde_json::Value;
@@ -11,7 +11,7 @@ impl ConnectionStore for Store {
     type Err = std::convert::Infallible;
     async fn load(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         slug: &str,
     ) -> Result<Option<PipedreamConnection>, Self::Err> {
         Ok(Some(PipedreamConnection {
@@ -26,12 +26,12 @@ impl ConnectionStore for Store {
     async fn save(&self, _: &PipedreamConnection) -> Result<(), Self::Err> {
         unreachable!()
     }
-    async fn delete(&self, _: &MacroUserIdStr<'static>, _: &str) -> Result<(), Self::Err> {
+    async fn delete(&self, _: &RoxUserIdStr<'static>, _: &str) -> Result<(), Self::Err> {
         unreachable!()
     }
     async fn list(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
     ) -> Result<Vec<PipedreamConnection>, Self::Err> {
         unreachable!()
     }

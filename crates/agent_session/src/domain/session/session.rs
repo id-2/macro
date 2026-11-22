@@ -20,7 +20,7 @@ use agent_runtime_protocol::domain::schema::v0::{
     AcpMessage, SystemEvent, ToRuntimeMessage, ToServerMessage,
 };
 use agent_runtime_protocol::domain::turn::RuntimeSessionClosedNotification;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::PROTOCOL_VERSION;
 use crate::domain::error::AgentSessionError;
@@ -44,7 +44,7 @@ pub struct SessionMachine<Token> {
     initialization: Option<crate::domain::model::HistoryBoundary>,
     phase: SessionPhase,
     next_request: u64,
-    connection_context: Option<macro_uuid::Uuid>,
+    connection_context: Option<rox_uuid::Uuid>,
     /// Held outside the phase so a partial flush strands nothing.
     pending: VecDeque<PendingAction<Token>>,
     /// The newest turn-occupying request the runtime has not answered yet.
@@ -150,13 +150,13 @@ impl<Token> SessionMachine<Token> {
     }
 
     /// Namespace request IDs for a fresh actor on a potentially shared transport.
-    pub(crate) fn with_connection_context(mut self, context: macro_uuid::Uuid) -> Self {
+    pub(crate) fn with_connection_context(mut self, context: rox_uuid::Uuid) -> Self {
         self.connection_context = Some(context);
         self
     }
 
     /// Retain the durable initialization identity for this actor's connection.
-    pub fn initialization_persisted(&mut self, id: macro_uuid::Uuid) {
+    pub fn initialization_persisted(&mut self, id: rox_uuid::Uuid) {
         self.initialization = Some(crate::domain::model::HistoryBoundary {
             initialization_log_id: id,
         });
@@ -333,7 +333,7 @@ impl<Token> SessionMachine<Token> {
 
     fn on_command(
         &mut self,
-        from: Option<MacroUserIdStr<'static>>,
+        from: Option<RoxUserIdStr<'static>>,
         action: AgentAction,
         action_id: AgentActionId,
         token: Token,
@@ -929,7 +929,7 @@ impl<Token> SessionMachine<Token> {
     /// [`PermissionPolicy::Prompt`].
     fn on_permission_answer(
         &mut self,
-        from: Option<MacroUserIdStr<'static>>,
+        from: Option<RoxUserIdStr<'static>>,
         answer: &AgentPermissionAction,
         token: Token,
         effects: &mut Vec<Effect<Token>>,
@@ -1059,7 +1059,7 @@ impl<Token> SessionMachine<Token> {
     /// resolved rather than left dangling on a turn that is ending anyway.
     fn cancel_pending_elicitation(
         &mut self,
-        from: Option<MacroUserIdStr<'static>>,
+        from: Option<RoxUserIdStr<'static>>,
         effects: &mut Vec<Effect<Token>>,
     ) {
         let SessionPhase::Live { elicitation, .. } = &mut self.phase else {
@@ -1098,7 +1098,7 @@ impl<Token> SessionMachine<Token> {
 
     fn send_permission_response(
         &self,
-        from: Option<MacroUserIdStr<'static>>,
+        from: Option<RoxUserIdStr<'static>>,
         request_id: RequestId,
         outcome: RequestPermissionOutcome,
         effects: &mut Vec<Effect<Token>>,

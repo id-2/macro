@@ -1,3 +1,4 @@
+import { formatLocale, interfaceLanguage } from '@app/lib/i18n';
 import type { CalendarTimeFormat } from '../types';
 
 /** FullCalendar and Intl options for the supported calendar time formats. */
@@ -8,27 +9,47 @@ export const CALENDAR_TIME_FORMAT_OPTIONS = {
     hour12: true,
   },
   '24-hour': {
-    hour: 'numeric',
+    hour: '2-digit',
     minute: '2-digit',
     hour12: false,
   },
 } satisfies Record<CalendarTimeFormat, Intl.DateTimeFormatOptions>;
 
-const calendarTimeFormatters = {
-  '12-hour': new Intl.DateTimeFormat(
-    undefined,
-    CALENDAR_TIME_FORMAT_OPTIONS['12-hour']
-  ),
-  '24-hour': new Intl.DateTimeFormat(
-    undefined,
-    CALENDAR_TIME_FORMAT_OPTIONS['24-hour']
-  ),
-} satisfies Record<CalendarTimeFormat, Intl.DateTimeFormat>;
+// A clock is only a string-builder, so one instance per locale and format is
+// reused; the locale comes from the interface, not the browser default.
+const calendarTimeFormatters = new Map<string, Intl.DateTimeFormat>();
 
-const compactWholeHourFormatter = new Intl.DateTimeFormat(undefined, {
-  hour: 'numeric',
-  hour12: true,
-});
+function calendarTimeFormatter(
+  timeFormat: CalendarTimeFormat,
+  locale = formatLocale()
+): Intl.DateTimeFormat {
+  const key = `${locale}|${timeFormat}`;
+  let formatter = calendarTimeFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(
+      locale,
+      CALENDAR_TIME_FORMAT_OPTIONS[timeFormat]
+    );
+    calendarTimeFormatters.set(key, formatter);
+  }
+  return formatter;
+}
+
+const compactWholeHourFormatters = new Map<string, Intl.DateTimeFormat>();
+
+function compactWholeHourFormatter(
+  locale = formatLocale()
+): Intl.DateTimeFormat {
+  let formatter = compactWholeHourFormatters.get(locale);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      hour: 'numeric',
+      hour12: true,
+    });
+    compactWholeHourFormatters.set(locale, formatter);
+  }
+  return formatter;
+}
 
 function compactDayPeriod(
   parts: Intl.DateTimeFormatPart[],
@@ -55,18 +76,30 @@ function compactDayPeriod(
     .join('');
 }
 
-/** Returns the time format that matches the user's current locale. */
+/** Returns the clock the interface language writes, e.g. 24-hour for Russian. */
 export function getDefaultCalendarTimeFormat(): CalendarTimeFormat {
-  return new Intl.DateTimeFormat(undefined, {
+  return new Intl.DateTimeFormat(formatLocale(), {
     hour: 'numeric',
   }).resolvedOptions().hour12 === false
     ? '24-hour'
     : '12-hour';
 }
 
+/**
+ * The clock actually shown: Russian writes times in 24 hours, so a 12-hour
+ * choice stored earlier (or copied from an English browser) never wins there.
+ */
+export function resolveCalendarTimeFormat(
+  timeFormat: CalendarTimeFormat
+): CalendarTimeFormat {
+  return interfaceLanguage() === 'ru' ? '24-hour' : timeFormat;
+}
+
 /** Formats a time using the calendar's selected 12/24-hour preference. */
 export function formatCalendarTime(date: Date, timeFormat: CalendarTimeFormat) {
-  return calendarTimeFormatters[timeFormat].format(date);
+  return calendarTimeFormatter(resolveCalendarTimeFormat(timeFormat)).format(
+    date
+  );
 }
 
 /** Formats event-card times compactly while preserving the selected clock. */
@@ -75,14 +108,15 @@ export function formatCompactCalendarTime(
   timeFormat: CalendarTimeFormat,
   showDayPeriod = true
 ) {
-  if (timeFormat === '24-hour') {
-    return calendarTimeFormatters[timeFormat].format(date);
+  const effectiveFormat = resolveCalendarTimeFormat(timeFormat);
+  if (effectiveFormat === '24-hour') {
+    return calendarTimeFormatter(effectiveFormat).format(date);
   }
 
   const formatter =
     date.getMinutes() === 0
-      ? compactWholeHourFormatter
-      : calendarTimeFormatters[timeFormat];
+      ? compactWholeHourFormatter()
+      : calendarTimeFormatter(effectiveFormat);
   return compactDayPeriod(formatter.formatToParts(date), showDayPeriod);
 }
 
@@ -94,7 +128,9 @@ export function formatCompactCalendarTimeRange(
 ) {
   const startIsAm = start.getHours() < 12;
   const endIsAm = end.getHours() < 12;
-  const sharesDayPeriod = timeFormat === '12-hour' && startIsAm === endIsAm;
+  const sharesDayPeriod =
+    resolveCalendarTimeFormat(timeFormat) === '12-hour' &&
+    startIsAm === endIsAm;
 
   return `${formatCompactCalendarTime(
     start,

@@ -8,7 +8,7 @@ use agent_fold::domain::model::ModelOption;
 use agent_fold::domain::model_selection::model_selection;
 use chrono::{DateTime, Utc};
 use harness_id::HarnessId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -154,7 +154,7 @@ pub trait HarnessModelAccess: Send + Sync + 'static {
     /// Whether `caller` may use and see `harness`, and whether it is connected.
     fn reach(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         harness: HarnessId,
     ) -> impl Future<Output = Result<HarnessModelReach, String>> + Send;
 }
@@ -190,7 +190,7 @@ pub trait InMemoryModelProbe: Send + Sync + 'static {
     /// Probe the running in-memory implementation.
     fn probe(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<RawModelProbe, ModelProbeError>> + Send;
 }
 
@@ -199,7 +199,7 @@ pub trait CursorModelProbe: Send + Sync + 'static {
     /// Probe using only the caller's own Cursor credential.
     fn probe(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<RawModelProbe, ModelProbeError>> + Send;
 }
 
@@ -217,7 +217,7 @@ pub trait AgentModelsService: Send + Sync + 'static {
     /// Load one target's model catalog without creating a persisted session.
     fn load(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         request: LoadAgentModels,
     ) -> impl Future<Output = Result<AgentModels, LoadAgentModelsError>> + Send;
 }
@@ -266,7 +266,7 @@ where
     /// remembered, otherwise the last one it reported.
     async fn load_roxd(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         harness: HarnessId,
     ) -> Result<AgentModels, LoadAgentModelsError> {
         let reach = self
@@ -322,7 +322,7 @@ where
 {
     async fn load(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         request: LoadAgentModels,
     ) -> Result<AgentModels, LoadAgentModelsError> {
         let probe = match (request.harness, request.harness_id) {

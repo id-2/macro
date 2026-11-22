@@ -4,7 +4,7 @@ use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use entity_access::domain::models::{
     AnyEntityPermission, EntityAccessReceipt, EntityPermission, ParticipantRole,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_permissions::share_permission::access_level::AccessLevel;
 
@@ -21,12 +21,12 @@ mod owned;
 mod owned_state;
 mod tokens;
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).unwrap()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).unwrap()
 }
 
 fn surface_id() -> Uuid {
-    macro_uuid::generate_uuid_v7()
+    rox_uuid::generate_uuid_v7()
 }
 
 fn receipt_for(

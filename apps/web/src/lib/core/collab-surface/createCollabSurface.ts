@@ -1,18 +1,18 @@
 import { fireAndForget } from '@core/util/fireAndForget';
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
-import { createLoroManager } from '@macro-inc/collaboration/collab/manager';
-import type { RawUpdate } from '@macro-inc/collaboration/collab/shared';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
+import { createLoroManager } from '@rox-one/collaboration/collab/manager';
+import type { RawUpdate } from '@rox-one/collaboration/collab/shared';
 import {
   IDBSnapshotStore,
   LORO_SNAPSHOT_DB_NAME,
-} from '@macro-inc/collaboration/collab/snapshot-store';
-import type { LiveSyncSource } from '@macro-inc/collaboration/collab/source';
+} from '@rox-one/collaboration/collab/snapshot-store';
+import type { LiveSyncSource } from '@rox-one/collaboration/collab/source';
 import {
   BrowserWALStore,
   LORO_WAL_DB_NAME,
-} from '@macro-inc/collaboration/collab/wal';
-import { MARKDOWN_LORO_SCHEMA } from '@macro-inc/lexical-core/markdown-loro-schema';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/collaboration/collab/wal';
+import { MARKDOWN_LORO_SCHEMA } from '@rox-one/lexical-core/markdown-loro-schema';
+import { Telemetry } from '@rox-one/observability';
 import { storageServiceClient } from '@service-storage/client';
 import type { CollabSurfaceResponse } from '@service-storage/service';
 import { createCollabSurfaceSource } from '@service-sync/source';

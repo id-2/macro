@@ -4,16 +4,16 @@ use crate::domain::{
     models::page::{ContactCursor, ContactIdEntry, ContactIdPage, ContactPageSize},
     ports::ContactsPageRepository,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 impl ContactsPageRepository for DbContactsRepository {
     #[tracing::instrument(name = "contacts.lookup.read", skip_all, fields(count = lookup.ids().len() as i64), err)]
     async fn lookup_contact_ids(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         if lookup.ids().is_empty() {
             return Ok(Vec::new());
         }
@@ -23,14 +23,14 @@ impl ContactsPageRepository for DbContactsRepository {
             .await?;
         Ok(rows
             .into_iter()
-            .filter_map(|row| MacroUserIdStr::try_from(row.contact).ok())
+            .filter_map(|row| RoxUserIdStr::try_from(row.contact).ok())
             .collect())
     }
 
     #[tracing::instrument(name = "contacts.page.read", skip_all, fields(limit = i64::from(limit.get()), has_cursor = after.is_some()), err)]
     async fn contact_id_page(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> Result<ContactIdPage, Report> {

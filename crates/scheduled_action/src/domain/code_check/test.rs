@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 
 use super::*;
@@ -47,17 +47,17 @@ impl RoutineCode for Checker {
             .collect())
     }
 
-    async fn owner_time_zone(&self, _: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn owner_time_zone(&self, _: &RoxUserIdStr<'static>) -> Option<String> {
         None
     }
 
-    async fn run(&self, _: &MacroUserIdStr<'static>, _: CodeRun<'_>) -> CodeOutcome {
+    async fn run(&self, _: &RoxUserIdStr<'static>, _: CodeRun<'_>) -> CodeOutcome {
         unreachable!("saving never runs code")
     }
 
     async fn reference(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         task: &str,
     ) -> Result<String, CodeUnavailable> {
         Ok(format!("TaskNamespace methods for: {task}"))
@@ -77,7 +77,7 @@ impl RoutineCode for Checker {
 
     async fn rewrite(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &routine_program::CodeStep,
         _: &str,
         _: &[String],
@@ -214,8 +214,8 @@ fn the_recorded_sdk_is_not_configuration() {
     assert!(!same_task(&task(&["one"], None), &task(&["two"], None)));
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()
 }
 
 #[tokio::test]

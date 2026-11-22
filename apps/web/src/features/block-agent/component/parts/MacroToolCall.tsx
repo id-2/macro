@@ -11,6 +11,7 @@
  * Only registered result renderers supply disclosures; raw payloads stay hidden.
  */
 
+import { t } from '@app/lib/i18n';
 import {
   hasToolRenderer,
   RenderTool,
@@ -88,7 +89,7 @@ export function MacroToolCall(props: {
       trailing={
         props.common.trailing ??
         (failure()
-          ? 'Failed'
+          ? t('agentChat.failed')
           : props.common.status === 'completed'
             ? resultSummary(response())
             : undefined)
@@ -177,8 +178,8 @@ function responseError(response: ToolResponse | undefined): string | undefined {
   if (typeof data !== 'object' || data === null) return undefined;
   if ('success' in data && data.success === false) {
     return 'message' in data && typeof data.message === 'string'
-      ? data.message || 'The tool did not succeed.'
-      : 'The tool did not succeed.';
+      ? data.message || t('agentChat.toolDidNotSucceed')
+      : t('agentChat.toolDidNotSucceed');
   }
   return undefined;
 }

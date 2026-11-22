@@ -9,7 +9,7 @@ import {
   safeFetch,
   statusError,
 } from '@core/util/safeFetch';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 
 import { makePersisted } from '@solid-primitives/storage';
 import { ok } from 'neverthrow';
@@ -52,6 +52,8 @@ import type {
 import type { AgentApiKey } from './generated/schemas/agentApiKey';
 import type { AgentSetupResponse } from './generated/schemas/agentSetupResponse';
 import type { AppleLoginRequest } from './generated/schemas/appleLoginRequest';
+import type { ClaimHandleRequest } from './generated/schemas/claimHandleRequest';
+import type { ClaimHandleResponse } from './generated/schemas/claimHandleResponse';
 import type { CreatedTeamInviteLinkResponse } from './generated/schemas/createdTeamInviteLinkResponse';
 import type { CreateGtmInviteLinkRequest } from './generated/schemas/createGtmInviteLinkRequest';
 import type { CreateTeamRequest } from './generated/schemas/createTeamRequest';
@@ -67,7 +69,7 @@ import type { GtmInviteOffer } from './generated/schemas/gtmInviteOffer';
 import type { GtmInviteOfferStatus } from './generated/schemas/gtmInviteOfferStatus';
 import type { InviteToTeamRequest } from './generated/schemas/inviteToTeamRequest';
 import type { JoinTeamByInviteLinkResponse } from './generated/schemas/joinTeamByInviteLinkResponse';
-import type { MacroApiTokenResponse } from './generated/schemas/macroApiTokenResponse';
+import type { RoxApiTokenResponse } from './generated/schemas/roxApiTokenResponse';
 import type { PasswordRequest } from './generated/schemas/passwordRequest';
 import type { PatchTeamRequest } from './generated/schemas/patchTeamRequest';
 import type { PatchUserGroupRequest } from './generated/schemas/patchUserGroupRequest';
@@ -346,6 +348,38 @@ const githubErrorResponseHandler: ErrorResponseHandler<GithubReauthenticationErr
     }
   };
 
+/** Errors starting a GitHub link can end in beyond the shared GitHub ones. */
+export type GithubLinkStartErrorCode =
+  | GithubReauthenticationErrorCode
+  | 'GITHUB_NOT_CONFIGURED';
+
+/**
+ * Keeps the sign-in service's own words when this deployment cannot start a
+ * link: its answer names the missing setting. Every other failure falls back
+ * to the shared GitHub wording.
+ */
+const githubLinkStartErrorResponseHandler: ErrorResponseHandler<GithubLinkStartErrorCode> =
+  async function handleGithubLinkStartErrorResponse(response) {
+    if (response.status === 409) {
+      try {
+        const body = (await response.json()) as {
+          code?: unknown;
+          message?: unknown;
+        };
+        if (
+          body?.code === 'github_not_configured' &&
+          typeof body.message === 'string' &&
+          body.message.trim()
+        ) {
+          return { code: 'GITHUB_NOT_CONFIGURED', message: body.message };
+        }
+      } catch {
+        // Not the structured body; fall through to the shared wording.
+      }
+    }
+    return githubErrorResponseHandler(response);
+  };
+
 export const authServiceClient = {
   /**
    * Which providers this deployment can connect. Pass `originalUrl` to also
@@ -450,7 +484,7 @@ export const authServiceClient = {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${args.accessToken}`,
-        'x-macro-refresh-token': args.refreshToken,
+        'x-rox-refresh-token': args.refreshToken,
       },
     });
   },
@@ -524,6 +558,18 @@ export const authServiceClient = {
       })
     ).map((result) => result);
   },
+  /**
+   * Claims this account's first-party handle, which can be done once. The
+   * server rejects a taken handle with 409 and never appends a suffix.
+   */
+  async claimHandle(args: ClaimHandleRequest) {
+    return (
+      await fetchWithAuth<ClaimHandleResponse>(`${authHost}/user/handle`, {
+        method: 'PUT',
+        body: JSON.stringify(args),
+      })
+    ).map((result) => result);
+  },
   async getUserNames(args: PostGetNamesRequestBody) {
     return (
       await fetchWithAuth<UserNames>(`${authHost}/user/get_names`, {
@@ -569,10 +615,10 @@ export const authServiceClient = {
     const accessToken = await getAccessToken();
     if (!accessToken) {
       Telemetry.warn('No access token found, fetching with cookies');
-      return authApiFetch<MacroApiTokenResponse>('/jwt/macro_api_token');
+      return authApiFetch<RoxApiTokenResponse>('/jwt/macro_api_token');
     }
 
-    return await authApiFetch<MacroApiTokenResponse>('/jwt/macro_api_token', {
+    return await authApiFetch<RoxApiTokenResponse>('/jwt/macro_api_token', {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -1196,9 +1242,13 @@ export const authServiceClient = {
       ? `${authHost}/link/github?original_url=${encodeURIComponent(originalUrl)}`
       : `${authHost}/link/github`;
     return (
-      await fetchWithAuth<InitGithubLinkResponse>(url, {
-        method: 'POST',
-      })
+      await fetchWithAuth<InitGithubLinkResponse, GithubLinkStartErrorCode>(
+        url,
+        {
+          method: 'POST',
+          errorResponseHandler: githubLinkStartErrorResponseHandler,
+        }
+      )
     ).map((result) => result.authorization_url);
   },
 

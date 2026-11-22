@@ -63,7 +63,7 @@ pub(super) async fn thread_metadata_by_ids(
 #[tracing::instrument(err, skip(pool, thread_ids))]
 pub(super) async fn thread_mail_projections_by_ids(
     pool: &PgPool,
-    viewer: macro_user_id::user_id::MacroUserIdStr<'_>,
+    viewer: rox_user_id::user_id::RoxUserIdStr<'_>,
     thread_ids: &[Uuid],
 ) -> Result<Vec<EmailThreadMailProjection>, sqlx::Error> {
     if thread_ids.is_empty() {
@@ -241,7 +241,7 @@ pub(super) async fn messages_by_thread_id_paginated(
             draft_generation, id, provider_id, thread_id, provider_thread_id, replying_to_id,
             global_id, link_id, provider_history_id, internal_date_ts, snippet,
             size_estimate, subject, sent_at, has_attachments, is_read, is_starred,
-            is_sent, is_draft, body_text, body_html_sanitized, body_macro,
+            is_sent, is_draft, body_text, body_html_sanitized, body_rox,
             headers_jsonb, created_at, updated_at
         FROM email_messages
         WHERE thread_id = $1
@@ -279,7 +279,7 @@ pub(super) async fn latest_content_message_rows(
             message.subject, message.sent_at, message.has_attachments,
             message.is_read, message.is_starred, message.is_sent,
             message.is_draft, message.body_text, message.body_html_sanitized,
-            message.body_macro, message.headers_jsonb, message.created_at,
+            message.body_rox, message.headers_jsonb, message.created_at,
             message.updated_at
         FROM UNNEST($1::uuid[]) AS requested(thread_id)
         CROSS JOIN LATERAL (
@@ -288,7 +288,7 @@ pub(super) async fn latest_content_message_rows(
                 global_id, link_id, provider_history_id, internal_date_ts,
                 snippet, size_estimate, subject, sent_at, has_attachments,
                 is_read, is_starred, is_sent, is_draft, body_text,
-                body_html_sanitized, body_macro, headers_jsonb, created_at,
+                body_html_sanitized, body_rox, headers_jsonb, created_at,
                 updated_at
             FROM email_messages
             WHERE thread_id = requested.thread_id
@@ -323,7 +323,7 @@ pub(super) async fn cross_inbox_reply_drafts(
             draft_generation, id, provider_id, thread_id, provider_thread_id, replying_to_id,
             global_id, link_id, provider_history_id, internal_date_ts, snippet,
             size_estimate, subject, sent_at, has_attachments, is_read, is_starred,
-            is_sent, is_draft, body_text, body_html_sanitized, body_macro,
+            is_sent, is_draft, body_text, body_html_sanitized, body_rox,
             headers_jsonb, created_at, updated_at
         FROM email_messages
         WHERE is_draft = true

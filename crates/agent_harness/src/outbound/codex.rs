@@ -19,7 +19,7 @@ use codex_cloud_agents::domain::{
     runtime::RuntimeIdentity,
 };
 use codex_connection::domain::ConnectionService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 
 /// Provisions an ACP attachment; cloud execution begins only with a prompt.
@@ -146,7 +146,7 @@ impl<
     async fn preflight(
         &self,
         _kind: AgentKind,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> Result<Option<SessionBlocker>> {
         let connections = self.connections.as_ref().ok_or_else(|| {
             HarnessError::Container(

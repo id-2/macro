@@ -6,13 +6,13 @@ pub mod drafts;
 
 pub use super::service::signature::SignaturePreparation;
 use chrono::{DateTime, Utc};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{
     events::{
-        EmailMacroEvent, MessageSendCancelledMetadata, MessageSendQueuedMetadata, SendCancelReason,
+        EmailRoxEvent, MessageSendCancelledMetadata, MessageSendQueuedMetadata, SendCancelReason,
     },
     models::EmailErr,
     ports::EmailRepo,
@@ -39,7 +39,7 @@ pub trait EmailSchedulingRepo: Send + Sync {
         &self,
         link_id: Uuid,
         message_id: Uuid,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         change: ScheduleChange,
         signature: Option<&SignaturePreparation>,
 
@@ -52,7 +52,7 @@ pub trait EmailSchedulingService: Send + Sync {
     /// Authorize the actor's selected inbox and apply a guarded transition.
     fn change_schedule(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         message_id: Uuid,
         change: ScheduleChange,
@@ -69,12 +69,12 @@ where
     E: Send + Sync,
     CS: Send + Sync,
     Eam: Send + Sync,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
 {
     async fn change_schedule(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         link_id: Uuid,
         message_id: Uuid,
         change: ScheduleChange,
@@ -118,7 +118,7 @@ where
         };
         let event = match change {
             ScheduleChange::Set(send_time) => {
-                EmailMacroEvent::message_send_queued(MessageSendQueuedMetadata {
+                EmailRoxEvent::message_send_queued(MessageSendQueuedMetadata {
                     link_id,
                     owner: link.macro_id,
                     actor: Some(actor),
@@ -129,7 +129,7 @@ where
                 })
             }
             ScheduleChange::Cancel => {
-                EmailMacroEvent::message_send_cancelled(MessageSendCancelledMetadata {
+                EmailRoxEvent::message_send_cancelled(MessageSendCancelledMetadata {
                     link_id,
                     owner: link.macro_id,
                     actor: Some(actor),

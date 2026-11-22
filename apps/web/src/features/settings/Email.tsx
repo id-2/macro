@@ -26,7 +26,7 @@ import { RoxMark } from '@core/component/RoxMark';
 import OutlookIcon from '@icon/outlook-color.svg';
 import ArrowsClockwiseIcon from '@icon/system/regular/arrows-clockwise.svg?component-solid';
 import CalendarSlashIcon from '@icon/system/regular/calendar-slash.svg?component-solid';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   fetchEmailConnectionProviders,
   useOutlookAvailable,
@@ -69,7 +69,7 @@ export function useConnectInbox(): (provider?: EmailProvider) => void {
       try {
         if (provider === 'OUTLOOK' && !(await outlookAvailable())) {
           span.setAttr('email.link.outcome', 'outlook_unavailable');
-          toast.failure('New Outlook connections are temporarily unavailable.');
+          toast.failure('Новые подключения Outlook временно недоступны.');
           return;
         }
         await span.run(() => startAddInbox({ provider }));
@@ -100,9 +100,9 @@ export function EmailCard(props: { class?: string } = {}) {
   const removeInboxMutation = useRemoveInboxMutation({
     onSuccess: (_data, linkId) => {
       clearSignatureState(linkId);
-      toast.success('Inbox removed');
+      toast.success('Ящик удалён');
     },
-    onError: () => toast.failure('Failed to remove inbox. Please try again.'),
+    onError: () => toast.failure('Не удалось удалить ящик. Попробуйте ещё раз.'),
   });
   const [removeTarget, setRemoveTarget] = createSignal<{
     id: string;
@@ -137,11 +137,11 @@ export function EmailCard(props: { class?: string } = {}) {
       (res) => {
         toast.success(
           res.already_in_progress
-            ? 'Sync already in progress'
-            : 'Re-sync started'
+            ? 'Синхронизация уже идёт'
+            : 'Повторная синхронизация запущена'
         );
       },
-      () => toast.failure('Failed to start re-sync')
+      () => toast.failure('Не удалось запустить повторную синхронизацию')
     );
     setResyncingIds((prev) => {
       const next = new Set(prev);
@@ -265,14 +265,14 @@ export function EmailCard(props: { class?: string } = {}) {
             icon={<GmailIcon />}
             title={
               hasInbox()
-                ? 'Connect another Google Workspace account'
-                : 'Connect a Google Workspace account'
+                ? 'Подключить ещё один аккаунт Google Workspace'
+                : 'Подключить аккаунт Google Workspace'
             }
-            description="Sync a Gmail or Google Workspace inbox into Rox Email."
+            description="Синхронизирует ящик Gmail или Google Workspace с почтой Rox."
           >
             <ConnectAction
-              label="Connect"
-              ariaLabel="Connect a Google Workspace account"
+              label="Подключить"
+              ariaLabel="Подключить аккаунт Google Workspace"
               onClick={() => onConnectEmail('GMAIL')}
             />
           </IntegrationRow>
@@ -281,13 +281,13 @@ export function EmailCard(props: { class?: string } = {}) {
           <SettingsSurface>
             <IntegrationRow
               icon={<OutlookIcon />}
-              title="Connect an Outlook account"
+              title="Подключить аккаунт Outlook"
               badge={<OutlookBetaBadge />}
-              description="Sync an Outlook.com or Microsoft 365 inbox into Rox Email."
+              description="Синхронизирует ящик Outlook.com или Microsoft 365 с почтой Rox."
             >
               <ConnectAction
-                label="Connect"
-                ariaLabel="Connect an Outlook account"
+                label="Подключить"
+                ariaLabel="Подключить аккаунт Outlook"
                 onClick={() => onConnectEmail('OUTLOOK')}
               />
             </IntegrationRow>
@@ -311,7 +311,7 @@ export function EmailCard(props: { class?: string } = {}) {
         <Panel depth={2} class="rounded-xl">
           <Panel.Header class="px-6">
             <Dialog.Title class="text-ink text-sm font-semibold">
-              Remove inbox
+              Удалить ящик
             </Dialog.Title>
           </Panel.Header>
           <Panel.Body class="p-6 font-sans flex flex-col gap-3">
@@ -320,23 +320,23 @@ export function EmailCard(props: { class?: string } = {}) {
                 when={removeTarget()?.isOwn}
                 fallback={
                   <>
-                    Remove access to{' '}
-                    <span class="text-ink">{removeTarget()?.email}</span>? The
-                    inbox and its data stay with its owner.
+                    Убрать доступ к{' '}
+                    <span class="text-ink">{removeTarget()?.email}</span>? Ящик
+                    и его данные останутся у владельца.
                   </>
                 }
               >
-                Remove <span class="text-ink">{removeTarget()?.email}</span>?
-                This clears all of its email data from Rox and cannot be
-                undone.
+                Удалить <span class="text-ink">{removeTarget()?.email}</span>?
+                Все данные почты этого ящика будут удалены из Rox. Это нельзя
+                отменить.
               </Show>
             </Dialog.Description>
             <div class="pt-3 justify-end items-center gap-3 inline-flex">
               <Button variant="ghost" onClick={() => setRemoveTarget(null)}>
-                Cancel
+                Отмена
               </Button>
               <Button variant="secondary" onClick={handleRemoveInbox}>
-                Remove
+                Удалить
               </Button>
             </div>
           </Panel.Body>
@@ -360,12 +360,12 @@ async function outlookAvailable(): Promise<boolean> {
 
 function syncStatusLabel(status: SyncStatus): string {
   return match(status)
-    .with(SyncStatus.SYNCING, () => 'Syncing…')
-    .with(SyncStatus.UP_TO_DATE, () => 'Up to date')
-    .with(SyncStatus.ERROR, () => 'Error — re-sync')
-    .with(SyncStatus.NEEDS_REAUTH, () => 'Reconnect to resume sync')
-    .with(SyncStatus.INACTIVE, () => 'Disabled')
-    .exhaustive(() => 'Unknown sync status');
+    .with(SyncStatus.SYNCING, () => 'Синхронизация…')
+    .with(SyncStatus.UP_TO_DATE, () => 'Актуально')
+    .with(SyncStatus.ERROR, () => 'Ошибка — повторите синхронизацию')
+    .with(SyncStatus.NEEDS_REAUTH, () => 'Переподключите, чтобы продолжить')
+    .with(SyncStatus.INACTIVE, () => 'Отключено')
+    .exhaustive(() => 'Неизвестный статус синхронизации');
 }
 
 // Live backfill progress bar. `completed`/`total` are the connection-gateway
@@ -374,12 +374,14 @@ function syncStatusLabel(status: SyncStatus): string {
 // Rough "time left" from the recent backfill rate. Rounds up and bins into
 // s / m / h so the estimate doesn't visibly jitter between progress events.
 function formatEta(seconds: number): string {
-  if (seconds < 60) return `~${Math.max(1, Math.ceil(seconds))}s left`;
+  if (seconds < 60) return `осталось ~${Math.max(1, Math.ceil(seconds))} с`;
   const minutes = Math.ceil(seconds / 60);
-  if (minutes < 60) return `~${minutes}m left`;
+  if (minutes < 60) return `осталось ~${minutes} мин`;
   const hours = Math.floor(minutes / 60);
   const remMinutes = minutes % 60;
-  return remMinutes > 0 ? `~${hours}h ${remMinutes}m left` : `~${hours}h left`;
+  return remMinutes > 0
+    ? `осталось ~${hours} ч ${remMinutes} мин`
+    : `осталось ~${hours} ч`;
 }
 
 function BackfillProgressBar(props: { progress: BackfillProgress }) {
@@ -398,12 +400,12 @@ function BackfillProgressBar(props: { progress: BackfillProgress }) {
     <div class="flex w-60 flex-col gap-2">
       <span class="flex items-center gap-1.5 text-xs text-ink-muted">
         <ArrowsClockwiseIcon class="size-3 shrink-0 animate-spin" />
-        Backfilling…
+        Загружаем историю…
       </span>
       <div class="flex items-center gap-6 whitespace-nowrap text-xs text-ink-muted">
         <span>
-          {props.progress.completed.toLocaleString()} of{' '}
-          {props.progress.total.toLocaleString()} threads
+          {props.progress.completed.toLocaleString('ru-RU')} из{' '}
+          {props.progress.total.toLocaleString('ru-RU')} цепочек
         </span>
         <Show when={etaLabel()}>{(label) => <span>{label()}</span>}</Show>
       </div>
@@ -437,13 +439,13 @@ function DisabledPrimaryRow(props: { email: string; onEnable: () => void }) {
           <span class="ph-no-capture text-sm truncate text-ink-muted">
             {props.email}
           </span>
-          <Chip label="Primary" />
-          <Chip label="Disabled" />
+          <Chip label="Основной" />
+          <Chip label="Отключён" />
         </div>
-        <span class="text-xs text-ink-muted">Sync disabled</span>
+        <span class="text-xs text-ink-muted">Синхронизация отключена</span>
       </div>
       <Button variant="secondary" size="md" onClick={props.onEnable}>
-        Enable
+        Включить
       </Button>
     </SettingsSurface>
   );
@@ -492,10 +494,10 @@ function InboxRow(props: {
               {props.link.email_address}
             </span>
             <Show when={props.isPrimary}>
-              <Chip label="Primary" />
+              <Chip label="Основной" />
             </Show>
             <Show when={!props.isPrimary && !props.isOwn}>
-              <Chip label="Shared" />
+              <Chip label="Общий" />
             </Show>
           </div>
           <Switch fallback={<span class="text-xs text-ink-muted">Gmail</span>}>
@@ -546,9 +548,9 @@ function InboxRow(props: {
               variant="primary"
               size="md"
               onClick={props.onReconnect}
-              aria-label={`Reconnect ${props.link.email_address}`}
+              aria-label={`Переподключить ${props.link.email_address}`}
             >
-              Reconnect
+              Переподключить
             </Button>
           </Show>
           {/* Explicitly enabling calendar also restores mailbox access when
@@ -563,9 +565,9 @@ function InboxRow(props: {
               variant="secondary"
               size="md"
               onClick={props.onEnableCalendar}
-              aria-label={`Enable calendar for ${props.link.email_address}`}
+              aria-label={`Включить календарь для ${props.link.email_address}`}
             >
-              Enable calendar
+              Включить календарь
             </Button>
           </Show>
           {/* Only the owner sees this: turning calendar off deletes the
@@ -580,19 +582,19 @@ function InboxRow(props: {
                 props.link.has_calendar_data)
             }
           >
-            <Tooltip label="Turn off calendar">
+            <Tooltip label="Выключить календарь">
               <Button
                 variant="secondary"
                 size="icon-sm"
                 onClick={props.onTurnOffCalendar}
-                aria-label={`Turn off calendar for ${props.link.email_address}`}
+                aria-label={`Выключить календарь для ${props.link.email_address}`}
               >
                 <CalendarSlashIcon class="size-4" />
               </Button>
             </Tooltip>
           </Show>
           <Show when={ENABLE_INBOX_RESYNC}>
-            <Tooltip label="Force sync">
+            <Tooltip label="Принудительная синхронизация">
               <Button
                 variant="secondary"
                 size="icon-sm"
@@ -602,20 +604,20 @@ function InboxRow(props: {
                     props.link.sync_status === SyncStatus.SYNCING)
                 }
                 onClick={props.onResync}
-                aria-label={`Force sync ${props.link.email_address}`}
+                aria-label={`Принудительно синхронизировать ${props.link.email_address}`}
               >
                 <ArrowsClockwiseIcon class="size-4" />
               </Button>
             </Tooltip>
           </Show>
-          <Tooltip label="Remove inbox">
+          <Tooltip label="Удалить ящик">
             <Button
               variant="ghost"
               size="md"
               onClick={props.onRemove}
-              aria-label={`Remove ${props.link.email_address}`}
+              aria-label={`Удалить ${props.link.email_address}`}
             >
-              Remove
+              Удалить
             </Button>
           </Tooltip>
         </div>

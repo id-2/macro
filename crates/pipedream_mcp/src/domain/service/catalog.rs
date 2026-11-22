@@ -6,7 +6,7 @@
 //! user's connected apps as their own section from the connections
 //! endpoint; the catalog itself carries no curated pinning.
 
-use crate::domain::models::{CatalogPage, MacroUserIdStr};
+use crate::domain::models::{CatalogPage, RoxUserIdStr};
 use crate::domain::ports::ConnectorDirectory;
 
 #[cfg(test)]
@@ -21,7 +21,7 @@ const DEFAULT_PAGE_SIZE: u32 = 20;
 #[tracing::instrument(skip(directory), err)]
 pub async fn browse_catalog<D: ConnectorDirectory>(
     directory: &D,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     search: Option<&str>,
     cursor: Option<&str>,
     limit: Option<u32>,

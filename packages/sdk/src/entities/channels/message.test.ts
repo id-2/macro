@@ -3,7 +3,7 @@ import type {
   MessageListItem,
   Message as MessageRecord,
 } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Message } from './message';
 
 function record(id: string, threadId?: string): MessageRecord {
@@ -42,7 +42,7 @@ function contextClient(target: MessageRecord) {
         },
       }),
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, selections };
 }
 

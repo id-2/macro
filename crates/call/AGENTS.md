@@ -99,7 +99,8 @@ in-call chat.
   standalone ownership, attendance, or an explicit invite is required.
 - Every authenticated token-producing HTTP route refuses a program
   (`macro_authorization::is_program_run`: a credential signed for an agent or a
-  routine run, or `x-macro-code-execution`), because tokens reach the model,
+  routine run, or the `x-rox-code-execution` mark, whose earlier
+  `x-macro-code-execution` name is still accepted), because tokens reach the model,
   outlive the run and cannot be revoked. A program can drop the header with a
   raw `fetch`, so the signed claims carry the refusal. The guest join has no
   credential and checks the header only.

@@ -214,9 +214,9 @@ deny = [
   { crate = "webpki-roots:>0.26.11, <1.0.10", reason = "Contains distrusted emSign roots (RUSTSEC-2026-0381)" },
   { crate = "aws-config", wrappers = [
     "aws-msk-iam-sasl-signer", # External crate, requires aws-config directly
-    "macro_aws_config",
+    "rox_aws_config",
     "workspace-hack",          # cargo-hakari generated crate
-  ], reason = "Use macro_aws_config for AWS configuration in workspace crates" },
+  ], reason = "Use rox_aws_config for AWS configuration in workspace crates" },
   { crate = "tracing-subscriber", wrappers = [
     "agent",                     # GenAI span tests
     "agent_egress",              # Connected-app exchange span tests only (dev-dependency)
@@ -232,7 +232,7 @@ deny = [
     "code_execution",            # Deno exit span field tests only (dev-dependency)
     "coding_agent_worker",       # Standalone daemon logging setup
     "convert_service",           # process_message span status tests only (dev-dependency)
-    "cursor_cloud_agents",       # Standalone ACP binary logging; stdout is the protocol, so macro_entrypoint cannot own it
+    "cursor_cloud_agents",       # Standalone ACP binary logging; stdout is the protocol, so rox_entrypoint cannot own it
     "dictation",                 # Metadata tracing and content-redaction tests only
     "document_storage_service",  # GraphQL telemetry span and log tests only (dev-dependency)
     "documents",                 # Dev logging only
@@ -254,9 +254,9 @@ deny = [
     "initiative",                # initiative.read span field tests only (dev-dependency)
     "lambda_runtime_api_client", # External crate allowed to use tracing-subscriber
     "loom",                      # External concurrency testing dependency
-    "macro_entrypoint",
-    "macro_authorization",      # Credential-redaction span tests only
-    "macro_tower_layers",        # OpenTelemetry layer tests
+    "rox_entrypoint",
+    "rox_authorization",      # Credential-redaction span tests only
+    "rox_tower_layers",        # OpenTelemetry layer tests
     "mcp_toolset",               # MCP trace-context propagation tests only (dev-dependency)
     "name_search",               # Search-term redaction span tests only (dev-dependency)
     "native_app_server",         # Dev tooling only
@@ -278,7 +278,7 @@ deny = [
     "whatsmeow",                 # Span hierarchy and JID-redaction tests only
     "worker-rs-otel",             # Cloudflare/WASM OpenTelemetry integration
     "workspace-hack",             # cargo-hakari generated crate
-  ], reason = "Use macro_entrypoint for tracing setup in workspace crates" },
+  ], reason = "Use rox_entrypoint for tracing setup in workspace crates" },
 ]
 
 # List of features to allow/deny

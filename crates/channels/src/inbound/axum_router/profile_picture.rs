@@ -28,7 +28,7 @@ pub struct SetChannelPictureRequest {
 pub async fn set_channel_picture_handler<
     S: ChannelService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,

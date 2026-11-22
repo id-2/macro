@@ -4,6 +4,7 @@ import {
   DEFAULT_DARK_THEME,
   DEFAULT_LIGHT_THEME,
   DEFAULT_THEMES,
+  isLegacyUnsetTheme,
 } from '../constants';
 import type {
   ThemeColorTokens,
@@ -31,7 +32,7 @@ export const [htmlColor, setHtmlColor] = makePersisted(
     muted?: string;
     input?: string;
   }>({ color: '' }),
-  { name: 'html-color-theme' }
+  { name: 'html-color-theme-v2' }
 );
 
 export const [userThemes, setUserThemes] = makePersisted(
@@ -65,8 +66,8 @@ setUserThemes(
 );
 
 export const [currentThemeId, setCurrentThemeId] = makePersisted(
-  createSignal<string>(DEFAULT_DARK_THEME),
-  { name: 'macro-selected-theme' }
+  createSignal<string>(DEFAULT_LIGHT_THEME),
+  { name: 'macro-selected-theme-v2' }
 );
 
 export const themes = createMemo<ThemeV3[]>(() => [
@@ -80,7 +81,7 @@ export const [themeColorTokens, setThemeColorTokens] =
 
 /** Intrinsic mode of the currently rendered theme. */
 export const [liveThemeMode, setLiveThemeMode] = createSignal<'light' | 'dark'>(
-  'dark'
+  'light'
 );
 
 /** Shared concrete colors for integrations which cannot inherit CSS tokens. */
@@ -113,26 +114,25 @@ export const [darkModeTheme, setDarkModeTheme] = makePersisted(
 export type ThemeMode = 'light' | 'dark' | 'system';
 
 /** Fallback for the initial themeMode, migrating the pre-"Active theme" setting
- *  (`macro-theme-should-match-system`) so returning users keep their appearance:
- *  auto-detect on → 'system'; auto-detect off (a pinned theme) → the fixed
- *  light/dark mode matching the previously-selected theme. Only used until the
- *  new `macro-theme-mode` key is written. */
+ *  (`macro-theme-should-match-system`). Someone who has not picked a theme
+ *  opens in light Lapis. An explicit system match, or a pinned non-default
+ *  theme, is kept. Only used until `macro-theme-mode` is written. */
 function initialThemeMode(): ThemeMode {
   if (typeof localStorage === 'undefined') {
-    return 'system';
+    return 'light';
   }
   const legacy = localStorage.getItem('macro-theme-should-match-system');
-  // New/already-migrated users, and anyone who had auto-detect on: follow the OS.
-  if (legacy !== 'false') {
+  if (legacy === 'true') {
     return 'system';
   }
-  // Auto-detect was off: pin to the mode matching the previously-selected theme
-  // based on the explicit mode stored by V3.
-  const pinned = themes().find((theme) => theme.id === currentThemeId());
-  if (!pinned) {
-    return 'system';
+  if (legacy === 'false') {
+    const pinned = themes().find((theme) => theme.id === currentThemeId());
+    if (!pinned || isLegacyUnsetTheme(pinned.id)) {
+      return 'light';
+    }
+    return pinned.mode;
   }
-  return pinned.mode;
+  return 'light';
 }
 
 export const [themeMode, setThemeMode] = makePersisted(
@@ -170,3 +170,59 @@ export const [showDarkThemes, setShowDarkThemes] = makePersisted(
 );
 
 export const [themeDepth, setThemeDepth] = createSignal<number>(0.15);
+
+function readStoredThemeId(name: string): string | null {
+  if (typeof localStorage === 'undefined') return null;
+  const raw = localStorage.getItem(name);
+  if (!raw) return null;
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return typeof parsed === 'string' ? parsed : null;
+  } catch {
+    return raw;
+  }
+}
+
+function openingThemeId(): string {
+  const resolved = themeMode() === 'system' ? systemMode() : themeMode();
+  return resolved === 'dark' ? darkModeTheme() : lightModeTheme();
+}
+
+/** Saved Rox Dark / Rox Light are the old defaults, not a choice. Open Lapis
+ *  in light mode. A different saved theme is left alone. */
+function adoptLapisWhenThemeWasUnset(): void {
+  const storedSelected = readStoredThemeId('macro-selected-theme');
+  const selectedUnset =
+    storedSelected === null || isLegacyUnsetTheme(storedSelected);
+  const opening = openingThemeId();
+  const openingIsChosen =
+    opening !== '' &&
+    !isLegacyUnsetTheme(opening) &&
+    opening !== DEFAULT_LIGHT_THEME;
+
+  if (selectedUnset && !openingIsChosen) {
+    setLightModeTheme(DEFAULT_LIGHT_THEME);
+    setCurrentThemeId(DEFAULT_LIGHT_THEME);
+    setThemeMode('light');
+    setLiveThemeMode('light');
+    return;
+  }
+
+  if (isLegacyUnsetTheme(lightModeTheme())) {
+    setLightModeTheme(DEFAULT_LIGHT_THEME);
+  }
+  const liveId = openingThemeId();
+  if (
+    storedSelected !== null &&
+    isLegacyUnsetTheme(storedSelected) &&
+    liveId !== ''
+  ) {
+    setCurrentThemeId(liveId);
+  }
+  const live = themes().find((theme) => theme.id === liveId);
+  if (live) {
+    setLiveThemeMode(live.mode);
+  }
+}
+
+adoptLapisWhenThemeWasUnset();

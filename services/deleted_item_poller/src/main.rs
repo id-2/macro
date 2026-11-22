@@ -11,14 +11,14 @@ use lambda_runtime::{
     Error, LambdaEvent, run, service_fn,
     tracing::{self},
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_event_broker::{GlobalSpawner, KafkaEventPublisher};
+use rox_entrypoint::RoxEntrypoint;
+use rox_event_broker::{GlobalSpawner, KafkaEventPublisher};
 use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     tracing::trace!("initiating lambda");
 
     let config = Config::from_env().context("all necessary env vars should be available")?;
@@ -39,10 +39,10 @@ async fn main() -> Result<(), Error> {
         .await
         .context("could not connect to db")?;
 
-    let document_delete_queue = macro_queues::DocumentDeleteQueue::new();
-    let chat_delete_queue = macro_queues::ChatDeleteQueue::new();
+    let document_delete_queue = rox_queues::DocumentDeleteQueue::new();
+    let chat_delete_queue = rox_queues::ChatDeleteQueue::new();
     let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(
-        &macro_aws_config::get_macro_aws_config().await,
+        &rox_aws_config::get_macro_aws_config().await,
     ))
     .document_delete_queue(&document_delete_queue)
     .chat_delete_queue(&chat_delete_queue);

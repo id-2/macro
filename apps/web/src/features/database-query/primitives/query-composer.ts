@@ -2,7 +2,7 @@ import {
   type DatabaseQueryChart,
   type DatabaseQueryDisplayMode,
   isDatabaseQueryChartMode,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import { err, ok, type Result } from 'neverthrow';
 import { createSignal, onCleanup } from 'solid-js';
 import type { QueryComposerOptions } from '../context/query-context';

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import {
   handleFileFolderDrop,
@@ -44,9 +45,7 @@ export function CreateFolder(props: {
     try {
       await action();
     } catch {
-      setPreparationError(
-        'Could not prepare the files. Please select them again.'
-      );
+      setPreparationError(t('drive.prepareFilesFailed'));
     } finally {
       setPreparing(false);
     }
@@ -66,7 +65,9 @@ export function CreateFolder(props: {
         showUploads={props.showUploads}
         tags={
           <Suspense
-            fallback={<span class="text-xs text-ink-muted">Loading tags…</span>}
+            fallback={
+              <span class="text-xs text-ink-muted">{t('drive.loadingTags')}</span>
+            }
           >
             <InlineTagsPill docTags={tags} showAddButton />
           </Suspense>

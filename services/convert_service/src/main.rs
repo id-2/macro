@@ -2,11 +2,11 @@
 use crate::api::context::{ApiContext, AuthorizationService};
 use anyhow::Context;
 use config::{Config, Environment};
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthorizationState, NoopMacroAuthJwtValidator,
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthorizationState, NoopRoxAuthJwtValidator,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use process::runner::run_worker;
 use sqlx::postgres::PgPoolOptions;
 use std::sync::Arc;
@@ -61,14 +61,14 @@ fn smoke_test_lok(lok_path: &str) -> anyhow::Result<()> {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let env = Environment::new_or_prod();
-    MacroEntrypoint::new(env).init();
+    RoxEntrypoint::new(env).init();
 
     // Parse our configuration from the environment.
     let config = Config::from_env().context("expected to be able to generate config")?;
 
     smoke_test_lok(&config.lok_path)?;
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
 
     let db = PgPoolOptions::new()
         .min_connections(1)
@@ -77,24 +77,24 @@ async fn main() -> anyhow::Result<()> {
         .await
         .context("could not connect to db")?;
 
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        NoopMacroAuthJwtValidator, // we only have internal calls in this service.
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        NoopRoxAuthJwtValidator, // we only have internal calls in this service.
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
 
     tracing::trace!("initialized config");
 
-    let queue_aws_config = macro_aws_config::get_macro_aws_config().await;
+    let queue_aws_config = rox_aws_config::get_macro_aws_config().await;
 
-    let s3_client = s3_client::S3::new(macro_aws_config::s3_client().await);
+    let s3_client = s3_client::S3::new(rox_aws_config::s3_client().await);
     tracing::trace!("initialized s3 client");
 
-    let convert_queue = macro_queues::ConvertQueue::new();
+    let convert_queue = rox_queues::ConvertQueue::new();
     let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(&queue_aws_config))
         .convert_queue(&convert_queue);
     tracing::trace!("initialized sqs client");

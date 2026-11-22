@@ -2,7 +2,7 @@
 use super::{Preview, PreviewError, PreviewId, PreviewStatus};
 use agent_fold::domain::log::AgentSessionId;
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use std::net::SocketAddr;
 use uuid::Uuid;
@@ -13,7 +13,7 @@ pub struct StoredPreview {
     /// Public snapshot.
     pub preview: Preview,
     /// Account charged for this preview.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// Agent's local HTTP port.
     pub port: u16,
     /// Replica which atomically claimed the SSH credential, if connected.
@@ -27,7 +27,7 @@ pub struct StoredCredential {
     /// Preview generation.
     pub preview: PreviewId,
     /// Viewer identity; absent for an SSH token.
-    pub user: Option<MacroUserIdStr<'static>>,
+    pub user: Option<RoxUserIdStr<'static>>,
     /// Unix milliseconds deadline.
     pub expires: i64,
 }
@@ -133,7 +133,7 @@ pub trait PreviewRepository: Send + Sync {
     async fn watch(
         &self,
         session: AgentSessionId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         limits: WatchLimits,
     ) -> Result<(), PreviewError>;
     /// Recently authorized watchers, bounded by the repository.
@@ -141,7 +141,7 @@ pub trait PreviewRepository: Send + Sync {
         &self,
         session: AgentSessionId,
         limit: i64,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, PreviewError>;
+    ) -> Result<Vec<RoxUserIdStr<'static>>, PreviewError>;
     /// Expire dead owners and reclaim credentials/leases/replicas.
     async fn sweep(&self) -> Result<Vec<Preview>, PreviewError>;
 }

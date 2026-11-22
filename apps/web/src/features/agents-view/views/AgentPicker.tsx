@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ModelCatalogMenu } from '@core/component/AI/component/input/ModelCatalogPicker';
 import { ModelIcon } from '@core/component/AI/component/ProviderIcon';
 import {
@@ -237,7 +238,7 @@ function DesktopAgentPicker(props: AgentPickerProps) {
                 }}
               >
                 <PlusIcon class="size-4" />
-                Create agent
+                {t('agentControls.createAgent')}
               </Dropdown.Item>
             </Dropdown.Group>
           </div>

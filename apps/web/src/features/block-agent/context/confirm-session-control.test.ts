@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 const spanAttributes = vi.hoisted(() => new Map<string, unknown>());
 // A span takes attributes until its callback settles, as an ended one would.
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     span: async (_name: string, run: (span: unknown) => Promise<void>) => {
       let ended = false;

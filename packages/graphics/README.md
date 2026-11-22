@@ -14,16 +14,16 @@ The next product checkpoint is a
 [legacy bridge and color policy](../../docs/architecture/canvas-legacy-bridge.md), kept outside
 the pure core. Expanding peer support is deferred.
 
-- `@macro-inc/graphics`: document, affine math, scene queries, selection, editing,
+- `@rox-one/graphics`: document, affine math, scene queries, selection, editing,
   validation and local history. No DOM, Solid, app or Loro imports.
-- `@macro-inc/graphics/browser`: pointer capture, keyboard, wheel and touch input.
-- `@macro-inc/graphics/pan-zoom`: the inertial glide and two-finger step shared
+- `@rox-one/graphics/browser`: pointer capture, keyboard, wheel and touch input.
+- `@rox-one/graphics/pan-zoom`: the inertial glide and two-finger step shared
   by Canvas and the image viewers. It owns no transform and imports nothing
   from the scene, so other pan/zoom surfaces can use it.
-- `@macro-inc/graphics/solid`: read-only reactive projection and keyed renderers.
-- `@macro-inc/graphics/loro`: optional Loro backend and presence APIs. The
+- `@rox-one/graphics/solid`: read-only reactive projection and keyed renderers.
+- `@rox-one/graphics/loro`: optional Loro backend and presence APIs. The
   in-memory peer transport lives in test support only.
-- `@macro-inc/graphics/loro/solid`: optional awareness rendering and smoothing.
+- `@rox-one/graphics/loro/solid`: optional awareness rendering and smoothing.
 
 ## Scene contract
 
@@ -382,7 +382,7 @@ excluded from scene undo. The in-memory peer harness gives tests two real Loro r
 selection, camera and local undo. See [the adapter notes](src/loro/README.md) for
 its ordered tree mapping, geometry conflict policy, limitations and validation cases.
 
-The optional `@macro-inc/graphics/loro/solid` wrapper adds colored peer cursors,
+The optional `@rox-one/graphics/loro/solid` wrapper adds colored peer cursors,
 selection outlines and ghosts of pending drawing/move/resize/rotation gestures.
 Awareness uses a separate ephemeral channel: it never enters the document, local
 selection, hit testing or undo. Disconnect clears remote overlays; reconnect sends

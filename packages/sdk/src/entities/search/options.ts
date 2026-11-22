@@ -1,6 +1,6 @@
 /**
  * Per-type search: the options every entity's own `search()` takes, and the
- * helper that builds one. Cross-type search is `macro.search`.
+ * helper that builds one. Cross-type search is `rox.search`.
  *
  * @packageDocumentation
  */
@@ -10,7 +10,7 @@ import type {
   UnifiedSearchResponseItem,
 } from '../../../generated/search/types.gen';
 import { type IterationOptions, iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 type Hit = UnifiedSearchResponseItem;
 
@@ -31,11 +31,11 @@ export interface SearchOpts extends IterationOptions {
 export function entitySearch<T, K extends Hit['type']>(opts: {
   filters?: EntityFilters;
   type: K;
-  make: (client: MacroClient, hit: Extract<Hit, { type: K }>) => T;
+  make: (client: RoxClient, hit: Extract<Hit, { type: K }>) => T;
   /** Opt in to CRM results (off by default server-side; required for company hits). */
   includeCrm?: boolean;
 }): (
-  client: MacroClient,
+  client: RoxClient,
   query: string,
   searchOpts?: SearchOpts,
 ) => AsyncGenerator<T> {
@@ -49,7 +49,7 @@ export function entitySearch<T, K extends Hit['type']>(opts: {
     );
 
   function pages(
-    client: MacroClient,
+    client: RoxClient,
     query: string,
     searchOpts: SearchOpts | undefined,
   ): AsyncGenerator<T> {

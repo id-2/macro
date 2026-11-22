@@ -1,7 +1,7 @@
-use macro_db_client::user::organization::{
+use rox_db_client::user::organization::{
     get_organization_roles_for_user, match_user_to_organization,
 };
-use macro_env_var::optional_read_env_var;
+use rox_env_var::optional_read_env_var;
 
 #[cfg(test)]
 mod test;
@@ -23,6 +23,19 @@ fn is_local_stripe_stub() -> bool {
 /// has a UNIQUE constraint, so it must be unique per user.
 fn local_stripe_customer_id(email: &str) -> String {
     format!("local-stripe-customer-{email}")
+}
+
+/// Roles a new personal account starts with.
+///
+/// Pro is the existing Premium tier: `professional_subscriber` plus
+/// `sub_opus`, the same roles a Premium subscription grants. `self_serve`
+/// stays so the person can still manage billing. Organization accounts keep
+/// the roles their organization already assigned.
+fn new_personal_account_roles() -> std::collections::HashSet<String> {
+    ["self_serve", "professional_subscriber", "sub_opus"]
+        .into_iter()
+        .map(str::to_string)
+        .collect()
 }
 
 /// Creates a new user
@@ -69,13 +82,13 @@ pub async fn create_user(
         Some(organization_id) => {
             get_organization_roles_for_user(db, organization_id, email).await?
         }
-        None => ["self_serve".to_string()].into_iter().collect(),
+        None => new_personal_account_roles(),
     };
 
     tracing::info!(organization_id=?organization_id, roles=?roles, "resolved organization and roles for new user");
 
     // Create user in macrodb
-    let user_id = macro_db_client::user::create_user::create_user(
+    let user_id = rox_db_client::user::create_user::create_user(
         db,
         fusionauth_user_id,
         username,
@@ -92,7 +105,7 @@ pub async fn create_user(
     tracing::info!(user_id, "created macro user and user profile in macrodb");
 
     if organization_id.is_some() {
-        macro_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
+        rox_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
         tracing::info!(organization_id=?organization_id, "deleted pending organization invitation");
     }
 
@@ -133,13 +146,13 @@ pub async fn create_user_profile(
         Some(organization_id) => {
             get_organization_roles_for_user(db, organization_id, email).await?
         }
-        None => ["self_serve".to_string()].into_iter().collect(),
+        None => new_personal_account_roles(),
     };
 
     tracing::trace!(roles=?roles, "got roles for user");
 
     // Create user in macrodb
-    macro_db_client::user::create_user::create_user_profile(
+    rox_db_client::user::create_user::create_user_profile(
         db,
         fusionauth_user_id,
         email,
@@ -149,7 +162,7 @@ pub async fn create_user_profile(
     .await?;
 
     if organization_id.is_some() {
-        macro_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
+        rox_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
     }
 
     tracing::trace!("created user in macrodb");

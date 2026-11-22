@@ -91,7 +91,7 @@ pub struct Forwarding {
 
 impl Forwarding {
     /// What the settings file asks for: `Ok(None)` unless it says
-    /// `services = true` and `MACRO_LOCAL_TELEMETRY`/`CI` don't turn telemetry off.
+    /// `services = true` and `ROX_LOCAL_TELEMETRY`/`CI` don't turn telemetry off.
     pub fn load(paths: &Paths) -> Result<Option<Self>, ForwardingError> {
         if paths.switch == Switch::Off {
             return Ok(None);

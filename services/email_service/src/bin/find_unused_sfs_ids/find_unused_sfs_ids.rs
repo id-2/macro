@@ -19,7 +19,7 @@ use std::path::Path;
 use std::time::Instant;
 
 use anyhow::Context;
-use macro_entrypoint::MacroEntrypoint;
+use rox_entrypoint::RoxEntrypoint;
 use sqlx::postgres::PgPoolOptions;
 
 #[tokio::main]
@@ -27,7 +27,7 @@ async fn main() -> anyhow::Result<()> {
     println!("=== Find Unused SFS IDs ===\n");
 
     // Initialize and load configuration
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let config = load_and_print_config()?;
 
     // Load used UUIDs into memory for fast lookups

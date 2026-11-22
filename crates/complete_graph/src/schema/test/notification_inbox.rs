@@ -58,7 +58,7 @@ fn comment(id: u128, minute: u32) -> Arc<UserNotificationRow<NotifEvent>> {
     }))
     .unwrap();
     Arc::new(UserNotificationRow {
-        owner_id: MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+        owner_id: RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
         notification_id: Uuid::from_u128(id),
         notification_event_type: "replied_to_document_comment_thread".to_string(),
         entity: doc_group().entity().clone(),
@@ -88,7 +88,7 @@ fn doc_entry() -> InboxEntry<SoupProjectionHydration> {
             also_listed_as: Vec::new(),
             thread_id: Some("a".to_string()),
             actor: Some(InboxActor::User(
-                MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
+                RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap(),
             )),
             actions: vec![InboxRowAction {
                 kind: InboxRowActionKind::Open,
@@ -296,7 +296,7 @@ struct ManualTriggers {
 impl FeedTriggers for ManualTriggers {
     fn subscribe(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         keying: CandidateKeying,
         own_work: bool,
     ) -> tokio::sync::mpsc::Receiver<FeedTrigger> {
@@ -312,7 +312,7 @@ struct NoTeam;
 impl FeedViewerResolver for NoTeam {
     fn team(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
     ) -> BoxFuture<'_, Result<Option<EntityAccessReceipt<MemberTeamRole>>, rootcause::Report>> {
         Box::pin(async { Ok(None) })
     }
@@ -357,8 +357,8 @@ fn context(
     )
 }
 
-fn viewer_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap()
+fn viewer_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap()
 }
 
 #[tokio::test]

@@ -8,7 +8,7 @@
  * owner's edits reach the live checkout and the history stays linear. Code
  * the owner pushes takes effect at the next restart, like a landing's.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import type { Ran } from '../../context/shell.ts';
 
 /** Runs git in the repository, as the agent. */

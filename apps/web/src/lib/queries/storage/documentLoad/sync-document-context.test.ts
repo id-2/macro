@@ -47,7 +47,7 @@ vi.mock('@core/context/user-info-gate', () => ({
 vi.mock('@service-auth/client', () => ({
   authServiceClient: { getLegacyUserPermissions: mocks.userInfo },
 }));
-vi.mock('@macro-inc/collaboration/collab/snapshot-store', () => ({
+vi.mock('@rox-one/collaboration/collab/snapshot-store', () => ({
   LORO_SNAPSHOT_DB_NAME: 'test-snapshots',
   IDBSnapshotStore: class {
     load = mocks.snapshot;

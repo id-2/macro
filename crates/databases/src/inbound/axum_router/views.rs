@@ -37,7 +37,7 @@ pub async fn view_positions_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let positions = state
         .service

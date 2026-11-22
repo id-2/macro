@@ -5,7 +5,7 @@ use foreign_entity::{
     },
     outbound::pg_foreign_entity_repo::PgForeignEntityRepo,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use serde_json::json;
 use sqlx::PgPool;
 use uuid::Uuid;

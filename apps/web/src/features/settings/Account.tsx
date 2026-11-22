@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import type { AccountDeletionReason } from '@app/lib/analytics/app-events';
 import { useFeatureFlag } from '@app/lib/analytics/posthog';
@@ -35,11 +36,8 @@ import TrashIcon from '@icon/system/regular/trash.svg';
 import IconUpload from '@icon/system/regular/upload-simple.svg?component-solid';
 import WarningIcon from '@icon/system/regular/warning.svg';
 import WarningCircleIcon from '@icon/system/regular/warning-circle.svg';
-import {
-  type BundleUpdateStatus,
-  nativeUpdateDescription,
-  useTauri,
-} from '@macro/tauri';
+import type { NativeUpdateStatus } from '@app/lib/tauri/native-updates';
+import { type BundleUpdateStatus, useTauri } from '@rox/tauri';
 import { useAiBillingSummaryQuery } from '@queries/auth';
 import {
   invalidateOwnUserName,
@@ -86,7 +84,7 @@ async function uploadProfilePicture(
   file: File
 ): Promise<{ id: string; url: string } | void> {
   if (file.size > MAX_PROFILE_PICTURE_SIZE) {
-    toast.failure('Image size too large');
+    toast.failure(t('settingsAccount.imageTooLarge'));
     return;
   }
 
@@ -95,12 +93,12 @@ async function uploadProfilePicture(
     const url = staticFileIdEndpoint(id);
     const response = await authServiceClient.putProfilePicture({ url });
     if (response.isErr()) {
-      toast.failure('Failed to upload profile picture');
+      toast.failure(t('settingsAccount.uploadFailed'));
       return;
     }
     return { id, url };
   } catch (_error) {
-    toast.failure('Failed to upload profile picture');
+    toast.failure(t('settingsAccount.uploadFailed'));
     return;
   }
 }
@@ -109,12 +107,12 @@ async function removeProfilePicture(): Promise<boolean> {
   try {
     const response = await authServiceClient.putProfilePicture({ url: '' });
     if (response.isErr()) {
-      toast.failure('Failed to remove profile picture');
+      toast.failure(t('settingsAccount.removeFailed'));
       return false;
     }
     return true;
   } catch (_error) {
-    toast.failure('Failed to remove profile picture');
+    toast.failure(t('settingsAccount.removeFailed'));
     return false;
   }
 }
@@ -122,36 +120,77 @@ async function removeProfilePicture(): Promise<boolean> {
 function formatBundleUpdateStatus(status: BundleUpdateStatus): string {
   switch (status.status) {
     case 'Idle':
-      return 'Idle';
+      return t('settingsAccount.bundleStatus.idle');
     case 'CheckingForUpdate':
-      return 'Checking for update...';
+      return t('settingsAccount.bundleStatus.checking');
     case 'UpdateFound':
-      return `Update available: v${status.data.version}`;
+      return t('settingsAccount.bundleStatus.updateAvailable', {
+        version: status.data.version,
+      });
     case 'NoUpdateNeeded':
-      return 'Up to date';
+      return t('settingsAccount.bundleStatus.upToDate');
     case 'WaitingForWifi':
-      return 'Waiting for Wi-Fi to download';
+      return t('settingsAccount.bundleStatus.waitingForWifi');
     case 'Downloading':
-      return `Downloading: ${Math.round(status.data.progress)}%`;
+      return t('settingsAccount.bundleStatus.downloading', {
+        percent: Math.round(status.data.progress),
+      });
     case 'Unzipping':
-      return `Installing: ${Math.round(status.data.progress)}%`;
+      return t('settingsAccount.bundleStatus.installing', {
+        percent: Math.round(status.data.progress),
+      });
     case 'ClearRequired':
-      return 'Cached update revoked';
+      return t('settingsAccount.bundleStatus.updateRevoked');
     case 'NativeUpdateRequired':
-      return 'App update required';
+      return t('settingsAccount.bundleStatus.updateRequired');
     case 'Completed':
-      return 'Update ready';
+      return t('settingsAccount.bundleStatus.ready');
     case 'Error':
-      return 'An error occurred when checking for updates';
+      return t('settingsAccount.bundleStatus.checkFailed');
+  }
+}
+
+/** The desktop updater's status line, in the section's language. */
+function nativeUpdateText(status: NativeUpdateStatus): string {
+  switch (status.status) {
+    case 'Disabled':
+      return t('settingsAccount.nativeStatus.disabled');
+    case 'Idle':
+      return t('settingsAccount.nativeStatus.idle');
+    case 'Checking':
+      return t('settingsAccount.nativeStatus.checking');
+    case 'Downloading':
+      return t('settingsAccount.nativeStatus.downloading');
+    case 'Ready':
+      return t('settingsAccount.nativeStatus.ready');
+    case 'Installing':
+      return t('settingsAccount.nativeStatus.installing');
+    case 'Error':
+      return status.data.message;
   }
 }
 
 /**
- * Save one name field with an optimistic update and rollback on failure.
- * Returns whether the save succeeded, which drives NameInput's status icon.
- * This panel renders its own value from a local signal, so the invalidation
- * is for everything else reading the name (see invalidateOwnUserName).
+ * Writes one part of the account name through the auth service and refreshes
+ * the shared own-name entry, which is what every other reader of the name
+ * (the sidebar, the `/account` portal) observes.
  */
+export async function writeUserNameField(
+  field: 'first_name' | 'last_name',
+  value: string
+): Promise<boolean> {
+  try {
+    const res = await authServiceClient.putUserName(
+      field === 'first_name' ? { first_name: value } : { last_name: value }
+    );
+    if (res.isErr()) return false;
+    fireAndForget(invalidateOwnUserName(), 'account-settings');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function saveUserName(
   value: string,
   field: 'first_name' | 'last_name',
@@ -159,20 +198,9 @@ async function saveUserName(
   setValue: (next: string | undefined) => void
 ): Promise<boolean> {
   setValue(value); // optimistic
-  try {
-    const res = await authServiceClient.putUserName(
-      field === 'first_name' ? { first_name: value } : { last_name: value }
-    );
-    if (res.isErr()) {
-      setValue(prev); // rollback on a returned error
-      return false;
-    }
-    fireAndForget(invalidateOwnUserName(), 'account-settings');
-    return true;
-  } catch {
-    setValue(prev); // rollback if the call throws before returning a Result
-    return false;
-  }
+  const ok = await writeUserNameField(field, value);
+  if (!ok) setValue(prev); // rollback when the write fails
+  return ok;
 }
 
 function ProfilePictureRow(props: { userId: string }) {
@@ -221,7 +249,7 @@ function ProfilePictureRow(props: { userId: string }) {
 
   return (
     <>
-      <Row label="Profile Picture">
+      <Row label={t('settingsNav.profilePicture')}>
         <div class="relative size-12 shrink-0">
           <Show
             when={profilePictureUrl()}
@@ -231,7 +259,7 @@ function ProfilePictureRow(props: { userId: string }) {
               <span
                 tabindex="0"
                 role="button"
-                aria-label="Upload profile picture"
+                aria-label={t('settingsAccount.uploadProfilePicture')}
                 onClick={pickProfilePicture}
                 class="flex size-full items-center justify-center rounded-full bg-edge text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
@@ -245,7 +273,7 @@ function ProfilePictureRow(props: { userId: string }) {
               <Dropdown.Trigger
                 as="div"
                 tabindex="0"
-                aria-label="Edit profile picture"
+                aria-label={t('settingsAccount.editProfilePicture')}
                 class="group block size-full outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <div class="size-full overflow-hidden rounded-full">
@@ -266,14 +294,14 @@ function ProfilePictureRow(props: { userId: string }) {
                 <Dropdown.Group>
                   <Dropdown.Item onSelect={pickProfilePicture}>
                     <IconUpload class="size-4" />
-                    Upload new picture
+                    {t('settingsAccount.uploadNewPicture')}
                   </Dropdown.Item>
                   <Dropdown.Item
                     class="text-failure"
                     onSelect={() => setShowRemoveConfirmModal(true)}
                   >
                     <TrashIcon class="size-4" />
-                    Remove picture
+                    {t('settingsAccount.removePicture')}
                   </Dropdown.Item>
                 </Dropdown.Group>
               </Dropdown.Content>
@@ -290,12 +318,12 @@ function ProfilePictureRow(props: { userId: string }) {
         <Panel depth={2} class="rounded-xl">
           <Panel.Header class="px-6">
             <Dialog.Title class="text-ink text-sm font-semibold">
-              Remove profile picture
+              {t('settingsAccount.removePictureTitle')}
             </Dialog.Title>
           </Panel.Header>
           <Panel.Body class="p-6 font-sans flex flex-col gap-3">
             <Dialog.Description class="text-ink-muted text-sm/tight font-normal">
-              Remove your current profile picture?
+              {t('settingsAccount.removePictureQuestion')}
             </Dialog.Description>
             <div class="pt-3 justify-end items-center gap-3 inline-flex">
               <Button
@@ -303,14 +331,14 @@ function ProfilePictureRow(props: { userId: string }) {
                 disabled={isRemoving()}
                 onClick={() => setShowRemoveConfirmModal(false)}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="secondary"
                 disabled={isRemoving()}
                 onClick={handleRemove}
               >
-                Remove
+                {t('settingsAccount.remove')}
               </Button>
             </div>
           </Panel.Body>
@@ -427,17 +455,17 @@ export function Account() {
 
       if (!deleted) {
         setIsDeleting(false);
-        toast.failure('Unable to delete your account. Please try again.');
+        toast.failure(t('settingsAccount.deleteFailed'));
       }
     } catch {
       setIsDeleting(false);
-      toast.failure('Unable to delete your account. Please try again.');
+      toast.failure(t('settingsAccount.deleteFailed'));
     }
   };
 
   return (
-    <SettingsPage title="Account">
-      <SettingsSection title="Profile">
+    <SettingsPage title={t('settingsNav.tabAccount')}>
+      <SettingsSection title={t('settingsNav.profile')}>
         <SettingsCard>
           <Show when={ENABLE_PROFILE_PICTURES}>
             <Show when={userId()} keyed>
@@ -445,7 +473,7 @@ export function Account() {
             </Show>
           </Show>
 
-          <Row label="Email">
+          <Row label={t('nav.email')}>
             <Tooltip
               as="span"
               label={email() ?? ''}
@@ -459,7 +487,7 @@ export function Account() {
             </Tooltip>
           </Row>
 
-          <Row label="First Name">
+          <Row label={t('settingsNav.firstName')}>
             <NameInput
               value={firstName()}
               onSave={(newValue) =>
@@ -470,11 +498,11 @@ export function Account() {
                   setUpdatedFirstName
                 )
               }
-              placeholder="Enter First Name"
+              placeholder={t('settingsAccount.enterFirstName')}
             />
           </Row>
 
-          <Row label="Last Name">
+          <Row label={t('settingsNav.lastName')}>
             <NameInput
               value={lastName()}
               onSave={(newValue) =>
@@ -485,7 +513,7 @@ export function Account() {
                   setUpdatedLastName
                 )
               }
-              placeholder="Enter Last Name"
+              placeholder={t('settingsAccount.enterLastName')}
             />
           </Row>
 
@@ -504,12 +532,12 @@ export function Account() {
       {/* A bare card like the plan card above, so the two match in height. */}
       <SettingsCard>
         <SettingsRow
-          label="Log out"
-          description="Sign out of Rox on this device."
+          label={t('settingsNav.logOut')}
+          description="Выйти из Rox на этом устройстве."
         >
           <Button variant="secondary" size="sm" onClick={() => logout()}>
             <SignOutIcon class="size-4" />
-            Log out
+            {t('settingsNav.logOut')}
           </Button>
         </SettingsRow>
       </SettingsCard>
@@ -518,8 +546,8 @@ export function Account() {
           Log out. */}
       <SettingsRow
         class="px-5"
-        label="Delete account"
-        description="Permanently delete your account and all associated data."
+        label={t('settingsNav.deleteAccount')}
+        description="Удалить аккаунт и все связанные данные безвозвратно."
       >
         <Button
           variant="danger"
@@ -529,7 +557,7 @@ export function Account() {
             setShowDeleteModal(true);
           }}
         >
-          Delete account
+          {t('settingsNav.deleteAccount')}
         </Button>
       </SettingsRow>
       <Dialog
@@ -544,7 +572,7 @@ export function Account() {
         <Panel depth={2} class="rounded-xl">
           <Panel.Header class="px-6">
             <Dialog.Title class="text-ink text-sm font-semibold">
-              Delete Account
+              {t('settingsAccount.deleteAccountTitle')}
             </Dialog.Title>
           </Panel.Header>
           <Panel.Body class="p-6 font-sans flex flex-col gap-3">
@@ -552,20 +580,22 @@ export function Account() {
               <IrreversibleWarning />
             </Dialog.Description>
             <p class="text-ink-muted text-sm/tight">
-              Only want to sign out?{' '}
+              {t('settingsAccount.onlyWantToSignOut')}{' '}
               <button
                 type="button"
                 class="text-ink underline underline-offset-2 outline-none focus-visible:ring-2 focus-visible:ring-edge-focus"
                 onClick={() => logout()}
               >
-                Log out instead
+                {t('settingsAccount.logOutInstead')}
               </button>
             </p>
             <div class="flex flex-col gap-3 pt-2">
               <label class="flex flex-col gap-1.5 text-sm" for="delete-reason">
                 <span>
-                  Why are you leaving?{' '}
-                  <span class="text-ink-muted">(optional)</span>
+                  {t('settingsAccount.whyLeaving')}{' '}
+                  <span class="text-ink-muted">
+                    {t('settingsAccount.optional')}
+                  </span>
                 </span>
                 <select
                   id="delete-reason"
@@ -579,10 +609,10 @@ export function Account() {
                     )
                   }
                 >
-                  <option value="">Select a reason</option>
+                  <option value="">{t('settingsAccount.selectReason')}</option>
                   <For each={ACCOUNT_DELETION_REASON_OPTIONS}>
                     {(option) => (
-                      <option value={option.value}>{option.label}</option>
+                      <option value={option.value}>{t(option.label)}</option>
                     )}
                   </For>
                 </select>
@@ -592,8 +622,10 @@ export function Account() {
                 for="delete-feedback"
               >
                 <span>
-                  Anything else you'd like us to know?{' '}
-                  <span class="text-ink-muted">(optional)</span>
+                  {t('settingsAccount.anythingElse')}{' '}
+                  <span class="text-ink-muted">
+                    {t('settingsAccount.optional')}
+                  </span>
                 </span>
                 <textarea
                   id="delete-feedback"
@@ -604,10 +636,10 @@ export function Account() {
                   onInput={(event) =>
                     setDeleteFeedback(event.currentTarget.value)
                   }
-                  placeholder="Your feedback helps us improve Rox"
+                  placeholder={t('settingsAccount.feedbackPlaceholder')}
                 />
                 <span class="text-ink-extra-muted text-xs">
-                  Please don't include sensitive information.
+                  {t('settingsAccount.sensitiveInfo')}
                 </span>
               </label>
             </div>
@@ -619,7 +651,7 @@ export function Account() {
                   resetDeleteFlow();
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button
                 variant="secondary"
@@ -628,7 +660,7 @@ export function Account() {
                   setShowDeleteModal(false);
                 }}
               >
-                Continue
+                {t('settingsAccount.continue')}
               </Button>
             </div>
           </Panel.Body>
@@ -646,14 +678,14 @@ export function Account() {
         <Panel depth={2} class="rounded-xl">
           <Panel.Header class="px-6">
             <Dialog.Title class="text-ink text-sm font-semibold">
-              Are you absolutely sure?
+              {t('settingsAccount.areYouSure')}
             </Dialog.Title>
           </Panel.Header>
           <Panel.Body class="p-6 font-sans flex flex-col gap-3">
             <Dialog.Description as="div" class="flex flex-col gap-3">
               <IrreversibleWarning />
               <p class="text-ink-muted text-sm/tight">
-                To confirm, press and hold the button below for 5 seconds.
+                {t('settingsAccount.holdToDeleteHint')}
               </p>
             </Dialog.Description>
             <div class="pt-3 justify-end items-center gap-3 inline-flex">
@@ -665,7 +697,7 @@ export function Account() {
                   resetDeleteFlow();
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <HoldButton
                 variant="danger"
@@ -673,9 +705,12 @@ export function Account() {
                 disabled={isDeleting()}
                 onConfirm={deleteAccountHandler}
               >
-                <Show when={isDeleting()} fallback="Hold to delete my account">
+                <Show
+                  when={isDeleting()}
+                  fallback={t('settingsAccount.holdToDelete')}
+                >
                   <SpinnerIcon class="size-4 animate-spin" />
-                  Deleting…
+                  {t('settingsAccount.deleting')}
                 </Show>
               </HoldButton>
             </div>
@@ -693,11 +728,10 @@ function IrreversibleWarning() {
       <WarningIcon class="size-5 shrink-0 text-failure" />
       <div class="flex flex-col gap-1">
         <span class="font-semibold text-failure">
-          This is permanent and irreversible.
+          {t('settingsAccount.irreversibleTitle')}
         </span>
         <span class="text-ink">
-          Your account and everything in it, including your documents, messages,
-          files, and settings, will be deleted and cannot be recovered.
+          {t('settingsAccount.irreversibleBody')}
         </span>
       </div>
     </div>
@@ -807,7 +841,7 @@ function NameInput(props: {
               <CheckIcon class="size-3.5 text-success" />
             </Match>
             <Match when={status() === 'error'}>
-              <Tooltip label="Couldn't save — try again" placement="top">
+              <Tooltip label={t('settingsAccount.couldNotSave')} placement="top">
                 <WarningCircleIcon class="size-3.5 text-failure" />
               </Tooltip>
             </Match>
@@ -828,17 +862,35 @@ function bundleUpdateAction(
 
   switch (status.status) {
     case 'Idle':
-      return { label: 'Check for Update', action: checkForUpdate };
+      return {
+        label: t('settingsAccount.bundleAction.check'),
+        action: checkForUpdate,
+      };
     case 'Error':
-      return { label: 'Retry', action: checkForUpdate };
+      return {
+        label: t('settingsAccount.bundleAction.retry'),
+        action: checkForUpdate,
+      };
     case 'UpdateFound':
-      return { label: 'Download', action: grantBundleUpdate };
+      return {
+        label: t('settingsAccount.bundleAction.download'),
+        action: grantBundleUpdate,
+      };
     case 'WaitingForWifi':
-      return { label: 'Download anyway', action: grantBundleUpdate };
+      return {
+        label: t('settingsAccount.bundleAction.downloadAnyway'),
+        action: grantBundleUpdate,
+      };
     case 'ClearRequired':
-      return { label: 'Reload', action: performUpdate };
+      return {
+        label: t('settingsAccount.bundleAction.reload'),
+        action: performUpdate,
+      };
     case 'Completed':
-      return { label: 'Update', action: performUpdate };
+      return {
+        label: t('settingsAccount.bundleAction.update'),
+        action: performUpdate,
+      };
     default:
       return null;
   }
@@ -852,7 +904,7 @@ function BundleVersionRow() {
     <Show when={bundleDebugInfo()}>
       {(info) => (
         <>
-          <Row label="Version">
+          <Row label={t('settingsAccount.version')}>
             {info().bundleBuild} ({info().source === 'embedded' ? 'app' : 'ota'}
             ) - {info().nativeBuild}
           </Row>
@@ -869,7 +921,7 @@ function BundleUpdateRow() {
     tauri?.bundleUpdateStatus() ?? { status: 'Idle' };
   const action = () => bundleUpdateAction(status());
   return (
-    <Row label="App Update">
+    <Row label={t('settingsAccount.appUpdate')}>
       <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
         <span class="text-sm text-ink-muted">
           {formatBundleUpdateStatus(status())}
@@ -890,10 +942,10 @@ function NativeUpdateRow() {
   const tauri = useTauri();
   return (
     <Show when={tauri && tauri.nativeUpdateStatus().status !== 'Disabled'}>
-      <Row label="Desktop app update">
+      <Row label={t('settingsAccount.desktopAppUpdate')}>
         <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
           <span class="text-sm text-ink-muted">
-            {tauri && nativeUpdateDescription(tauri.nativeUpdateStatus())}
+            {tauri && nativeUpdateText(tauri.nativeUpdateStatus())}
           </span>
           <Show when={tauri?.nativeUpdateStatus().status === 'Ready'}>
             <Button
@@ -903,7 +955,7 @@ function NativeUpdateRow() {
                 fireAndForget(tauri?.restartNativeUpdate(), 'native-updates')
               }
             >
-              Restart to update
+              {t('settingsAccount.restartToUpdate')}
             </Button>
           </Show>
         </div>

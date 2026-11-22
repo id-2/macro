@@ -1,7 +1,8 @@
 import { useViewTabHotkeys, ViewSidebar } from '@app/components/view-shell';
+import { ActionItem } from '@app/components/view-shell/SidebarActionItem';
 import { SidebarCreateButton } from '@app/components/view-shell/SidebarCreateButton';
 import { SidebarRoutineSuggestions } from '@app/features/routine-suggestions/routine-suggestions';
-import { t } from '@app/lib/i18n';
+import PlusIcon from '@icon/system/regular/plus.svg';
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import { useSplitPanelOrThrow } from '@components/app/split-layout/layoutUtils';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
@@ -22,7 +23,7 @@ import SignalIcon from '@icon/system/regular/wave-sine.svg';
 import NoiseIcon from '@icon/system/regular/waveform.svg';
 import { pressHandlers } from '@ui';
 import { tourTarget } from '@ui/components/Tour';
-import { type Component, For, Show } from 'solid-js';
+import { createSignal, type Component, For, Show } from 'solid-js';
 import { Dynamic } from 'solid-js/web';
 import { composeEmail } from '../compose-email';
 import {
@@ -39,6 +40,7 @@ import type { EmailTab } from '../types';
 import { useVisibleEmailTab } from '../use-visible-email-tab';
 import { EmailSavedViewsSection } from '../views/email-saved-views';
 import { EmailInboxList } from './EmailInboxSelector';
+import { CreateRoxMailboxDialog } from './CreateRoxMailboxDialog';
 
 const PRIMARY_TAB_IDS = [
   'favorites',
@@ -77,6 +79,16 @@ const TAB_ICONS: Record<EmailTab, Component<{ class?: string }>> = {
   trash: TrashIcon,
 };
 
+const RUSSIAN_TAB_LABELS: Partial<Record<EmailTab, string>> = {
+  focus: 'Фокус',
+  favorites: 'Избранное',
+  scheduled: 'Запланированные',
+  reminders: 'Напоминания',
+  archived: 'Архив',
+  spam: 'Спам',
+  trash: 'Корзина',
+};
+
 function Tab(props: { id: EmailTab; label?: string; onNavigate?: () => void }) {
   const { state, setTab, savedViewActive } = useEmailView();
 
@@ -91,7 +103,11 @@ function Tab(props: { id: EmailTab; label?: string; onNavigate?: () => void }) {
       <ViewSidebar.Icon>
         <Dynamic component={TAB_ICONS[props.id]} class="size-4" />
       </ViewSidebar.Icon>
-      <span class="truncate">{props.label ?? EMAIL_TAB_LABELS[props.id]}</span>
+      <span class="truncate">
+        {props.label ??
+          RUSSIAN_TAB_LABELS[props.id] ??
+          EMAIL_TAB_LABELS[props.id]}
+      </span>
     </ViewSidebar.Item>
   );
 }
@@ -142,15 +158,15 @@ export function EmailNavigation(props: { onNavigate?: () => void }) {
           <ViewSidebar.Icon>
             <TrayIcon class="size-4" />
           </ViewSidebar.Icon>
-          <span class="truncate">{t('viewMenus.inbox')}</span>
+          <span class="truncate">Входящие</span>
         </ViewSidebar.Item>
         <For each={PRIMARY_TAB_IDS.filter(isVisible)}>
           {(id) => <Tab id={id} onNavigate={props.onNavigate} />}
         </For>
       </ViewSidebar.Nav>
-      <section aria-label={t('viewMenus.library')} class="shrink-0">
+      <section aria-label="Библиотека" class="shrink-0">
         <h2 class="flex h-(--sidebar-row-height) items-center px-(--sidebar-item-inset) text-xs font-medium text-ink-muted">
-          {t('viewMenus.library')}
+          Библиотека
         </h2>
         <ViewSidebar.Nav
           aria-label="Email library"
@@ -160,7 +176,7 @@ export function EmailNavigation(props: { onNavigate?: () => void }) {
             {(id) => (
               <Tab
                 id={id}
-                label={id === 'all' ? 'All mail' : undefined}
+                label={id === 'all' ? 'Вся почта' : undefined}
                 onNavigate={props.onNavigate}
               />
             )}
@@ -175,6 +191,7 @@ export function EmailSidebar() {
   const isVisible = useVisibleEmailTab();
   const panel = useSplitPanelOrThrow();
   const { openWithSplit } = useSplitLayout();
+  const [mailboxOpen, setMailboxOpen] = createSignal(false);
   const { state, setTab } = useEmailView();
 
   const tabIds = () =>
@@ -198,18 +215,27 @@ export function EmailSidebar() {
       <ViewSidebar.Header>
         <div class="flex min-w-0 items-center gap-1">
           <ViewSidebar.CloseButton class="shrink-0" />
-          <ViewSidebar.Title>Email</ViewSidebar.Title>
+          <ViewSidebar.Title>Почта</ViewSidebar.Title>
         </div>
       </ViewSidebar.Header>
 
-      <Show when={!isTouchDevice()}>
-        <ViewSidebar.Primary>
-          <SidebarCreateButton
-            label="New email"
-            onCreate={() => composeEmail(openWithSplit, state.inboxIds)}
+      <ViewSidebar.Primary>
+        <div class="flex min-w-0 flex-col gap-1">
+          <ActionItem
+            icon={PlusIcon}
+            label="Создать почту Rox"
+            gradient
+            onPress={() => setMailboxOpen(true)}
           />
-        </ViewSidebar.Primary>
-      </Show>
+          <Show when={!isTouchDevice()}>
+            <SidebarCreateButton
+              label="Создать"
+              onCreate={() => composeEmail(openWithSplit, state.inboxIds)}
+            />
+          </Show>
+        </div>
+      </ViewSidebar.Primary>
+
 
       <ViewSidebar.Content>
         <SidebarRoutineSuggestions surface="email" />
@@ -217,7 +243,7 @@ export function EmailSidebar() {
 
         <Show when={isTouchDevice()}>
           <SidebarCreateButton
-            label="New email"
+            label="Создать"
             onCreate={() => composeEmail(openWithSplit, state.inboxIds)}
           />
         </Show>
@@ -225,6 +251,10 @@ export function EmailSidebar() {
         <EmailNavigation />
 
         <EmailSavedViewsSection />
+        <CreateRoxMailboxDialog
+          open={mailboxOpen()}
+          onOpenChange={setMailboxOpen}
+        />
       </ViewSidebar.Content>
     </ViewSidebar.Root>
   );

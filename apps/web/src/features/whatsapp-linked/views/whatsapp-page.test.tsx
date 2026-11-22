@@ -756,7 +756,7 @@ describe('passkey', () => {
       name: 'Continue in Rox desktop',
     });
     expect(link.getAttribute('href')).toBe(
-      'macro:///external?whatsappPairing=pairing-1'
+      'rox:///external?whatsappPairing=pairing-1'
     );
     link.addEventListener('click', (event) => event.preventDefault());
     fireEvent.click(link);

@@ -36,7 +36,7 @@ impl Notification for AgentSignInExpiryMetadata {
 }
 
 impl NotificationTitle for AgentSignInExpiryMetadata {
-    fn format_title(&self, _sender_id: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_title(&self, _sender_id: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         let agent = self.agent.display_name();
         let computer = &self.computer_name;
         Ok(match self.stage {
@@ -50,7 +50,7 @@ impl NotificationTitle for AgentSignInExpiryMetadata {
         })
     }
 
-    fn format_body(&self, _sender_id: Option<MacroUserIdStr<'_>>) -> Result<String, Report> {
+    fn format_body(&self, _sender_id: Option<RoxUserIdStr<'_>>) -> Result<String, Report> {
         Ok(match self.stage {
             AgentSignInExpiryStage::ExpiresSoon | AgentSignInExpiryStage::ExpiresToday => {
                 "Sign in again in Settings → Machines to keep the team's agents running on it."
@@ -75,7 +75,7 @@ impl NotificationExtIos for AgentSignInExpiryMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {

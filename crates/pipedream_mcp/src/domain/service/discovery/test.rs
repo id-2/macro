@@ -21,7 +21,7 @@ fn entry() -> CatalogEntry {
 impl ConnectorDirectory for Directory {
     async fn search(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         search: Option<&str>,
         _cursor: Option<&str>,
         limit: u32,
@@ -35,7 +35,7 @@ impl ConnectorDirectory for Directory {
     }
     async fn retrieve(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         slug: &str,
     ) -> anyhow::Result<Option<CatalogEntry>> {
         Ok((slug == "linear").then(entry))
@@ -45,7 +45,7 @@ impl ConnectorDirectory for Directory {
 impl ConnectorCapabilities for Directory {
     async fn tools(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         slug: &str,
     ) -> anyhow::Result<Vec<ConnectorTool>> {
         self.seen.lock().unwrap().push(user.to_string());
@@ -91,7 +91,7 @@ struct Native(Option<String>);
 impl OverlayConnections for Native {
     async fn connected_name(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         overlay: &ConnectorOverlay,
     ) -> anyhow::Result<Option<String>> {
         assert_eq!(*overlay, linear_overlay());
@@ -103,15 +103,15 @@ impl ConnectionStore for Store {
     async fn save(&self, _: &PipedreamConnection) -> Result<(), String> {
         panic!("discovery must not write")
     }
-    async fn delete(&self, _: &MacroUserIdStr<'static>, _: &str) -> Result<(), String> {
+    async fn delete(&self, _: &RoxUserIdStr<'static>, _: &str) -> Result<(), String> {
         panic!("discovery must not delete")
     }
-    async fn list(&self, _: &MacroUserIdStr<'static>) -> Result<Vec<PipedreamConnection>, String> {
+    async fn list(&self, _: &RoxUserIdStr<'static>) -> Result<Vec<PipedreamConnection>, String> {
         panic!("inspect only the requested app")
     }
     async fn load(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         slug: &str,
     ) -> Result<Option<PipedreamConnection>, String> {
         self.seen.lock().unwrap().push(user.to_string());
@@ -146,8 +146,8 @@ fn service(
         Arc::new(Native(Some("Linear".into()))),
     )
 }
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("caller@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("caller@example.com").unwrap()
 }
 fn inspect(slug: &str) -> DiscoveryRequest {
     DiscoveryRequest::Inspect {

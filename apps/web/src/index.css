@@ -2079,3 +2079,35 @@ input[type="number"] {
     animation: none;
   }
 }
+
+/* Entry-screen type: the Rox Mono Typeface for the promise line and the
+   Spectral italic the heading is set in. Subset to Cyrillic + Latin basics. */
+@font-face {
+  font-family: 'Rox Mono Entry';
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/ROXMono-Medium.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Rox Mono Entry';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/ROXMono-SemiBold.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Spectral Entry';
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+  src: url('/fonts/Spectral-Italic-500.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Rox Mono Entry';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('/fonts/ROXMono-Light.woff2') format('woff2');
+}

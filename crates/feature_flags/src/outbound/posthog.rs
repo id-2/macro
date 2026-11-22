@@ -1,8 +1,8 @@
 //! Strict remote evaluation through PostHog's V2 `/flags` endpoint.
 
 use crate::{FeatureFlags, FlagSnapshot, FlagValue, ServiceContext, ServiceFeatureFlags};
-use macro_env::Environment;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_env::Environment;
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::{Client, Url};
 use rootcause::Report;
 use serde::Deserialize;
@@ -141,7 +141,7 @@ impl PostHogFeatureFlags {
 }
 
 impl FeatureFlags for PostHogFeatureFlags {
-    async fn load(&self, user_id: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
+    async fn load(&self, user_id: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
         tokio::time::timeout(self.timeout, self.evaluate(user_id.as_ref()))
             .await
             .map_err(|_| LoadError::Timeout)?

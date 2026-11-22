@@ -2,7 +2,7 @@ use crate::email::service::message::Message;
 use crate::service::attachment::Attachment;
 use crate::service::contact::Contact;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Identify, SimpleSortMethod, SortOn};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -294,5 +294,5 @@ pub struct UserThreadIds {
 #[derive(Debug, serde::Serialize, serde::Deserialize, ToSchema)]
 pub struct GetThreadOwnerResponse {
     #[schema(value_type = String)]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
 }

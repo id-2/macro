@@ -1,4 +1,4 @@
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { beginInteraction } from './flow';
 import type { UiOperationOutcome } from './ui-operation';
 

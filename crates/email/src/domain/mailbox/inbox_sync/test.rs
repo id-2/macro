@@ -1,6 +1,6 @@
 use super::*;
-use macro_user_id::email::EmailStr;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::email::EmailStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::gmail::inbox_sync::{
     DeleteMessagePayload, GmailMessagePayload, UpdateLabelsPayload, UpsertMessagePayload,
 };
@@ -27,7 +27,7 @@ fn failure(outcome: InboxSyncDisposition) -> (bool, DetailedError) {
 fn link(is_sync_active: bool, needs_reauth: bool) -> Link {
     Link {
         id: Uuid::from_u128(1),
-        macro_id: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        macro_id: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
         fusionauth_user_id: "fusionauth-user".to_string(),
         email_address: EmailStr::try_from("owner@example.com".to_string()).unwrap(),
         provider: UserProvider::Gmail,

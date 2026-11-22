@@ -7,7 +7,7 @@ use import_notion::domain::model::{
     SearchObject,
 };
 use import_notion::domain::ports::NotionError;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 use super::*;
 use crate::domain::models::{ImportKind, NotionDecision, NotionTaskFields};
@@ -17,8 +17,8 @@ fn id(hex: char) -> NotionId {
     NotionId::parse(&hex.to_string().repeat(32)).unwrap()
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|owner@acme.test")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|owner@acme.test")
         .unwrap()
         .into_owned()
 }
@@ -46,7 +46,7 @@ struct FakeStore(Mutex<Vec<WrittenObject>>);
 impl WrittenObjects for FakeStore {
     async fn written(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         import_ids: &[Uuid],
     ) -> crate::domain::ports::Result<Vec<WrittenObject>> {
         Ok(self
@@ -61,7 +61,7 @@ impl WrittenObjects for FakeStore {
 
     async fn record_written(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         objects: &[WrittenObject],
     ) -> crate::domain::ports::Result<Vec<WrittenObject>> {
         let mut stored = self.0.lock().unwrap();
@@ -178,7 +178,7 @@ const TITLE_COLUMN: Uuid = Uuid::from_u128(502);
 impl WorkspaceWriter for FakeWriter {
     async fn create_tracker_project(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
         _: &str,
         _: &str,
@@ -188,7 +188,7 @@ impl WorkspaceWriter for FakeWriter {
     }
     async fn create_tracker_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
         _: &str,
         _: &str,
@@ -199,7 +199,7 @@ impl WorkspaceWriter for FakeWriter {
     }
     async fn link_tracker_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Uuid,
         _: &crate::domain::ports::TrackerTaskRelations,
     ) -> anyhow::Result<()> {
@@ -208,7 +208,7 @@ impl WorkspaceWriter for FakeWriter {
 
     async fn create_folder(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         name: &str,
         parent: Option<Uuid>,
     ) -> anyhow::Result<Uuid> {
@@ -219,7 +219,7 @@ impl WorkspaceWriter for FakeWriter {
 
     async fn folder_exists(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _folder: Uuid,
     ) -> anyhow::Result<bool> {
         Ok(true)
@@ -227,7 +227,7 @@ impl WorkspaceWriter for FakeWriter {
 
     async fn share_with_team(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         entity: SharedEntity,
     ) -> anyhow::Result<()> {
         self.shares.lock().unwrap().push(entity);
@@ -236,7 +236,7 @@ impl WorkspaceWriter for FakeWriter {
 
     async fn create_document(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         markdown: &str,
@@ -261,7 +261,7 @@ impl WorkspaceWriter for FakeWriter {
 
     async fn create_task(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _id: Uuid,
         _name: &str,
         _markdown: &str,
@@ -275,7 +275,7 @@ impl WorkspaceWriter for FakeWriter {
 
     async fn create_database(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _name: &str,
     ) -> anyhow::Result<NewDatabase> {
         *self.databases.lock().unwrap() += 1;
@@ -288,7 +288,7 @@ impl WorkspaceWriter for FakeWriter {
 
     async fn apply_database_ops(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _database_id: Uuid,
         ops: Vec<DatabaseOp>,
     ) -> anyhow::Result<Vec<OpResult>> {
@@ -325,7 +325,7 @@ impl WorkspaceWriter for FakeWriter {
 
     async fn team_members(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
     ) -> anyhow::Result<Vec<TeamMember>> {
         Ok(Vec::new())
     }

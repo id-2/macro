@@ -19,7 +19,7 @@ use ai_usage::AiFeature;
 use ai_usage::domain::financial::{
     CentParts, CustomerMoney, FinancialError, FundingAuthorizationId, InvocationId, PublicUsage,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use thiserror::Error;
 
 use super::models::{
@@ -105,7 +105,7 @@ pub enum FundingSource {
     /// Explicitly authorized customer liability, regardless of invoice state.
     Postpaid,
     /// Unfunded in-flight excess; never collectible from the customer.
-    MacroAbsorbed,
+    RoxAbsorbed,
 }
 
 /// An exact money split. A source boundary can fall inside one public picodollar,
@@ -124,7 +124,7 @@ impl FundingPortion {
     pub fn category(self) -> PricingCategory {
         match self.source {
             FundingSource::Included => PricingCategory::Included,
-            FundingSource::Prepaid | FundingSource::Postpaid | FundingSource::MacroAbsorbed => {
+            FundingSource::Prepaid | FundingSource::Postpaid | FundingSource::RoxAbsorbed => {
                 PricingCategory::Extra
             }
         }
@@ -177,9 +177,9 @@ pub struct AuthorizationSnapshot {
     /// Exactly one actual provider attempt, not a logical multi-attempt run.
     pub invocation_id: InvocationId,
     /// Account owning shared credits and postpaid cap.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// Seat whose own included allowance is consumed.
-    pub seat: MacroUserIdStr<'static>,
+    pub seat: RoxUserIdStr<'static>,
     /// Frozen verified period; do not derive from current time at finalization.
     pub period: BillingPeriod,
     /// Policy selected prospectively for this seat/period.
@@ -343,7 +343,7 @@ impl UsageAllocation {
                 amount: self.postpaid,
             },
             FundingPortion {
-                source: FundingSource::MacroAbsorbed,
+                source: FundingSource::RoxAbsorbed,
                 amount: self.macro_absorbed,
             },
         ]

@@ -4,10 +4,10 @@ use crate::domain::ports::{AcceptedControl, QueuedControl};
 use shared_entity_registry::OwnedPurgeOutcome;
 
 #[derive(Default)]
-struct Recipient(Mutex<Vec<MacroUserIdStr<'static>>>);
+struct Recipient(Mutex<Vec<RoxUserIdStr<'static>>>);
 
 impl AgentSessionNotificationRecipient for Recipient {
-    async fn delete_user_sessions(&self, owner: MacroUserIdStr<'static>) -> SessionResult<()> {
+    async fn delete_user_sessions(&self, owner: RoxUserIdStr<'static>) -> SessionResult<()> {
         self.0.lock().unwrap().push(owner);
         Ok(())
     }
@@ -36,7 +36,7 @@ impl AgentSessionNotificationRecipient for Recipient {
         _: AgentSessionId,
         _: AgentActionId,
         _: String,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
         _: crate::domain::model::PrompterKind,
     ) -> SessionResult<()> {
         unreachable!()
@@ -45,7 +45,7 @@ impl AgentSessionNotificationRecipient for Recipient {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         unreachable!()
     }
@@ -53,7 +53,7 @@ impl AgentSessionNotificationRecipient for Recipient {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         unreachable!()
     }
@@ -71,7 +71,7 @@ impl AgentSessionNotificationRecipient for Recipient {
 #[tokio::test]
 async fn cleanup_requires_internal_credentials_not_user_bot_or_harness_authority() {
     let recipient = Arc::new(Recipient::default());
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".into(),
@@ -84,7 +84,7 @@ async fn cleanup_requires_internal_credentials_not_user_bot_or_harness_authority
     let router: Router = agent_session_control_router(AgentSessionControlState::new(
         recipient.clone(),
         Arc::new(entity_access::domain::ports::NoOpEntityAccessService),
-        MacroAuthorizationState::new(Arc::new(auth)),
+        RoxAuthorizationState::new(Arc::new(auth)),
     ));
     let bearer = format!("Bearer {OWNER}");
     for headers in [
@@ -92,7 +92,7 @@ async fn cleanup_requires_internal_credentials_not_user_bot_or_harness_authority
         vec![("authorization", bearer.as_str())],
         vec![(BOT_TOKEN_HEADER, BOT_TOKEN), (BOT_SCOPE_HEADER, "user")],
         vec![(HARNESS_TOKEN_HEADER, HARNESS_TOKEN)],
-        vec![(macro_authorization::INTERNAL_API_KEY_HEADER, "bad-key")],
+        vec![(rox_authorization::INTERNAL_API_KEY_HEADER, "bad-key")],
     ] {
         let mut request = Request::builder()
             .method("DELETE")
@@ -114,7 +114,7 @@ async fn cleanup_requires_internal_credentials_not_user_bot_or_harness_authority
                 .method("DELETE")
                 .uri("/user/macro%7Cowner%40example.com")
                 .header(
-                    macro_authorization::INTERNAL_API_KEY_HEADER,
+                    rox_authorization::INTERNAL_API_KEY_HEADER,
                     "test-internal-key",
                 )
                 .body(Body::empty())

@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE crm_domains SET domain = 'client.example.invalid' WHERE company_id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3fdf9a86b8b97274bb6817a8f5f431337bc03e7302d54fe6a59c714b3fe5dad7"
+}

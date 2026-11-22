@@ -1,6 +1,6 @@
 use super::*;
 use axum::response::IntoResponse;
-use macro_authorization::CODE_EXECUTION_HEADER;
+use rox_authorization::CODE_EXECUTION_HEADER;
 
 #[test]
 fn a_program_cannot_send_without_the_users_quoted_approval() {
@@ -36,7 +36,7 @@ fn a_program_cannot_send_without_the_users_quoted_approval() {
 fn a_routine_owner_token_may_send() {
     let mut code_step = HeaderMap::new();
     code_step.insert(
-        macro_authorization::CODE_EXECUTION_HEADER,
+        rox_authorization::CODE_EXECUTION_HEADER,
         "1".parse().unwrap(),
     );
     for headers in [HeaderMap::new(), code_step.clone()] {

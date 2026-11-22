@@ -1,13 +1,13 @@
 //! Android push notification content.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Serialize;
 
 /// Content for an Android push. The outbound adapter encodes the FCM transport.
 #[derive(Debug, Serialize)]
 pub struct FCMMessage<T> {
     /// Intended account, checked by the device before display or navigation.
-    pub recipient_id: MacroUserIdStr<'static>,
+    pub recipient_id: RoxUserIdStr<'static>,
     /// Visible title, absent for a notification-clear command.
     pub title: Option<String>,
     /// Visible body, absent for a notification-clear command.
@@ -25,7 +25,7 @@ impl<T> FCMMessage<T> {
         body: String,
         identifier: String,
         data: T,
-        recipient_id: MacroUserIdStr<'static>,
+        recipient_id: RoxUserIdStr<'static>,
     ) -> Self {
         Self {
             recipient_id,
@@ -37,7 +37,7 @@ impl<T> FCMMessage<T> {
     }
 
     /// Clear a previously displayed notification without displaying an alert.
-    pub fn clear(identifier: String, data: T, recipient_id: MacroUserIdStr<'static>) -> Self {
+    pub fn clear(identifier: String, data: T, recipient_id: RoxUserIdStr<'static>) -> Self {
         Self {
             recipient_id,
             title: None,

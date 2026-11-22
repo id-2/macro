@@ -1,7 +1,7 @@
 //! Initialization leases, completion accounting and follow-up capabilities.
 use super::BackfillDatabaseError;
 use crate::domain::mailbox::inbox_sync::{InboxSyncAttachmentRecipients, LabelCatalogRepository};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{attachment::AttachmentUploadMetadata, link::Link};
 use uuid::Uuid;
 
@@ -172,14 +172,14 @@ pub trait BackfillLifecycleEffects: Send + Sync {
     /// Send the existing progress refresh, best effort.
     fn refresh_progress(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         link_id: Uuid,
         progress: BackfillProgress,
     ) -> impl Future<Output = ()> + Send;
     /// Publish ordered contact connections using the existing ingress.
     fn connect_contacts(
         &self,
-        owner: &MacroUserIdStr<'static>,
-        contacts: Vec<MacroUserIdStr<'static>>,
+        owner: &RoxUserIdStr<'static>,
+        contacts: Vec<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = Result<(), rootcause::Report>> + Send;
 }

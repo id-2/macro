@@ -17,7 +17,7 @@ use super::{
 };
 use anyhow::Context;
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt, ViewAccessLevel};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use std::sync::Arc;
 
@@ -119,7 +119,7 @@ where
     pub async fn read(
         &self,
         receipt: EntityAccessReceipt<ViewAccessLevel>,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         actor: Option<&str>,
         start: Option<u32>,
         count: Option<u32>,
@@ -140,7 +140,7 @@ where
     pub async fn edit(
         &self,
         receipt: EntityAccessReceipt<EditAccessLevel>,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         actor: Option<&str>,
         operations: Vec<WordDocumentOperation>,
         options: WordEditOptions,
@@ -179,7 +179,7 @@ where
 
     /// The requesting user's name as Word should show it: the name they set,
     /// else their email's local part.
-    async fn user_name(&self, user: &MacroUserIdStr<'_>) -> String {
+    async fn user_name(&self, user: &RoxUserIdStr<'_>) -> String {
         match self.documents.display_name(user.as_ref()).await {
             Ok(Some(name)) => name.chars().take(MAX_AUTHOR_LENGTH).collect(),
             Ok(None) => email_name(user),
@@ -193,7 +193,7 @@ where
     async fn run(
         &self,
         document_id: &str,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         actor: Option<&str>,
         access: AccessLevel,
         request: WordDocumentRequest,
@@ -257,7 +257,7 @@ where
     }
 }
 
-fn email_name(user: &MacroUserIdStr<'_>) -> String {
+fn email_name(user: &RoxUserIdStr<'_>) -> String {
     let email = user.email_str();
     email.split('@').next().unwrap_or(email).to_owned()
 }

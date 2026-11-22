@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO crm_email_rule_revisions (team_id, user_id, revision, link_id, schema_version, definition) VALUES ($1, $2, 2, $3, 1, '{\"schema_version\":1,\"include\":[]}'::jsonb)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "35bd423d1638073f0ca9f8ca9a10e1bba7b2eab56862fb1a51d434a5e2deeae2"
+}

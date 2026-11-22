@@ -1,44 +1,37 @@
-import { MacroMarkIcon } from '@app/features/onboarding/components/macro-mark-icon';
 import { OnboardingShell } from '@app/features/onboarding/components/onboarding-shell';
-import { displayName, sourceUrl } from '@core/constant/brand';
-import { type JSX, Show } from 'solid-js';
-
+import { RoxMark } from '@core/component/RoxMark';
+import { displayName } from '@core/constant/brand';
+import { Show } from 'solid-js';
+import { entryCopy } from './entry-copy';
 /** The centered sign-in card, framed and styled like onboarding's slides. */
 export function LoginCard(props: {
   /** The header yields to the on-screen keyboard on phones. */
   compact: boolean;
   /** The agent signup page names what it creates. */
   agentSignup?: boolean;
+  /** A step carries its own heading and copy, so the card's yields to it. */
+  hideHeader?: boolean;
   children: JSX.Element;
 }) {
   return (
     <OnboardingShell>
       <div class="mx-auto flex w-full max-w-sm flex-col items-center text-center">
         <Show when={!props.compact}>
-          <div
-            aria-hidden="true"
-            class="flex size-16 items-center justify-center rounded-[18px] text-ink"
-            style={{
-              background:
-                'var(--onboarding-intro-background, linear-gradient(145deg, #171717, #090909 65%))',
-              'box-shadow':
-                'var(--onboarding-intro-shadow, inset .5px .5px 1px #ffffff1c, inset -.5px -.5px 1px #0008, 0 1px 1px #131313, 0 4px 10px #0005)',
-            }}
-          >
-            <MacroMarkIcon class="size-10" />
+          <div class="size-20 overflow-hidden rounded-[22px]">
+            <RoxMark class="size-full" fetchpriority="high" cover />
           </div>
+        </Show>
+        <Show when={!props.compact && !props.hideHeader}>
           <h1
             tabindex="-1"
-            class="mt-8 font-[Roboto_Slab_Variable] text-[30px] font-[315] leading-[1.2] tracking-[-.025em] outline-none [text-wrap:balance] sm:text-[36px]"
+            class="mt-8 whitespace-nowrap font-['Spectral_Entry'] text-[26px] font-medium italic leading-[1.2] tracking-[-.03em] text-ink/90 outline-none sm:text-[30px]"
           >
             {props.agentSignup
-              ? 'Sign up as an agent'
-              : `Welcome to ${displayName}`}
+              ? entryCopy().agentTitle
+              : entryCopy().welcome(displayName)}
           </h1>
-          <p class="mt-4 font-[Inter_Variable] text-sm leading-6 text-ink-muted sm:text-[15px]">
-            {props.agentSignup
-              ? 'Use your own Google account or email address. You get an SDK token next.'
-              : 'The open source workspace'}
+          <p class="mt-4 max-w-[330px] font-[Inter_Variable] text-[9.5px] leading-[1.45] tracking-[-.005em] text-ink-muted">
+            {props.agentSignup ? entryCopy().agentSubtitle : entryCopy().tagline}
           </p>
         </Show>
         <div
@@ -46,44 +39,6 @@ export function LoginCard(props: {
         >
           {props.children}
         </div>
-        <p class="mt-8 text-xs leading-5 text-ink-extra-muted [text-wrap:balance]">
-          By continuing, you agree to our{' '}
-          <a
-            href="/terms"
-            class="underline underline-offset-2 hover:text-ink-muted"
-          >
-            terms
-          </a>{' '}
-          and{' '}
-          <a
-            href="/privacy"
-            class="underline underline-offset-2 hover:text-ink-muted"
-          >
-            privacy policy
-          </a>
-          .
-        </p>
-        <p class="mt-3 text-xs leading-5 text-ink-extra-muted [text-wrap:balance]">
-          {displayName} is a modified version of{' '}
-          <a
-            href="https://github.com/macro-inc/macro"
-            target="_blank"
-            rel="noreferrer"
-            class="underline underline-offset-2 hover:text-ink-muted"
-          >
-            macro-inc/macro
-          </a>
-          , modified 2026-11-12 under the existing license notices.{' '}
-          <a
-            href={sourceUrl}
-            target="_blank"
-            rel="noreferrer"
-            class="underline underline-offset-2 hover:text-ink-muted"
-          >
-            Source
-          </a>
-          .
-        </p>
       </div>
     </OnboardingShell>
   );

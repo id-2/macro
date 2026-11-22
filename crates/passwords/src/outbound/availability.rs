@@ -48,7 +48,7 @@ fn agent_vault(flags: &FlagSnapshot) -> bool {
 #[async_trait]
 impl<F: FeatureFlags> AgentAvailability for PasswordAvailability<F> {
     #[tracing::instrument(skip_all, name = "passwords.agent.admission.flags")]
-    async fn agent_vault_enabled(&self, user: &macro_user_id::user_id::MacroUserIdStr<'_>) -> bool {
+    async fn agent_vault_enabled(&self, user: &rox_user_id::user_id::RoxUserIdStr<'_>) -> bool {
         // Each user's own snapshot: an agent never inherits its responsible
         // human's rollout. Off, missing or failed evaluation is disabled.
         self.flags
@@ -66,7 +66,7 @@ pub struct LocalPasswordsFlags;
 impl FeatureFlags for LocalPasswordsFlags {
     async fn load(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<FlagSnapshot, rootcause::Report> {
         Ok(FlagSnapshot::new([
             (PASSWORDS_FLAG.into(), FlagValue::Boolean(true)),

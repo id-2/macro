@@ -10,7 +10,7 @@ use email::domain::{
 };
 use entity_access::domain::{models::AccessError, ports::EntityAccessService};
 use futures::future::{BoxFuture, join_all};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Instrument;
 use uuid::Uuid;
 
@@ -49,7 +49,7 @@ pub trait SoupEmailThreadMetadataEdgeReader: Send + Sync + 'static {
     /// Load canonical metadata for authorized threads on behalf of `user_id`.
     fn get_email_thread_metadata<'a>(
         &'a self,
-        user_id: &'a MacroUserIdStr<'static>,
+        user_id: &'a RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> impl Future<Output = HashMap<Uuid, EmailThreadMetadataLoad>> + Send + 'a;
 }
@@ -68,7 +68,7 @@ pub trait SoupEmailThreadMailProjectionEdgeReader: Send + Sync + 'static {
     /// Load Mail projection data for authorized threads on behalf of `user_id`.
     fn get_email_thread_mail_projections<'a>(
         &'a self,
-        user_id: &'a MacroUserIdStr<'static>,
+        user_id: &'a RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> impl Future<Output = HashMap<Uuid, EmailThreadMailProjectionLoad>> + Send + 'a;
 }
@@ -214,7 +214,7 @@ pub trait SoupEmailContentEdgeReader:
     /// Load content for authorized threads on behalf of `user_id`.
     fn get_email_content<'a>(
         &'a self,
-        user_id: &'a MacroUserIdStr<'static>,
+        user_id: &'a RoxUserIdStr<'static>,
         keys: Vec<EmailContentKey>,
     ) -> impl Future<Output = HashMap<EmailContentKey, EmailContentLoad>> + Send + 'a;
 }
@@ -226,7 +226,7 @@ pub struct NoOpSoupEmailContentEdgeReader;
 impl SoupEmailContentEdgeReader for NoOpSoupEmailContentEdgeReader {
     async fn get_email_content(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         keys: Vec<EmailContentKey>,
     ) -> HashMap<EmailContentKey, EmailContentLoad> {
         keys.into_iter()
@@ -238,7 +238,7 @@ impl SoupEmailContentEdgeReader for NoOpSoupEmailContentEdgeReader {
 impl SoupEmailThreadMetadataEdgeReader for NoOpSoupEmailContentEdgeReader {
     async fn get_email_thread_metadata(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> HashMap<Uuid, EmailThreadMetadataLoad> {
         thread_ids
@@ -256,7 +256,7 @@ impl SoupEmailThreadMetadataEdgeReader for NoOpSoupEmailContentEdgeReader {
 impl SoupEmailThreadMailProjectionEdgeReader for NoOpSoupEmailContentEdgeReader {
     async fn get_email_thread_mail_projections(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> HashMap<Uuid, EmailThreadMailProjectionLoad> {
         thread_ids
@@ -297,7 +297,7 @@ where
 {
     async fn get_email_thread_metadata(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> HashMap<Uuid, EmailThreadMetadataLoad> {
         let thread_ids = thread_ids.into_iter().collect::<HashSet<_>>();
@@ -388,7 +388,7 @@ where
 {
     async fn get_email_thread_mail_projections(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
     ) -> HashMap<Uuid, EmailThreadMailProjectionLoad> {
         let thread_ids = thread_ids.into_iter().collect::<HashSet<_>>();
@@ -483,7 +483,7 @@ where
 {
     async fn get_email_content(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         keys: Vec<EmailContentKey>,
     ) -> HashMap<EmailContentKey, EmailContentLoad> {
         let thread_ids = keys.iter().map(|key| key.thread_id).collect::<HashSet<_>>();
@@ -673,7 +673,7 @@ fn spawn_in_current_span(batch: BoxFuture<'static, ()>) -> tokio::task::JoinHand
 
 /// DataLoader for canonical metadata attached to Soup email threads.
 pub struct EmailThreadMetadataLoader<R> {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     viewer_id: Option<Uuid>,
     reader: R,
 }
@@ -683,7 +683,7 @@ impl<R> EmailThreadMetadataLoader<R> {
     ///
     /// `viewer_id` is the viewer's opaque account id (`macro_user.id`), logged
     /// instead of the email-bearing `user_id` when a thread is unavailable.
-    pub fn new(user_id: MacroUserIdStr<'static>, viewer_id: Option<Uuid>, reader: R) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>, viewer_id: Option<Uuid>, reader: R) -> Self {
         Self {
             user_id,
             viewer_id,
@@ -720,7 +720,7 @@ where
 
 /// Build a canonical email-thread metadata DataLoader scoped to the requesting user.
 pub fn email_thread_metadata_loader<R>(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     viewer_id: Option<Uuid>,
     reader: R,
 ) -> DataLoader<EmailThreadMetadataLoader<R>>
@@ -740,7 +740,7 @@ where
 
 /// DataLoader for Mail-specific cache facts and canonical previews.
 pub struct EmailThreadMailProjectionLoader<R> {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     viewer_id: Option<Uuid>,
     reader: R,
 }
@@ -750,7 +750,7 @@ impl<R> EmailThreadMailProjectionLoader<R> {
     ///
     /// `viewer_id` is the viewer's opaque account id (`macro_user.id`), logged
     /// instead of the email-bearing `user_id` when a thread is unavailable.
-    pub fn new(user_id: MacroUserIdStr<'static>, viewer_id: Option<Uuid>, reader: R) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>, viewer_id: Option<Uuid>, reader: R) -> Self {
         Self {
             user_id,
             viewer_id,
@@ -787,7 +787,7 @@ where
 
 /// Build a Mail projection DataLoader scoped to the requesting user.
 pub fn email_thread_mail_projection_loader<R>(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     viewer_id: Option<Uuid>,
     reader: R,
 ) -> DataLoader<EmailThreadMailProjectionLoader<R>>
@@ -807,7 +807,7 @@ where
 
 /// DataLoader for adaptively hydrated content messages attached to Soup email threads.
 pub struct EmailContentLoader<R> {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     reader: R,
 }
 
@@ -840,7 +840,7 @@ impl std::error::Error for EmailContentLoaderError {}
 
 impl<R> EmailContentLoader<R> {
     /// Create a DataLoader scoped to the requesting user.
-    pub fn new(user_id: MacroUserIdStr<'static>, reader: R) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>, reader: R) -> Self {
         Self { user_id, reader }
     }
 }
@@ -880,7 +880,7 @@ where
 
 /// Build an email-content DataLoader scoped to the requesting user.
 pub fn email_content_loader<R>(
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     reader: R,
 ) -> DataLoader<EmailContentLoader<R>>
 where

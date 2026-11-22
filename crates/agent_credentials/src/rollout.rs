@@ -18,7 +18,7 @@ use std::collections::HashMap;
 use std::future::Future;
 
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 use crate::AGENT_TEAMMATES_FLAG;
@@ -38,8 +38,8 @@ pub trait AgentCreators: Send + Sync {
     /// agent teammate, or there is no one to follow.
     fn creator_of(
         &self,
-        agent: &MacroUserIdStr<'_>,
-    ) -> impl Future<Output = Result<Option<MacroUserIdStr<'static>>, Report>> + Send;
+        agent: &RoxUserIdStr<'_>,
+    ) -> impl Future<Output = Result<Option<RoxUserIdStr<'static>>, Report>> + Send;
 }
 
 /// Whether agent teammates are on for `agent`: the flag as its creator sees
@@ -47,7 +47,7 @@ pub trait AgentCreators: Send + Sync {
 pub async fn agent_teammates_enabled<Creators: AgentCreators, Flags: FeatureFlags>(
     creators: &Creators,
     flags: Option<&Flags>,
-    agent: &MacroUserIdStr<'_>,
+    agent: &RoxUserIdStr<'_>,
 ) -> bool {
     let Some(flags) = flags else {
         return false;
@@ -91,12 +91,12 @@ pub async fn agent_teammates_enabled<Creators: AgentCreators, Flags: FeatureFlag
 /// have none.
 #[derive(Clone, Default)]
 pub struct FakeAgentCreators {
-    creators: HashMap<MacroUserIdStr<'static>, MacroUserIdStr<'static>>,
+    creators: HashMap<RoxUserIdStr<'static>, RoxUserIdStr<'static>>,
 }
 
 impl FakeAgentCreators {
     /// Record that `creator` invited `agent`.
-    pub fn set(&mut self, agent: MacroUserIdStr<'static>, creator: MacroUserIdStr<'static>) {
+    pub fn set(&mut self, agent: RoxUserIdStr<'static>, creator: RoxUserIdStr<'static>) {
         self.creators.insert(agent, creator);
     }
 }
@@ -104,8 +104,8 @@ impl FakeAgentCreators {
 impl AgentCreators for FakeAgentCreators {
     async fn creator_of(
         &self,
-        agent: &MacroUserIdStr<'_>,
-    ) -> Result<Option<MacroUserIdStr<'static>>, Report> {
+        agent: &RoxUserIdStr<'_>,
+    ) -> Result<Option<RoxUserIdStr<'static>>, Report> {
         Ok(self.creators.get(agent).cloned())
     }
 }

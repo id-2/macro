@@ -24,7 +24,7 @@ export function devCompression(
   return {
     name: 'macro-dev-compression',
     apply: (_config, { command, isPreview }) =>
-      command === 'serve' && !isPreview && env.MACRO_DEV_COMPRESSION !== 'false',
+      command === 'serve' && !isPreview && env.ROX_DEV_COMPRESSION !== 'false',
     configureServer(server) {
       // Before Vite's own middlewares, so module responses pass through it.
       server.middlewares.use(middleware);

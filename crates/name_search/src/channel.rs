@@ -6,9 +6,9 @@ use channels::domain::models::ChannelType;
 use channels::outbound::channel_name::{
     ChannelNameSearch, batch_resolve_channel_names, match_channel_names,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use models_search_cursor::{SearchCursorOption, SearchMethodCursor};
 use sqlx::{Pool, Postgres};
@@ -50,7 +50,7 @@ pub struct ChannelNameSearchScope<'a> {
 )]
 pub async fn search_channel_names<'a>(
     db: &Pool<Postgres>,
-    macro_user_id: &MacroUserId<Lowercase<'a>>,
+    macro_user_id: &RoxUserId<Lowercase<'a>>,
     scope: ChannelNameSearchScope<'_>,
     term: String,
     exact_match: bool,
@@ -83,7 +83,7 @@ pub async fn search_channel_names<'a>(
             }
         })
         .collect();
-    let viewer_user_id = MacroUserIdStr(macro_user_id.clone());
+    let viewer_user_id = RoxUserIdStr(macro_user_id.clone());
 
     let matches = match_channel_names(
         db,

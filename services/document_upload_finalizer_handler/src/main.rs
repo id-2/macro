@@ -41,7 +41,7 @@ struct MacroEntrypointExt;
 
 impl MacroEntrypointExt {
     fn init() {
-        macro_entrypoint::MacroEntrypoint::default().init();
+        rox_entrypoint::RoxEntrypoint::default().init();
         tracing::trace!("initiating document upload finalizer lambda");
     }
 }

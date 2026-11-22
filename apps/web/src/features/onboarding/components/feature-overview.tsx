@@ -25,7 +25,7 @@ import './feature-overview.css';
 // Matching connector names let StoryStage carry the actual welcome icons here.
 const features = [
   {
-    label: 'Email',
+    label: 'Почта',
     color: 'var(--color-write)',
     source: 'Google',
     icon: Mail,
@@ -33,7 +33,7 @@ const features = [
     y: 45,
   },
   {
-    label: 'Chat',
+    label: 'Чат',
     color: 'var(--color-chat)',
     source: 'Slack',
     icon: Chat,
@@ -41,7 +41,7 @@ const features = [
     y: 19,
   },
   {
-    label: 'Sheets',
+    label: 'Таблицы',
     color: 'var(--color-success)',
     source: 'Sheets',
     icon: Sheet,
@@ -49,7 +49,7 @@ const features = [
     y: 6,
   },
   {
-    label: 'Docs',
+    label: 'Документы',
     color: 'var(--color-note)',
     source: 'Notion',
     icon: Doc,
@@ -57,7 +57,7 @@ const features = [
     y: 19,
   },
   {
-    label: 'Tasks',
+    label: 'Задачи',
     color: 'var(--color-task)',
     source: 'Linear',
     icon: Task,
@@ -65,7 +65,7 @@ const features = [
     y: 46,
   },
   {
-    label: 'CRM',
+    label: 'Клиенты',
     color: 'var(--color-contact)',
     source: 'HubSpot',
     icon: CRM,
@@ -73,7 +73,7 @@ const features = [
     y: 78,
   },
   {
-    label: 'Agents',
+    label: 'Агенты',
     color: 'var(--color-snippet)',
     source: 'GitHub',
     icon: Sparkle,
@@ -81,7 +81,7 @@ const features = [
     y: 88,
   },
   {
-    label: 'Calls',
+    label: 'Звонки',
     color: 'var(--color-note)',
     source: 'Zoom',
     icon: Call,
@@ -108,7 +108,7 @@ const expandedFeatures = [
     y: expandedPositions[index][1],
   })),
   {
-    label: 'Calendar',
+    label: 'Календарь',
     source: 'Calendar',
     icon: Calendar,
     color: 'var(--color-note)',
@@ -116,7 +116,7 @@ const expandedFeatures = [
     y: 5,
   },
   {
-    label: 'Booking links',
+    label: 'Запись',
     source: 'Booking',
     icon: Booking,
     color: 'var(--color-chat)',
@@ -124,7 +124,7 @@ const expandedFeatures = [
     y: 5,
   },
   {
-    label: 'Recordings',
+    label: 'Записи',
     source: 'Recordings',
     icon: Recording,
     color: 'var(--color-write)',
@@ -132,7 +132,7 @@ const expandedFeatures = [
     y: 5,
   },
   {
-    label: 'File storage',
+    label: 'Файлы',
     source: 'Storage',
     icon: Folder,
     color: 'var(--color-note)',
@@ -140,7 +140,7 @@ const expandedFeatures = [
     y: 71,
   },
   {
-    label: 'Databases',
+    label: 'Базы',
     source: 'Databases',
     icon: Database,
     color: 'var(--color-success)',
@@ -148,7 +148,7 @@ const expandedFeatures = [
     y: 71,
   },
   {
-    label: 'Diagrams',
+    label: 'Схемы',
     source: 'Diagrams',
     icon: Diagram,
     color: 'var(--color-contact)',
@@ -156,7 +156,7 @@ const expandedFeatures = [
     y: 49,
   },
   {
-    label: 'Coding agents',
+    label: 'Код',
     source: 'Coding',
     icon: Coding,
     color: 'var(--color-task)',
@@ -184,10 +184,10 @@ function FeatureConstellation(
       role={props.onSelect ? 'group' : 'img'}
       aria-label={
         props.onSelect
-          ? 'Features to try first'
+          ? 'Какие возможности попробовать сначала'
           : `${items()
               .map((feature) => feature.label)
-              .join(', ')}, connected in Rox`
+              .join(', ')} в Rox`
       }
     >
       <div class="feature-flow-light" aria-hidden="true">
@@ -213,7 +213,11 @@ function FeatureConstellation(
         </div>
       </Show>
       <div class="feature-flow-core glass" aria-hidden="true">
-        <RoxMark class="size-full" />
+        <RoxMark
+          cover
+          class="absolute inset-0 size-full"
+          style={{ width: '100%', height: '100%' }}
+        />
       </div>
       <For each={items()}>
         {(feature) => (
@@ -298,14 +302,14 @@ export function FeatureOverview(props: {
           tabindex="-1"
           class="font-[Roboto_Slab_Variable] text-[30px] font-[315] leading-[1.2] tracking-[-.025em] outline-none [text-wrap:balance] sm:text-[36px]"
         >
-          Which features do you want to try first?
+          Какие возможности попробовать сначала?
         </h1>
         <div class="feature-overview-description mx-auto mt-5 max-w-lg text-sm leading-6 text-ink-muted sm:text-[15px]">
-          <p>Choose as many as you like. You can try the rest anytime.</p>
+          <p>Можно выбрать несколько. Остальные доступны в любой момент.</p>
         </div>
       </header>
       <ContinueButton
-        label="Continue"
+        label="Продолжить"
         onClick={() => props.onContinue([...selected()])}
       />
     </section>

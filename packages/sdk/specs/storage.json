@@ -35890,7 +35890,7 @@
             "description": "Attempt id."
           },
           "requester_id": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "Person asking to join."
           },
           "resolved_at": {
@@ -35904,7 +35904,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "Participant who approved or denied it."
               }
             ]
@@ -35963,7 +35963,7 @@
             "description": "The attempt; channel participants read its current outcome by id."
           },
           "requester_id": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "Person asking to join."
           },
           "requester_name": {
@@ -36005,7 +36005,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "User the actor created the channel for, when the actor is a bot."
               }
             ]
@@ -36013,7 +36013,7 @@
           "participant_user_ids": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MacroUserIdStr"
+              "$ref": "#/components/schemas/RoxUserIdStr"
             },
             "description": "Active participants after creation (including the owner)."
           }
@@ -36334,7 +36334,7 @@
           "added_user_ids": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MacroUserIdStr"
+              "$ref": "#/components/schemas/RoxUserIdStr"
             },
             "description": "Users added by this mutation."
           },
@@ -36369,13 +36369,13 @@
             "description": "Type of channel the participants were removed from."
           },
           "removed_by": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "Actor who removed the participants; equals the sole removed user for a\nself-service leave."
           },
           "removed_user_ids": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MacroUserIdStr"
+              "$ref": "#/components/schemas/RoxUserIdStr"
             },
             "description": "Users removed by this mutation."
           }
@@ -36387,7 +36387,7 @@
         "required": ["channel_id", "actor"],
         "properties": {
           "actor": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "User who changed the picture."
           },
           "channel_id": {
@@ -36671,7 +36671,7 @@
         "required": ["channel_id", "actor"],
         "properties": {
           "actor": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "The user who updated the channel."
           },
           "channel_id": {
@@ -37713,7 +37713,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "Who submitted the command, if acting on a user's behalf."
               }
             ]
@@ -40861,7 +40861,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The user whose feed this copy belongs on, when different from the actor."
               }
             ]
@@ -40935,7 +40935,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The user whose feed this creation belongs on, when different from\n[`Self::actor`]. Absent means the actor is also the subject."
               }
             ]
@@ -40976,7 +40976,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The authenticated user who deleted the document; `None` for\nunauthenticated or internal callers."
               }
             ]
@@ -40991,7 +40991,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The user whose feed this delete belongs on, when different from\n[`Self::actor`]."
               }
             ]
@@ -41300,7 +41300,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The users id if present"
               }
             ]
@@ -41674,7 +41674,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The user whose feed this edit belongs on, when different from\n[`Self::actor`]."
               }
             ]
@@ -41701,7 +41701,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "User represented by an agent, if any."
               }
             ]
@@ -41890,7 +41890,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The authenticated user who performed the update; `None` for\nunauthenticated or internal callers."
               }
             ]
@@ -41927,7 +41927,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The user whose feed this update belongs on, when different from\n[`Self::actor`]."
               }
             ]
@@ -51551,7 +51551,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "The agent teammate whose computer this is, when it is one. People\nreach the agent by message; nothing else may run on its computer.\nSet on the caller-facing listings and on a patch's answer."
               }
             ]
@@ -52102,7 +52102,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "User who prompted it, absent when a bot acted on nobody's behalf."
               }
             ]
@@ -52300,7 +52300,7 @@
           "memberIds": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MacroUserIdStr"
+              "$ref": "#/components/schemas/RoxUserIdStr"
             },
             "description": "Member user ids. The owner is never stored here."
           },
@@ -52309,7 +52309,7 @@
             "description": "Display name."
           },
           "ownerId": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "Owner of the initiative."
           },
           "sharePermission": {
@@ -53295,7 +53295,7 @@
         ],
         "description": "Location response with content lifecycle metadata."
       },
-      "MacroUserIdStr": {
+      "RoxUserIdStr": {
         "type": "string"
       },
       "MailboxDomainConflict": {
@@ -60838,7 +60838,7 @@
           "audience": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MacroUserIdStr"
+              "$ref": "#/components/schemas/RoxUserIdStr"
             },
             "description": "Everyone with a stake in what happens next: the owner plus every user\nwho has prompted or answered this session. Resolved by the emitter so\na consumer fanning out never has to read the session's log."
           },
@@ -60862,7 +60862,7 @@
             ]
           },
           "owner_id": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "User who owns the session."
           },
           "session_id": {
@@ -60896,7 +60896,7 @@
           "mentioned": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/MacroUserIdStr"
+              "$ref": "#/components/schemas/RoxUserIdStr"
             },
             "description": "The users named, already narrowed to those who can open the session\nand never including the author."
           },
@@ -60906,7 +60906,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "Who wrote the prompt, absent when a bot acted on nobody's behalf."
               }
             ]
@@ -67277,7 +67277,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "User who prompted it, absent when a bot acted on nobody's behalf."
               }
             ]
@@ -67323,7 +67323,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "User who prompted it, absent when a bot acted on nobody's behalf."
               }
             ]
@@ -67360,7 +67360,7 @@
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/MacroUserIdStr",
+                "$ref": "#/components/schemas/RoxUserIdStr",
                 "description": "User who prompted it, absent when a bot acted on nobody's behalf."
               }
             ]
@@ -68317,7 +68317,7 @@
             "description": "URL of the new picture; `None` when the picture was removed."
           },
           "user_id": {
-            "$ref": "#/components/schemas/MacroUserIdStr",
+            "$ref": "#/components/schemas/RoxUserIdStr",
             "description": "User whose profile picture changed."
           }
         }

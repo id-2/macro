@@ -1,0 +1,18 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO user_notification\n               (user_id, notification_id, state, event_item_type, event_item_id, deleted_at)\n           VALUES ($1, $2, $3::text::notification_state, 'email_thread', $4,\n                   CASE WHEN $5 THEN now() END)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text",
+        "Uuid",
+        "Text",
+        "Text",
+        "Bool"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "10e89e84921f8cbe21d00402b0b798e1b7582fdb91b08059d37c0a9243ee15ad"
+}

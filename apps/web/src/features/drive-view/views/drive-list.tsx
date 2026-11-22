@@ -10,6 +10,7 @@ import {
 } from '@app/features/soup';
 import { TutorialRow } from '@app/features/video-tutorials';
 import { DEBUG_SETTING_KEYS, useDebugSetting } from '@app/lib/debugSettings';
+import { t } from '@app/lib/i18n';
 import { useSplitPanelOrThrow } from '@components/app/split-layout/layoutUtils';
 import { StaticMarkdownContext } from '@core/component/LexicalMarkdown/component/core/StaticMarkdown';
 import { toast } from '@core/component/Toast/Toast';
@@ -161,7 +162,7 @@ export function DriveList() {
     try {
       await source.refresh();
     } catch {
-      toast.failure('Files couldn’t be loaded. Try again.');
+      toast.failure(t('drive.filesLoadFailedRetry'));
     }
   }
 
@@ -184,7 +185,7 @@ export function DriveList() {
     activation: {
       createMetadata: (intent) => ({ newSplit: intent === 'alternate' }),
 
-      alternateDescription: 'Open in new split',
+      alternateDescription: t('nav.openInNewSplit'),
     },
   });
 
@@ -258,11 +259,11 @@ export function DriveList() {
   };
 
   const emptyMessage = () => {
-    if (source.error()) return 'More files couldn’t be loaded.';
-    if (source.hasMore()) return 'Looking for matching files…';
-    if (isSearching()) return 'No files match this search.';
+    if (source.error()) return t('nav.moreFilesLoadFailed');
+    if (source.hasMore()) return t('drive.searchingFiles');
+    if (isSearching()) return t('drive.noFilesForSearch');
 
-    return 'Your native files live in Drive. Upload or create files here, or import them from another service.';
+    return t('drive.emptyDriveDescription');
   };
 
   return (
@@ -271,7 +272,7 @@ export function DriveList() {
         <div
           ref={setGrid}
           role="grid"
-          aria-label="Drive files"
+          aria-label={t('drive.driveFiles')}
           aria-multiselectable="true"
           aria-activedescendant={rowElementId(list.focus.key())}
           tabIndex={0}
@@ -282,12 +283,12 @@ export function DriveList() {
               role="alert"
               class="flex shrink-0 items-center gap-2 border-b border-edge-muted p-3 text-xs text-ink-muted"
             >
-              Databases couldn’t be loaded.
+              {t('drive.databasesLoadFailed')}
               <Button
                 variant="secondary"
                 onClick={() => fireAndForget(refresh(), 'drive-view')}
               >
-                Try again
+                {t('common.tryAgain')}
               </Button>
             </div>
           </Show>
@@ -295,12 +296,12 @@ export function DriveList() {
             <Switch>
               <Match when={!forceEmptyState() && showError()}>
                 <div class="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 text-sm text-ink-muted">
-                  <span>Files couldn’t be loaded.</span>
+                  <span>{t('drive.filesLoadFailed')}</span>
                   <Button
                     variant="secondary"
                     onClick={() => fireAndForget(refresh(), 'drive-view')}
                   >
-                    Try again
+                    {t('common.tryAgain')}
                   </Button>
                 </div>
               </Match>
@@ -317,7 +318,7 @@ export function DriveList() {
                 >
                   <SpinnerIcon
                     aria-hidden={false}
-                    aria-label="Loading files"
+                    aria-label={t('drive.loadingFiles')}
                     class="size-5 animate-spin"
                   />
                 </div>
@@ -336,7 +337,7 @@ export function DriveList() {
                           variant="secondary"
                           onClick={() => fireAndForget(refresh(), 'drive-view')}
                         >
-                          Try again
+                          {t('common.tryAgain')}
                         </Button>
                       </Show>
                       <Show when={hasFilters()}>
@@ -344,7 +345,7 @@ export function DriveList() {
                           variant="secondary"
                           onClick={state.clearFilters}
                         >
-                          Clear filters
+                          {t('drive.resetFilters')}
                         </Button>
                       </Show>
                       <Show when={!forceEmptyState() && source.hasMore()}>
@@ -355,7 +356,7 @@ export function DriveList() {
                             fireAndForget(loadMore(), 'drive-view')
                           }
                         >
-                          Search more results
+                          {t('drive.searchFurther')}
                         </Button>
                       </Show>
                     </div>
@@ -364,10 +365,10 @@ export function DriveList() {
                   <EmptyStatePanel
                     centered
                     graphic={EmptyStateFolderGraphic}
-                    title="This folder is empty"
-                    description="Create something new or drop files here to add them to this folder."
+                    title={t('drive.emptyFolderTitle')}
+                    description={t('drive.emptyFolderDescription')}
                     primaryAction={{
-                      label: 'Back to Drive',
+                      label: t('drive.backToDrive'),
                       icon: ArrowLeftIcon,
                       onClick: () => state.selectFolder(null),
                     }}
@@ -422,8 +423,8 @@ export function DriveList() {
                           >
                             <div class="px-3 py-2 text-xs font-semibold text-ink-muted">
                               {index() === 0
-                                ? 'Featured Results'
-                                : 'More Results'}
+                                ? t('drive.featuredResults')
+                                : t('drive.moreResults')}
                             </div>
                           </Show>
                           <div
@@ -506,7 +507,7 @@ export function DriveList() {
                                 class="flex items-center gap-2 p-3 text-xs text-ink-muted"
                               >
                                 <SpinnerIcon class="size-3 animate-spin" />
-                                Loading more…
+                                {t('drive.loadingMore')}
                               </div>
                             </Show>
                             <Show when={source.error()}>
@@ -514,14 +515,14 @@ export function DriveList() {
                                 role="alert"
                                 class="flex items-center gap-2 p-3 text-xs text-ink-muted"
                               >
-                                More files couldn’t be loaded.
+                                {t('nav.moreFilesLoadFailed')}
                                 <Button
                                   variant="secondary"
                                   onClick={() =>
                                     fireAndForget(loadMore(), 'drive-view')
                                   }
                                 >
-                                  Try again
+                                  {t('common.tryAgain')}
                                 </Button>
                               </div>
                             </Show>
@@ -543,7 +544,7 @@ export function DriveList() {
                 role="status"
                 class="pointer-events-none absolute bottom-3 right-3 text-xs text-ink-muted"
               >
-                Searching…
+                {t('drive.searching')}
               </div>
             </Show>
             <Show when={selected().length > 0}>

@@ -2,7 +2,7 @@
 use super::*;
 use crate::outbound::postgres::PostgresRepository;
 use chrono::{DateTime, Duration, Utc};
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
 use model_user::UserContext;
 use rootcause::Report;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -14,10 +14,10 @@ const EMPTY_PUBLIC_SCHEMA: &str = "DROP SCHEMA public CASCADE; CREATE SCHEMA pub
 
 #[derive(Clone)]
 struct Identity;
-impl MacroAuthorizationService for Identity {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for Identity {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if !matches!(jwt, "host" | "member" | "stranger") {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: format!("macro|{jwt}@example.test"),
@@ -29,17 +29,17 @@ impl MacroAuthorizationService for Identity {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
     async fn authorize_internal(
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 struct People;
@@ -96,13 +96,13 @@ async fn http_booking_receipt_recovery_reschedule_cancel_and_team_auth(pool: sql
         .unwrap();
     sqlx::raw_sql("CREATE TABLE \"User\" (id text PRIMARY KEY); CREATE TABLE team (id uuid PRIMARY KEY); INSERT INTO \"User\" VALUES ('macro|host@example.test');").execute(&pool).await.unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20260918164303_calendar_scheduling.sql"
+        "../../../../rox_db_client/migrations/20260918164303_calendar_scheduling.sql"
     ))
     .execute(&pool)
     .await
     .unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20260918175703_scheduling_recovery.sql"
+        "../../../../rox_db_client/migrations/20260918175703_scheduling_recovery.sql"
     ))
     .execute(&pool)
     .await
@@ -114,7 +114,7 @@ async fn http_booking_receipt_recovery_reschedule_cancel_and_team_auth(pool: sql
     ));
     let app: Router = router(RouterState::new(
         service.clone(),
-        MacroAuthorizationState::new(Arc::new(Identity)),
+        RoxAuthorizationState::new(Arc::new(Identity)),
     ));
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let base = format!("http://{}", listener.local_addr().unwrap());
@@ -287,13 +287,13 @@ async fn http_booking_links_require_confirmation_and_revision(pool: sqlx::PgPool
         .unwrap();
     sqlx::raw_sql("CREATE TABLE \"User\" (id text PRIMARY KEY); CREATE TABLE team (id uuid PRIMARY KEY); INSERT INTO \"User\" VALUES ('macro|host@example.test');").execute(&pool).await.unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20260918164303_calendar_scheduling.sql"
+        "../../../../rox_db_client/migrations/20260918164303_calendar_scheduling.sql"
     ))
     .execute(&pool)
     .await
     .unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20260918175703_scheduling_recovery.sql"
+        "../../../../rox_db_client/migrations/20260918175703_scheduling_recovery.sql"
     ))
     .execute(&pool)
     .await
@@ -304,7 +304,7 @@ async fn http_booking_links_require_confirmation_and_revision(pool: sqlx::PgPool
             Calendar(AtomicBool::new(false)),
             People,
         )),
-        MacroAuthorizationState::new(Arc::new(Identity)),
+        RoxAuthorizationState::new(Arc::new(Identity)),
     ));
     let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
     let base = format!("http://{}", listener.local_addr().unwrap());

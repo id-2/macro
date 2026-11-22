@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::event_trigger::EventRejection;
-use macro_event_broker::Event;
-use macro_uuid::Uuid;
+use rox_event_broker::Event;
+use rox_uuid::Uuid;
 use rdkafka::message::{OwnedMessage, Timestamp};
 use serde_json::{Value, json};
 use std::collections::{HashSet, VecDeque};
@@ -39,12 +39,12 @@ struct FakeConsumer {
     shutdown: CancellationToken,
 }
 
-impl EventConsumer<DeclaredMacroEvent> for FakeConsumer {
+impl EventConsumer<DeclaredRoxEvent> for FakeConsumer {
     type MessageType<'a> = OwnedMessage;
 
     async fn recv<'a>(
         &'a self,
-    ) -> Result<MessageWrapper<Self::MessageType<'a>, DeclaredMacroEvent>, Report> {
+    ) -> Result<MessageWrapper<Self::MessageType<'a>, DeclaredRoxEvent>, Report> {
         let mut state = self.state.lock().unwrap();
         let message = state.messages.pop_front().expect("unexpected receive");
         state.received.push(message.offset());
@@ -178,7 +178,7 @@ async fn run(consumer: &FakeConsumer) -> Result<(), Report> {
 #[test]
 fn subscriptions_are_exact_and_group_is_dedicated() {
     assert_eq!(
-        DeclaredMacroEvent::topics(),
+        DeclaredRoxEvent::topics(),
         &[
             "macro.documents",
             "macro.channels",
@@ -204,7 +204,7 @@ async fn admits_both_topics_before_committing() {
         11,
     );
     // Confirm transport conversion preserves identity, schema and typed payload.
-    let decoded = DeclaredMacroEvent::decode(&channel).unwrap();
+    let decoded = DeclaredRoxEvent::decode(&channel).unwrap();
     let incoming = incoming_event(decoded);
     assert_eq!(incoming.event_id.to_string(), EVENT_ID);
     assert_eq!(incoming.schema_version, 1);
@@ -290,7 +290,7 @@ async fn schema_mismatch_is_an_observable_permanent_reject() {
         Some(vec![]),
         10,
     );
-    let error = DeclaredMacroEvent::decode(&record).err().unwrap();
+    let error = DeclaredRoxEvent::decode(&record).err().unwrap();
     assert_eq!(decode_rejection(&error), "unsupported_schema");
     let consumer = fixture(vec![record, document(11)], vec![]);
     run(&consumer).await.unwrap();
@@ -382,7 +382,7 @@ async fn already_cancelled_shutdown_does_not_receive() {
 
 #[test]
 fn document_conversion_preserves_the_envelope() {
-    let event = incoming_event(DeclaredMacroEvent::decode(&document(10)).unwrap());
+    let event = incoming_event(DeclaredRoxEvent::decode(&document(10)).unwrap());
     let EventPayload::Document(payload) = event.payload else {
         panic!("expected document payload");
     };
@@ -413,7 +413,7 @@ fn call_conversion_preserves_the_envelope() {
         Some(ENTITY_ID.as_bytes().to_vec()),
         10,
     );
-    let event = incoming_event(DeclaredMacroEvent::decode(&message).unwrap());
+    let event = incoming_event(DeclaredRoxEvent::decode(&message).unwrap());
     let EventPayload::Call(payload) = event.payload else {
         panic!("expected call payload");
     };
@@ -436,9 +436,9 @@ fn the_routine_behind_an_event_reaches_ingestion() {
         10,
     );
 
-    let event = incoming_event(DeclaredMacroEvent::decode(&message).unwrap());
+    let event = incoming_event(DeclaredRoxEvent::decode(&message).unwrap());
 
     assert_eq!(event.routine_id, Some(routine_id));
-    let unstamped = incoming_event(DeclaredMacroEvent::decode(&document(10)).unwrap());
+    let unstamped = incoming_event(DeclaredRoxEvent::decode(&document(10)).unwrap());
     assert_eq!(unstamped.routine_id, None);
 }

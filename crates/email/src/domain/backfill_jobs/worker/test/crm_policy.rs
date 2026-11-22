@@ -4,7 +4,7 @@ use ::crm::domain::{email_policy_work::*, email_privacy::EmailContributionMailbo
 fn request() -> PopulateCrmPolicyPayload {
     PopulateCrmPolicyPayload {
         team_id: TEAM,
-        macro_id: macro_user_id::user_id::MacroUserIdStr::try_from("macro|owner@example.com")
+        macro_id: rox_user_id::user_id::RoxUserIdStr::try_from("macro|owner@example.com")
             .unwrap(),
         link_id: LINK,
         work_id: Uuid::from_u128(40),

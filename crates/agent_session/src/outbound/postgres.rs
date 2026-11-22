@@ -54,8 +54,8 @@ use entity_registry_db_utils::{
     EntityRegistryError, NewEntityRecord, OwnedEntityRegistrar, RegisteredEntityType, WriteOutcome,
     delete_entity, touch_updated,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_owner::Owner;
 use sqlx::PgPool;
 use std::num::NonZeroUsize;
@@ -71,7 +71,7 @@ pub struct PgAgentSessionRepo<B> {
 impl<B: BotFacts + 'static> CodingAgentUpdatesRepo for PgAgentSessionRepo<B> {
     async fn candidates(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> std::result::Result<Vec<UpdateCandidate>, crate::domain::coding_agents::CodingAgentError>
     {
         let rows = sqlx::query!(
@@ -686,7 +686,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
 
     async fn preview(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         ids: &[AgentSessionId],
     ) -> Result<Vec<SessionPreviewCandidate>> {
         let uuids: Vec<Uuid> = ids.iter().map(AgentSessionId::as_uuid).collect();
@@ -881,7 +881,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
 
     async fn recent_for_owner(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         limit: NonZeroUsize,
     ) -> Result<Vec<AgentSession>> {
         let rows = sqlx::query_as!(
@@ -1002,7 +1002,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
         Ok(())
     }
 
-    async fn add_follower(&self, id: AgentSessionId, user: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn add_follower(&self, id: AgentSessionId, user: &RoxUserIdStr<'static>) -> Result<()> {
         sqlx::query!(
             r#"
             INSERT INTO agent_session_follower (agent_session_id, user_id)
@@ -1021,7 +1021,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
     async fn turn_prompter(&self, id: AgentSessionId) -> Result<Option<TurnPrompter>> {
         let row = sqlx::query!(
             r#"
-            SELECT turn_action_id, turn_prompter_kind, turn_prompter AS "turn_prompter: MacroUserIdStr<'static>", turn_prompter_client
+            SELECT turn_action_id, turn_prompter_kind, turn_prompter AS "turn_prompter: RoxUserIdStr<'static>", turn_prompter_client
             FROM agent_session
             WHERE id = $1
             "#,
@@ -1339,7 +1339,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
         Ok(())
     }
 
-    async fn user_sandbox_size(&self, user_id: &MacroUserIdStr<'static>) -> Result<SandboxSize> {
+    async fn user_sandbox_size(&self, user_id: &RoxUserIdStr<'static>) -> Result<SandboxSize> {
         let size = sqlx::query_scalar!(
             r#"
             SELECT sandbox_size
@@ -1360,7 +1360,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
 
     async fn set_user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         size: SandboxSize,
     ) -> Result<()> {
         sqlx::query!(
@@ -1382,7 +1382,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
 
     async fn user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<CodingPreferences> {
         let preferences = sqlx::query!(
             r#"
@@ -1405,7 +1405,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
 
     async fn set_user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         preferences: CodingPreferences,
     ) -> Result<()> {
         sqlx::query!(
@@ -1516,7 +1516,7 @@ impl<B: BotFacts + 'static> AgentSessionRepo for PgAgentSessionRepo<B> {
 struct AgentSessionLogRow {
     id: Uuid,
     agent_session_id: Uuid,
-    user_id: Option<MacroUserIdStr<'static>>,
+    user_id: Option<RoxUserIdStr<'static>>,
     direction: String,
     content: serde_json::Value,
     created_at: DateTime<Utc>,
@@ -1786,7 +1786,7 @@ impl<B: BotFacts + 'static> AgentSessionLogRepo for PgAgentSessionRepo<B> {
             }
         }
 
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let created_at = sqlx::query_scalar!(
             r#"
             INSERT INTO agent_session_log (id, agent_session_id, user_id, direction, content, created_at)
@@ -1925,7 +1925,7 @@ impl<B: BotFacts + 'static> AgentSessionLogRepo for PgAgentSessionRepo<B> {
             SELECT
                 log.id,
                 log.agent_session_id,
-                log.user_id AS "user_id: MacroUserIdStr",
+                log.user_id AS "user_id: RoxUserIdStr",
                 log.direction,
                 log.content,
                 log.created_at
@@ -1963,7 +1963,7 @@ impl<B: BotFacts + 'static> AgentSessionLogRepo for PgAgentSessionRepo<B> {
         let rows = sqlx::query_as!(
             AgentSessionLogRow,
             r#"
-            SELECT id, agent_session_id, user_id AS "user_id: MacroUserIdStr",
+            SELECT id, agent_session_id, user_id AS "user_id: RoxUserIdStr",
                    direction, content, created_at
             FROM agent_session_log
             WHERE agent_session_id = $1
@@ -1991,10 +1991,10 @@ impl<B: BotFacts + 'static> AgentSessionLogRepo for PgAgentSessionRepo<B> {
     async fn participants(
         &self,
         agent_session_id: AgentSessionId,
-    ) -> Result<Vec<MacroUserIdStr<'static>>> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>> {
         let users = sqlx::query_scalar!(
             r#"
-            SELECT DISTINCT log.user_id AS "user_id!: MacroUserIdStr"
+            SELECT DISTINCT log.user_id AS "user_id!: RoxUserIdStr"
             FROM agent_session_log AS log
             WHERE log.agent_session_id = $1
               AND log.user_id IS NOT NULL
@@ -2208,14 +2208,14 @@ impl<B: BotFacts + 'static> SessionAudience for PgAgentSessionRepo<B> {
     async fn viewers(
         &self,
         agent_session_id: AgentSessionId,
-    ) -> std::result::Result<Vec<MacroUserIdStr<'static>>, rootcause::Report> {
+    ) -> std::result::Result<Vec<RoxUserIdStr<'static>>, rootcause::Report> {
         // The owner, which is who the dedicated channel's participant
         // list used to resolve to: `create` only ever wrote the one owner
         // row. Widens to a real grant lookup when sessions grow shared
         // access.
         let viewers = sqlx::query_scalar!(
             r#"
-            SELECT owner_id AS "owner_id: MacroUserIdStr"
+            SELECT owner_id AS "owner_id: RoxUserIdStr"
             FROM agent_session
             WHERE id = $1
             "#,

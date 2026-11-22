@@ -11,7 +11,7 @@ use ::messages::{
 use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessReceipt, EntityPermission, RequiredPermission,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

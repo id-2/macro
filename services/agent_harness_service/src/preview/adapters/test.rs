@@ -16,7 +16,7 @@ async fn direct_mcp_credentials_follow_revocation_while_established_previews_sur
     let pool = sqlx::postgres::PgPoolOptions::new()
         .connect_lazy("postgres://localhost/unused")
         .unwrap();
-    let authority = MacroAuthority {
+    let authority = RoxAuthority {
         sessions: repo.clone(),
         access: Arc::new(
             entity_access::domain::service::EntityAccessServiceImpl::new(

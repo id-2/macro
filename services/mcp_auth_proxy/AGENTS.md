@@ -78,7 +78,7 @@ and other library consumers. Both retain OAuth metadata, CORS, and bearer auth.
 
 ## Gotchas
 
-- Every OAuth broker route refuses a request carrying `x-macro-code-execution` (403): a program that drives the email sign-in and reads the code from the user's inbox would hold an MCP grant for the account.
+- Every OAuth broker route refuses a request carrying `x-rox-code-execution` (or its earlier `x-macro-code-execution` name) (403): a program that drives the email sign-in and reads the code from the user's inbox would hold an MCP grant for the account.
 - Never refuse an unrecognized `resource`: deployed clients send whatever they
   derive from their configured URL, and refusing it breaks live grants on
   refresh.
@@ -129,7 +129,7 @@ and other library consumers. Both retain OAuth metadata, CORS, and bearer auth.
 - `validate_bearer` refuses (403) a Rox API token that signs `agent_scope`: a scoped code-mode session or a routine dry run reaches no MCP tools, whose own credentials would carry no scope.
 
 Public MCP may additionally receive the existing `UserApiKeyAuthorizer` through
-`mounted_mcp_router`. `x-macro-user-api-key` resolves only the key owner and is
+`mounted_mcp_router`. `x-rox-user-api-key` resolves only the key owner and is
 rechecked on every request; never trust an acting-user header or client agent
 claim. JWT bearer authentication remains independent and unchanged.
 

@@ -1,4 +1,4 @@
-import type { Appearance } from '@macro-inc/graphics';
+import type { Appearance } from '@rox-one/graphics';
 
 export const initialAppearance: Appearance = {
   fill: 'transparent',

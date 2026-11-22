@@ -6,7 +6,7 @@ impl SessionWorkingBranchRepo for InMemoryAgentSessionRepo {
     async fn record_working_branch(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         expected_repository_url: &str,
         branch: &RepositoryBranch,
         claim: Option<SessionClaim>,

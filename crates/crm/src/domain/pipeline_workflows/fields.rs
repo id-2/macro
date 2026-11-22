@@ -11,7 +11,7 @@ use databases::domain::{
     catalog,
     models::{ColumnDetail, ColumnId},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{
     CellValue, ColumnKind, DateRange, EntityKind, EntityRef, OptionId, OptionRef,
 };
@@ -195,7 +195,7 @@ pub enum FieldValue {
 pub(crate) fn cell_value(
     field: &PipelineField,
     input: &FieldInput,
-    viewer: &MacroUserIdStr<'_>,
+    viewer: &RoxUserIdStr<'_>,
 ) -> Result<CellValue, String> {
     let name = &field.name;
     match field.kind {
@@ -301,7 +301,7 @@ pub(crate) fn matches(
     field: &PipelineField,
     cell: Option<&PropertyValue>,
     wanted: &FieldInput,
-    viewer: &MacroUserIdStr<'_>,
+    viewer: &RoxUserIdStr<'_>,
 ) -> Result<bool, String> {
     let name = &field.name;
     if matches!(field.kind, FieldKind::Formula | FieldKind::Relation) {
@@ -520,19 +520,19 @@ fn date_range(field: &str, value: &str) -> Result<DateRange, String> {
 }
 
 /// A person's Rox user id: `me`, an email address, or the id itself.
-fn person(field: &str, value: &str, viewer: &MacroUserIdStr<'_>) -> Result<String, String> {
+fn person(field: &str, value: &str, viewer: &RoxUserIdStr<'_>) -> Result<String, String> {
     let value = value.trim();
     if value.eq_ignore_ascii_case("me") {
         return Ok(viewer.as_ref().to_owned());
     }
-    let id = if value.to_lowercase().starts_with("macro|") {
+    let id = if value.to_lowercase().starts_with("macro|") || value.to_lowercase().starts_with("rox|") {
         value.to_lowercase()
     } else if value.contains('@') {
-        format!("macro|{}", value.to_lowercase())
+        format!("{}|{}", rox_user_id::user_id::ROX_PREFIX, value.to_lowercase())
     } else {
         String::new()
     };
-    MacroUserIdStr::parse_from_str(&id)
+    RoxUserIdStr::parse_from_str(&id)
         .map(|_| id.clone())
         .map_err(|_| {
             format!(

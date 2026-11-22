@@ -4,23 +4,23 @@ use super::properties_pg_repo::PropertiesPgRepo;
 use super::property_definition_queries;
 use crate::domain::model::PropertyDefinitionOwner;
 use crate::domain::ports::PropertiesRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::property_option::{PropertyOption, PropertyOptionValue};
 use models_properties::{DataType, EntityType};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
-fn user_1() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn user_1() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 
-fn user_2() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user2@test.com").unwrap()
+fn user_2() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user2@test.com").unwrap()
 }
 
-fn user_3() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user3@test.com").unwrap()
+fn user_3() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user3@test.com").unwrap()
 }
 
 fn team_1() -> Uuid {
@@ -547,7 +547,7 @@ async fn get_caller_tag_definitions_with_options(pool: Pool<Postgres>) -> anyhow
 async fn create_database_property_definition_preserves_type_and_isolates_ownership(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let database_id = macro_uuid::generate_uuid_v7();
+    let database_id = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO databases (id) VALUES ($1)", database_id)
         .execute(&pool)
         .await?;
@@ -592,7 +592,7 @@ async fn create_database_property_definition_rejects_missing_database(
     let repo = PropertiesPgRepo::new(pool);
     let result = repo
         .create_database_property_definition(
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             "Missing database",
             DataType::String,
             false,

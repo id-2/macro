@@ -19,7 +19,7 @@ import { IS_MAC } from '@core/constant/isMac';
 import { observedSize } from '@core/directive/observedSize';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isInDOMRect } from '@core/util/rect';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createCallback } from '@solid-primitives/rootless';
 import { debounce } from '@solid-primitives/scheduled';
 import { cn } from '@ui';

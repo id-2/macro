@@ -3,6 +3,7 @@ import { openExternalUrl } from '@core/util/url';
 import { getWebOrigin } from '@core/util/webOrigin';
 import { useNavigate } from '@solidjs/router';
 import { isSameDay, isTomorrow } from 'date-fns';
+import { formatLocale } from '@app/lib/i18n';
 import { createDeferred } from 'solid-js';
 import { useCalendarView } from '../calendar/components/CalendarViewContext';
 import { formatCompactCalendarTime } from '../calendar/utils/time-format';
@@ -37,20 +38,20 @@ export function CalendarCallSidebar() {
     );
     let day: string;
     if (isSameDay(start, now())) {
-      day = 'Today';
+      day = 'Сегодня';
     } else if (isTomorrow(start)) {
-      day = 'Tomorrow';
+      day = 'Завтра';
     } else {
-      day = start.toLocaleDateString([], {
+      day = start.toLocaleDateString(formatLocale(), {
         month: 'short',
         day: 'numeric',
       });
     }
     if (call.allDay) {
-      return `${day} · All day`;
+      return `${day} · Весь день`;
     }
     if (start <= now()) {
-      return 'Now';
+      return 'Сейчас';
     }
     const time = formatCompactCalendarTime(
       start,

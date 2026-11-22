@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { TraceFlow, usePending } from '@app/observability/flow';
 import { SidePanel } from '@components/app/side-panel';
 import { createMemo, Match, onCleanup, Show, Suspense, Switch } from 'solid-js';
@@ -113,10 +114,10 @@ function CompanyContent(props: CompanyProps) {
               <RecordFilesSection scope={scope()} />
             </Match>
             <Match when={section() === 'tasks'}>
-              <Suspense fallback={<CrmListSkeleton label="Loading tasks" />}>
+              <Suspense fallback={<CrmListSkeleton label={t('crm.loadingTasks')} />}>
                 <Show
                   when={scope()}
-                  fallback={<CrmListSkeleton label="Loading tasks" />}
+                  fallback={<CrmListSkeleton label={t('crm.loadingTasks')} />}
                 >
                   {(current) => <context.RecordTasks scope={current()} />}
                 </Show>
@@ -132,7 +133,7 @@ function CompanyContent(props: CompanyProps) {
       <RecordDetailsSection company={company()} />
       <SidePanel.Section
         id="company-properties"
-        title="Properties"
+        title={t('crm.properties')}
         order={30}
         defaultOpen
         render={(renderSection) => (
@@ -147,10 +148,10 @@ function CompanyContent(props: CompanyProps) {
           <CompanyListsSection companyId={props.companyId} />
         </Suspense>
       </Show>
-      <SidePanel.Section id="company-sharing" title="Email sharing" order={50}>
+      <SidePanel.Section id="company-sharing" title={t('crm.emailSharing')} order={50}>
         <CompanySharingSection company={company()} />
       </SidePanel.Section>
-      <SidePanel.Section id="company-references" title="References" order={20}>
+      <SidePanel.Section id="company-references" title={t('crm.references')} order={20}>
         <RecordReferencesSection scope={scope()} />
       </SidePanel.Section>
     </SidePanel.Layout>

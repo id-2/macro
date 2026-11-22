@@ -7,8 +7,8 @@ use crate::domain::{
     models::{AccessError, AccessExplanation, Entity, EntityType},
     ports::{ExplainAccessRepository, ExplainAccessService},
 };
-use macro_user_id::{
-    cowlike::CowLike, lowercased::Lowercase, user_id::MacroUserId, user_id::MacroUserIdStr,
+use rox_user_id::{
+    cowlike::CowLike, lowercased::Lowercase, user_id::RoxUserId, user_id::RoxUserIdStr,
 };
 
 /// Orchestrates labeled access explanations.
@@ -34,7 +34,7 @@ where
     #[tracing::instrument(err, skip(self, user_id))]
     async fn explain_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<AccessExplanation, AccessError> {
@@ -48,7 +48,7 @@ where
             .await?;
 
         Ok(AccessExplanation::from_grants(
-            MacroUserIdStr(user_id.clone().into_owned()),
+            RoxUserIdStr(user_id.clone().into_owned()),
             Entity {
                 entity_id: entity_id.to_string(),
                 entity_type,

@@ -8,8 +8,8 @@ use entity_access::domain::models::{
 use entity_access_management::domain::models::EntityAccessManagementError;
 use entity_access_management::domain::ports::EntityAccessManagementService;
 use entity_mutation::{EntityMutationEffect, RestoreEntity};
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::{ContentType, DocumentMetadata, FileType};
 use model::folder::{
     FileSystemNodeWithIds, FolderItem, S3Destination, UploadFolderRequest,
@@ -32,7 +32,7 @@ use s3_key::BulkUploadStagingKey;
 use uuid::Uuid;
 
 use super::*;
-use crate::domain::events::{ProjectCreatedMetadata, ProjectMacroEvent};
+use crate::domain::events::{ProjectCreatedMetadata, ProjectRoxEvent};
 use crate::domain::models::{MarkedUploadedTree, PurgedProjectTree};
 use crate::domain::ports::MockProjectRepo;
 
@@ -63,8 +63,8 @@ impl TestEventBroker {
     }
 }
 
-impl MacroEventBroker for TestEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for TestEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -391,8 +391,8 @@ pub(super) fn service_with_event_broker<D: BulkUploadRequestPort>(
     )
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).unwrap()
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).unwrap()
 }
 
 fn owner(value: &str) -> Owner {
@@ -423,7 +423,7 @@ async fn publish_project_event_records_the_serialized_envelope() {
         RecordingBulkUpload::default(),
         event_broker,
     );
-    let event = ProjectMacroEvent::created(
+    let event = ProjectRoxEvent::created(
         "project-id",
         ProjectCreatedMetadata {
             project_id: "project-id".to_string(),
@@ -452,7 +452,7 @@ fn publish_project_event_errors_are_non_fatal() {
         RecordingBulkUpload::default(),
         TestEventBroker::failing(),
     );
-    let event = ProjectMacroEvent::created(
+    let event = ProjectRoxEvent::created(
         "project-id",
         ProjectCreatedMetadata {
             project_id: "project-id".to_string(),
@@ -2640,13 +2640,13 @@ use models_permissions::share_permission::team_share::{TeamShareFacts, TeamShare
 const OTHER_USER: &str = "macro|other@example.com";
 const TEAM_ID: Uuid = Uuid::from_u128(0xb2222222_2222_2222_2222_222222222222);
 
-fn owner_user() -> MacroUserIdStr<'static> {
+fn owner_user() -> RoxUserIdStr<'static> {
     user_id("macro|owner@example.com")
 }
 
 fn team_share_facts(
     project_id: Uuid,
-    owner: MacroUserIdStr<'static>,
+    owner: RoxUserIdStr<'static>,
     owner_team_id: Option<Uuid>,
     revision: i64,
 ) -> TeamShareFacts {

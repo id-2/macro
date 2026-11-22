@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 
@@ -28,7 +28,7 @@ async fn insert_agent(pool: &PgPool, model: &str) -> anyhow::Result<Uuid> {
     )
     .execute(pool)
     .await?;
-    let bot_id = macro_uuid::generate_uuid_v7();
+    let bot_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO bots (id, kind, name, handle, has_agent, owner_user_id) VALUES ($1, 'owned', 'Agent', 'agent', true, $2)",
         bot_id,
@@ -63,7 +63,7 @@ async fn a_stored_key_carries_the_agent_as_configured_now(pool: PgPool) -> anyho
     assert_eq!(stored.encrypted, encrypted());
     assert_eq!(
         stored.agent.owner,
-        AgentOwner::User(MacroUserIdStr::try_from(OWNER.to_owned())?)
+        AgentOwner::User(RoxUserIdStr::try_from(OWNER.to_owned())?)
     );
     assert_eq!(stored.agent.model, "anthropic/claude-sonnet-5-5");
     assert_eq!(stored.agent.harness, "in-memory");

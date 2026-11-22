@@ -1,6 +1,6 @@
 use super::*;
 use email::outbound::EmailPgRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]

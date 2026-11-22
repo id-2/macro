@@ -16,7 +16,7 @@ use super::ics::{
 use super::join_requests::{CalendarJoinRequest, CalendarJoinRequestStatus};
 use super::labels::{EventCopy, EventLabels};
 use super::meeting_links::{
-    MacroCallEventError, MeetingLink, MeetingLinkError, MeetingLinkRequest,
+    RoxCallEventError, MeetingLink, MeetingLinkError, MeetingLinkRequest,
 };
 use super::models::{
     ActorInboxes, AlignedGuestCopy, AppliedGoogleGrant, AttendeeResponseStatus, CalendarAttendee,
@@ -932,6 +932,23 @@ pub trait CalendarRepository: Send + Sync + 'static {
         requester_id: &str,
     ) -> impl Future<Output = Result<Vec<VisibleCalendar>, Report>> + Send;
 
+    /// Persist a personal calendar the requester owns inside Rox, returned by
+    /// [`list_visible_calendars`](Self::list_visible_calendars). The default
+    /// refuses; only the Postgres repository stores one.
+    fn create_owned_calendar(
+        &self,
+        requester_id: &str,
+        fusionauth_user_id: &str,
+        name: &str,
+    ) -> impl Future<Output = Result<VisibleCalendar, Report>> + Send {
+        let _ = (self, requester_id, fusionauth_user_id, name);
+        async {
+            Err(rootcause::report!(
+                "creating a Rox calendar is not supported by this repository"
+            ))
+        }
+    }
+
     /// The IANA time zone of the requester's primary calendar, resolved the
     /// same way [`get_creation_target`](Self::get_creation_target) picks its
     /// default target.
@@ -1082,6 +1099,23 @@ pub trait CalendarMutationService: Send + Sync + 'static {
         requester_id: &str,
     ) -> impl Future<Output = Result<Vec<VisibleCalendar>, CalendarMutationError>> + Send;
 
+    /// Create a personal calendar owned by the signed-in requester. It is not
+    /// a Google or Outlook calendar. The default refuses so callers that only
+    /// proxy provider writes do not pretend to store one.
+    fn create_owned_calendar(
+        &self,
+        requester_id: &str,
+        fusionauth_user_id: &str,
+        name: &str,
+    ) -> impl Future<Output = Result<VisibleCalendar, CalendarMutationError>> + Send {
+        let _ = (self, requester_id, fusionauth_user_id, name);
+        async {
+            Err(CalendarMutationError::InvalidInput(
+                "creating a Rox calendar is not supported".to_string(),
+            ))
+        }
+    }
+
     /// Patch an event at its provider — the whole event or series, or one
     /// occurrence of a recurring series — and persist the echo. `calendar_id`
     /// selects which copy of a multi-calendar event is patched. `None`
@@ -1205,7 +1239,7 @@ pub trait CalendarEventForwardSource: Send + Sync + 'static {
 /// [`super::meeting_links::create_event_with_macro_call`] and
 /// [`super::meeting_links::update_event_with_macro_call`]; hosts that are not
 /// the calendar write authority forward the request to the calendar service.
-pub trait CalendarMacroCallService: Send + Sync + 'static {
+pub trait CalendarRoxCallService: Send + Sync + 'static {
     /// Mint a Rox call for `draft` and create the event carrying its link.
     fn create_event_with_macro_call(
         &self,
@@ -1213,7 +1247,7 @@ pub trait CalendarMacroCallService: Send + Sync + 'static {
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> impl Future<Output = Result<CalendarEvent, MacroCallEventError>> + Send;
+    ) -> impl Future<Output = Result<CalendarEvent, RoxCallEventError>> + Send;
 
     /// Switch an event to a Rox call, applying `patch` in the same write.
     fn update_event_with_macro_call(
@@ -1223,7 +1257,7 @@ pub trait CalendarMacroCallService: Send + Sync + 'static {
         calendar_id: Option<Uuid>,
         patch: CalendarEventPatch,
         scope: CalendarUpdateScope,
-    ) -> impl Future<Output = Result<CalendarEvent, MacroCallEventError>> + Send;
+    ) -> impl Future<Output = Result<CalendarEvent, RoxCallEventError>> + Send;
 }
 
 /// Outbound port minting Rox meetings for calendar events.

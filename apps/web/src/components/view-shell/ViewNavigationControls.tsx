@@ -43,11 +43,11 @@ export function ViewSidebarToggle(props: {
   const label = () =>
     ws?.aside.isSheet()
       ? props.action === 'expand'
-        ? 'Show sidebar'
-        : 'Hide sidebar'
+        ? t('nav.showSidebar')
+        : t('nav.hideSidebar')
       : props.action === 'expand'
-        ? 'Show navigation'
-        : 'Hide navigation';
+        ? t('nav.showNavigation')
+        : t('nav.hideNavigation');
   // A touch sheet or overlay closes from its backdrop; it shows no Hide.
   const dismissesFromBackdrop = () =>
     ws?.aside.isSheet() || (isTouchDevice() && ws?.aside.isOverlay());

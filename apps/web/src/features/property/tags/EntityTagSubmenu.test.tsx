@@ -1,4 +1,8 @@
 /** @vitest-environment jsdom */
+import {
+  interfaceLanguageReady,
+  setInterfaceLanguage,
+} from '@app/lib/i18n';
 import type { TagSetResponse } from '@service-properties/generated/schemas/tagSetResponse';
 import {
   cleanup,
@@ -10,7 +14,14 @@ import {
 import { Dropdown } from '@ui';
 import { ImperativeDialogHost } from '@ui/components/ImperativeDialog';
 import { createSignal, Show } from 'solid-js';
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { EntityTagSubmenu } from './EntityTagSubmenu';
 import type { DocTags } from './tag-picker-session';
 
@@ -79,6 +90,8 @@ const scrollIntoView = Object.getOwnPropertyDescriptor(
   'scrollIntoView'
 );
 let style: HTMLStyleElement;
+beforeAll(() => setInterfaceLanguage('en'));
+
 beforeEach(() => {
   mocks.save.mockReset().mockResolvedValue(undefined);
   mocks.add.mockReset().mockResolvedValue({ id: 'created-tag' });
@@ -376,4 +389,24 @@ it('does not report completion or close the parent after a rejected tag write', 
   );
   expect(complete).not.toHaveBeenCalled();
   expect(screen.getByRole('menuitem', { name: 'Add tag' })).toBeTruthy();
+});
+
+it('names the tag action in Russian', async () => {
+  setInterfaceLanguage('ru');
+  await interfaceLanguageReady(5000);
+  setup();
+
+  fireEvent.keyDown(screen.getByRole('button', { name: 'Actions' }), {
+    key: 'Enter',
+  });
+  const trigger = await screen.findByRole('menuitem', {
+    name: 'Добавить тег',
+  });
+  trigger.focus();
+  fireEvent.keyDown(trigger, { key: 'ArrowRight' });
+  expect(
+    await screen.findByPlaceholderText('Change or add tags')
+  ).toBeTruthy();
+
+  setInterfaceLanguage('en');
 });

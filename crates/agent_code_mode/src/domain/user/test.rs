@@ -9,7 +9,7 @@ struct Credentials(Mutex<Vec<(String, ToolCaller)>>);
 impl UserExecutionCredentials for Credentials {
     async fn issue(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: &ToolCaller,
         _session: Option<uuid::Uuid>,
     ) -> Result<RunEnvironment, CodeModeError> {
@@ -59,8 +59,8 @@ impl ProgramExecutor for Returns {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|fixture@example.com").unwrap()
 }
 
 fn request() -> ExecuteRequest {
@@ -76,7 +76,7 @@ async fn runs_as_the_authenticated_user_and_returns_data_with_activity() {
     let service =
         UserCodeModeService::new(Arc::new(Returns(json!({"data": 42}))), credentials.clone());
 
-    let caller = ToolCaller::Agent(bot_id::BotId::new_from_uuid(macro_uuid::Uuid::from_u128(
+    let caller = ToolCaller::Agent(bot_id::BotId::new_from_uuid(rox_uuid::Uuid::from_u128(
         0xA1,
     )));
     let receipt = service

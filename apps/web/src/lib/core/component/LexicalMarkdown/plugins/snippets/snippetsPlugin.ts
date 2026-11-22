@@ -1,6 +1,6 @@
 import { fireAndForget } from '@core/util/fireAndForget';
 import { $dfsIterator, mergeRegister } from '@lexical/utils';
-import type { PeerIdValidator } from '@macro-inc/lexical-core';
+import type { PeerIdValidator } from '@rox-one/lexical-core';
 import {
   $collapseInlineSearch,
   $createAwaitNode,
@@ -14,7 +14,7 @@ import {
   InlineSearchNode,
   InlineSearchNodesType,
   validTriggerPosition,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $getNodeByKey,
   $insertNodes,

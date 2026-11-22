@@ -2,7 +2,7 @@ import { useHandleFileUpload } from '@app/util/handleFileUpload';
 import { FileDropOverlay } from '@core/component/FileDropOverlay';
 import { fileFolderDrop } from '@core/directive/fileFolderDrop';
 import { handleFileFolderDrop } from '@core/util/upload';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createSignal, type FlowComponent, Show } from 'solid-js';
 
 false && fileFolderDrop;

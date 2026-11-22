@@ -1,6 +1,6 @@
 //! Job-first locking, execution fencing and durable queue recovery.
 
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 use crate::domain::ports::{ExecutionRepo, ImportRepo};
 
@@ -17,7 +17,7 @@ impl ImportRepo for PgSlackImportRepo {
     async fn create(
         &self,
         team: TeamId,
-        admin: &MacroUserIdStr<'_>,
+        admin: &RoxUserIdStr<'_>,
         command: &CreateImport,
         limits: &ImportLimits,
     ) -> PortResult<ImportProgress> {
@@ -124,7 +124,7 @@ impl ImportRepo for PgSlackImportRepo {
         &self,
         team: TeamId,
         job: JobId,
-    ) -> PortResult<Option<MacroUserIdStr<'static>>> {
+    ) -> PortResult<Option<RoxUserIdStr<'static>>> {
         sqlx::query_scalar!(
             "SELECT user_id FROM slack_import_job WHERE team_id = $1 AND id = $2",
             Uuid::from(team),
@@ -134,7 +134,7 @@ impl ImportRepo for PgSlackImportRepo {
         .await
         .map_err(internal)?
         .map(|user| {
-            MacroUserIdStr::parse_from_str(&user)
+            RoxUserIdStr::parse_from_str(&user)
                 .map(CowLike::into_owned)
                 .map_err(internal)
         })
@@ -149,7 +149,7 @@ impl ExecutionRepo for PgSlackImportRepo {
     async fn requester(
         &self,
         event: &ImportEvent,
-    ) -> PortResult<Option<(TeamId, MacroUserIdStr<'static>)>> {
+    ) -> PortResult<Option<(TeamId, RoxUserIdStr<'static>)>> {
         let generation = number(event.generation)?;
         let row = sqlx::query!(
             r#"SELECT j.team_id, j.user_id FROM slack_import_job j
@@ -166,7 +166,7 @@ impl ExecutionRepo for PgSlackImportRepo {
         row.map(|r| {
             Ok((
                 r.team_id.try_into().map_err(internal)?,
-                MacroUserIdStr::parse_from_str(&r.user_id)
+                RoxUserIdStr::parse_from_str(&r.user_id)
                     .map_err(internal)?
                     .into_owned(),
             ))
@@ -247,7 +247,7 @@ impl ExecutionRepo for PgSlackImportRepo {
                 attempts: row.attempts as u32,
             },
             team_id: job.team_id.try_into().map_err(internal)?,
-            requested_by: MacroUserIdStr::parse_from_str(&job.user_id)
+            requested_by: RoxUserIdStr::parse_from_str(&job.user_id)
                 .map_err(internal)?
                 .into_owned(),
             metadata: ConversationMetadata {

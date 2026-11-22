@@ -17,7 +17,7 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::EditAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::DatabaseAccessLevelExtractor;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use models_databases::{DatabaseId, RowId, TableId};
 use serde::{Deserialize, Serialize};
@@ -33,7 +33,7 @@ use crate::domain::ports::DatabaseWebhooksService;
 pub struct DatabaseWebhooksRouterState<Service, EntityAccess, Authorization> {
     service: Arc<Service>,
     entity_access_service: Arc<EntityAccess>,
-    authorization_state: MacroAuthorizationState<Authorization>,
+    authorization_state: RoxAuthorizationState<Authorization>,
 }
 
 impl<Service, EntityAccess, Authorization> Clone
@@ -56,7 +56,7 @@ impl<Service, EntityAccess, Authorization>
     pub fn new(
         service: Arc<Service>,
         entity_access_service: Arc<EntityAccess>,
-        authorization_state: MacroAuthorizationState<Authorization>,
+        authorization_state: RoxAuthorizationState<Authorization>,
     ) -> Self {
         Self {
             service,
@@ -77,7 +77,7 @@ impl<Service, EntityAccess, Authorization>
 
 impl<Service, EntityAccess, Authorization>
     FromRef<DatabaseWebhooksRouterState<Service, EntityAccess, Authorization>>
-    for MacroAuthorizationState<Authorization>
+    for RoxAuthorizationState<Authorization>
 {
     fn from_ref(state: &DatabaseWebhooksRouterState<Service, EntityAccess, Authorization>) -> Self {
         state.authorization_state.clone()
@@ -91,7 +91,7 @@ pub fn database_webhooks_router<Service, EntityAccess, Authorization, RouterStat
 where
     Service: DatabaseWebhooksService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
     RouterState: Send + Sync + 'static,
 {
     let people_only = axum::middleware::from_fn_with_state(
@@ -122,16 +122,16 @@ where
 /// the code-mode header) must not mint one it could return to the model, nor
 /// a bot acting for the user. A credential that does not verify is rejected
 /// here, so a failed check cannot let the request through.
-async fn refuse_programs<Authorization: MacroAuthorizationService>(
-    State(authorization): State<MacroAuthorizationState<Authorization>>,
+async fn refuse_programs<Authorization: RoxAuthorizationService>(
+    State(authorization): State<RoxAuthorizationState<Authorization>>,
     request: axum::extract::Request,
     next: axum::middleware::Next,
 ) -> axum::response::Response {
     use axum::extract::FromRequestParts as _;
     let (mut parts, body) = request.into_parts();
-    let principal = match macro_authorization::OptionalMacroAuthorizationExtractor::<
+    let principal = match rox_authorization::OptionalRoxAuthorizationExtractor::<
         Authorization,
-        macro_authorization::AnyPrincipal,
+        rox_authorization::AnyPrincipal,
     >::from_request_parts(&mut parts, &authorization)
     .await
     {
@@ -139,13 +139,11 @@ async fn refuse_programs<Authorization: MacroAuthorizationService>(
         Err(rejection) => return rejection.into_response(),
     };
     let program = match &principal {
-        Some(macro_authorization::MacroAuthorization::User(user)) => {
-            macro_authorization::is_program_run(user.attribution(), &parts.headers)
+        Some(rox_authorization::RoxAuthorization::User(user)) => {
+            rox_authorization::is_program_run(user.attribution(), &parts.headers)
         }
-        Some(macro_authorization::MacroAuthorization::Bot(_)) => true,
-        _ => parts
-            .headers
-            .contains_key(macro_authorization::CODE_EXECUTION_HEADER),
+        Some(rox_authorization::RoxAuthorization::Bot(_)) => true,
+        _ => rox_authorization::marks_code_execution(&parts.headers),
     };
     if program {
         tracing::warn!("refused creating a database webhook to a program");
@@ -351,7 +349,7 @@ pub async fn create_webhook_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabaseWebhooksService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let created = state
         .service
@@ -382,7 +380,7 @@ pub async fn list_webhooks_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabaseWebhooksService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let webhooks = state
         .service
@@ -420,7 +418,7 @@ pub async fn delete_webhook_handler<Service, EntityAccess, Authorization>(
 where
     Service: DatabaseWebhooksService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     state
         .service

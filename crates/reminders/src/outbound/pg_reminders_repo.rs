@@ -8,7 +8,7 @@ mod test;
 use crate::domain::models::{DueFiring, DueReminder};
 use crate::domain::ports::{ReminderDispatchRepo, RemindersRepo};
 use chrono::{DateTime, Utc};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -61,7 +61,7 @@ impl RemindersRepo for PgRemindersRepo {
 
     async fn email_candidates(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         thread_ids: Option<&[Uuid]>,
         cursor: Option<crate::domain::email_collection::EmailReminderCursor>,
         as_of: DateTime<Utc>,
@@ -124,7 +124,7 @@ impl ReminderDispatchRepo for PgRemindersRepo {
                 reminder_id: row.id,
                 thread_id: row.thread_id,
                 description: row.description,
-                owner_id: MacroUserIdStr::parse_from_str(&row.user_id)
+                owner_id: RoxUserIdStr::parse_from_str(&row.user_id)
                     .map_err(|_| RemindersRepoErr::InvalidUserId {
                         reminder_id: row.id,
                     })?
@@ -142,7 +142,7 @@ impl ReminderDispatchRepo for PgRemindersRepo {
         scheduled_for: DateTime<Utc>,
         retry_before: DateTime<Utc>,
     ) -> Result<bool, Self::Err> {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
 
         // One statement covers both a first claim and a retry. The unique index
         // on (reminder_id, scheduled_for) makes the insert the claim; the

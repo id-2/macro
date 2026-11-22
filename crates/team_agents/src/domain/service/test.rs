@@ -16,8 +16,8 @@ const ADMIN: &str = "macro|admin@example.com";
 const TEAM: &str = "0193a1b2-0000-7000-8000-0000000000aa";
 const COMPUTER: Uuid = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_00c1);
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
 fn receipt<Permission: RequiredPermission>() -> EntityAccessReceipt<Permission> {
@@ -76,7 +76,7 @@ impl TeamAgentRepository for FakeRepository {
         Ok(())
     }
 
-    async fn remove_seat(&self, user_id: &MacroUserIdStr<'_>) -> Result<(), FakeError> {
+    async fn remove_seat(&self, user_id: &RoxUserIdStr<'_>) -> Result<(), FakeError> {
         self.journal.record("seat.remove");
         self.agents
             .lock()
@@ -85,7 +85,7 @@ impl TeamAgentRepository for FakeRepository {
         Ok(())
     }
 
-    async fn delete_account(&self, user_id: &MacroUserIdStr<'_>) -> Result<(), FakeError> {
+    async fn delete_account(&self, user_id: &RoxUserIdStr<'_>) -> Result<(), FakeError> {
         self.journal.record("account.delete");
         self.agents
             .lock()
@@ -96,7 +96,7 @@ impl TeamAgentRepository for FakeRepository {
 
     async fn get(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<TeamAgentRecord>, FakeError> {
         Ok(self
             .agents
@@ -125,7 +125,7 @@ impl TeamMembership for FakeMembership {
     async fn add_agent(
         &self,
         _: EntityAccessReceipt<AdminTeamRole>,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<(), TeamAgentError> {
         self.0.record("team.add");
         Ok(())
@@ -134,7 +134,7 @@ impl TeamMembership for FakeMembership {
     async fn undo_add_agent(
         &self,
         _: EntityAccessReceipt<AdminTeamRole>,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<(), TeamAgentError> {
         self.0.record("team.undo");
         Ok(())
@@ -143,7 +143,7 @@ impl TeamMembership for FakeMembership {
     async fn remove_agent(
         &self,
         _: EntityAccessReceipt<AdminTeamRole>,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<(), TeamAgentError> {
         self.0.record("team.remove");
         Ok(())
@@ -153,12 +153,12 @@ impl TeamMembership for FakeMembership {
 struct FakeApiKeys(Journal);
 
 impl AgentApiKeys for FakeApiKeys {
-    async fn revoke_all(&self, _: &MacroUserIdStr<'_>) -> Result<(), TeamAgentError> {
+    async fn revoke_all(&self, _: &RoxUserIdStr<'_>) -> Result<(), TeamAgentError> {
         self.0.record("api_key.revoke_all");
         Ok(())
     }
 
-    async fn mint(&self, _: &MacroUserIdStr<'_>) -> Result<AgentApiKey, TeamAgentError> {
+    async fn mint(&self, _: &RoxUserIdStr<'_>) -> Result<AgentApiKey, TeamAgentError> {
         self.0.record("api_key.mint");
         Ok(AgentApiKey::parse(
             "mak_0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef".to_owned(),
@@ -172,7 +172,7 @@ struct FakeRepos(Journal);
 impl AgentRepos for FakeRepos {
     async fn create(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: Uuid,
         seed: &PersonaSeed,
     ) -> Result<AgentRepo, TeamAgentError> {
@@ -183,14 +183,14 @@ impl AgentRepos for FakeRepos {
         })
     }
 
-    async fn delete(&self, _: &MacroUserIdStr<'_>) -> Result<(), TeamAgentError> {
+    async fn delete(&self, _: &RoxUserIdStr<'_>) -> Result<(), TeamAgentError> {
         self.0.record("repo.delete");
         Ok(())
     }
 
     async fn voice(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: Uuid,
     ) -> Result<Option<VoiceModel>, TeamAgentError> {
         let committed = self
@@ -204,7 +204,7 @@ impl AgentRepos for FakeRepos {
 
     async fn set_voice(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         team_id: Uuid,
         voice: &VoiceModel,
     ) -> Result<(), TeamAgentError> {
@@ -219,7 +219,7 @@ struct FakeComputers {
     journal: Journal,
     refuse_purchase: bool,
     /// (computer, agent) links made by purchases.
-    links: Arc<Mutex<Vec<(ComputerId, MacroUserIdStr<'static>)>>>,
+    links: Arc<Mutex<Vec<(ComputerId, RoxUserIdStr<'static>)>>>,
 }
 
 impl Computers for FakeComputers {
@@ -242,7 +242,7 @@ impl Computers for FakeComputers {
     async fn computer_for_agent(
         &self,
         _: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Option<ComputerId>, TeamAgentError> {
         Ok(self
             .links
@@ -256,7 +256,7 @@ impl Computers for FakeComputers {
     async fn agent_of(
         &self,
         computer_id: ComputerId,
-    ) -> Result<Option<MacroUserIdStr<'static>>, TeamAgentError> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, TeamAgentError> {
         Ok(self
             .links
             .lock()
@@ -281,8 +281,8 @@ impl Computers for FakeComputers {
 impl agent_credentials::AgentCreators for FakeRepository {
     async fn creator_of(
         &self,
-        agent: &MacroUserIdStr<'_>,
-    ) -> Result<Option<MacroUserIdStr<'static>>, Report> {
+        agent: &RoxUserIdStr<'_>,
+    ) -> Result<Option<RoxUserIdStr<'static>>, Report> {
         Ok(self
             .agents
             .lock()
@@ -305,7 +305,7 @@ impl Flags {
 }
 
 impl FeatureFlags for Flags {
-    async fn load(&self, user: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
+    async fn load(&self, user: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, Report> {
         let agent = user.as_ref().ends_with(AGENT_EMAIL_DOMAIN);
         Ok(FlagSnapshot::new([(
             AGENT_TEAMMATES_FLAG.to_owned(),

@@ -1,6 +1,6 @@
 use comms_db_client::messages::create_message::{CreateMessageOptions, create_message};
 use comms_db_client::messages::get_messages::get_channel_messages;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -43,7 +43,7 @@ async fn thread_rows(pool: &Pool<Postgres>, root_id: Uuid) -> anyhow::Result<i64
 }
 
 async fn insert_channel_root(pool: &Pool<Postgres>, channel_id: Uuid) -> anyhow::Result<Uuid> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content) VALUES ($1, 'channel', $2, $3, 'root')",
     )
@@ -56,7 +56,7 @@ async fn insert_channel_root(pool: &Pool<Postgres>, channel_id: Uuid) -> anyhow:
 }
 
 async fn insert_document_root(pool: &Pool<Postgres>, document_id: &str) -> anyhow::Result<Uuid> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content)
          VALUES ($1, 'document', $2, $3, 'root')",
@@ -128,7 +128,7 @@ async fn channel_insert_gets_parent_columns_and_thread_row(
     fixtures(path = "../fixtures", scripts("channels"))
 )]
 async fn parent_only_channel_insert_gets_thread_row(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, sender_id, content)
          VALUES ($1, 'channel', $2, $3, 'hi')",
@@ -159,7 +159,7 @@ async fn document_root_without_channel_inserts_and_gets_thread_row(
     );
     assert_eq!(thread_rows(&pool, root_id).await?, 1);
 
-    let reply_id = macro_uuid::generate_uuid_v7();
+    let reply_id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, thread_id, sender_id, content)
          VALUES ($1, 'document', $2, $3, $4, 'reply')",
@@ -198,7 +198,7 @@ async fn reply_with_different_parent_than_root_is_rejected(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, thread_id, sender_id, content)
          VALUES ($1, 'document', $2, $3, $4, 'reply')",
     )
-    .bind(macro_uuid::generate_uuid_v7())
+    .bind(rox_uuid::generate_uuid_v7())
     .bind(OTHER_DOC)
     .bind(doc_root)
     .bind(USER2)
@@ -215,7 +215,7 @@ async fn reply_with_different_parent_than_root_is_rejected(
         "INSERT INTO comms_messages (id, parent_entity_type, parent_entity_id, thread_id, sender_id, content)
          VALUES ($1, 'channel', $2, $3, $4, 'reply')",
     )
-    .bind(macro_uuid::generate_uuid_v7())
+    .bind(rox_uuid::generate_uuid_v7())
     .bind(CH3.to_string())
     .bind(channel_root)
     .bind(USER2)
@@ -403,7 +403,7 @@ async fn pdf_anchors_reference_document_thread_rows(pool: Pool<Postgres>) -> any
     .bind(Uuid::from_u128(0xf0000000_0000_0000_0000_000000000003))
     .bind(DOC)
     .bind(USER1)
-    .bind(macro_uuid::generate_uuid_v7())
+    .bind(rox_uuid::generate_uuid_v7())
     .execute(&pool)
     .await
     .expect_err("root_id must reference a thread row");

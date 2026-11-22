@@ -6,7 +6,7 @@ use favorites::domain::{
     ports::FavoritesService,
 };
 use graphql_common::GraphqlEntityType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::{GraphqlFavorite, NoOpEntityFavoriteEdgeReader};
 
@@ -47,7 +47,7 @@ pub trait FavoriteQueryReader: Send + Sync + 'static {
     /// List a user's favorites matching `filter`, in manual order.
     fn list_favorites<'a>(
         &'a self,
-        user_id: &'a MacroUserIdStr<'static>,
+        user_id: &'a RoxUserIdStr<'static>,
         filter: &'a FavoriteFilter,
     ) -> impl Future<Output = Result<Vec<Favorite>, FavoritesError>> + Send + 'a;
 }
@@ -58,7 +58,7 @@ where
 {
     async fn list_favorites(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         filter: &FavoriteFilter,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         FavoritesService::list_favorites(self.as_ref(), user_id, filter).await
@@ -68,7 +68,7 @@ where
 impl FavoriteQueryReader for NoOpEntityFavoriteEdgeReader {
     async fn list_favorites(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _filter: &FavoriteFilter,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         Ok(Vec::new())
@@ -79,7 +79,7 @@ impl FavoriteQueryReader for NoOpEntityFavoriteEdgeReader {
 #[tracing::instrument(skip_all, err(Debug))]
 pub async fn resolve_favorites<R>(
     ctx: &Context<'_>,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
     filter: FavoriteFilter,
 ) -> async_graphql::Result<Vec<GraphqlFavorite>>
 where

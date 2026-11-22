@@ -2,7 +2,7 @@
 //!
 //! Follows the canonical pattern in `macro_event_broker/examples/example_event.rs`:
 //! per-variant metadata structs, a [`TopicEvent`] enum tagged by `event_type`,
-//! and a [`MacroEvent`] wrapper keyed by document id.
+//! and a [`RoxEvent`] wrapper keyed by document id.
 
 #[cfg(test)]
 mod test;
@@ -10,9 +10,9 @@ mod test;
 use activity::Actor;
 use chrono::{DateTime, Utc};
 use document_sub_type::DocumentSubType;
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::RoxDocumentsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxDocumentsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use model_owner::Owner;
 use serde::{Deserialize, Serialize};
@@ -37,7 +37,7 @@ pub struct DocumentCreatedMetadata {
     /// The user whose feed this creation belongs on, when different from
     /// [`Self::actor`]. Absent means the actor is also the subject.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
     /// The document name, with any file extension stripped.
     pub document_name: String,
     /// File type of the document, when known.
@@ -64,7 +64,7 @@ pub struct DocumentUpdatedMetadata {
     pub owner: Owner,
     /// The authenticated user who performed the update; `None` for
     /// unauthenticated or internal callers.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Who mechanically updated the document. Absent on events published
     /// before attribution, and on user-receipt writes (ingest then uses
     /// [`Self::actor_user_id`]).
@@ -74,7 +74,7 @@ pub struct DocumentUpdatedMetadata {
     /// The user whose feed this update belongs on, when different from
     /// [`Self::actor`].
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
     /// New (cleaned) document name; `None` when unchanged.
     pub document_name: Option<String>,
     /// Project id before the update.
@@ -99,7 +99,7 @@ pub struct DocumentDeletedMetadata {
     pub sub_type: Option<DocumentSubType>,
     /// The authenticated user who deleted the document; `None` for
     /// unauthenticated or internal callers.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Who mechanically deleted the document. Absent on events published
     /// before attribution, and on user-receipt writes (ingest then uses
     /// [`Self::actor_user_id`]).
@@ -109,7 +109,7 @@ pub struct DocumentDeletedMetadata {
     /// The user whose feed this delete belongs on, when different from
     /// [`Self::actor`].
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
     /// Project the document belonged to, when any.
     pub project_id: Option<String>,
 }
@@ -142,7 +142,7 @@ pub struct DocumentSyncEditor {
     #[cfg_attr(feature = "schema", schema(value_type = String))]
     pub actor: Actor<'static>,
     /// User represented by an agent, if any.
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
 }
 
 /// Metadata for [`DocumentTopicEvent::SyncContentUpdated`].
@@ -162,7 +162,7 @@ pub struct DocumentSyncContentUpdatedMetadata {
     /// The user whose feed this edit belongs on, when different from
     /// [`Self::actor`].
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
     /// Distinct editors since the preceding snapshot notification.
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub editors: Vec<DocumentSyncEditor>,
@@ -183,7 +183,7 @@ impl DocumentSyncContentUpdatedMetadata {
             file_type,
             document_version_id,
             actor: actor.and_then(|id| Actor::try_from(id).ok()),
-            on_behalf_of: on_behalf_of.and_then(|id| MacroUserIdStr::try_from(id).ok()),
+            on_behalf_of: on_behalf_of.and_then(|id| RoxUserIdStr::try_from(id).ok()),
             editors: Vec::new(),
         }
     }
@@ -251,7 +251,7 @@ pub struct DocumentCopiedMetadata {
     pub actor: Option<Actor<'static>>,
     /// The user whose feed this copy belongs on, when different from the actor.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
     /// The name of the new document.
     pub document_name: String,
     /// File type of the document, when known.
@@ -306,12 +306,12 @@ impl TopicEvent for DocumentTopicEvent {
 }
 
 /// Publishable event for [`RoxDocumentsTopic`], keyed by document id.
-pub struct DocumentMacroEvent {
+pub struct DocumentRoxEvent {
     key: String,
     event: Event<DocumentTopicEvent>,
 }
 
-impl DocumentMacroEvent {
+impl DocumentRoxEvent {
     /// Build a created event keyed by the new document id.
     pub fn created(key: impl Into<String>, metadata: DocumentCreatedMetadata) -> Self {
         Self::new(key, DocumentTopicEvent::Created(metadata))
@@ -380,7 +380,7 @@ impl DocumentMacroEvent {
     }
 }
 
-impl MacroEvent for DocumentMacroEvent {
+impl RoxEvent for DocumentRoxEvent {
     type EventPayload = DocumentTopicEvent;
 
     fn key(&self) -> &str {

@@ -13,6 +13,7 @@ mod details;
 mod guest_policy;
 pub(crate) mod invite;
 mod join;
+mod local;
 mod organizer_copy;
 mod replacement;
 
@@ -37,8 +38,8 @@ use super::{
         ProviderSeriesMutationOutcome, RetiredCalendarEvent,
     },
 };
-use crate::domain::events::{CalendarEventMetadata, CalendarMacroEvent, CalendarTopicEvent};
-use macro_event_broker::MacroEventBroker;
+use crate::domain::events::{CalendarEventMetadata, CalendarRoxEvent, CalendarTopicEvent};
+use rox_event_broker::RoxEventBroker;
 
 const EMPTY_PATCH: &str = "the patch changes nothing";
 
@@ -58,7 +59,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     /// Construct the service from its ports.
@@ -98,7 +99,7 @@ where
     fn publish_calendar_event(&self, event: CalendarTopicEvent) {
         let _ = self
             .macro_event_broker
-            .send_event(&CalendarMacroEvent::for_change(event))
+            .send_event(&CalendarRoxEvent::for_change(event))
             .inspect_err(|error| {
                 tracing::error!(error=?error, "failed to publish calendar event");
             });
@@ -265,7 +266,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(
@@ -299,7 +300,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(skip(self, requester_id, draft), err)]
@@ -323,6 +324,11 @@ where
             .ok_or(CalendarMutationError::NoWritableCalendar)?;
         if target.is_read_only {
             return Err(CalendarMutationError::ReadOnly);
+        }
+        if target.is_local {
+            validate_local_draft(&draft)?;
+            let upsert = local::created_event(&target, &draft, Utc::now())?;
+            return self.persist_echo(target.actor.as_ref(), upsert).await;
         }
         self.require_provider_writes(target.token_identity.provider)?;
         validate_conference(target.token_identity.provider, draft.conference)?;
@@ -380,6 +386,11 @@ where
         let target = self
             .resolve_mutation_target(requester_id, event_id, calendar_id)
             .await?;
+        if target.is_local {
+            return Err(CalendarMutationError::InvalidInput(
+                "Editing an event on a Rox calendar is not supported yet".to_string(),
+            ));
+        }
         match target.organizer_copy_calendar_id {
             Some(organizer_calendar_id) if patch.reaches_meeting() => {
                 self.update_through_organizer_copy(
@@ -406,6 +417,30 @@ where
         let target = self
             .resolve_mutation_target(requester_id, event_id, calendar_id)
             .await?;
+        // An event Rox keeps itself has no provider copy to retire: removing
+        // its stored source removes the event, exactly as a provider deletion
+        // does after the provider answers.
+        if target.is_local {
+            if target.is_read_only {
+                return Err(CalendarMutationError::ReadOnly);
+            }
+            let retired = self
+                .repository
+                .remove_provider_source(
+                    target.account_id,
+                    target.calendar_id,
+                    &target.provider_event_id,
+                )
+                .await
+                .map_err(|error| CalendarMutationError::PersistFailed(format!("{error:?}")))?;
+            if !retired.is_empty() {
+                self.publish_retirements(retired);
+                self.refresh
+                    .calendar_changed(&target.owner_id, target.email_link_id, false)
+                    .await;
+            }
+            return Ok(());
+        }
         match target.organizer_copy_calendar_id {
             Some(organizer_calendar_id) => {
                 self.delete_through_organizer_copy(
@@ -440,6 +475,11 @@ where
         // their answer would never reach the meeting.
         if target.is_snapshot {
             return Err(CalendarMutationError::Snapshot);
+        }
+        if target.is_local {
+            return Err(CalendarMutationError::InvalidInput(
+                "Answers are not recorded on a Rox calendar yet".to_string(),
+            ));
         }
         self.require_provider_writes(target.token_identity.provider)?;
         let Some(actor) = target.actor.as_ref() else {
@@ -580,6 +620,35 @@ where
             .map_err(internal)
     }
 
+    #[tracing::instrument(skip(self, requester_id, fusionauth_user_id), err)]
+    async fn create_owned_calendar(
+        &self,
+        requester_id: &str,
+        fusionauth_user_id: &str,
+        name: &str,
+    ) -> Result<super::models::VisibleCalendar, CalendarMutationError> {
+        let name = name.trim();
+        if name.is_empty() || name.chars().count() > 120 {
+            return Err(CalendarMutationError::InvalidInput(
+                "calendar name must be 1 to 120 characters".to_string(),
+            ));
+        }
+        if fusionauth_user_id.is_empty() {
+            return Err(CalendarMutationError::InvalidInput(
+                "signed-in user is missing".to_string(),
+            ));
+        }
+        let calendar = self
+            .repository
+            .create_owned_calendar(requester_id, fusionauth_user_id, name)
+            .await
+            .map_err(internal)?;
+        self.refresh
+            .calendar_changed(requester_id, calendar.email_link_id, false)
+            .await;
+        Ok(calendar)
+    }
+
     #[tracing::instrument(skip(self, requester_id), err)]
     async fn disconnect_calendar(
         &self,
@@ -608,7 +677,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     /// Close the push channels a disconnected calendar left open. Best-effort:
@@ -887,7 +956,7 @@ where
     R: CalendarRepository,
     G: CalendarMutationProvider,
     T: CalendarAccessTokenProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     N: CalendarRefreshNotifier,
 {
     #[tracing::instrument(skip(self, requester_id), err)]
@@ -906,6 +975,23 @@ where
             .ok_or(CalendarMutationError::NoWritableCalendar)?;
         if target.is_read_only {
             return Err(CalendarMutationError::ReadOnly);
+        }
+        // A Rox-kept event exists only here, so its cancellation is the row
+        // removal the provider path performs after the provider answers.
+        if target.is_local {
+            let provider_id = super::models::creation_provider_id(creation_key, &target.owner_id);
+            let retired = self
+                .repository
+                .remove_provider_source(target.account_id, target.calendar_id, &provider_id)
+                .await
+                .map_err(|error| CalendarMutationError::PersistFailed(format!("{error:?}")))?;
+            if !retired.is_empty() {
+                self.publish_retirements(retired);
+                self.refresh
+                    .calendar_changed(&target.owner_id, target.email_link_id, false)
+                    .await;
+            }
+            return Ok(());
         }
         self.require_provider_writes(target.token_identity.provider)?;
         let access_token = self.fetch_token(&target.token_identity).await?;
@@ -934,6 +1020,24 @@ where
         }
         Ok(())
     }
+}
+
+/// What a calendar kept inside Rox cannot hold yet: a conference it has no
+/// meeting provider to create, or a status event only Google understands.
+fn validate_local_draft(draft: &CalendarEventDraft) -> Result<(), CalendarMutationError> {
+    if draft.conference.is_some_and(|change| {
+        !matches!(change, super::models::ConferenceChange::Removed)
+    }) {
+        return Err(CalendarMutationError::InvalidInput(
+            "Conferencing is not available on a Rox calendar yet".into(),
+        ));
+    }
+    if draft.out_of_office.is_some() {
+        return Err(CalendarMutationError::InvalidInput(
+            "Out-of-office events are not available on a Rox calendar yet".into(),
+        ));
+    }
+    Ok(())
 }
 
 fn validate_conference(

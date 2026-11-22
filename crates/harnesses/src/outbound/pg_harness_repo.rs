@@ -16,7 +16,7 @@ use chrono::{DateTime, Utc};
 use entity_access_db_utils::{EntityType, delete_entity_access_rows, team_share};
 use harness_id::HarnessId;
 use harness_token::HashedHarnessToken;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -167,7 +167,7 @@ impl TryFrom<HarnessRow> for Harness {
             claude_mode: if row.has_claude_login {
                 ClaudeMode::OwnAccount
             } else {
-                ClaudeMode::MacroCredits
+                ClaudeMode::RoxCredits
             },
         })
     }
@@ -587,7 +587,7 @@ impl HarnessRepo for PgHarnessRepo {
 
     async fn list_usable_harnesses(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<Harness>, Self::Err> {
         let rows = sqlx::query_as!(
             HarnessRow,
@@ -616,7 +616,7 @@ impl HarnessRepo for PgHarnessRepo {
 
     async fn list_directory_harnesses(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<Harness>, Self::Err> {
         let rows = sqlx::query_as!(
             HarnessRow,
@@ -661,7 +661,7 @@ impl HarnessRepo for PgHarnessRepo {
     async fn harness_access(
         &self,
         harness_id: HarnessId,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<HarnessAccess, Self::Err> {
         let level = sqlx::query_scalar!(
             r#"SELECT harness_access_level($1, $2) AS "access?: AccessLevel""#,
@@ -821,7 +821,7 @@ impl HarnessRepo for PgHarnessRepo {
 
     async fn user_has_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         let has_team = sqlx::query_scalar!(
@@ -844,7 +844,7 @@ impl HarnessRepo for PgHarnessRepo {
 
     async fn user_owns_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         let owns_team = sqlx::query_scalar!(

@@ -30,12 +30,12 @@ import {
   INTERNAL_TRANSFORMERS,
   protectEmptyParagraphLines,
   stripDraftCommentMarks,
-} from '@macro-inc/lexical-core';
-import { SKIP_SCROLL_INTO_VIEW_TAG } from '@macro-inc/lexical-core/constants';
+} from '@rox-one/lexical-core';
+import { SKIP_SCROLL_INTO_VIEW_TAG } from '@rox-one/lexical-core/constants';
 import {
   $getId,
   INITIALIZE_DOCUMENT_IDS,
-} from '@macro-inc/lexical-core/plugins/nodeIdPlugin';
+} from '@rox-one/lexical-core/plugins/nodeIdPlugin';
 import {
   $addUpdateTag,
   $createParagraphNode,

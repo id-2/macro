@@ -1,5 +1,5 @@
 import { zValidator } from '@hono/zod-validator';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { Hono } from 'hono';
 import * as z from 'zod';
 import { runCommentMarkChange } from '../comment-mark/run';

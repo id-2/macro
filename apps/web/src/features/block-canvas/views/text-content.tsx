@@ -2,8 +2,8 @@ import {
   StaticLexical,
   StaticMarkdownContext,
 } from '@core/component/LexicalMarkdown/component/core/StaticMarkdown';
-import type { RichText, TextGeometry, TextMeasurer } from '@macro-inc/graphics';
-import { textLayoutStyle } from '@macro-inc/graphics/browser';
+import type { RichText, TextGeometry, TextMeasurer } from '@rox-one/graphics';
+import { textLayoutStyle } from '@rox-one/graphics/browser';
 import { createSignal, ErrorBoundary, Show } from 'solid-js';
 import { render } from 'solid-js/web';
 import { plainRichText, validCanvasText } from '../core/text-codec';

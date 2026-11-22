@@ -4,7 +4,7 @@
 mod test;
 
 use futures::{StreamExt as _, stream};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use std::{
     collections::{BTreeSet, HashMap},
@@ -67,7 +67,7 @@ impl<P: ActivityEventPublisher, A: ActivityAudienceExpander> ActivityAnnouncemen
             // Project moves can originate in a project the subject has never seen.
             // Its identifier must remain private, including after access is revoked.
             // Other domains retain their existing subject-feed behavior.
-            if let Ok(viewer) = MacroUserIdStr::parse_from_str(subject) {
+            if let Ok(viewer) = RoxUserIdStr::parse_from_str(subject) {
                 let allowed = !matches!(
                     kind,
                     EntityType::Initiative

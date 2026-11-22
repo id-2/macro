@@ -22,7 +22,7 @@ fn soup_channel(
                 auto_join_team,
                 created_at: "2026-01-01T00:00:00Z".parse().unwrap(),
                 updated_at: "2026-01-02T00:00:00Z".parse().unwrap(),
-                owner_id: MacroUserIdStr::try_from(VALID_USER_ID.to_string()).unwrap(),
+                owner_id: RoxUserIdStr::try_from(VALID_USER_ID.to_string()).unwrap(),
             },
             participants: Vec::new(),
             is_participant: true,

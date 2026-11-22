@@ -7,7 +7,7 @@
 //! linked pull request, not a history of captures.
 
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 
 pub use agent_session::domain::model::AgentSessionId;
@@ -50,7 +50,7 @@ impl ChangesetId {
     #[expect(clippy::new_without_default, reason = "each call mints a distinct id")]
     #[must_use]
     pub fn new() -> Self {
-        Self(macro_uuid::generate_uuid_v7())
+        Self(rox_uuid::generate_uuid_v7())
     }
 
     /// Wrap an existing UUID.

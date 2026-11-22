@@ -8,7 +8,7 @@ use email::inbound::axum::{
     api_types::ApiAttachmentDraft, axum_impls::EmailLinkExtractor,
     thread_labels_router::UpdateThreadLabelError,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -36,7 +36,7 @@ pub struct TransferDraftResponse {
     responses((status=200,body=TransferDraftResponse),(status=403),(status=404),(status=409),(status=500)))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<EmailSvc, AuthorizationService>>,
     Path(source_id): Path<Uuid>,
     Json(request): Json<TransferDraftRequest>,
@@ -72,7 +72,7 @@ pub struct TransferRecoveryResponse {
     params(("id"=Uuid,Path)),responses((status=200,body=TransferRecoveryResponse),(status=403),(status=500)))]
 pub async fn recover(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<TransferRecoveryResponse>, UpdateThreadLabelError> {
     let result = ctx

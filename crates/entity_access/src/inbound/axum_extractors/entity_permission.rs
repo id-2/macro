@@ -10,9 +10,9 @@ use axum::{
     extract::{FromRef, FromRequestParts, Path},
     http::request::Parts,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
-    OptionalMacroAuthorizationExtractor,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
+    OptionalRoxAuthorizationExtractor,
 };
 use tracing::Level;
 
@@ -46,9 +46,9 @@ pub struct EntityPermissionExtractor<Svc, Auth> {
 impl<S, Svc, Auth> FromRequestParts<S> for EntityPermissionExtractor<Svc, Auth>
 where
     Arc<Svc>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -58,7 +58,7 @@ where
         let service = <Arc<Svc>>::from_ref(state);
 
         let authorization =
-            OptionalMacroAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(
+            OptionalRoxAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(
                 parts, state,
             )
             .await
@@ -73,7 +73,7 @@ where
 
         let parsed_type = parse_entity_type(&entity_type)?;
 
-        if let Some(MacroAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
+        if let Some(RoxAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
         {
             let entity_access_receipt = generate_bot_entity_access_receipt::<AnyEntityPermission>(
                 service.as_ref(),
@@ -90,10 +90,10 @@ where
         }
 
         let (is_internal_access, acting_user) = match authorization.authorization.as_ref() {
-            Some(MacroAuthorization::User(user)) => (false, Some(user)),
-            Some(MacroAuthorization::Internal(user)) => (true, user.as_ref()),
-            Some(MacroAuthorization::Harness(_)) => return Err(ExtractorError::Unauthorized),
-            Some(MacroAuthorization::Bot(_)) => unreachable!("bot authorization returned above"),
+            Some(RoxAuthorization::User(user)) => (false, Some(user)),
+            Some(RoxAuthorization::Internal(user)) => (true, user.as_ref()),
+            Some(RoxAuthorization::Harness(_)) => return Err(ExtractorError::Unauthorized),
+            Some(RoxAuthorization::Bot(_)) => unreachable!("bot authorization returned above"),
             None => (false, None),
         };
         let (macro_user_id, user_context) = acting_user

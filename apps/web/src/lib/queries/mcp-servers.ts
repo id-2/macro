@@ -1,5 +1,5 @@
 import { throwOnErr } from '@core/util/result';
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import { cognitionApiServiceClient } from '@service-cognition/client';
 import type {

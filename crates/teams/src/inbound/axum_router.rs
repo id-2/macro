@@ -56,7 +56,7 @@ use entity_access::domain::{
     models::{EntityAccessReceipt, RequiredPermission},
     ports::EntityAccessService,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 
 use crate::domain::{
@@ -102,7 +102,7 @@ pub struct TeamRouterState<T, Eas, Auth> {
     /// The entity access service.
     pub entity_access_service: Arc<Eas>,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, Eas, Auth> FromRef<TeamRouterState<T, Eas, Auth>> for Arc<Eas> {
@@ -111,7 +111,7 @@ impl<T, Eas, Auth> FromRef<TeamRouterState<T, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<T, Eas, Auth> FromRef<TeamRouterState<T, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Eas, Auth> FromRef<TeamRouterState<T, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &TeamRouterState<T, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -133,7 +133,7 @@ pub fn teams_router<T, Eas, Auth, S>(state: TeamRouterState<T, Eas, Auth>) -> Ro
 where
     T: TeamService + TeamInviteLinkService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     let people_only = axum::middleware::from_fn_with_state(
@@ -217,16 +217,16 @@ const PROGRAM_TEAM_REFUSAL: &str = "An agent's program cannot invite people, mak
 /// credential signed for an agent or a routine run, or the code-mode header)
 /// nor a bot acting for a member. A credential that does not verify is
 /// rejected here, so a failed check cannot let the request through.
-async fn refuse_programs<Auth: MacroAuthorizationService>(
-    axum::extract::State(authorization): axum::extract::State<MacroAuthorizationState<Auth>>,
+async fn refuse_programs<Auth: RoxAuthorizationService>(
+    axum::extract::State(authorization): axum::extract::State<RoxAuthorizationState<Auth>>,
     request: axum::extract::Request,
     next: axum::middleware::Next,
 ) -> Response {
     use axum::extract::FromRequestParts as _;
     let (mut parts, body) = request.into_parts();
-    let principal = match macro_authorization::OptionalMacroAuthorizationExtractor::<
+    let principal = match rox_authorization::OptionalRoxAuthorizationExtractor::<
         Auth,
-        macro_authorization::AnyPrincipal,
+        rox_authorization::AnyPrincipal,
     >::from_request_parts(&mut parts, &authorization)
     .await
     {
@@ -234,13 +234,11 @@ async fn refuse_programs<Auth: MacroAuthorizationService>(
         Err(rejection) => return rejection.into_response(),
     };
     let program = match &principal {
-        Some(macro_authorization::MacroAuthorization::User(user)) => {
-            macro_authorization::is_program_run(user.attribution(), &parts.headers)
+        Some(rox_authorization::RoxAuthorization::User(user)) => {
+            rox_authorization::is_program_run(user.attribution(), &parts.headers)
         }
-        Some(macro_authorization::MacroAuthorization::Bot(_)) => true,
-        _ => parts
-            .headers
-            .contains_key(macro_authorization::CODE_EXECUTION_HEADER),
+        Some(rox_authorization::RoxAuthorization::Bot(_)) => true,
+        _ => rox_authorization::marks_code_execution(&parts.headers),
     };
     if program {
         tracing::warn!("refused a team membership change to a program");

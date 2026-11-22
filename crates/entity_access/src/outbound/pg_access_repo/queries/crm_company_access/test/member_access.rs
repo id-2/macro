@@ -17,7 +17,7 @@ async fn member_revocation_and_regrant_apply_to_records_and_recipients(
     )
     .fetch_one(&pool)
     .await?;
-    let member = MacroUserId::parse_from_str(&member_id)?.lowercase();
+    let member = RoxUserId::parse_from_str(&member_id)?.lowercase();
     for enabled in [true, false, true] {
         sqlx::query!(
             "UPDATE team_user SET crm_access = $1 WHERE user_id = $2",
@@ -75,7 +75,7 @@ async fn member_revocation_and_regrant_apply_to_records_and_recipients(
     .await?;
     assert_eq!(administrators.len(), 2);
     for id in administrators {
-        let user = MacroUserId::parse_from_str(&id)?.lowercase();
+        let user = RoxUserId::parse_from_str(&id)?.lowercase();
         assert!(
             get_crm_company_access(&pool, &company, &user)
                 .await?

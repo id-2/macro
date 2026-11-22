@@ -27,7 +27,7 @@ pub mod inbound;
 #[cfg(any(feature = "outbound", feature = "consumer"))]
 pub mod outbound;
 
-pub use domain::events::{ActivityMacroEvent, ActivityTopicEvent, ActivityWireRow};
+pub use domain::events::{ActivityRoxEvent, ActivityTopicEvent, ActivityWireRow};
 pub use domain::models::{
     AccessRequest, Action, ActionDecodeError, ActionTag, Activity, ActivityRecord, ActivitySource,
     Actor, AppearanceChange, AppearanceUpdate, Attribution, CallStart, CommonAction,

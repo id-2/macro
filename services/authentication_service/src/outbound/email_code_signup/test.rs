@@ -1,10 +1,10 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use uuid::Uuid;
 
 use super::*;
 
 async fn account(pool: &PgPool, email: &str, is_verified: bool) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
         id,

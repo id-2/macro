@@ -10,8 +10,8 @@ use entity_mutation::{
     MoveEntity, RenameEntity, RestoreEntity, TrashEntity, capability::MoveEntityRequest,
     project_refs,
 };
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 
 use super::{
@@ -49,7 +49,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     type Receipt = EditAccessLevel;
 
@@ -72,7 +72,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     /// Filing a database in a folder shares it with the folder's members,
     /// which only its owner may do.
@@ -110,7 +110,7 @@ where
     Cells: CellStore + DatabaseDuplicateRepo,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     type Receipt = ViewAccessLevel;
 
@@ -118,7 +118,7 @@ where
         &self,
         _entity: Entity<'static>,
         receipt: EntityAccessReceipt<Self::Receipt>,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         display_name: Option<String>,
     ) -> Result<Vec<EntityMutationEffect>, EntityMutationErrorCode> {
         let copy = DatabaseDuplicateService::duplicate_database(
@@ -143,7 +143,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     type Receipt = OwnerAccessLevel;
 
@@ -167,7 +167,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     type Receipt = OwnerAccessLevel;
 
@@ -189,7 +189,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     type Receipt = OwnerAccessLevel;
 

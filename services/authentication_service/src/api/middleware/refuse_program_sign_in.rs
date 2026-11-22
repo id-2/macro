@@ -7,9 +7,9 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{
-    AnyPrincipal, CredentialAttribution, MacroAuthorization, MacroAuthorizationState,
-    OptionalMacroAuthorizationExtractor, PROGRAM_SIGN_IN_REFUSAL, is_program_run,
+use rox_authorization::{
+    AnyPrincipal, CredentialAttribution, RoxAuthorization, RoxAuthorizationState,
+    OptionalRoxAuthorizationExtractor, PROGRAM_SIGN_IN_REFUSAL, is_program_run,
 };
 
 #[cfg(test)]
@@ -24,19 +24,19 @@ mod test;
 /// program outside the sandbox can simply send none. A credential that does
 /// not verify counts as none, so a person with a stale session still signs in.
 pub(in crate::api) async fn handler(
-    State(authorization): State<MacroAuthorizationState<AuthorizationService>>,
+    State(authorization): State<RoxAuthorizationState<AuthorizationService>>,
     request: Request,
     next: Next,
 ) -> Response {
     let (mut parts, body) = request.into_parts();
-    let attribution = match OptionalMacroAuthorizationExtractor::<
+    let attribution = match OptionalRoxAuthorizationExtractor::<
         AuthorizationService,
         AnyPrincipal,
     >::from_request_parts(&mut parts, &authorization)
     .await
     {
-        Ok(OptionalMacroAuthorizationExtractor {
-            authorization: Some(MacroAuthorization::User(user)),
+        Ok(OptionalRoxAuthorizationExtractor {
+            authorization: Some(RoxAuthorization::User(user)),
             ..
         }) => user.attribution(),
         _ => CredentialAttribution::Person,

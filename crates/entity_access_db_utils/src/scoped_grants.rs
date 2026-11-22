@@ -29,7 +29,7 @@ pub struct Grant<'a> {
 #[derive(Clone, Copy, Debug)]
 pub struct EntityGrant<'a> {
     /// The entity the grant is written on.
-    pub entity_id: macro_uuid::Uuid,
+    pub entity_id: rox_uuid::Uuid,
     /// The entity's `entity_access.entity_type`.
     pub entity_type: &'a str,
     /// The grant.
@@ -49,7 +49,7 @@ pub fn refuse_grant(adds_access: bool) -> Result<(), sqlx::Error> {
 /// scope.
 pub async fn refuse_added_access(
     connection: &mut PgConnection,
-    entity_id: &macro_uuid::Uuid,
+    entity_id: &rox_uuid::Uuid,
     entity_type: EntityType,
     grants: &[Grant<'_>],
 ) -> Result<(), sqlx::Error> {

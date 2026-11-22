@@ -18,7 +18,7 @@ import {
   sortKeysBetween,
   type TextFont,
   translation,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { plainRichText, type TextAlign } from './text-codec';
 
 /**

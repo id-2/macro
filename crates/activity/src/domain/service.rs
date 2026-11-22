@@ -10,7 +10,7 @@ use std::{
 };
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::{
     models::{Action, RecordedAction},
@@ -35,7 +35,7 @@ pub struct NoopActivityMetadataResolver;
 impl ActivityMetadataResolver for NoopActivityMetadataResolver {
     async fn resolve_properties(
         &self,
-        _viewer: &MacroUserIdStr<'_>,
+        _viewer: &RoxUserIdStr<'_>,
         _property_ids: &[String],
     ) -> HashMap<String, ActivityPropertyMetadata> {
         HashMap::new()
@@ -87,7 +87,7 @@ where
     /// one viewer-scoped metadata request.
     pub async fn subject_activity_range(
         &self,
-        subject_id: &MacroUserIdStr<'_>,
+        subject_id: &RoxUserIdStr<'_>,
         from: DateTime<Utc>,
         to: DateTime<Utc>,
         limit: NonZeroU32,

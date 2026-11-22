@@ -1,5 +1,5 @@
 /**
- * Person tokens: what ChatGPT sees in place of a Macro user id or an email
+ * Person tokens: what ChatGPT sees in place of a Rox user id or an email
  * address. OpenAI's review rejects a tool that returns personal identifiers
  * the request didn't need, yet ChatGPT still has to name people back to us
  * (assign a task, mention someone, filter by owner). So every

@@ -3,7 +3,7 @@ import {
   type GraphicsDocument,
   type TextFitRequest,
   translation,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { expect, type Page, test } from '@playwright/test';
 import { prepareCanvasEdit } from '../../../../../../services/ai-editing-worker/src/canvas/operations';
 

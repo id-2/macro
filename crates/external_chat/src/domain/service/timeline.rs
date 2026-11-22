@@ -2,7 +2,7 @@
 use super::*;
 use crate::domain::rich::RichContent;
 use entity_access::domain::models::{AccessLevel, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::{
     SharePermissionV2, UpdateSharePermissionRequestV2,
     channel_share_permission::{UpdateChannelSharePermission, UpdateOperation},
@@ -13,7 +13,7 @@ impl<P: ChatProvider> ExternalChatService<P> {
     #[tracing::instrument(name = "whatsapp.linked.list", skip_all, err, fields(count))]
     pub async fn list(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> ExternalChatResult<Vec<ExternalChatSummary>> {
         let records = self.timeline.visible_chats(user).await?;
         let account = self.provider.account(user).await?;

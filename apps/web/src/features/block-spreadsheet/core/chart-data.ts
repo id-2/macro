@@ -1,4 +1,4 @@
-import { cellPlainText } from '@macro-inc/spreadsheet/cell-mentions';
+import { cellPlainText } from '@rox-one/spreadsheet/cell-mentions';
 import {
   type ChartPlot,
   type ChartRange,
@@ -6,13 +6,13 @@ import {
   parseChartLiteral,
   parseChartReference,
   type SheetChart,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import type { WorkbookCalculation } from './calculation';
 import { paletteColor } from './drawingml-colors';
 import { formatCellAddress } from './spreadsheet-document';
 import type { SpreadsheetWorkbookSheet } from './workbook-document';
 
-export type { ChartValue } from '@macro-inc/spreadsheet/sheet-drawings';
+export type { ChartValue } from '@rox-one/spreadsheet/sheet-drawings';
 /**
  * Reads a reference that names a sheet and cells, row by row, up to
  * `MAX_CHART_POINTS` values.

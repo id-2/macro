@@ -1,4 +1,4 @@
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use super::{AdapterError, map_sqlx};
@@ -6,7 +6,7 @@ use crate::domain::models::{InitiativeError, InitiativeId, InitiativeList, Initi
 
 pub(super) async fn list_accessible(
     pool: &PgPool,
-    user_id: &MacroUserIdStr<'static>,
+    user_id: &RoxUserIdStr<'static>,
 ) -> Result<InitiativeList, InitiativeError> {
     let rows = sqlx::query!(
         r#"

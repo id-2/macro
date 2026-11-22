@@ -1,7 +1,7 @@
 import type { ApiEmailFilter } from '../../../generated/email/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import type { Link } from './link';
 
 /** Sender importance rule. */
@@ -15,9 +15,9 @@ export interface EmailFilterOptions {
 }
 
 /** An importance filter matched by sender address or domain. */
-export class EmailFilter extends MacroEntity<ApiEmailFilter> {
+export class EmailFilter extends RoxEntity<ApiEmailFilter> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     id: string,
     seed?: ApiEmailFilter,
     private readonly inbox?: Link,
@@ -30,13 +30,13 @@ export class EmailFilter extends MacroEntity<ApiEmailFilter> {
   }
 
   /** Construct a lazy filter handle. */
-  static byId(client: MacroClient, id: string, inbox?: Link): EmailFilter {
+  static byId(client: RoxClient, id: string, inbox?: Link): EmailFilter {
     return new EmailFilter(client, id, undefined, inbox);
   }
 
   /** Seed from a server record. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     record: ApiEmailFilter,
     inbox?: Link,
   ): EmailFilter {
@@ -48,7 +48,7 @@ export class EmailFilter extends MacroEntity<ApiEmailFilter> {
       await this.client.email.listEmailFilters({ headers: this.headers }),
     ).filters.find((f) => f.id === this.id);
     if (!record)
-      throw new MacroNotFoundError(`Email filter ${this.id} is unavailable`);
+      throw new RoxNotFoundError(`Email filter ${this.id} is unavailable`);
     return record;
   }
 

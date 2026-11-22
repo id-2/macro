@@ -44,7 +44,7 @@ export const EMAIL_TAB_LABELS = {
   get trash() {
     return t('viewMenus.trash');
   },
-  focus: 'Focus',
+  focus: 'Фокус',
 } as const satisfies Record<EmailTab, string>;
 
 export type EmailTabItem = {

@@ -3,7 +3,7 @@
 
 use chrono::{DateTime, Utc};
 use connection_gateway_client::client::ConnectionGatewayClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use serde::Serialize;
 
@@ -129,7 +129,7 @@ impl TableEventPublisher for GatewayTableEventPublisher {
     async fn awareness(
         &self,
         database_id: DatabaseId,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         can_edit: bool,
         state: &Awareness,
     ) -> Result<(), Self::Error> {
@@ -176,7 +176,7 @@ impl TableEventPublisher for NoOpTableEventPublisher {
     async fn awareness(
         &self,
         _database_id: DatabaseId,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _can_edit: bool,
         _state: &Awareness,
     ) -> Result<(), Self::Error> {
@@ -235,7 +235,7 @@ impl TableEventPublisher for MaybeGatewayTableEventPublisher {
     async fn awareness(
         &self,
         database_id: DatabaseId,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         can_edit: bool,
         state: &Awareness,
     ) -> Result<(), Self::Error> {

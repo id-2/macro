@@ -1,5 +1,5 @@
 use super::state::{State, Status};
-use macro_bundle_updater_plugin::inbound::plugin::PluginService;
+use rox_bundle_updater_plugin::inbound::plugin::PluginService;
 use serde::Deserialize;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;

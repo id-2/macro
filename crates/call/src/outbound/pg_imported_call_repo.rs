@@ -2,7 +2,7 @@
 use crate::domain::{imports::*, records::*};
 use async_trait::async_trait;
 use entity_access_db_utils::{AccessLevel, EntityAccessSourceType, EntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -47,13 +47,13 @@ impl ImportedCallRepository for PgImportedCallRepository {
         let id = existing
             .as_ref()
             .map(|r| r.call_id)
-            .unwrap_or_else(macro_uuid::generate_uuid_v7);
+            .unwrap_or_else(rox_uuid::generate_uuid_v7);
         let duration = call
             .started_at
             .zip(call.ended_at)
             .map(|(s, e)| (e - s).num_milliseconds());
         if existing.is_none() {
-            let share_id = macro_uuid::generate_uuid_v7().to_string();
+            let share_id = rox_uuid::generate_uuid_v7().to_string();
             share_permission_db_utils::create_private_share_permission(tx.as_mut(), &share_id)
                 .await?;
             sqlx::query!(
@@ -172,7 +172,7 @@ impl ImportedCallRepository for PgImportedCallRepository {
 
     async fn list_owned(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ImportedCallPreview>, rootcause::Report> {
         Ok(sqlx::query_as!(
             ImportedCallPreview,
@@ -187,7 +187,7 @@ impl ImportedCallRepository for PgImportedCallRepository {
 
     async fn list_source_records(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         provider: CallProvider,
     ) -> Result<Vec<ImportedCallRecord>, rootcause::Report> {
         let provider: &'static str = provider.into();
@@ -227,7 +227,7 @@ impl ImportedCallRepository for PgImportedCallRepository {
 
     async fn read_owned(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<Option<CallEntityRecord>, rootcause::Report> {
         // One MVCC snapshot includes all children; no partially replaced transcript.

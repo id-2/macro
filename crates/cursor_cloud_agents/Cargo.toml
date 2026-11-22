@@ -28,8 +28,8 @@ base64 = { workspace = true }
 bytes = { workspace = true }
 static_file_service_client = { path = "../static_file_service_client" }
 futures = { workspace = true }
-macro_tower_layers = { path = "../macro_tower_layers" }
-macro_env_var = { path = "../macro_env_var" }
+rox_tower_layers = { path = "../rox_tower_layers" }
+rox_env_var = { path = "../rox_env_var" }
 # `stream` on top of the workspace features: the run stream is consumed as
 # `bytes_stream`, which reqwest gates behind it.
 reqwest = { workspace = true, features = ["stream"] }

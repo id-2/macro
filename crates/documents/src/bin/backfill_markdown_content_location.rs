@@ -14,8 +14,8 @@ use documents::outbound::markdown_init::LexicalSyncMarkdownInitializer;
 use documents::outbound::pg_document_repo::PgMarkdownBackfillRepo;
 use documents::outbound::s3_markdown_source::S3MarkdownObjectReader;
 use lexical_client::LexicalClient;
-use macro_env_var::env_vars;
-use macro_service_urls::{LexicalServiceUrl, SyncServiceUrl};
+use rox_env_var::env_vars;
+use rox_service_urls::{LexicalServiceUrl, SyncServiceUrl};
 use sqlx::postgres::PgPoolOptions;
 use sync_service_client::SyncServiceClient;
 
@@ -87,7 +87,7 @@ impl Args {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    macro_entrypoint::MacroEntrypoint::default().init();
+    rox_entrypoint::RoxEntrypoint::default().init();
 
     let args = Args::parse();
     let options = args.options()?;
@@ -189,7 +189,7 @@ async fn build_object_reader(enabled: bool) -> anyhow::Result<OptionalMarkdownOb
         .to_string();
 
     Ok(OptionalMarkdownObjectReader::Enabled(
-        S3MarkdownObjectReader::new(document_storage_bucket, macro_aws_config::s3_client().await),
+        S3MarkdownObjectReader::new(document_storage_bucket, rox_aws_config::s3_client().await),
     ))
 }
 

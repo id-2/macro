@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro, type StructuredCompletionResponse } from '../src/macro';
-import { MacroApiError } from '../src/utils';
+import { Macro, type StructuredCompletionResponse } from '../src/rox';
+import { RoxApiError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -75,7 +75,7 @@ test('AI allowance and unavailable responses remain explicit API errors', async 
         questions: { greeting: 'Is this a greeting?' },
       })
       .catch((error: unknown) => error);
-    expect(error).toBeInstanceOf(MacroApiError);
-    expect((error as MacroApiError).status).toBe(status);
+    expect(error).toBeInstanceOf(RoxApiError);
+    expect((error as RoxApiError).status).toBe(status);
   }
 });

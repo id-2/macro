@@ -1,5 +1,5 @@
-import type { RoxdDetectedAgent, RoxdStatus } from '@macro/tauri/roxd';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import type { RoxdDetectedAgent, RoxdStatus } from '@rox/tauri/roxd';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { err, ok, type Result, ResultAsync } from 'neverthrow';
 import { createSignal } from 'solid-js';
 import {
@@ -22,9 +22,9 @@ const MODEL_LOAD_ATTEMPTS = 10;
 const MODEL_LOAD_INTERVAL_MS = 1500;
 
 const FALLBACK_ERRORS: Record<SetupStep, string> = {
-  detect: 'Could not look for agents on this computer.',
-  connect: 'Could not connect this computer to your account.',
-  agent: 'Could not create your agent.',
+  detect: 'Не удалось поискать агентов на этом компьютере.',
+  connect: 'Не удалось подключить этот компьютер к вашей учётной записи.',
+  agent: 'Не удалось создать вашего агента.',
 };
 
 /**
@@ -38,7 +38,7 @@ export function createLocalRuntimeSetup(caps: SetupCapabilities) {
   const [scanning, setScanning] = createSignal(false);
   /** The running daemon once connect succeeded, for resuming. */
   let connected: RoxdStatus | undefined;
-  let lastChoices: SetupChoices = { fullAccess: false };
+  let lastChoices: SetupChoices = { fullAccess: true };
 
   const attempt = async <T>(
     step: SetupStep,
@@ -121,7 +121,7 @@ export function createLocalRuntimeSetup(caps: SetupCapabilities) {
       const model = chooseModel(result.value);
       if (model) return model;
     }
-    throw lastError ?? new Error('Your agent did not report any models.');
+    throw lastError ?? new Error('Ваш агент не сообщил ни одной модели.');
   };
 
   /** Reuse an agent already bound to this runtime, or create one. */
@@ -131,7 +131,8 @@ export function createLocalRuntimeSetup(caps: SetupCapabilities) {
     parent: Span
   ): Promise<ReadyAgent> => {
     const harnessId = status.harnessId;
-    if (!harnessId) throw new Error('This computer is not connected yet.');
+    if (!harnessId)
+      throw new Error('Этот компьютер ещё не подключён к учётной записи.');
     // Bypass is a setting on the runtime itself; an agent can only choose it
     // once the runtime allows it.
     if (choices.fullAccess) {
@@ -141,13 +142,16 @@ export function createLocalRuntimeSetup(caps: SetupCapabilities) {
       (agent) => agent.harnessId === harnessId
     );
     if (existing) return existing;
-    const name = status.agentName ?? 'Local agent';
+    const name = status.agentName ?? 'Локальный агент';
     const defaultModel = await loadModel(harnessId, parent);
     return await parent.run(() =>
       caps.createAgent({
         name,
-        handle: agentHandle(name),
-        description: `Runs ${name} on this computer with your own login.`,
+        // The Russian fallback name has no letters a handle can use.
+        handle:
+          agentHandle(status.agentName ?? status.agentId ?? 'local-agent') ||
+          'local-agent',
+        description: `Запускает ${name} на этом компьютере под вашей учётной записью.`,
         harnessId,
         defaultModel,
         autoAcceptPermissions: choices.fullAccess,

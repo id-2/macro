@@ -118,7 +118,7 @@ export function RouteCalls() {
         <FeaturePageSection
           id="call-external"
           title="External calls, shared by link."
-          description="Create a meeting link and send it to anyone outside your team. They can join in their browser without a Macro account or installing anything."
+          description="Create a meeting link and send it to anyone outside your team. They can join in their browser without a Rox account or installing anything."
         />
         <CallsComparison />
         <FeaturePageFaq

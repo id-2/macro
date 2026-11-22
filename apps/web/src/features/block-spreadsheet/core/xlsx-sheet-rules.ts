@@ -1,4 +1,4 @@
-import { literalListItems } from '@macro-inc/spreadsheet/data-validation';
+import { literalListItems } from '@rox-one/spreadsheet/data-validation';
 import {
   CONDITIONAL_FORMAT_TYPES,
   type ComparisonOperator,
@@ -8,7 +8,7 @@ import {
   type DataValidation,
   MAX_SHEET_RULES,
   TIME_PERIODS,
-} from '@macro-inc/spreadsheet/sheet-rules';
+} from '@rox-one/spreadsheet/sheet-rules';
 import {
   formatCellAddress,
   parseCellAddress,
@@ -708,7 +708,7 @@ export function notesParts(
   });
   if (!entries.length) return;
   const comments = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<comments xmlns="${MAIN}"><authors><author>Macro</author></authors><commentList>${entries
+<comments xmlns="${MAIN}"><authors><author>Rox</author></authors><commentList>${entries
     .map(
       ({ address, note }) =>
         `<comment ref="${address}" authorId="0"><text><r><t xml:space="preserve">${xml(note)}</t></r></text></comment>`

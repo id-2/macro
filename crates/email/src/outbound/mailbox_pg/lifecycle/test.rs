@@ -1,8 +1,8 @@
 use super::*;
 use crate::domain::mailbox::credentials::{CredentialHealth, MailboxCredentialHealthRepository};
 use email_api_client::domain::models::{MailboxAccess, TokenError};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::{
     Arc,
     atomic::{AtomicUsize, Ordering},
@@ -69,13 +69,13 @@ impl InboxLifecycleRepository for CountingRemovals {
 }
 fn actor(name: &str) -> InboxActor {
     InboxActor {
-        macro_id: MacroUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap(),
+        macro_id: RoxUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap(),
         credential_owner: format!("{name}-owner"),
     }
 }
 /// Creates the account and returns the id its credentials are stored under.
 async fn user(db: &PgPool, name: &str) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let actor = actor(name);
     sqlx::query!(
         "INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
@@ -103,8 +103,8 @@ async fn shared(db: &PgPool) -> (PgMailboxSync, Uuid, Uuid) {
     for name in ["shared", "leaving", "remaining"] {
         user(db, name).await;
     }
-    let old = macro_uuid::generate_uuid_v7();
-    let replacement = macro_uuid::generate_uuid_v7();
+    let old = rox_uuid::generate_uuid_v7();
+    let replacement = rox_uuid::generate_uuid_v7();
     sqlx::query!("UPDATE email_links SET macro_id = 'macro|shared@example.com',fusionauth_user_id = 'leaving-owner',grant_id = $2 WHERE id = $1",link,old).execute(db).await.unwrap();
     sqlx::query!(
         "INSERT INTO promoted_shared_mailboxes(macro_id) VALUES ('macro|shared@example.com')"
@@ -434,7 +434,7 @@ async fn leaving_shared_custodian_rebinds_work_and_rejects_old_health_even_with_
     .execute(&db)
     .await
     .unwrap();
-    let command = macro_uuid::generate_uuid_v7();
+    let command = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO email_mailbox_commands(id,link_id,generation,actor_id,intent,status)
         VALUES ($1,$2,1,'macro|shared@example.com','{"kind":"read","value":true}','confirming')"#,
@@ -546,7 +546,7 @@ async fn generation_bumps_delete_superseded_sync_work(db: PgPool) {
         "rebinding carries the work into the new generation and drops the old copy"
     );
     assert!(
-        repo.claim_stream(macro_uuid::generate_uuid_v7())
+        repo.claim_stream(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .is_some()
@@ -603,7 +603,7 @@ async fn final_shared_disconnect_freezes_ingestion_and_keeps_revocation_after_ca
     assert!(!row.is_sync_active);
     assert!(row.disconnect_requested_at.is_some());
     assert!(
-        repo.claim_stream(macro_uuid::generate_uuid_v7())
+        repo.claim_stream(rox_uuid::generate_uuid_v7())
             .await
             .unwrap()
             .is_none()
@@ -664,7 +664,7 @@ async fn inaccessible_mailbox_cannot_be_removed_or_resynced(db: PgPool) {
 async fn outlook_resync_fences_page_workers_and_never_creates_a_gmail_backfill(db: PgPool) {
     let (repo, link, _) = shared(&db).await;
     let old = repo
-        .claim_stream(macro_uuid::generate_uuid_v7())
+        .claim_stream(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -715,7 +715,7 @@ async fn outlook_resync_starts_a_new_import_run_once(db: PgPool) {
     sqlx::query!(
         r#"INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id,initial_complete,import_started_at,import_completed_at)
         VALUES ($1,$2,1,'folder_catalog','mail',true,now() - interval '1 day',now() - interval '23 hours')"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link
     )
     .execute(&db)

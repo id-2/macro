@@ -8,7 +8,7 @@ use agent_session::domain::routines::{
     RoutineSessions, ValidateRoutineSession, ValidatedRoutineSession,
 };
 use anyhow::{Context, Result};
-use macro_authorization::INTERNAL_API_KEY_HEADER;
+use rox_authorization::INTERNAL_API_KEY_HEADER;
 use reqwest::{Client, Response, StatusCode, Url, header::HeaderValue};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
@@ -112,7 +112,7 @@ impl AgentSessionClient {
             .map_err(|_| RoutineSessionError::OperationFailed)?;
         // The harness continues this trace, so a run is one trace end to end.
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .client
             .post(url)

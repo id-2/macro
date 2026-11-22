@@ -1,4 +1,5 @@
 import { FileDownloadButton } from '@core/component/FileDownload';
+import { t } from '@app/lib/i18n';
 import type { FileDownloadController } from '@core/util/createFileDownload';
 import { HeaderActionGroup } from './HeaderActionGroup';
 import { SidePanel } from './side-panel/SidePanel';
@@ -9,7 +10,7 @@ export function FileDownloadHeader(props: {
 }) {
   return (
     <SidePanel.HeaderActions>
-      <HeaderActionGroup label="File download">
+      <HeaderActionGroup label={t('nav.fileDownload')}>
         <FileDownloadButton grouped download={props.download} />
       </HeaderActionGroup>
     </SidePanel.HeaderActions>

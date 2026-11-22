@@ -1,3 +1,5 @@
+import { t } from '@app/lib/i18n';
+
 export type CrmListColumnId = 'stage' | 'owner' | 'revenue';
 
 export type CrmDisplayOptions = {
@@ -9,8 +11,8 @@ export const DEFAULT_CRM_DISPLAY_OPTIONS: CrmDisplayOptions = {
   listColumns: { stage: false, owner: true, revenue: true },
 };
 
-export const CRM_LIST_COLUMN_LABELS: Record<CrmListColumnId, string> = {
-  stage: 'Stage',
-  owner: 'Owner',
-  revenue: 'Revenue',
-};
+export function crmListColumnLabel(column: CrmListColumnId): string {
+  if (column === 'stage') return t('crm.stage');
+  if (column === 'owner') return t('crm.owner');
+  return t('crm.revenue');
+}

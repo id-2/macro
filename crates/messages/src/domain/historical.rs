@@ -4,7 +4,7 @@ use std::collections::HashSet;
 
 use channel_sender::ChannelSender;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -88,7 +88,7 @@ pub struct HistoricalMessage {
 #[derive(Debug, Clone, Serialize)]
 pub struct HistoricalReaction {
     /// Mapped human identity; no roster membership is required.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Converted Unicode reaction, bounded by the database's 32-character limit.
     pub emoji: String,
     /// Original reaction time, or source message time when absent.
@@ -101,7 +101,7 @@ pub struct HistoricalUserMention {
     /// Caller-generated UUIDv7.
     pub id: Uuid,
     /// Mentioned human identity.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
 }
 
 impl HistoricalBatch {

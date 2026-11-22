@@ -703,7 +703,7 @@ fn trusted_system_and_quiet_inputs_survive_repeated_chunked_history_replay() {
         notification::{Notification, NotificationEvent, NotificationInput, notification_context},
     };
     let event = Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "app".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {

@@ -23,9 +23,10 @@ export function HomeEmptyState() {
           <EmptyStatePanel
             centered
             graphic={EmptyStateNoSearchMatchGraphic}
-            title={`No results for "${search()}"`}
-            description="Search across messages, documents, tasks, and more. Try a different query or broaden your filters."
+            title={`Ничего не найдено по запросу «${search()}»`}
+            description="Ищите по сообщениям, документам, задачам и другому. Попробуйте другой запрос или ослабьте фильтры."
             documentationUrl={`${DOCS_BASE}/product/search`}
+            documentationLabel="Документация"
           />
         )}
       </Match>
@@ -34,8 +35,8 @@ export function HomeEmptyState() {
         <EmptyStatePanel
           centered
           graphic={EmptyStateNoFilterMatchGraphic}
-          title="No items matching the filters"
-          description="Try adjusting or clearing your filters to see more results."
+          title="Нет элементов по этим фильтрам"
+          description="Измените или сбросьте фильтры, чтобы увидеть больше результатов."
         >
           <FilteredHiddenBanner
             hasHiddenItems={false}
@@ -47,38 +48,40 @@ export function HomeEmptyState() {
       <Match when={!emailActive()}>
         <EmptyStatePanel
           graphic={EmptyStateInboxTrayGraphic}
-          title="Welcome home"
-          description="Your recent work and notifications will appear here. Connect email to include your inbox, too."
+          title="Добро пожаловать"
+          description="Здесь появятся недавние дела и уведомления. Подключите почту, чтобы добавить и входящие."
           primaryAction={{
-            label: 'Connect email',
+            label: 'Подключить почту',
             onClick: () => fireAndForget(startAddInbox(), 'add-inbox'),
           }}
           documentationUrl={`${DOCS_BASE}/product/home`}
+          documentationLabel="Документация"
         />
       </Match>
 
       <Match when={state.tab === 'noise'}>
         <EmptyStatePanel
           graphic={EmptyStateInboxTrayGraphic}
-          title="No noise"
+          title="Нет шума"
           description={
             <>
-              Low-priority items like newsletters and notifications collect
-              here.
+              Сюда попадают маловажные элементы: рассылки и уведомления.
               <br />
-              Nothing to clear right now.
+              Сейчас разбирать нечего.
             </>
           }
           documentationUrl={`${DOCS_BASE}/product/home`}
+          documentationLabel="Документация"
         />
       </Match>
 
       <Match when={true}>
         <EmptyStatePanel
           graphic={EmptyStateInboxTrayGraphic}
-          title="No activity yet"
-          description="Your recent documents, sent emails, AI chats, and notifications will appear here."
+          title="Активности пока нет"
+          description="Здесь появятся недавние документы, отправленные письма, чаты с ИИ и уведомления."
           documentationUrl={`${DOCS_BASE}/product/home`}
+          documentationLabel="Документация"
         />
       </Match>
     </Switch>

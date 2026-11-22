@@ -2,7 +2,7 @@ import { handleAiUsageLimitError } from '@app/features/paywall/ai-usage-limit-ha
 import { isAiUsageLimitError } from '@app/lib/service-clients/ai-usage-limit';
 import type { ResultError } from '@core/util/result';
 import { sleep } from '@core/util/sleep';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { scheduledActionClient } from '@service-scheduled-action/client';
 import type {
   Draft,

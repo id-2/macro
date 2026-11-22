@@ -142,9 +142,9 @@ export function OnboardingInbox() {
                 each={emails()}
                 fallback={
                   <div class="flex flex-col items-center justify-center gap-1 py-12 text-center">
-                    <p class="text-sm font-medium text-ink">Inbox zero 🎉</p>
+                    <p class="text-sm font-medium text-ink">Входящие разобраны 🎉</p>
                     <p class="text-sm text-ink/60">
-                      You've cleared every email.
+                      Вы разобрали все письма.
                     </p>
                   </div>
                 }

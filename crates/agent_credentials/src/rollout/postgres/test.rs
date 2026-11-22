@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 
@@ -35,9 +35,9 @@ async fn an_agent_follows_its_creator_then_its_team_owner(pool: PgPool) {
     insert_fixtures(&pool).await;
     let creators = PgAgentCreators::new(pool);
 
-    let sam = MacroUserIdStr::parse_from_str("macro|sam@agents.macro.invalid").unwrap();
-    let kim = MacroUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
-    let admin = MacroUserIdStr::parse_from_str("macro|admin@rox.one").unwrap();
+    let sam = RoxUserIdStr::parse_from_str("macro|sam@agents.macro.invalid").unwrap();
+    let kim = RoxUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
+    let admin = RoxUserIdStr::parse_from_str("macro|admin@rox.one").unwrap();
 
     assert_eq!(
         creators.creator_of(&sam).await.unwrap(),
@@ -60,8 +60,8 @@ async fn with_its_creator_gone_the_team_owners_rollout_decides(pool: PgPool) {
 
     insert_fixtures(&pool).await;
     let creators = PgAgentCreators::new(pool);
-    let kim = MacroUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
-    let admin = MacroUserIdStr::parse_from_str("macro|admin@rox.one")
+    let kim = RoxUserIdStr::parse_from_str("macro|kim@agents.macro.invalid").unwrap();
+    let admin = RoxUserIdStr::parse_from_str("macro|admin@rox.one")
         .unwrap()
         .into_owned();
 

@@ -8,6 +8,7 @@ import {
   Dialog,
   type ManagedDialogProps,
 } from '@ui';
+import { formatLocale, t } from '@app/lib/i18n';
 import { createUniqueId, Show } from 'solid-js';
 import { formatSnoozeDeadline, type SnoozeOption } from '../core/snooze';
 
@@ -35,14 +36,14 @@ export function SnoozePicker(
       <CommandMenuShell>
         <CommandMenuShell.Header>
           <CommandMenuSearchInput
-            aria-label="Snooze until"
+            aria-label={t('settingsNotifications.snoozeUntil')}
             role="combobox"
             aria-expanded="true"
             aria-controls={`${id}-options`}
             aria-activedescendant={
               props.options.length ? `${id}-${list.selectedIndex()}` : undefined
             }
-            placeholder="Choose a time, or type tomorrow 10am…"
+            placeholder={t('settingsNotifications.snoozePlaceholder')}
             value={props.query}
             disabled={props.pending}
             onInput={(event) => {
@@ -67,12 +68,14 @@ export function SnoozePicker(
         </CommandMenuShell.Header>
         <CommandMenuShell.Toolbar class="flex-col items-start gap-1 px-4 py-3">
           <Dialog.Title class="text-sm font-medium text-ink">
-            Snooze notifications
-            {props.count > 1 ? ` for ${props.count} items` : ''}
+            {props.count > 1
+              ? t('settingsNotifications.snoozeTitleCount', {
+                  count: props.count,
+                })
+              : t('settingsNotifications.snoozeTitle')}
           </Dialog.Title>
           <Dialog.Description class="text-xs text-ink-muted">
-            Notifications resume automatically. Times are in your local time
-            zone.
+            {t('settingsNotifications.snoozeDescription')}
           </Dialog.Description>
         </CommandMenuShell.Toolbar>
         <CommandMenuShell.Body class="flex flex-col">
@@ -93,14 +96,14 @@ export function SnoozePicker(
                   {option.label}
                 </span>
                 <span class="text-xs font-normal text-ink-muted">
-                  {formatSnoozeDeadline(option.until)}
+                  {formatSnoozeDeadline(option.until, formatLocale())}
                 </span>
               </div>
             )}
           </CommandMenuList>
           <Show when={!props.options.length}>
             <CommandMenuEmptyState>
-              Enter a future time, like 2h or tomorrow 10am.
+              {t('settingsNotifications.snoozeEmpty')}
             </CommandMenuEmptyState>
           </Show>
           <Show when={props.error}>
@@ -111,11 +114,13 @@ export function SnoozePicker(
         </CommandMenuShell.Body>
         <CommandMenuShell.Footer>
           <span role="status">
-            <Show when={!props.pending} fallback="Snoozing…">
+            <Show when={!props.pending} fallback={t('settingsNotifications.snoozing')}>
               <span class="mobile:hidden">
-                ↑ ↓ to choose · Enter to snooze · Esc to cancel
+                {t('settingsNotifications.snoozeKeyHint')}
               </span>
-              <span class="hidden mobile:inline">Tap a time to snooze</span>
+              <span class="hidden mobile:inline">
+                {t('settingsNotifications.snoozeTapHint')}
+              </span>
             </Show>
           </span>
           <Button
@@ -124,7 +129,7 @@ export function SnoozePicker(
             class="ml-auto shrink-0 text-ink-muted hover:text-ink mobile:min-h-11 mobile:px-2"
             onClick={() => props.onOpenChange(false)}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
         </CommandMenuShell.Footer>
       </CommandMenuShell>

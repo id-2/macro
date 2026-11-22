@@ -5,7 +5,7 @@ import {
 } from '@core/component/UploadProgress/uploadProgress';
 import { humanFileSize } from '@core/util/humanFileSize';
 import { holdAutomaticReload } from '@core/util/reloadForNewerBuild';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { match } from 'ts-pattern';
 import type {
   ZipWorkerRequest,

@@ -2,7 +2,7 @@
 //! before a routine is saved, and the saved task records the version they
 //! checked against.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use routine_program::{CODE_STEPS, RoutineProgram, STEP_CONTEXT};
 use serde::Serialize;
 use serde_json::Value;
@@ -169,7 +169,7 @@ pub struct InvalidCodeSteps(pub String);
 /// [`CodeGuide`] for `task`.
 pub async fn guide(
     code: &impl RoutineCode,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     task: &str,
 ) -> anyhow::Result<CodeGuide> {
     let task = task.trim();

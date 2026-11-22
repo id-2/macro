@@ -5,7 +5,7 @@ mod test;
 
 use crate::domain::SettlementTrigger;
 use authentication_service_client::AuthServiceClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Arc;
 use std::time::Duration;
 
@@ -32,7 +32,7 @@ impl HttpSettlementTrigger {
 }
 
 impl SettlementTrigger for HttpSettlementTrigger {
-    fn request_settlement(&self, payer: MacroUserIdStr<'static>) {
+    fn request_settlement(&self, payer: RoxUserIdStr<'static>) {
         let client = self.client.clone();
         tokio::spawn(async move {
             let mut backoff = RETRY_BACKOFF.iter();

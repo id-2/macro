@@ -24,14 +24,14 @@ aws-sdk-secretsmanager = { workspace = true }
 aws-sdk-sqs = { workspace = true }
 axum = { workspace = true }
 contacts = { path = "../../crates/contacts", features = ["axum"] }
-macro_auth = { path = "../../crates/macro_auth" }
-macro_authorization = { path = "../../crates/macro_authorization", features = [
+rox_auth = { path = "../../crates/rox_auth" }
+rox_authorization = { path = "../../crates/rox_authorization", features = [
   "postgres",
 ] }
-macro_aws_config = { path = "../../crates/macro_aws_config" }
-macro_cors = { path = "../../crates/macro_cors" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env = { path = "../../crates/macro_env" }
+rox_aws_config = { path = "../../crates/rox_aws_config" }
+rox_cors = { path = "../../crates/rox_cors" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env = { path = "../../crates/rox_env" }
 rate_limit = { path = "../../crates/rate_limit", features = ["axum"] }
 redis = { workspace = true }
 secretsmanager_client = { path = "../../crates/secretsmanager_client" }
@@ -41,11 +41,11 @@ tokio = { workspace = true }
 tracing = { workspace = true }
 utoipa = { workspace = true }
 utoipa-swagger-ui = { workspace = true }
-macro_service_urls = { path = "../../crates/macro_service_urls" }
+rox_service_urls = { path = "../../crates/rox_service_urls" }
 workspace-hack = { version = "0.1", path = "../../crates/workspace-hack" }
-macro_env_var = { path = "../../crates/macro_env_var" }
-macro_queues = { path = "../../crates/macro_queues" }
-macro_config = { path = "../../crates/macro_config" }
+rox_env_var = { path = "../../crates/rox_env_var" }
+rox_queues = { path = "../../crates/rox_queues" }
+rox_config = { path = "../../crates/rox_config" }
 database_env_vars = { path = "../../crates/database_env_vars" }
 doppler-config = { workspace = true }
 
@@ -55,5 +55,5 @@ mock = []
 [dev-dependencies]
 http-body-util = { workspace = true }
 tower = { workspace = true }
-macro_user_id = { path = "../../crates/macro_user_id" }
+rox_user_id = { path = "../../crates/rox_user_id" }
 serde_json = { workspace = true }

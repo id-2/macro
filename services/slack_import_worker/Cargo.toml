@@ -13,12 +13,12 @@ chrono = { workspace = true }
 database_env_vars = { path = "../../crates/database_env_vars" }
 entity_access = { path = "../../crates/entity_access", default-features = false, features = ["outbound"] }
 import = { path = "../../crates/import" }
-macro_aws_config = { path = "../../crates/macro_aws_config", features = ["s3"] }
-macro_config = { path = "../../crates/macro_config" }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_queues = { path = "../../crates/macro_queues" }
-macro_service_urls = { path = "../../crates/macro_service_urls" }
-macro_user_id = { path = "../../crates/macro_user_id" }
+rox_aws_config = { path = "../../crates/rox_aws_config", features = ["s3"] }
+rox_config = { path = "../../crates/rox_config" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_queues = { path = "../../crates/rox_queues" }
+rox_service_urls = { path = "../../crates/rox_service_urls" }
+rox_user_id = { path = "../../crates/rox_user_id" }
 messages = { path = "../../crates/messages", features = ["outbound"] }
 rootcause = { workspace = true }
 serde_json = { workspace = true }

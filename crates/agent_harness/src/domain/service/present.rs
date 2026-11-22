@@ -22,7 +22,7 @@ use crate::domain::queue::InFlightTurn;
 /// answers back into, the person it answers, and the bot it answers as.
 struct Voice {
     origin: AnnounceOrigin,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
     bot_id: BotId,
 }
 
@@ -45,7 +45,7 @@ impl Voice {
         self.origin.reply_placement.voice_style()
     }
 
-    fn thread_id(&self) -> Option<macro_uuid::Uuid> {
+    fn thread_id(&self) -> Option<rox_uuid::Uuid> {
         self.origin.reply_placement.thread_id(self.origin.thread_id)
     }
 
@@ -54,7 +54,7 @@ impl Voice {
         &self,
         session_id: AgentSessionId,
         turn: TurnId,
-        message_id: macro_uuid::Uuid,
+        message_id: rox_uuid::Uuid,
         segments: Vec<ProjectedSegment>,
     ) -> ReplyPresentation {
         ReplyPresentation {
@@ -251,7 +251,7 @@ where
         if flight.presented.len() < count {
             flight
                 .presented
-                .resize_with(count, macro_uuid::generate_uuid_v7);
+                .resize_with(count, rox_uuid::generate_uuid_v7);
             flight.announcement_message_id = flight.presented.last().copied();
             if let Some(store) = &self.conversation_turns {
                 match store
@@ -310,7 +310,7 @@ where
             return Ok(());
         }
         while flight.presented.len() < count {
-            flight.presented.push(macro_uuid::generate_uuid_v7());
+            flight.presented.push(rox_uuid::generate_uuid_v7());
         }
         // Downstream events name the reply's latest message.
         flight.announcement_message_id = flight.presented.last().copied();
@@ -325,7 +325,7 @@ where
     /// last showed.
     fn shows_differently(
         &self,
-        message_id: macro_uuid::Uuid,
+        message_id: rox_uuid::Uuid,
         segments: &[ProjectedSegment],
     ) -> bool {
         self.presented_shapes

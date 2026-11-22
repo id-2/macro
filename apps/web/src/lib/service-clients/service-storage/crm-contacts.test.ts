@@ -10,7 +10,7 @@ const mocks = vi.hoisted(() => ({
   reportError: vi.fn(),
 }));
 
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: mocks.reportError },
 }));
 

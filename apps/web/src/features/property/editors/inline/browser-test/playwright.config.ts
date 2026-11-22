@@ -14,7 +14,7 @@ export default defineConfig({
     },
   },
   webServer: {
-    command: `MACRO_DEV_HTTPS=false bunx vite --port ${PORT} --strictPort`,
+    command: `ROX_DEV_HTTPS=false bunx vite --port ${PORT} --strictPort`,
     cwd: fileURLToPath(new URL('../../../../../../', import.meta.url)),
     url: `http://localhost:${PORT}/app/`,
     reuseExistingServer: false,

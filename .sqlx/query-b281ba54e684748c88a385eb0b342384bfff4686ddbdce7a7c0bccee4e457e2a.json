@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_messages(id,thread_id,link_id,is_draft,subject,body_html_sanitized,provider_id,provider_version) VALUES($1,$2,$3,true,'Outlook draft','<p>Body</p>','outlook-original','v1')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "b281ba54e684748c88a385eb0b342384bfff4686ddbdce7a7c0bccee4e457e2a"
+}

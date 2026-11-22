@@ -13,8 +13,8 @@ use entity_access::{
     },
     inbound::axum_extractors::AgentSessionAccessLevelExtractor,
 };
-use macro_authorization::{ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService};
-use macro_uuid::Uuid;
+use rox_authorization::{ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService};
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -30,7 +30,7 @@ pub fn agent_session_pull_request_router<T, Access, Auth, S>(
 where
     T: SessionPullRequestLinks,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -109,7 +109,7 @@ pub struct PullRequestSessionsResponse {
 pub async fn list_session_pull_requests<
     T: SessionPullRequestLinks,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -142,7 +142,7 @@ pub async fn list_session_pull_requests<
 pub async fn link_session_pull_request<
     T: SessionPullRequestLinks,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -178,7 +178,7 @@ pub async fn link_session_pull_request<
 pub async fn unlink_session_pull_request<
     T: SessionPullRequestLinks,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
@@ -209,10 +209,10 @@ pub async fn unlink_session_pull_request<
 pub async fn sessions_for_pull_request<
     T: SessionPullRequestLinks,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(request): Json<PullRequestUrl>,
 ) -> Result<Json<PullRequestSessionsResponse>, AgentSessionApiError> {
     let sessions = state
@@ -246,10 +246,10 @@ pub async fn sessions_for_pull_request<
 pub async fn sessions_for_pull_requests<
     T: SessionPullRequestLinks,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<AgentSessionRouterState<T, Access, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(request): Json<PullRequestUrls>,
 ) -> Result<Json<PullRequestsSessionsResponse>, AgentSessionApiError> {
     Ok(Json(PullRequestsSessionsResponse {

@@ -2,7 +2,7 @@ use super::*;
 use channel_sender::ChannelSender;
 use chrono::TimeZone;
 use entity_access::domain::models::{Entity, EntityPermission, EntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MockMessageReader,
     discussions::{MAX_DISCUSSIONS, PAGE_SIZE},
@@ -16,8 +16,8 @@ use models_permissions::share_permission::access_level::AccessLevel;
 
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813b";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|author@rox.one".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|author@rox.one".to_owned()).unwrap()
 }
 
 fn receipt() -> EntityAccessReceipt<ViewAccessLevel> {

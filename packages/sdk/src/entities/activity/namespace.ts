@@ -3,7 +3,7 @@ import type {
   ToolActivityEvent,
 } from '../../../generated/cognition/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { EntityReference } from '../reference';
 import { User } from '../users/user';
 import { activityEntity } from './entity';
@@ -36,9 +36,9 @@ export interface ActivityRange {
 /**
  * The acting user's own action history across Rox.
  *
- * @routing Use when reading what the user did, opened, edited or sent in a time range, or a teammate's or project's history; not everything that changed in the workspace (`macro.workspace`).
+ * @routing Use when reading what the user did, opened, edited or sent in a time range, or a teammate's or project's history; not everything that changed in the workspace (`rox.workspace`).
  *
- * @agent `macro.activity.mine` lists the user's own raw actions (opened,
+ * @agent `rox.activity.mine` lists the user's own raw actions (opened,
  * edited, sent), including actions agents took for them; `User.activity`
  * reads privacy-reviewed daily, weekly and monthly summaries of the user's
  * or a teammate's work; `Initiative.activity` reads one project's history.
@@ -47,7 +47,7 @@ export interface ActivityRange {
  * events; when `truncated` is true, split the range and read each part.
  */
 export class ActivityNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * The acting user's actions in `[from, to)`, newest first, at most 100; when
@@ -56,7 +56,7 @@ export class ActivityNamespace {
    * @example
    * const to = new Date();
    * const from = new Date(to.getTime() - 7 * 24 * 60 * 60 * 1000);
-   * const { activities, truncated } = await macro.activity.mine({ from, to });
+   * const { activities, truncated } = await rox.activity.mine({ from, to });
    *
    * @readonly
    */
@@ -82,7 +82,7 @@ export class ActivityNamespace {
 }
 
 function activityEvent(
-  client: MacroClient,
+  client: RoxClient,
   event: ToolActivityEvent,
 ): ActivityEvent {
   return {

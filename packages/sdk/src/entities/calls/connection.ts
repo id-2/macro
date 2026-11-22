@@ -3,7 +3,7 @@ import type {
   JoinCallRequest,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { CallRecord } from './call-record';
 
 const inspectSymbol: unique symbol = Symbol.for('nodejs.util.inspect.custom');
@@ -33,7 +33,7 @@ export class CallConnection {
 
   /** Construct a connection from the server's admission response. */
   constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     response: CallTokenResponse,
   ) {
     this.call = CallRecord.byId(client, response.callId);

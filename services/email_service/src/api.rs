@@ -4,7 +4,7 @@ pub(crate) mod read_receipts;
 use anyhow::Context;
 use axum::Router;
 use context::ApiContext;
-use macro_tower_layers::MacroRequestIdAndTracingLayer;
+use rox_tower_layers::RoxRequestIdAndTracingLayer;
 use std::time::Duration;
 use tower::ServiceBuilder;
 use tower_http::compression::CompressionLayer;
@@ -43,7 +43,7 @@ pub(crate) async fn setup_and_serve(state: ApiContext) -> anyhow::Result<()> {
         port
     );
     axum::serve(listener, app.into_make_service())
-        .with_graceful_shutdown(macro_entrypoint::shutdown_signal())
+        .with_graceful_shutdown(rox_entrypoint::shutdown_signal())
         .await
         .context("error starting service")
 }
@@ -71,10 +71,10 @@ pub(crate) fn app(state: ApiContext) -> Router {
 /// the code could sign in as the user. A person's responses pass unchanged.
 fn hide_sign_in_emails_from_programs<S: Clone + Send + Sync + 'static>(
     router: Router<S>,
-    authorization: macro_authorization::MacroAuthorizationState<context::AuthorizationService>,
+    authorization: rox_authorization::RoxAuthorizationState<context::AuthorizationService>,
 ) -> Router<S> {
     router.layer(axum::middleware::from_fn(move |request, next| {
-        macro_authorization::rewrite_program_json(
+        rox_authorization::rewrite_program_json(
             authorization.clone(),
             request,
             next,
@@ -93,8 +93,8 @@ mod sign_in_email_test;
 fn traced(api: Router) -> Router {
     api.layer(
         ServiceBuilder::new()
-            .layer(MacroRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
-            .layer(macro_cors::cors_layer())
+            .layer(RoxRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
+            .layer(rox_cors::cors_layer())
             .layer(CompressionLayer::new().gzip(true)),
     )
 }

@@ -7,7 +7,7 @@
  *     behavior().use(chat({ macro: macroClient({ apiKey }) }))
  *       .on((sources) => sources.messages, async (message, { wake, chat }) => …)
  */
-import type { Macro } from '@macro-inc/sdk';
+import type { Macro } from '@rox-one/sdk';
 import { behavior } from '../../../core/behavior.ts';
 import { module } from '../../../core/capability.ts';
 import { source } from '../../../core/event.ts';

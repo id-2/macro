@@ -171,7 +171,7 @@ export function CollectionPanes(props: {
 export function CollectionEmpty() {
   return (
     <div class="flex size-full min-h-0 items-center justify-center px-6 text-center text-sm text-ink-muted">
-      Select an item to preview
+      Выберите элемент, чтобы посмотреть его здесь
     </div>
   );
 }

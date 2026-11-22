@@ -16,11 +16,12 @@ import type {
   ClaimedMutation,
   MutationInspection,
 } from '@graphql-cache/protocol';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { OperationResult } from '@urql/core';
 import { authKeys } from '../auth/keys';
 import type { UserInfoData } from '../auth/user-info';
 import { queryClient } from '../client';
+import { readBodyRox } from './body-rox-compat';
 import {
   createLocalDraftStore,
   type DraftStorageSession,
@@ -219,6 +220,7 @@ export function localDraftMessage(local: LocalDraft): EmailMessage {
     created_at: time,
     updated_at: time,
     body_html_sanitized: content.body_html,
+    body_rox: readBodyRox(content),
     to: content.to ?? [],
     cc: content.cc ?? [],
     bcc: content.bcc ?? [],
@@ -841,7 +843,7 @@ export function localDraftQueueLifecycle(
             text(input.senderEmail) ?? text(object(message.from).email),
           body_html: text(input.bodyHtml),
           body_text: text(input.bodyText),
-          body_macro: text(input.bodyMacro),
+          body_rox: text(input.bodyRox),
           replying_to_id: text(input.replyingToId),
           provider_id: text(input.providerId),
           provider_thread_id: text(input.providerThreadId),

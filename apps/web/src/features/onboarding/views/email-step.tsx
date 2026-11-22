@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { createEffect, on } from 'solid-js';
 import { GoogleAccountsStep } from '../components/google-accounts-step';
@@ -50,7 +51,7 @@ export function EmailStep(props: {
       loading={inboxes.accounts().t === 'loading'}
       error={
         inboxes.accounts().t === 'error'
-          ? "Couldn't load your connected accounts."
+          ? t('onboarding.accountsLoadFailed')
           : undefined
       }
       onRetry={inboxes.retry}

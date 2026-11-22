@@ -27,7 +27,7 @@ const COLUMN_WIDTHS: Record<TaskGridColumnId, string> = {
 
 export const TASK_DUE_DATE_COLUMN = {
   id: 'dueDate',
-  label: 'Due date',
+  label: 'Срок',
   defId: SYSTEM_PROPERTY_IDS.DUE_DATE,
   dataType: DataType.DATE,
   isMultiSelect: false,
@@ -37,7 +37,7 @@ export const TASK_DUE_DATE_COLUMN = {
 export const TASK_GRID_COLUMNS = [
   {
     id: 'status',
-    label: 'Status',
+    label: 'Статус',
     defId: SYSTEM_PROPERTY_IDS.STATUS,
     dataType: DataType.SELECT_STRING,
     isMultiSelect: false,
@@ -47,7 +47,7 @@ export const TASK_GRID_COLUMNS = [
   },
   {
     id: 'priority',
-    label: 'Priority',
+    label: 'Приоритет',
     defId: SYSTEM_PROPERTY_IDS.PRIORITY,
     dataType: DataType.SELECT_STRING,
     isMultiSelect: false,
@@ -58,7 +58,7 @@ export const TASK_GRID_COLUMNS = [
   TASK_DUE_DATE_COLUMN,
   {
     id: 'assignees',
-    label: 'Assignees',
+    label: 'Исполнители',
     defId: SYSTEM_PROPERTY_IDS.ASSIGNEES,
     dataType: DataType.ENTITY,
     isMultiSelect: true,
@@ -70,7 +70,7 @@ export const TASK_GRID_COLUMNS = [
 /** The task's project, shown only while Projects is enabled. */
 export const TASK_PROJECT_COLUMN = {
   id: 'initiative',
-  label: 'Project',
+  label: 'Проект',
   defId: SYSTEM_PROPERTY_IDS.PROJECT,
   dataType: DataType.ENTITY,
   isMultiSelect: false,

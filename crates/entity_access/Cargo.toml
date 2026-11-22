@@ -12,7 +12,7 @@ required-features = ["explain_binary"]
 [features]
 axum = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model",
   "dep:model-error-response",
 ]
@@ -20,7 +20,7 @@ default = ["axum", "inbound", "outbound", "ports"]
 explain_binary = [
   "dep:clap",
   "dep:database_env_vars",
-  "dep:macro_entrypoint",
+  "dep:rox_entrypoint",
   "outbound",
   "ports",
 ]
@@ -42,21 +42,21 @@ uuid = { workspace = true }
 # Domain models (always included)
 bot_id = { path = "../bot_id" }
 rootcause = { workspace = true }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 models_entity_access_management = { path = "../models_entity_access_management" }
 models_permissions = { path = "../models_permissions" }
 
 clap = { workspace = true, optional = true }
 database_env_vars = { path = "../database_env_vars", optional = true }
-macro_entrypoint = { path = "../macro_entrypoint", optional = true }
+rox_entrypoint = { path = "../rox_entrypoint", optional = true }
 
 # Async runtime (for ports)
 tokio = { workspace = true, optional = true }
 
 # Axum dependencies (for inbound)
 axum = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = ["axum"] }
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = ["axum"] }
 model = { path = "../model", optional = true }
 model-error-response = { path = "../model-error-response", optional = true }
 model_owner = { path = "../model_owner" }
@@ -72,7 +72,7 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 harness_id = { path = "../harness_id" }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 model_user = { path = "../model_user" }
 rootcause = { workspace = true }
 sqlx = { workspace = true, features = ["postgres", "runtime-tokio-rustls"] }

@@ -51,7 +51,7 @@ macro_rules! push_capable {
 
             fn as_apns<'a>(
                 &self,
-                _sender: Option<MacroUserIdStr<'a>>,
+                _sender: Option<RoxUserIdStr<'a>>,
                 _entity: &model_entity::Entity<'_>,
                 _notification_id: Uuid,
             ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -121,7 +121,7 @@ struct Delivered {
 async fn deliver<T: Notification + NotificationExtIos + Clone>(
     pool: &Pool<Postgres>,
     notification: T,
-    recipients: [&MacroUserIdStr<'static>; 2],
+    recipients: [&RoxUserIdStr<'static>; 2],
 ) -> Delivered
 where
     T::NotifData: Serialize + Send + Sync + 'static,

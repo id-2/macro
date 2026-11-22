@@ -1,7 +1,7 @@
 import { type Context, createContextKey } from "@opentelemetry/api";
 
 const SUPPRESS_USER_ID_KEY = createContextKey(
-	"@macro-inc/observability/suppress-user-id",
+	"@rox-one/observability/suppress-user-id",
 );
 
 /** Marks telemetry whose contract forbids user identity enrichment. */

@@ -1,6 +1,6 @@
 use super::*;
 use email_api_client::domain::models::EmailApiError;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sha2::{Digest, Sha256};
 
 async fn setup(db: &PgPool) -> (PgMailboxSync, Uuid, WatchLease, Uuid) {

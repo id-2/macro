@@ -1,7 +1,7 @@
 import { processEmailColors, stripColorSchemeMediaQueries } from '@core/email';
 import { interceptMailtoLinks } from '@core/util/interceptMailtoLinks';
-import { sanitizeEmailHtml } from '@macro-inc/email-renderer';
-import type { HtmlRenderDecoratorProps } from '@macro-inc/lexical-core/nodes/HtmlRenderNode';
+import { sanitizeEmailHtml } from '@rox-one/email-renderer';
+import type { HtmlRenderDecoratorProps } from '@rox-one/lexical-core/nodes/HtmlRenderNode';
 import {
   type Component,
   createEffect,

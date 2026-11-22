@@ -65,7 +65,7 @@ export function TaskGroupHeader(props: {
     unnamedProjectId() ? 'INITIATIVE' : undefined
   );
   const label = createMemo(() => {
-    if (!props.row.groupId) return props.row.label || 'Not set';
+    if (!props.row.groupId) return props.row.label || 'Не задано';
 
     if (props.groupBy === 'status' || props.groupBy === 'priority') {
       return getPropertyOptionLabel(props.row.groupId) ?? props.row.label;

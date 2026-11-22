@@ -205,7 +205,7 @@ impl ActivitySummarizer for CountingSummarizer {
 
 #[tokio::test]
 async fn the_kill_switch_stops_summaries_before_any_model_call() {
-    let id = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(1));
+    let id = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(1));
     let session = crate::testing::test_agent_session(id);
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
     flags.set(
@@ -263,7 +263,7 @@ async fn the_kill_switch_stops_summaries_before_any_model_call() {
 
 #[tokio::test]
 async fn summaries_run_while_the_kill_switch_is_off() {
-    let id = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(1));
+    let id = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(1));
     let session = crate::testing::test_agent_session(id);
     let mut flags = feature_flags::outbound::fake::FakeFeatureFlags::default();
     flags.set(

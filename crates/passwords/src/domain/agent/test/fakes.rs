@@ -6,7 +6,7 @@ use crate::domain::{
     service::test::fakes::{FakeEnrollment, FakeRepository},
 };
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{
     collections::HashMap,
     sync::{
@@ -25,7 +25,7 @@ pub struct FakeDirectory {
 }
 #[async_trait]
 impl AgentDirectory for FakeDirectory {
-    async fn resolve(&self, user: &MacroUserIdStr<'_>) -> Result<Option<DirectoryAgent>, Error> {
+    async fn resolve(&self, user: &RoxUserIdStr<'_>) -> Result<Option<DirectoryAgent>, Error> {
         let call = self.calls.fetch_add(1, Ordering::SeqCst);
         if self
             .revoke_after
@@ -52,7 +52,7 @@ pub struct FakeAgentAvailability {
 }
 #[async_trait]
 impl AgentAvailability for FakeAgentAvailability {
-    async fn agent_vault_enabled(&self, _: &MacroUserIdStr<'_>) -> bool {
+    async fn agent_vault_enabled(&self, _: &RoxUserIdStr<'_>) -> bool {
         self.calls.fetch_add(1, Ordering::SeqCst);
         self.enabled.load(Ordering::SeqCst)
     }
@@ -70,7 +70,7 @@ pub struct FakeAgents {
     pub delivered: Mutex<Vec<Uuid>>,
     pub calls: AtomicUsize,
     /// Current human team administrators, used as reviewers.
-    pub admins: Mutex<Vec<MacroUserIdStr<'static>>>,
+    pub admins: Mutex<Vec<RoxUserIdStr<'static>>>,
     /// Publisher identity retained per operation or enrollment key.
     pub publishers: Mutex<HashMap<Uuid, (String, AgentAction)>>,
     /// Enrollment keys the fixture marks retired.
@@ -220,9 +220,9 @@ impl AgentRepository for FakeAgents {
         &self,
         _: TeamId,
         item: ItemId,
-        after: Option<&MacroUserIdStr<'_>>,
+        after: Option<&RoxUserIdStr<'_>>,
         limit: u8,
-    ) -> Result<Vec<(MacroUserIdStr<'static>, AgentAccessRow)>, Error> {
+    ) -> Result<Vec<(RoxUserIdStr<'static>, AgentAccessRow)>, Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
         let mut rows: Vec<_> = self
             .rows
@@ -234,8 +234,8 @@ impl AgentRepository for FakeAgents {
             })
             .map(|((_, agent), row)| {
                 (
-                    MacroUserIdStr::parse_from_str(agent)
-                        .map(macro_user_id::cowlike::CowLike::into_owned)
+                    RoxUserIdStr::parse_from_str(agent)
+                        .map(rox_user_id::cowlike::CowLike::into_owned)
                         .unwrap(),
                     row.clone(),
                 )
@@ -252,7 +252,7 @@ impl AgentRepository for FakeAgents {
     async fn catalog(
         &self,
         team: TeamId,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         _: &str,
         after: Option<ItemId>,
         limit: u8,
@@ -279,7 +279,7 @@ impl AgentRepository for FakeAgents {
         &self,
         _: TeamId,
         items: &[ItemId],
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Vec<(ItemId, AgentAccessRow)>, Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
         let rows = self.rows.lock().unwrap();
@@ -420,7 +420,7 @@ impl AgentRepository for FakeAgents {
     async fn pending(
         &self,
         team: TeamId,
-        creator: Option<&MacroUserIdStr<'_>>,
+        creator: Option<&RoxUserIdStr<'_>>,
         _: Option<Uuid>,
         limit: u8,
     ) -> Result<Vec<PendingRequest>, Error> {
@@ -440,8 +440,8 @@ impl AgentRepository for FakeAgents {
                     creator.is_none_or(|creator| record.user_id.as_ref() == creator.as_ref());
                 (record.metadata.team_id == team && manageable).then(|| PendingRequest {
                     record,
-                    agent: MacroUserIdStr::parse_from_str(agent)
-                        .map(macro_user_id::cowlike::CowLike::into_owned)
+                    agent: RoxUserIdStr::parse_from_str(agent)
+                        .map(rox_user_id::cowlike::CowLike::into_owned)
                         .unwrap(),
                     row: row.clone(),
                 })
@@ -455,7 +455,7 @@ impl AgentRepository for FakeAgents {
         _: TeamId,
         item: ItemId,
         request: Uuid,
-    ) -> Result<Option<(MacroUserIdStr<'static>, AgentAccessRow)>, Error> {
+    ) -> Result<Option<(RoxUserIdStr<'static>, AgentAccessRow)>, Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
         Ok(self
             .rows
@@ -471,8 +471,8 @@ impl AgentRepository for FakeAgents {
             })
             .map(|((_, agent), row)| {
                 (
-                    MacroUserIdStr::parse_from_str(agent)
-                        .map(macro_user_id::cowlike::CowLike::into_owned)
+                    RoxUserIdStr::parse_from_str(agent)
+                        .map(rox_user_id::cowlike::CowLike::into_owned)
                         .unwrap(),
                     row.clone(),
                 )

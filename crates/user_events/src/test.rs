@@ -1,12 +1,12 @@
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 #[test]
 fn picture_changed_is_keyed_by_user_and_tagged() {
-    let user_id = MacroUserIdStr::parse_from_str("macro|owner@example.com")
+    let user_id = RoxUserIdStr::parse_from_str("macro|owner@example.com")
         .unwrap()
         .into_owned();
-    let event = UserMacroEvent::picture_changed(UserPictureChangedMetadata {
+    let event = UserRoxEvent::picture_changed(UserPictureChangedMetadata {
         user_id: user_id.clone(),
         file_id: Some("f".to_string()),
         url: Some("https://static/file/f".to_string()),

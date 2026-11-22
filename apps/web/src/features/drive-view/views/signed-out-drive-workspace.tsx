@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ViewBreadcrumbs, ViewShell } from '@app/components/view-shell';
 import { SplitRouter } from '@app/lib/split-router';
 import { SplitPanel } from '@components/app/split-panel';
@@ -23,8 +24,8 @@ export function SignedOutDriveWorkspace() {
                 fallback={
                   <EmptyStatePanel
                     centered
-                    title="Sign in to view your files"
-                    description="Your files and folders are available after you sign in."
+                    title={t('drive.signInToViewFiles')}
+                    description={t('drive.signInToViewFilesBody')}
                   >
                     <LoginButton />
                   </EmptyStatePanel>

@@ -4,7 +4,7 @@ import {
   $convertCardToMention,
   $isDocumentCardNode,
   type DocumentCardDecoratorProps,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { $getNodeByKey, SKIP_DOM_SELECTION_TAG } from 'lexical';
 import { createSignal, onCleanup, Show, Suspense, useContext } from 'solid-js';
 import { LexicalWrapperContext } from '../../context/LexicalWrapperContext';

@@ -22,10 +22,10 @@ use entity_access::{
         },
         ports::EntityAccessService,
     },
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use models_permissions::share_permission::{SharePermissionV2, UpdateSharePermissionRequestV2};
 use serde::Deserialize;
@@ -39,7 +39,7 @@ pub struct PipelineRouterState<P, E, A> {
     /// Entity access receipt issuer.
     pub access: Arc<E>,
     /// Authentication state.
-    pub authorization: MacroAuthorizationState<A>,
+    pub authorization: RoxAuthorizationState<A>,
 }
 
 impl<P, E, A> Clone for PipelineRouterState<P, E, A> {
@@ -56,7 +56,7 @@ impl<P, E, A> FromRef<PipelineRouterState<P, E, A>> for Arc<E> {
         state.access.clone()
     }
 }
-impl<P, E, A> FromRef<PipelineRouterState<P, E, A>> for MacroAuthorizationState<A> {
+impl<P, E, A> FromRef<PipelineRouterState<P, E, A>> for RoxAuthorizationState<A> {
     fn from_ref(state: &PipelineRouterState<P, E, A>) -> Self {
         state.authorization.clone()
     }
@@ -67,7 +67,7 @@ pub fn router<P, E, A, S>(state: PipelineRouterState<P, E, A>) -> Router<S>
 where
     P: PipelineService,
     E: EntityAccessService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()
@@ -100,8 +100,8 @@ where
 /// Create a private or team-shared pipeline.
 #[utoipa::path(post, path = "/crm/pipelines", operation_id = "create_crm_pipeline", request_body = CreatePipeline,
     responses((status = 200, body = AccessiblePipeline)))]
-pub async fn create<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    team: MacroUserTeamExtractorV2<MemberTeamRole, E, A>,
+pub async fn create<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    team: RoxUserTeamExtractorV2<MemberTeamRole, E, A>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Json(input): Json<CreatePipeline>,
 ) -> Result<Json<AccessiblePipeline>, PipelineError> {
@@ -119,8 +119,8 @@ pub async fn create<P: PipelineService, E: EntityAccessService, A: MacroAuthoriz
 /// List the caller's live pipelines in their CRM.
 #[utoipa::path(get, path = "/crm/pipelines", operation_id = "list_crm_pipelines",
     responses((status = 200, body = Vec<AccessiblePipeline>)))]
-pub async fn list<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    team: MacroUserTeamExtractorV2<MemberTeamRole, E, A>,
+pub async fn list<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    team: RoxUserTeamExtractorV2<MemberTeamRole, E, A>,
     State(state): State<PipelineRouterState<P, E, A>>,
 ) -> Result<Json<Vec<AccessiblePipeline>>, PipelineError> {
     Ok(Json(
@@ -133,9 +133,9 @@ pub async fn list<P: PipelineService, E: EntityAccessService, A: MacroAuthorizat
     ))
 }
 
-async fn receipt<T: RequiredPermission, E: EntityAccessService, A: MacroAuthorizationService>(
+async fn receipt<T: RequiredPermission, E: EntityAccessService, A: RoxAuthorizationService>(
     access: &E,
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     id: Uuid,
 ) -> Result<EntityAccessReceipt<T>, PipelineError> {
     Ok(access
@@ -151,8 +151,8 @@ async fn receipt<T: RequiredPermission, E: EntityAccessService, A: MacroAuthoriz
 /// Read one pipeline by its entity identity.
 #[utoipa::path(get, path = "/crm/pipelines/{id}", operation_id = "get_crm_pipeline",
     params(("id" = Uuid, Path)), responses((status = 200, body = AccessiblePipeline)))]
-pub async fn read<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+pub async fn read<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<AccessiblePipeline>, PipelineError> {
@@ -167,8 +167,8 @@ pub async fn read<P: PipelineService, E: EntityAccessService, A: MacroAuthorizat
 /// Read the host-owned table schema.
 #[utoipa::path(get, path = "/crm/pipelines/{id}/table", operation_id = "get_crm_pipeline_table",
     params(("id" = Uuid, Path)), responses((status = 200, body = databases::domain::models::TableDetail)))]
-pub async fn table<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+pub async fn table<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<databases::domain::models::TableDetail>, PipelineError> {
@@ -186,9 +186,9 @@ pub async fn table<P: PipelineService, E: EntityAccessService, A: MacroAuthoriza
 pub async fn view_positions<
     P: PipelineService,
     E: EntityAccessService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path((id, view)): Path<(Uuid, Uuid)>,
 ) -> Result<Json<Vec<databases::domain::models::CardPosition>>, PipelineError> {
@@ -213,8 +213,8 @@ pub struct RowsQuery {
 /// Read pipeline records through pipeline access.
 #[utoipa::path(get, path = "/crm/pipelines/{id}/rows", operation_id = "get_crm_pipeline_rows",
     params(("id" = Uuid, Path), RowsQuery), responses((status = 200, body = databases::domain::storage::StorageRows)))]
-pub async fn rows<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+pub async fn rows<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
     Query(query): Query<RowsQuery>,
@@ -236,9 +236,9 @@ pub async fn rows<P: PipelineService, E: EntityAccessService, A: MacroAuthorizat
 pub async fn query_rows<
     P: PipelineService,
     E: EntityAccessService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
     Json(query): Json<databases::domain::storage::StorageRowsQuery>,
@@ -257,8 +257,8 @@ pub async fn query_rows<
 /// Edit pipeline schema or records with the common typed operations.
 #[utoipa::path(post, path = "/crm/pipelines/{id}/ops", operation_id = "apply_crm_pipeline_ops",
     request_body = databases::domain::models::OpBatch, params(("id" = Uuid, Path)), responses((status = 200, body = databases::domain::models::AppliedOps)))]
-pub async fn apply_ops<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+pub async fn apply_ops<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
     Json(batch): Json<databases::domain::models::OpBatch>,
@@ -281,9 +281,9 @@ pub async fn apply_ops<P: PipelineService, E: EntityAccessService, A: MacroAutho
 pub async fn stage_requirements<
     P: PipelineService,
     E: EntityAccessService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<Vec<StageRequirement>>, PipelineError> {
@@ -301,9 +301,9 @@ pub async fn stage_requirements<
 pub async fn set_stage_requirement<
     P: PipelineService,
     E: EntityAccessService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
     Json(rule): Json<StageRequirement>,
@@ -343,8 +343,8 @@ pub struct TrashPipeline {
 /// Rename a pipeline.
 #[utoipa::path(put, path = "/crm/pipelines/{id}/name", operation_id = "rename_crm_pipeline", request_body = RenamePipeline,
     params(("id" = Uuid, Path)), responses((status = 204)))]
-pub async fn rename<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+pub async fn rename<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
     Json(input): Json<RenamePipeline>,
@@ -361,8 +361,8 @@ pub async fn rename<P: PipelineService, E: EntityAccessService, A: MacroAuthoriz
 /// Update sharing.
 #[utoipa::path(put, path = "/crm/pipelines/{id}/sharing", operation_id = "share_crm_pipeline", request_body = SharePipeline,
     params(("id" = Uuid, Path)), responses((status = 204)))]
-pub async fn share<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+pub async fn share<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
     Json(input): Json<SharePipeline>,
@@ -382,9 +382,9 @@ pub async fn share<P: PipelineService, E: EntityAccessService, A: MacroAuthoriza
 pub async fn permissions<
     P: PipelineService,
     E: EntityAccessService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
 ) -> Result<Json<SharePermissionV2>, PipelineError> {
@@ -403,9 +403,9 @@ pub async fn permissions<
 pub async fn update_permissions<
     P: PipelineService,
     E: EntityAccessService,
-    A: MacroAuthorizationService,
+    A: RoxAuthorizationService,
 >(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
     Json(request): Json<UpdateSharePermissionRequestV2>,
@@ -423,8 +423,8 @@ pub async fn update_permissions<
 /// Trash or restore a pipeline.
 #[utoipa::path(put, path = "/crm/pipelines/{id}/trash", operation_id = "trash_crm_pipeline", request_body = TrashPipeline,
     params(("id" = Uuid, Path)), responses((status = 204)))]
-pub async fn trash<P: PipelineService, E: EntityAccessService, A: MacroAuthorizationService>(
-    auth: MacroAuthorizationExtractor<A, UserOrInternal>,
+pub async fn trash<P: PipelineService, E: EntityAccessService, A: RoxAuthorizationService>(
+    auth: RoxAuthorizationExtractor<A, UserOrInternal>,
     State(state): State<PipelineRouterState<P, E, A>>,
     Path(id): Path<Uuid>,
     Json(input): Json<TrashPipeline>,

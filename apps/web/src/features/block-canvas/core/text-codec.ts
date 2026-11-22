@@ -2,7 +2,7 @@ import {
   canLabel,
   type GraphicsDocument,
   type RichText,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import type { SerializedEditorState } from 'lexical';
 
 export {
@@ -10,9 +10,9 @@ export {
   richTextPlainText,
   type TextAlign,
   validCanvasText,
-} from '@macro-inc/lexical-core/canvas-text';
+} from '@rox-one/lexical-core/canvas-text';
 
-import { validCanvasText } from '@macro-inc/lexical-core/canvas-text';
+import { validCanvasText } from '@rox-one/lexical-core/canvas-text';
 
 /** A pending picker query is ordinary text outside the active editor. */
 export function serializeCanvasTextState(

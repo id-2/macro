@@ -90,8 +90,8 @@ export function RoutinesList(props: {
   const groups = () =>
     (
       [
-        { key: 'activity', title: 'When something happens' },
-        { key: 'schedule', title: 'On a schedule' },
+        { key: 'activity', title: 'Когда что-то происходит' },
+        { key: 'schedule', title: 'По расписанию' },
       ] as const
     )
       .map((group) => ({
@@ -101,12 +101,12 @@ export function RoutinesList(props: {
       .filter((group) => group.rows.length > 0);
   const tabs = (): JSX.Element => (
     <Tabs
-      aria-label="Show routines"
+      aria-label="Показать рутины"
       options={[
-        { value: 'all', label: 'All', count: props.rows.length },
+        { value: 'all', label: 'Все', count: props.rows.length },
         {
           value: 'on',
-          label: 'On',
+          label: 'Включены',
           count: props.rows.filter((row) => row.enabled).length,
         },
         ...(props.discover
@@ -134,7 +134,7 @@ export function RoutinesList(props: {
           <ViewShell.Header>
             <Show when={props.showTitle !== false}>
               <h1 class="mb-3 text-xl font-semibold tracking-[-0.03em] text-ink">
-                Routines
+                Рутины
               </h1>
             </Show>
             <div class="mb-3 flex min-w-0 items-center gap-2">
@@ -149,8 +149,8 @@ export function RoutinesList(props: {
                     input.select();
                   })
                 }
-                label="Search routines"
-                placeholder="Search routines"
+                label="Поиск рутин"
+                placeholder="Поиск рутин"
                 value={search()}
                 onValueChange={setSearch}
                 onEscape={() => list?.focus()}
@@ -158,7 +158,7 @@ export function RoutinesList(props: {
                 hotkey="cmd+f"
               />
               <Button variant="secondary" onClick={props.onCreate}>
-                Create Routine
+                Создать рутину
               </Button>
             </div>
           </ViewShell.Header>
@@ -167,18 +167,18 @@ export function RoutinesList(props: {
         <ListHeader
           title={
             <div class="flex min-w-0 items-center gap-3">
-              <h1 class="text-sm font-semibold text-ink">Routines</h1>
+              <h1 class="text-sm font-semibold text-ink">Рутины</h1>
               {tabs()}
             </div>
           }
         >
           <ViewCreateButton
             presentation="toolbar"
-            aria-label="Create Routine"
+            aria-label="Создать рутину"
             onClick={props.onCreate}
           />
           <ListHeaderSearch
-            label="Search routines"
+            label="Поиск рутин"
             value={search()}
             onValueChange={setSearch}
             focusResults={() => list?.focus()}
@@ -191,9 +191,9 @@ export function RoutinesList(props: {
           role="alert"
           class="mx-4 mb-3 flex items-center justify-between gap-2 text-sm text-failure"
         >
-          Could not load routines.
+          Не удалось загрузить рутины
           <Button variant="ghost" size="sm" onClick={props.onRetry}>
-            Retry
+            Повторить
           </Button>
         </div>
       </Show>
@@ -272,7 +272,7 @@ function RoutinesTable(props: {
       <div
         ref={props.listRef}
         role="table"
-        aria-label="Routines"
+        aria-label="Рутины"
         aria-busy={props.loading}
         tabIndex={-1}
         class="min-w-0 outline-none"
@@ -285,12 +285,12 @@ function RoutinesTable(props: {
             role="row"
             class="min-h-8 px-2 text-xs font-medium text-ink-extra-muted"
           >
-            <span role="columnheader">Name</span>
-            <span role="columnheader">Trigger</span>
-            <span role="columnheader">Steps</span>
-            <span role="columnheader">Last run</span>
+            <span role="columnheader">Название</span>
+            <span role="columnheader">Условие</span>
+            <span role="columnheader">Шаги</span>
+            <span role="columnheader">Последний запуск</span>
             <span role="columnheader" class="sr-only">
-              On
+              Включены
             </span>
           </RoutineRowLayout>
         </div>
@@ -383,19 +383,19 @@ function RoutinesTable(props: {
               <ClockIcon class="size-6 text-ink-extra-muted" />
               <p>
                 {props.loading
-                  ? 'Loading routines…'
+                  ? 'Загрузка рутин…'
                   : props.error
-                    ? 'Routines are unavailable'
+                    ? 'Рутины недоступны'
                     : props.search.trim() || props.show === 'on'
-                      ? 'No matching routines'
-                      : 'No routines yet'}
+                      ? 'Нет подходящих рутин'
+                      : 'Рутин пока нет'}
               </p>
               <Show
                 when={!props.loading && !props.error && !props.search.trim()}
               >
                 <p>
-                  Create a routine to act on new email, tasks and messages, or
-                  on a schedule.
+                  Создайте рутину, чтобы действовать при новой почте, задачах и
+                  сообщениях или по расписанию.
                 </p>
               </Show>
             </div>

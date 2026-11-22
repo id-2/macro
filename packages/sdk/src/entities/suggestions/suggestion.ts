@@ -10,18 +10,18 @@ import type {
   Target,
 } from '../../../generated/scheduled-action/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { activityEntity } from '../activity/entity';
 import { AgentSession } from '../agent-sessions/agent-session';
 import { EmailDraft } from '../email/draft';
-import type { MacroEntityType } from '../entity';
+import type { RoxEntityType } from '../entity';
 import type { EntityReference } from '../reference';
 
 /** An item a suggestion is about: any handle with an entity type, such as an `EmailThread`, and optionally a part of it, such as one message in a channel. */
 export interface SuggestionItem {
   readonly entity: {
     readonly id: string;
-    readonly entityType: MacroEntityType;
+    readonly entityType: RoxEntityType;
   };
   readonly part?: { readonly id: string };
 }
@@ -60,7 +60,7 @@ export function targets(items: SuggestionItem[]): Target[] {
 
 /** A suggestions write's outcome, with its suggestion as a handle. */
 export function outcome(
-  client: MacroClient,
+  client: RoxClient,
   record: SuggestionWriteRecord,
 ): SuggestionWriteOutcome {
   return {
@@ -74,19 +74,19 @@ export function outcome(
 
 /**
  * One of the user's suggestions: a prompt to run, a note about specific items, or a
- * routine suggestion. List-sourced only, from `macro.suggestions.list()` or
- * `macro.suggestions.review()`, so this wraps the record the caller already has.
+ * routine suggestion. List-sourced only, from `rox.suggestions.list()` or
+ * `rox.suggestions.review()`, so this wraps the record the caller already has.
  *
  * @mcp-exclude Suggestions are written by hidden generation sessions and acted on in the app, not over MCP.
  */
 export class Suggestion {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     private readonly record: SuggestionRecord,
   ) {}
 
   /** Wrap a suggestion record already in hand. */
-  static from(client: MacroClient, record: SuggestionRecord): Suggestion {
+  static from(client: RoxClient, record: SuggestionRecord): Suggestion {
     return new Suggestion(client, record);
   }
 
@@ -320,7 +320,7 @@ export class Suggestion {
    * Attach a reply draft to this open reply suggestion, with a `reason`; it replaces
    * the suggestion's old draft. Only a suggestions generation session may. The draft is
    * the user's own unsent draft in the thread the suggestion is about, from
-   * `macro.email.createDraft({thread, replyingTo, ...}, await thread.link())`.
+   * `rox.email.createDraft({thread, replyingTo, ...}, await thread.link())`.
    * Nothing is sent.
    */
   async attachDraft(

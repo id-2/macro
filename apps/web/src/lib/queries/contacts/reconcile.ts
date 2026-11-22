@@ -1,7 +1,7 @@
 import type { CacheHost } from '@graphql-cache/host/types';
 import { CONTACT_SYNC_UNSUPPORTED } from '@graphql-cache/people/sync-protocol';
 import type { HydrationScope } from '@graphql-cache/protocol';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { fetchContactDirectoryByIds } from '@service-storage/graphql-contacts';
 import { ContactDirectoryScopeError } from './cache-scope';
 import { contactRecordKey } from './contact-key';

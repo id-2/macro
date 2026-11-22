@@ -3,7 +3,7 @@
 
 use std::collections::HashMap;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -30,7 +30,7 @@ impl ComputerAgents for PgComputerRepo {
     async fn agent_of(
         &self,
         computer: ComputerId,
-    ) -> Result<Option<MacroUserIdStr<'static>>, PgComputerError> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, PgComputerError> {
         PgComputerAgents::new(self.pool.clone())
             .agent_of(computer)
             .await
@@ -39,7 +39,7 @@ impl ComputerAgents for PgComputerRepo {
     async fn computer_for_agent(
         &self,
         team_id: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Option<ComputerId>, PgComputerError> {
         PgComputerAgents::new(self.pool.clone())
             .computer_for_agent(team_id, agent)
@@ -49,7 +49,7 @@ impl ComputerAgents for PgComputerRepo {
     async fn has_live_computer(
         &self,
         team_id: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<bool, PgComputerError> {
         PgComputerAgents::new(self.pool.clone())
             .has_live_computer(team_id, agent)
@@ -65,7 +65,7 @@ impl harnesses::domain::ports::ComputerTeamAgents for PgComputerAgents {
     async fn team_agents_of(
         &self,
         computers: &[ComputerId],
-    ) -> Result<HashMap<ComputerId, MacroUserIdStr<'static>>, PgComputerError> {
+    ) -> Result<HashMap<ComputerId, RoxUserIdStr<'static>>, PgComputerError> {
         let ids: Vec<Uuid> = computers
             .iter()
             .map(|computer| computer.as_uuid())
@@ -88,7 +88,7 @@ impl harnesses::domain::ports::ComputerTeamAgents for PgComputerAgents {
         .await?;
         rows.into_iter()
             .map(|row| {
-                let agent = MacroUserIdStr::try_from(row.agent_user_id).map_err(|_| {
+                let agent = RoxUserIdStr::try_from(row.agent_user_id).map_err(|_| {
                     PgComputerError::Corrupt("agent_user_id is not a Rox user id".to_owned())
                 })?;
                 Ok((ComputerId::new_from_uuid(row.id), agent))
@@ -104,7 +104,7 @@ impl ComputerAgents for PgComputerAgents {
     async fn agent_of(
         &self,
         computer: ComputerId,
-    ) -> Result<Option<MacroUserIdStr<'static>>, PgComputerError> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, PgComputerError> {
         let agent = sqlx::query_scalar!(
             r#"
             SELECT agent_user_id FROM hosted_runtime WHERE id = $1
@@ -119,7 +119,7 @@ impl ComputerAgents for PgComputerAgents {
         .flatten();
         agent
             .map(|agent| {
-                MacroUserIdStr::try_from(agent).map_err(|_| {
+                RoxUserIdStr::try_from(agent).map_err(|_| {
                     PgComputerError::Corrupt("agent_user_id is not a Rox user id".to_owned())
                 })
             })
@@ -130,7 +130,7 @@ impl ComputerAgents for PgComputerAgents {
     async fn computer_for_agent(
         &self,
         team_id: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Option<ComputerId>, PgComputerError> {
         // A purchase still confirming counts: its id is the future computer's.
         let id = sqlx::query_scalar!(
@@ -152,7 +152,7 @@ impl ComputerAgents for PgComputerAgents {
     async fn has_live_computer(
         &self,
         team_id: Uuid,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<bool, PgComputerError> {
         Ok(sqlx::query_scalar!(
             r#"

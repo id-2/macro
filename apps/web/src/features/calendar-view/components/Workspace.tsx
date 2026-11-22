@@ -8,6 +8,7 @@ import {
 import { useCalendarView } from '@app/features/calendar/components/CalendarViewContext';
 import { RangeUnavailableBanner } from '@app/features/calendar/components/RangeUnavailableBanner';
 import { ViewTour } from '@app/features/tours/ViewTour';
+import { t } from '@app/lib/i18n';
 import { createRenderQueue } from '@app/lib/utils/create-render-queue';
 import { createSizeBreakpoints } from '@app/util/create-size-breakpoints';
 import {
@@ -206,7 +207,9 @@ function WorkspaceContent(props: { headerLeading?: JSX.Element }) {
   const panel = useSplitPanelOrThrow();
 
   // An inline preview keeps its host's name.
-  useSplitDisplayName(() => (panel.isInlinePreview ? undefined : 'Calendar'));
+  useSplitDisplayName(() =>
+    panel.isInlinePreview ? undefined : t('nav.calendar')
+  );
 
   return (
     <Switch>

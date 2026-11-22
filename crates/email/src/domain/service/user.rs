@@ -2,7 +2,7 @@ use crate::domain::{
     models::{EmailErr, LinkLabel, UserEmailLink},
     ports::{EmailUserRepo, EmailUserService},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::EmailServiceImpl;
 
@@ -20,7 +20,7 @@ where
 {
     async fn get_user_email_senders(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
         link_id: uuid::Uuid,
     ) -> Result<Vec<crate::domain::senders::SendAsAddress>, EmailErr> {
         let inboxes = self.email_repo.user_accessible_inboxes(macro_id).await?;
@@ -43,7 +43,7 @@ where
 
     async fn get_user_email_labels(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<LinkLabel>, EmailErr> {
         let inboxes = self.email_repo.user_accessible_inboxes(macro_id).await?;
         let mut labels = Vec::new();
@@ -60,7 +60,7 @@ where
 
     async fn get_user_email_links(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<UserEmailLink>, EmailErr> {
         let details = self.email_repo.user_inbox_details(macro_id).await?;
         let mut links = Vec::with_capacity(details.len());

@@ -1,7 +1,7 @@
 import { defineBlock, type ExtractLoadType, LoadErrors } from '@core/block';
 import { ENABLE_MARKDOWN_LIVE_COLLABORATION } from '@core/constant/featureFlags';
 import { lazy } from '@core/util/lazy';
-import { NOOP_SPAN } from '@macro-inc/observability';
+import { NOOP_SPAN } from '@rox-one/observability';
 import { fetchSyncDocumentOpenContext } from '@queries/storage/documentLoad/sync-document-context';
 import { makeFileFromBlob } from '@service-storage/util/makeFileFromBlob';
 import { createSyncServiceSource } from '@service-sync/source';
@@ -57,12 +57,12 @@ export const definition = defineBlock({
             owner: documentMetadata.owner,
             documentId: documentMetadata.documentId,
             documentVersionId: documentMetadata.documentVersionId.toString(),
-            // @ts-ignore: TODO: fix / replace @macro-inc/document-processing-job-types
+            // @ts-ignore: TODO: fix / replace @rox-one/document-processing-job-types
             fileType: 'md',
           },
           fileName: documentMetadata.documentName,
           mimeType: definition.accepted['md']!,
-          // @ts-ignore: TODO: fix / replace @macro-inc/document-processing-job-types
+          // @ts-ignore: TODO: fix / replace @rox-one/document-processing-job-types
           metadata: documentMetadata,
         });
 

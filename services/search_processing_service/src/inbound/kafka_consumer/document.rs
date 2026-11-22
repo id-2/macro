@@ -1,7 +1,7 @@
 //! Maps document lifecycle events to search-index actions and processes them.
 
-use documents::domain::events::{DocumentMacroEvent, DocumentTopicEvent};
-use macro_event_broker::MacroEvent as _;
+use documents::domain::events::{DocumentRoxEvent, DocumentTopicEvent};
+use rox_event_broker::RoxEvent as _;
 use model::document::FileType;
 use sqs_client::search::document::SearchExtractorMessage;
 
@@ -197,7 +197,7 @@ async fn process_document_index_action(
 
 pub(super) async fn process_document_event(
     context: &KafkaProcessingContext,
-    event: &DocumentMacroEvent,
+    event: &DocumentRoxEvent,
     partition: i32,
     offset: i64,
 ) -> EventOutcome {

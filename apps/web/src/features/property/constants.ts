@@ -6,7 +6,11 @@
 import type { BlockAlias, BlockName } from '@core/block';
 import { SYSTEM_PROPERTY_IDS } from './identifiers';
 
-export { PROPERTY_OPTION_IDS, SYSTEM_PROPERTY_IDS } from './identifiers';
+export {
+  PROPERTY_OPTION_IDS,
+  SYSTEM_PROPERTY_IDS,
+  systemPropertyDisplayName,
+} from './identifiers';
 
 export const NUMBER_DECIMAL_PLACES = 4;
 

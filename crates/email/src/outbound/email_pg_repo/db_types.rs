@@ -5,7 +5,7 @@ use crate::domain::models::{
 };
 use chrono::{DateTime, Utc};
 use doppleganger::{Doppleganger, Mirror};
-use macro_user_id::{cowlike::CowLike, email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, email::EmailStr, user_id::RoxUserIdStr};
 use sqlx::Type;
 use uuid::Uuid;
 
@@ -125,7 +125,7 @@ impl ThreadPreviewCursorDbRow {
         EmailThreadPreview {
             id,
             provider_id,
-            owner_id: MacroUserIdStr::parse_from_str(&owner_id)
+            owner_id: RoxUserIdStr::parse_from_str(&owner_id)
                 .expect("invalid macro_id in email_links")
                 .into_owned(),
             inbox_visible,
@@ -231,7 +231,7 @@ pub struct DbMessageRow {
     pub is_draft: bool,
     pub body_text: Option<String>,
     pub body_html_sanitized: Option<String>,
-    pub body_macro: Option<String>,
+    pub body_rox: Option<String>,
     pub headers_jsonb: Option<serde_json::Value>,
     pub created_at: chrono::DateTime<Utc>,
     pub updated_at: chrono::DateTime<Utc>,
@@ -261,7 +261,7 @@ impl From<DbMessageRow> for MessageRow {
             has_attachments: row.has_attachments,
             body_text: row.body_text,
             body_html_sanitized: row.body_html_sanitized,
-            body_macro: row.body_macro,
+            body_rox: row.body_rox,
             headers_json: row.headers_jsonb,
             created_at: row.created_at,
             updated_at: row.updated_at,
@@ -490,7 +490,7 @@ impl From<DbSimpleMessageRow> for SimpleMessageInfo {
 }
 
 impl DbLink {
-    pub(crate) fn try_into_model(self) -> Result<Link, macro_user_id::error::ParseErr> {
+    pub(crate) fn try_into_model(self) -> Result<Link, rox_user_id::error::ParseErr> {
         let DbLink {
             id,
             macro_id,
@@ -505,7 +505,7 @@ impl DbLink {
 
         Ok(Link {
             id,
-            macro_id: MacroUserIdStr::parse_from_str(&macro_id)?.into_owned(),
+            macro_id: RoxUserIdStr::parse_from_str(&macro_id)?.into_owned(),
             fusionauth_user_id,
             email_address: EmailStr::try_from(email_address)?,
             provider: DbUserProvider::mirror(provider),

@@ -10,7 +10,7 @@ use crate::domain::{
 };
 use anyhow::Context;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 #[cfg(test)]
@@ -40,11 +40,11 @@ impl TryFrom<StoredRequest> for ChannelAccessRequest {
         Ok(Self {
             id: row.id,
             channel_id: row.channel_id,
-            requester_id: MacroUserIdStr::try_from(row.requester_id)?,
+            requester_id: RoxUserIdStr::try_from(row.requester_id)?,
             status,
             created_at: row.created_at,
             resolved_at: row.resolved_at,
-            resolved_by: row.resolved_by.map(MacroUserIdStr::try_from).transpose()?,
+            resolved_by: row.resolved_by.map(RoxUserIdStr::try_from).transpose()?,
         })
     }
 }
@@ -75,7 +75,7 @@ impl ChannelAccessRequestRepo for PgChannelsRepo {
     async fn latest_access_request(
         &self,
         channel_id: Uuid,
-        requester: &MacroUserIdStr<'static>,
+        requester: &RoxUserIdStr<'static>,
     ) -> anyhow::Result<Option<ChannelAccessRequest>> {
         sqlx::query_as!(
             StoredRequest,
@@ -161,7 +161,7 @@ impl ChannelAccessRequestRepo for PgChannelsRepo {
     async fn cancel_access_request(
         &self,
         channel_id: Uuid,
-        requester: &MacroUserIdStr<'static>,
+        requester: &RoxUserIdStr<'static>,
         at: DateTime<Utc>,
     ) -> anyhow::Result<Option<ChannelAccessRequest>> {
         sqlx::query_as!(
@@ -187,7 +187,7 @@ impl ChannelAccessRequestRepo for PgChannelsRepo {
         &self,
         channel_id: Uuid,
         request_id: Uuid,
-        resolver: &MacroUserIdStr<'static>,
+        resolver: &RoxUserIdStr<'static>,
         decision: ChannelAccessDecision,
         at: DateTime<Utc>,
     ) -> anyhow::Result<Option<ResolvedChannelAccessRequest>> {

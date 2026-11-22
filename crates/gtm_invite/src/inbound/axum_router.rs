@@ -36,7 +36,7 @@ use axum::{
     response::IntoResponse,
     routing::{delete, get, post},
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use rate_limit::{RateLimitService, inbound::rate_limit_middleware};
 
@@ -79,7 +79,7 @@ pub struct GtmInviteRouterState<T, R, Auth> {
     /// The rate limiter guarding the public resolve endpoint.
     pub rate_limiter: R,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<T, R: Clone, Auth> Clone for GtmInviteRouterState<T, R, Auth> {
@@ -92,7 +92,7 @@ impl<T, R: Clone, Auth> Clone for GtmInviteRouterState<T, R, Auth> {
     }
 }
 
-impl<T, R, Auth> FromRef<GtmInviteRouterState<T, R, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, R, Auth> FromRef<GtmInviteRouterState<T, R, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &GtmInviteRouterState<T, R, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -103,7 +103,7 @@ pub fn gtm_invite_router<T, R, Auth, S>(state: GtmInviteRouterState<T, R, Auth>)
 where
     T: GtmInviteService,
     R: RateLimitService + Clone,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()

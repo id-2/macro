@@ -5,7 +5,7 @@ use crate::domain::{
 };
 use crate::outbound::PgUsageRepo;
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 fn publication() -> RatePublication {
     let effective_at = DateTime::from_timestamp(1_800_000_000, 0).unwrap();
@@ -239,7 +239,7 @@ async fn conflicting_replays_and_direct_mutation_cannot_replace_facts(pool: PgPo
     let admission = prepare(&repo).await;
     repo.admit(admission.clone()).await.unwrap();
     let mut changed = admission.request.clone();
-    changed.user = MacroUserIdStr::try_from("macro|other@example.com".to_owned()).unwrap();
+    changed.user = RoxUserIdStr::try_from("macro|other@example.com".to_owned()).unwrap();
     assert!(matches!(
         repo.prepare(changed, admission.rate.clone()).await,
         Err(FinancialError::ReplayConflict {

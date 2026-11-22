@@ -20,7 +20,7 @@ use chrono::Utc;
 use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, EntityType, RequiredPermission, ViewAccessLevel,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use tracing::Instrument as _;
 
 use super::error::{ChangesError, ExtractError, Result};

@@ -13,7 +13,7 @@ use entity_access::domain::{
     models::{AccessError, EntityAccessReceipt, EntityType},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MessageReader, models::MessageParent, ports::MessageError, service::MessageWrite,
 };
@@ -22,7 +22,7 @@ use std::sync::Arc;
 trait ContextAuthorizer: Send + Sync + 'static {
     fn capability(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> impl Future<Output = Result<EntityAccessReceipt<MessageWrite>>> + Send;
 }
@@ -30,7 +30,7 @@ trait ContextAuthorizer: Send + Sync + 'static {
 impl<Access: EntityAccessService> ContextAuthorizer for Access {
     async fn capability(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         parent: &MessageParent,
     ) -> Result<EntityAccessReceipt<MessageWrite>> {
         self.generate_entity_access_receipt::<MessageWrite>(
@@ -96,7 +96,7 @@ impl<Access> MessagePromptContextAdapter<Access> {
 impl<Access: ContextAuthorizer> MessagePromptContext for MessagePromptContextAdapter<Access> {
     async fn authorize_origin(
         &self,
-        actor: &MacroUserIdStr<'static>,
+        actor: &RoxUserIdStr<'static>,
         origin: &AnnounceOrigin,
     ) -> Result<()> {
         let access = self

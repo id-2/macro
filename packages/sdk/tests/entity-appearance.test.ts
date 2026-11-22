@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
-import { type EntityAppearance, Macro } from '../src/macro';
-import { MacroApiError } from '../src/utils';
+import { type EntityAppearance, Macro } from '../src/rox';
+import { RoxApiError } from '../src/utils';
 import { setDefaultRequestVerbHeader } from '../src/utils/activity';
 
 const originalFetch = globalThis.fetch;
@@ -83,7 +83,7 @@ for (const entry of cases) {
     expect(await entity.appearance()).toEqual({});
     refuse = true;
     await expect(entity.setAppearance(appearance)).rejects.toBeInstanceOf(
-      MacroApiError,
+      RoxApiError,
     );
     expect(await entity.appearance()).toEqual({});
     expect(reads).toBe(1);
@@ -101,7 +101,7 @@ for (const entry of cases) {
       expect(request.method).toBe('PUT');
       expect(new URL(request.url).pathname).toBe(`${entry.path}/appearance`);
       expect(request.headers.get('authorization')).toBe('Bearer test-token');
-      expect(request.headers.get('x-macro-sdk-verb')).toBe('edited');
+      expect(request.headers.get('x-rox-sdk-verb')).toBe('edited');
     }
     expect(await writes[1].json()).toEqual(appearance);
     expect(await writes[2].json()).toEqual({});

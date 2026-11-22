@@ -1,5 +1,5 @@
 import type { QuerySchema } from '@app/features/database-query/core/query';
-import { buildMentionMarkdownString } from '@macro-inc/lexical-core/utils/mentions';
+import { buildMentionMarkdownString } from '@rox-one/lexical-core/utils/mentions';
 
 /** A chat opened from a database: what the agent is told, and what the composer starts with. */
 export type DatabaseChat = {

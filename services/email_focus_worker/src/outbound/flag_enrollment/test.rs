@@ -2,8 +2,8 @@ use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
 
 use super::*;
 
-fn owner(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn owner(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 #[tokio::test]
@@ -39,8 +39,8 @@ mod with_posthog_and_the_database {
         outbound::FocusPgRepository,
     };
     use feature_flags::outbound::posthog_local::PostHogLocalFeatureFlags;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
-    use macro_env::Environment;
+    use rox_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_env::Environment;
     use serde_json::json;
     use sqlx::{Pool, Postgres};
     use wiremock::{

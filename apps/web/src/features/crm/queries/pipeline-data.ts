@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { analytics } from '@app/lib/analytics';
 import type { DatabaseOp } from '@core/database-sql/generated/types';
 import { countRowWrites } from '@queries/storage/databases';
@@ -105,7 +106,7 @@ export function createPipelineApi(
 ): DatabaseApi {
   const failure = () => ({
     kind: 'fetch' as const,
-    message: 'Could not read this pipeline.',
+    message: t('crm.pipelineReadFailed'),
   });
   const table = () =>
     new ResultAsync(storage.getCrmPipelineTable(pipeline.id)).mapErr(failure);

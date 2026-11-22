@@ -57,7 +57,7 @@ parse_args() {
 
 run_local_setup() {
   stage_section "Running local setup"
-  stage_note "Set MACRO_LOCAL_VERBOSE=1 to show setup command output."
+  stage_note "Set ROX_LOCAL_VERBOSE=1 to show setup command output."
   if stage_is_dry_run; then
     stage_note "Dry run: stages will be shown but not executed."
   fi

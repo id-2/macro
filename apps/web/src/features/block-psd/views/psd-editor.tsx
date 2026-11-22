@@ -17,7 +17,7 @@ import CloudArrowUp from '@icon/system/regular/cloud-arrow-up.svg';
 import CloudCheck from '@icon/system/regular/cloud-check.svg';
 import Keyboard from '@icon/system/regular/keyboard.svg';
 import WarningCircle from '@icon/system/regular/warning-circle.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { Button } from '@ui/components/Button';
 import {
   createEffect,

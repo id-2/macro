@@ -261,7 +261,7 @@ fn send_request() -> SendRequest {
             bcc: None,
             body_text: Some("body".to_string()),
             body_html: None,
-            body_macro: None,
+            body_rox: None,
             attachments: None,
             headers_json: None,
             send_time: None,

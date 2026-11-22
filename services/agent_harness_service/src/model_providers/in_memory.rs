@@ -2,7 +2,7 @@
 
 use agent_harness::domain::capability_discovery::{CapabilityProbeError, RawCapabilityProbe};
 use agent_inmem::domain::model_access::InMemModelAccess;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use std::sync::Arc;
 
@@ -34,7 +34,7 @@ impl InMemoryModels {
 impl InMemoryModelProbe for InMemoryModels {
     async fn probe(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
     ) -> Result<RawModelProbe, ModelProbeError> {
         let Some(engine) = &self.engine else {
             return Ok(RawModelProbe::Unsupported);
@@ -54,10 +54,10 @@ impl InMemoryModelProbe for InMemoryModels {
 }
 
 impl agent_harness::domain::capability_discovery::CapabilityProbe for InMemoryModels {
-    type Target = MacroUserIdStr<'static>;
+    type Target = RoxUserIdStr<'static>;
     async fn probe(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         model: Option<&str>,
     ) -> Result<RawCapabilityProbe, CapabilityProbeError> {
         let Some(engine) = &self.engine else {
@@ -68,7 +68,11 @@ impl agent_harness::domain::capability_discovery::CapabilityProbe for InMemoryMo
             .access(&Owner::User(caller.clone()))
             .await
             .map_err(|error| CapabilityProbeError::Failed(error.to_string()))?;
-        let current = access.default_model(model.unwrap_or(&self.current));
+        // A model persisted before its provider's key went away is replaced
+        // by one this deployment can call, not reported as unsupported.
+        let current = agent_inmem::domain::models::default_model(
+            access.default_model(model.unwrap_or(&self.current)),
+        );
         if !engine.supported_models().contains(&current) {
             return Err(CapabilityProbeError::Failed("unsupported model".to_owned()));
         }

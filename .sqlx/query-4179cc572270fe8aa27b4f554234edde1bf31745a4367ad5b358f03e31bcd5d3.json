@@ -1,0 +1,17 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_messages(id,thread_id,link_id,is_draft,replying_to_id,subject,body_html_sanitized) VALUES($1,$2,$3,true,$4,'Re: Parent','<p>Reply</p>')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "4179cc572270fe8aa27b4f554234edde1bf31745a4367ad5b358f03e31bcd5d3"
+}

@@ -2,8 +2,8 @@
 
 use std::borrow::Cow;
 
-use ::email::domain::events::{EmailMacroEvent, EmailTopicEvent};
-use macro_event_broker::MacroEvent as _;
+use ::email::domain::events::{EmailRoxEvent, EmailTopicEvent};
+use rox_event_broker::RoxEvent as _;
 use opensearch_client::OpensearchClient;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -50,7 +50,7 @@ pub(super) struct EmailEventDescription {
 /// ordering against a buffered thread event (e.g. a link removal racing a
 /// message upsert) is not guaranteed — an accepted risk of the same order as
 /// this consumer's existing commit-at-handoff drop window.
-pub(super) fn email_ordering_key(event: &EmailMacroEvent) -> Cow<'_, str> {
+pub(super) fn email_ordering_key(event: &EmailRoxEvent) -> Cow<'_, str> {
     let thread_id = match &event.event().event {
         EmailTopicEvent::LinkConnected(_)
         | EmailTopicEvent::LinkDisconnected(_)
@@ -254,7 +254,7 @@ async fn process_email_index_action(
 pub(super) async fn process_email_event(
     db: &PgPool,
     opensearch_client: &OpensearchClient,
-    event: &EmailMacroEvent,
+    event: &EmailRoxEvent,
     partition: i32,
     offset: i64,
 ) -> EventOutcome {

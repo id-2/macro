@@ -3,8 +3,8 @@
 use super::pricing::AiPricing;
 pub use ai_usage::NON_BILLABLE_AI_FEATURES;
 use chrono::{DateTime, Datelike, Months, TimeZone, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use roles_and_permissions::domain::model::RoleId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
@@ -347,7 +347,7 @@ pub enum PayerScope {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SeatAllowance {
     /// The user occupying the seat.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// Included AI for this seat, in cents at provider cost.
     pub included_cents: i64,
 }
@@ -356,7 +356,7 @@ pub struct SeatAllowance {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct SeatUsage {
     /// The user occupying the seat.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// Usage in cents at provider cost.
     pub used_cents: i64,
     /// Total historical overage across paid allowance intervals, when plan
@@ -378,17 +378,17 @@ pub struct Entitlement {
     pub unlimited: bool,
     /// The account that owns credits, overage settings, and the Stripe
     /// customer. The user themself unless they are a team member.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// Every user whose usage can consume the payer's shared credits and
     /// overage. Contains at least the payer.
-    pub billed_users: Vec<MacroUserIdStr<'static>>,
+    pub billed_users: Vec<RoxUserIdStr<'static>>,
     /// How the payer relates to the user.
     pub scope: PayerScope,
 }
 
 impl Entitlement {
     /// A user with no team, paying (or not) for themself.
-    pub fn personal(user: MacroUserIdStr<'static>, tier: PlanTier) -> Self {
+    pub fn personal(user: RoxUserIdStr<'static>, tier: PlanTier) -> Self {
         Self {
             tier,
             seat_tiers: vec![tier],
@@ -426,7 +426,7 @@ impl Entitlement {
     }
 
     /// Whether `user` is the payer (and may change billing settings).
-    pub fn is_payer(&self, user: &MacroUserIdStr<'_>) -> bool {
+    pub fn is_payer(&self, user: &RoxUserIdStr<'_>) -> bool {
         self.payer.as_ref() == user.as_ref()
     }
 
@@ -724,7 +724,7 @@ pub struct UsageSnapshot {
     pub unlimited: bool,
     /// The payer for this user's AI.
     #[schema(value_type = String)]
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// Whether the requesting user is the payer.
     pub can_manage_billing: bool,
     /// Seats billed to the payer.

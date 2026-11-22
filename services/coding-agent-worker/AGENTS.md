@@ -20,7 +20,7 @@ chat message.
 - `src/providers/daytona.ts`: the current `CommandRunner`/`AgentSandbox`
   implementation (Daytona). Add a new provider by implementing `interfaces.ts`.
 - `src/webhook.ts`: registers/repairs the Rox webhook subscription
-  (`message.posted`) via `@macro-inc/sdk`.
+  (`message.posted`) via `@rox-one/sdk`.
 - `container/`: the Dockerfile and flake baking the dev shell + opencode
   sidecar into the sandbox image.
 

@@ -4,7 +4,7 @@ use bot_id::BotId;
 use chrono::{DateTime, Utc};
 use computer_id::ComputerId;
 use harness_id::HarnessId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pairing_id::PairingId;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -108,7 +108,7 @@ pub struct Harness {
     /// reach the agent by message; nothing else may run on its computer.
     /// Set on the caller-facing listings and on a patch's answer.
     #[serde(default)]
-    pub team_agent_user_id: Option<MacroUserIdStr<'static>>,
+    pub team_agent_user_id: Option<RoxUserIdStr<'static>>,
     /// How Claude Code on this machine is paid for, derived from whether
     /// it has an active Claude login. Only meaningful for Rox computers.
     #[serde(default)]
@@ -123,7 +123,8 @@ pub struct Harness {
 pub enum ClaudeMode {
     /// Rox credits, through Rox's Anthropic gateway.
     #[default]
-    MacroCredits,
+    #[serde(rename = "macro_credits")]
+    RoxCredits,
     /// A Claude account signed in on the computer.
     OwnAccount,
 }
@@ -132,7 +133,7 @@ impl ClaudeMode {
     /// Storage representation.
     pub const fn as_str(self) -> &'static str {
         match self {
-            Self::MacroCredits => "macro_credits",
+            Self::RoxCredits => "macro_credits",
             Self::OwnAccount => "own_account",
         }
     }
@@ -143,7 +144,7 @@ impl std::str::FromStr for ClaudeMode {
 
     fn from_str(value: &str) -> Result<Self, Self::Err> {
         match value {
-            "macro_credits" => Ok(Self::MacroCredits),
+            "macro_credits" => Ok(Self::RoxCredits),
             "own_account" => Ok(Self::OwnAccount),
             other => Err(format!("unknown claude mode: {other}")),
         }
@@ -170,7 +171,7 @@ pub struct CreateHostedPairing {
     /// Harness display name.
     pub name: String,
     /// The team admin who bought the computer.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// The computer the harness runs on.
     pub computer_id: ComputerId,
 }
@@ -186,7 +187,11 @@ pub struct HostedPairing {
 
 /// Sent by a daemon reading its own harness while it holds a runtime connection,
 /// so the service can log when its own answer disagrees.
-pub const RUNTIME_CONNECTED_HEADER: &str = "x-macro-harness-runtime-connected";
+pub const RUNTIME_CONNECTED_HEADER: &str = "x-rox-harness-runtime-connected";
+
+/// The name [`RUNTIME_CONNECTED_HEADER`] had before the rename, still read
+/// from daemons that predate it.
+pub const LEGACY_RUNTIME_CONNECTED_HEADER: &str = "x-macro-harness-runtime-connected";
 
 /// Request to open a pairing: the daemon asks for a code the user approves.
 ///

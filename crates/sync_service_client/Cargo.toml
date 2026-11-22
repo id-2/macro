@@ -7,7 +7,7 @@ version = "0.1.0"
 [dependencies]
 anyhow = { workspace = true }
 base64 = { workspace = true }
-macro_sync_service_jwt = { path = "../macro_sync_service_jwt" }
+rox_sync_service_jwt = { path = "../rox_sync_service_jwt" }
 model = { path = "../model" }
 reqwest = { workspace = true }
 serde = { workspace = true }

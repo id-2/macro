@@ -20,7 +20,7 @@ struct FakeDirectory {
 impl TaskDirectory for FakeDirectory {
     async fn task(
         &self,
-        _viewer: &MacroUserIdStr<'static>,
+        _viewer: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> Result<TaskFacts> {
         match task.as_str() {
@@ -37,7 +37,7 @@ impl TaskDirectory for FakeDirectory {
 
     async fn pull_requests(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> Result<Vec<TaskPullRequest>> {
         self.task(viewer, task).await?;
@@ -83,7 +83,7 @@ impl SessionTaskRepo for InMemorySessionTasks {
     async fn set_task(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         task: &TaskDocumentId,
     ) -> Result<SessionTaskWrite, AgentSessionError> {
         let mut stored = self.sessions.get(session).await?;
@@ -165,7 +165,7 @@ fn seeded(harness: &Harness) -> crate::domain::model::AgentSession {
 fn parses_task_ids_links_and_macro_references() {
     let expected = TaskDocumentId(TASK.to_owned());
     let short =
-        macro_uuid::ShortUuidConverter::default().from_uuid(&uuid::Uuid::parse_str(TASK).unwrap());
+        rox_uuid::ShortUuidConverter::default().from_uuid(&uuid::Uuid::parse_str(TASK).unwrap());
     for input in [
         TASK.to_owned(),
         format!("  {}  ", TASK.to_uppercase()),
@@ -323,7 +323,7 @@ async fn refuses_another_owner_a_document_that_is_not_a_task_and_a_hidden_task()
     let harness = harness(RecordingLinker::default(), FakeDirectory::default());
     let session = seeded(&harness);
     let owner = session.owner_user().unwrap();
-    let other = MacroUserIdStr::try_from_email("other@example.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@example.com").unwrap();
 
     assert!(matches!(
         harness.tasks.link_task(session.id, &other, TASK).await,
@@ -523,7 +523,7 @@ async fn lists_a_tasks_pull_requests() {
             pull_requests: pull_requests.clone(),
         },
     );
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
 
     let listed = harness
         .tasks

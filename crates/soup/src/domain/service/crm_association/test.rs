@@ -253,7 +253,7 @@ fn requested_opt_in_sources_are_constrained() {
             ),
         )
         .unwrap(),
-        user_id: MacroUserIdStr::parse_from_str("macro|test@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com")
             .unwrap()
             .into_owned(),
         company_ids,

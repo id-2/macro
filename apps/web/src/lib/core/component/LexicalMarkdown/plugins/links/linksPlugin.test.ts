@@ -11,8 +11,8 @@ import {
   ALL_TRANSFORMERS,
   INTERNAL_TRANSFORMERS,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core';
-import { $isUnlinkedTextNode } from '@macro-inc/lexical-core/nodes/UnlinkedTextNode';
+} from '@rox-one/lexical-core';
+import { $isUnlinkedTextNode } from '@rox-one/lexical-core/nodes/UnlinkedTextNode';
 import {
   $createParagraphNode,
   $createTextNode,

@@ -4,7 +4,7 @@ use super::helpers::*;
 use crate::domain::companies_repo::*;
 use crate::domain::model::{CrmCompanyContactsQuery, CrmError};
 use crate::outbound::companies_repo::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

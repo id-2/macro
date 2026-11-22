@@ -6,7 +6,7 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use macro_middleware::tracking::ClientIp;
+use rox_middleware::tracking::ClientIp;
 use model::response::ErrorResponse;
 
 /// IP-based rate limit for mobile welcome email requests.

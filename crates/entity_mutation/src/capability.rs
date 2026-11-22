@@ -14,7 +14,7 @@
 //! cascade consequence as an ordered update or deletion effect.
 
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt, RequiredPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use models_permissions::share_permission::UpdateSharePermissionRequestV2;
 
@@ -134,7 +134,7 @@ pub trait DuplicateEntity {
         &self,
         entity: Entity<'static>,
         receipt: EntityAccessReceipt<Self::Receipt>,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         display_name: Option<String>,
     ) -> impl Future<Output = Result<Vec<EntityMutationEffect>, EntityMutationErrorCode>> + Send;
 }

@@ -1,12 +1,12 @@
 use super::*;
 use crate::domain::rollout::{ComputerRollout, ENABLE_MACRO_COMPUTERS};
 use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 pub(super) fn enabled_rollout() -> ComputerRollout {
     let mut flags = FakeFeatureFlags::default();
     flags.set(
-        MacroUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
         Ok(FlagSnapshot::new([(
             ENABLE_MACRO_COMPUTERS.into(),
             FlagValue::Boolean(true),
@@ -18,7 +18,7 @@ pub(super) fn enabled_rollout() -> ComputerRollout {
 fn disabled_rollout() -> ComputerRollout {
     let mut flags = FakeFeatureFlags::default();
     flags.set(
-        MacroUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+        RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
         Ok(FlagSnapshot::new([(
             ENABLE_MACRO_COMPUTERS.into(),
             FlagValue::Boolean(false),
@@ -41,7 +41,7 @@ async fn purchase_for_team_refuses_flag_off_before_reserving_or_billing() {
             billing: PurchaseBilling::Stripe,
             purchase_key: key("buy-dialog-1"),
             team_id: TEAM,
-            created_by: MacroUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+            created_by: RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
             size: ComputerSize::Standard,
             name: None,
             extra_items: vec![],
@@ -65,7 +65,7 @@ async fn offers_refuse_flag_off_before_billing() {
         service
             .offers(
                 TEAM,
-                MacroUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap()
+                RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap()
             )
             .await,
         Err(ComputerError::RolloutDisabled)
@@ -92,7 +92,7 @@ async fn existing_computer_with_flag_off() -> (
             billing: PurchaseBilling::Stripe,
             purchase_key: key("buy-dialog-1"),
             team_id: TEAM,
-            created_by: MacroUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
+            created_by: RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap(),
             size: ComputerSize::Standard,
             name: Some("Build box".to_owned()),
             extra_items: vec![],

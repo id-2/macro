@@ -7,8 +7,8 @@
 mod test;
 
 use crate::domain::models::email_notification_digest::ports::{MessageId, MessageReceiptRepo};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -34,7 +34,7 @@ impl MessageReceiptRepo for DbMessageReceiptRepository {
     async fn record_message_id(
         &self,
         message_id: MessageId,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> Result<(), Report> {
         let user_id_str = user_id.to_string();
@@ -58,7 +58,7 @@ impl MessageReceiptRepo for DbMessageReceiptRepository {
     async fn mark_message_failed(
         &self,
         message_id: MessageId,
-    ) -> Result<(MacroUserIdStr<'static>, Uuid), Report> {
+    ) -> Result<(RoxUserIdStr<'static>, Uuid), Report> {
         let row = sqlx::query!(
             r#"
             UPDATE notification_message_receipt
@@ -71,7 +71,7 @@ impl MessageReceiptRepo for DbMessageReceiptRepository {
         .fetch_one(&self.db)
         .await?;
 
-        let user_id = MacroUserIdStr::parse_from_str(&row.user_id)
+        let user_id = RoxUserIdStr::parse_from_str(&row.user_id)
             .map(CowLike::into_owned)
             .map_err(|e| rootcause::report!(e))?;
 
@@ -80,7 +80,7 @@ impl MessageReceiptRepo for DbMessageReceiptRepository {
 
     async fn did_all_messages_fail(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         notification_id: Uuid,
     ) -> Result<bool, Report> {
         let user_id_str = user_id.to_string();

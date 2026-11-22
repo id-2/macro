@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT generation FROM email_message_reconciliation WHERE link_id = $1 ORDER BY generation",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "generation",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false
+    ]
+  },
+  "hash": "8e2e36afa6647af05c8c19986923c924f905f4bcb56e06dcbb914b9bdc9e4dba"
+}

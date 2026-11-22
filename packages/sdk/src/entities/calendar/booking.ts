@@ -5,8 +5,8 @@ import type {
   BookingSlot,
 } from '../../../generated/calendar/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 
 /**
@@ -14,7 +14,7 @@ import { User } from '../users/user';
  * links. Detail loads through the host's management view, so it needs the
  * personal owner, a host of the meeting or a team administrator.
  */
-export class Booking extends MacroEntity<BookingRecord> {
+export class Booking extends RoxEntity<BookingRecord> {
   protected async fetch(): Promise<BookingRecord> {
     return unwrap(
       await this.client.calendar.getManagedBooking({ path: { id: this.id } }),
@@ -22,12 +22,12 @@ export class Booking extends MacroEntity<BookingRecord> {
   }
 
   /** A handle to a booking by id. Detail loads on first access. */
-  static byId(client: MacroClient, id: string): Booking {
+  static byId(client: RoxClient, id: string): Booking {
     return new Booking(client, id);
   }
 
   /** A handle seeded with a booking record the service returned. */
-  static fromRecord(client: MacroClient, record: BookingRecord): Booking {
+  static fromRecord(client: RoxClient, record: BookingRecord): Booking {
     return new Booking(client, record.id, record);
   }
 

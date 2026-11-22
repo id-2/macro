@@ -1,7 +1,7 @@
 //! Maps channel lifecycle events to search-index actions and processes them.
 
-use channels::domain::broker_events::{ChannelMacroEvent, ChannelTopicEvent};
-use macro_event_broker::MacroEvent as _;
+use channels::domain::broker_events::{ChannelRoxEvent, ChannelTopicEvent};
+use rox_event_broker::RoxEvent as _;
 use opensearch_client::OpensearchClient;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -79,7 +79,7 @@ async fn process_channel_index_action(
 pub(super) async fn process_channel_event(
     _db: &PgPool,
     opensearch_client: &OpensearchClient,
-    event: &ChannelMacroEvent,
+    event: &ChannelRoxEvent,
     partition: i32,
     offset: i64,
 ) -> EventOutcome {

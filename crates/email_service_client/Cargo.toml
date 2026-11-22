@@ -7,7 +7,7 @@ version = "0.1.0"
 [dependencies]
 anyhow = { workspace = true }
 email = { path = "../email", features = ["axum", "inbound"] }
-macro_tower_layers = { path = "../macro_tower_layers" }
+rox_tower_layers = { path = "../rox_tower_layers" }
 models_email = { path = "../models_email" }
 reqwest = { workspace = true }
 tracing = { workspace = true }

@@ -7,12 +7,12 @@ import type {
 } from '../../generated/properties/types.gen';
 import type { FavoriteEntityRef } from '../../generated/storage/types.gen';
 import { Lazy, unwrap } from '../utils';
-import type { MacroClient } from '../utils/client';
+import type { RoxClient } from '../utils/client';
 import type { PropertyDefinition } from './properties/property-definition';
 import type { PropertyOption } from './properties/property-option';
 
 /** How the entity-addressed APIs (favorites) identify an entity's type. */
-export type MacroEntityType = FavoriteEntityRef['entityType'];
+export type RoxEntityType = FavoriteEntityRef['entityType'];
 
 /** An entity that can be added to and removed from the user's favorites. */
 export interface Favoritable {
@@ -55,11 +55,11 @@ type Normalized<V> = null extends V
  * mutation. Subclasses implement {@link fetch} and build their surface from
  * {@link field} and {@link mutate}.
  */
-export abstract class MacroEntity<Detail> {
+export abstract class RoxEntity<Detail> {
   protected readonly detail: Lazy<Detail>;
 
   protected constructor(
-    protected readonly client: MacroClient,
+    protected readonly client: RoxClient,
     public readonly id: string,
     seed?: Detail,
   ) {
@@ -118,7 +118,7 @@ export abstract class MacroEntity<Detail> {
 
   /** Run a write, unwrap it, and drop the cached detail so reads refetch. */
   protected async mutate<TData>(
-    fn: (client: MacroClient) => Promise<{
+    fn: (client: RoxClient) => Promise<{
       data?: TData;
       error?: unknown;
       response?: Response;
@@ -132,11 +132,11 @@ export abstract class MacroEntity<Detail> {
 
 /** An entity the favorites API can address, and so can be (un)favorited. */
 export abstract class FavoritableEntity<Detail>
-  extends MacroEntity<Detail>
+  extends RoxEntity<Detail>
   implements Favoritable
 {
   /** How the entity-addressed APIs (favorites) identify this entity's type. */
-  abstract readonly entityType: MacroEntityType;
+  abstract readonly entityType: RoxEntityType;
 
   /**
    * Read the caller's effective permission on this entity.

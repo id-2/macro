@@ -1,4 +1,4 @@
-import { $diffNodeDeleteAtStart } from '@macro-inc/lexical-core';
+import { $diffNodeDeleteAtStart } from '@rox-one/lexical-core';
 import type { LexicalEditor } from 'lexical';
 import { COMMAND_PRIORITY_CRITICAL } from 'lexical';
 import { mapRegisterDelete } from '../shared/utils';

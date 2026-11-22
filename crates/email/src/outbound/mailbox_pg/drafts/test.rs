@@ -10,7 +10,7 @@ use crate::{
     },
 };
 use email_api_client::domain::models::{MailboxState, SendRequest};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 mod delivery_status;
 mod sent_view;
@@ -104,7 +104,7 @@ async fn explicit_retry_and_read_only_recheck_have_different_delivery_effects(db
         .await
         .unwrap();
     let actor =
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("outlook-test@example.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("outlook-test@example.com").unwrap();
     let facts = repo
         .message_operation_facts(&[input.db_id])
         .await
@@ -179,7 +179,7 @@ async fn conflict_resolution_rechecks_version_at_commit_and_requires_a_fresh_sen
         .await
         .unwrap();
     let actor =
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("outlook-test@example.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("outlook-test@example.com").unwrap();
     let facts = repo
         .message_operation_facts(&[input.db_id])
         .await
@@ -485,9 +485,9 @@ async fn remote_ingestion_preserves_an_unsynced_local_edit_and_records_remote_co
     remote.content.message.is_draft = true;
     remote.content.message.body_text = Some("Outlook edit".into());
     sync.ingest(&work, remote).await.unwrap();
-    let row=sqlx::query!("SELECT m.body_text,m.body_macro,m.provider_version,d.base_version,d.remote_snapshot FROM email_messages m JOIN email_mailbox_drafts d ON d.message_id = m.id WHERE m.id = $1",input.db_id).fetch_one(&db).await.unwrap();
+    let row=sqlx::query!("SELECT m.body_text,m.body_rox,m.provider_version,d.base_version,d.remote_snapshot FROM email_messages m JOIN email_mailbox_drafts d ON d.message_id = m.id WHERE m.id = $1",input.db_id).fetch_one(&db).await.unwrap();
     assert_eq!(row.body_text.as_deref(), Some("Local body"));
-    assert_eq!(row.body_macro.as_deref(), Some("Local editor document"));
+    assert_eq!(row.body_rox.as_deref(), Some("Local editor document"));
     assert_eq!(row.provider_version.as_deref(), Some("v2"));
     assert_eq!(row.base_version.as_deref(), Some("v1"));
     assert_eq!(row.remote_snapshot.unwrap()["body_text"], "Outlook edit");
@@ -768,7 +768,7 @@ async fn draft_organization_waits_for_binding_and_rebases_queued_edits(db: PgPoo
         .mailbox_action_messages(link, input.thread_db_id)
         .await
         .unwrap();
-    let actor = macro_user_id::user_id::MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap();
+    let actor = rox_user_id::user_id::RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap();
     let first = repo
         .enqueue_mailbox_action(
             link,
@@ -933,7 +933,7 @@ async fn queued_local_draft_command_cannot_resurrect_a_discarded_draft(db: PgPoo
         .mailbox_action_messages(link, input.thread_db_id)
         .await
         .unwrap();
-    let actor = macro_user_id::user_id::MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap();
+    let actor = rox_user_id::user_id::RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap();
     repo.enqueue_mailbox_action(
         link,
         actor,
@@ -980,7 +980,7 @@ async fn late_organization_confirmation_preserves_a_transferred_source_tombstone
         .mailbox_action_messages(link, input.thread_db_id)
         .await
         .unwrap();
-    let actor = macro_user_id::user_id::MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap();
+    let actor = rox_user_id::user_id::RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap();
     repo.enqueue_mailbox_action(
         link,
         actor,
@@ -1035,7 +1035,7 @@ async fn native_draft_first_edit_adopts_proven_organization_versions_before_proj
         .mailbox_action_messages(link, input.thread_db_id)
         .await
         .unwrap();
-    let actor = macro_user_id::user_id::MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap();
+    let actor = rox_user_id::user_id::RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap();
     repo.enqueue_mailbox_action(
         link,
         actor,

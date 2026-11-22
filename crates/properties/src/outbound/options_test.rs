@@ -6,7 +6,7 @@ use crate::domain::model::{
     PropertyOptionReplacePlan, PropertyOptionRewrite, UpdatePropertyOptionOutcome,
 };
 use crate::domain::ports::PropertiesRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::service::property_value::PropertyValue;
 use models_properties::{DataType, EntityType};

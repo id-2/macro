@@ -64,7 +64,7 @@ impl SessionTasks for FixedTasks {
     fn link_task<'a>(
         &'a self,
         session: AgentSessionId,
-        _owner: &'a macro_user_id::user_id::MacroUserIdStr<'static>,
+        _owner: &'a rox_user_id::user_id::RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<LinkedTask, SessionTaskError>> {
         self.linked.lock().unwrap().push((session, task.to_owned()));
@@ -84,7 +84,7 @@ impl SessionTasks for FixedTasks {
 
     fn task_pull_requests<'a>(
         &'a self,
-        _owner: &'a macro_user_id::user_id::MacroUserIdStr<'static>,
+        _owner: &'a rox_user_id::user_id::RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<TaskPullRequests, SessionTaskError>> {
         Box::pin(async move {
@@ -102,7 +102,7 @@ impl SessionTasks for FixedTasks {
     fn link_session_pull_request<'a>(
         &'a self,
         _session: AgentSessionId,
-        _owner: &'a macro_user_id::user_id::MacroUserIdStr<'static>,
+        _owner: &'a rox_user_id::user_id::RoxUserIdStr<'static>,
     ) -> BoxFuture<'a, Result<(), SessionTaskError>> {
         Box::pin(async { Ok(()) })
     }

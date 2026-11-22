@@ -2,7 +2,7 @@ import {
   cellDateMention,
   cellPlainText,
   encodeCellMention,
-} from '@macro-inc/spreadsheet/cell-mentions';
+} from '@rox-one/spreadsheet/cell-mentions';
 import { describe, expect, it } from 'vitest';
 import { cellDateInput, serialDay } from './cell-date';
 

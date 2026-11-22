@@ -1,7 +1,11 @@
+import {
+  interfaceLanguageReady,
+  setInterfaceLanguage,
+} from '@app/lib/i18n';
 import { MACRO_AGENT_PRINCIPAL_ID } from '@core/constant/macroAgent';
 import { MACRO_SYSTEM_PRINCIPAL_ID } from '@core/constant/macroSystem';
 import { createRoot } from 'solid-js';
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   createMockActivityContext,
   MOCK_VIEWER_ID,
@@ -22,8 +26,17 @@ function nameOf(
 describe('createActorName', () => {
   const context = createMockActivityContext();
 
+  beforeAll(() => setInterfaceLanguage('en'));
+
   it('names the viewer "You"', () => {
     expect(nameOf(context, MOCK_VIEWER_ID)).toBe('You');
+  });
+
+  it('names the viewer "Вы" in Russian', async () => {
+    setInterfaceLanguage('ru');
+    await interfaceLanguageReady(5000);
+    expect(nameOf(context, MOCK_VIEWER_ID)).toBe('Вы');
+    setInterfaceLanguage('en');
   });
 
   it('resolves other users through displayName', () => {

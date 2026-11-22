@@ -1,4 +1,4 @@
-import type { ResourceLifetime } from '@macro-inc/email-renderer/browser';
+import type { ResourceLifetime } from '@rox-one/email-renderer/browser';
 import { createRoot, createSignal } from 'solid-js';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { message } from '../tests/messages';
@@ -225,7 +225,7 @@ describe('independent email body', () => {
     }
   });
   it.each([
-    { body_macro: 'A document mention' },
+    { body_rox: 'A document mention' },
     {
       body_html_sanitized: null,
       body_text: '**Plaintext using the existing app renderer**',

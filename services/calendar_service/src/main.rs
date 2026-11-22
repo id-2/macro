@@ -16,15 +16,15 @@ use calendar_service::calendar_reauth::LinkManagerReauthNotifier;
 use calendar_service::calendar_refresh::ConnectionGatewayCalendarRefresh;
 use calendar_service::calendar_tokens::CalendarTokenProviderAdapter;
 use calendar_service::config::{Config, calendar_watch_config};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_env::Environment;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
-use macro_service_urls::{
+use rox_entrypoint::RoxEntrypoint;
+use rox_env::Environment;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
+use rox_service_urls::{
     AppServiceUrl, AuthServiceUrl, ConnectionGatewayUrl, DocumentStorageServiceUrl,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -43,10 +43,10 @@ mod scheduling_recovery;
 #[tokio::main]
 #[tracing::instrument(err)]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
     let env = Environment::new_or_prod();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
     );
@@ -103,7 +103,7 @@ async fn main() -> anyhow::Result<()> {
     );
 
     let event_broker_tracker = TaskTracker::new();
-    let macro_event_broker = MacroEventBrokerService::new(
+    let macro_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
@@ -112,7 +112,7 @@ async fn main() -> anyhow::Result<()> {
     let worker_cancellation_token = CancellationToken::new();
     let worker_tracker = TaskTracker::new();
 
-    let backfill_queue = macro_queues::CalendarServiceBackfillQueue::new();
+    let backfill_queue = rox_queues::CalendarServiceBackfillQueue::new();
     let backfill_queue_client = CalendarBackfillQueueClient::new(
         aws_sdk_sqs::Client::new(&aws_config),
         backfill_queue.to_string(),
@@ -123,7 +123,7 @@ async fn main() -> anyhow::Result<()> {
     // Reauth-required notifications ride the shared email link-manager queue,
     // whose email_service consumer owns the single reconnect-your-inbox
     // notification; the queue URL resolves from per-environment defaults.
-    let link_manager_queue = macro_queues::LinkManagerQueue::new();
+    let link_manager_queue = rox_queues::LinkManagerQueue::new();
     let reauth_notifier = LinkManagerReauthNotifier::new(
         aws_sdk_sqs::Client::new(&aws_config),
         link_manager_queue.to_string(),
@@ -177,13 +177,13 @@ async fn main() -> anyhow::Result<()> {
     let jwt_args =
         JwtValidationArgs::new_with_secret_manager(config.environment, &secretsmanager_client)
             .await?;
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
 
@@ -327,7 +327,7 @@ async fn main() -> anyhow::Result<()> {
     );
     let scheduling_service = Arc::new(calendar_scheduling::domain::service::Service::new(
         calendar_scheduling::outbound::postgres::PostgresRepository::new(db.clone()),
-        calendar_scheduling::outbound::macro_services::MacroCalendars::with_meeting_links(
+        calendar_scheduling::outbound::macro_services::RoxCalendars::with_meeting_links(
             calendar_service.clone(),
             calendar_mutation_service.clone(),
             meeting_links.clone(),

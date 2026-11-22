@@ -10,7 +10,7 @@ use sqlx::PgPool;
 #[cfg(test)]
 mod test;
 
-/// Macrodb-backed [`TeamCrmSettingsRepository`].
+/// Roxdb-backed [`TeamCrmSettingsRepository`].
 #[derive(Clone, Debug)]
 pub struct TeamCrmSettingsRepositoryImpl {
     pool: PgPool,

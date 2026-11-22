@@ -23,7 +23,7 @@ use crate::domain::model::SessionMetadata;
 use crate::domain::speculation::{FoldInput, Speculation, SpeculativeFold};
 use crate::inbound::wire::{FoldedMessage, FoldedStreamEvent};
 use agent_runtime_protocol::domain::action::{AgentAction, AgentActionId};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 use wasm_bindgen::prelude::*;
 
@@ -161,7 +161,7 @@ enum WireInput {
         action_id: AgentActionId,
         action: AgentAction,
         #[serde(default)]
-        user_id: Option<MacroUserIdStr<'static>>,
+        user_id: Option<RoxUserIdStr<'static>>,
     },
     /// `{kind: "retracted", actionId}`
     #[serde(rename_all = "camelCase")]
@@ -220,7 +220,7 @@ impl LogEntry {
             // renders into carries a sender of its own anyway.
             user_id: self
                 .user_id
-                .and_then(|id| MacroUserIdStr::try_from(id).ok()),
+                .and_then(|id| RoxUserIdStr::try_from(id).ok()),
             content: self.message,
             logged_at: Some(cursor.created_at),
         }

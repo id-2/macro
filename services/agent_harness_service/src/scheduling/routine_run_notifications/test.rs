@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::models::request::NotificationResult;
 use notification::domain::models::{Notification, SendNotificationRequest};
 use notification::domain::service::SendNotificationError;
@@ -46,7 +46,7 @@ async fn sent_for(end: RunEnd, parent: Option<&str>) -> Vec<serde_json::Value> {
     let notifications = RoutineRunNotifications::new(Arc::clone(&ingress), tracker.clone());
 
     notifications.run_finished(FinishedRoutineRun {
-        owner: MacroUserIdStr::parse_from_str(OWNER).unwrap(),
+        owner: RoxUserIdStr::parse_from_str(OWNER).unwrap(),
         routine_id: uuid::Uuid::nil(),
         routine_name: "Morning brief".to_string(),
         parent_name: parent.map(str::to_owned),

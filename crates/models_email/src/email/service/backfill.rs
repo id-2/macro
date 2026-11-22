@@ -2,7 +2,7 @@ use crate::email::db::backfill as db_backfill;
 use crate::email::service::thread::ListThreadsPayload;
 use crate::service::attachment::AttachmentUploadArgs;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use strum::{AsRefStr, Display, EnumString};
@@ -352,14 +352,14 @@ pub struct DepopulateCrmContactPayload {
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct PopulateCrmForUserPayload {
-    pub macro_id: MacroUserIdStr<'static>,
+    pub macro_id: RoxUserIdStr<'static>,
 }
 
 /// Identity captured when durable history was scheduled, retained across retries.
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct PopulateCrmPolicyPayload {
     pub team_id: Uuid,
-    pub macro_id: MacroUserIdStr<'static>,
+    pub macro_id: RoxUserIdStr<'static>,
     pub link_id: Uuid,
     pub work_id: Uuid,
     pub consent_incarnation: Uuid,
@@ -368,7 +368,7 @@ pub struct PopulateCrmPolicyPayload {
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct DepopulateCrmForUserPayload {
-    pub macro_id: MacroUserIdStr<'static>,
+    pub macro_id: RoxUserIdStr<'static>,
     /// Team the user was just removed from. Passed explicitly because
     /// the consumer cannot recover this via `get_team_id_for_user` —
     /// by the time it runs the user has already been removed from

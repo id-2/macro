@@ -1,6 +1,6 @@
 use chrono::{Duration, SubsecRound, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
@@ -8,16 +8,16 @@ use crate::domain::models::{InviteLink, InviteLinkStatus, InviteToken, ListInvit
 use crate::domain::ports::GtmInviteRepo;
 use crate::outbound::pg_gtm_invite_repo::PgGtmInviteRepo;
 
-fn staff(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn staff(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
-fn prospect() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("ada@startup.io").unwrap()
+fn prospect() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("ada@startup.io").unwrap()
 }
 
-fn other_prospect() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("grace@startup.io").unwrap()
+fn other_prospect() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("grace@startup.io").unwrap()
 }
 
 fn link(created_by: &str, first_name: &str) -> InviteLink {

@@ -12,7 +12,7 @@ import { FIXTURE_SCOPE, noImport } from './fixture-scope';
 
 afterEach(cleanup);
 
-const UNREACHABLE = "Can't reach Macro. Check your connection.";
+const UNREACHABLE = "Can't reach Rox. Check your connection.";
 
 it('marks the vault unreachable when a username read gets no answer, and recovers on reselect', async () => {
   const source = createFakePasswordSource();

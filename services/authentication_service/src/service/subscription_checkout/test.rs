@@ -17,7 +17,7 @@ impl CheckoutGateway for FakeGateway {
     type Promotion = String;
     type Error = std::io::Error;
 
-    async fn customer(&self, _: &MacroUserIdStr<'_>) -> Result<Option<()>, Self::Error> {
+    async fn customer(&self, _: &RoxUserIdStr<'_>) -> Result<Option<()>, Self::Error> {
         Ok((!self.missing_customer).then_some(()))
     }
     async fn history(&self, _: &()) -> Result<SubscriptionHistory, Self::Error> {
@@ -28,7 +28,7 @@ impl CheckoutGateway for FakeGateway {
     }
     async fn invite_promotion(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<Option<String>, Self::Error> {
         Ok(self.invite.then(|| "invite".into()))
     }
@@ -50,7 +50,7 @@ impl CheckoutGateway for FakeGateway {
 
 fn request(trial: bool) -> CheckoutRequest<'static> {
     CheckoutRequest {
-        user_id: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
         plan: SeatPlan::Premium,
         onboarding_trial: trial,
         success_url: "https://rox.one/app/onboarding?subscriptionSuccess=true".into(),

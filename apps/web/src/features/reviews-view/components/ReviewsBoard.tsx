@@ -4,6 +4,7 @@ import type {
   TaskBoardMove,
   TaskBoardTask,
 } from '@app/features/tasks-view/core/task-board';
+import { type TranslationKey, t } from '@app/lib/i18n';
 import { confirmMergePullRequest } from '@block-pr/component/MergePullRequestButton';
 import {
   PrLinkChips,
@@ -48,17 +49,54 @@ type PendingStage = { stage: ReviewsBoardStage; updatedAt: unknown };
 
 const ACTION_COPY: Record<
   ReviewsBoardAction,
-  { done: string; failed: string }
+  { done: TranslationKey; failed: TranslationKey }
 > = {
-  merge: { done: 'Merged', failed: 'Failed to merge pull request' },
+  merge: { done: 'reviews.toastMerged', failed: 'reviews.mergeFailed' },
   'convert-to-draft': {
-    done: 'Converted to draft:',
-    failed: 'Failed to convert pull request to a draft',
+    done: 'reviews.convertedToDraft',
+    failed: 'reviews.convertToDraftFailed',
   },
   'mark-ready': {
-    done: 'Ready for review:',
-    failed: 'Failed to mark pull request ready for review',
+    done: 'reviews.readyForReview',
+    failed: 'reviews.markReadyFailed',
   },
+};
+
+const STAGE_COPY: Record<
+  ReviewsBoardStage,
+  { label: TranslationKey; description: TranslationKey }
+> = {
+  draft: { label: 'reviews.stageDraft', description: 'reviews.stageDraftHint' },
+  review: { label: 'reviews.stageReview', description: 'reviews.stageReviewHint' },
+  failing: {
+    label: 'reviews.stageFailing',
+    description: 'reviews.stageFailingHint',
+  },
+  conflicts: {
+    label: 'reviews.stageConflicts',
+    description: 'reviews.stageConflictsHint',
+  },
+  ready: { label: 'reviews.stageReady', description: 'reviews.stageReadyHint' },
+  merged: {
+    label: 'reviews.stageMerged',
+    description: 'reviews.stageMergedHint',
+  },
+};
+
+/** A column's name, or nothing for an id the board does not know. */
+const stageLabel = (id: string): string | undefined => {
+  const copy = STAGE_COPY[id as ReviewsBoardStage] as
+    | { label: TranslationKey; description: TranslationKey }
+    | undefined;
+  return copy ? t(copy.label) : undefined;
+};
+
+/** What a column's drop overlay explains, or nothing for an unknown id. */
+const stageDescription = (id: string): string | undefined => {
+  const copy = STAGE_COPY[id as ReviewsBoardStage] as
+    | { label: TranslationKey; description: TranslationKey }
+    | undefined;
+  return copy ? t(copy.description) : undefined;
 };
 
 /**
@@ -115,7 +153,7 @@ export function ReviewsBoard(props: {
     }
     return REVIEWS_BOARD_STAGES.map((stage) => ({
       id: stage.id,
-      label: stage.label,
+      label: stageLabel(stage.id) ?? stage.id,
       tasks: cards.get(stage.id) ?? [],
       hasMore: false,
       loadingMore: false,
@@ -183,21 +221,18 @@ export function ReviewsBoard(props: {
     } catch (error) {
       updatePending(review.id);
       toast.failure(
-        pullRequestFailureMessage(error, ACTION_COPY[action].failed)
+        pullRequestFailureMessage(error, t(ACTION_COPY[action].failed))
       );
       return false;
     } finally {
       updateSet(review.id, false);
     }
-    toast.success(`${ACTION_COPY[action].done} ${prDisplayName(target)}`);
+    toast.success(`${t(ACTION_COPY[action].done)} ${prDisplayName(target)}`);
     // The routes patch the stored pull request first, so the list refetch
     // already sees the change.
     queryClient.invalidateQueries({ queryKey: soupKeys.astItems._def });
     return true;
   };
-
-  const stageDescription = (id: string) =>
-    REVIEWS_BOARD_STAGES.find((stage) => stage.id === id)?.description;
 
   return (
     // Size from the content slot, which is not a flex container, like the
@@ -209,13 +244,13 @@ export function ReviewsBoard(props: {
         canMove={(request) => actionFor(request) !== undefined}
         onMove={move}
       >
-        <TaskBoard.Columns aria-label="Pull request board">
+        <TaskBoard.Columns aria-label={t('reviews.boardAria')}>
           {(column) => (
             <TaskBoard.Column>
               <TaskBoard.Header>
                 <h2
                   class="truncate text-sm font-medium"
-                  title={stageDescription(column().id)}
+                  title={stageDescription(column().id) ?? undefined}
                 >
                   {column().label}
                 </h2>
@@ -227,10 +262,10 @@ export function ReviewsBoard(props: {
                 {stageDescription(column().id)}
               </TaskBoard.DropOverlay>
               <TaskBoard.Cards
-                itemsLabel="pull requests"
+                itemsLabel={t('reviews.boardItemsLabel')}
                 empty={
                   <p class="px-2 py-6 text-center text-xs text-ink-extra-muted">
-                    No pull requests
+                    {t('reviews.noPullRequests')}
                   </p>
                 }
               >
@@ -277,7 +312,9 @@ export function ReviewsBoard(props: {
             disabled={props.isLoadingMore}
             onClick={props.onLoadMore}
           >
-            {props.isLoadingMore ? 'Loading…' : 'Load more pull requests'}
+            {props.isLoadingMore
+              ? t('reviews.loading')
+              : t('reviews.loadMorePullRequests')}
           </Button>
         </div>
       </Show>

@@ -19,7 +19,7 @@ impl NativeToolGate for Gate {
     ) -> Pin<Box<dyn Future<Output = NativeToolVerdict> + Send + 'a>> {
         assert_eq!(name, "ExecuteCode");
         assert_eq!(args["source"], "fixture");
-        assert_eq!(args["turn_id"], macro_uuid::Uuid::from_u128(1).to_string());
+        assert_eq!(args["turn_id"], rox_uuid::Uuid::from_u128(1).to_string());
         self.calls.fetch_add(1, Ordering::SeqCst);
         Box::pin(async { self.verdict.clone() })
     }
@@ -41,7 +41,7 @@ async fn owner_approval_is_required_before_credentials_and_cancel_skips_gate() {
         session: session.id,
         agent_id: session.bot_id,
         owner: session.owner_user().unwrap().clone(),
-        turn: macro_uuid::Uuid::from_u128(1),
+        turn: rox_uuid::Uuid::from_u128(1),
     };
     let gate = Gate {
         verdict: NativeToolVerdict::Refuse("Owner declined".into()),
@@ -73,14 +73,14 @@ async fn owner_approval_is_required_before_credentials_and_cancel_skips_gate() {
 async fn execution_credentials_use_the_gate_resolved_requester() {
     let session = test_agent_session(AgentSessionId::new());
     let requester =
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     let identity = ExecutionIdentity {
         execution: agent_code_mode::domain::ExecutionId::mint(),
         acting_as: ai_toolset::actor::ToolActor::Requester,
         session: session.id,
         owner: session.owner_user().unwrap().clone(),
         agent_id: session.bot_id,
-        turn: macro_uuid::Uuid::from_u128(1),
+        turn: rox_uuid::Uuid::from_u128(1),
     };
     let gate = Gate {
         verdict: NativeToolVerdict::RunAs(requester.clone()),
@@ -534,7 +534,7 @@ enum ScopeEnforcement {
     SignedScope,
     /// The service accepts no Rox API token, so the credential grants
     /// nothing there.
-    NoMacroCredential,
+    NoRoxCredential,
 }
 
 /// Decided per host when it is added.
@@ -560,7 +560,7 @@ fn enforcement(host: SdkHost) -> ScopeEnforcement {
         // routes edit documents, which a run that sends nothing may do;
         // unfurl previews public links for any caller.
         SdkHost::DocumentContent | SdkHost::EditingWorker | SdkHost::Unfurl => {
-            ScopeEnforcement::NoMacroCredential
+            ScopeEnforcement::NoRoxCredential
         }
     }
 }
@@ -601,13 +601,13 @@ fn every_sdk_host_holds_a_scoped_credential_to_its_scope() {
                     ),
                     "{environment} {name} ({url}) serves under a prefix the scope doesn't strip"
                 ),
-                ScopeEnforcement::NoMacroCredential => {}
+                ScopeEnforcement::NoRoxCredential => {}
             }
         }
     }
     for (key, operation) in code_execution::domain::operations() {
         let (service, _) = key.split_once('.').unwrap();
-        if let ScopeEnforcement::NoMacroCredential = enforcement(host(service)) {
+        if let ScopeEnforcement::NoRoxCredential = enforcement(host(service)) {
             for scope in [
                 SessionScope::Generation,
                 SessionScope::NoSend,
@@ -633,9 +633,9 @@ const PUBLIC: &str = include_str!(
 
 /// Session and public MCP runs sign the scope they store with the
 /// correlation, so services with no database hold the run to it too.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) {
-    use macro_auth::middleware::decode_jwt::{JwtToken, JwtValidationArgs, handler};
+    use rox_auth::middleware::decode_jwt::{JwtToken, JwtValidationArgs, handler};
     sqlx::raw_sql(
         r#"
         INSERT INTO macro_user (id, username, email, stripe_customer_id)
@@ -653,19 +653,19 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
     .execute(&pool)
     .await
     .unwrap();
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(
         1,
     )));
     let owner = session.owner_user().unwrap().clone();
     // The agent the fixture's session runs, which a correlation must name.
-    let agent = bot_id::BotId::new_from_uuid(macro_uuid::Uuid::from_u128(0xa9e7));
+    let agent = bot_id::BotId::new_from_uuid(rox_uuid::Uuid::from_u128(0xa9e7));
     let identity = ExecutionIdentity {
         execution: agent_code_mode::domain::ExecutionId::mint(),
         acting_as: ai_toolset::actor::ToolActor::Owner,
         session: session.id,
         agent_id: agent,
         owner: owner.clone(),
-        turn: macro_uuid::Uuid::from_u128(1),
+        turn: rox_uuid::Uuid::from_u128(1),
     };
     let signed = |token: &str| match handler(
         &JwtValidationArgs::testing_macro_token("fixture", PUBLIC),
@@ -673,11 +673,11 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
     )
     .unwrap()
     {
-        JwtToken::MacroApiToken(token) => {
+        JwtToken::RoxApiToken(token) => {
             assert!(token.agent_correlation_id.is_some());
             token.agent_scope
         }
-        JwtToken::MacroAccessToken(_) => panic!("a code-mode credential is a Rox API token"),
+        JwtToken::RoxAccessToken(_) => panic!("a code-mode credential is a Rox API token"),
     };
     for (scope, name) in [
         (Some(SessionScope::Generation), Some("generation")),
@@ -686,7 +686,7 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
     ] {
         let run = RunCredentials {
             egress: EgressRollout::new(None),
-            signer: MacroApiTokenSigner::new(pool.clone(), "fixture", PRIVATE),
+            signer: RoxApiTokenSigner::new(pool.clone(), "fixture", PRIVATE),
             correlations: agent_correlation::outbound::PgCorrelationRepository(pool.clone()),
             gate: Arc::new(Gate {
                 verdict: NativeToolVerdict::RunAs(owner.clone()),
@@ -705,7 +705,7 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
         );
         let run = UserRunCredentials {
             egress: EgressRollout::new(None),
-            signer: MacroApiTokenSigner::new(pool.clone(), "fixture", PRIVATE),
+            signer: RoxApiTokenSigner::new(pool.clone(), "fixture", PRIVATE),
             correlations: agent_correlation::outbound::PgCorrelationRepository(pool.clone()),
             endpoints: SdkEndpoints::default(),
             scopes: Arc::new(Scopes(scope)),
@@ -728,7 +728,7 @@ async fn a_run_signs_its_sessions_scope_into_its_credential(pool: sqlx::PgPool) 
 async fn the_egress_flag_fails_closed_to_direct() {
     use code_execution::domain::Egress;
     use feature_flags::{FlagSnapshot, FlagValue, outbound::fake::FakeFeatureFlags};
-    let user = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     let flags = |result: Result<FlagSnapshot, String>| {
         let mut flags = FakeFeatureFlags::default();
         flags.set(user.clone(), result);
@@ -817,7 +817,7 @@ async fn the_egress_flag_is_read_once_per_user_for_a_while() {
     }
 
     impl feature_flags::FeatureFlags for Counted {
-        async fn load(&self, _: &MacroUserIdStr<'_>) -> Result<FlagSnapshot, rootcause::Report> {
+        async fn load(&self, _: &RoxUserIdStr<'_>) -> Result<FlagSnapshot, rootcause::Report> {
             self.loads.fetch_add(1, Ordering::SeqCst);
             if self.failing.load(Ordering::SeqCst) {
                 return Err(rootcause::report!("PostHog is down"));
@@ -835,8 +835,8 @@ async fn the_egress_flag_is_read_once_per_user_for_a_while() {
         loads: Arc::clone(&loads),
         failing: Arc::clone(&failing),
     }));
-    let user = MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
-    let other = MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
 
     assert_eq!(rollout.egress(&user).await, Egress::Proxied);
     assert_eq!(rollout.egress(&user).await, Egress::Proxied);

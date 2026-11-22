@@ -6,7 +6,7 @@ use github_pull_requests::domain::models::{
     ChangesetRange, GitRef, GithubPullRequestDiff, GithubPullRequestDiffError, PullRequestRef,
 };
 use github_pull_requests::domain::ports::GithubPullRequestDiffReader;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::StatusCode;
 use serde::Deserialize;
 
@@ -107,7 +107,7 @@ impl<Installations: GithubSyncRepo, Client: GithubSyncClient> GithubPullRequestD
     #[tracing::instrument(skip_all, err)]
     async fn read(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         pull_request: &PullRequestRef,
     ) -> Result<GithubPullRequestDiff, GithubPullRequestDiffError> {
         let repository = &pull_request.repository;

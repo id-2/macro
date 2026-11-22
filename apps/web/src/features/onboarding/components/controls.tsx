@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import ArrowRightIcon from '@icon/system/regular/arrow-right.svg';
 import { type JSX, onCleanup, onMount } from 'solid-js';
 
@@ -57,7 +58,7 @@ export function SkipButton(props: {
       disabled={props.disabled}
       onClick={props.onClick}
     >
-      {props.label ?? 'Skip for now'}
+      {props.label ?? t('onboarding.skipForNow')}
     </button>
   );
 }
@@ -81,13 +82,13 @@ export function ContinueButton(props: {
         {props.secondary}
         <button
           type="button"
-          aria-label={props.label ?? 'Continue'}
-          title={props.label ?? 'Continue'}
+          aria-label={props.label ?? t('onboarding.continue')}
+          title={props.label ?? t('onboarding.continue')}
           disabled={props.disabled}
           onClick={props.onClick}
           class="flex min-h-14 min-w-44 max-w-full items-center justify-center gap-4 rounded-full bg-ink px-7 py-3.5 text-base font-medium text-surface transition-opacity hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-ink disabled:opacity-40"
         >
-          <span>{props.label ?? 'Continue'}</span>
+          <span>{props.label ?? t('onboarding.continue')}</span>
           <ArrowRightIcon class="size-5 shrink-0" aria-hidden="true" />
         </button>
       </div>

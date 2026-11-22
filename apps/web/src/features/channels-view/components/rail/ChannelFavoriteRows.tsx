@@ -2,6 +2,7 @@ import { ViewSidebar } from '@app/components/view-shell';
 import { FavoriteContextMenu } from '@app/features/favorites/FavoriteContextMenu';
 import { FavoriteIcon } from '@app/features/favorites/FavoriteIcon';
 import { useFavoriteDisplayName } from '@app/util/favorites';
+import { t } from '@app/lib/i18n';
 import { ChannelMutedIndicator } from '@channel/components/ChannelMutedIndicator';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { UnreadIndicator } from '@entity/components/UnreadIndicator';
@@ -146,7 +147,7 @@ export function ChannelFavoritesSection() {
               rail.toggleGroup('favorites');
             }}
           >
-            <span class="min-w-0 truncate">Favorites</span>
+            <span class="min-w-0 truncate">{t('channelSections.favorites')}</span>
             <CaretDownIcon
               class={cn(
                 'size-2.5 shrink-0 opacity-0 transition-[opacity,rotate] duration-200 motion-reduce:transition-none group-hover/sidebar-section:opacity-100',

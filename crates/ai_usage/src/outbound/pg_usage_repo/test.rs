@@ -4,7 +4,7 @@ use crate::domain::{
     AiFeature, CompletionUsage, SYSTEM_USER_ID, Usage, UsageApiParams, UsageContext,
 };
 use chrono::Utc;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 fn completion(feature: AiFeature, model: &str, input: u64, output: u64) -> CompletionUsage {
@@ -148,9 +148,9 @@ async fn usage_references_the_agent_key_that_paid_for_it(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn agent_session_usage_rows_carry_their_session(pool: PgPool) {
     let service = UsageServiceImpl::new(PgUsageRepo::new(pool.clone()));
-    let owner = MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
-    let session = macro_uuid::generate_uuid_v7();
-    let other_session = macro_uuid::generate_uuid_v7();
+    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
+    let session = rox_uuid::generate_uuid_v7();
+    let other_session = rox_uuid::generate_uuid_v7();
     let one_million_input = UsageAmount::Tokens {
         input: 1_000_000,
         output: 0,
@@ -351,7 +351,7 @@ async fn counting_decisions_survive_repricing_and_remain_visible_to_analytics(po
     sqlx::query!(
         r#"INSERT INTO ai_usage (id, feature, user_id, model, input_tokens, output_tokens)
            VALUES ($1, 'chat', $2, $3, 1000000, 0)"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         row.user.as_ref(),
         model,
     )
@@ -405,7 +405,7 @@ async fn query_filters_by_user(pool: PgPool) {
     let repo = PgUsageRepo::new(pool);
 
     let mut other = completion(AiFeature::Chat, "claude-opus-4-8", 1, 1);
-    other.user = MacroUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap();
+    other.user = RoxUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap();
     repo.insert_usage(&other, true).await.unwrap();
     repo.insert_usage(&completion(AiFeature::Chat, "claude-opus-4-8", 1, 1), false)
         .await
@@ -414,7 +414,7 @@ async fn query_filters_by_user(pool: PgPool) {
     let only_other = repo
         .query_usage(&UsageApiParams {
             include_users: vec![
-                MacroUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap(),
+                RoxUserIdStr::try_from("macro|someone@example.com".to_string()).unwrap(),
             ],
             ..Default::default()
         })

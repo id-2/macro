@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { runCanvasInSandbox } from '../sandbox';
 import type { CanvasMeasurer } from './render';
 import { canvasRevision } from './revision';

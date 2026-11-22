@@ -2,14 +2,14 @@ use super::*;
 use crate::domain::ExecutionStatus;
 use serde_json::json;
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn records_survive_reconnection_and_remain_scoped_to_their_session(pool: PgPool) {
     sqlx::raw_sql(include_str!("test/sessions.sql"))
         .execute(&pool)
         .await
         .unwrap();
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(1));
-    let other = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(2));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(1));
+    let other = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(2));
     let record = ExecutionRecord {
         acting_as: None,
         turn_id: None,
@@ -61,13 +61,13 @@ async fn records_survive_reconnection_and_remain_scoped_to_their_session(pool: P
     ));
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn records_with_nul_characters_are_saved_without_them(pool: PgPool) {
     sqlx::raw_sql(include_str!("test/sessions.sql"))
         .execute(&pool)
         .await
         .unwrap();
-    let session = AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(1));
+    let session = AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(1));
     let mut record = ExecutionRecord {
         acting_as: None,
         turn_id: None,

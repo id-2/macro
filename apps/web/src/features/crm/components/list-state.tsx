@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ListSkeleton } from '@app/components/view-shell/ListSkeleton';
 import { fireAndForget } from '@core/util/fireAndForget';
 import EmptyStateCompaniesGraphic from '@design/empty-state-companies.svg';
@@ -42,10 +43,10 @@ export function CrmListSearchEmpty(props: {
       topSpacerClass="grow-[0.5] basis-0 mobile:basis-0"
       graphic={EmptyStateNoSearchMatchGraphic}
       title={props.title}
-      description={props.description ?? 'Try a different search.'}
+      description={props.description ?? t('crm.tryDifferentSearch')}
       primaryAction={
         props.onClearSearch
-          ? { label: 'Clear search', onClick: props.onClearSearch }
+          ? { label: t('crm.clearSearch'), onClick: props.onClearSearch }
           : undefined
       }
     />
@@ -61,10 +62,10 @@ export function CrmListError(props: {
       centered
       topSpacerClass="grow-[0.5] basis-0 mobile:basis-0"
       graphic={EmptyStateNoAccessGraphic}
-      description="Please try again to reload this view."
-      title={props.title ?? "Couldn't load this list."}
+      description={t('crm.reloadViewHint')}
+      title={props.title ?? t('crm.couldNotLoadList')}
       primaryAction={{
-        label: 'Try again',
+        label: t('crm.tryAgain'),
         onClick: () => fireAndForget(props.onRetry(), 'crm'),
       }}
     />
@@ -74,7 +75,7 @@ export function CrmListError(props: {
 export function CrmListSkeleton(props: { label?: string; count?: number }) {
   return (
     <ListSkeleton.Root
-      label={props.label ?? 'Loading CRM list'}
+      label={props.label ?? t('crm.loadingCrmList')}
       class="@container/crm-skeleton w-full shrink-0 overflow-hidden py-1"
     >
       <For each={Array.from({ length: props.count ?? 6 })}>
@@ -115,7 +116,7 @@ export function CrmListRetry(props: {
         size="sm"
         onClick={() => fireAndForget(props.onRetry(), 'crm')}
       >
-        Retry
+        {t('crm.retry')}
       </Button>
     </div>
   );

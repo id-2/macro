@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_ai_projection::AiProjectionQueueMessage;
 use sha2::{Digest, Sha256};
 
@@ -49,14 +49,14 @@ pub trait AiProjectionService: Clone + Send + Sync + 'static {
     /// the finished generation.
     fn upsert_projection(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         params: UpsertProjectionParams,
     ) -> impl Future<Output = Result<UserAiProjection, UpsertProjectionError>> + Send;
 
     /// Returns whether the user has the `read:professional_features` permission.
     fn has_professional_features(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, AiProjectionError>> + Send;
 
     /// Materializes the projection instance referenced by the queue message.
@@ -123,7 +123,7 @@ where
 
         // For `user` targets the target id is the user id. `team` targets store
         // a team id here and are not yet materialized against a specific user.
-        let user_id = MacroUserIdStr::try_from(message.target_id.clone())
+        let user_id = RoxUserIdStr::try_from(message.target_id.clone())
             .map_err(|e| AiProjectionError::BadRequest(format!("invalid target user id: {e}")))?;
 
         let result = self
@@ -186,7 +186,7 @@ where
     /// is in zero or multiple teams).
     async fn resolve_target_id(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         target_type: TargetType,
     ) -> Result<String, UpsertProjectionError> {
         match target_type {
@@ -243,7 +243,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn upsert_projection(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         params: UpsertProjectionParams,
     ) -> Result<UserAiProjection, UpsertProjectionError> {
         if params.id.trim().is_empty() {
@@ -341,7 +341,7 @@ where
     #[tracing::instrument(skip(self), err)]
     async fn has_professional_features(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<bool, AiProjectionError> {
         self.repository
             .user_has_permission(user_id, READ_PROFESSIONAL_FEATURES)

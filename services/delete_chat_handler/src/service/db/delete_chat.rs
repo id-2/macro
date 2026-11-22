@@ -42,7 +42,7 @@ pub async fn delete_chat(db: sqlx::PgPool, chat_id: &str) -> anyhow::Result<()> 
         .await?;
     }
 
-    let chat_uuid = macro_uuid::string_to_uuid(chat_id)?;
+    let chat_uuid = rox_uuid::string_to_uuid(chat_id)?;
     sqlx::query!(
         r#"
         DELETE FROM "entity_access"

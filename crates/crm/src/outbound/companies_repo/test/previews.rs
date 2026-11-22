@@ -11,16 +11,16 @@ use axum::{
 };
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
 use harness_id::HarnessId;
-use macro_authorization::{
+use rox_authorization::{
     AuthorizedUserApiKey, CredentialOrigin, HARNESS_TOKEN_HEADER, HarnessAuthentication,
     HarnessAuthorizationOwner, HarnessAuthorizer, INTERNAL_API_KEY_HEADER,
-    INTERNAL_MACRO_USER_ID_HEADER, InternalAuthConfig, JwtValidator, MacroAuthorizationError,
-    MacroAuthorizationServiceImpl, MacroAuthorizationState, MacroUserAuthentication,
+    INTERNAL_MACRO_USER_ID_HEADER, InternalAuthConfig, JwtValidator, RoxAuthorizationError,
+    RoxAuthorizationServiceImpl, RoxAuthorizationState, RoxUserAuthentication,
     NoBotAuthorizer, USER_API_KEY_HEADER, UserApiKeyAuthorizer, ValidatedCredential,
     ValidatedIdentity,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rootcause::Report;
 use serde_json::{Value, json};
@@ -51,7 +51,7 @@ impl JwtValidator for FixtureCredential {
     fn validate_credential(
         &self,
         token: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         Ok(ValidatedCredential {
             origin: CredentialOrigin::Session,
             identity: ValidatedIdentity {
@@ -84,7 +84,7 @@ impl UserApiKeyAuthorizer for FixtureApiKey {
     async fn authorize_user_api_key(
         &self,
         api_key: &str,
-    ) -> Result<AuthorizedUserApiKey, Report<MacroAuthorizationError>> {
+    ) -> Result<AuthorizedUserApiKey, Report<RoxAuthorizationError>> {
         Ok(AuthorizedUserApiKey {
             user_context: user_context(api_key),
             account_manager: None,
@@ -101,21 +101,21 @@ impl HarnessAuthorizer for FixtureHarness {
         &self,
         harness_token: &str,
         _acting_user_claim: Option<String>,
-    ) -> Result<HarnessAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<HarnessAuthentication, Report<RoxAuthorizationError>> {
         if harness_token != HARNESS_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         let harness_id = HarnessId::parse_uuid_str("00000000-0000-0000-0000-0000000000aa")
-            .map_err(|_| Report::new(MacroAuthorizationError::InvalidCredentials))?;
-        let macro_user_id = MacroUserIdStr::try_from(OWNER.to_owned())
-            .map_err(|_| Report::new(MacroAuthorizationError::ActingUserNotAuthorized))?;
+            .map_err(|_| Report::new(RoxAuthorizationError::InvalidCredentials))?;
+        let macro_user_id = RoxUserIdStr::try_from(OWNER.to_owned())
+            .map_err(|_| Report::new(RoxAuthorizationError::ActingUserNotAuthorized))?;
         Ok(HarnessAuthentication {
             harness_id,
             token_id: Uuid::nil(),
             owner: HarnessAuthorizationOwner::User {
                 user_id: OWNER.to_owned(),
             },
-            acting_user: MacroUserAuthentication {
+            acting_user: RoxUserAuthentication {
                 origin: CredentialOrigin::Harness,
                 agent_id: None,
                 agent_via: None,
@@ -137,8 +137,8 @@ fn app(pool: PgPool) -> Router {
         entity_access_service: Arc::new(EntityAccessServiceImpl::new(PgAccessRepository::new(
             pool,
         ))),
-        authorization_state: MacroAuthorizationState::new(Arc::new(
-            MacroAuthorizationServiceImpl::new(
+        authorization_state: RoxAuthorizationState::new(Arc::new(
+            RoxAuthorizationServiceImpl::new(
                 FixtureCredential,
                 InternalAuthConfig {
                     api_key: INTERNAL_KEY.into(),

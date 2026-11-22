@@ -29,7 +29,9 @@ const HARNESS_PRETTYNAME: Record<string, string> = {
   'minimax-m3': 'MiniMax M3',
   'gpt-oss-120b': 'GPT OSS 120B',
   'nemotron-lightning-3p5-30b-a3b': 'Nemotron Lightning 3.5 30B A3B',
-  'gemini-3.8-flash': 'Gemini 3.8 Flash',
+  // Kept so a routed id and a bare session id still resolve. Never shown:
+  // a person must not see Gemini for this id, and Rox R1 Max stays on Groq.
+  'gemini-3.8-flash': '',
 };
 
 /** Vendor acronyms that read as shouting only when they are not shouted. */
@@ -114,13 +116,16 @@ export function modelLabel(
   description?: string | null
 ): string {
   if (!id) return 'Model';
+  const bare = id.trim().replace(/^[\w.-]+\//, '');
+  if (bare.toLowerCase() === 'gemini-3.8-flash')
+    return HARNESS_PRETTYNAME['gemini-3.8-flash'] ?? '';
   const resolvedDefault = defaultModelName(id, name, description);
   if (resolvedDefault)
     return `${modelLabel(resolvedDefault, resolvedDefault)} (default)`;
   const pretty =
     MODEL_PRETTYNAME[id as Model] ??
     MODEL_PRETTYNAME[`anthropic/${id}` as Model] ??
-    HARNESS_PRETTYNAME[id.replace(/^[\w.-]+\//, '')];
+    HARNESS_PRETTYNAME[bare];
   if (pretty) return pretty;
   const reported = name?.trim();
   if (reported && reported !== id.trim())

@@ -3,7 +3,7 @@
 use super::*;
 
 #[sqlx::test(
-    migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS",
+    migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS",
     fixtures(path = "../../../../../../../fixtures", scripts("email_crm_selected"))
 )]
 async fn matching_thread_fetches_stay_bounded_with_stale_statistics(

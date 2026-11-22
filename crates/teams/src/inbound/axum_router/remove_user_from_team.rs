@@ -1,10 +1,10 @@
 use axum::extract::{Path, State};
 use entity_access::{
     domain::{models::AdminTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::RoxAuthorizationService;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_error_response::ErrorResponse;
 
 use crate::domain::{model::RemoveUserFromTeamError, team_repo::TeamService};
@@ -15,7 +15,7 @@ use super::TeamRouterState;
 #[derive(serde::Deserialize)]
 pub struct Param {
     /// The ID of the user to remove.
-    pub remove_user_id: MacroUserIdStr<'static>,
+    pub remove_user_id: RoxUserIdStr<'static>,
 }
 
 /// Removes a user from a team.
@@ -34,8 +34,8 @@ pub struct Param {
     ),
 )]
 #[tracing::instrument(skip_all, err)]
-pub async fn handler<T: TeamService, Eas: EntityAccessService, Auth: MacroAuthorizationService>(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+pub async fn handler<T: TeamService, Eas: EntityAccessService, Auth: RoxAuthorizationService>(
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<TeamRouterState<T, Eas, Auth>>,
     Path(Param { remove_user_id }): Path<Param>,
 ) -> Result<(), RemoveUserFromTeamError> {

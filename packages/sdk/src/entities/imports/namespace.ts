@@ -5,8 +5,8 @@ import type {
   ImportStatus,
   TrackImportOutcome,
 } from '../../../generated/cognition/types.gen';
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
 import { Task } from '../tasks/task';
 import { ImportEntry, type ImportedItem } from './entry';
@@ -70,7 +70,7 @@ export interface NotionPageImport {
  * recreating it.
  */
 export class ImportNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * The caller's ledger entries, newest first: their staged candidates,
@@ -131,7 +131,7 @@ export class ImportNamespace {
       }))
       .exhaustive();
     if (!expected.fits)
-      throw new MacroError(
+      throw new RoxError(
         `A ${candidate.source} import is recorded as a ${expected.kind}`,
       );
     return this.trackAs(candidate, 'imported', item);

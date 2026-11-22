@@ -8,12 +8,12 @@ use axum::{
     routing::{get, post},
 };
 use http_body_util::BodyExt;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
 #[allow(deprecated)]
-use macro_authorization::LEGACY_DSS_INTERNAL_API_KEY_HEADER;
-use macro_authorization::{
-    INTERNAL_API_KEY_HEADER, InternalAuthConfig, InternalOnly, MacroAuthJwtValidator,
-    MacroAuthorizationExtractor, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_authorization::LEGACY_DSS_INTERNAL_API_KEY_HEADER;
+use rox_authorization::{
+    INTERNAL_API_KEY_HEADER, InternalAuthConfig, InternalOnly, RoxAuthJwtValidator,
+    RoxAuthorizationExtractor, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
 use serde_json::{Value, json};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -32,10 +32,10 @@ const UNAUTHORIZED_BODY: &str = r#"{"message":"unauthorized"}"#;
 
 #[derive(Clone)]
 struct TestState {
-    authorization_state: MacroAuthorizationState<AuthorizationService>,
+    authorization_state: RoxAuthorizationState<AuthorizationService>,
 }
 
-impl FromRef<TestState> for MacroAuthorizationState<AuthorizationService> {
+impl FromRef<TestState> for RoxAuthorizationState<AuthorizationService> {
     fn from_ref(state: &TestState) -> Self {
         state.authorization_state.clone()
     }
@@ -60,24 +60,24 @@ impl FromRef<TestState> for Arc<Config> {
 }
 
 async fn internal_auth_probe(
-    _authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
 ) -> Json<Value> {
     Json(json!({ "authorized": true }))
 }
 
 fn test_state() -> TestState {
-    let authorization_service = MacroAuthorizationServiceImpl::new(
-        MacroAuthJwtValidator::new(JwtValidationArgs::new_testing()),
+    let authorization_service = RoxAuthorizationServiceImpl::new(
+        RoxAuthJwtValidator::new(JwtValidationArgs::new_testing()),
         InternalAuthConfig {
             api_key: TEST_INTERNAL_API_KEY.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
 
     TestState {
-        authorization_state: MacroAuthorizationState::new(Arc::new(authorization_service)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(authorization_service)),
     }
 }
 

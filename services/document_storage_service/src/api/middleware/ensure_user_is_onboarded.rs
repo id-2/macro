@@ -5,13 +5,13 @@ use axum::{
     middleware::Next,
     response::Response,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::user::onboarding_status::get_onboarding_status;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::user::onboarding_status::get_onboarding_status;
 use sqlx::PgPool;
 
 pub async fn handler(
     State(db): State<PgPool>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     req: Request,
     next: Next,
 ) -> Result<Response, (StatusCode, String)> {

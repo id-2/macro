@@ -23,7 +23,7 @@ impl SessionCodeMode for SpanRecordingCodeMode {
         _: &AgentSession,
         _: ExecutionId,
         _: ai_toolset::actor::ToolActor,
-        _: macro_uuid::Uuid,
+        _: rox_uuid::Uuid,
         _: ExecuteRequest,
         _: tokio_util::sync::CancellationToken,
     ) -> Result<ExecutionReceipt, CodeModeError> {

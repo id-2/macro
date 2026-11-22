@@ -44,7 +44,7 @@ pub async fn setup_and_serve(state: ApiContext, port: usize) -> anyhow::Result<(
 }
 
 fn app(state: ApiContext) -> Router {
-    let cors = macro_cors::cors_layer();
+    let cors = rox_cors::cors_layer();
     let jwt_validation_args = state.jwt_validation_args.clone();
 
     let inner = api_router()

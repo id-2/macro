@@ -1,13 +1,13 @@
 //! The per-user settings file, the opt-out switches, and where events wait to be
 //! sent.
 //!
-//! Launch-timing export is off unless `MACRO_LOCAL_TELEMETRY` is explicitly on.
+//! Launch-timing export is off unless `ROX_LOCAL_TELEMETRY` is explicitly on.
 //! Unset means off for this local runner ([`Switch::from_env`]). The settings
 //! file `~/.config/macro/local-telemetry.toml` is not created by this runner, so
 //! a missing file never turns sending on. The file lives outside every repository
 //! and is read only by this process, so a token already in it never reaches a
 //! commit, a generated env file, or a container's environment. `enabled = false`
-//! in it, or `MACRO_LOCAL_TELEMETRY=off`, also turns telemetry off; so does `CI`
+//! in it, or `ROX_LOCAL_TELEMETRY=off`, also turns telemetry off; so does `CI`
 //! unless the variable is explicitly on. This runner does not write `services =
 //! true`; the foreign Grafana copy is a separate switch and stays off.
 
@@ -31,8 +31,9 @@ const FORWARDER_DIR: &str = "forwarder";
 const LOOPBACK_HOSTS: &[&str] = &["localhost", "127.0.0.1", "[::1]"];
 /// The shared OTLP ingest route, the one CI's `export-ci-telemetry` sends to.
 pub const DEFAULT_ENDPOINT: &str = "https://otlp.macro-internal.com";
-/// The environment variable that turns telemetry off (or on, under CI).
-pub const SWITCH_VAR: &str = "MACRO_LOCAL_TELEMETRY";
+/// The environment variable that turns telemetry off (or on, under CI). The
+/// Macro-era spelling (`MACRO_LOCAL_TELEMETRY`) is still read as a fallback.
+pub const SWITCH_VAR: &str = "ROX_LOCAL_TELEMETRY";
 
 /// Where settings are read, where events are buffered, and how a missing
 /// settings file is provisioned.
@@ -42,7 +43,7 @@ pub struct Paths {
     pub config: PathBuf,
     /// Pending event files, one per recording process.
     pub buffer_dir: PathBuf,
-    /// What `MACRO_LOCAL_TELEMETRY` and `CI` say.
+    /// What `ROX_LOCAL_TELEMETRY` and `CI` say.
     pub switch: Switch,
     /// How to write the settings file when it doesn't exist; `None` never writes it.
     pub provision: Option<Provision>,
@@ -89,30 +90,32 @@ impl Paths {
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
 pub enum Switch {
     /// No environment switch was applied. Callers that manage the settings file
-    /// themselves use this. An unset `MACRO_LOCAL_TELEMETRY` is not this: it is
+    /// themselves use this. An unset `ROX_LOCAL_TELEMETRY` is not this: it is
     /// [`Switch::Off`].
     #[default]
     Default,
-    /// `MACRO_LOCAL_TELEMETRY=on`: on even under `CI`, if a settings file already
+    /// `ROX_LOCAL_TELEMETRY=on`: on even under `CI`, if a settings file already
     /// allows it. This runner still does not create that file.
     On,
-    /// Off. This is the local runner's default when `MACRO_LOCAL_TELEMETRY` is
-    /// unset, and also `MACRO_LOCAL_TELEMETRY=off` or `CI` without an explicit on.
+    /// Off. This is the local runner's default when `ROX_LOCAL_TELEMETRY` is
+    /// unset, and also `ROX_LOCAL_TELEMETRY=off` or `CI` without an explicit on.
     /// Nothing is written or sent.
     Off,
 }
 
 impl Switch {
-    /// Read `MACRO_LOCAL_TELEMETRY`, then `CI`. Unset means off: this local runner
-    /// does not export launch timing unless the variable is explicitly on.
+    /// Read `ROX_LOCAL_TELEMETRY` (else its `MACRO_` spelling), then `CI`. Unset
+    /// means off: this local runner does not export launch timing unless the
+    /// variable is explicitly on.
     pub fn from_env() -> Self {
         let value = |name: &str| {
             std::env::var_os(name)
                 .map(|value| value.to_string_lossy().trim().to_ascii_lowercase())
                 .filter(|value| !value.is_empty())
         };
+        let switch = value(SWITCH_VAR).or_else(|| value("MACRO_LOCAL_TELEMETRY"));
         let ci = value("CI").is_some_and(|ci| ci != "0" && ci != "false");
-        Self::parse(value(SWITCH_VAR).as_deref(), ci)
+        Self::parse(switch.as_deref(), ci)
     }
 
     pub(crate) fn parse(switch: Option<&str>, ci: bool) -> Self {

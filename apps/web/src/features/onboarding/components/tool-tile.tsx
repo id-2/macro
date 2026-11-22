@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { PipedreamConnectorIcon } from '@core/pipedream/ConnectorIcon';
 import CheckIcon from '@icon/system/regular/check.svg';
 import PlusIcon from '@icon/system/regular/plus.svg';
@@ -16,20 +17,28 @@ export function ToolTile(props: {
     props.state === 'connected' || props.state === 'account-linked';
   const label = () =>
     props.state === 'account-linked'
-      ? 'Account linked'
+      ? t('onboarding.accountLinked')
       : props.state === 'connected'
-        ? 'Connected'
+        ? t('onboarding.connected')
         : props.state === 'disabled'
-          ? 'Enable'
+          ? t('onboarding.enable')
           : props.state === 'loading'
-            ? 'Checking connection…'
+            ? t('onboarding.checkingConnection')
             : props.state === 'error'
-              ? 'Status unavailable'
-              : 'Integration';
+              ? t('onboarding.statusUnavailable')
+              : t('onboarding.integration');
   return (
     <button
       type="button"
-      aria-label={`${props.state === 'account-linked' ? 'Account linked to' : connected() ? 'Connected to' : props.busy ? 'Connecting' : props.state === 'disabled' ? 'Enable' : 'Connect'} ${props.tool.name}`}
+      aria-label={`${props.state === 'account-linked'
+          ? t('onboarding.accountLinkedTo')
+          : connected()
+            ? t('onboarding.connectedTo')
+            : props.busy
+              ? t('onboarding.connecting')
+              : props.state === 'disabled'
+                ? t('onboarding.enable')
+                : t('onboarding.connect')} ${props.tool.name}`}
       aria-busy={props.busy}
       disabled={props.disabled || props.busy || connected()}
       onClick={() => props.onConnect()}

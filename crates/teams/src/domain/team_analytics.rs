@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::model::TeamRole;
 
@@ -15,7 +15,7 @@ pub enum TeamAnalyticsEvent {
         /// The id of the team that was created.
         team_id: uuid::Uuid,
         /// The macro user id of the user who owns the created team.
-        owner_id: MacroUserIdStr<'static>,
+        owner_id: RoxUserIdStr<'static>,
         /// The name of the created team.
         team_name: String,
     },
@@ -26,7 +26,7 @@ pub enum TeamAnalyticsEvent {
         /// The id of the team invite that was created.
         team_invite_id: uuid::Uuid,
         /// The macro user id of the user who created the invite.
-        inviter_id: MacroUserIdStr<'static>,
+        inviter_id: RoxUserIdStr<'static>,
         /// The team name, when it was available to the caller.
         team_name: Option<String>,
     },
@@ -37,7 +37,7 @@ pub enum TeamAnalyticsEvent {
         /// The id of the team invite that the user accepted.
         team_invite_id: uuid::Uuid,
         /// The macro user id of the user who joined the team.
-        member_id: MacroUserIdStr<'static>,
+        member_id: RoxUserIdStr<'static>,
         /// The role granted to the user who joined the team.
         role: TeamRole,
     },
@@ -46,9 +46,9 @@ pub enum TeamAnalyticsEvent {
         /// The id of the team that the user left.
         team_id: uuid::Uuid,
         /// The macro user id of the member who left the team.
-        member_id: MacroUserIdStr<'static>,
+        member_id: RoxUserIdStr<'static>,
         /// The macro user id of the user who removed the member.
-        removed_by_id: MacroUserIdStr<'static>,
+        removed_by_id: RoxUserIdStr<'static>,
         /// The role the member had before leaving the team.
         role: TeamRole,
     },

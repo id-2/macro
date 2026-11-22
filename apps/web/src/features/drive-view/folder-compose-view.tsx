@@ -73,7 +73,7 @@ export function FolderComposeView(props: FolderComposeProps) {
     parentId: props.parentId,
     source: props.source,
   });
-  onMount(() => panel.handle.setDisplayName('New folder'));
+  onMount(() => panel.handle.setDisplayName(t('drive.newFolderTitle')));
   const close = () => panel.handle.close();
   return (
     <SplitPanel.Root class="bg-transparent">
@@ -84,7 +84,9 @@ export function FolderComposeView(props: FolderComposeProps) {
             showUploads={!isTouchDevice()}
             destination={
               props.destination ??
-              (props.parentId ? 'Selected folder' : 'Drive')
+              (props.parentId
+                ? t('drive.selectedFolder')
+                : t('drive.title'))
             }
             initialDraft={props.initialDraft}
             onClose={close}

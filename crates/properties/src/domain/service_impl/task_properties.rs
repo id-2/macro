@@ -7,9 +7,9 @@ use std::collections::HashSet;
 
 use bot_id::BotIdStr;
 use entity_access::domain::models::EntityAccessAuth;
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::EntityType;
 use models_properties::api::requests::SetPropertyValue;
 use models_properties::service::{entity_property::EntityProperty, property_value::PropertyValue};
@@ -27,7 +27,7 @@ where
     R: PropertiesRepo,
     P: PermissionService,
     N: NotificationService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<R::Err> + From<P::Err> + From<N::Err>,
 {
     /// Share the initiative through its owner domain before persisting assignees.
@@ -54,7 +54,7 @@ where
                 continue;
             }
             assignee_ids.push(
-                MacroUserIdStr::parse_from_str(&reference.entity_id)
+                RoxUserIdStr::parse_from_str(&reference.entity_id)
                     .map(|user_id| user_id.into_owned())
                     .map_err(|error| PropertiesErr::Validation(error.to_string()))?,
             );
@@ -242,7 +242,7 @@ where
         &self,
         entity_id: &str,
         value: Option<SetPropertyValue>,
-        assigned_by_user_id: Option<&MacroUserIdStr<'_>>,
+        assigned_by_user_id: Option<&RoxUserIdStr<'_>>,
     ) -> Result<(), PropertiesErr> {
         let Some(SetPropertyValue::MultiEntityReference { references }) = &value else {
             if value.is_some() {
@@ -268,7 +268,7 @@ where
                 continue;
             }
             assignee_ids.push(
-                MacroUserIdStr::parse_from_str(&reference.entity_id)
+                RoxUserIdStr::parse_from_str(&reference.entity_id)
                     .map_err(|error| PropertiesErr::Validation(error.to_string()))?,
             );
         }
@@ -291,8 +291,8 @@ where
     pub async fn handle_task_assignee_notifications(
         &self,
         task_id: Uuid,
-        assignee_ids: &[MacroUserIdStr<'_>],
-        assigned_by_user_id: Option<&MacroUserIdStr<'_>>,
+        assignee_ids: &[RoxUserIdStr<'_>],
+        assigned_by_user_id: Option<&RoxUserIdStr<'_>>,
     ) -> Result<(), PropertiesErr> {
         if assignee_ids.is_empty() {
             return Ok(());
@@ -329,7 +329,7 @@ where
             _ => Default::default(),
         };
 
-        let recipient_ids: Vec<MacroUserIdStr<'_>> = assignee_ids
+        let recipient_ids: Vec<RoxUserIdStr<'_>> = assignee_ids
             .iter()
             .filter(|id| {
                 !current_assignee_ids.contains(id.as_ref())
@@ -362,7 +362,7 @@ where
     pub async fn handle_task_assignee_permissions(
         &self,
         task_id: Uuid,
-        assignee_ids: &[MacroUserIdStr<'_>],
+        assignee_ids: &[RoxUserIdStr<'_>],
     ) -> Result<(), PropertiesErr> {
         if assignee_ids.is_empty() {
             return Ok(());

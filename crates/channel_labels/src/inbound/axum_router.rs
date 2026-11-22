@@ -14,10 +14,10 @@ use axum::{
 };
 use entity_access::{
     domain::{models::MemberTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::OptionalMacroUserTeamExtractorV2,
+    inbound::axum_extractors::OptionalRoxUserTeamExtractorV2,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
@@ -35,7 +35,7 @@ use crate::domain::{
 pub struct ChannelLabelsRouterState<S, Eas, Auth> {
     service: Arc<S>,
     entity_access_service: Arc<Eas>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Eas, Auth> Clone for ChannelLabelsRouterState<S, Eas, Auth> {
@@ -57,7 +57,7 @@ where
     pub fn new(
         service: Arc<S>,
         entity_access_service: Arc<Eas>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -74,7 +74,7 @@ impl<S, Eas, Auth> FromRef<ChannelLabelsRouterState<S, Eas, Auth>> for Arc<Eas> 
 }
 
 impl<S, Eas, Auth> FromRef<ChannelLabelsRouterState<S, Eas, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &ChannelLabelsRouterState<S, Eas, Auth>) -> Self {
         state.authorization_state.clone()
@@ -95,7 +95,7 @@ pub fn channel_labels_router<S, Eas, Auth, T>(
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -124,7 +124,7 @@ pub fn channel_sections_router<S, Eas, Auth, T>(
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -227,14 +227,14 @@ pub struct ChannelLabelChannelPathParams {
 #[tracing::instrument(err, skip_all)]
 pub async fn list_channel_labels_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
 ) -> Result<Json<ChannelLabelsList>, ChannelLabelsError>
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let receipt = ChannelLabelsReceipt::from_access(
         user.authorization.macro_user_id,
@@ -270,15 +270,15 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn create_channel_label_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Json(req): Json<CreateChannelLabelRequest>,
 ) -> Result<Json<ChannelLabel>, ChannelLabelsError>
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let receipt = ChannelLabelsReceipt::from_access(
         user.authorization.macro_user_id,
@@ -320,8 +320,8 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn rename_channel_label_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Path(params): Path<ChannelLabelPathParams>,
     Json(req): Json<RenameChannelLabelRequest>,
@@ -329,7 +329,7 @@ pub async fn rename_channel_label_handler<S, Eas, Auth>(
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let actor = user.authorization.macro_user_id;
     let target = req
@@ -375,15 +375,15 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn delete_channel_label_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Path(params): Path<ChannelLabelPathParams>,
 ) -> Result<StatusCode, ChannelLabelsError>
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let receipt = ChannelLabelsReceipt::from_access(
         user.authorization.macro_user_id,
@@ -417,8 +417,8 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn set_channel_label_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Path(params): Path<ChannelLabelChannelPathParams>,
     Json(req): Json<SetChannelLabelRequest>,
@@ -426,7 +426,7 @@ pub async fn set_channel_label_handler<S, Eas, Auth>(
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let receipt = ChannelLabelsReceipt::from_access(
         user.authorization.macro_user_id,
@@ -459,15 +459,15 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn preview_smart_tag_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Json(rule): Json<ChannelLabelRule>,
 ) -> Result<Json<SmartTagPreview>, ChannelLabelsError>
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let receipt = ChannelLabelsReceipt::from_access(
         user.authorization.macro_user_id,
@@ -494,14 +494,14 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn list_channel_sections_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
 ) -> Result<Json<ChannelLabelsList>, ChannelLabelsError>
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     list_channel_labels_handler(State(state), access, user, Query(scope)).await
 }
@@ -527,15 +527,15 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn create_channel_section_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Json(req): Json<CreateChannelLabelRequest>,
 ) -> Result<Json<ChannelLabel>, ChannelLabelsError>
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     create_channel_label_handler(State(state), access, user, Query(scope), Json(req)).await
 }
@@ -561,8 +561,8 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn update_channel_section_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Path(params): Path<ChannelLabelPathParams>,
     Json(req): Json<RenameChannelLabelRequest>,
@@ -570,7 +570,7 @@ pub async fn update_channel_section_handler<S, Eas, Auth>(
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     rename_channel_label_handler(
         State(state),
@@ -601,15 +601,15 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn delete_channel_section_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Path(params): Path<ChannelLabelPathParams>,
 ) -> Result<StatusCode, ChannelLabelsError>
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     delete_channel_label_handler(State(state), access, user, Query(scope), Path(params)).await
 }
@@ -634,8 +634,8 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn set_channel_section_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Path(params): Path<ChannelLabelChannelPathParams>,
     Json(req): Json<SetChannelLabelRequest>,
@@ -643,7 +643,7 @@ pub async fn set_channel_section_handler<S, Eas, Auth>(
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     set_channel_label_handler(
         State(state),
@@ -675,15 +675,15 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn preview_channel_section_handler<S, Eas, Auth>(
     State(state): State<ChannelLabelsRouterState<S, Eas, Auth>>,
-    access: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    access: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Query(scope): Query<ChannelLabelScopeQuery>,
     Json(rule): Json<ChannelLabelRule>,
 ) -> Result<Json<SmartTagPreview>, ChannelLabelsError>
 where
     S: ChannelLabelsService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     preview_smart_tag_handler(State(state), access, user, Query(scope), Json(rule)).await
 }

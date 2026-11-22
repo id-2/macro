@@ -105,7 +105,7 @@ Follow the [infrastructure guide](../development/infrastructure.md) for the patt
 
 ## 5. Service discovery
 
-- Add a `service_url!` entry to `crates/macro_service_urls/src/lib.rs` with
+- Add a `service_url!` entry to `crates/rox_service_urls/src/lib.rs` with
   `local`, `dev`, and `prod` values.
 - Add the in-network override in `local_env.rs`:
   `OVERRIDE_<NAME>_URL = http://<compose-alias>:8080`. The `local` default is a host
@@ -126,7 +126,7 @@ Follow the [infrastructure guide](../development/infrastructure.md) for the patt
   must be `opt_in` or `modes: &[Mode::Local]`, or `run_dev` steals dev messages.
 - `tooling/xtask/crates/xtask_ports/src/layout.rs`: add the `Port` variant **at
   the end**; offsets come from declaration order.
-- `local/resources.rs` and `crates/macro_queues`: any queue or bucket the service
+- `local/resources.rs` and `crates/rox_queues`: any queue or bucket the service
   needs. A worker whose queue doesn't exist locally spins in a tight loop.
 
 ## 7. API clients (HTTP services)
@@ -141,7 +141,7 @@ Follow the [infrastructure guide](../development/infrastructure.md) for the patt
 
 ## 8. Kafka topics (only if you add one)
 
-Add it to the `topics!` list in `crates/macro_event_topics/src/lib.rs` and run
+Add it to the `topics!` list in `crates/rox_event_topics/src/lib.rs` and run
 `cargo x kafka-topics`. Never hand-edit `.github/kafka-cluster-topics.json`.
 
 ## Verify locally

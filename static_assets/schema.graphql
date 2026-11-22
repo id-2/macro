@@ -681,7 +681,7 @@ input CreateCalendarEventInput {
 	"""
 	conference: GraphqlCalendarConferenceChange
 	"""
-	Mint a Macro call and write its join link into the description and
+	Mint a Rox call and write its join link into the description and
 	location before creating the event, so the invitation carries it.
 	Cannot be combined with `conference`.
 	"""
@@ -1346,7 +1346,7 @@ enum EmailMessageOperationIssue {
 	"""
 	MOVE_CONFLICT
 	"""
-	The original was sent outside Macro.
+	The original was sent outside Rox.
 	"""
 	MOVE_SOURCE_SENT
 	"""
@@ -1931,7 +1931,7 @@ type GraphqlActivityUnknownAction {
 }
 
 """
-The coding agent a Macro computer signs in to an account for.
+The coding agent a Rox computer signs in to an account for.
 """
 enum GraphqlAgentProvider {
 	"""
@@ -2247,7 +2247,7 @@ type GraphqlAgentSessionWaitingForInputMetadata {
 }
 
 """
-Metadata for a Macro computer's agent sign-in running out.
+Metadata for a Rox computer's agent sign-in running out.
 """
 type GraphqlAgentSignInExpiryMetadata {
 	"""
@@ -2273,7 +2273,7 @@ type GraphqlAgentSignInExpiryMetadata {
 }
 
 """
-How close a Macro computer's agent sign-in is to no longer working.
+How close a Rox computer's agent sign-in is to no longer working.
 """
 enum GraphqlAgentSignInExpiryStage {
 	"""
@@ -2365,7 +2365,7 @@ A calendar visible to the viewer.
 """
 type GraphqlCalendar {
 	"""
-	Macro calendar identifier.
+	Rox calendar identifier.
 	"""
 	id: ID!
 	"""
@@ -2487,7 +2487,7 @@ type GraphqlCalendarCapabilities {
 	"""
 	customRecurrence: Boolean!
 	"""
-	Whether email reminders are delivered by the provider or Macro.
+	Whether email reminders are delivered by the provider or Rox.
 	"""
 	emailReminders: Boolean!
 	"""
@@ -2600,11 +2600,11 @@ A calendar event entity: the series content shared by every occurrence.
 """
 type GraphqlCalendarEvent {
 	"""
-	Macro event identifier.
+	Rox event identifier.
 	"""
 	id: ID!
 	"""
-	Macro user who owns this event projection.
+	Rox user who owns this event projection.
 	"""
 	ownerId: String!
 	"""
@@ -3951,7 +3951,7 @@ type GraphqlCommentedOnDocumentMetadata {
 }
 
 """
-Metadata for a Macro computer finishing, or failing, first-time setup.
+Metadata for a Rox computer finishing, or failing, first-time setup.
 """
 type GraphqlComputerSetupMetadata {
 	"""
@@ -3967,7 +3967,7 @@ type GraphqlComputerSetupMetadata {
 	"""
 	computerName: String!
 	"""
-	The Macro user id of the agent teammate the computer runs; absent for
+	The Rox user id of the agent teammate the computer runs; absent for
 	a plain computer.
 	"""
 	agentUserId: String
@@ -3987,7 +3987,7 @@ type GraphqlComputerSetupMetadata {
 }
 
 """
-How a Macro computer's first setup ended.
+How a Rox computer's first setup ended.
 """
 enum GraphqlComputerSetupOutcome {
 	"""
@@ -4009,7 +4009,7 @@ type GraphqlContact {
 	"""
 	id: ID!
 	"""
-	Target user identifier, also used for people who have not joined Macro.
+	Target user identifier, also used for people who have not joined Rox.
 	"""
 	userId: ID!
 	"""
@@ -4017,7 +4017,7 @@ type GraphqlContact {
 	"""
 	email: String!
 	"""
-	Macro profile name, then this viewer's address-book name; null means use email fallback.
+	Rox profile name, then this viewer's address-book name; null means use email fallback.
 	"""
 	name: String
 }
@@ -4833,7 +4833,7 @@ type GraphqlEmailLink {
 	"""
 	id: ID!
 	"""
-	Macro user that owns the inbox.
+	Rox user that owns the inbox.
 	"""
 	macroId: String!
 	"""
@@ -5504,15 +5504,15 @@ enum GraphqlEntityType {
 	"""
 	INITIATIVE
 	"""
-	Macro Database entity (a collection of user-defined tables).
+	Rox Database entity (a collection of user-defined tables).
 	"""
 	DATABASE
 	"""
-	Row of a Macro Database table.
+	Row of a Rox Database table.
 	"""
 	DATABASE_ROW
 	"""
-	Macro Form entity (a questionnaire answered into a database table).
+	Rox Form entity (a questionnaire answered into a database table).
 	"""
 	FORM
 	"""
@@ -6993,7 +6993,7 @@ bot id, or a team id depending on this discriminator.
 """
 enum GraphqlOwnerType {
 	"""
-	A Macro user.
+	A Rox user.
 	"""
 	USER
 	"""
@@ -7474,7 +7474,7 @@ enum GraphqlPropertyTargetEntityType {
 	"""
 	COMPANY
 	"""
-	Row of a Macro database table.
+	Row of a Rox database table.
 	"""
 	DATABASE_ROW
 	"""
@@ -7974,7 +7974,7 @@ enum GraphqlScheduledActionEventName {
 	"""
 	CALL_ENDED
 	"""
-	Macro's GitHub App received a delivery.
+	Rox's GitHub App received a delivery.
 	"""
 	GITHUB
 }
@@ -8012,7 +8012,7 @@ type GraphqlScheduledActionGithubSelector {
 }
 
 """
-Any of several schedules and optional Macro event filters.
+Any of several schedules and optional Rox event filters.
 """
 type GraphqlScheduledActionMultipleTrigger {
 	"""
@@ -8363,7 +8363,7 @@ type GraphqlSoupAgentSession implements GraphqlSoupEntity {
 	"""
 	pullRequestState: GraphqlAgentPullRequestState
 	"""
-	The linked pull request's Macro entity, when visible to the viewer.
+	The linked pull request's Rox entity, when visible to the viewer.
 	"""
 	pullRequestId: ID
 	"""
@@ -8484,7 +8484,7 @@ type GraphqlSoupCalendarEvent implements GraphqlSoupEntity {
 	"""
 	metadata: GraphqlEntityMetadata!
 	"""
-	The owning Macro user.
+	The owning Rox user.
 	"""
 	ownerId: String!
 	"""
@@ -9301,7 +9301,7 @@ type GraphqlSoupCrmContact implements GraphqlSoupEntity {
 }
 
 """
-A row of a Macro database table. Its cells are its `properties`, keyed
+A row of a Rox database table. Its cells are its `properties`, keyed
 by the columns' property definitions.
 """
 type GraphqlSoupDatabaseRow implements GraphqlSoupEntity {
@@ -9771,9 +9771,9 @@ type GraphqlSoupEmailMessage {
 	"""
 	bodyHtmlSanitized: String
 	"""
-	The message body in Macro's rich-text format.
+	The message body in Rox's rich-text format.
 	"""
-	bodyMacro: String
+	bodyRox: String
 	"""
 	The message body with quoted replies removed.
 	"""
@@ -10221,7 +10221,7 @@ enum GraphqlSoupEntityType {
 	"""
 	AGENT_SESSION
 	"""
-	Row of a Macro database table.
+	Row of a Rox database table.
 	"""
 	DATABASE_ROW
 	"""
@@ -11516,7 +11516,7 @@ input NotificationEntityInput {
 }
 
 """
-Who a row is from: a person, an agent, or Macro itself.
+Who a row is from: a person, an agent, or Rox itself.
 """
 type NotificationInboxActor {
 	"""
@@ -11524,7 +11524,7 @@ type NotificationInboxActor {
 	"""
 	kind: NotificationInboxActorKind!
 	"""
-	The user id for a user, the bot id for an agent; absent for Macro.
+	The user id for a user, the bot id for an agent; absent for Rox.
 	Not `id`: the client cache reads an `id` field as entity identity.
 	"""
 	principalId: String
@@ -11541,7 +11541,7 @@ you do not know without an author.
 """
 enum NotificationInboxActorKind {
 	"""
-	A Macro user.
+	A Rox user.
 	"""
 	USER
 	"""
@@ -11549,7 +11549,7 @@ enum NotificationInboxActorKind {
 	"""
 	AGENT
 	"""
-	Macro itself.
+	Rox itself.
 	"""
 	MACRO
 }
@@ -11779,7 +11779,7 @@ type NotificationInboxRow {
 	latestAt: String!
 	"""
 	Who the row is from, per its newest shown notification; absent when
-	that is no one in Macro (outside email senders, GitHub users).
+	that is no one in Rox (outside email senders, GitHub users).
 	"""
 	actor: NotificationInboxActor
 	"""
@@ -12089,7 +12089,7 @@ Resolve exactly the message revision and provider version the user reviewed.
 """
 input ResolveEmailMessageOperationInput {
 	"""
-	Stable Macro message ID.
+	Stable Rox message ID.
 	"""
 	messageId: ID!
 	"""
@@ -12238,7 +12238,12 @@ input SaveEmailDraftInput {
 	"""
 	bodyHtml: String
 	"""
-	Macro body.
+	Rox body.
+	"""
+	bodyRox: String
+	"""
+	Legacy name for `body_rox`, still sent by work queued before the
+	rename. Ignored when `body_rox` is present.
 	"""
 	bodyMacro: String
 	"""
@@ -12318,6 +12323,11 @@ input SendEmailAttemptInput {
 	restoreBodyText: String
 	"""
 	Editor document before the watermark.
+	"""
+	restoreBodyRox: String
+	"""
+	Legacy name for `restore_body_rox`, still sent by sends queued before
+	the rename. Ignored when `restore_body_rox` is present.
 	"""
 	restoreBodyMacro: String
 }

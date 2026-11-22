@@ -5,7 +5,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use external_chat::domain::models::{AttachmentRef, MediaKind, MediaShape};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 use tokio::sync::mpsc;

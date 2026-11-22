@@ -10,7 +10,7 @@ import { EMAIL_COMPOSE_TO_INPUT_SELECTOR } from '@app/features/email-compose/cor
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import { toast } from '@core/component/Toast/Toast';
 import { triggerFocusNewElement } from '@core/directive/focusInput';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { fetchCalendarEventIcs } from '@queries/calendar/ics';
 
 /**

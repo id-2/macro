@@ -39,7 +39,7 @@ export default {
   empty: 'No passwords here yet',
   loading: 'Loading passwords…',
   failed: 'Could not complete this action. Please try again.',
-  unreachable: "Can't reach Macro. Check your connection.",
+  unreachable: "Can't reach Rox. Check your connection.",
   retry: 'Retry',
   name: 'Name',
   kind: 'Type',

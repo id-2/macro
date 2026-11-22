@@ -22,24 +22,25 @@
 
 html[data-theme-light='true'] .onboarding-flow {
   color-scheme: light;
-  --onboarding-intro-background: linear-gradient(145deg, #fdfcfb, #faf8f3);
-  --onboarding-intro-shadow: 0 8px 30px -12px #1d1c1a20;
-  --color-surface: #f5f1e8;
-  --color-surface-0: #f5f1e8;
-  --color-surface-1: #faf8f3;
-  --color-surface-2: #fcfbf8;
-  --color-surface-3: #fdfcfb;
-  --color-surface-4: #fefefd;
-  --color-panel: #faf8f3;
-  --color-ink: #1d1c1a;
-  --color-ink-muted: #54524f;
-  --color-ink-extra-muted: #72706c;
-  --color-ink-placeholder: #8f8c86;
-  --color-edge: #d9d4ca;
-  --color-edge-muted: #e6e1d7;
-  --color-accent-contrast: #f5f1e8;
-  --color-accent-contrast-muted: #e6e1d7;
-  --color-input: #faf8f3;
+  /* Lapis light: the cool bluish palette, not the old cream. */
+  --onboarding-intro-background: linear-gradient(145deg, #f7f9fc, #e8eef6);
+  --onboarding-intro-shadow: 0 8px 30px -12px #1f2b3a20;
+  --color-surface: #e8eef6;
+  --color-surface-0: #e8eef6;
+  --color-surface-1: #f1f5fa;
+  --color-surface-2: #f6f9fc;
+  --color-surface-3: #fafcfe;
+  --color-surface-4: #ffffff;
+  --color-panel: #f1f5fa;
+  --color-ink: #232b35;
+  --color-ink-muted: #4b5563;
+  --color-ink-extra-muted: #6c7784;
+  --color-ink-placeholder: #8d98a5;
+  --color-edge: #d5dde7;
+  --color-edge-muted: #e2e8f0;
+  --color-accent-contrast: #e8eef6;
+  --color-accent-contrast-muted: #d5dde7;
+  --color-input: #f6f9fc;
   --glass-highlight-base: 18%;
   --glass-rim-strong-base: 18%;
   --glass-rim-soft-base: 12%;
@@ -49,15 +50,15 @@ html[data-theme-light='true'] .onboarding-flow {
 
 html[data-theme-light='true'] .onboarding-flow h1,
 html[data-theme-light='true'] .onboarding-flow h2 {
-  color: #000;
+  color: var(--color-ink);
 }
 
 html[data-theme-light='true'] .onboarding-flow .onboarding-tool-icon {
-  background: #faf8f3;
+  background: var(--color-surface-1);
 }
 
 html[data-theme-light='true'] .onboarding-flow :is(.feature-flow-icon, .feature-flow-core) {
-  background: linear-gradient(145deg, #fffdf5a6, #f5f1e833);
+  background: linear-gradient(145deg, #ffffffa6, #e8eef633);
 }
 
 html[data-theme-light='true'] [data-workspace-intro] {

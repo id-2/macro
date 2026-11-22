@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_links SET provider = 'OUTLOOK', sync_generation = 3, grant_generation = 5\n           WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "5b6133276a8b09ee143870d92f965e661fdc264cf8df41f36256bc5a5900cbd8"
+}

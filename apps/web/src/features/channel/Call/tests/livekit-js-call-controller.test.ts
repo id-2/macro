@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { CallTokenResponse } from '@service-call/client';
 import type { Room, RoomOptions } from 'livekit-client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

@@ -2,7 +2,7 @@ use contacts::domain::models::messages::ContactConnection;
 use contacts::domain::ports::ContactsIngress;
 use contacts::domain::service::SqsContactsIngress;
 use contacts::outbound::ingress::SqsContactsQueue;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Process contacts for a single macro ID
 pub async fn process_macro_id(
@@ -29,7 +29,7 @@ pub async fn process_macro_id(
     let connections = contact_emails
         .iter()
         .map(|email| {
-            MacroUserIdStr::try_from_email(email)
+            RoxUserIdStr::try_from_email(email)
                 .map(|contact| ContactConnection::new(link.macro_id.clone(), contact))
         })
         .collect::<Result<Vec<_>, _>>()?;

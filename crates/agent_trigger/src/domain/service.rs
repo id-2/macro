@@ -21,8 +21,8 @@ use messages::domain::service::MessageWrite;
 use messages::domain::{events::MessagePostedMetadata, models::MessageParent};
 
 use channel_sender::ChannelSender;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use crate::domain::broker_events::{ThreadMessageKind, TriggerDecision};
 use crate::domain::thread_window::{ThreadMessage, render_transcript, thread_window};
@@ -67,7 +67,7 @@ pub trait TeamMembershipLookup: Send + Sync + 'static {
     /// Check whether a user belongs to a team.
     fn user_has_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> impl Future<Output = Result<bool>> + Send;
 }
@@ -148,7 +148,7 @@ pub trait ThreadHistory: Send + Sync + 'static {
     /// Recheck that the invoking user may still write to this conversation.
     fn authorize_invocation(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         parent: &MessageParent,
         root_id: Uuid,
     ) -> impl Future<Output = Result<Option<AuthorizedInvocation>>> + Send;
@@ -282,7 +282,7 @@ where
 
     async fn agent_is_available_for(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         parent: &MessageParent,
         bot_id: BotId,
     ) -> Result<bool> {
@@ -345,7 +345,7 @@ where
     /// Recheck task access and agent ownership before an assignment starts work.
     pub async fn authorize_task_assignment(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         parent: &MessageParent,
         root_id: Uuid,
         bot_id: BotId,
@@ -372,7 +372,7 @@ where
 
     async fn owner_allows(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         owner: Option<&BotOwner>,
     ) -> Result<bool> {
         match owner {
@@ -589,7 +589,7 @@ where
     async fn evaluate_implicit(
         &self,
         posted: &MessagePostedMetadata,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         invocation: &AuthorizedInvocation,
     ) -> Result<Option<TriggerDecision>> {
         let Some(thread_id) = posted.thread_id else {

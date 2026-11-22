@@ -6,7 +6,7 @@ mod test;
 use std::collections::HashSet;
 
 use entity_access::domain::models::EntityAccessReceipt;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 
 use crate::domain::models::{Favorite, FavoriteFilter, FavoritesError};
@@ -34,7 +34,7 @@ where
 
     async fn add_favorite_for_user(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> Result<Favorite, FavoritesError> {
         validate_entity(entity)?;
@@ -93,7 +93,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn add_favorite_with_established_access(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> Result<Favorite, FavoritesError> {
         self.add_favorite_for_user(user_id, entity).await
@@ -102,7 +102,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn list_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         filter: &FavoriteFilter,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         Ok(self
@@ -115,7 +115,7 @@ where
     #[tracing::instrument(err, skip(self))]
     async fn remove_favorite_by_entity(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entity: &Entity<'_>,
     ) -> Result<(), FavoritesError> {
         validate_entity(entity)?;
@@ -134,7 +134,7 @@ where
     #[tracing::instrument(err, skip(self, ordered))]
     async fn reorder_favorites(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         ordered: &[Entity<'_>],
     ) -> Result<(), FavoritesError> {
         if ordered.is_empty() {
@@ -161,7 +161,7 @@ where
     #[tracing::instrument(err, skip(self, user_id, entities))]
     async fn favorited_entities(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
     ) -> Result<HashSet<Entity<'static>>, FavoritesError> {
         if entities.is_empty() {

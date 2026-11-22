@@ -5,8 +5,8 @@ use super::*;
 const AGENT: &str = "macro|sam-rivera-abc123@agents.macro.invalid";
 const PERSON: &str = "macro|person@example.com";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_owned()).unwrap()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_owned()).unwrap()
 }
 
 /// Every key belongs to the account named by the key itself.
@@ -16,8 +16,8 @@ impl McpUserApiKeys for KeysOf {
     fn user<'a>(
         &'a self,
         key: &'a str,
-    ) -> Pin<Box<dyn Future<Output = Option<MacroUserIdStr<'static>>> + Send + 'a>> {
-        Box::pin(async move { MacroUserIdStr::try_from(key.to_owned()).ok() })
+    ) -> Pin<Box<dyn Future<Output = Option<RoxUserIdStr<'static>>> + Send + 'a>> {
+        Box::pin(async move { RoxUserIdStr::try_from(key.to_owned()).ok() })
     }
 }
 

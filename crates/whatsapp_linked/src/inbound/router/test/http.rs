@@ -24,12 +24,12 @@ use external_chat::{
     inbound::router::{ExternalChatRouterState, external_chats_router},
     outbound::pg::PgExternalChatRepository,
 };
-use macro_authorization::{
+use rox_authorization::{
     AuthorizedUserApiKey, BotActingUserClaims, BotAuthentication, BotScope, CredentialOrigin,
     HarnessAuthentication, HarnessAuthorizationOwner, InternalIdentityClaims,
-    MacroAuthorizationError, MacroUserAuthentication, ValidatedCredential, ValidatedIdentity,
+    RoxAuthorizationError, RoxUserAuthentication, ValidatedCredential, ValidatedIdentity,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use model_user::UserContext;
 use rootcause::Report;
 use sqlx::PgPool;
@@ -37,7 +37,7 @@ use tower::ServiceExt;
 
 const GROUP: &str = "120363000000000001@g.us";
 /// A test user's id, typed.
-fn person(user: &str) -> macro_user_id::user_id::MacroUserIdStr<'static> {
+fn person(user: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
     user.to_owned().try_into().expect("test user ids are valid")
 }
 
@@ -67,8 +67,8 @@ fn context(user: &str) -> UserContext {
     }
 }
 
-fn acting(user: &str, origin: CredentialOrigin) -> MacroUserAuthentication {
-    MacroUserAuthentication {
+fn acting(user: &str, origin: CredentialOrigin) -> RoxUserAuthentication {
+    RoxUserAuthentication {
         origin,
         agent_id: None,
         agent_via: None,
@@ -81,8 +81,8 @@ fn acting(user: &str, origin: CredentialOrigin) -> MacroUserAuthentication {
 #[derive(Clone)]
 struct Credentials;
 
-impl MacroAuthorizationService for Credentials {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for Credentials {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         self.authorize_identity(jwt)
             .await
             .map(|credential| UserContext {
@@ -96,14 +96,14 @@ impl MacroAuthorizationService for Credentials {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         let (user, origin) = match jwt {
             ALICE_SESSION => (ALICE, CredentialOrigin::Session),
             BOB_SESSION => (BOB, CredentialOrigin::Session),
             ALICE_API_JWT | ALICE_AGENT_JWT | ALICE_ROUTINE_JWT => {
-                (ALICE, CredentialOrigin::MacroApiJwt)
+                (ALICE, CredentialOrigin::RoxApiJwt)
             }
-            _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         };
         Ok(ValidatedCredential {
             identity: ValidatedIdentity {
@@ -122,13 +122,13 @@ impl MacroAuthorizationService for Credentials {
     async fn authorize_user_api_key(
         &self,
         api_key: &str,
-    ) -> Result<AuthorizedUserApiKey, Report<MacroAuthorizationError>> {
+    ) -> Result<AuthorizedUserApiKey, Report<RoxAuthorizationError>> {
         match api_key {
             ALICE_API_KEY => Ok(AuthorizedUserApiKey {
                 user_context: context(ALICE),
                 account_manager: None,
             }),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
@@ -137,9 +137,9 @@ impl MacroAuthorizationService for Credentials {
         token: &str,
         bot_scope: BotScope,
         _claims: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         if token != BOT_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(BotAuthentication {
             bot_id: serde_json::from_value(serde_json::json!(Uuid::from_u128(1))).unwrap(),
@@ -154,9 +154,9 @@ impl MacroAuthorizationService for Credentials {
         &self,
         token: &str,
         _claim: Option<String>,
-    ) -> Result<HarnessAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<HarnessAuthentication, Report<RoxAuthorizationError>> {
         if token != HARNESS_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(HarnessAuthentication {
             harness_id: harness_id::HarnessId::new_from_uuid(Uuid::from_u128(3)),
@@ -172,8 +172,8 @@ impl MacroAuthorizationService for Credentials {
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -183,7 +183,7 @@ struct Unlimited;
 impl SendRateLimiter for Unlimited {
     async fn check(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> ExternalChatResult<()> {
         Ok(())
     }
@@ -234,13 +234,13 @@ fn request(principal: Principal, method: Method, path: &str, body: Body) -> Requ
             builder.header(header::AUTHORIZATION, format!("Bearer {ALICE_API_JWT}"))
         }
         Principal::ApiKey => {
-            builder.header(macro_authorization::USER_API_KEY_HEADER, ALICE_API_KEY)
+            builder.header(rox_authorization::USER_API_KEY_HEADER, ALICE_API_KEY)
         }
         Principal::Bot => builder
-            .header(macro_authorization::BOT_TOKEN_HEADER, BOT_TOKEN)
-            .header(macro_authorization::BOT_SCOPE_HEADER, "user"),
+            .header(rox_authorization::BOT_TOKEN_HEADER, BOT_TOKEN)
+            .header(rox_authorization::BOT_SCOPE_HEADER, "user"),
         Principal::Harness => {
-            builder.header(macro_authorization::HARNESS_TOKEN_HEADER, HARNESS_TOKEN)
+            builder.header(rox_authorization::HARNESS_TOKEN_HEADER, HARNESS_TOKEN)
         }
     };
     builder.body(body).unwrap()
@@ -368,7 +368,7 @@ async fn every_route_enforces_its_credential_rules(pool: PgPool) {
         .await
         .unwrap();
 
-    let authorization_state = MacroAuthorizationState::new(Arc::new(Credentials));
+    let authorization_state = RoxAuthorizationState::new(Arc::new(Credentials));
     let app: Router = Router::new()
         .nest(
             "/external-chats",
@@ -552,7 +552,7 @@ async fn a_program_cannot_pair_a_linked_device(pool: PgPool) {
         "/whatsapp",
         whatsapp_router(WhatsAppRouterState {
             service,
-            authorization_state: MacroAuthorizationState::new(Arc::new(Credentials)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(Credentials)),
         }),
     );
 
@@ -581,7 +581,7 @@ async fn a_program_cannot_pair_a_linked_device(pool: PgPool) {
                 .header(header::CONTENT_TYPE, "application/json")
                 .header(header::AUTHORIZATION, format!("Bearer {bearer}"));
             if code_execution {
-                request = request.header(macro_authorization::CODE_EXECUTION_HEADER, "1");
+                request = request.header(rox_authorization::CODE_EXECUTION_HEADER, "1");
             }
             let status = app
                 .clone()

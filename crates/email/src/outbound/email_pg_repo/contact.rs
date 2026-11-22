@@ -44,7 +44,7 @@ pub(crate) async fn upsert_contacts(
     let mut names: Vec<Option<String>> = Vec::with_capacity(unique_map.len());
 
     for (email, name) in &unique_map {
-        ids.push(macro_uuid::generate_uuid_v7());
+        ids.push(rox_uuid::generate_uuid_v7());
         link_ids.push(link_id);
         emails.push(email.clone());
         names.push(name.clone());

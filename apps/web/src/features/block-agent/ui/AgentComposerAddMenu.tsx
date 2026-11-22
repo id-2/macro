@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   ComposerAddDrawer,
   ComposerAddMenu,
@@ -64,7 +65,7 @@ export function AgentComposerAddMenu(props: {
         ),
         {
           id: 'library',
-          label: 'Add from library',
+          label: t('agentChat.addFromLibrary'),
           description: 'Reference docs, people, or channels',
           icon: <BooksIcon />,
           hint: '@',
@@ -83,7 +84,7 @@ export function AgentComposerAddMenu(props: {
       ],
     },
     {
-      label: 'Connections',
+      label: t('agentChat.connections'),
       items: [
         ...connections.model().capabilities.map((connection) => ({
           id: connection.id,
@@ -92,10 +93,10 @@ export function AgentComposerAddMenu(props: {
             connection.status === 'connected'
               ? (connection.account !== connection.title &&
                   connection.account) ||
-                'Open connection settings'
+                t('agentChat.openConnectionSettings')
               : connection.status === 'off'
-                ? 'Disabled · Open settings'
-                : 'Needs attention · Open settings',
+                ? t('agentChat.connectionDisabled')
+                : t('agentChat.connectionNeedsAttention'),
           icon: providerIcon(connection.provider),
           onSelect: () =>
             openTarget({
@@ -127,7 +128,7 @@ export function AgentComposerAddMenu(props: {
           ? [
               {
                 id: 'loading',
-                label: 'Loading connections…',
+                label: t('agentChat.loadingConnections'),
                 icon: <PlugsIcon />,
                 disabled: true,
                 onSelect: () => {},
@@ -139,7 +140,7 @@ export function AgentComposerAddMenu(props: {
               {
                 id: 'retry',
                 label: 'Retry connections',
-                description: 'Some connections could not be loaded',
+                description: t('agentChat.connectionsLoadFailed'),
                 icon: <PlugsIcon />,
                 onSelect: connections.retry,
               },
@@ -147,7 +148,7 @@ export function AgentComposerAddMenu(props: {
           : []),
         {
           id: 'connect',
-          label: 'Add connections',
+          label: t('agentChat.addConnections'),
           description: 'Connect more apps to Rox',
           icon: <PlusIcon />,
           onSelect: () => openTarget({ kind: 'overview', mode: 'discover' }),
@@ -155,7 +156,7 @@ export function AgentComposerAddMenu(props: {
         {
           id: 'manage',
           label: 'Manage connections',
-          description: 'Accounts, permissions, and settings',
+          description: t('agentChat.connectionsDescription'),
           icon: <PlugsIcon />,
           onSelect: () => openTarget({ kind: 'overview', mode: 'connected' }),
         },
@@ -190,10 +191,12 @@ export function AgentComposerAddMenu(props: {
           >
             <div class="flex items-center justify-between gap-3 border-b border-edge-muted px-5 py-3">
               <Dialog.Title class="text-base font-medium">
-                {selected.kind === 'overview' ? 'Connections' : selected.title}
+                {selected.kind === 'overview'
+                  ? t('agentChat.connections')
+                  : selected.title}
               </Dialog.Title>
               <Dialog.CloseButton as={Button} variant="ghost" size="sm">
-                Done
+                {t('agentChat.done')}
               </Dialog.CloseButton>
             </div>
             <Suspense

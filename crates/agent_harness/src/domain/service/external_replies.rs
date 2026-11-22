@@ -113,7 +113,7 @@ where
         &self,
         session_id: AgentSessionId,
         origin: AnnounceOrigin,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
     ) -> Result<()> {
         let Some(store) = &self.external_replies else {
             return Ok(());
@@ -129,7 +129,7 @@ where
                 &ExternalReplyTarget {
                     origin,
                     actor,
-                    message_id: macro_uuid::generate_uuid_v7(),
+                    message_id: rox_uuid::generate_uuid_v7(),
                 },
             )
             .await?;

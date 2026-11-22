@@ -11,10 +11,10 @@ use axum::{
     routing::get,
 };
 use frecency::domain::models::AggregateFrecency;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{
     CursorOptionExt, CursorWithValAndFilter, PaginateOn, Paginated, SimpleSortMethod,
     TypeEraseCursor,
@@ -40,7 +40,7 @@ pub struct ChannelListRouterState<S, Auth> {
     /// Inner channel list service.
     pub inner: Arc<S>,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for ChannelListRouterState<S, Auth> {
@@ -54,7 +54,7 @@ impl<S, Auth> Clone for ChannelListRouterState<S, Auth> {
 
 impl<S, Auth> ChannelListRouterState<S, Auth> {
     /// Build router state from a channel list service and authorization state.
-    pub fn new(s: S, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(s: S, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             inner: Arc::new(s),
             authorization_state,
@@ -62,7 +62,7 @@ impl<S, Auth> ChannelListRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<ChannelListRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<ChannelListRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &ChannelListRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -72,7 +72,7 @@ impl<S, Auth> FromRef<ChannelListRouterState<S, Auth>> for MacroAuthorizationSta
 pub fn channel_list_router<S, Auth, T>(s: ChannelListRouterState<S, Auth>) -> Router<T>
 where
     S: ChannelListService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -119,13 +119,13 @@ impl IntoResponse for ChannelListRouterErr {
 )]
 async fn get_channels_handler<S, Auth>(
     State(service): State<ChannelListRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Query(params): Query<GetChannelsQueryParams>,
     cursor: Option<CursorWithValAndFilter<Uuid, SimpleSortMethod, ()>>,
 ) -> Result<Json<ApiChannelListPage>, ChannelListRouterErr>
 where
     S: ChannelListService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let user = &authorization.authorization.user;
     let limit = params
@@ -184,11 +184,11 @@ struct GetChannelsQueryParams {
 /// Handle legacy channel activity list requests.
 pub async fn get_activity_handler<S, Auth>(
     State(service): State<ChannelListRouterState<S, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<Vec<ApiActivity>>, ChannelListRouterErr>
 where
     S: ChannelListService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let user = &authorization.authorization.user;
     let res = service
@@ -358,7 +358,7 @@ pub struct ApiChannelListItem {
     pub updated_at: chrono::DateTime<chrono::Utc>,
     /// id of the user who created the channel
     #[schema(value_type = String)]
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
 }
 
 impl ApiChannelListItem {

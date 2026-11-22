@@ -9,7 +9,7 @@ use databases::domain::ports::CreatorAccess;
 use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, EntityType, RequiredPermission,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{DatabaseId, TableId};
 use serde_json::Value;
 
@@ -112,7 +112,7 @@ where
         let webhook = self
             .repository
             .insert_webhook(NewWebhook {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 database_id,
                 table_id,
                 created_by: creator.to_string(),
@@ -167,7 +167,7 @@ where
             .await
             .map_err(DatabaseWebhookError::Repository)?
             .ok_or(DatabaseWebhookError::NotFound)?;
-        let creator = MacroUserIdStr::try_from(webhook.created_by.clone()).map_err(|error| {
+        let creator = RoxUserIdStr::try_from(webhook.created_by.clone()).map_err(|error| {
             DatabaseWebhookError::Repository(rootcause::report!(
                 "stored webhook creator is not a user id: {error}"
             ))

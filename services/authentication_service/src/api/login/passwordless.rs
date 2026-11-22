@@ -4,7 +4,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_middleware::tracking::ClientIp;
+use rox_middleware::tracking::ClientIp;
 
 use std::borrow::Cow;
 
@@ -50,6 +50,10 @@ pub async fn handler(
 
     let lowercase_email = req.email.to_lowercase();
 
+    // The identity provider lookup only decides whether to hint SSO. FusionAuth can be
+    // mid-restart or have no IdP configured at all, and in both cases email-only
+    // passwordless login is still the correct path, so a lookup failure must not abort
+    // the request. Log the underlying error and continue.
     match ctx
         .auth_client
         .lookup_identity_provider(&lowercase_email)
@@ -59,13 +63,12 @@ pub async fn handler(
         Ok(Some(idp_id)) => {
             return Ok((StatusCode::ACCEPTED, Json(SsoRequiredResponse { idp_id })).into_response());
         }
-        Err(e) => {
-            tracing::error!(error=?e, "unable to lookup identity providers");
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                "unable to lookup identity providers",
-            )
-                .into_response());
+        Err(error) => {
+            tracing::warn!(
+                ?error,
+                email=%lowercase_email,
+                "identity provider lookup failed, continuing with email-only passwordless login"
+            );
         }
     };
 
@@ -73,7 +76,7 @@ pub async fn handler(
         .unwrap_or(Cow::Borrowed(lowercase_email.as_str()))
         .to_string();
 
-    let blocked_email = macro_db_client::blocked_email::get_blocked_emails(
+    let blocked_email = rox_db_client::blocked_email::get_blocked_emails(
         &ctx.db,
         &[&lowercase_email, &blocked_email_without_alias],
     )
@@ -100,7 +103,7 @@ pub async fn handler(
             if !req.is_agent {
                 revert_unconfirmed_agent(
                     &ctx,
-                    &format!("macro|{lowercase_email}"),
+                    &format!("{}|{lowercase_email}", rox_user_id::user_id::ROX_PREFIX),
                     &lowercase_email,
                 )
                 .await;
@@ -120,10 +123,10 @@ pub async fn handler(
                     (StatusCode::BAD_REQUEST, "handle is required for signup").into_response()
                 })?;
                 let handle =
-                    macro_user_id::handle::MailboxHandle::parse(handle).map_err(|_| {
+                    rox_user_id::handle::MailboxHandle::parse(handle).map_err(|_| {
                         (StatusCode::BAD_REQUEST, "invalid or reserved handle").into_response()
                     })?;
-                if macro_db_client::macro_user::check_username_exists(&ctx.db, handle.as_str())
+                if rox_db_client::macro_user::check_username_exists(&ctx.db, handle.as_str())
                     .await
                     .map_err(|error| {
                         tracing::error!(?error, "unable to check mailbox handle availability");
@@ -209,10 +212,12 @@ pub async fn handler(
                 .into_response()
         })?;
 
-    // Hand the code back only when explicitly compiled for local/dev tooling
-    // that needs to complete passwordless login without reading the email.
+    // The code belongs in the mailbox, never in this response: returning it
+    // would let anyone who types a known address take that person's session
+    // without the mailbox. A local stack that cannot read email may opt in
+    // with PASSWORDLESS_RETURN_CODE=true; every deployment leaves it unset.
     let body = PasswordlessStartedResponse {
-        code: cfg!(feature = "return_passwordless_code").then_some(code),
+        code: ctx.passwordless_return_code.0.then_some(code),
     };
 
     Ok((StatusCode::OK, Json(body)).into_response())

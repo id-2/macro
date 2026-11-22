@@ -12,8 +12,8 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 
 use super::model::{OpenTarget, ResolveReason, SuggestionError, Target};
@@ -37,7 +37,7 @@ pub enum ResolutionEvent {
     /// The person sent or posted on the item themself.
     Replied {
         /// Who sent or posted.
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         /// Where.
         item: Item,
         /// The thread, by its root part, the post replied in; `None` when it
@@ -60,7 +60,7 @@ pub enum ResolutionEvent {
         item: Item,
         /// The people who may have lost access; `None` when it could be
         /// anyone.
-        users: Option<Vec<MacroUserIdStr<'static>>>,
+        users: Option<Vec<RoxUserIdStr<'static>>>,
     },
 }
 
@@ -165,7 +165,7 @@ impl<Repo: SuggestionRepo, Access: SuggestionAccess> SuggestionResolution<Repo, 
     async fn matched(
         &self,
         event: &ResolutionEvent,
-    ) -> Result<Vec<(Uuid, MacroUserIdStr<'static>)>, SuggestionError> {
+    ) -> Result<Vec<(Uuid, RoxUserIdStr<'static>)>, SuggestionError> {
         let item = event.item();
         let open = self
             .repo
@@ -186,8 +186,8 @@ impl<Repo: SuggestionRepo, Access: SuggestionAccess> SuggestionResolution<Repo, 
     async fn without_access(
         &self,
         item: &Item,
-        suggestions: Vec<(Uuid, MacroUserIdStr<'static>)>,
-    ) -> Result<Vec<(Uuid, MacroUserIdStr<'static>)>, SuggestionError> {
+        suggestions: Vec<(Uuid, RoxUserIdStr<'static>)>,
+    ) -> Result<Vec<(Uuid, RoxUserIdStr<'static>)>, SuggestionError> {
         let target = Target {
             entity_type: item.entity_type,
             entity_id: item.entity_id.clone(),

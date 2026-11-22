@@ -1,5 +1,5 @@
-import { $isImageNode, $isVideoNode } from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+import { $isImageNode, $isVideoNode } from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import {
   $getRoot,
   $isElementNode,

@@ -20,7 +20,7 @@ use chrono::{DateTime, NaiveDate, Utc};
 use futures::try_join;
 use rootcause::Report;
 use serde::{Deserialize, Serialize};
-use sqlx::{PgPool, Postgres, Transaction};
+use sqlx::{PgPool, Postgres, Row, Transaction};
 use uuid::Uuid;
 
 use crate::domain::{
@@ -323,6 +323,157 @@ struct VisibleCalendarRow {
     provider: String,
     online_meeting_providers: Vec<String>,
     contributes_to_availability: bool,
+}
+
+struct RoxCalendarLink {
+    id: Uuid,
+    email_address: String,
+}
+
+/// Stores a personal calendar on the requester's Rox mailbox so
+/// [`PgCalendarRepository::list_visible_calendars`] returns it. The account
+/// uses the existing `google` discriminator only because that is what the
+/// list query already accepts; no Google grant or sync job is created.
+async fn insert_owned_calendar(
+    pool: &PgPool,
+    requester_id: &str,
+    fusionauth_user_id: &str,
+    name: &str,
+) -> Result<VisibleCalendar, Report> {
+    let mut tx = pool.begin().await.map_err(report)?;
+    sqlx::query("SELECT pg_advisory_xact_lock(hashtextextended($1, 0))")
+        .bind(format!("rox-calendar:{requester_id}"))
+        .execute(&mut *tx)
+        .await
+        .map_err(report)?;
+
+    let existing = sqlx::query(
+        r#"
+        SELECT id, email_address::text AS email_address
+        FROM email_links
+        WHERE macro_id = $1
+          AND provider = 'ROX'
+          AND deleting_at IS NULL
+        ORDER BY created_at
+        LIMIT 1
+        "#,
+    )
+    .bind(requester_id)
+    .fetch_optional(&mut *tx)
+    .await
+    .map_err(report)?;
+    let existing = match existing {
+        Some(row) => Some(RoxCalendarLink {
+            id: row.try_get("id").map_err(report)?,
+            email_address: row.try_get("email_address").map_err(report)?,
+        }),
+        None => None,
+    };
+    let link = if let Some(link) = existing {
+        link
+    } else {
+        let id = Uuid::now_v7();
+        let email_address = format!("calendar-{id}@rox.one");
+        sqlx::query(
+            r#"
+            INSERT INTO email_links (
+                id, macro_id, fusionauth_user_id, email_address, provider,
+                is_sync_active, is_primary
+            )
+            VALUES ($1, $2, $3, $4, 'ROX', false, false)
+            "#,
+        )
+        .bind(id)
+        .bind(requester_id)
+        .bind(fusionauth_user_id)
+        .bind(&email_address)
+        .execute(&mut *tx)
+        .await
+        .map_err(report)?;
+        RoxCalendarLink { id, email_address }
+    };
+
+    let account_id = match sqlx::query_scalar::<_, Uuid>(
+        "SELECT id FROM calendar_accounts WHERE email_link_id = $1",
+    )
+    .bind(link.id)
+    .fetch_optional(&mut *tx)
+    .await
+    .map_err(report)?
+    {
+        Some(id) => {
+            sqlx::query(
+                r#"
+                UPDATE calendar_accounts
+                SET sync_status = 'ready', updated_at = now()
+                WHERE id = $1 AND sync_status = 'disabled'
+                "#,
+            )
+            .bind(id)
+            .execute(&mut *tx)
+            .await
+            .map_err(report)?;
+            id
+        }
+        None => {
+            let id = Uuid::now_v7();
+            sqlx::query(
+                r#"
+                INSERT INTO calendar_accounts (
+                    id, owner_id, email_link_id, provider, provider_account_id, sync_status
+                )
+                VALUES ($1, $2, $3, 'google', 'rox', 'ready')
+                "#,
+            )
+            .bind(id)
+            .bind(requester_id)
+            .bind(link.id)
+            .execute(&mut *tx)
+            .await
+            .map_err(report)?;
+            id
+        }
+    };
+
+    let calendar_id = Uuid::now_v7();
+    let color = "#6D5EF5";
+    sqlx::query(
+        r#"
+        INSERT INTO calendars (
+            id, account_id, provider_calendar_id, name, time_zone, color,
+            access_role, is_primary, is_selected, default_reminders
+        )
+        VALUES ($1, $2, $3, $4, 'UTC', $5, 'owner', false, true, '[]'::jsonb)
+        "#,
+    )
+    .bind(calendar_id)
+    .bind(account_id)
+    .bind(format!("rox:{calendar_id}"))
+    .bind(name)
+    .bind(color)
+    .execute(&mut *tx)
+    .await
+    .map_err(report)?;
+
+    let mut log = change_log::ChangeLogBatch::default();
+    log.record(link.id, CalendarChangeOp::UpsertCalendar(calendar_id));
+    log.commit(tx).await?;
+
+    Ok(VisibleCalendar {
+        provider: CalendarProvider::Google,
+        capabilities: CalendarCapabilities::google(),
+        id: calendar_id,
+        email_link_id: link.id,
+        email_address: link.email_address,
+        name: name.to_owned(),
+        color: Some(color.to_owned()),
+        is_primary: false,
+        is_writable: true,
+        is_subscription: false,
+        contributes_to_availability: true,
+        sync_error: None,
+        default_reminders: Vec::new(),
+    })
 }
 
 fn visible_calendar(row: VisibleCalendarRow) -> VisibleCalendar {
@@ -2452,16 +2603,23 @@ impl CalendarRepository for PgCalendarRepository {
             return Ok(None);
         };
         let actor = ActorInboxes::from_owned(self.owned_inboxes(requester_id).await?);
+        // A calendar Rox keeps itself has no grant behind its copy, so its
+        // mutations are answered from the stored projection instead.
+        let is_local = row.provider == "ROX";
+        let provider = match CalendarProvider::from_link(&row.provider) {
+            Some(provider) => provider,
+            None if is_local => CalendarProvider::Google,
+            None => return Err(rootcause::report!("unsupported calendar provider")),
+        };
         let token_identity = CalendarLinkTokenIdentity {
-            binding: Some(CalendarGrantBinding {
+            binding: (!is_local).then_some(CalendarGrantBinding {
                 link_id: row.email_link_id,
                 sync_generation: row.sync_generation,
                 grant_generation: row.grant_generation,
             }),
             fusionauth_user_id: row.fusionauth_user_id,
             email_address: row.email_address,
-            provider: CalendarProvider::from_link(&row.provider)
-                .ok_or_else(|| rootcause::report!("unsupported calendar provider"))?,
+            provider,
         };
         Ok(Some(CalendarEventMutationTarget {
             event_id: row.event_id,
@@ -2484,6 +2642,7 @@ impl CalendarRepository for PgCalendarRepository {
             },
             is_snapshot: row.is_snapshot,
             organizer_copy_calendar_id: row.organizer_copy_calendar_id,
+            is_local,
         }))
     }
 
@@ -2614,16 +2773,24 @@ impl CalendarRepository for PgCalendarRepository {
             return Ok(None);
         };
         let actor = ActorInboxes::from_owned(self.owned_inboxes(requester_id).await?);
+        // A calendar stored only inside Rox has no provider grant to write
+        // through, so it carries no token identity: the mutation service writes
+        // its events to Rox itself.
+        let is_local = row.provider == "ROX";
+        let provider = match CalendarProvider::from_link(&row.provider) {
+            Some(provider) => provider,
+            None if is_local => CalendarProvider::Google,
+            None => return Ok(None),
+        };
         let token_identity = CalendarLinkTokenIdentity {
-            binding: Some(CalendarGrantBinding {
+            binding: (!is_local).then_some(CalendarGrantBinding {
                 link_id: row.email_link_id,
                 sync_generation: row.sync_generation,
                 grant_generation: row.grant_generation,
             }),
             fusionauth_user_id: row.fusionauth_user_id,
             email_address: row.email_address,
-            provider: CalendarProvider::from_link(&row.provider)
-                .ok_or_else(|| rootcause::report!("unsupported calendar provider"))?,
+            provider,
         };
         Ok(Some(CalendarCreationTarget {
             owner_id: row.owner_id,
@@ -2635,6 +2802,7 @@ impl CalendarRepository for PgCalendarRepository {
             observed_access_role: row.access_role,
             is_primary: row.is_primary,
             token_identity,
+            is_local,
             actor,
         }))
     }
@@ -2728,6 +2896,16 @@ impl CalendarRepository for PgCalendarRepository {
         Ok(rows.into_iter().map(visible_calendar).collect())
     }
 
+    #[tracing::instrument(skip(self, requester_id, fusionauth_user_id), err)]
+    async fn create_owned_calendar(
+        &self,
+        requester_id: &str,
+        fusionauth_user_id: &str,
+        name: &str,
+    ) -> Result<VisibleCalendar, Report> {
+        insert_owned_calendar(&self.pool, requester_id, fusionauth_user_id, name).await
+    }
+
     #[tracing::instrument(skip(self, event_ids), fields(event_count = event_ids.len()), err)]
     async fn event_copies(&self, event_ids: &[Uuid]) -> Result<Vec<EventCopy>, Report> {
         let rows = sqlx::query!(
@@ -2779,7 +2957,7 @@ impl CalendarRepository for PgCalendarRepository {
 
     #[tracing::instrument(skip(self, requester_id), err)]
     async fn owned_inboxes(&self, requester_id: &str) -> Result<Vec<OwnedInbox>, Report> {
-        sqlx::query!(
+        let rows = sqlx::query!(
             r#"
             SELECT
                 link.id AS link_id,
@@ -2801,18 +2979,22 @@ impl CalendarRepository for PgCalendarRepository {
         )
         .fetch_all(&self.pool)
         .await
-        .map_err(report)?
-        .into_iter()
-        .map(|row| {
-            Ok(OwnedInbox {
-                link_id: row.link_id,
-                email: row.email_address,
-                provider: CalendarProvider::from_link(&row.provider)
-                    .ok_or_else(|| rootcause::report!("unsupported calendar provider"))?,
-                writable_calendar_ids: row.writable_calendar_ids,
+        .map_err(report)?;
+        Ok(rows
+            .into_iter()
+            .filter_map(|row| {
+                // A first-party Rox mailbox is not a Google or Outlook grant.
+                // Leaving it in this list would fail every event write on the
+                // grants the requester does have.
+                let provider = CalendarProvider::from_link(&row.provider)?;
+                Some(OwnedInbox {
+                    link_id: row.link_id,
+                    email: row.email_address,
+                    provider,
+                    writable_calendar_ids: row.writable_calendar_ids,
+                })
             })
-        })
-        .collect()
+            .collect())
     }
 
     #[tracing::instrument(skip(self), err)]

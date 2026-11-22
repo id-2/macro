@@ -11,7 +11,7 @@ use email::domain::{
 use email::inbound::axum::api_types::DraftEditPrecondition;
 use email::inbound::axum::axum_impls::EmailLinkExtractor;
 use email::inbound::axum::send_router::{SendMessageError, refuse_program_send};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use sqlx_core::types::chrono::{DateTime, Utc};
 use thiserror::Error;
@@ -99,7 +99,7 @@ pub async fn handler(
     Query(precondition): Query<DraftEditPrecondition>,
     State(ctx): State<ApiContext>,
     Cached(authorization): Cached<
-        MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+        RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     >,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<EmailSvc, AuthorizationService>>,
     Path(draft_id): Path<Uuid>,

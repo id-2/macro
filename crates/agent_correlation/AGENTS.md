@@ -93,7 +93,8 @@ code, not in its prompt. The harness also signs the scope into the credential
 - `scope` sets only a correlation and clears any routine; use
   `scope_attribution` to carry both. A bare `tokio::spawn` drops both; wrap
   request work in `capture`.
-- Read `x-macro-sdk-verb` only after signed correlation validation; unknown
+- Read `x-rox-sdk-verb` (or the earlier `x-macro-sdk-verb`) only after signed
+  correlation validation; unknown
   verbs are absent, a verb never outlives its correlation, and it grants no
   authority.
 - Do not check session state: accepted work can complete after a session ends.

@@ -30,7 +30,7 @@ async fn chat_ownership(pool: &Pool<Postgres>, chat_id: &str) -> ChatOwnership {
         ORDER BY source_type::text, source_id
         "#,
     )
-    .bind(macro_uuid::string_to_uuid(chat_id).unwrap())
+    .bind(rox_uuid::string_to_uuid(chat_id).unwrap())
     .fetch_all(pool)
     .await
     .unwrap();
@@ -149,7 +149,7 @@ async fn bot_owner_team_default_link_share_comes_from_owner_team(pool: Pool<Post
     .await
     .unwrap();
     let repo = test_repo(pool);
-    let teamless_user = MacroUserIdStr::parse_from_str("macro|no-team@example.com")
+    let teamless_user = RoxUserIdStr::parse_from_str("macro|no-team@example.com")
         .unwrap()
         .into_owned();
 

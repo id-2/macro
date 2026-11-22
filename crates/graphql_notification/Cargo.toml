@@ -9,7 +9,7 @@ notification_state = { path = "../notification_state", features = ["graphql"] }
 async-graphql = { workspace = true, features = ["dataloader"] }
 async-stream = { workspace = true }
 graphql_common = { path = "../graphql_common" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 model_notifications = { path = "../model_notifications" }
 notification = { path = "../notification" }

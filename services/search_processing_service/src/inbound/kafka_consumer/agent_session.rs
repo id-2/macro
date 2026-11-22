@@ -1,9 +1,9 @@
 //! Lifecycle events trigger an authoritative reread, including deletion.
 
 use ::agent_session::domain::events::{
-    AgentSessionLifecycleEvent, AgentSessionLifecycleEventName, AgentSessionLifecycleMacroEvent,
+    AgentSessionLifecycleEvent, AgentSessionLifecycleEventName, AgentSessionLifecycleRoxEvent,
 };
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 
 use super::{EventOutcome, KafkaProcessingContext, MAX_PROCESSING_ATTEMPTS, retry_processing};
 use crate::domain::agent_session_index::ReconcileTrigger;
@@ -16,7 +16,7 @@ use crate::domain::agent_session_index::ReconcileTrigger;
 /// changed the reply. `mentioned` is published when a prompt is accepted,
 /// before the prompt reaches the log. `command_rejected` is refused before the
 /// runtime, so nothing reaches the log.
-pub(super) fn changes_search_projection(event: &AgentSessionLifecycleMacroEvent) -> bool {
+pub(super) fn changes_search_projection(event: &AgentSessionLifecycleRoxEvent) -> bool {
     match &event.event().event {
         AgentSessionLifecycleEvent::Settled(_)
         | AgentSessionLifecycleEvent::Mentioned(_)
@@ -39,13 +39,13 @@ pub(super) fn changes_search_projection(event: &AgentSessionLifecycleMacroEvent)
 /// queued for the session and not yet started covers any later event for it. Keep this in
 /// step with [`process_agent_session_event`]: an event kind handled any other
 /// way must not be coalesced.
-pub(super) fn reread_key(event: &AgentSessionLifecycleMacroEvent) -> String {
+pub(super) fn reread_key(event: &AgentSessionLifecycleRoxEvent) -> String {
     event.event().event.session_id().to_string()
 }
 
 pub(super) async fn process_agent_session_event(
     context: &KafkaProcessingContext,
-    event: &AgentSessionLifecycleMacroEvent,
+    event: &AgentSessionLifecycleRoxEvent,
 ) -> EventOutcome {
     let id = event.event().event.session_id();
     let trigger =

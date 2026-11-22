@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::models::{Notification, SendNotificationRequestBuilder, TaggedContent};
 use crate::outbound::repository::NotificationDbOps;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -27,7 +27,7 @@ impl Notification for AccessRequested {
 
 async fn insert<T: Notification + Serialize + Send + Sync>(
     pool: &PgPool,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
     entity: Entity<'static>,
     secondary: Option<Entity<'static>>,
     notification: T,
@@ -52,8 +52,8 @@ async fn insert<T: Notification + Serialize + Send + Sync>(
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn filters_before_limit_per_entity_and_preserves_full_reads(pool: PgPool) {
-    let viewer = MacroUserIdStr::try_from_email("viewer@test.com").unwrap();
-    let other = MacroUserIdStr::try_from_email("other@test.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@test.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@test.com").unwrap();
     let channel = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let second = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let read_channel = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
@@ -239,7 +239,7 @@ impl Notification for Reaction {
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn top_level_filter_finds_older_mentions_before_limiting(pool: PgPool) {
-    let viewer = MacroUserIdStr::try_from_email("viewer@test.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@test.com").unwrap();
     let channel = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let root = insert(
         &pool,
@@ -340,7 +340,7 @@ impl Notification for Reply {
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn channel_feed_scope_excludes_thread_roots_before_the_limit(pool: PgPool) {
-    let viewer = MacroUserIdStr::try_from_email("viewer@test.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@test.com").unwrap();
     let channel = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let witness = insert(
         &pool,
@@ -459,8 +459,8 @@ async fn channel_feed_scope_excludes_thread_roots_before_the_limit(pool: PgPool)
 async fn channel_feed_scoping_is_viewer_and_channel_local_and_ignores_deleted_reasons(
     pool: PgPool,
 ) {
-    let viewer = MacroUserIdStr::try_from_email("viewer@test.com").unwrap();
-    let other = MacroUserIdStr::try_from_email("other@test.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@test.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@test.com").unwrap();
     let channel = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let another = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let witness = insert(
@@ -505,7 +505,7 @@ async fn channel_feed_scoping_is_viewer_and_channel_local_and_ignores_deleted_re
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn channel_feed_preserves_mention_duplicates_and_does_not_scope_thread_edges(pool: PgPool) {
-    let viewer = MacroUserIdStr::try_from_email("viewer@test.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@test.com").unwrap();
     let channel = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let thread = EntityType::ChannelMessage.with_entity_string("root".to_owned());
     let root = insert(
@@ -587,7 +587,7 @@ async fn channel_feed_preserves_mention_duplicates_and_does_not_scope_thread_edg
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn channel_and_top_level_feeds_badge_requests_to_join(pool: PgPool) {
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
     let channel = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     insert(
         &pool,
@@ -627,8 +627,8 @@ async fn channel_and_top_level_feeds_badge_requests_to_join(pool: PgPool) {
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn event_type_filter_limits_unseen_mentions_past_newer_sends(pool: PgPool) {
-    let viewer = MacroUserIdStr::try_from_email("viewer@example.com").unwrap();
-    let other = MacroUserIdStr::try_from_email("other@example.com").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@example.com").unwrap();
+    let other = RoxUserIdStr::try_from_email("other@example.com").unwrap();
     let channel = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let quiet = EntityType::Channel.with_entity_string(Uuid::now_v7().to_string());
     let thread = EntityType::ChannelMessage.with_entity_string(Uuid::now_v7().to_string());

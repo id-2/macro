@@ -6,7 +6,7 @@ explicit Nix invocation. See also [Rust development](rust.md).
 
 ## Locate the schema and owner
 
-- RoxDB migrations live in [`crates/macro_db_client/migrations/`](../../crates/macro_db_client/migrations/).
+- RoxDB migrations live in [`crates/rox_db_client/migrations/`](../../crates/rox_db_client/migrations/).
   Check the owning crate's migrations/recipes before assuming another database
   uses the same setup.
 - Inspect migrations or use the [dump-schema skill](../../.agents/skills/dump-schema/SKILL.md)
@@ -93,7 +93,7 @@ compatible with the service code currently deployed, not just the code in its PR
    For RoxDB, from the root:
 
    ```bash
-   sqlx migrate add --source crates/macro_db_client/migrations <descriptive_name>
+   sqlx migrate add --source crates/rox_db_client/migrations <descriptive_name>
    ```
 
    Edit the generated file. For another migration directory, use its `--source`
@@ -115,7 +115,7 @@ compatible with the service code currently deployed, not just the code in its PR
 3. **Apply schema changes** to the local database:
 
    ```bash
-   just crates/macro_db_client/migrate_db
+   just crates/rox_db_client/migrate_db
    ```
 
    Migrations deploy before services and must survive a rolling deploy: give
@@ -194,7 +194,7 @@ Only after confirming the target is the disposable local database and the user
 approves losing its data, run from the repository root inside Nix:
 
 ```bash
-just crates/macro_db_client/drop_db -y -f
+just crates/rox_db_client/drop_db -y -f
 just setup_macrodb
 ```
 

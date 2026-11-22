@@ -18,8 +18,8 @@ use std::{
 use analytics_client::{AnalyticsClient, BackgroundSender, ProductEventProperties};
 use entity_access::{domain::ports::AccessRepository, outbound::PgAccessRepository};
 use lru::LruCache;
-use macro_env::Environment;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_env::Environment;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_auth_proxy::inbound::middleware::McpAuthMethod;
 use serde::Serialize;
 
@@ -257,7 +257,7 @@ impl McpAnalytics {
     /// delays or fails an MCP response.
     pub fn record(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         client: McpClientSignals,
         event: McpAnalyticsEvent,
     ) {
@@ -275,7 +275,7 @@ impl PostHogSink {
     async fn capture(
         &self,
         posthog: &AnalyticsClient,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         client: McpClientSignals,
         event: McpAnalyticsEvent,
     ) {
@@ -295,7 +295,7 @@ impl PostHogSink {
 
     /// The user's team, from the cache when it is fresh. A failed read is not
     /// cached, so the next event tries again.
-    async fn team_id(&self, user_id: &MacroUserIdStr<'static>) -> Option<uuid::Uuid> {
+    async fn team_id(&self, user_id: &RoxUserIdStr<'static>) -> Option<uuid::Uuid> {
         if let Some(team_id) = self.team_cache.get(user_id, Instant::now()) {
             return team_id;
         }
@@ -316,7 +316,7 @@ impl PostHogSink {
 
 /// Each user's team (or none), remembered for [`TEAM_TTL`].
 struct TeamCache {
-    entries: Mutex<LruCache<MacroUserIdStr<'static>, CachedTeam>>,
+    entries: Mutex<LruCache<RoxUserIdStr<'static>, CachedTeam>>,
 }
 
 #[derive(Clone, Copy)]
@@ -336,7 +336,7 @@ impl TeamCache {
 
     /// The user's team as read within [`TEAM_TTL`] of `now`, or `None` when
     /// it has to be read again.
-    fn get(&self, user_id: &MacroUserIdStr<'static>, now: Instant) -> Option<Option<uuid::Uuid>> {
+    fn get(&self, user_id: &RoxUserIdStr<'static>, now: Instant) -> Option<Option<uuid::Uuid>> {
         let mut entries = self.entries.lock().expect("team cache poisoned");
         let cached = *entries.get(user_id)?;
         if now.saturating_duration_since(cached.read_at) < TEAM_TTL {
@@ -346,7 +346,7 @@ impl TeamCache {
         None
     }
 
-    fn put(&self, user_id: MacroUserIdStr<'static>, team_id: Option<uuid::Uuid>, read_at: Instant) {
+    fn put(&self, user_id: RoxUserIdStr<'static>, team_id: Option<uuid::Uuid>, read_at: Instant) {
         self.entries
             .lock()
             .expect("team cache poisoned")

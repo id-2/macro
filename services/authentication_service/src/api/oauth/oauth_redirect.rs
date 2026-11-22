@@ -17,7 +17,7 @@ use axum::{
     http::{HeaderValue, StatusCode},
     response::{IntoResponse, Response},
 };
-use macro_auth::middleware::decode_jwt::decode_macro_access_token_allow_expired;
+use rox_auth::middleware::decode_jwt::decode_macro_access_token_allow_expired;
 use maud::{DOCTYPE, Markup, html};
 use model::response::ErrorResponse;
 use referral::domain::{models::ReferralCode, ports::ReferralService};
@@ -129,7 +129,7 @@ pub async fn handler(
                     "unable to store mobile session code"
                 );
             })
-            .map_err(InnerErr::MacroCacheErr)
+            .map_err(InnerErr::RoxCacheErr)
     };
 
     let state: Option<SsoState> = if let Some(state) = params.state {
@@ -207,7 +207,7 @@ enum InnerErr {
     #[error("{0}")]
     Serde(#[from] serde_json::Error),
     #[error("Rox Cache Err {0}")]
-    MacroCacheErr(anyhow::Error),
+    RoxCacheErr(anyhow::Error),
     #[error("Failed to parse url {0}")]
     ParseErr(#[from] url::ParseError),
     #[error("original_url is not allowed")]
@@ -224,7 +224,7 @@ impl IntoResponse for InnerErr {
                 }),
             )
                 .into_response(),
-            InnerErr::MacroCacheErr(_e) => (
+            InnerErr::RoxCacheErr(_e) => (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(ErrorResponse {
                     message: "unable to store session code".into(),

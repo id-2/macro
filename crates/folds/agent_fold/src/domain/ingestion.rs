@@ -9,7 +9,7 @@ use super::log::AgentSessionLog;
 use super::model::FoldEvent;
 use super::ports::FoldMachine;
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::Deserialize;
 use std::collections::HashSet;
 

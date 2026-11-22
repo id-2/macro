@@ -28,7 +28,7 @@ fn thread(messages: Vec<FocusMessage>) -> FocusThread {
     FocusThread {
         thread_id: Uuid::new_v4(),
         link_id: Uuid::new_v4(),
-        owner: macro_user_id::user_id::MacroUserIdStr::try_from_email("owner@acme.example")
+        owner: rox_user_id::user_id::RoxUserIdStr::try_from_email("owner@acme.example")
             .unwrap(),
         owner_email: "owner@acme.example".to_owned(),
         is_signal: true,

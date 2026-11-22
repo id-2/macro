@@ -6,29 +6,29 @@ export const TASKS_TOUR = defineTourTargets('tasks', ['filter']);
 
 export const tasksTour = defineViewTour({
   id: 'tasks',
-  title: 'Tasks',
+  title: 'Задачи',
   connector: { kind: 'mcp', label: 'Linear', tools: ['Linear'] },
-  video: { youtubeId: 'gxJquVXRX5A', title: 'Rox Tasks', duration: '1:35' },
+  video: { youtubeId: 'gxJquVXRX5A', title: 'Задачи Rox', duration: '1:35' },
   steps: [
     {
       target: VIEW_SHELL_TOUR.aside,
       entry: VIEW_SHELL_TOUR.sidebarToggle,
-      entryLabel: 'Show the task sidebar to continue',
-      title: 'Turn plans into progress',
+      entryLabel: 'Откройте боковую панель задач, чтобы продолжить',
+      title: 'Превратите планы в движение',
       description:
-        'Create a task with a clear next step, or connect Linear to bring your issues into Rox.',
+        'Создайте задачу с ясным следующим шагом или подключите Linear, чтобы перенести задачи в Rox.',
     },
     {
       target: VIEW_SHELL_TOUR.main,
-      title: 'Give work an owner',
+      title: 'Назначьте ответственного',
       description:
-        'Open a task to set its assignee, due date, and status. Add context so the next step is clear.',
+        'Откройте задачу, чтобы указать исполнителя, срок и статус. Добавьте контекст, чтобы следующий шаг был понятен.',
     },
     {
       target: TASKS_TOUR.filter,
-      title: 'Keep tasks organized with tags',
+      title: 'Держите задачи в порядке с помощью тегов',
       description:
-        'Tag tasks by project, team, or type of work, then use Filter to narrow your task list to the tags that matter now.',
+        'Помечайте задачи проектом, командой или видом работы, затем фильтруйте список по тегам, которые важны сейчас.',
     },
   ],
 });

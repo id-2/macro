@@ -4,8 +4,8 @@ use std::fmt;
 
 use agent_runtime_protocol::domain::action::AgentActionId;
 use agent_runtime_protocol::domain::tool_approval::{ToolApprovalNotice, ToolApprovalStatus};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::MACRO_SERVER_SLUG;
 use crate::domain::error::EgressError;
@@ -19,7 +19,7 @@ impl ToolApprovalId {
     /// A fresh id, time-ordered.
     #[must_use]
     pub fn mint() -> Self {
-        Self(macro_uuid::generate_uuid_v7())
+        Self(rox_uuid::generate_uuid_v7())
     }
 
     /// Wrap a stored id.
@@ -54,9 +54,9 @@ pub struct ToolApproval {
     pub request_id: serde_json::Value,
     /// The owner whose access the call spends; the only one who may approve
     /// or decline it.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Who prompted the turn; `None` for a bot on nobody's behalf.
-    pub requested_by: Option<MacroUserIdStr<'static>>,
+    pub requested_by: Option<RoxUserIdStr<'static>>,
     /// `macro`, or the connected app's slug.
     pub server_slug: String,
     /// What a person calls the server.
@@ -68,7 +68,7 @@ pub struct ToolApproval {
     /// Where it stands.
     pub status: ToolApprovalStatus,
     /// Who resolved it, when a person did.
-    pub resolved_by: Option<MacroUserIdStr<'static>>,
+    pub resolved_by: Option<RoxUserIdStr<'static>>,
     /// Approved for good: the person who asked may make the calls it covers
     /// without the owner being asked again.
     pub remembered: bool,
@@ -105,14 +105,14 @@ pub struct StandingApproval {
     /// The session it holds in, for as long as the session lasts.
     pub session: AgentSessionId,
     /// Who may make the calls.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// `macro`, or the connected app's slug.
     pub server_slug: String,
     /// The one tool covered on Rox's server, which reaches all of the
     /// owner's data; `None` covers a whole connected app.
     pub tool_name: Option<String>,
     /// The owner who said so.
-    pub granted_by: MacroUserIdStr<'static>,
+    pub granted_by: RoxUserIdStr<'static>,
 }
 
 impl StandingApproval {
@@ -120,7 +120,7 @@ impl StandingApproval {
     /// the whole app otherwise. `None` when no person asked, since there is
     /// nobody to remember.
     #[must_use]
-    pub fn covering(approval: &ToolApproval, granted_by: &MacroUserIdStr<'static>) -> Option<Self> {
+    pub fn covering(approval: &ToolApproval, granted_by: &RoxUserIdStr<'static>) -> Option<Self> {
         Some(Self {
             session: approval.session,
             user: approval.requested_by.clone()?,
@@ -136,7 +136,7 @@ impl StandingApproval {
     pub fn covers(
         &self,
         session: AgentSessionId,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         server_slug: &str,
         tool: &str,
     ) -> bool {

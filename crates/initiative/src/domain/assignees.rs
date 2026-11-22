@@ -2,7 +2,7 @@
 
 use super::{models::InitiativeError, ports::InitiativeRepo, service::initiative_id_from_receipt};
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::HashSet;
 
 /// Minimal owning service for property compositions that grant assignee access.
@@ -25,7 +25,7 @@ impl<R: InitiativeRepo> InitiativeAssignees<R> {
     pub async fn grant(
         &self,
         receipt: &EntityAccessReceipt<EditAccessLevel>,
-        users: Vec<MacroUserIdStr<'static>>,
+        users: Vec<RoxUserIdStr<'static>>,
     ) -> Result<(), InitiativeError> {
         grant(&self.0, receipt, users).await
     }
@@ -34,7 +34,7 @@ impl<R: InitiativeRepo> InitiativeAssignees<R> {
 pub(super) async fn grant<R: InitiativeRepo>(
     repo: &R,
     receipt: &EntityAccessReceipt<EditAccessLevel>,
-    users: Vec<MacroUserIdStr<'static>>,
+    users: Vec<RoxUserIdStr<'static>>,
 ) -> Result<(), InitiativeError> {
     let id = initiative_id_from_receipt(receipt)?;
     let mut seen = HashSet::new();

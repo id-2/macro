@@ -1,7 +1,7 @@
 use super::*;
 
 async fn channel(pool: &PgPool) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels(id, channel_type, owner_id) VALUES ($1, 'private', $2)",
         id,
@@ -81,9 +81,9 @@ async fn channel_parent_fk_rejects_missing_channels_and_cascades(pool: PgPool) {
 async fn soft_delete_cleans_only_matching_parent_message_notifications(pool: PgPool) {
     setup(&pool).await;
     let channel = channel(&pool).await;
-    let team = macro_uuid::generate_uuid_v7();
-    let company = macro_uuid::generate_uuid_v7();
-    let contact = macro_uuid::generate_uuid_v7();
+    let team = rox_uuid::generate_uuid_v7();
+    let company = rox_uuid::generate_uuid_v7();
+    let contact = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO team(id, name, owner_id) VALUES ($1, 'test', $2)",
         team,
@@ -103,16 +103,16 @@ async fn soft_delete_cleans_only_matching_parent_message_notifications(pool: PgP
         ("document", "message-doc-a".to_owned(), "commentId"),
         (
             "initiative",
-            macro_uuid::generate_uuid_v7().to_string(),
+            rox_uuid::generate_uuid_v7().to_string(),
             "messageId",
         ),
         ("crm_company", company.to_string(), "messageId"),
         ("crm_contact", contact.to_string(), "messageId"),
     ] {
-        let message = macro_uuid::generate_uuid_v7();
+        let message = rox_uuid::generate_uuid_v7();
         sqlx::query!("INSERT INTO comms_messages(id, parent_entity_type, parent_entity_id, sender_id, content) VALUES ($1, $2, $3, $4, 'test')", message, parent_type, parent_id, USER)
             .execute(&pool).await.unwrap();
-        let matching = macro_uuid::generate_uuid_v7();
+        let matching = rox_uuid::generate_uuid_v7();
         let mut keep = Vec::new();
         for (id, kind, parent, metadata) in [
             (
@@ -122,31 +122,31 @@ async fn soft_delete_cleans_only_matching_parent_message_notifications(pool: PgP
                 serde_json::json!({key: message}),
             ),
             (
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 parent_type,
                 "different-parent".into(),
                 serde_json::json!({key: message}),
             ),
             (
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 "different-type",
                 parent_id.clone(),
                 serde_json::json!({key: message}),
             ),
             (
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 parent_type,
                 parent_id.clone(),
-                serde_json::json!({key: macro_uuid::generate_uuid_v7()}),
+                serde_json::json!({key: rox_uuid::generate_uuid_v7()}),
             ),
             (
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 parent_type,
                 parent_id.clone(),
                 serde_json::json!({"threadId": message}),
             ),
             (
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 parent_type,
                 parent_id.clone(),
                 serde_json::json!({"commentId": 42}),

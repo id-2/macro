@@ -7,7 +7,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::ErrorResponse;
 use stripe_inbox::domain::model::{Consumer, OrderingKey};
 use stripe_inbox::domain::ports::Replayed;
@@ -69,7 +69,7 @@ fn unknown_consumer() -> Response {
 )]
 pub(crate) async fn replay_dead_handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Json(request): Json<ReplayDeadRequest>,
 ) -> Result<Json<ReplayDeadResponse>, Response> {
     let consumer = request
@@ -97,7 +97,7 @@ pub(crate) async fn replay_dead_handler(
 #[tracing::instrument(skip(ctx, _internal_authorization), err(Debug))]
 pub(crate) async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Json(request): Json<ReplayRequest>,
 ) -> Result<Response, Response> {
     let consumer: Consumer = request.consumer.parse().map_err(|_| unknown_consumer())?;

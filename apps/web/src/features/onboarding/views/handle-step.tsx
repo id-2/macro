@@ -25,7 +25,7 @@ export function HandleStep(props: { onContinue: () => void }) {
       setError(
         cause instanceof Error && cause.message
           ? cause.message
-          : 'That handle could not be claimed. Please try another.'
+          : 'Это имя занять не удалось. Попробуйте другое.'
       );
     } finally {
       setClaiming(false);
@@ -45,15 +45,15 @@ export function HandleStep(props: { onContinue: () => void }) {
           tabindex="-1"
           class="font-[Roboto_Slab_Variable] text-3xl font-[315]"
         >
-          Choose your Rox handle.
+          Выберите своё имя в Rox.
         </h1>
         <p class="text-sm leading-6 text-ink-muted">
-          Your handle is your required Rox address. You can import an external
-          inbox next, but you do not need one to use your workspace.
+          Имя — это ваш обязательный адрес Rox. Внешний ящик можно подключить
+          позже, для работы он не нужен.
         </p>
       </header>
       <label class="flex flex-col gap-2 text-left text-sm font-medium">
-        Handle
+        Имя
         <input
           id="onboarding-handle"
           type="text"
@@ -74,9 +74,9 @@ export function HandleStep(props: { onContinue: () => void }) {
       </Show>
       <Show when={handle() && !isAllowedHandle(handle())}>
         <p role="alert" class="text-sm text-ink-muted">
-          Use 3–32 lowercase letters, numbers, dots, underscores, or hyphens.
-          Reserved names, leading or trailing dots, and consecutive dots are not
-          allowed.
+          Можно 3–32 строчные буквы, цифры, точки, подчёркивания или дефисы.
+          Занятые имена, точки в начале и в конце, а также две точки подряд
+          запрещены.
         </p>
       </Show>
       <Show when={error()}>
@@ -85,7 +85,7 @@ export function HandleStep(props: { onContinue: () => void }) {
         </p>
       </Show>
       <ContinueButton
-        label={claiming() ? 'Claiming handle…' : 'Continue'}
+        label={claiming() ? 'Занимаем имя…' : 'Продолжить'}
         disabled={claiming() || !isAllowedHandle(handle())}
         onClick={() => fireAndForget(submit(), 'onboarding')}
       />

@@ -12,7 +12,7 @@ use ::activity::{
     Action, Activity, ActivitySource, Actor, Attribution, CommonAction, DomainActivity, EntityType,
     Ingest, InitiativeTaskChange, PropertyChange, event_time,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::EntityType as PropertyEntityType;
 use models_properties::service::property_value::PropertyValue;
 use system_properties::SystemPropertyKey;
@@ -42,8 +42,8 @@ fn entity_type(property_entity: &PropertyEntityType) -> Option<EntityType> {
 
 fn event_attribution(
     actor: &Option<Actor<'static>>,
-    on_behalf_of: &Option<MacroUserIdStr<'static>>,
-    actor_user_id: &Option<MacroUserIdStr<'static>>,
+    on_behalf_of: &Option<RoxUserIdStr<'static>>,
+    actor_user_id: &Option<RoxUserIdStr<'static>>,
 ) -> Option<Attribution> {
     if let Some(actor) = actor.clone() {
         return Some(match on_behalf_of.clone() {

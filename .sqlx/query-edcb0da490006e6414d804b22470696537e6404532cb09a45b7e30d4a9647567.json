@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO crm_email_rule_companies (team_id, user_id, revision, company_id) VALUES ($1, $2, 1, $3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "edcb0da490006e6414d804b22470696537e6404532cb09a45b7e30d4a9647567"
+}

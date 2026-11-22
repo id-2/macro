@@ -1,9 +1,9 @@
 use super::*;
 use ai_billing::{AiAdmissionError, DenyReason};
 use axum::{body::Body, http::Request};
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rootcause::Report;
 use std::sync::Mutex;
@@ -18,13 +18,13 @@ const TEST_USER: &str = "macro|test@example.com";
 #[derive(Clone)]
 struct FakeAuthorization;
 
-impl MacroAuthorizationService for FakeAuthorization {
+impl RoxAuthorizationService for FakeAuthorization {
     async fn authorize(
         &self,
         jwt: &str,
-    ) -> std::result::Result<UserContext, Report<MacroAuthorizationError>> {
+    ) -> std::result::Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: TEST_USER.to_string(),
@@ -38,33 +38,33 @@ impl MacroAuthorizationService for FakeAuthorization {
         &self,
         jwt: &str,
     ) -> std::result::Result<
-        macro_authorization::ValidatedCredential,
-        Report<MacroAuthorizationError>,
+        rox_authorization::ValidatedCredential,
+        Report<RoxAuthorizationError>,
     > {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> std::result::Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> std::result::Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
 struct FakeImportService {
-    calls: Mutex<Vec<(MacroUserIdStr<'static>, ImportSource)>>,
+    calls: Mutex<Vec<(RoxUserIdStr<'static>, ImportSource)>>,
     outcome: Mutex<Option<Result<bool>>>,
-    cancels: Mutex<Vec<MacroUserIdStr<'static>>>,
+    cancels: Mutex<Vec<RoxUserIdStr<'static>>>,
 }
 
 impl NotionWorkspaceImporter for FakeImportService {
     async fn prepare_notion_import(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _scope: import_notion::domain::model::ImportScope,
         _sharing: Option<crate::domain::models::NotionSharing>,
         _wait: std::time::Duration,
@@ -74,7 +74,7 @@ impl NotionWorkspaceImporter for FakeImportService {
 
     async fn notion_import_report(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
     ) -> Result<NotionImportReport> {
         let cancelled = !self.cancels.lock().unwrap().is_empty();
         Ok(NotionImportReport {
@@ -90,7 +90,7 @@ impl NotionWorkspaceImporter for FakeImportService {
 
     async fn attach_notion_review(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _review_id: Uuid,
         _session_id: agent_session::domain::model::AgentSessionId,
     ) -> Result<u64> {
@@ -99,14 +99,14 @@ impl NotionWorkspaceImporter for FakeImportService {
 
     async fn start_notion_write(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _review_id: Uuid,
         _choices: crate::domain::models::NotionWriteChoices,
     ) -> Result<NotionImportReport> {
         unimplemented!("routes never write")
     }
 
-    async fn cancel_notion_import(&self, user: &MacroUserIdStr<'static>) -> Result<bool> {
+    async fn cancel_notion_import(&self, user: &RoxUserIdStr<'static>) -> Result<bool> {
         self.cancels.lock().unwrap().push(user.clone());
         Ok(true)
     }
@@ -115,20 +115,20 @@ impl NotionWorkspaceImporter for FakeImportService {
 impl ImportService for FakeImportService {
     async fn start_discovery(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> Result<bool> {
         self.calls.lock().unwrap().push((user, source));
         self.outcome.lock().unwrap().take().unwrap()
     }
 
-    async fn state(&self, _user: MacroUserIdStr<'static>) -> Result<ImportState> {
+    async fn state(&self, _user: RoxUserIdStr<'static>) -> Result<ImportState> {
         unimplemented!("discovery must not read state")
     }
 
     async fn run_import(
         &self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _import_ids: Vec<Uuid>,
         _discard_ids: Vec<Uuid>,
     ) -> Result<RunImportOutcome> {
@@ -144,7 +144,7 @@ fn discovery_router(outcome: Result<bool>) -> (Router, Arc<FakeImportService>) {
     });
     let router = import_router(ImportRouterState {
         service: service.clone(),
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorization)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorization)),
     });
     (router, service)
 }
@@ -213,7 +213,7 @@ async fn discovery_accepts_slack_idempotently_and_forwards_identity() {
         assert_eq!(
             *service.calls.lock().unwrap(),
             vec![(
-                MacroUserIdStr::parse_from_str(TEST_USER).unwrap(),
+                RoxUserIdStr::parse_from_str(TEST_USER).unwrap(),
                 ImportSource::Slack
             )]
         );
@@ -296,7 +296,7 @@ async fn cancelling_a_notion_import_cancels_it_for_the_caller_and_reports_where_
     assert_eq!(response.status(), StatusCode::OK);
     assert_eq!(
         service.cancels.lock().unwrap().as_slice(),
-        [MacroUserIdStr::parse_from_str(TEST_USER)
+        [RoxUserIdStr::parse_from_str(TEST_USER)
             .unwrap()
             .into_owned()]
     );
@@ -311,7 +311,7 @@ async fn cancelling_a_notion_import_cancels_it_for_the_caller_and_reports_where_
 impl WorkspaceImporter for FakeImportService {
     async fn prepare_workspace_import(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: ImportSource,
         _: Option<crate::domain::models::NotionSharing>,
         _: std::time::Duration,
@@ -320,7 +320,7 @@ impl WorkspaceImporter for FakeImportService {
     }
     async fn workspace_import_report(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> Result<NotionImportReport> {
         self.calls.lock().unwrap().push((user.clone(), source));
@@ -328,7 +328,7 @@ impl WorkspaceImporter for FakeImportService {
     }
     async fn attach_workspace_review(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: ImportSource,
         _: Uuid,
         _: agent_session::domain::model::AgentSessionId,
@@ -337,7 +337,7 @@ impl WorkspaceImporter for FakeImportService {
     }
     async fn start_workspace_write(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: ImportSource,
         _: Uuid,
         _: crate::domain::models::NotionWriteChoices,
@@ -346,7 +346,7 @@ impl WorkspaceImporter for FakeImportService {
     }
     async fn cancel_workspace_import(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> Result<bool> {
         self.calls.lock().unwrap().push((user.clone(), source));
@@ -418,7 +418,7 @@ fn ledger_row(source: ImportSource, foreign_id: &str, status: ImportStatus) -> I
 impl ImportStager for FakeImportService {
     async fn stage(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         _initiator: Initiator,
         source: ImportSource,
         foreign_id: &str,
@@ -442,7 +442,7 @@ impl ImportStager for FakeImportService {
 
     async fn record_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         _initiator: Initiator,
         source: ImportSource,
         foreign_id: &str,
@@ -462,7 +462,7 @@ impl ImportStager for FakeImportService {
 
     async fn discard_entity(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<DiscardOutcome> {
         Ok(if id.is_nil() {
@@ -474,7 +474,7 @@ impl ImportStager for FakeImportService {
 
     async fn list_entities(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: Option<ImportSource>,
         status: Option<ImportStatus>,
     ) -> Result<Vec<ImportEntity>> {
@@ -491,7 +491,7 @@ impl ImportStager for FakeImportService {
 impl NotionPageImporter for FakeImportService {
     async fn import_notion_page(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         page_url_or_id: &str,
     ) -> Result<ImportNotionPageOutcome> {
         self.calls

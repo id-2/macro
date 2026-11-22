@@ -6,7 +6,7 @@ import {
   createConnectorInteraction,
   type GraphicsEditor,
   setConnectorCommand,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { batch, createSignal, onCleanup } from 'solid-js';
 
 export function createConnectorState(editor: GraphicsEditor) {

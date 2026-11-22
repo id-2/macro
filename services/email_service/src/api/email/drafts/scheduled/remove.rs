@@ -7,7 +7,7 @@ use axum_extra::extract::Cached;
 use email::domain::scheduled::{EmailSchedulingService, ScheduleChange};
 use email::inbound::axum::api_types::DraftEditPrecondition;
 use email::inbound::axum::axum_impls::EmailLinkExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use uuid::Uuid;
 
@@ -32,7 +32,7 @@ pub async fn handler(
     Query(precondition): Query<DraftEditPrecondition>,
     State(ctx): State<ApiContext>,
     Cached(authorization): Cached<
-        MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+        RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     >,
     Cached(EmailLinkExtractor(link, _)): Cached<EmailLinkExtractor<EmailSvc, AuthorizationService>>,
     Path(message_id): Path<Uuid>,

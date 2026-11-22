@@ -12,7 +12,7 @@ use ::chat::domain::events::{
     ChatTopicEvent, ChatUpdatedMetadata,
 };
 use ::email::domain::events::{
-    EmailEventOrigin, EmailMacroEvent, EmailTopicEvent, LinkConnectedMetadata,
+    EmailEventOrigin, EmailRoxEvent, EmailTopicEvent, LinkConnectedMetadata,
     LinkDisconnectReason, LinkDisconnectedMetadata, LinkReauthRequiredMetadata,
     MessageDeletedMetadata, MessageDraftSyncedMetadata, MessageReceivedMetadata,
     MessageSendCancelledMetadata, MessageSendQueuedMetadata, MessageSentMetadata, SendCancelReason,
@@ -22,7 +22,7 @@ use ::email::domain::events::{
     ThreadsReindexRequestedMetadata,
 };
 use calendar_events::domain::events::{
-    CalendarEventMetadata, CalendarMacroEvent, CalendarTopicEvent,
+    CalendarEventMetadata, CalendarRoxEvent, CalendarTopicEvent,
 };
 use channels::domain::{
     broker_events::{
@@ -38,12 +38,12 @@ use documents::domain::events::{
     DocumentSyncContentUpdatedMetadata, DocumentTopicEvent, DocumentUpdatedMetadata,
     EmailAttachmentsReleasedMetadata, InteractionReason,
 };
-use macro_event_broker::{Event, EventBrokerError, MacroEvent as _, MessageParts};
-use macro_event_topics::{
-    MacroCalendarTopic, MacroCallsTopic, MacroChannelsTopic, MacroChatsTopic, RoxDocumentsTopic,
-    MacroEmailTopic, MacroProjectsTopic, MacroPropertiesTopic, Topic as _,
+use rox_event_broker::{Event, EventBrokerError, RoxEvent as _, MessageParts};
+use rox_event_topics::{
+    RoxCalendarTopic, RoxCallsTopic, RoxChannelsTopic, RoxChatsTopic, RoxDocumentsTopic,
+    RoxEmailTopic, RoxProjectsTopic, RoxPropertiesTopic, Topic as _,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use model_owner::Owner;
 use models_properties::{
@@ -131,7 +131,7 @@ fn test_pool(workers: usize, capacity: usize) -> (WorkerPool, Vec<mpsc::Receiver
 }
 
 fn received_thread_backfilled_event(thread_id: Uuid, offset: i64) -> ReceivedEvent {
-    let event = DeclaredMacroEvent::EmailMacroEvent(EmailMacroEvent::new(
+    let event = DeclaredRoxEvent::EmailRoxEvent(EmailRoxEvent::new(
         EMAIL_LINK_ID.to_string(),
         EmailTopicEvent::ThreadBackfilled(ThreadBackfilledMetadata {
             link_id: EMAIL_LINK_ID,
@@ -167,7 +167,7 @@ fn received_lifecycle_event(
         events::SessionIdentity,
         model::{AgentSessionId, SessionSource},
     };
-    use macro_event_topics::MacroAgentSessionLifecycleTopic;
+    use rox_event_topics::RoxAgentSessionLifecycleTopic;
 
     let id = AgentSessionId::new_from_uuid(session);
     let event = event(SessionIdentity {
@@ -181,12 +181,12 @@ fn received_lifecycle_event(
         source: SessionSource::User,
     });
     let message = encoded_message(
-        MacroAgentSessionLifecycleTopic::TOPIC_STR,
+        RoxAgentSessionLifecycleTopic::TOPIC_STR,
         id,
         Event::new(event),
     );
     attach_event_coordinates(
-        DeclaredMacroEvent::decode(&message),
+        DeclaredRoxEvent::decode(&message),
         0,
         offset,
         tracing::Span::none(),
@@ -200,8 +200,8 @@ const SECOND_AGENT_SESSION_ID: Uuid = Uuid::from_u128(11);
 /// instead of hanging it; paused time makes the wait instant.
 const BLOCKED_HANDOFF_TIMEOUT: Duration = Duration::from_secs(60);
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
 }
 
 fn started_event() -> CallTopicEvent {
@@ -1391,17 +1391,17 @@ fn subscribes_to_declared_search_processing_topics_with_durable_group() {
         SearchProcessingConsumerGroup::GROUP_NAME,
         "search-processing-service"
     );
-    let topics = DeclaredMacroEvent::topics();
-    assert!(topics.contains(&macro_event_topics::MacroAgentSessionLifecycleTopic::TOPIC_STR));
-    assert_eq!(MacroChatsTopic::TOPIC_STR, "macro.chats");
-    assert!(topics.contains(&MacroCallsTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroChannelsTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroChatsTopic::TOPIC_STR));
+    let topics = DeclaredRoxEvent::topics();
+    assert!(topics.contains(&rox_event_topics::RoxAgentSessionLifecycleTopic::TOPIC_STR));
+    assert_eq!(RoxChatsTopic::TOPIC_STR, "macro.chats");
+    assert!(topics.contains(&RoxCallsTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxChannelsTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxChatsTopic::TOPIC_STR));
     assert!(topics.contains(&RoxDocumentsTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroEmailTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroProjectsTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroPropertiesTopic::TOPIC_STR));
-    assert!(topics.contains(&MacroCalendarTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxEmailTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxProjectsTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxPropertiesTopic::TOPIC_STR));
+    assert!(topics.contains(&RoxCalendarTopic::TOPIC_STR));
 }
 
 #[test]
@@ -1616,8 +1616,8 @@ fn bot_owned_document_event_preserves_the_principal_for_indexing() {
         ),
     };
 
-    let decoded = DeclaredMacroEvent::decode(&message).expect("decodable document event");
-    let DeclaredMacroEvent::DocumentMacroEvent(event) = decoded else {
+    let decoded = DeclaredRoxEvent::decode(&message).expect("decodable document event");
+    let DeclaredRoxEvent::DocumentRoxEvent(event) = decoded else {
         panic!("expected document event");
     };
     let DocumentIndexAction::ExtractText {
@@ -1676,13 +1676,13 @@ fn project_id_collection_is_stable_and_drops_missing_or_empty_ids() {
 fn email_envelope_decodes_round_trip() {
     let event = draft_email_event(false);
     let message = encoded_message(
-        MacroEmailTopic::TOPIC_STR,
+        RoxEmailTopic::TOPIC_STR,
         EMAIL_LINK_ID,
         Event::new(event.clone()),
     );
 
-    let decoded = DeclaredMacroEvent::decode(&message).expect("decodable email event");
-    let DeclaredMacroEvent::EmailMacroEvent(decoded_event) = decoded else {
+    let decoded = DeclaredRoxEvent::decode(&message).expect("decodable email event");
+    let DeclaredRoxEvent::EmailRoxEvent(decoded_event) = decoded else {
         panic!("expected email event");
     };
     assert_eq!(decoded_event.key(), EMAIL_LINK_ID.to_string());
@@ -1695,7 +1695,7 @@ fn agent_session_lifecycle_decodes_and_routes_by_session() {
         events::*,
         model::{AgentSessionId, SessionSource},
     };
-    use macro_event_topics::MacroAgentSessionLifecycleTopic;
+    use rox_event_topics::RoxAgentSessionLifecycleTopic;
 
     let id = AgentSessionId::new_from_uuid(Uuid::from_u128(10));
     let identity = SessionIdentity {
@@ -1715,13 +1715,13 @@ fn agent_session_lifecycle_decodes_and_routes_by_session() {
         AgentSessionLifecycleEvent::Deleted(SessionDeletedMetadata { identity }),
     ] {
         let message = encoded_message(
-            MacroAgentSessionLifecycleTopic::TOPIC_STR,
+            RoxAgentSessionLifecycleTopic::TOPIC_STR,
             id,
             Event::new(event.clone()),
         );
-        let decoded = DeclaredMacroEvent::decode(&message).unwrap();
+        let decoded = DeclaredRoxEvent::decode(&message).unwrap();
         assert_eq!(ordering_key(&decoded), id.to_string());
-        let DeclaredMacroEvent::AgentSessionLifecycleMacroEvent(decoded) = decoded else {
+        let DeclaredRoxEvent::AgentSessionLifecycleRoxEvent(decoded) = decoded else {
             panic!("expected agent-session lifecycle event");
         };
         assert_eq!(decoded.event().event, event);
@@ -1739,13 +1739,13 @@ fn chat_envelope_decodes_round_trip() {
         attachment_count: 0,
     });
     let message = encoded_message(
-        MacroChatsTopic::TOPIC_STR,
+        RoxChatsTopic::TOPIC_STR,
         CHAT_ID,
         Event::new(event.clone()),
     );
 
-    let decoded = DeclaredMacroEvent::decode(&message).expect("decodable chat event");
-    let DeclaredMacroEvent::ChatMacroEvent(decoded_event) = decoded else {
+    let decoded = DeclaredRoxEvent::decode(&message).expect("decodable chat event");
+    let DeclaredRoxEvent::ChatRoxEvent(decoded_event) = decoded else {
         panic!("expected chat event");
     };
     assert_eq!(decoded_event.key(), CHAT_ID);
@@ -1759,13 +1759,13 @@ fn channel_envelope_decodes_round_trip() {
         actor: channel_sender(),
     });
     let message = encoded_message(
-        MacroChannelsTopic::TOPIC_STR,
+        RoxChannelsTopic::TOPIC_STR,
         CHANNEL_ID,
         Event::new(event.clone()),
     );
 
-    let decoded = DeclaredMacroEvent::decode(&message).expect("decodable channel event");
-    let DeclaredMacroEvent::ChannelMacroEvent(decoded_event) = decoded else {
+    let decoded = DeclaredRoxEvent::decode(&message).expect("decodable channel event");
+    let DeclaredRoxEvent::ChannelRoxEvent(decoded_event) = decoded else {
         panic!("expected channel event");
     };
     assert_eq!(decoded_event.key(), CHANNEL_ID.to_string());
@@ -1780,13 +1780,13 @@ fn calendar_envelope_decodes_round_trip_keyed_by_event_id() {
         owner_id: "macro|user".to_string(),
     });
     let message = encoded_message(
-        MacroCalendarTopic::TOPIC_STR,
+        RoxCalendarTopic::TOPIC_STR,
         &event_id.to_string(),
         Event::new(event.clone()),
     );
 
-    let decoded = DeclaredMacroEvent::decode(&message).expect("decodable calendar event");
-    let DeclaredMacroEvent::CalendarMacroEvent(decoded_event) = decoded else {
+    let decoded = DeclaredRoxEvent::decode(&message).expect("decodable calendar event");
+    let DeclaredRoxEvent::CalendarRoxEvent(decoded_event) = decoded else {
         panic!("expected calendar event");
     };
     assert_eq!(decoded_event.key(), event_id.to_string());
@@ -1820,14 +1820,14 @@ fn calendar_events_shard_by_event_id_so_one_event_stays_ordered() {
     // Two changes to one event must land on the same worker, or a later
     // update could be indexed before an earlier one.
     let event_id = uuid::Uuid::now_v7();
-    let first = DeclaredMacroEvent::CalendarMacroEvent(CalendarMacroEvent::for_change(
+    let first = DeclaredRoxEvent::CalendarRoxEvent(CalendarRoxEvent::for_change(
         CalendarTopicEvent::Created(CalendarEventMetadata {
             event_id,
             owner_id: "macro|user".to_string(),
         }),
     ));
     // A different variant for the same entity must still shard together.
-    let second = DeclaredMacroEvent::CalendarMacroEvent(CalendarMacroEvent::for_change(
+    let second = DeclaredRoxEvent::CalendarRoxEvent(CalendarRoxEvent::for_change(
         CalendarTopicEvent::Deleted(CalendarEventMetadata {
             event_id,
             owner_id: "macro|user".to_string(),
@@ -1847,13 +1847,13 @@ fn project_envelope_decodes_round_trip_with_string_key() {
         restored_project_ids: vec![PROJECT_ID.to_string(), CHILD_PROJECT_ID.to_string()],
     });
     let message = encoded_message(
-        MacroProjectsTopic::TOPIC_STR,
+        RoxProjectsTopic::TOPIC_STR,
         PROJECT_ID,
         Event::new(event.clone()),
     );
 
-    let decoded = DeclaredMacroEvent::decode(&message).expect("decodable project event");
-    let DeclaredMacroEvent::ProjectMacroEvent(decoded_event) = decoded else {
+    let decoded = DeclaredRoxEvent::decode(&message).expect("decodable project event");
+    let DeclaredRoxEvent::ProjectRoxEvent(decoded_event) = decoded else {
         panic!("expected project event");
     };
     assert_eq!(decoded_event.key(), PROJECT_ID);
@@ -1870,13 +1870,13 @@ fn property_envelope_decodes_round_trip_with_entity_key() {
         on_behalf_of: None,
     });
     let message = encoded_message(
-        MacroPropertiesTopic::TOPIC_STR,
+        RoxPropertiesTopic::TOPIC_STR,
         PROPERTY_ENTITY_ID,
         Event::new(event.clone()),
     );
 
-    let decoded = DeclaredMacroEvent::decode(&message).expect("decodable property event");
-    let DeclaredMacroEvent::PropertyMacroEvent(decoded_event) = decoded else {
+    let decoded = DeclaredRoxEvent::decode(&message).expect("decodable property event");
+    let DeclaredRoxEvent::PropertyRoxEvent(decoded_event) = decoded else {
         panic!("expected property event");
     };
     assert_eq!(decoded_event.key(), PROPERTY_ENTITY_ID);
@@ -1954,8 +1954,8 @@ fn exact_macro_documents_envelopes_decode_into_document_events() {
             payload: Some(payload.to_vec()),
         };
 
-        let decoded = DeclaredMacroEvent::decode(&message).expect("decodable document event");
-        let DeclaredMacroEvent::DocumentMacroEvent(decoded_event) = decoded else {
+        let decoded = DeclaredRoxEvent::decode(&message).expect("decodable document event");
+        let DeclaredRoxEvent::DocumentRoxEvent(decoded_event) = decoded else {
             panic!("expected document event");
         };
         assert_eq!(decoded_event.key(), DOCUMENT_ID);
@@ -1966,41 +1966,41 @@ fn exact_macro_documents_envelopes_decode_into_document_events() {
 #[tokio::test]
 async fn malformed_missing_key_and_unsupported_email_messages_are_commit_safe() {
     let malformed = TestMessage {
-        topic: MacroEmailTopic::TOPIC_STR,
+        topic: RoxEmailTopic::TOPIC_STR,
         key: Some(EMAIL_LINK_ID.to_string()),
         payload: Some(b"not json".to_vec()),
     };
     let malformed = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&malformed),
+        DeclaredRoxEvent::decode(&malformed),
         7,
         60,
         tracing::Span::none(),
     );
 
     let missing_key = TestMessage {
-        topic: MacroEmailTopic::TOPIC_STR,
+        topic: RoxEmailTopic::TOPIC_STR,
         key: None,
         payload: encoded_message(
-            MacroEmailTopic::TOPIC_STR,
+            RoxEmailTopic::TOPIC_STR,
             EMAIL_LINK_ID,
             Event::new(draft_email_event(false)),
         )
         .payload,
     };
     let missing_key = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&missing_key),
+        DeclaredRoxEvent::decode(&missing_key),
         7,
         61,
         tracing::Span::none(),
     );
 
     let unsupported = encoded_message(
-        MacroEmailTopic::TOPIC_STR,
+        RoxEmailTopic::TOPIC_STR,
         EMAIL_LINK_ID,
         Event::with_schema_version(draft_email_event(false), 2),
     );
     let unsupported = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&unsupported),
+        DeclaredRoxEvent::decode(&unsupported),
         7,
         62,
         tracing::Span::none(),
@@ -2021,7 +2021,7 @@ async fn malformed_missing_key_and_unsupported_email_messages_are_commit_safe() 
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroEmailTopic::TOPIC_STR);
+            assert_eq!(topic, RoxEmailTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2036,12 +2036,12 @@ async fn malformed_missing_key_and_unsupported_email_messages_are_commit_safe() 
 #[tokio::test]
 async fn malformed_and_unsupported_chat_messages_are_commit_safe() {
     let malformed = TestMessage {
-        topic: MacroChatsTopic::TOPIC_STR,
+        topic: RoxChatsTopic::TOPIC_STR,
         key: Some(CHAT_ID.to_string()),
         payload: Some(b"not json".to_vec()),
     };
     let malformed = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&malformed),
+        DeclaredRoxEvent::decode(&malformed),
         5,
         40,
         tracing::Span::none(),
@@ -2058,12 +2058,12 @@ async fn malformed_and_unsupported_chat_messages_are_commit_safe() {
         message_id: CHAT_MESSAGE_ID.to_string(),
     });
     let unsupported = encoded_message(
-        MacroChatsTopic::TOPIC_STR,
+        RoxChatsTopic::TOPIC_STR,
         CHAT_ID,
         Event::with_schema_version(unsupported_event, 2),
     );
     let unsupported = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&unsupported),
+        DeclaredRoxEvent::decode(&unsupported),
         5,
         41,
         tracing::Span::none(),
@@ -2074,7 +2074,7 @@ async fn malformed_and_unsupported_chat_messages_are_commit_safe() {
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroChatsTopic::TOPIC_STR);
+            assert_eq!(topic, RoxChatsTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2097,12 +2097,12 @@ async fn unsupported_project_schema_message_is_commit_safe() {
         restored_project_ids: vec![PROJECT_ID.to_string()],
     });
     let message = encoded_message(
-        MacroProjectsTopic::TOPIC_STR,
+        RoxProjectsTopic::TOPIC_STR,
         PROJECT_ID,
         Event::with_schema_version(event, 2),
     );
     let decoded = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&message),
+        DeclaredRoxEvent::decode(&message),
         4,
         30,
         tracing::Span::none(),
@@ -2115,7 +2115,7 @@ async fn unsupported_project_schema_message_is_commit_safe() {
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroProjectsTopic::TOPIC_STR);
+            assert_eq!(topic, RoxProjectsTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2137,12 +2137,12 @@ async fn unsupported_property_schema_message_is_commit_safe() {
         on_behalf_of: None,
     });
     let message = encoded_message(
-        MacroPropertiesTopic::TOPIC_STR,
+        RoxPropertiesTopic::TOPIC_STR,
         PROPERTY_ENTITY_ID,
         Event::with_schema_version(event, 2),
     );
     let decoded = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&message),
+        DeclaredRoxEvent::decode(&message),
         6,
         50,
         tracing::Span::none(),
@@ -2155,7 +2155,7 @@ async fn unsupported_property_schema_message_is_commit_safe() {
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroPropertiesTopic::TOPIC_STR);
+            assert_eq!(topic, RoxPropertiesTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2174,12 +2174,12 @@ async fn unsupported_channel_schema_message_is_commit_safe() {
         actor: channel_sender(),
     });
     let message = encoded_message(
-        MacroChannelsTopic::TOPIC_STR,
+        RoxChannelsTopic::TOPIC_STR,
         CHANNEL_ID,
         Event::with_schema_version(event, 2),
     );
     let decoded = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&message),
+        DeclaredRoxEvent::decode(&message),
         2,
         20,
         tracing::Span::none(),
@@ -2192,7 +2192,7 @@ async fn unsupported_channel_schema_message_is_commit_safe() {
             expected,
             actual,
         }) => {
-            assert_eq!(topic, MacroChannelsTopic::TOPIC_STR);
+            assert_eq!(topic, RoxChannelsTopic::TOPIC_STR);
             assert_eq!(expected, 1);
             assert_eq!(actual, 2);
         }
@@ -2207,12 +2207,12 @@ async fn unsupported_channel_schema_message_is_commit_safe() {
 #[tokio::test]
 async fn malformed_missing_key_and_unsupported_schema_messages_are_commit_safe() {
     let malformed = TestMessage {
-        topic: MacroCallsTopic::TOPIC_STR,
+        topic: RoxCallsTopic::TOPIC_STR,
         key: Some(CALL_ID.to_string()),
         payload: Some(b"not json".to_vec()),
     };
     let malformed = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&malformed),
+        DeclaredRoxEvent::decode(&malformed),
         1,
         10,
         tracing::Span::none(),
@@ -2220,17 +2220,17 @@ async fn malformed_missing_key_and_unsupported_schema_messages_are_commit_safe()
     assert!(matches!(malformed, Err(EventBrokerError::Serialization(_))));
 
     let missing_key = TestMessage {
-        topic: MacroCallsTopic::TOPIC_STR,
+        topic: RoxCallsTopic::TOPIC_STR,
         key: None,
         payload: encoded_message(
-            MacroCallsTopic::TOPIC_STR,
+            RoxCallsTopic::TOPIC_STR,
             CALL_ID,
             Event::new(archived_event()),
         )
         .payload,
     };
     let missing_key = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&missing_key),
+        DeclaredRoxEvent::decode(&missing_key),
         1,
         11,
         tracing::Span::none(),
@@ -2241,12 +2241,12 @@ async fn malformed_missing_key_and_unsupported_schema_messages_are_commit_safe()
     ));
 
     let unsupported = encoded_message(
-        MacroCallsTopic::TOPIC_STR,
+        RoxCallsTopic::TOPIC_STR,
         CALL_ID,
         Event::with_schema_version(archived_event(), 2),
     );
     let unsupported = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&unsupported),
+        DeclaredRoxEvent::decode(&unsupported),
         1,
         12,
         tracing::Span::none(),
@@ -2277,12 +2277,12 @@ async fn malformed_missing_key_and_unsupported_schema_messages_are_commit_safe()
 async fn successful_handoff_carries_event_partition_and_offset() {
     let event = archived_event();
     let message = encoded_message(
-        MacroCallsTopic::TOPIC_STR,
+        RoxCallsTopic::TOPIC_STR,
         CALL_ID,
         Event::new(event.clone()),
     );
     let decoded = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&message),
+        DeclaredRoxEvent::decode(&message),
         3,
         42,
         tracing::Span::none(),
@@ -2297,7 +2297,7 @@ async fn successful_handoff_carries_event_partition_and_offset() {
     let received = receivers[0].recv().await.expect("handed-off event");
     assert_eq!(received.partition, 3);
     assert_eq!(received.offset, 42);
-    let DeclaredMacroEvent::CallMacroEvent(received_event) = received.event else {
+    let DeclaredRoxEvent::CallRoxEvent(received_event) = received.event else {
         panic!("expected call event");
     };
     assert_eq!(received_event.event().event, event);
@@ -2306,12 +2306,12 @@ async fn successful_handoff_carries_event_partition_and_offset() {
 #[tokio::test]
 async fn closed_worker_channel_leaves_the_current_message_uncommitted() {
     let message = encoded_message(
-        MacroCallsTopic::TOPIC_STR,
+        RoxCallsTopic::TOPIC_STR,
         CALL_ID,
         Event::new(archived_event()),
     );
     let decoded = attach_event_coordinates(
-        DeclaredMacroEvent::decode(&message),
+        DeclaredRoxEvent::decode(&message),
         3,
         42,
         tracing::Span::none(),
@@ -2682,13 +2682,13 @@ async fn events_with_distinct_ordering_keys_spread_across_workers() {
 
 #[test]
 fn email_events_shard_by_thread_and_link_scoped_events_by_producer_key() {
-    let thread_scoped = DeclaredMacroEvent::EmailMacroEvent(EmailMacroEvent::new(
+    let thread_scoped = DeclaredRoxEvent::EmailRoxEvent(EmailRoxEvent::new(
         EMAIL_LINK_ID.to_string(),
         received_email_event(false),
     ));
     assert_eq!(ordering_key(&thread_scoped), EMAIL_THREAD_ID.to_string());
 
-    let link_scoped = DeclaredMacroEvent::EmailMacroEvent(EmailMacroEvent::new(
+    let link_scoped = DeclaredRoxEvent::EmailRoxEvent(EmailRoxEvent::new(
         EMAIL_LINK_ID.to_string(),
         EmailTopicEvent::LinkDisconnected(LinkDisconnectedMetadata {
             link_id: EMAIL_LINK_ID,
@@ -2699,7 +2699,7 @@ fn email_events_shard_by_thread_and_link_scoped_events_by_producer_key() {
     ));
     assert_eq!(ordering_key(&link_scoped), EMAIL_LINK_ID.to_string());
 
-    let multi_thread = DeclaredMacroEvent::EmailMacroEvent(EmailMacroEvent::new(
+    let multi_thread = DeclaredRoxEvent::EmailRoxEvent(EmailRoxEvent::new(
         EMAIL_LINK_ID.to_string(),
         EmailTopicEvent::ThreadsReindexRequested(ThreadsReindexRequestedMetadata {
             link_id: EMAIL_LINK_ID,
@@ -2714,11 +2714,11 @@ fn email_events_shard_by_thread_and_link_scoped_events_by_producer_key() {
 #[test]
 fn non_email_events_shard_by_their_producer_key() {
     let message = encoded_message(
-        MacroCallsTopic::TOPIC_STR,
+        RoxCallsTopic::TOPIC_STR,
         CALL_ID,
         Event::new(archived_event()),
     );
-    let call = DeclaredMacroEvent::decode(&message).expect("decodable call event");
+    let call = DeclaredRoxEvent::decode(&message).expect("decodable call event");
     assert_eq!(ordering_key(&call), CALL_ID.to_string());
 
     let message = encoded_message(
@@ -2728,7 +2728,7 @@ fn non_email_events_shard_by_their_producer_key() {
             document_id: DOCUMENT_ID.to_string(),
         })),
     );
-    let document = DeclaredMacroEvent::decode(&message).expect("decodable document event");
+    let document = DeclaredRoxEvent::decode(&message).expect("decodable document event");
     assert_eq!(ordering_key(&document), DOCUMENT_ID);
 }
 
@@ -2902,7 +2902,7 @@ async fn coalesced_event_records_a_process_event_span_with_its_outcome() {
 fn received_record_span_names_its_event() {
     let capture = OtelCapture::install();
     let record = kafka_record(
-        macro_event_topics::MacroAgentSessionLifecycleTopic::TOPIC_STR,
+        rox_event_topics::RoxAgentSessionLifecycleTopic::TOPIC_STR,
         AGENT_SESSION_ID.to_string(),
         1,
         4,
@@ -2942,7 +2942,7 @@ fn received_record_span_names_its_event() {
 #[tokio::test]
 async fn record_span_covers_processing_and_fails_with_a_dropped_event() {
     let capture = OtelCapture::install();
-    let record = kafka_record(MacroEmailTopic::TOPIC_STR, EMAIL_LINK_ID.to_string(), 2, 7);
+    let record = kafka_record(RoxEmailTopic::TOPIC_STR, EMAIL_LINK_ID.to_string(), 2, 7);
     for _ in 0..2 {
         capture.rearm();
         let event = received_thread_backfilled_event(EMAIL_THREAD_ID, 7).event;

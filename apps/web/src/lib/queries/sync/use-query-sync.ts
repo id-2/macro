@@ -1,7 +1,7 @@
 import { AgentSession } from '@core/agent-session/AgentSession';
 import { publishSessionActivity } from '@core/agent-session/session-activity';
 import { noteSessionActivity } from '@core/agent-session/session-turn';
-import { WebsocketEvent } from '@macro-inc/collaboration/websocket';
+import { WebsocketEvent } from '@rox-one/collaboration/websocket';
 import { handleAgentSessionChanges } from '@queries/agent-session/changes-sync';
 import { handleAgentSessionPreview } from '@queries/agent-session/preview';
 import { handleAgentSessionQueue } from '@queries/agent-session/queue-sync';

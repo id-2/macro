@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::scheduled::{EmailSchedulingRepo, EmailSchedulingService, ScheduleChange};
 use crate::domain::service::EmailServiceImpl;
 use email_db_client::messages::scheduled::get::get_and_start_processing_scheduled_message;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_event_broker::NoopRoxEventBroker;
 
 fn identity() -> (Uuid, Uuid) {
     (
@@ -11,8 +11,8 @@ fn identity() -> (Uuid, Uuid) {
     )
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 
 fn future() -> ScheduleChange {
@@ -163,11 +163,11 @@ async fn service_authorizes_actor_and_validates_future_time(
         enqueuer: (),
         crm_service: (),
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        macro_event_broker: NoopRoxEventBroker,
         sent_undo_delay_secs: 5,
     };
     let (link, message) = identity();
-    let stranger = MacroUserIdStr::parse_from_str("macro|stranger@test.com")?;
+    let stranger = RoxUserIdStr::parse_from_str("macro|stranger@test.com")?;
     assert!(matches!(
         service
             .change_schedule(stranger, link, message, future(), None, 0)
@@ -222,7 +222,7 @@ async fn scheduled_source_rejects_delete_and_migration_into_existing_reply(
         enqueuer: NoOpEnqueuer,
         crm_service: NoOpCrmService,
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        macro_event_broker: NoopRoxEventBroker,
         sent_undo_delay_secs: 5,
     };
     let (link, message) = identity();
@@ -250,7 +250,7 @@ async fn scheduled_source_rejects_delete_and_migration_into_existing_reply(
         bcc: vec![],
         body_text: Some("stale autosave".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: None,
@@ -334,7 +334,7 @@ fn stale_input(message: Uuid) -> ResolvedDraftInput {
         bcc: vec![],
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -530,7 +530,7 @@ async fn initial_schedule_prepares_signature_but_time_updates_preserve_content(
         enqueuer: (),
         crm_service: (),
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        macro_event_broker: NoopRoxEventBroker,
         sent_undo_delay_secs: 5,
     };
     service

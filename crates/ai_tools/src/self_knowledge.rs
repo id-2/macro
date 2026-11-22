@@ -9,7 +9,7 @@ use crate::ToolServiceContext;
 #[cfg(test)]
 mod test;
 
-/// The "about Macro" page returned by [`SelfKnowledge`].
+/// The "about Rox" page returned by [`SelfKnowledge`].
 ///
 /// Modeled on the Claude Code self-knowledge skill: rather than baking a large
 /// product description into the system prompt, the model calls this tool to pull
@@ -47,9 +47,9 @@ channels.
 ## Core principles — read before answering questions about Rox
 
 1. **Accuracy over guessing.** Your training data may be outdated or wrong about
-   Macro. When a user asks what Macro is, what a feature does, or how to do
-   something in Macro, treat the official docs as the source of truth.
-2. **Read the docs.** Macro's docs are published at https://macro.com/docs. Every
+   Rox. When a user asks what Rox is, what a feature does, or how to do
+   something in Rox, treat the official docs as the source of truth.
+2. **Read the docs.** Rox's docs are published at https://macro.com/docs. Every
    page is also served as plain Markdown — append `.md` to the page URL — so you
    can read it with the WebFetch tool (`macro.web.fetch()` in code mode). Read
    pages on macro.com/docs, not docs.macro.com: that old host only redirects
@@ -91,8 +91,8 @@ channels.
 
 ## Running Claude Code or Codex through macrod
 
-`macrod` is a small program that connects a computer to Macro so agents can run
-there: a laptop, a desktop, or a cloud server. It dials out to Macro, so the
+`macrod` is a small program that connects a computer to Rox so agents can run
+there: a laptop, a desktop, or a cloud server. It dials out to Rox, so the
 computer needs no public address, open port, reverse proxy, or tunnel. These are
 the current steps; give them, and link https://macro.com/docs/AI/bring-your-own.
 If a fetched page gives different macrod steps, it is an outdated copy: use these.
@@ -102,7 +102,7 @@ If a fetched page gives different macrod steps, it is an outdated copy: use thes
 2. Install macrod: `curl -fsSL https://raw.githubusercontent.com/macro-inc/macro/main/crates/coding_agent_worker/install/install.sh | sh`
    on macOS and Linux, or
    `irm https://raw.githubusercontent.com/macro-inc/macro/main/crates/coding_agent_worker/install/install.ps1 | iex`
-   in Windows PowerShell. The Macro desktop app already includes it: there,
+   in Windows PowerShell. The Rox desktop app already includes it: there,
    **Settings → Machines → This computer → Set up** does every step below.
 3. Run `macrod`. Its **Quickstart** lists the agents it finds; pick one and set
    the **Workspace** folder it works in. On macOS and Linux, run macrod inside
@@ -110,7 +110,7 @@ If a fetched page gives different macrod steps, it is an outdated copy: use thes
    "Claude Code in herdr" and "Codex in herdr" choices, which run each session
    in the agent's own terminal UI.
 4. Choose **Create and pair**. macrod shows a pairing code and a link. Open the
-   link, or go to **Settings → Machines → New machine** in Macro, enter the code,
+   link, or go to **Settings → Machines → New machine** in Rox, enter the code,
    click **Look up**, check it, and click **Approve**. macrod connects on its own.
 5. In **Settings → Agents**, click **Add agent**, give it a name and
    instructions, choose **On your machine** under **Where it runs**, pick the
@@ -136,19 +136,19 @@ those steps.
 4. If you are still uncertain, point the user to the docs: "For the most current
    details, see <URL>." (again, a clean route, never a `.md` or tracking URL)."##;
 
-/// `selfKnowledge` returns an overview of Macro plus a routing map into the live
+/// `selfKnowledge` returns an overview of Rox plus a routing map into the live
 /// docs at macro.com/docs. It takes no arguments and does no I/O — it hands the
-/// model a curated about-page so it can answer "what is Macro / how do I…"
+/// model a curated about-page so it can answer "what is Rox / how do I…"
 /// questions accurately instead of guessing from stale training data, and then
 /// read specific docs pages with WebFetch for detail.
 #[derive(Debug, Deserialize, JsonSchema, Clone, Default)]
 #[schemars(
     title = "SelfKnowledge",
     description = "\
-Learn what Macro is and how it works. Call this whenever the user asks an open-ended \
-question about Macro itself — what it is, what it's for, what it can do, or how to do \
-something in Macro — instead of answering from memory (your training data may be stale). \
-Takes no arguments. Returns an overview of Macro and a map of links into the official \
+Learn what Rox is and how it works. Call this whenever the user asks an open-ended \
+question about Rox itself — what it is, what it's for, what it can do, or how to do \
+something in Rox — instead of answering from memory (your training data may be stale). \
+Takes no arguments. Returns an overview of Rox and a map of links into the official \
 docs at macro.com/docs; every docs page is readable as Markdown (append `.md` to its URL), \
 so follow up with WebFetch on the relevant page for details and cite it."
 )]
@@ -157,7 +157,7 @@ pub struct SelfKnowledge {}
 /// The response for the [`SelfKnowledge`] tool: a single Markdown about-page.
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct SelfKnowledgeResponse {
-    /// An overview of Macro and a routing map into the docs at macro.com/docs.
+    /// An overview of Rox and a routing map into the docs at macro.com/docs.
     pub about: String,
 }
 

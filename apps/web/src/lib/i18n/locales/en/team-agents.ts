@@ -90,7 +90,7 @@ export default {
   removeFailed: "Couldn't remove {{name}}. Try again.",
   connectClaudeTitle: 'Connect {{name}} to your Claude plan',
   connectClaudeBody:
-    '{{name}} uses your Claude Pro or Max plan instead of Macro credits, starting with its next task.',
+    '{{name}} uses your Claude Pro or Max plan instead of Rox credits, starting with its next task.',
   connectClaudeFootnote:
     "Only {{name}}'s computer keeps this sign-in. Revoke it any time in claude.ai settings.",
   claudeSignedIn: '{{name}} now uses your Claude plan',

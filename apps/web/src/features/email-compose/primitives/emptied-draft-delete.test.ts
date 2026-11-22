@@ -35,7 +35,7 @@ vi.mock('@queries/client', () => ({
 vi.mock('@core/component/Toast/Toast', () => ({
   toast: { failure: vi.fn() },
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   NOOP_SPAN: {},
   Telemetry: { error: vi.fn() },
 }));

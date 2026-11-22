@@ -6,7 +6,7 @@ mod test;
 
 use crate::domain::{BillingError, Result, SettlementCandidates};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 /// Postgres-backed [`SettlementCandidates`].
@@ -27,7 +27,7 @@ impl SettlementCandidates for PgSettlementCandidates {
         &self,
         since: DateTime<Utc>,
         now: DateTime<Utc>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>> {
         // Counted usage is read through `ai_usage_created_at_idx`; the two
         // billing tables are small (one row per payer or reload). A reload
         // whose collector has not reported back in ten minutes was abandoned
@@ -66,7 +66,7 @@ impl SettlementCandidates for PgSettlementCandidates {
         .map_err(|e| BillingError::Storage(e.into()))?;
         rows.into_iter()
             .map(|user_id| {
-                MacroUserIdStr::try_from(user_id)
+                RoxUserIdStr::try_from(user_id)
                     .map_err(|error| BillingError::Storage(error.into()))
             })
             .collect()

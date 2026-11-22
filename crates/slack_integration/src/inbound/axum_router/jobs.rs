@@ -6,9 +6,9 @@ use axum::{
 };
 use entity_access::{
     domain::{models::AdminTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use serde::Deserialize;
 
 use super::{ApiError, SlackRouterState};
@@ -27,13 +27,13 @@ pub struct ListQuery {
     params(("before" = Option<JobId>, Query)), responses((status = 200, body = ImportPage)))]
 pub async fn list<T, Eas, Auth>(
     State(state): State<SlackRouterState<T, Eas, Auth>>,
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     Query(query): Query<ListQuery>,
 ) -> Result<Json<ImportPage>, ApiError>
 where
     T: ImportService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -49,13 +49,13 @@ where
         (status = 404, description = "Unknown or inaccessible job")))]
 pub async fn progress<T, Eas, Auth>(
     State(state): State<SlackRouterState<T, Eas, Auth>>,
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     Path(job_id): Path<JobId>,
 ) -> Result<Json<ImportProgress>, ApiError>
 where
     T: ImportService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -71,13 +71,13 @@ where
         (status = 404, description = "Unknown or inaccessible job")))]
 pub async fn finalize<T, Eas, Auth>(
     State(state): State<SlackRouterState<T, Eas, Auth>>,
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     Path(job_id): Path<JobId>,
 ) -> Result<Json<ImportProgress>, ApiError>
 where
     T: ImportService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state
@@ -93,13 +93,13 @@ where
         (status = 404, description = "Unknown or inaccessible job")))]
 pub async fn cancel<T, Eas, Auth>(
     State(state): State<SlackRouterState<T, Eas, Auth>>,
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     Path(job_id): Path<JobId>,
 ) -> Result<Json<ImportProgress>, ApiError>
 where
     T: ImportService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(
         state

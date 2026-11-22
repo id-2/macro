@@ -16,41 +16,14 @@ export type ReviewsBoardStage =
 /** Whether GitHub can merge a pull request's head into its base. */
 export type PullRequestMergeability = 'mergeable' | 'conflicting' | 'unknown';
 
-export const REVIEWS_BOARD_STAGES: readonly {
-  id: ReviewsBoardStage;
-  label: string;
-  description: string;
-}[] = [
-  {
-    id: 'draft',
-    label: 'Draft',
-    description: 'Drop a pull request here to convert it to a draft',
-  },
-  {
-    id: 'review',
-    label: 'In review',
-    description: 'Open, with checks running or none reported yet',
-  },
-  {
-    id: 'failing',
-    label: 'Checks failing',
-    description: 'A check failed on the latest commit',
-  },
-  {
-    id: 'conflicts',
-    label: 'Conflicts',
-    description: 'The branch conflicts with its base',
-  },
-  {
-    id: 'ready',
-    label: 'Ready to merge',
-    description: 'Every check passed',
-  },
-  {
-    id: 'merged',
-    label: 'Merged',
-    description: 'Drop a pull request here to merge it',
-  },
+/** The board's columns, left to right; each names itself where it renders. */
+export const REVIEWS_BOARD_STAGES: readonly { id: ReviewsBoardStage }[] = [
+  { id: 'draft' },
+  { id: 'review' },
+  { id: 'failing' },
+  { id: 'conflicts' },
+  { id: 'ready' },
+  { id: 'merged' },
 ];
 
 /** Finished conclusions that fail the head commit. */

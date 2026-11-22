@@ -3,7 +3,7 @@
  * collapsed console group and one span tree.
  */
 
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import type { Result, ResultAsync } from 'neverthrow';
 import { match } from 'ts-pattern';
 import type {

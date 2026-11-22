@@ -3,8 +3,8 @@ use ai_billing::{AiAdmissionError, AiAdmissionService, DenyReason};
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-pub(in crate::domain::service) fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|import@example.com").unwrap()
+pub(in crate::domain::service) fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|import@example.com").unwrap()
 }
 
 fn denied() -> AiAdmissionError {
@@ -28,7 +28,7 @@ impl Admission {
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        caller: &'a MacroUserIdStr<'_>,
+        caller: &'a RoxUserIdStr<'_>,
         feature: ai_usage::AiFeature,
     ) -> ai_billing::domain::admission::AdmissionFuture<'a> {
         assert_eq!(caller, &user());
@@ -47,12 +47,12 @@ struct Ledger {
     rows: Vec<ImportEntity>,
     runs: Vec<ImportRun>,
     team_id: Option<Uuid>,
-    roster: Vec<MacroUserIdStr<'static>>,
+    roster: Vec<RoxUserIdStr<'static>>,
     target: Option<ImportTargetReservation>,
 }
 
 impl Repo {
-    pub(in crate::domain::service) fn with_roster(roster: Vec<MacroUserIdStr<'static>>) -> Self {
+    pub(in crate::domain::service) fn with_roster(roster: Vec<RoxUserIdStr<'static>>) -> Self {
         Self(Arc::new(Mutex::new(Ledger {
             team_id: Some(Uuid::now_v7()),
             roster,
@@ -107,7 +107,7 @@ impl CanonicalImportRepo for Repo {
 
     async fn reserve_target(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         key: &ImportTargetKey,
         kind: ImportTargetKind,
         existing: Option<Uuid>,
@@ -145,13 +145,13 @@ impl CanonicalImportRepo for Repo {
 }
 
 impl ImportRepo for Repo {
-    async fn list_runs(&self, caller: &MacroUserIdStr<'static>) -> Result<Vec<ImportRun>> {
+    async fn list_runs(&self, caller: &RoxUserIdStr<'static>) -> Result<Vec<ImportRun>> {
         assert_eq!(caller, &user());
         Ok(self.0.lock().unwrap().runs.clone())
     }
     async fn start_run(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         source: ImportSource,
         from: &[RunStatus],
     ) -> Result<bool> {
@@ -177,7 +177,7 @@ impl ImportRepo for Repo {
     }
     async fn finish_run(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         source: ImportSource,
         to: RunStatus,
         error: Option<&str>,
@@ -197,7 +197,7 @@ impl ImportRepo for Repo {
     }
     async fn get(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<Option<ImportEntity>> {
         Ok(self
@@ -211,7 +211,7 @@ impl ImportRepo for Repo {
     }
     async fn list(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: Option<ImportSource>,
         _: Option<ImportStatus>,
     ) -> Result<Vec<ImportEntity>> {
@@ -219,7 +219,7 @@ impl ImportRepo for Repo {
     }
     async fn mark_importing(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         ids: &[Uuid],
     ) -> Result<Vec<ImportEntity>> {
         let mut ledger = self.0.lock().unwrap();
@@ -235,7 +235,7 @@ impl ImportRepo for Repo {
     }
     async fn mark_imported(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         id: Uuid,
         entity_id: &str,
         entity_type: &str,
@@ -253,7 +253,7 @@ impl ImportRepo for Repo {
     }
     async fn mark_import_failed(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         id: Uuid,
         error: &str,
     ) -> Result<bool> {
@@ -266,7 +266,7 @@ impl ImportRepo for Repo {
         row.last_error = Some(error.into());
         Ok(true)
     }
-    async fn discard(&self, _: &MacroUserIdStr<'static>, id: Uuid) -> Result<bool> {
+    async fn discard(&self, _: &RoxUserIdStr<'static>, id: Uuid) -> Result<bool> {
         let mut ledger = self.0.lock().unwrap();
         let row = ledger.rows.iter_mut().find(|row| row.id == id).unwrap();
         if row.status != ImportStatus::Staged {
@@ -275,26 +275,26 @@ impl ImportRepo for Repo {
         row.status = ImportStatus::Discarded;
         Ok(true)
     }
-    async fn user_team_id(&self, _: &MacroUserIdStr<'static>) -> Result<Option<Uuid>> {
+    async fn user_team_id(&self, _: &RoxUserIdStr<'static>) -> Result<Option<Uuid>> {
         Ok(self.0.lock().unwrap().team_id)
     }
-    async fn team_members(&self, team: Uuid) -> Result<Vec<MacroUserIdStr<'static>>> {
+    async fn team_members(&self, team: Uuid) -> Result<Vec<RoxUserIdStr<'static>>> {
         let ledger = self.0.lock().unwrap();
         assert_eq!(Some(team), ledger.team_id);
         Ok(ledger.roster.clone())
     }
-    async fn fail_stale_importing(&self, _: &MacroUserIdStr<'static>, _: i64) -> Result<u64> {
+    async fn fail_stale_importing(&self, _: &RoxUserIdStr<'static>, _: i64) -> Result<u64> {
         Ok(0)
     }
-    async fn fail_stale_runs(&self, _: &MacroUserIdStr<'static>, _: i64) -> Result<u64> {
+    async fn fail_stale_runs(&self, _: &RoxUserIdStr<'static>, _: i64) -> Result<u64> {
         Ok(0)
     }
-    async fn touch_importing(&self, _: &MacroUserIdStr<'static>, _: &[Uuid]) -> Result<u64> {
+    async fn touch_importing(&self, _: &RoxUserIdStr<'static>, _: &[Uuid]) -> Result<u64> {
         Ok(0)
     }
     async fn get_own_by_foreign_id(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         source: ImportSource,
         foreign_id: &str,
     ) -> Result<Option<ImportEntity>> {
@@ -309,7 +309,7 @@ impl ImportRepo for Repo {
     }
     async fn find_team_imported(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: ImportSource,
         _: &str,
     ) -> Result<Option<ImportEntity>> {
@@ -317,7 +317,7 @@ impl ImportRepo for Repo {
     }
     async fn upsert_staged(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         source: ImportSource,
         _: ImportKind,
         initiator: Initiator,
@@ -347,7 +347,7 @@ impl ImportRepo for Repo {
     }
     async fn upsert_imported(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         source: ImportSource,
         _: ImportKind,
         _: Initiator,
@@ -370,19 +370,19 @@ impl ImportRepo for Repo {
 
 pub(in crate::domain::service) struct NoConnector;
 impl ConnectorSelect for NoConnector {
-    async fn user_toolset(&self, _: &MacroUserIdStr<'static>) -> UserMcpTools {
+    async fn user_toolset(&self, _: &RoxUserIdStr<'static>) -> UserMcpTools {
         panic!("unexpected connector call")
     }
     async fn connector_toolset(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: mcp_select::ConnectorRef<'_>,
     ) -> anyhow::Result<Option<UserMcpTools>> {
         panic!("unexpected connector call")
     }
     async fn connector_connected(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: mcp_select::ConnectorRef<'_>,
     ) -> anyhow::Result<bool> {
         panic!("unexpected connector call")
@@ -398,7 +398,7 @@ pub(in crate::domain::service) struct Creator {
 impl EntityCreator for Creator {
     async fn can_view(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: ImportSource,
         _: &str,
     ) -> anyhow::Result<bool> {
@@ -406,7 +406,7 @@ impl EntityCreator for Creator {
     }
     async fn create_task(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &str,
         _: &ImportedTaskProperties,
@@ -416,7 +416,7 @@ impl EntityCreator for Creator {
     }
     async fn create_notion_document(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         _: &str,
         _: &NotionLinks,
@@ -427,7 +427,7 @@ impl EntityCreator for Creator {
     }
     async fn create_channel(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
         target: &ImportTargetReservation,
         _: &[String],

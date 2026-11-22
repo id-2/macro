@@ -1,17 +1,17 @@
 use device::{IsIpad, detect_is_ipad, is_ipad};
 use logger::Logger;
-use macro_bundle_updater_plugin::domain::{
+use rox_bundle_updater_plugin::domain::{
     asset_service::BundleAssetResolver, bundle_routes::BundleRoutes,
 };
 #[cfg(feature = "auto_apply_update")]
-use macro_bundle_updater_plugin::inbound::plugin::apply_completed_update_from;
+use rox_bundle_updater_plugin::inbound::plugin::apply_completed_update_from;
 #[cfg(mobile)]
-use macro_bundle_updater_plugin::inbound::plugin::retry_waiting_for_wifi;
+use rox_bundle_updater_plugin::inbound::plugin::retry_waiting_for_wifi;
 #[cfg(all(mobile, feature = "auto_apply_update"))]
-use macro_bundle_updater_plugin::inbound::plugin::{allow_update_reload_retry, start_update_check};
-use macro_bundle_updater_plugin::outbound::fs::FileSystem;
-use navigation_plugin::scheme::MacroScheme;
-use navigation_plugin::{MacroNavigationPlugin, NavigatePayload};
+use rox_bundle_updater_plugin::inbound::plugin::{allow_update_reload_retry, start_update_check};
+use rox_bundle_updater_plugin::outbound::fs::FileSystem;
+use navigation_plugin::scheme::RoxScheme;
+use navigation_plugin::{RoxNavigationPlugin, NavigatePayload};
 use reqwest::cookie::CookieStore;
 use reqwest::header::{COOKIE, ORIGIN};
 use rootcause::{Report, report};
@@ -27,7 +27,15 @@ use tauri::{AppHandle, Emitter, Manager, RunEvent, Runtime};
 mod android_tls;
 mod tauri_protocol;
 
-pub(crate) const APP_SCHEME: &str = "macro";
+pub(crate) const APP_SCHEME: &str = navigation_plugin::scheme::APP_SCHEME;
+/// Pre-rebrand links (`macro://…`) still arrive from emails and older builds.
+pub(crate) const LEGACY_APP_SCHEME: &str = navigation_plugin::scheme::LEGACY_APP_SCHEME;
+
+/// True for the current and the legacy app scheme, so deep links keep working
+/// while links already sent in emails are migrated.
+pub(crate) fn is_app_scheme(url: &Url) -> bool {
+    matches!(url.scheme(), APP_SCHEME | LEGACY_APP_SCHEME)
+}
 use tauri_plugin_deep_link::DeepLinkExt;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
@@ -45,6 +53,7 @@ mod logging;
 mod macos_notification_permission;
 #[cfg(feature = "cef")]
 pub mod screen_capture;
+mod session_cookies;
 mod share_target;
 mod staged_upload;
 #[cfg(test)]
@@ -139,17 +148,27 @@ static ALLOWED_DOMAINS: &[&str] = &[
     "http://localhost:3007",
     "http://localhost:3008",
     "http://localhost:3009",
+    // The local stand the desktop bundle is built against: its single-origin
+    // proxy serves the app, auth and every backend route on one host.
+    "https://app.rox.one",
 ];
 
 /// hosts whose `/app` urls are Rox app links. Main-frame navigations to
 /// these are routed through the SPA router instead of loading the remote
 /// site in the webview. Keep in parity with the deep-link hosts in
 /// tauri.conf.json.
-static APP_LINK_HOSTS: &[&str] = &["rox.one", "dev.rox.one", "staging.rox.one"];
+static APP_LINK_HOSTS: &[&str] = &[
+    "rox.one",
+    "dev.rox.one",
+    "staging.rox.one",
+    // The local stand: its `/app` pages are routes of the running app, so a
+    // navigation there must not replace the webview with the live site.
+    "app.rox.one",
+];
 
 /// The navigation policy of every webview the app opens.
-fn navigation_plugin() -> MacroNavigationPlugin {
-    MacroNavigationPlugin::new(ALLOWED_DOMAINS)
+fn navigation_plugin() -> RoxNavigationPlugin {
+    RoxNavigationPlugin::new(ALLOWED_DOMAINS)
         .expect("Domains must be valid urls")
         .with_app_link_hosts(APP_LINK_HOSTS)
 }
@@ -349,7 +368,7 @@ pub fn run_with(builder: tauri::Builder<AppRuntime>, configure_window: Configure
         .plugin(navigation.clone())
         .manage(navigation.clone())
         .plugin(
-            macro_bundle_updater_plugin::inbound::plugin::MacroBundleUpdaterPlugin::new(
+            rox_bundle_updater_plugin::inbound::plugin::RoxBundleUpdaterPlugin::new(
                 AppEnvironment::current()
                     .bundle_update_base_url()
                     .parse()
@@ -418,6 +437,7 @@ pub fn run_with(builder: tauri::Builder<AppRuntime>, configure_window: Configure
             desktop_update::restart_native_update,
             diagnostics::read_desktop_diagnostics,
             diagnostics::record_frontend_diagnostic,
+            session_cookies::prune_session_cookies,
             open_external_url,
             #[cfg(target_os = "linux")]
             linux_notification::send_linux_notification,
@@ -469,14 +489,14 @@ pub fn run_with(builder: tauri::Builder<AppRuntime>, configure_window: Configure
             graphql_cache_plugin::commands::graphql_cache_delete_records,
             graphql_cache_plugin::commands::graphql_cache_teardown,
             graphql_cache_plugin::commands::graphql_cache_clear,
-            macro_bundle_updater_plugin::inbound::plugin::grant_bundle_update,
-            macro_bundle_updater_plugin::inbound::plugin::perform_update,
-            macro_bundle_updater_plugin::inbound::plugin::ack_bundle_update_reload,
-            macro_bundle_updater_plugin::inbound::plugin::set_bundle_reload_hold,
-            macro_bundle_updater_plugin::inbound::plugin::check_for_update,
-            macro_bundle_updater_plugin::inbound::plugin::get_bundle_debug_info,
-            macro_bundle_updater_plugin::inbound::plugin::get_bundle_update_status,
-            macro_bundle_updater_plugin::inbound::plugin::clear_bundle,
+            rox_bundle_updater_plugin::inbound::plugin::grant_bundle_update,
+            rox_bundle_updater_plugin::inbound::plugin::perform_update,
+            rox_bundle_updater_plugin::inbound::plugin::ack_bundle_update_reload,
+            rox_bundle_updater_plugin::inbound::plugin::set_bundle_reload_hold,
+            rox_bundle_updater_plugin::inbound::plugin::check_for_update,
+            rox_bundle_updater_plugin::inbound::plugin::get_bundle_debug_info,
+            rox_bundle_updater_plugin::inbound::plugin::get_bundle_update_status,
+            rox_bundle_updater_plugin::inbound::plugin::clear_bundle,
             is_ipad,
             get_native_build_time,
             get_pending_share_filenames,
@@ -719,10 +739,25 @@ enum LaunchState {
 #[tauri::command]
 fn open_external_url(
     app: AppHandle<AppRuntime>,
-    navigation: tauri::State<'_, MacroNavigationPlugin>,
+    navigation: tauri::State<'_, RoxNavigationPlugin>,
     url: Url,
 ) -> bool {
     navigation.open_external(&app, &url)
+}
+
+/// Resolve a custom-scheme or app-link URL to the route handed to the SPA
+/// router. `rox://` is the current scheme; `macro://` links already sent in
+/// emails are translated to the same route.
+fn resolve_deep_link_route(url: Url) -> Result<Url, Report> {
+    if is_app_scheme(&url) {
+        return Ok(url);
+    }
+    if matches!(url.scheme(), "http" | "https")
+        && navigation_plugin::is_app_link(APP_LINK_HOSTS, &url)
+    {
+        return Ok(RoxScheme::from_url(&url)?.0);
+    }
+    Err(report!("unexpected deep link scheme: {}", url.scheme()))
 }
 
 /// Convert a deep link url into a `navigate` event for the frontend router.
@@ -730,24 +765,15 @@ fn open_external_url(
 fn emit_navigate_for_deep_link(url: Url, handle: &AppHandle) -> Result<(), Report> {
     // Auth callbacks belong exclusively to the native browser session. They
     // must not reach SPA routing or application logs, even via an explicit intent.
-    if url.scheme() == APP_SCHEME && url.host_str() == Some("android-auth") {
+    if is_app_scheme(&url) && url.host_str() == Some("android-auth") {
         return Ok(());
     }
-    // Universal/App links come in as https:// URLs, custom scheme links come in as macro://
-    let macro_scheme = match url.scheme() {
-        s if s == APP_SCHEME => MacroScheme::new(url)?,
-        "http" | "https" if navigation_plugin::is_app_link(APP_LINK_HOSTS, &url) => {
-            MacroScheme::from_url(&url)?
-        }
-        scheme => {
-            return Err(report!("unexpected deep link scheme: {}", scheme));
-        }
-    };
+    let target = resolve_deep_link_route(url)?;
 
     let payload = NavigatePayload {
-        path: macro_scheme.0.path(),
-        query: macro_scheme.0.query().unwrap_or_default(),
-        fragment: macro_scheme.0.fragment(),
+        path: target.path(),
+        query: target.query().unwrap_or_default(),
+        fragment: target.fragment(),
     };
     // we send a navigate event instead of calling navigate directly
     // because navigate performs a full browser navigation

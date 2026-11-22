@@ -9,7 +9,7 @@ pub struct CallInvite {
     /// Validated, server-issued meeting capability.
     pub share_token: String,
     /// Sender of the invitation.
-    pub invited_by: MacroUserIdStr<'static>,
+    pub invited_by: RoxUserIdStr<'static>,
     /// Destination email, included in the delivery rate-limit key.
     pub recipient_email: String,
 }

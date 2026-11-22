@@ -2,7 +2,7 @@ import {
   ArrayQueue,
   JsonSerializer,
   WebsocketBuilder,
-} from '@macro-inc/collaboration/websocket';
+} from '@rox-one/collaboration/websocket';
 import { createRoot } from 'solid-js';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import type { ToWebsocketMessage } from './generated/schemas/toWebsocketMessage';

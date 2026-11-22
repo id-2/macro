@@ -5,7 +5,7 @@ import type {
   SplitContent,
 } from '@components/app/split-layout/layoutManager';
 import { useUserId } from '@core/context/user';
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 import { existingDirectMessage } from '@queries/channel/get-or-create-dm';
 
 type OpenDirectMessageOptions = Pick<

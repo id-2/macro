@@ -23,7 +23,7 @@
 mod thread_exclusions;
 
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 // === Constants matching the fixture ===
 

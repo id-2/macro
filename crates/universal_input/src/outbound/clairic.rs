@@ -2,7 +2,7 @@
 use std::{collections::BTreeMap, sync::Arc, time::Duration};
 
 use ai_usage::{UsageAmount, UsageContext, UsageRecorder};
-use macro_env_var::maybe_env_var;
+use rox_env_var::maybe_env_var;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -119,7 +119,7 @@ impl ClairicFieldExtractor {
         usage: UsageContext,
     ) -> Result<Value, InputError> {
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .client
             .post(&self.endpoint)

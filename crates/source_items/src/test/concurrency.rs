@@ -4,7 +4,7 @@
 //! check the projection makes no transaction wait on another one it did not wait on before.
 
 use super::{DOC, DOC_2, MEMBER, OWNER, assert_exact, grant, insert_document, row, rows};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{PgConnection, PgPool, Postgres, Transaction};
 
 /// The ways two open transactions can reach commit.

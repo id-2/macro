@@ -2,7 +2,7 @@
 //! sees them: each service's canonical URL type, resolved afresh for every
 //! enrollment. Local stacks override them per fleet (`OVERRIDE_*`).
 
-use macro_service_urls::{
+use rox_service_urls::{
     AgentHarnessEgressUrl, AgentHarnessServiceUrl, ApiGatewayUrl, AuthServiceUrl,
     ConnectionGatewayWebsocketUrl, DocumentCognitionServiceUrl, DocumentStorageServiceUrl,
     McpServiceUrl, ScheduledActionServiceUrl,
@@ -31,7 +31,7 @@ struct UnreachableAddress {
 
 fn checked(name: &'static str, raw: &str, websocket: bool) -> Result<String, TeamAgentError> {
     let invalid = || TeamAgentError::internal(UnreachableAddress { name });
-    let url = macro_service_urls::Url::parse(raw).map_err(|_| invalid())?;
+    let url = rox_service_urls::Url::parse(raw).map_err(|_| invalid())?;
     let scheme_ok = if websocket {
         matches!(url.scheme(), "ws" | "wss")
     } else {

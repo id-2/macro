@@ -38,7 +38,7 @@ impl<R: CalendarRepository> ConnectionGrants for GoogleConnectionGrants<R> {
     }
 
     async fn consume(&self, in_progress_link_id: Uuid) -> Result<(), ConnectionError> {
-        macro_db_client::in_progress_user_link::delete_in_progress_user_link(
+        rox_db_client::in_progress_user_link::delete_in_progress_user_link(
             &self.db,
             &in_progress_link_id,
         )

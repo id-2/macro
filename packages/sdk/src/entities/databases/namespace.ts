@@ -1,4 +1,4 @@
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { type CreateDatabaseOptions, Database } from './database';
 import {
   type DatabaseQueryOptions,
@@ -13,18 +13,18 @@ import { SavedQuery, type SaveQueryOptions } from './saved-query';
  *
  * A table the user names can be a tab inside a database with another name,
  * so look through every database's tables before saying it does not exist.
- * Person columns hold user ids, never names: find people in `macro.people`,
+ * Person columns hold user ids, never names: find people in `rox.people`,
  * then write their ids. Select the rows a write means first, then change
  * exactly those by `row_id`, and read them back before saying it worked.
  *
  * ```js
- * const databases = await macro.databases.list();
+ * const databases = await rox.databases.list();
  * const matches = await Promise.all(
  *   databases.map(async (database) => ({ database, table: await database.table('Tickets') })),
  * );
  * const { database } = matches.find((match) => match.table);
  * const people = await database.query(
- *   `SELECT id FROM macro.people WHERE email = 'sam@example.com'`,
+ *   `SELECT id FROM rox.people WHERE email = 'sam@example.com'`,
  * );
  * const sam = people.result?.rows[0]?.[0]?.value;
  * const open = await database.query(`SELECT row_id FROM "Tickets" WHERE "Status" = 'Open'`);
@@ -70,10 +70,10 @@ import { SavedQuery, type SaveQueryOptions } from './saved-query';
  *
  * **Verify.** After a change, read back the affected schema or rows before claiming success. After an ambiguous failure, inspect the current state before retrying a create or insert. Never describe a proposed change as saved.
  *
- * **Answers.** Answer a question about the data, or a request for a chart, with a saved live query block beside a sentence stating the answer, never with a block you wrote or edited yourself: run the `SELECT` with `database.query`, save exactly that SQL with `database.saveQuery` (or `macro.databases.saveQuery` when it spans databases), and put its `toBlock()` in the document. Restyle an answer with `withView`; to ask something else, save a new question. A query result, a saved question, and a document containing its block are different outcomes: say which happened.
+ * **Answers.** Answer a question about the data, or a request for a chart, with a saved live query block beside a sentence stating the answer, never with a block you wrote or edited yourself: run the `SELECT` with `database.query`, save exactly that SQL with `database.saveQuery` (or `rox.databases.saveQuery` when it spans databases), and put its `toBlock()` in the document. Restyle an answer with `withView`; to ask something else, save a new question. A query result, a saved question, and a document containing its block are different outcomes: say which happened.
  */
 export class DatabaseNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * Run one SQL statement over the caller's visible databases. Writes execute once.

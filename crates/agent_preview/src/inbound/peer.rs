@@ -5,7 +5,11 @@ use hyper_util::rt::TokioIo;
 use std::time::Duration;
 use tracing::Instrument;
 /// A routing marker grants no authentication. Any marked request needing a second hop is refused.
-pub(super) const FORWARDED: &str = "x-macro-preview-hop";
+pub(super) const FORWARDED: &str = "x-rox-preview-hop";
+
+/// The marker's name before the rename. A peer running an older version
+/// marks its hop with it, so both are read and stripped.
+pub(super) const LEGACY_FORWARDED: &str = "x-macro-preview-hop";
 
 #[tracing::instrument(skip_all, err)]
 pub(super) async fn forward(
@@ -30,7 +34,7 @@ pub(super) async fn forward(
     request
         .headers_mut()
         .insert(FORWARDED, axum::http::HeaderValue::from_static("1"));
-    macro_tower_layers::inject_trace_headers(request.headers_mut());
+    rox_tower_layers::inject_trace_headers(request.headers_mut());
     *request.uri_mut() = request
         .uri()
         .path_and_query()

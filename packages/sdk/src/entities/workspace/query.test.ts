@@ -1,10 +1,10 @@
 import { describe, expect, test } from 'bun:test';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { WorkspaceQuery } from './query';
 
 describe('workspace query', () => {
   test('opts into agent sessions with the unit literal the server reads', async () => {
-    const query = new WorkspaceQuery({} as MacroClient);
+    const query = new WorkspaceQuery({} as RoxClient);
 
     const body = await query.body({ includeTypes: ['agent_session'] });
 

@@ -1,4 +1,4 @@
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
@@ -11,21 +11,21 @@ mod test;
 #[serde(deny_unknown_fields)]
 pub struct ContactsNodes {
     /// User IDs whose pairwise connections should be upserted.
-    pub users: HashSet<MacroUserIdStr<'static>>,
+    pub users: HashSet<RoxUserIdStr<'static>>,
 }
 
 /// An explicit undirected relationship between two contacts users.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct ContactConnection {
     /// One endpoint of the relationship.
-    pub first: MacroUserIdStr<'static>,
+    pub first: RoxUserIdStr<'static>,
     /// The other endpoint of the relationship.
-    pub second: MacroUserIdStr<'static>,
+    pub second: RoxUserIdStr<'static>,
 }
 
 impl ContactConnection {
     /// Creates an explicit relationship between two users.
-    pub fn new(first: MacroUserIdStr<'static>, second: MacroUserIdStr<'static>) -> Self {
+    pub fn new(first: RoxUserIdStr<'static>, second: RoxUserIdStr<'static>) -> Self {
         Self { first, second }
     }
 }

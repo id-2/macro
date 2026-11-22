@@ -7,7 +7,7 @@ use crate::domain::counting::AiUsageEnforcement;
 #[cfg(test)]
 mod test;
 
-// Keep configuration deserialization outside the domain policy. MacroConfig
+// Keep configuration deserialization outside the domain policy. RoxConfig
 // parses the raw Doppler/environment value as a strict boolean.
 impl<'de> serde::Deserialize<'de> for AiUsageEnforcement {
     fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
@@ -40,14 +40,14 @@ pub fn load_ai_usage_enforcement() -> Result<AiUsageEnforcement, rootcause::Repo
 /// malformed or non-Unicode values return an error that the host must propagate
 /// to fail startup.
 ///
-/// Hosts using MacroConfig must call this loader as well: its defaulted fields
+/// Hosts using RoxConfig must call this loader as well: its defaulted fields
 /// treat `null` as absent, but a present non-boolean flag must fail startup. The
 /// returned value is authoritative (including process-env fallback when the
 /// Doppler application configuration omits the key).
 pub fn load_startup_flag(name: &'static str) -> Result<bool, rootcause::Report> {
     // Unlike maybe_env_var!, this preserves errors for present non-Unicode values.
     let value =
-        macro_env_var::optional_read_env_var(name).context(format!("failed to read {name}"))?;
+        rox_env_var::optional_read_env_var(name).context(format!("failed to read {name}"))?;
     parse_startup_flag(name, value.as_deref())
 }
 

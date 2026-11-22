@@ -25,7 +25,7 @@ import {
   LanguageDefinitions,
   normalizedLanguage,
   type SupportedLanguage,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { Button, CopyButton, cn, Dropdown, ToggleSwitch } from '@ui';
 import {
   $getNodeByKey,

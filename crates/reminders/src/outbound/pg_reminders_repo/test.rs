@@ -1,19 +1,19 @@
 use super::*;
 use crate::domain::email_followup::EmailFollowup;
 use chrono::{Duration, TimeZone};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 mod email_collection;
 const USER_A: &str = "macro|reminders-a@rox.one";
 const USER_B: &str = "macro|reminders-b@rox.one";
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 fn at(y: i32, m: u32, d: u32, h: u32) -> DateTime<Utc> {
     Utc.with_ymd_and_hms(y, m, d, h, 0, 0).single().unwrap()
 }
 async fn insert_user(pool: &PgPool, id: &str) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let macro_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
     )

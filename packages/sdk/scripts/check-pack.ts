@@ -109,8 +109,8 @@ try {
 
     const source =
       runtime === 'core'
-        ? "import { Macro, Rox } from '@macro-inc/sdk'; if (Macro !== Rox) throw new Error('Macro must alias Rox'); console.log(Rox.name);"
-        : `import { connectRoom, publishScreen } from '@macro-inc/sdk/calls/${runtime}';
+        ? "import { Macro, Rox } from '@rox-one/sdk'; if (Macro !== Rox) throw new Error('Macro must alias Rox'); console.log(Rox.name);"
+        : `import { connectRoom, publishScreen } from '@rox-one/sdk/calls/${runtime}';
            console.log(connectRoom, publishScreen);`;
     await run(['node', '--input-type=module', '-e', source], consumer);
     const types = join(consumer, 'consumer.ts');
@@ -119,7 +119,7 @@ try {
       runtime === 'core'
         ? source
         : `${source}
-      import type { CallRecord } from '@macro-inc/sdk';
+      import type { CallRecord } from '@rox-one/sdk';
       export const join = async (call: CallRecord) => {
         const { room } = await connectRoom(call);
         // @ts-expect-error Room must retain the selected runtime's types.
@@ -170,7 +170,7 @@ try {
         // code outside the chunks loaded by the initial entry point.
         const lazy = await build({
           stdin: {
-            contents: `export const connect = () => import('@macro-inc/sdk/calls/browser');`,
+            contents: `export const connect = () => import('@rox-one/sdk/calls/browser');`,
             resolveDir: consumer,
           },
           bundle: true,

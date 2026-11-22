@@ -1,6 +1,6 @@
 //! Domain-owned project models.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::folder::FileSystemNode;
 use model::project::Project;
 use model_entity::{Entity, EntityType};
@@ -27,7 +27,7 @@ pub struct CreateProjectArgs {
 #[derive(Debug, Clone)]
 pub struct EditProjectArgs {
     /// Authenticated actor, required when this edit enables a share link.
-    pub actor_id: Option<MacroUserIdStr<'static>>,
+    pub actor_id: Option<RoxUserIdStr<'static>>,
     /// Project identifier.
     pub project_id: String,
     /// Replacement name, or `None` to leave it unchanged.
@@ -87,7 +87,7 @@ pub struct MarkedUploadedTree {
     /// Root project name.
     pub name: String,
     /// Root project owner.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Optional parent of the root project.
     pub parent_id: Option<String>,
     /// Finalized project identifiers, including the root and all descendants.
@@ -100,7 +100,7 @@ pub struct MarkedUploadedTree {
 #[derive(Debug)]
 pub struct UploadFolderRepoArgs {
     /// Owner of every project and document in the tree.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Initial sharing configuration for every created item.
     pub share_permission: SharePermissionV2,
     /// Root folder contents to persist.

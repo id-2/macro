@@ -2,7 +2,7 @@
 use super::{AgentAccessRow, AgentAction, DirectoryAgent, StoredRequestStatus, WakeId};
 use crate::domain::models::{Error, ItemId, Permission, Record, TeamId, TotpKeyId};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 // Ports are object-safe (`Arc<dyn Port>`) for composition, so they use async_trait.
@@ -14,7 +14,7 @@ pub trait AgentDirectory: Send + Sync {
     /// the directory knows. Dependency failures are errors, never admission.
     async fn resolve(
         &self,
-        api_key_user: &MacroUserIdStr<'_>,
+        api_key_user: &RoxUserIdStr<'_>,
     ) -> Result<Option<DirectoryAgent>, Error>;
 }
 
@@ -25,7 +25,7 @@ pub trait AgentAvailability: Send + Sync {
     /// The user's own snapshot enables both the Passwords and agent-vault keys.
     /// Evaluated for the agent on agent routes and for the reviewer on human
     /// review routes; never inherited from another account.
-    async fn agent_vault_enabled(&self, user: &MacroUserIdStr<'_>) -> bool;
+    async fn agent_vault_enabled(&self, user: &RoxUserIdStr<'_>) -> bool;
     /// Provider configuration is present. Never performs provider I/O.
     fn provider_configured(&self) -> bool;
 }
@@ -38,9 +38,9 @@ pub struct AgentAudit {
     /// Audited item.
     pub item: ItemId,
     /// Principal acting: the agent, or the human reviewer.
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
     /// Agent the entry is about.
-    pub agent: MacroUserIdStr<'static>,
+    pub agent: RoxUserIdStr<'static>,
     /// Untrusted wake correlation of agent actions.
     pub wake: Option<WakeId>,
     /// Fixed action.
@@ -55,7 +55,7 @@ pub struct AgentAudit {
 #[derive(Clone, Debug)]
 pub struct IntentAgent {
     /// Publishing agent.
-    pub agent: MacroUserIdStr<'static>,
+    pub agent: RoxUserIdStr<'static>,
     /// Wake correlation of the original attempt.
     pub wake: WakeId,
     /// Audited action: create or update for intents, TOTP setup for enrollments.
@@ -103,13 +103,13 @@ pub struct NewRequest {
     /// Requested item.
     pub item: ItemId,
     /// Requesting agent.
-    pub agent: MacroUserIdStr<'static>,
+    pub agent: RoxUserIdStr<'static>,
     /// Wake correlation.
     pub wake: WakeId,
     /// Requested permission.
     pub permission: Permission,
     /// Human creator to notify alongside current team administrators.
-    pub human_creator: Option<MacroUserIdStr<'static>>,
+    pub human_creator: Option<RoxUserIdStr<'static>>,
     /// New request id.
     pub request_id: Uuid,
     /// Item display name, frozen into the reviewer notification.
@@ -126,7 +126,7 @@ pub struct AccessTransition {
     /// metadata revision CAS against `record.revision`.
     pub record: Record,
     /// Agent concerned.
-    pub agent: MacroUserIdStr<'static>,
+    pub agent: RoxUserIdStr<'static>,
     /// Standing approval after the transition.
     pub approved: bool,
     /// Expected request revision (resolve) or permission revision (revoke).
@@ -136,7 +136,7 @@ pub struct AccessTransition {
     /// Whether the grant or approval changes, advancing the permission revision.
     pub permission_changed: bool,
     /// Human reviewer.
-    pub reviewer: MacroUserIdStr<'static>,
+    pub reviewer: RoxUserIdStr<'static>,
     /// Audited action.
     pub action: AgentAction,
 }
@@ -161,7 +161,7 @@ pub struct PendingRequest {
     /// Item record.
     pub record: Record,
     /// Requesting agent.
-    pub agent: MacroUserIdStr<'static>,
+    pub agent: RoxUserIdStr<'static>,
     /// Stored access facts including the pending request.
     pub row: AgentAccessRow,
 }
@@ -178,13 +178,13 @@ pub struct AccessEvent {
     /// Current item display name, for reviewer notifications.
     pub item_name: String,
     /// Agent addressed by resolution events.
-    pub agent: MacroUserIdStr<'static>,
+    pub agent: RoxUserIdStr<'static>,
     /// Request.
     pub request_id: Uuid,
     /// New status; `Pending` announces a request to its reviewers.
     pub status: StoredRequestStatus,
     /// Humans to notify of a pending request, resolved at commit.
-    pub reviewers: Vec<MacroUserIdStr<'static>>,
+    pub reviewers: Vec<RoxUserIdStr<'static>>,
 }
 
 /// Agent persistence beside the human repository. Values never cross it.
@@ -219,7 +219,7 @@ pub trait AgentRepository: Send + Sync {
     async fn catalog(
         &self,
         team: TeamId,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         query: &str,
         after: Option<ItemId>,
         limit: u8,
@@ -229,7 +229,7 @@ pub trait AgentRepository: Send + Sync {
         &self,
         team: TeamId,
         items: &[ItemId],
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
     ) -> Result<Vec<(ItemId, AgentAccessRow)>, Error>;
     /// Record audit entries.
     async fn audit(&self, entries: &[AgentAudit]) -> Result<(), Error>;
@@ -242,7 +242,7 @@ pub trait AgentRepository: Send + Sync {
     async fn pending(
         &self,
         team: TeamId,
-        creator: Option<&MacroUserIdStr<'_>>,
+        creator: Option<&RoxUserIdStr<'_>>,
         after: Option<Uuid>,
         limit: u8,
     ) -> Result<Vec<PendingRequest>, Error>;
@@ -252,15 +252,15 @@ pub trait AgentRepository: Send + Sync {
         team: TeamId,
         item: ItemId,
         request: Uuid,
-    ) -> Result<Option<(MacroUserIdStr<'static>, AgentAccessRow)>, Error>;
+    ) -> Result<Option<(RoxUserIdStr<'static>, AgentAccessRow)>, Error>;
     /// Every agent with an access row on the item, ordered by agent id after `after`.
     async fn item_access(
         &self,
         team: TeamId,
         item: ItemId,
-        after: Option<&MacroUserIdStr<'_>>,
+        after: Option<&RoxUserIdStr<'_>>,
         limit: u8,
-    ) -> Result<Vec<(MacroUserIdStr<'static>, AgentAccessRow)>, Error>;
+    ) -> Result<Vec<(RoxUserIdStr<'static>, AgentAccessRow)>, Error>;
     /// A bounded batch of due undelivered events, oldest due first.
     async fn undelivered(&self) -> Result<Vec<AccessEvent>, Error>;
     /// Mark an event delivered.

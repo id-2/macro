@@ -1,7 +1,7 @@
 //! Credential-free audit records written by the transaction that commits an action.
 
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 /// Actions required in the enterprise audit trail.
 #[derive(
@@ -58,13 +58,13 @@ impl AuditRecord {
     /// Construct an audit row for a known actor and resource.
     #[must_use]
     pub fn new(
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         action: AuditAction,
         resource_id: impl Into<String>,
         result: AuditResult,
     ) -> Self {
         Self {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             actor_id: actor.as_ref().to_owned(),
             action,
             resource_id: resource_id.into(),

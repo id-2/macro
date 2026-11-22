@@ -104,8 +104,8 @@ it('serves HTTPS and HMR with the existing CA and detected hostname', async () =
 it.each([
   { TAURI_ENV_PLATFORM: 'linux' },
   { TAURI_DEV_HOST: '192.168.1.2' },
-  { MACRO_LOCAL_BACKEND_PROXY: 'https://localhost:8090' },
-  { MACRO_DEV_HTTPS: 'false' },
+  { ROX_LOCAL_BACKEND_PROXY: 'https://localhost:8090' },
+  { ROX_DEV_HTTPS: 'false' },
 ])('preserves HTTP for %j', async (env) => {
   const config = await resolveConfig(
     { configFile: false, plugins: [devHttps(env)] },

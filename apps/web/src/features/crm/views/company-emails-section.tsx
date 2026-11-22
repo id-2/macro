@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import EmptyStateEmailGraphic from '@design/empty-state-email.svg';
 import type { CrmCompanyEntity } from '@entity';
 import { Tabs } from '@ui';
@@ -26,21 +27,25 @@ export function CompanyEmailsSection(props: { company?: CrmCompanyEntity }) {
   const emailsQuery = useCompanyEmailsQuery(domains, view, signalView);
 
   const emptyMessage = () => {
-    const kind = signalView() === 'signal' ? 'signal emails' : 'emails';
-    if (view() === 'me') return `No ${kind} with this company in your inbox.`;
-    if (props.company?.emailSync === false) {
-      return 'Email sync is disabled for this company.';
+    const signal = signalView() === 'signal';
+    if (view() === 'me') {
+      return signal
+        ? t('crm.noCompanySignalEmailsInbox')
+        : t('crm.noCompanyEmailsInbox');
     }
-    return `No ${kind} with this company yet.`;
+    if (props.company?.emailSync === false) {
+      return t('crm.emailSyncDisabled');
+    }
+    return signal ? t('crm.noCompanySignalEmails') : t('crm.noCompanyEmails');
   };
 
   return (
     <RecordSection
-      title="Emails"
+      title={t('crm.emails')}
       search={search()}
       onSearchChange={setSearch}
       createAction={{
-        label: 'New email',
+        label: t('crm.newEmail'),
         disabled: props.company?.emailSync === false,
         onClick: () => crm.openEmailComposer(),
       }}
@@ -55,23 +60,23 @@ export function CompanyEmailsSection(props: { company?: CrmCompanyEntity }) {
           }}
         >
           <Tabs
-            aria-label="Email importance"
+            aria-label={t('crm.emailImportance')}
             size="sm"
             touch="inset"
             options={[
-              { value: 'signal', label: 'Signal' },
-              { value: 'all', label: 'All' },
+              { value: 'signal', label: t('crm.signal') },
+              { value: 'all', label: t('crm.all') },
             ]}
             value={signalView()}
             onChange={setSignalView}
           />
           <Tabs
-            aria-label="Email inboxes"
+            aria-label={t('crm.emailInboxes')}
             size="sm"
             touch="inset"
             options={[
-              { value: 'team', label: 'Team' },
-              { value: 'me', label: 'Me' },
+              { value: 'team', label: t('crm.team') },
+              { value: 'me', label: t('crm.me') },
             ]}
             value={view()}
             onChange={setView}
@@ -88,12 +93,12 @@ export function CompanyEmailsSection(props: { company?: CrmCompanyEntity }) {
           <CrmListEmpty
             graphic={EmptyStateEmailGraphic}
             title={emptyMessage()}
-            description="Conversations with this company's email domains will appear here."
+            description={t('crm.companyEmailsEmpty')}
             action={
               props.company?.emailSync === false
                 ? undefined
                 : {
-                    label: 'New email',
+                    label: t('crm.newEmail'),
                     onClick: () => crm.openEmailComposer(),
                   }
             }

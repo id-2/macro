@@ -10,7 +10,7 @@ use crate::domain::{
     },
     models::{Actor, Grant, GranteeKind, ItemId, Record, TeamId},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Review page parameters, parsed after admission.
@@ -29,7 +29,7 @@ pub enum ReviewQuery {
         /// Page size.
         limit: u8,
         /// Last agent of the previous page.
-        after: Option<MacroUserIdStr<'static>>,
+        after: Option<RoxUserIdStr<'static>>,
     },
 }
 impl ReviewQuery {
@@ -58,8 +58,8 @@ impl ReviewQuery {
             .map_err(|_| AgentError::Invalid)?;
         let after = cursor
             .map(|cursor| {
-                MacroUserIdStr::parse_from_str(&cursor)
-                    .map(macro_user_id::cowlike::CowLike::into_owned)
+                RoxUserIdStr::parse_from_str(&cursor)
+                    .map(rox_user_id::cowlike::CowLike::into_owned)
             })
             .transpose()
             .map_err(|_| AgentError::Invalid)?;
@@ -156,10 +156,10 @@ impl AgentVaultService {
         team: TeamId,
         item: ItemId,
         limit: u8,
-        after: Option<MacroUserIdStr<'static>>,
+        after: Option<RoxUserIdStr<'static>>,
     ) -> Result<AgentAccessRequestPage, AgentError> {
         let record = self.managed(actor, team, item).await?;
-        let mut agents: Vec<(MacroUserIdStr<'static>, Option<AgentAccessRow>)> = self
+        let mut agents: Vec<(RoxUserIdStr<'static>, Option<AgentAccessRow>)> = self
             .agents
             .item_access(team, item, after.as_ref(), limit.saturating_add(1))
             .await?
@@ -270,7 +270,7 @@ impl AgentVaultService {
         actor: &Actor,
         team: TeamId,
         item: ItemId,
-        agent: Result<MacroUserIdStr<'static>, AgentError>,
+        agent: Result<RoxUserIdStr<'static>, AgentError>,
         body: Result<RevokeBody, AgentError>,
     ) -> Result<AgentItemAccess, AgentError> {
         self.reviewer(actor, team).await?;
@@ -322,7 +322,7 @@ impl AgentVaultService {
     /// Replace this agent's Agent grant; `None` removes it.
     fn set_agent_grant(
         record: &mut Record,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         permission: Option<crate::domain::models::Permission>,
     ) {
         record.grants.retain(|grant| {

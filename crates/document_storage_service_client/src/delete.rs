@@ -127,7 +127,7 @@ impl DocumentStorageServiceClient {
             .extend(["internal", "passwords"])
             .extend(resource);
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .lifecycle_client
             .request(method, url)

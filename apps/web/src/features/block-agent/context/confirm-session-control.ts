@@ -1,6 +1,6 @@
 import type { AgentSession } from '@core/agent-session/AgentSession';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import type { AgentAction } from '@service-agent-harness/generated/schemas';
 import { issueSessionAction } from '../queries/issue-session-action';
 

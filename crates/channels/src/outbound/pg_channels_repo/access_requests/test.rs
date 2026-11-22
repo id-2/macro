@@ -9,7 +9,7 @@ use entity_access::domain::models::{
     Entity, EntityAccessReceipt, EntityPermission, EntityType, MemberParticipantRole,
     ParticipantRole as AccessRole,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
 
@@ -44,8 +44,8 @@ fn service(pool: &PgPool) -> (Service, RecordedEvents) {
     (service, events)
 }
 
-fn user(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{name}@join.test")).unwrap()
+fn user(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{name}@join.test")).unwrap()
 }
 
 fn participant(name: &str, channel_id: Uuid) -> EntityAccessReceipt<MemberParticipantRole> {

@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::service::billing::{ObservedItem, SubscriptionObserved, SubscriptionStatus};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::str::FromStr;
 
 #[tokio::test]
@@ -22,7 +22,7 @@ async fn catalog_changes_only_apply_to_new_purchases() {
             billing: PurchaseBilling::Stripe,
             purchase_key: key("buy-dialog-1"),
             team_id: TEAM,
-            created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+            created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
             size: ComputerSize::Standard,
             name: None,
             extra_items: vec![],
@@ -44,7 +44,7 @@ async fn catalog_changes_only_apply_to_new_purchases() {
             billing: PurchaseBilling::Stripe,
             purchase_key: key("buy-dialog-2"),
             team_id: TEAM,
-            created_by: MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
+            created_by: RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap(),
             size: ComputerSize::Standard,
             name: None,
             extra_items: vec![],

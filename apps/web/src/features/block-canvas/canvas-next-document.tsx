@@ -3,7 +3,7 @@ import { ENABLE_MENTION_TRACKING } from '@core/constant/featureFlags';
 import { useUserId } from '@core/context/user';
 import { getDisplayName, tryMacroId } from '@core/user';
 import { fireAndForget } from '@core/util/fireAndForget';
-import type { GraphicsEditor } from '@macro-inc/graphics';
+import type { GraphicsEditor } from '@rox-one/graphics';
 import { debounce } from '@solid-primitives/scheduled';
 import {
   createEffect,

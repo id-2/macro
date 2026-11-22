@@ -38,7 +38,7 @@ impl FakeSearcher {
 impl SkillSearcher for FakeSearcher {
     async fn search_skills_by_name(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _query: &str,
         _match_type: SkillMatchType,
     ) -> Result<Vec<SkillSummary>, SkillError> {
@@ -79,7 +79,7 @@ impl FakeLister {
 impl SkillLister for FakeLister {
     async fn list_skills(
         &self,
-        _user_id: &MacroUserIdStr<'_>,
+        _user_id: &RoxUserIdStr<'_>,
         _limit: u16,
     ) -> Result<Vec<SkillSummary>, SkillError> {
         self.results
@@ -90,8 +90,8 @@ impl SkillLister for FakeLister {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|user@example.com".to_string()).unwrap()
 }
 
 fn skill(id: u128, name: &str, updated_at_secs: Option<i64>) -> SkillSummary {
@@ -286,7 +286,7 @@ impl FakeReader {
 impl SkillReader for FakeReader {
     async fn authorize(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         document_id: uuid::Uuid,
     ) -> Result<EntityAccessReceipt<ViewAccessLevel>, SkillError> {
         self.calls.lock().unwrap().push("authorize");

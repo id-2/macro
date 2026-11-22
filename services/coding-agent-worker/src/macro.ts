@@ -1,4 +1,4 @@
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 import { env } from './env';
 import { ensureWebhook } from './webhook';
 

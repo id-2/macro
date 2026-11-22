@@ -83,7 +83,7 @@ pub(crate) fn map_message_resource_to_service(
         labels,
         body_text: parsed.body_text,
         body_html_sanitized: parsed.body_html_sanitized,
-        body_macro: None,
+        body_rox: None,
         attachments,
         attachments_draft: Vec::new(),
         attachments_forwarded: Vec::new(),

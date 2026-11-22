@@ -5,7 +5,7 @@ import {
   ExternalChatSend,
   ExternalChatUpload,
   Macro,
-} from '../src/macro';
+} from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {

@@ -32,7 +32,7 @@ fn mcp_server_record(
     credentials: Option<mcp_client::domain::models::StoredCredentials>,
 ) -> McpServerRecord {
     McpServerRecord {
-        user_id: MacroUserIdStr::parse_from_str("macro|user-1@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|user-1@example.com").unwrap(),
         url: "https://mcp.linear.app/mcp".to_owned(),
         server_name: "Linear".to_owned(),
         credentials,

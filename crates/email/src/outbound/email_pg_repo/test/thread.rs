@@ -12,7 +12,7 @@ async fn mail_projection_excludes_trashed_messages(pool: Pool<Postgres>) -> anyh
     let trash = uuid::uuid!("20000009-0000-0000-0000-000000000009");
     let rows = repo
         .thread_mail_projections_by_ids(
-            macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|user1@test.com")?,
+            rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|user1@test.com")?,
             &[draft, trash],
         )
         .await?;
@@ -607,7 +607,7 @@ async fn draft_aggregate_inbox_state_matches_canonical_metadata(
     .await?;
     let projections = EmailPgRepo::new(pool)
         .thread_mail_projections_by_ids(
-            macro_user_id::user_id::MacroUserIdStr::parse_from_str(&owner)?,
+            rox_user_id::user_id::RoxUserIdStr::parse_from_str(&owner)?,
             &ids,
         )
         .await?;

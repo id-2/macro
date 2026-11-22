@@ -2,7 +2,7 @@ import { useSplitLayout } from '@components/app/split-layout/layout';
 import { fileTypeToBlockName } from '@core/constant/allBlocks';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { openInNewSplitForMention } from '@core/util/openInNewSplit';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { getItemPreview, isAccessiblePreviewItem } from '@queries/preview';
 
 /** Capture the database's source panel before the authorized preview resolves. */

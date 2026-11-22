@@ -4,14 +4,14 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use referral::domain::{models::ReferralCode, ports::ReferralService};
 use sqlx::PgPool;
 use teams::domain::team_repo::TeamService;
 
 use crate::service::user::email_code_signup::EmailCodeSignupPort;
 
-/// The email-code signup port over MacroDB and the teams and referral services.
+/// The email-code signup port over RoxDB and the teams and referral services.
 pub(crate) struct EmailCodeSignupEffects<'a, T, R> {
     pub pool: &'a PgPool,
     pub teams: &'a T,
@@ -26,7 +26,7 @@ pub(crate) async fn claim_first_proof(
     fusionauth_user_id: &str,
     email: &str,
 ) -> anyhow::Result<bool> {
-    let macro_user_id = macro_uuid::string_to_uuid(fusionauth_user_id)?;
+    let macro_user_id = rox_uuid::string_to_uuid(fusionauth_user_id)?;
     let claimed = sqlx::query!(
         r#"
         UPDATE "macro_user_email_verification"
@@ -57,7 +57,7 @@ where
 
     async fn join_domain_team(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> anyhow::Result<Option<uuid::Uuid>> {
         let member = self.teams.try_join_team_by_domain(user_id).await?;
         Ok(member.map(|member| member.team_id))
@@ -65,7 +65,7 @@ where
 
     async fn track_referral(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         referral_code: &str,
     ) -> anyhow::Result<()> {
         self.referrals

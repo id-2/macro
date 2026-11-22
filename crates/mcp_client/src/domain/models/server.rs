@@ -1,7 +1,7 @@
 use super::consts::MCP_CLIENT_NAME;
 use crate::domain::ports::{McpConnector, McpServerHttp, McpServerStore};
 use crate::domain::service::PersistingCredentialStore;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rmcp::RoleClient;
 use rmcp::model::{ClientConfig, Implementation, ProtocolVersion};
 use rmcp::service::{ClientInitializeError, RunningService, ServiceExt};
@@ -81,7 +81,7 @@ pub struct McpServerConnectionInfo {
 #[serde(rename_all = "snake_case")]
 pub struct McpServerRecord {
     /// The user who owns these credentials.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The server URL these credentials authenticate against.
     pub url: String,
     /// Name of the MCP server.

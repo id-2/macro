@@ -219,7 +219,7 @@ document.querySelector('#create-draft')!.addEventListener('click', async () => {
       calendarInvitations: [],
       bodyText: body,
       bodyHtmlSanitized: `<p>${body}</p>`,
-      bodyMacro: null,
+      bodyRox: null,
       bodyReplyless: null,
       createdAt: now,
       updatedAt: now,

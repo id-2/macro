@@ -20,12 +20,12 @@ chrono = { workspace = true }
 hex = { workspace = true }
 lexical_client = { path = "../lexical_client" }
 gmail_emulator = { path = "../gmail_emulator" }
-macro_auth = { path = "../macro_auth", features = ["testing"] }
-macro_authorization = { path = "../macro_authorization" }
-macro_aws_config = { path = "../macro_aws_config", features = ["sqs"] }
-macro_db_migrator = { path = "../macro_db_migrator" }
-macro_event_topics = { path = "../macro_event_topics" }
-macro_user_id = { workspace = true }
+rox_auth = { path = "../rox_auth", features = ["testing"] }
+rox_authorization = { path = "../rox_authorization" }
+rox_aws_config = { path = "../rox_aws_config", features = ["sqs"] }
+rox_db_migrator = { path = "../rox_db_migrator" }
+rox_event_topics = { path = "../rox_event_topics" }
+rox_user_id = { workspace = true }
 outlook_emulator = { path = "../outlook_emulator" }
 rdkafka = { workspace = true }
 redis = { workspace = true, features = ["tokio-comp"] }
@@ -48,4 +48,4 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 [dev-dependencies]
 chrono = { workspace = true }
 feature_flags = { path = "../feature_flags" }
-macro_env = { path = "../macro_env" }
+rox_env = { path = "../rox_env" }

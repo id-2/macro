@@ -22,7 +22,7 @@ mod test;
 use std::sync::LazyLock;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::CreationPrincipal;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -48,7 +48,7 @@ pub enum Attribution {
         /// Who mechanically acted.
         actor: Actor<'static>,
         /// Whose activity feed this belongs on.
-        subject: MacroUserIdStr<'static>,
+        subject: RoxUserIdStr<'static>,
     },
 }
 
@@ -59,13 +59,13 @@ impl Attribution {
     }
 
     /// A bot or the platform acted for `subject`.
-    pub fn delegated(actor: Actor<'static>, subject: MacroUserIdStr<'static>) -> Self {
+    pub fn delegated(actor: Actor<'static>, subject: RoxUserIdStr<'static>) -> Self {
         Self::Delegated { actor, subject }
     }
 
     /// Delegated to `on_behalf_of` when set, otherwise direct. Mirrors how
     /// events carry attribution as an actor plus an optional subject.
-    pub fn new(actor: Actor<'static>, on_behalf_of: Option<MacroUserIdStr<'static>>) -> Self {
+    pub fn new(actor: Actor<'static>, on_behalf_of: Option<RoxUserIdStr<'static>>) -> Self {
         match on_behalf_of {
             Some(subject) => Self::Delegated { actor, subject },
             None => Self::Direct { actor },
@@ -80,7 +80,7 @@ impl Attribution {
     }
 
     /// The initiating user when this action is delegated; `None` when direct.
-    pub fn on_behalf_of(&self) -> Option<MacroUserIdStr<'static>> {
+    pub fn on_behalf_of(&self) -> Option<RoxUserIdStr<'static>> {
         match self {
             Self::Direct { .. } => None,
             Self::Delegated { subject, .. } => Some(subject.clone()),
@@ -619,7 +619,7 @@ impl Activity {
         source_event_id: Uuid,
         ordinal: u32,
         actor: Actor<'static>,
-        on_behalf_of: Option<MacroUserIdStr<'static>>,
+        on_behalf_of: Option<RoxUserIdStr<'static>>,
         entity_type: EntityType,
         entity_id: impl Into<String>,
         action: CommonAction,
@@ -643,7 +643,7 @@ impl Activity {
         source_event_id: Uuid,
         ordinal: u32,
         actor: Actor<'static>,
-        on_behalf_of: Option<MacroUserIdStr<'static>>,
+        on_behalf_of: Option<RoxUserIdStr<'static>>,
         entity: A,
         occurred_at: DateTime<Utc>,
     ) -> Self {
@@ -665,7 +665,7 @@ impl Activity {
         source_event_id: Uuid,
         ordinal: u32,
         actor: Actor<'static>,
-        on_behalf_of: Option<MacroUserIdStr<'static>>,
+        on_behalf_of: Option<RoxUserIdStr<'static>>,
         entity_type: EntityType,
         entity_id: String,
         action: Action,

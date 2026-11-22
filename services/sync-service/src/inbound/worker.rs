@@ -1,5 +1,5 @@
 use bebop::{Record, SubRecord};
-use macro_sync_service_jwt::session::{SessionIdentity, SessionKind};
+use rox_sync_service_jwt::session::{SessionIdentity, SessionKind};
 use tracing::{Instrument, error};
 use wasm_bindgen::JsValue;
 use worker::{Env, Headers, Method, Request, RequestInit, Response, Result, Stub};

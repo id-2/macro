@@ -1,7 +1,7 @@
 //! Ports (trait contracts) for the account manager domain.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use user_api_key::domain::models::UserApiKey;
 use uuid::Uuid;
 
@@ -18,15 +18,15 @@ pub trait AccountManagerRepo: Send + Sync + 'static {
     /// Whether the user is an agent account. `None` when there is no such user.
     fn is_agent(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<bool>, Self::Err>> + Send;
 
     /// Open a request, or return the pair's request that is already pending.
     fn open_request(
         &self,
         id: Uuid,
-        managed: &MacroUserIdStr<'_>,
-        manager: &MacroUserIdStr<'_>,
+        managed: &RoxUserIdStr<'_>,
+        manager: &RoxUserIdStr<'_>,
         requested_by: AccountManagerRole,
         expires_at: DateTime<Utc>,
     ) -> impl Future<Output = Result<OpenedRequest, Self::Err>> + Send;
@@ -40,7 +40,7 @@ pub trait AccountManagerRepo: Send + Sync + 'static {
     /// List the grants on an account that are approved or active.
     fn list_for_managed(
         &self,
-        managed: &MacroUserIdStr<'_>,
+        managed: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<AccountManagerGrant>, Self::Err>> + Send;
 
     /// Resolve an unexpired pending request.
@@ -82,16 +82,16 @@ pub trait AccountManagerDelivery: Send + Sync + 'static {
     /// Post the request card as `sender`.
     fn deliver_request(
         &self,
-        sender: &MacroUserIdStr<'static>,
-        recipient: &MacroUserIdStr<'static>,
+        sender: &RoxUserIdStr<'static>,
+        recipient: &RoxUserIdStr<'static>,
         grant_id: Uuid,
     ) -> impl Future<Output = Result<(), rootcause::Report>> + Send;
 
     /// Post the one-time link as `sender`, the side that approved.
     fn deliver_approval(
         &self,
-        sender: &MacroUserIdStr<'static>,
-        recipient: &MacroUserIdStr<'static>,
+        sender: &RoxUserIdStr<'static>,
+        recipient: &RoxUserIdStr<'static>,
         grant_id: Uuid,
     ) -> impl Future<Output = Result<(), rootcause::Report>> + Send;
 }
@@ -110,28 +110,28 @@ pub trait AccountManagerService: Send + Sync + 'static {
     /// Ask `counterparty` for a grant in which the caller takes `caller_role`.
     fn request(
         &self,
-        caller: &MacroUserIdStr<'static>,
-        counterparty: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
+        counterparty: &RoxUserIdStr<'static>,
         caller_role: AccountManagerRole,
     ) -> impl Future<Output = Result<AccountManagerGrant, AccountManagerError>> + Send;
 
     /// Read a grant the caller is part of.
     fn get(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<AccountManagerGrant, AccountManagerError>> + Send;
 
     /// List the managers of the caller's account.
     fn list_managers(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<AccountManagerGrant>, AccountManagerError>> + Send;
 
     /// Approve or decline a request the caller didn't make.
     fn respond(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
         decision: AccountManagerDecision,
     ) -> impl Future<Output = Result<AccountManagerGrant, AccountManagerError>> + Send;
@@ -139,14 +139,14 @@ pub trait AccountManagerService: Send + Sync + 'static {
     /// Issue the credential to the manager. Works once.
     fn claim(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<ClaimedCredential, AccountManagerError>> + Send;
 
     /// End a grant: either side may withdraw it at any point.
     fn revoke(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<AccountManagerGrant, AccountManagerError>> + Send;
 }

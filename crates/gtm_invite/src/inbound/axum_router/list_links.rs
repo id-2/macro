@@ -5,11 +5,11 @@ use axum::{
     extract::{Query, State},
 };
 use chrono::Utc;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 
 use super::GtmInviteRouterState;
 use super::dto::{GtmInviteLink, GtmInviteLinkList, ListGtmInviteLinksQuery};
-use super::gtm_macro_staff::GtmMacroStaffExtractor;
+use super::gtm_macro_staff::GtmRoxStaffExtractor;
 use crate::domain::models::GtmInviteError;
 use crate::domain::ports::GtmInviteService;
 
@@ -28,9 +28,9 @@ use crate::domain::ports::GtmInviteService;
     )
 )]
 #[tracing::instrument(skip_all, fields(mine = query.mine), err)]
-pub async fn handler<T: GtmInviteService, R, Auth: MacroAuthorizationService>(
+pub async fn handler<T: GtmInviteService, R, Auth: RoxAuthorizationService>(
     State(state): State<GtmInviteRouterState<T, R, Auth>>,
-    staff: GtmMacroStaffExtractor<Auth>,
+    staff: GtmRoxStaffExtractor<Auth>,
     Query(query): Query<ListGtmInviteLinksQuery>,
 ) -> Result<Json<GtmInviteLinkList>, GtmInviteError> {
     let caller = &staff.macro_user_id;

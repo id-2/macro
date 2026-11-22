@@ -5,7 +5,7 @@ import { MarkdownTextarea } from '@core/component/LexicalMarkdown/component/core
 import { keyboardShortcutsPlugin } from '@core/component/LexicalMarkdown/plugins/keyboard-shortcuts';
 import { isInlineMediaFileName } from '@core/component/LexicalMarkdown/utils/fileUploadUtils';
 import { fileFolderDrop } from '@core/directive/fileFolderDrop';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { cn, Scroll } from '@ui';
 import type { LexicalEditor } from 'lexical';
 import {

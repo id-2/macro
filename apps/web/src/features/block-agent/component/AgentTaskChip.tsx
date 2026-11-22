@@ -4,6 +4,7 @@
  * the task, it reads "Task" and still opens it.
  */
 
+import { t } from '@app/lib/i18n';
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import { PopupPreview } from '@core/component/DocumentPreview';
 import { EntityIcon } from '@core/component/EntityIcon';
@@ -33,7 +34,7 @@ function TaskChipButton(props: {
     <button
       type="button"
       data-agent-task={props.taskId}
-      title={props.title ?? 'Open task'}
+      title={props.title ?? t('agentChat.openTask')}
       {...navHandlers}
     >
       <ChipShell>

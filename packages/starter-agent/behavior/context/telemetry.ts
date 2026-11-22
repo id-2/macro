@@ -4,8 +4,8 @@
  * dropped. Spans record ids, counts and outcomes, never content.
  */
 import { createHash } from 'node:crypto';
-import { type Span, Telemetry } from '@macro-inc/observability/core';
-import { createServerTracingProvider } from '@macro-inc/observability/server';
+import { type Span, Telemetry } from '@rox-one/observability/core';
+import { createServerTracingProvider } from '@rox-one/observability/server';
 import type { Trace } from '../agent/claude.ts';
 
 type Environment = Readonly<Record<string, string | undefined>>;

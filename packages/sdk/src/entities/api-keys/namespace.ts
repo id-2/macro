@@ -1,5 +1,5 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { UserApiKey } from './api-key';
 
 /**
@@ -8,7 +8,7 @@ import { UserApiKey } from './api-key';
  * @routing Use when creating, listing or revoking the user's API keys; not bot credentials.
  */
 export class ApiKeyNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a lazy key handle. */
   byId(id: string): UserApiKey {

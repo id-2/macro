@@ -1,0 +1,26 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT\n            pg_stat_get_xact_tuples_updated('email_messages'::regclass) AS \"updated!\",\n            pg_stat_get_xact_tuples_inserted(\n                (SELECT reltoastrelid FROM pg_class WHERE oid = 'email_messages'::regclass)\n            ) AS \"toast_inserted!\"\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "updated!",
+        "type_info": "Int8"
+      },
+      {
+        "ordinal": 1,
+        "name": "toast_inserted!",
+        "type_info": "Int8"
+      }
+    ],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": [
+      null,
+      null
+    ]
+  },
+  "hash": "589d892665d1075ec4a7c4aaa5672371768863552c901c04f956a1f027ff4fa7"
+}

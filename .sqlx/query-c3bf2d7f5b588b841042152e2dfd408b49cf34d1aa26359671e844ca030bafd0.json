@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_messages (id, thread_id, link_id, from_contact_id, is_sent, is_draft, internal_date_ts) VALUES ('00000000-0000-4000-8000-000000000054', $1, $2, '00000000-0000-4000-8000-000000000032', TRUE, TRUE, '2026-01-03')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c3bf2d7f5b588b841042152e2dfd408b49cf34d1aa26359671e844ca030bafd0"
+}

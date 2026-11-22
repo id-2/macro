@@ -5,7 +5,7 @@ use entity_access::{
     domain::{models::EditAccessLevel, ports::EntityAccessService},
     inbound::axum_extractors::{ProjectAccessLevelExtractor, ProjectBodyAccessLevelExtractorV2},
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model::{
     project::{BasicProject, request::PatchProjectRequestV2},
     response::{GenericSuccessResponse, SuccessResponse},
@@ -35,7 +35,7 @@ use crate::domain::{models::ProjectError, ports::ProjectService};
 )]
 pub async fn edit_project_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     access: ProjectAccessLevelExtractor<EditAccessLevel, Svc, Auth>,
     project: Extension<BasicProject>,
     body: ProjectBodyAccessLevelExtractorV2<EditAccessLevel, PatchProjectRequestV2, Svc, Auth>,
@@ -43,7 +43,7 @@ pub async fn edit_project_handler<T, Svc, Auth>(
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let body = body.into_inner();
     // A scoped session shares nothing; this route's path can't say whether

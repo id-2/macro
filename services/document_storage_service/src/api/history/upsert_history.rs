@@ -4,7 +4,7 @@ use axum::extract::State;
 use axum::{extract::Path, http::StatusCode, response::IntoResponse};
 use entity_access::domain::models::EntityPermission;
 use entity_access::inbound::axum_extractors::HistoryAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{
     GenericErrorResponse, GenericResponse, GenericSuccessResponse, SuccessResponse,
 };
@@ -40,7 +40,7 @@ pub async fn upsert_history_handler(
         AuthorizationService,
     >,
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(Params { item_type, item_id }): Path<Params>,
 ) -> impl IntoResponse {
     let access_level = match history_access.entity_access_receipt.entity_permission() {
@@ -68,7 +68,7 @@ pub async fn upsert_history_handler(
 
     if item_type != "thread" {
         // Update the item's last accessed time
-        if let Err(e) = macro_db_client::history::upsert_item_last_accessed(
+        if let Err(e) = rox_db_client::history::upsert_item_last_accessed(
             &mut transaction,
             item_id.as_str(),
             item_type.as_str(),
@@ -83,7 +83,7 @@ pub async fn upsert_history_handler(
         }
     }
 
-    if let Err(e) = macro_db_client::history::upsert_user_history(
+    if let Err(e) = rox_db_client::history::upsert_user_history(
         &mut transaction,
         user.authorization.user.macro_user_id.clone(),
         item_id.as_str(),
@@ -100,7 +100,7 @@ pub async fn upsert_history_handler(
 
     // If the item is a document, track the document view
     if item_type == "document"
-        && let Err(e) = macro_db_client::document::track_document::track_document(
+        && let Err(e) = rox_db_client::document::track_document::track_document(
             &mut transaction,
             item_id.as_str(),
             Some(user.authorization.user.macro_user_id.as_ref()),

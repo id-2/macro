@@ -1,5 +1,5 @@
 import { sleep } from '@core/util/sleep';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { err, ok, type Result } from 'neverthrow';
 import {
   type Accessor,

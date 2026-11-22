@@ -5,10 +5,10 @@ use crate::api;
 use crate::composition::api::{ApiDependencies, api_context};
 use anyhow::Context;
 use document_storage_service_client::DocumentStorageServiceClient;
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_env::Environment;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
-use macro_service_urls::{
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_env::Environment;
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
+use rox_service_urls::{
     AuthServiceUrl, ConnectionGatewayUrl, DocumentStorageServiceUrl, StaticFileServiceUrl,
 };
 use sqlx::postgres::PgPoolOptions;
@@ -25,9 +25,9 @@ pub fn run() -> impl Future<Output = anyhow::Result<()>> {
 async fn run_server() -> anyhow::Result<()> {
     let env = Environment::new_or_prod();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
 
-    let s3_client = s3_client::S3::new(macro_aws_config::s3_client().await);
+    let s3_client = s3_client::S3::new(rox_aws_config::s3_client().await);
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
@@ -54,14 +54,14 @@ async fn run_server() -> anyhow::Result<()> {
         .await
         .context("could not connect to db")?;
 
-    let gmail_inbox_sync_queue = macro_queues::GmailInboxSyncQueue::new();
-    let gmail_inbox_sync_retry_queue = macro_queues::GmailInboxSyncRetryQueue::new();
-    let gmail_ops_queue = macro_queues::GmailOpsQueue::new();
-    let backfill_queue = macro_queues::EmailBackfillQueue::new();
-    let email_scheduled_queue = macro_queues::EmailScheduledQueue::new();
-    let sfs_uploader_queue = macro_queues::SfsUploaderQueue::new();
-    let link_manager_queue = macro_queues::LinkManagerQueue::new();
-    let sqs_client = sqs_client::SQS::new(macro_aws_config::sqs_client().await)
+    let gmail_inbox_sync_queue = rox_queues::GmailInboxSyncQueue::new();
+    let gmail_inbox_sync_retry_queue = rox_queues::GmailInboxSyncRetryQueue::new();
+    let gmail_ops_queue = rox_queues::GmailOpsQueue::new();
+    let backfill_queue = rox_queues::EmailBackfillQueue::new();
+    let email_scheduled_queue = rox_queues::EmailScheduledQueue::new();
+    let sfs_uploader_queue = rox_queues::SfsUploaderQueue::new();
+    let link_manager_queue = rox_queues::LinkManagerQueue::new();
+    let sqs_client = sqs_client::SQS::new(rox_aws_config::sqs_client().await)
         .gmail_inbox_sync_queue(&gmail_inbox_sync_queue)
         .gmail_inbox_sync_retry_queue(&gmail_inbox_sync_retry_queue)
         .gmail_ops_queue(&gmail_ops_queue)
@@ -111,7 +111,7 @@ async fn run_server() -> anyhow::Result<()> {
         JwtValidationArgs::new_with_secret_manager(config.environment, &secretsmanager_client)
             .await?;
     let event_broker_tracker = TaskTracker::new();
-    let macro_event_broker = MacroEventBrokerService::new(
+    let macro_event_broker = RoxEventBrokerService::new(
         KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
@@ -123,7 +123,7 @@ async fn run_server() -> anyhow::Result<()> {
     let contacts_ingress = std::sync::Arc::new(contacts::domain::service::SqsContactsIngress {
         queue: contacts::outbound::ingress::SqsContactsQueue::new(
             aws_sdk_sqs::Client::new(&aws_config),
-            macro_queues::ContactsQueue::new().to_string(),
+            rox_queues::ContactsQueue::new().to_string(),
         ),
     });
     let read_receipts = crate::composition::read_receipts(db.clone(), env)?;

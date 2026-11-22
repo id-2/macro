@@ -78,7 +78,7 @@ impl LexicalClient {
         request: &NotionSnapshotRequest<'_>,
     ) -> Result<NotionSnapshot> {
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = check_response(
             self.client
                 .post(format!("{}/snapshot/notion", self.url))

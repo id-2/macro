@@ -12,7 +12,7 @@ use entity_access::{
 
 async fn receipts(
     pool: &Pool<Postgres>,
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     ids: &[Uuid],
 ) -> Vec<EntityAccessReceipt<ViewAccessLevel>> {
     EntityAccessServiceImpl::new(PgAccessRepository::new(pool.clone()))
@@ -43,7 +43,7 @@ async fn reminder_collection_applies_current_inbox_and_all_email_facets(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let mailbox = service(pool.clone());
-    let user = MacroUserIdStr::try_from_email("user1@test.com")?;
+    let user = RoxUserIdStr::try_from_email("user1@test.com")?;
     let first = uuid::uuid!("20000001-0000-0000-0000-000000000001");
     let second = uuid::uuid!("20000201-0000-0000-0000-000000000201");
     let pdf = uuid::uuid!("20000005-0000-0000-0000-000000000005");
@@ -129,7 +129,7 @@ async fn reminder_collection_rechecks_delegation_after_receipt_minting(
     sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ('d1000000-0000-0000-0000-000000000002', 'delegate', 'delegate@test.com', 'collection_delegate')"#).execute(&pool).await?;
     sqlx::query!(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|delegate@test.com', 'delegate@test.com', 'd1000000-0000-0000-0000-000000000002')"#).execute(&pool).await?;
     sqlx::query!("INSERT INTO macro_user_links (primary_macro_id, child_macro_id, link_id) VALUES ('macro|delegate@test.com', 'macro|user1@test.com', $1)", link).execute(&pool).await?;
-    let user = MacroUserIdStr::try_from_email("delegate@test.com")?;
+    let user = RoxUserIdStr::try_from_email("delegate@test.com")?;
     let mailbox = service(pool.clone());
     let filters = ReminderThreadFilter {
         inbox_ids: Some(vec![link]),
@@ -168,7 +168,7 @@ async fn reminder_collection_excludes_shared_rows_outside_mail_inboxes(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let thread = uuid::uuid!("20000001-0000-0000-0000-000000000001");
-    let user = MacroUserIdStr::try_from_email("shared-viewer@test.com")?;
+    let user = RoxUserIdStr::try_from_email("shared-viewer@test.com")?;
     sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ('d2000000-0000-0000-0000-000000000002', 'shared-viewer', 'shared-viewer@test.com', 'collection_shared')"#).execute(&pool).await?;
     sqlx::query!(r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ('macro|shared-viewer@test.com', 'shared-viewer@test.com', 'd2000000-0000-0000-0000-000000000002')"#).execute(&pool).await?;
     sqlx::query!("INSERT INTO entity_access (entity_id, entity_type, source_id, source_type, access_level) VALUES ($1, 'email_thread', $2, 'user', 'view')", thread, user.as_ref()).execute(&pool).await?;

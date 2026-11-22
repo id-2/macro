@@ -1,4 +1,4 @@
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { SearchOpts } from '../search/options';
 import { Project } from './project';
 
@@ -14,7 +14,7 @@ import { Project } from './project';
  * @example Link an agent session from a project.
  * ```js
  * const chip = JSON.stringify({ id: session.id, label: '', expanded: true });
- * const document = await macro.documents.create({
+ * const document = await rox.documents.create({
  *   name: 'Agent work',
  *   project,
  *   markdown: `<m-agent-session-mention>${chip}</m-agent-session-mention>`,
@@ -25,7 +25,7 @@ import { Project } from './project';
  * @routing Use when organizing items into projects (folders); not initiatives, which group tasks.
  */
 export class ProjectNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   byId(id: string): Project {
     return Project.byId(this.client, id);

@@ -18,8 +18,8 @@ use entity_access::{
     outbound::PgAccessRepository,
 };
 use import::outbound::pg_import_repo::PgImportRepo;
-use macro_queues::{SlackImportDlq, SlackImportQueue};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_queues::{SlackImportDlq, SlackImportQueue};
+use rox_user_id::user_id::RoxUserIdStr;
 use sha2::{Digest, Sha256};
 use slack_import_worker::composition::{
     authorizer::WorkerAuthorizer, channel_sink::ChannelImportSink,
@@ -210,8 +210,8 @@ async fn resources(endpoint: &str) -> Resources {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|t17@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|t17@example.com").unwrap()
 }
 
 async fn team(pool: &PgPool) -> TeamId {
@@ -242,13 +242,13 @@ fn access(team: TeamId) -> EntityAccessReceipt<AdminTeamRole> {
 // all target IDs in public receipts; reference disclosure uses the real lookup.
 struct Admin(WorkerAuthorizer<Access>);
 impl ImportAuthorizer for Admin {
-    async fn require_admin(&self, team: TeamId, user: &MacroUserIdStr<'_>) -> PortResult<()> {
+    async fn require_admin(&self, team: TeamId, user: &RoxUserIdStr<'_>) -> PortResult<()> {
         self.0.require_admin(team, user).await
     }
     async fn require_target(
         &self,
         team: TeamId,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         metadata: &ConversationMetadata,
         target: Uuid,
     ) -> PortResult<()> {
@@ -258,7 +258,7 @@ impl ImportAuthorizer for Admin {
 impl ImportProgressAccess for Admin {
     async fn participating_targets(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: &[Uuid],
     ) -> PortResult<Vec<Uuid>> {
         Ok(vec![])
@@ -268,7 +268,7 @@ struct NoGateway;
 impl ImportNotifier for NoGateway {
     async fn invalidate(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: TeamId,
         _: JobId,
         _: u64,
@@ -572,7 +572,7 @@ async fn assert_no_notification_or_activity_rows(pool: &PgPool) {
 }
 
 #[ignore = "requires Docker with localstack/localstack:4 and a local PostgreSQL test role"]
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn sealed_uploads_queue_replay_and_search_completion_barrier(pool: PgPool) {
     let (_container, endpoint) = LocalStack::start().await;
     let Resources { storage, queue, .. } = resources(&endpoint).await;

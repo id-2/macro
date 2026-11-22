@@ -5,7 +5,7 @@ mod test;
 
 use std::sync::Arc;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 
 use crate::domain::{
@@ -72,7 +72,7 @@ where
     #[tracing::instrument(err, skip(self, ordered))]
     async fn reorder_favorites(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         ordered: Vec<Entity<'static>>,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         self.favorites.reorder_favorites(&user_id, &ordered).await?;

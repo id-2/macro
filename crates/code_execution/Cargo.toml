@@ -7,7 +7,7 @@ publish = false
 [dependencies]
 url = { workspace = true }
 axum = { workspace = true }
-macro_tower_layers = { path = "../macro_tower_layers" }
+rox_tower_layers = { path = "../rox_tower_layers" }
 opentelemetry = { workspace = true, features = ["trace"] }
 tracing-opentelemetry = { workspace = true }
 reqwest = { workspace = true, features = ["stream"] }

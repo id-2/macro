@@ -1,3 +1,6 @@
+import { publicDomain } from '@core/constant/brand';
+import { isPublicDomainHost } from './siteHost';
+
 const LOGIN_COOKIE_AGE = 2592000; // 1 month in seconds
 
 type CookieOptions = {
@@ -5,6 +8,7 @@ type CookieOptions = {
   maxAge?: number;
   path?: string;
   sameSite?: string;
+  domain?: string;
 };
 
 type LoginCookieOptions = {
@@ -13,6 +17,7 @@ type LoginCookieOptions = {
   maxAge: number;
   path: '/';
   sameSite: 'Lax';
+  domain?: string;
 };
 
 const LOGIN_STORAGE_KEY = 'macro:login';
@@ -50,6 +55,10 @@ export function syncLoginStorage(isAuthenticated: boolean) {
 export function getLoginCookieOptions(
   isAuthenticated: boolean
 ): LoginCookieOptions {
+  // The hint travels with the session: every public-site host sees the same
+  // auth cookies, so a host-only hint would hide a live session from a sibling
+  // host (sign in on app.rox.one, open my.rox.one, see the signed-out screen).
+  const domain = isPublicDomainHost() ? publicDomain : undefined;
   if (isAuthenticated) {
     const expires = new Date();
     expires.setMonth(expires.getMonth() + 1);
@@ -59,6 +68,7 @@ export function getLoginCookieOptions(
       maxAge: LOGIN_COOKIE_AGE,
       path: '/',
       sameSite: 'Lax',
+      domain,
     };
   }
   return {
@@ -67,7 +77,21 @@ export function getLoginCookieOptions(
     maxAge: 0,
     path: '/',
     sameSite: 'Lax',
+    domain,
   };
+}
+
+/**
+ * Write the sign-in hint. Signing out also expires the host-only hint older
+ * builds left behind, which would otherwise keep claiming a session on this
+ * host after the shared one is gone.
+ */
+export function writeLoginHint(isAuthenticated: boolean) {
+  const { value, ...options } = getLoginCookieOptions(isAuthenticated);
+  updateCookie('login', value, options);
+  if (!isAuthenticated && options.domain) {
+    updateCookie('login', value, { ...options, domain: undefined });
+  }
 }
 
 export function updateCookie(
@@ -85,6 +109,9 @@ export function updateCookie(
   }
   if (options.path) {
     newCookie += `; path=${options.path}`;
+  }
+  if (options.domain) {
+    newCookie += `; domain=${options.domain}`;
   }
   if (options.sameSite) {
     newCookie += `; SameSite=${options.sameSite}`;

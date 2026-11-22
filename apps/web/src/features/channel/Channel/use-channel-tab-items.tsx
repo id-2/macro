@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useCall } from '@channel/Call/use-call';
 import { isNativeCallEnabled } from '@channel/Call/use-callkit';
 import { ENABLE_CALLS } from '@core/constant/featureFlags';
@@ -37,7 +38,7 @@ export function CallTabLabel(props: { channelId: string }) {
   return (
     <span class="flex items-center gap-1.5">
       <LiveCallDot channelId={props.channelId} />
-      Call
+      {t('nav.call')}
     </span>
   );
 }
@@ -81,7 +82,23 @@ export function useChannelTabItems(
     <LiveCallDot class={props.class} channelId={channelId} />
   );
   return () =>
-    availableTabs().map((tab) =>
-      tab.value === 'call' ? { ...tab, icon: LiveIcon } : { ...tab }
-    );
+    availableTabs().map((tab) => {
+      const labeled = { ...tab, label: channelTabLabel(tab.value) };
+      return tab.value === 'call' ? { ...labeled, icon: LiveIcon } : labeled;
+    });
+}
+
+function channelTabLabel(value: ChannelTabId) {
+  switch (value) {
+    case 'messages':
+      return t('nav.messages');
+    case 'attachments':
+      return t('nav.attachments');
+    case 'calls':
+      return t('nav.calls');
+    case 'participants':
+      return t('nav.participants');
+    case 'call':
+      return t('nav.call');
+  }
 }

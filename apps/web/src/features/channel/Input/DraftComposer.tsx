@@ -10,7 +10,7 @@ import {
   handleFileFolderDrop,
   uploadFile,
 } from '@core/util/upload';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { ComposerSurface } from '@ui';
 import { createSignal, Show } from 'solid-js';
 import { createInputAttachmentTracker } from './attachment-tracker';

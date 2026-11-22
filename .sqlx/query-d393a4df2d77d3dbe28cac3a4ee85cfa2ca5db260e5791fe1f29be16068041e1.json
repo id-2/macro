@@ -1,0 +1,34 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT has_pdf_attachment, has_image_attachment, has_document_attachment\n         FROM email_threads WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "has_pdf_attachment",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "has_image_attachment",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 2,
+        "name": "has_document_attachment",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      false,
+      false
+    ]
+  },
+  "hash": "d393a4df2d77d3dbe28cac3a4ee85cfa2ca5db260e5791fe1f29be16068041e1"
+}

@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use super::*;
 use bot_id::BotId;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -328,11 +328,11 @@ async fn foreign_recipients_follow_exact_source_and_current_team_membership(
     }
     assert_eq!(
         get_entity_users(&pool, &personal, EntityType::ForeignEntity).await?,
-        vec![MacroUserIdStr::parse_from_str(OWNER)?.into_owned()]
+        vec![RoxUserIdStr::parse_from_str(OWNER)?.into_owned()]
     );
     assert_eq!(
         get_entity_users(&pool, &shared, EntityType::ForeignEntity).await?,
-        vec![MacroUserIdStr::parse_from_str(DELEGATE)?.into_owned()]
+        vec![RoxUserIdStr::parse_from_str(DELEGATE)?.into_owned()]
     );
     sqlx::query!(
         "DELETE FROM team_user WHERE team_id = $1 AND user_id = $2",

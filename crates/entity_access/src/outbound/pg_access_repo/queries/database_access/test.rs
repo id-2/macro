@@ -1,7 +1,7 @@
 use super::*;
 use crate::outbound::pg_access_repo::queries::get_user_source_ids;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 
 const OWNER: &str = "macro|owner@team.com";
 const MEMBER: &str = "macro|member@team.com";
@@ -153,7 +153,7 @@ async fn insert_database(pool: &PgPool) -> Uuid {
 }
 
 async fn source_ids(pool: &PgPool, email: &str) -> SourceIds {
-    let user = MacroUserIdStr::try_from_email(email).unwrap();
+    let user = RoxUserIdStr::try_from_email(email).unwrap();
     get_user_source_ids(pool, Some(&user)).await.unwrap()
 }
 
@@ -353,7 +353,7 @@ async fn viewing_a_form_that_shares_responses_grants_view_on_its_database(pool: 
 
     let member = get_user_source_ids(
         &pool,
-        Some(&MacroUserIdStr::try_from(MEMBER.to_string()).unwrap()),
+        Some(&RoxUserIdStr::try_from(MEMBER.to_string()).unwrap()),
     )
     .await
     .unwrap();

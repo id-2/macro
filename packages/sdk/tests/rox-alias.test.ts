@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { Macro, Rox } from '../src/macro';
+import { Macro, Rox } from '../src/rox';
 
 describe('Rox client class', () => {
   test('is exported under the new name with Macro kept as an alias', () => {

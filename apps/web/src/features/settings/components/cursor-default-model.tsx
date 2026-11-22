@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ModelCatalogPicker } from '@core/component/AI/component/input/ModelCatalogPicker';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -87,11 +88,11 @@ export function CursorDefaultModel(props: { triggerClass?: string }) {
   const changeModel = async (modelId: string) => {
     try {
       await setDefaultModel.mutateAsync({ modelId });
-      toast.success('Default model updated');
+      toast.success('Модель по умолчанию обновлена');
     } catch (error) {
       toast.failure(
         (error instanceof ThrownResultError && error.message) ||
-          'Failed to set your default model'
+          'Не удалось изменить модель по умолчанию'
       );
     }
   };
@@ -101,11 +102,11 @@ export function CursorDefaultModel(props: { triggerClass?: string }) {
     if (!modelId) return;
     try {
       await setDefaultModel.mutateAsync({ modelId, effort: choice.value });
-      toast.success('Default effort updated');
+      toast.success('Уровень усилия обновлён');
     } catch (error) {
       toast.failure(
         (error instanceof ThrownResultError && error.message) ||
-          'Failed to set your default effort'
+          'Не удалось изменить уровень усилия'
       );
     }
   };
@@ -119,7 +120,7 @@ export function CursorDefaultModel(props: { triggerClass?: string }) {
           options={[]}
           placeholder="Loading models…"
           onSelect={(id) => fireAndForget(changeModel(id), 'cursor-connect')}
-          ariaLabel="Default model"
+          ariaLabel={t('runtimeSharing.defaultModel')}
           triggerClass={
             props.triggerClass ??
             'h-9 w-full justify-between text-base [&>span]:flex-1'
@@ -132,7 +133,7 @@ export function CursorDefaultModel(props: { triggerClass?: string }) {
         when={!cursorModels.isError}
         fallback={
           <div class="flex items-center gap-2">
-            <p class="text-xs text-negative">Could not load Cursor models.</p>
+            <p class="text-xs text-negative">Не удалось загрузить модели Cursor.</p>
             <Button
               type="button"
               variant="secondary"
@@ -141,7 +142,7 @@ export function CursorDefaultModel(props: { triggerClass?: string }) {
                 fireAndForget(cursorModels.refetch(), 'cursor-connect')
               }
             >
-              Retry
+              {t('common.retry')}
             </Button>
           </div>
         }
@@ -163,7 +164,7 @@ export function CursorDefaultModel(props: { triggerClass?: string }) {
                   fireAndForget(changeModel(id), 'cursor-connect')
                 }
                 disabled={setDefaultModel.isPending}
-                ariaLabel="Default model"
+                ariaLabel={t('runtimeSharing.defaultModel')}
                 triggerClass={
                   props.triggerClass ??
                   'h-9 w-full justify-between text-base [&>span]:flex-1'

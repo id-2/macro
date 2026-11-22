@@ -11,7 +11,7 @@ use agent_session::domain::model::AgentSessionId;
 use agent_session::domain::ports::AgentSessionRepo;
 use async_trait::async_trait;
 use connection_gateway_client::ConnectionGatewayClient;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use rate_limit::{RateLimitConfig, RateLimitKey, RateLimitService};
 use std::sync::Arc;
@@ -105,7 +105,7 @@ impl UiCommandDelivery for GatewayUiDelivery {
     #[tracing::instrument(name = "ui.command.send", skip_all, err)]
     async fn send(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         frame: &UiCommandFrame,
     ) -> Result<u64, CodeModeError> {
         let message = serde_json::to_value(frame).map_err(storage)?;

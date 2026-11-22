@@ -1,7 +1,7 @@
 //! The ids of a user's active notifications of chosen event types, for
 //! clients that act on them in bulk without reading their notification feed.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::future::Future;
 use tracing::field::Empty;
@@ -19,7 +19,7 @@ pub trait ActiveNotificationIdRepository: Send + Sync {
     /// notifications whose event type is one of `event_types`, newest first.
     fn active_notification_ids(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         event_types: &[String],
         limit: u32,
     ) -> impl Future<Output = Result<Vec<Uuid>, ActiveNotificationIdStorageError>> + Send;
@@ -85,7 +85,7 @@ impl<R: ActiveNotificationIdRepository> ActiveNotificationIdService<R> {
     )]
     pub async fn list(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         mut event_types: Vec<String>,
         limit: Option<u32>,
     ) -> Result<Vec<Uuid>, ActiveNotificationIdsError> {

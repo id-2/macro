@@ -1,4 +1,5 @@
 import { listOwnedSlotName } from '@app/components/list';
+import { t } from '@app/lib/i18n';
 import { openEntityInSplitFromUnifiedList } from '@app/features/next-soup/utils';
 import {
   type FacetSelection,
@@ -160,8 +161,8 @@ function DriveComposition(props: { route: DriveRouteState }) {
           },
           { replace: true }
         );
-        toast.alert('Folder unavailable', {
-          subtext: 'It may have moved, been deleted, or no longer be shared.',
+        toast.alert(t('drive.folderUnavailable'), {
+          subtext: t('drive.folderUnavailableBody'),
         });
       }
     )
@@ -195,7 +196,7 @@ function DriveComposition(props: { route: DriveRouteState }) {
       },
     });
   });
-  onMount(() => panel.handle.setDisplayName('Drive'));
+  onMount(() => panel.handle.setDisplayName(t('drive.title')));
 
   return (
     <DriveProvider
@@ -209,7 +210,7 @@ function DriveComposition(props: { route: DriveRouteState }) {
       }}
     >
       <KnownFoldersProvider value={knownFolders}>
-        <DriveWorkspace tour={<ViewTour tour={documentsTour} />} />
+        <DriveWorkspace tour={<ViewTour tour={documentsTour()} />} />
       </KnownFoldersProvider>
     </DriveProvider>
   );

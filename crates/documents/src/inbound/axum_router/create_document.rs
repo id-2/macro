@@ -6,8 +6,8 @@ use axum::{Json, extract::State};
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::ProjectBodyAccessLevelExtractorV2;
 use entity_registry::CreationPrincipalExtractor;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal, UserOrInternalCaller,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal, UserOrInternalCaller,
 };
 use model::document::response::CreateDocumentRequest;
 use model::document::{FileType, FileTypeExt};
@@ -44,7 +44,7 @@ use crate::domain::response::CreateDocumentResponse;
 pub async fn create_document_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
     CreationPrincipalExtractor { principal, .. }: CreationPrincipalExtractor<Auth>,
@@ -76,10 +76,10 @@ pub async fn create_document_handler<
 pub async fn create_document_internal_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    caller: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     project: ProjectBodyAccessLevelExtractorV2<EditAccessLevel, CreateDocumentRequest, Svc, Auth>,
 ) -> Result<Json<CreateDocumentResponse>, DocumentError> {
     let req = project.into_inner();

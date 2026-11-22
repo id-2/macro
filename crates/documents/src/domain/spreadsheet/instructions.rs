@@ -182,7 +182,7 @@ impl<D: SpreadsheetDocumentLookup, W: EditingWorkerService> SpreadsheetAiEditSer
             })?;
 
         let context = UsageContext::new(AiFeature::AiEditing, caller)
-            .with_entity(macro_uuid::string_to_uuid(document_id).ok());
+            .with_entity(rox_uuid::string_to_uuid(document_id).ok());
         for usage in result.usage {
             self.recorder.record(context.clone().into_event(
                 usage.model,

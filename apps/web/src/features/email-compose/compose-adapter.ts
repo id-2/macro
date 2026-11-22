@@ -17,7 +17,7 @@ import { interceptMailtoLinks } from '@core/util/interceptMailtoLinks';
 import { handleFileFolderDrop } from '@core/util/upload';
 import ArrowCounterClockwise from '@icon/system/regular/arrow-counter-clockwise.svg?component-solid';
 import ExclamationIcon from '@icon/system/regular/exclamation-mark.svg?component-solid';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import { useContactRecipientSource } from '@queries/contacts/recipient-source';
 import {
@@ -522,7 +522,7 @@ export function createEmailComposeContext(): EmailComposeContext {
                 bcc: contacts(draft.bcc),
                 subject: draft.subject,
                 body_text: draft.bodyText,
-                body_macro: draft.bodyMacro,
+                body_rox: draft.bodyRox,
                 body_html_sanitized: draft.optimisticBodyHtml,
                 replying_to_id:
                   draft.replyingToId == null
@@ -598,7 +598,7 @@ export function createEmailComposeContext(): EmailComposeContext {
           includeSignature: input.message.include_signature,
           restoreBodyHtml: input.restoreBodyHtml,
           restoreBodyText: input.restoreBodyText,
-          restoreBodyMacro: input.restoreBodyMacro,
+          restoreBodyRox: input.restoreBodyRox,
         });
         // The thread shown after Send renders from this snapshot on mount; it
         // must already hold the send, or the thread shows the draft instead.

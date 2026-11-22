@@ -19,7 +19,7 @@ use agent_runtime_protocol::domain::ports::{
 use agent_runtime_protocol::domain::schema::v0::ToRuntimeMessage;
 use agent_runtime_protocol::domain::schema::v0::{AcpMessage, ToServerMessage};
 use entity_access::domain::models::{EntityAccessReceipt, EntityType, OwnerAccessLevel};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use std::sync::{Arc, Mutex};
 use tokio::sync::Notify;
 use tracing::instrument::WithSubscriber as _;
@@ -64,7 +64,7 @@ struct DisabledMember;
 impl enterprise::domain::AgentSessionAdmission for DisabledMember {
     fn ensure_allowed<'a>(
         &'a self,
-        _user: MacroUserIdStr<'static>,
+        _user: RoxUserIdStr<'static>,
         _preset_id: &'a str,
     ) -> enterprise::domain::EnterpriseFuture<'a, ()> {
         Box::pin(async { Err(enterprise::domain::EnterpriseError::MemberDisabled) })
@@ -83,7 +83,7 @@ async fn disabled_member_cannot_start_a_new_agent_session() {
         repo_branch: None,
         id,
         owner_id: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
         ),
         bot_id: BotId::TEST_A,
         thread_id: None,
@@ -122,7 +122,7 @@ async fn previews_hydrate_bot_identity_only_for_accessible_sessions() {
     };
     assert_eq!(data.bot.as_ref().unwrap().name, "Test Agent");
     let other =
-        macro_user_id::user_id::MacroUserIdStr::try_from_email("other@example.com").unwrap();
+        rox_user_id::user_id::RoxUserIdStr::try_from_email("other@example.com").unwrap();
     assert_eq!(
         fx.service
             .preview_sessions(&other, vec![fx.session])
@@ -138,7 +138,7 @@ struct GrantingViewAccess(AgentSessionId);
 impl crate::domain::ports::SessionViewAccess for GrantingViewAccess {
     fn can_view<'a>(
         &'a self,
-        _viewer: &'a macro_user_id::user_id::MacroUserIdStr<'static>,
+        _viewer: &'a rox_user_id::user_id::RoxUserIdStr<'static>,
         session: AgentSessionId,
     ) -> std::pin::Pin<Box<dyn Future<Output = Result<bool>> + Send + 'a>> {
         Box::pin(async move { Ok(session == self.0) })
@@ -161,7 +161,7 @@ async fn previews_resolve_discussion_and_link_access_through_the_view_port() {
         fx.repo.insert_session(discussion_session.clone());
         fx.repo.insert_session(channel_session.clone());
         let collaborator =
-            macro_user_id::user_id::MacroUserIdStr::try_from_email("collaborator@example.com")
+            rox_user_id::user_id::RoxUserIdStr::try_from_email("collaborator@example.com")
                 .unwrap();
         let ids = vec![discussion_session.id, channel_session.id, fx.session];
 
@@ -817,7 +817,7 @@ impl AgentSessionRepo for BlockingPromptLogs {
 
     async fn preview(
         &self,
-        viewer: &MacroUserIdStr<'static>,
+        viewer: &RoxUserIdStr<'static>,
         ids: &[AgentSessionId],
     ) -> Result<Vec<crate::domain::model::SessionPreviewCandidate>> {
         self.repo.preview(viewer, ids).await
@@ -829,7 +829,7 @@ impl AgentSessionRepo for BlockingPromptLogs {
 
     async fn recent_for_owner(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         limit: std::num::NonZeroUsize,
     ) -> Result<Vec<crate::domain::model::AgentSession>> {
         self.repo.recent_for_owner(owner, limit).await
@@ -874,7 +874,7 @@ impl AgentSessionRepo for BlockingPromptLogs {
         self.repo.set_turn_prompter(id, prompter).await
     }
 
-    async fn add_follower(&self, id: AgentSessionId, user: &MacroUserIdStr<'static>) -> Result<()> {
+    async fn add_follower(&self, id: AgentSessionId, user: &RoxUserIdStr<'static>) -> Result<()> {
         self.repo.add_follower(id, user).await
     }
 
@@ -935,13 +935,13 @@ impl AgentSessionRepo for BlockingPromptLogs {
         self.repo.set_sandbox_size(id, size).await
     }
 
-    async fn user_sandbox_size(&self, user_id: &MacroUserIdStr<'static>) -> Result<SandboxSize> {
+    async fn user_sandbox_size(&self, user_id: &RoxUserIdStr<'static>) -> Result<SandboxSize> {
         self.repo.user_sandbox_size(user_id).await
     }
 
     async fn set_user_sandbox_size(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         size: SandboxSize,
     ) -> Result<()> {
         self.repo.set_user_sandbox_size(user_id, size).await
@@ -949,14 +949,14 @@ impl AgentSessionRepo for BlockingPromptLogs {
 
     async fn user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<CodingPreferences> {
         self.repo.user_coding_preferences(user_id).await
     }
 
     async fn set_user_coding_preferences(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         preferences: CodingPreferences,
     ) -> Result<()> {
         self.repo
@@ -1113,7 +1113,7 @@ impl AgentSessionLogRepo for BlockingPromptLogs {
     async fn participants(
         &self,
         agent_session_id: AgentSessionId,
-    ) -> Result<Vec<MacroUserIdStr<'static>>> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>> {
         AgentSessionLogRepo::participants(&self.repo, agent_session_id).await
     }
 }

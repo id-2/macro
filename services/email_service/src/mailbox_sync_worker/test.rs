@@ -4,7 +4,7 @@ use email::outbound::mailbox_pg::PgMailboxSync;
 use email_api_client::domain::models::{
     MailFolder, MailboxChangePage, MailboxMessage, ProviderId, StreamPosition, StreamToken,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
 use tokio::sync::Notify;
@@ -57,7 +57,7 @@ impl MailboxGateway for Provider {
 }
 
 async fn mailbox(db: &PgPool, folder: &str, synced: bool, due: &str) -> Uuid {
-    let link = macro_uuid::generate_uuid_v7();
+    let link = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO email_links (id,macro_id,fusionauth_user_id,email_address,provider,grant_generation)
@@ -75,7 +75,7 @@ async fn mailbox(db: &PgPool, folder: &str, synced: bool, due: &str) -> Uuid {
         INSERT INTO email_sync_streams (id,link_id,generation,kind,scope_id,position,initial_complete,next_run_at)
         VALUES ($1,$2,1,'mail_folder',$3,$4,$5,now() - $6::text::interval)
     "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         link,
         folder,
         synced.then_some("checkpoint"),

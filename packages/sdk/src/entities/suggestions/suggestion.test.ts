@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
 import type { Suggestion as SuggestionRecord } from '../../../generated/scheduled-action/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { EmailDraft } from '../email/draft';
 import { EmailThread } from '../email/thread';
 import { SuggestionNamespace } from './namespace';
@@ -38,7 +38,7 @@ describe('Suggestion drafts', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
     const suggestion = Suggestion.from(client, REPLY_SUGGESTION);
 
     const outcome = await suggestion.attachDraft(
@@ -57,7 +57,7 @@ describe('Suggestion drafts', () => {
   });
 
   test('a reply suggestion names its draft as a handle; other suggestions have none', () => {
-    const client = {} as MacroClient;
+    const client = {} as RoxClient;
     expect(Suggestion.from(client, REPLY_SUGGESTION).draft).toBeInstanceOf(
       EmailDraft,
     );
@@ -87,7 +87,7 @@ describe('Suggestion drafts', () => {
           },
         }),
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const drafts = await EmailThread.byId(client, 'thread').drafts();
 
@@ -106,7 +106,7 @@ describe('Suggestion accept', () => {
           return { data: undefined };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     await Suggestion.from(client, REPLY_SUGGESTION).accept();
 
@@ -129,7 +129,7 @@ describe('Suggestion list', () => {
 
   const COUNTS = { open: 1, running: 0, failed: 0, done: 1 };
 
-  function feedClient(requests: unknown[]): MacroClient {
+  function feedClient(requests: unknown[]): RoxClient {
     return {
       scheduledAction: {
         listSuggestions: async (request: { query?: { limit?: number } }) => {
@@ -141,7 +141,7 @@ describe('Suggestion list', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
   }
 
   test('list returns the open suggestions, then the done ones, with their status', async () => {
@@ -183,7 +183,7 @@ describe('Suggestion list', () => {
 
 describe('Suggestion facts', () => {
   test('a reply suggestion shows who it waits on and its draft preview', () => {
-    const suggestion = Suggestion.from({} as MacroClient, {
+    const suggestion = Suggestion.from({} as RoxClient, {
       ...REPLY_SUGGESTION,
       kind: 'entity',
       action: 'reply',
@@ -200,13 +200,13 @@ describe('Suggestion facts', () => {
     expect(suggestion.waitingSince).toBe('2026-11-08T09:00:00Z');
     expect(suggestion.from).toBe('Ada Lovelace');
     expect(suggestion.draftPreview).toBe('Thanks, see you Monday');
-    expect(Suggestion.from({} as MacroClient, REPLY_SUGGESTION).from).toBe(
+    expect(Suggestion.from({} as RoxClient, REPLY_SUGGESTION).from).toBe(
       undefined,
     );
   });
 
   test('a settled suggestion names its result as a handle', () => {
-    const client = {} as MacroClient;
+    const client = {} as RoxClient;
     const done = Suggestion.from(client, {
       ...REPLY_SUGGESTION,
       state: 'done',
@@ -229,7 +229,7 @@ describe('Suggestion facts', () => {
           return { data: undefined };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     await Suggestion.from(client, REPLY_SUGGESTION).restore();
 

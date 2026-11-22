@@ -49,10 +49,10 @@ export function useGithubConnection() {
     try {
       await authorizeGithub(
         (callbackUrl) => initGithubLink.mutateAsync(callbackUrl),
-        'Failed to connect GitHub'
+        'Не удалось подключить GitHub'
       );
     } catch {
-      toast.failure('Failed to start GitHub connect flow');
+      toast.failure('Не удалось начать подключение GitHub');
     }
   };
 
@@ -60,7 +60,7 @@ export function useGithubConnection() {
     try {
       await deleteGithubLink.mutateAsync();
     } catch {
-      toast.failure('Failed to disconnect GitHub');
+      toast.failure('Не удалось отключить GitHub');
     }
   };
 
@@ -68,10 +68,10 @@ export function useGithubConnection() {
     try {
       await authorizeGithub(
         (callbackUrl) => reauthenticateGithub.mutateAsync(callbackUrl),
-        'Failed to reconnect GitHub'
+        'Не удалось переподключить GitHub'
       );
     } catch {
-      toast.failure('Failed to start GitHub reconnect flow');
+      toast.failure('Не удалось начать повторное подключение GitHub');
     }
   };
 
@@ -97,15 +97,15 @@ export function GitHubCard(props: { class?: string } = {}) {
   const github = useGithubConnection();
   const connectionLabel = () =>
     github.connectionState() === 'attention'
-      ? 'Reconnect required'
-      : 'Connected';
+      ? 'Нужно переподключить'
+      : 'Подключено';
 
   return (
     <SettingsCard class={props.class}>
       <IntegrationRow
         icon={<GithubIcon />}
         title="GitHub"
-        description="Review your pull requests in Rox, see live pull request status in docs and chats, and let agents work in your repositories."
+        description="В Rox видны ваши запросы на слияние и их актуальный статус в документах и чатах, а агенты могут работать в ваших репозиториях."
         status={
           <Show when={github.connectionState()}>
             {(state) => <StatusDot state={state()} label={connectionLabel()} />}
@@ -114,12 +114,12 @@ export function GitHubCard(props: { class?: string } = {}) {
       >
         <Show
           when={!github.loading()}
-          fallback={<span class="text-sm text-ink-muted">Loading…</span>}
+          fallback={<span class="text-sm text-ink-muted">Загрузка…</span>}
         >
           <Switch
             fallback={
               <ConnectAction
-                label="Connect"
+                label="Подключить"
                 onClick={() =>
                   fireAndForget(github.connect(), 'github-settings')
                 }
@@ -136,7 +136,7 @@ export function GitHubCard(props: { class?: string } = {}) {
                 )}
               </Show>
               <ConnectAction
-                label="Disconnect"
+                label="Отключить"
                 variant="danger"
                 onClick={() =>
                   fireAndForget(github.disconnect(), 'github-settings')
@@ -146,7 +146,7 @@ export function GitHubCard(props: { class?: string } = {}) {
             </Match>
             <Match when={github.status() === 'reauthentication_required'}>
               <ConnectAction
-                label="Reconnect"
+                label="Переподключить"
                 onClick={() =>
                   fireAndForget(github.reconnect(), 'github-settings')
                 }
@@ -162,7 +162,7 @@ export function GitHubCard(props: { class?: string } = {}) {
             rel="noopener noreferrer"
             class="inline-flex h-7 items-center gap-1.5 rounded-md px-2 text-sm font-medium text-ink-muted outline-none transition-colors hover:bg-ink/4 hover:text-ink focus-visible:bg-ink/6"
           >
-            Configure app
+            Настроить приложение
             <ArrowUpRightIcon class="size-3.5 opacity-70" />
           </a>
         </Show>

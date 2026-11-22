@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { AskMacroButton } from '@app/features/chat/ChatWithAgentButton';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
 import { CanvasDocument } from '@block-canvas/component/CanvasDocument';
@@ -33,12 +34,15 @@ function CanvasDetailContent(props: {
   const analytics = useAnalytics();
   const download = createFileDownload(() => ({
     id: `${props.data.documentMetadata.documentId}:${props.data.documentMetadata.documentVersionId}`,
-    name: documentDownloadName(props.data.documentMetadata, 'Unknown Filename'),
+    name: documentDownloadName(
+      props.data.documentMetadata,
+      t('drive.unknownFilename')
+    ),
     load: async () => {
       const blob = props.savedFile() ?? props.data.file;
       if (!blob)
         return err([
-          { code: 'NOT_READY', message: 'Canvas content is still loading.' },
+          { code: 'NOT_READY', message: t('drive.canvasLoading') },
         ]);
       analytics.track('download', { blockType: 'canvas' });
       return ok({ blob });
@@ -85,14 +89,15 @@ export function CanvasDetailDocument(props: {
       userAccessLevel={props.data.userAccessLevel}
     >
       <SidePanel.HeaderActions>
-        <HeaderActionGroup label="Actions">
+        <HeaderActionGroup label={t('drive.actions')}>
           <AskMacroButton
             grouped
             entity={{
               type: 'document',
               id: props.documentId,
               name:
-                props.data.documentMetadata.documentName ?? 'Unknown Filename',
+                props.data.documentMetadata.documentName ??
+                t('drive.unknownFilename'),
               fileType: 'canvas',
             }}
           />
@@ -126,7 +131,7 @@ export function CanvasDetail(props: {
     <FileDetailLoadGate
       documentId={props.documentId}
       entityType="canvas"
-      label="canvas"
+      label={t('drive.entityCanvas')}
       load={loadCanvasDocument}
     >
       {(data) => (

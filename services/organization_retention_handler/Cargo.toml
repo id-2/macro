@@ -7,12 +7,12 @@ version = "0.1.0"
 [dependencies]
 anyhow = { workspace = true }
 aws-sdk-sqs = { workspace = true }
-macro_aws_config = { path = "../../crates/macro_aws_config" }
+rox_aws_config = { path = "../../crates/rox_aws_config" }
 aws_lambda_events = { workspace = true, features = ["sqs"] }
 lambda_runtime = { workspace = true }
-macro_entrypoint = { path = "../../crates/macro_entrypoint" }
-macro_env_var = { path = "../../crates/macro_env_var" }
-macro_queues = { path = "../../crates/macro_queues" }
+rox_entrypoint = { path = "../../crates/rox_entrypoint" }
+rox_env_var = { path = "../../crates/rox_env_var" }
+rox_queues = { path = "../../crates/rox_queues" }
 sqlx = { workspace = true }
 sqs_client = { path = "../../crates/sqs_client" }
 tokio = { workspace = true }

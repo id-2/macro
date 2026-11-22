@@ -15,7 +15,7 @@ import { useIsAuthenticated } from '@core/auth';
 import { useUserId } from '@core/context/user';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isTauri } from '@core/util/platform';
-import { releaseNotificationCover } from '@macro/tauri/push-api';
+import { releaseNotificationCover } from '@rox/tauri/push-api';
 import { useMeetingMessageSync } from '@queries/messages/meeting-sync';
 import { ImperativeDialogHost } from '@ui';
 import { type JSX, onCleanup, onMount, type ParentProps, Show } from 'solid-js';

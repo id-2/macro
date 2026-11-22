@@ -15,11 +15,11 @@ import type {
   OutOfOfficeProperties,
   UpdateCalendarEventRequest,
 } from '../../../generated/calendar/types.gen';
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import type { Channel } from '../channels/channel';
 import { shareWithChannel } from '../channels/share';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import { Calendar } from './calendar';
 import { CalendarReplacement } from './replacement';
 
@@ -137,9 +137,9 @@ export interface RsvpEventOptions {
  * `calendar.createEvent`. A bare {@link CalendarEvent.byId} handle can drive
  * mutations, but reading a field on it throws.
  */
-export class CalendarEvent extends MacroEntity<CalendarEventRecord> {
+export class CalendarEvent extends RoxEntity<CalendarEventRecord> {
   protected async fetch(): Promise<CalendarEventRecord> {
-    throw new MacroError(
+    throw new RoxError(
       `calendar event ${this.id} has no fetch-by-id endpoint; read the record ` +
         `returned by calendar.createEvent / event.update / event.rsvp instead`,
     );
@@ -147,13 +147,13 @@ export class CalendarEvent extends MacroEntity<CalendarEventRecord> {
 
   /** A handle to a calendar event by id, for driving mutations. Reading a
    * field on it throws (there is no fetch-by-id endpoint). */
-  static byId(client: MacroClient, id: string): CalendarEvent {
+  static byId(client: RoxClient, id: string): CalendarEvent {
     return new CalendarEvent(client, id);
   }
 
   /** A handle seeded with a synced event record; reads resolve without a fetch. */
   static fromRecord(
-    client: MacroClient,
+    client: RoxClient,
     record: CalendarEventRecord,
   ): CalendarEvent {
     return new CalendarEvent(client, record.id, record);

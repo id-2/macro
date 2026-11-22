@@ -89,8 +89,8 @@ vi.mock('@app/components/drag-drop/create-distance-pointer-sensor', () => ({
     cancel: vi.fn(),
   }),
 }));
-vi.mock('@macro-inc/observability', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@macro-inc/observability')>()),
+vi.mock('@rox-one/observability', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@rox-one/observability')>()),
   Telemetry: {
     span: async (
       _name: string,

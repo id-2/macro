@@ -6,7 +6,7 @@ use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::{
     ProjectBodyAccessLevelExtractorV2, ThreadAccessLevelExtractor,
 };
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 use thiserror::Error;
 
@@ -85,7 +85,7 @@ where
     S: Send + Sync + 'static,
     T: EmailService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Router::new()
         .route(
@@ -116,7 +116,7 @@ where
 pub async fn update_thread_project_handler<
     T: EmailService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<EmailThreadRouterState<T, Svc, Auth>>,
     access: ThreadAccessLevelExtractor<EditAccessLevel, Svc, Auth>,

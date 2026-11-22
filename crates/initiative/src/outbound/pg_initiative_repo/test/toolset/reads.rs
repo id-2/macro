@@ -16,7 +16,7 @@ impl InitiativeResources for VisibleResources {
     }
     fn set_initial_properties(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: InitiativeId,
         _: Vec<crate::domain::models::InitialPropertyValue>,
     ) -> ResourceFuture<'_, ()> {

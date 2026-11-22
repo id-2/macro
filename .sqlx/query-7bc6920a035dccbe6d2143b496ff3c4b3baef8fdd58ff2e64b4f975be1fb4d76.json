@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_threads SET inbox_visible = false WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7bc6920a035dccbe6d2143b496ff3c4b3baef8fdd58ff2e64b4f975be1fb4d76"
+}

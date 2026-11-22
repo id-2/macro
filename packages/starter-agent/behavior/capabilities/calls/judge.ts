@@ -9,7 +9,7 @@
  * with no project and no tools, so the worst a message can do is get the
  * agent into a call in a channel it's already in. Unsure is no.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import { type Pending, pending, ruleOut, type World } from './arbiter.ts';
 import { after, elapsed } from './config.ts';

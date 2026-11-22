@@ -1,7 +1,7 @@
 //! Composition of saved-view storage with the Teams-owned membership reader.
 use crm::domain::companies_repo::CompaniesRepository;
 use crm::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use saved_views::{
     PgViewStorage,
     domain::{ChangeNotifier, MembershipPort, SavedViewService},
@@ -56,7 +56,7 @@ impl MembershipPort for Membership {
     }
 
     async fn viewer_teams(&self, viewer: &str) -> Result<Vec<Uuid>, Self::Err> {
-        let viewer = MacroUserIdStr::parse_from_str(viewer)
+        let viewer = RoxUserIdStr::parse_from_str(viewer)
             .map_err(|error| TeamError::BadRequest(error.to_string()))?;
         Ok(self
             .teams

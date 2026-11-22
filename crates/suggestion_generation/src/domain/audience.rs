@@ -5,8 +5,8 @@ use std::sync::Arc;
 
 use chrono::{DateTime, Utc};
 use chrono_tz::Tz;
-use macro_user_id::cowlike::CowLike as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike as _;
+use rox_user_id::user_id::RoxUserIdStr;
 use suggestions::domain::ports::SuggestionAudience;
 
 use super::night;
@@ -29,7 +29,7 @@ impl<Repo> PaidAudience<Repo> {
 impl<Repo: GenerationRepo> SuggestionAudience for PaidAudience<Repo> {
     async fn seen(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: &str,
         now: DateTime<Utc>,
     ) -> Result<(), rootcause::Report> {

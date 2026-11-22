@@ -1,9 +1,9 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 
 use crate::domain::models::{
-    GithubAppInstallationSource, GithubKey, MacroTaskId, ResolvedTeamTaskReference,
+    GithubAppInstallationSource, GithubKey, RoxTaskId, ResolvedTeamTaskReference,
     TeamTaskReference,
 };
 use crate::domain::ports::GithubSyncRepo;
@@ -63,8 +63,8 @@ async fn test_upsert_task_ids_inserts_new(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("org", "repo", 10);
     let tasks = vec![
-        MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
-        MacroTaskId::from_short_uuid("2ZbZ7wJQfEMWyBSycKYTYr").unwrap(),
+        RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
+        RoxTaskId::from_short_uuid("2ZbZ7wJQfEMWyBSycKYTYr").unwrap(),
     ];
 
     repo.upsert_task_ids(key.clone(), &tasks).await.unwrap();
@@ -82,8 +82,8 @@ async fn test_upsert_task_ids_ignores_duplicates(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("my-org", "my-repo", 1);
     let tasks = vec![
-        MacroTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(), // already exists
-        MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
+        RoxTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(), // already exists
+        RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
     ];
 
     repo.upsert_task_ids(key.clone(), &tasks).await.unwrap();
@@ -102,8 +102,8 @@ async fn test_upsert_task_ids_records_owning_team(pool: Pool<Postgres>) {
     // 0d0dc589-f301-43f1-8b11-4ab448ca4bb4 is team task ENG-123 of team
     // dddddddd-...; the second task id has no team_task row.
     let team_task =
-        MacroTaskId::from_uuid(&Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap());
-    let teamless_task = MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap();
+        RoxTaskId::from_uuid(&Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap());
+    let teamless_task = RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap();
 
     let key = GithubKey::new("org", "repo", 10);
     repo.upsert_task_ids(key.clone(), &[team_task.clone(), teamless_task.clone()])
@@ -138,13 +138,13 @@ async fn test_upsert_task_ids_backfills_team_on_existing_rows(pool: Pool<Postgre
     let repo = PgGithubSyncRepo::new(pool.clone());
 
     let team_task =
-        MacroTaskId::from_uuid(&Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap());
+        RoxTaskId::from_uuid(&Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap());
     let key = GithubKey::new("org", "repo", 10);
 
     // Simulate a legacy row written before team_id existed.
     sqlx::query!(
         r#"INSERT INTO github_pr_tasks (id, github_key, task_id) VALUES ($1, $2, $3)"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         key.as_ref(),
         &team_task.short_uuid
     )
@@ -196,9 +196,9 @@ async fn test_filter_duplicate_tasks_removes_existing(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("my-org", "my-repo", 1);
     let candidates = vec![
-        MacroTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(), // exists
-        MacroTaskId::from_short_uuid("bMv3eymKvu18qsQyrpt1VH").unwrap(), // exists
-        MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
+        RoxTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(), // exists
+        RoxTaskId::from_short_uuid("bMv3eymKvu18qsQyrpt1VH").unwrap(), // exists
+        RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
     ];
 
     let new_only = repo.filter_duplicate_tasks(key, &candidates).await.unwrap();
@@ -216,8 +216,8 @@ async fn test_filter_duplicate_tasks_all_new(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("my-org", "my-repo", 1);
     let candidates = vec![
-        MacroTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
-        MacroTaskId::from_short_uuid("2ZbZ7wJQfEMWyBSycKYTYr").unwrap(),
+        RoxTaskId::from_short_uuid("xoyQ8nrV6PNZFmpsWYMdyC").unwrap(),
+        RoxTaskId::from_short_uuid("2ZbZ7wJQfEMWyBSycKYTYr").unwrap(),
     ];
 
     let new_only = repo.filter_duplicate_tasks(key, &candidates).await.unwrap();
@@ -234,8 +234,8 @@ async fn test_filter_duplicate_tasks_all_existing(pool: Pool<Postgres>) {
 
     let key = GithubKey::new("my-org", "my-repo", 1);
     let candidates = vec![
-        MacroTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(),
-        MacroTaskId::from_short_uuid("bMv3eymKvu18qsQyrpt1VH").unwrap(),
+        RoxTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap(),
+        RoxTaskId::from_short_uuid("bMv3eymKvu18qsQyrpt1VH").unwrap(),
     ];
 
     let new_only = repo.filter_duplicate_tasks(key, &candidates).await.unwrap();
@@ -277,14 +277,14 @@ async fn test_resolve_team_task_references(pool: Pool<Postgres>) {
     let expected_known = ResolvedTeamTaskReference {
         reference: TeamTaskReference::new("eng", 123).unwrap(),
         team_id: Uuid::parse_str("dddddddd-dddd-dddd-dddd-dddddddddddd").unwrap(),
-        task_id: MacroTaskId::from_uuid(
+        task_id: RoxTaskId::from_uuid(
             &Uuid::parse_str("0d0dc589-f301-43f1-8b11-4ab448ca4bb4").unwrap(),
         ),
     };
     let expected_platform = ResolvedTeamTaskReference {
         reference: TeamTaskReference::new("platform_api", 7).unwrap(),
         team_id: Uuid::parse_str("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee").unwrap(),
-        task_id: MacroTaskId::from_uuid(
+        task_id: RoxTaskId::from_uuid(
             &Uuid::parse_str("11111111-1111-1111-1111-111111111111").unwrap(),
         ),
     };
@@ -404,7 +404,7 @@ async fn test_filter_duplicate_tasks_different_key_not_filtered(pool: Pool<Postg
 
     // s61dee.. exists for my-org/my-repo/pull/1, but not for this key
     let key = GithubKey::new("my-org", "other-repo", 42);
-    let candidates = vec![MacroTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap()];
+    let candidates = vec![RoxTaskId::from_short_uuid("s61deeZUHehUjkNT8rxB3S").unwrap()];
 
     let new_only = repo.filter_duplicate_tasks(key, &candidates).await.unwrap();
 

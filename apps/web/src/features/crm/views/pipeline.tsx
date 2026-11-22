@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ViewSidebar } from '@app/components/view-shell';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
 import { InlineTitleEditor } from '@core/component/InlineTitleEditor';
@@ -67,7 +68,7 @@ export function PipelineView(props: {
   const exportCsv = async () => {
     setError('');
     if ((await exporter?.run()) === 'failed')
-      setError('Could not export this pipeline. Please try again.');
+      setError(t('crm.couldNotExportPipeline'));
   };
   async function save(action: () => Promise<void>) {
     if (pending()) return false;
@@ -77,7 +78,7 @@ export function PipelineView(props: {
       await action();
       return true;
     } catch {
-      setError('Could not save this change. Please try again.');
+      setError(t('crm.couldNotSaveChange'));
       return false;
     } finally {
       setPending(false);
@@ -125,8 +126,8 @@ export function PipelineView(props: {
             <span ref={title} class="flex min-w-0 px-1">
               <InlineTitleEditor
                 value={props.pipeline.name}
-                placeholder="Untitled pipeline"
-                ariaLabel="Pipeline name"
+                placeholder={t('crm.untitledPipeline')}
+                ariaLabel={t('crm.pipelineName')}
                 class="text-sm"
                 onRename={(name) =>
                   fireAndForget(
@@ -162,19 +163,19 @@ export function PipelineView(props: {
                       onSelect={() => fireAndForget(exportCsv(), 'crm')}
                     >
                       <DownloadIcon class="size-4" />
-                      Export CSV
+                      {t('crm.exportCsv')}
                     </Dropdown.Item>
                     <Show when={canEdit() && tracked()}>
                       <Dropdown.Item onSelect={() => setImporting(true)}>
                         <UploadIcon class="size-4" />
-                        Import CSV
+                        {t('crm.importCsv')}
                       </Dropdown.Item>
                     </Show>
                   </Show>
                   <Show when={isOwner()}>
                     <Dropdown.Item onSelect={() => setDeleting(true)}>
                       <TrashIcon class="size-4" />
-                      Trash pipeline
+                      {t('crm.trashPipeline')}
                     </Dropdown.Item>
                   </Show>
                 </Dropdown.Group>
@@ -182,7 +183,7 @@ export function PipelineView(props: {
             </Dropdown>
           </Show>
           <div class="ml-auto flex shrink-0 items-center gap-2">
-            <HeaderActionGroup label="Sharing">
+            <HeaderActionGroup label={t('crm.sharing')}>
               <props.Sharing
                 pipeline={props.pipeline}
                 onCopyLink={props.onCopyLink}
@@ -203,7 +204,7 @@ export function PipelineView(props: {
           <Show when={isTouchDevice()}>
             <Button
               aria-label="Pipeline actions"
-              tooltip="Pipeline actions"
+              tooltip={t('crm.pipelineActions')}
               variant="ghost"
               size="icon-md"
               onClick={openActions}
@@ -276,7 +277,7 @@ export function PipelineView(props: {
                 onClick={() => fireAndForget(exportCsv(), 'crm')}
               >
                 <DownloadIcon class="size-4" />
-                Export CSV
+                {t('crm.exportCsv')}
               </Button>
               <Show when={canEdit() && tracked()}>
                 <Button
@@ -288,12 +289,12 @@ export function PipelineView(props: {
                   }}
                 >
                   <UploadIcon class="size-4" />
-                  Import CSV
+                  {t('crm.importCsv')}
                 </Button>
               </Show>
             </Show>
             <div class="flex items-center justify-between gap-3">
-              <span class="text-sm">Sharing</span>
+              <span class="text-sm">{t('crm.sharing')}</span>
               <props.Sharing
                 pipeline={props.pipeline}
                 onCopyLink={props.onCopyLink}
@@ -309,7 +310,7 @@ export function PipelineView(props: {
                 }}
               >
                 <TrashIcon class="size-4" />
-                Trash pipeline
+                {t('crm.trashPipeline')}
               </Button>
             </Show>
             <Show when={error()}>
@@ -324,7 +325,7 @@ export function PipelineView(props: {
               disabled={pending()}
               onClick={() => setActionsOpen(false)}
             >
-              Done
+              {t('crm.done')}
             </Button>
           </ActionDialogShell.Footer>
         </ActionDialogShell>
@@ -346,13 +347,13 @@ export function PipelineView(props: {
         open={deleting()}
         onOpenChange={setDeleting}
         pending={pending()}
-        title="Trash pipeline?"
+        title={t('crm.trashPipelineTitle')}
         body={
           <p>
-            The pipeline and its entries will move to trash.
+            {t('crm.trashPipelineBody')}
             <Show when={tracked()}>
               {' '}
-              The companies and contacts remain in your CRM.
+              {t('crm.trashPipelineKeepsRecords')}
             </Show>
           </p>
         }

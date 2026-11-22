@@ -54,7 +54,7 @@ const telemetry = vi.hoisted(() => {
   };
 });
 
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { span: telemetry.span },
 }));
 

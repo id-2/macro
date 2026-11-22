@@ -45,7 +45,7 @@ pub struct UserInfo {
 }
 
 #[derive(Clone, serde::Serialize, serde::Deserialize, Eq, PartialEq, Debug)]
-pub struct UserInfoWithMacroUserId {
+pub struct UserInfoWithRoxUserId {
     pub id: String,
     pub email: String,
     pub organization_id: Option<i32>,

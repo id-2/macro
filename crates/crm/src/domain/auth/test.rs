@@ -92,10 +92,10 @@ fn team_receipt_from_team_receipt_validates_type_and_id() {
 #[test]
 fn team_receipt_hidden_gate_derives_from_team_role() {
     use entity_access::domain::models::{Entity, EntityPermission, MemberTeamRole, TeamRole};
-    use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+    use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 
     let team = team_uuid();
-    let user = MacroUserIdStr::parse_from_str("macro|user@example.com")
+    let user = RoxUserIdStr::parse_from_str("macro|user@example.com")
         .unwrap()
         .into_owned();
     let receipt_with_role = |role: TeamRole| {
@@ -123,7 +123,7 @@ async fn acting_user_bots_follow_current_member_access_without_changing_team_bot
     use entity_access::domain::models::{
         BotId, BotReceiptScope, Entity, EntityPermission, MemberTeamRole,
     };
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_user_id::user_id::RoxUserIdStr;
     use std::sync::atomic::{AtomicU8, AtomicUsize, Ordering};
 
     struct Membership {
@@ -164,7 +164,7 @@ async fn acting_user_bots_follow_current_member_access_without_changing_team_bot
         .unwrap()
     };
     let actor = receipt(BotReceiptScope::User {
-        acting_user: MacroUserIdStr::parse_from_str("macro|user@example.com").unwrap(),
+        acting_user: RoxUserIdStr::parse_from_str("macro|user@example.com").unwrap(),
     });
     for state in [1, 0, 1] {
         membership.state.store(state, Ordering::Relaxed);

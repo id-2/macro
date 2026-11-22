@@ -3,7 +3,7 @@
 use std::{collections::BTreeMap, fmt, str::FromStr};
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use uuid::Uuid;
@@ -871,7 +871,7 @@ pub struct ClaimedConversation {
     /// Owning team for source-scoped dedupe and authorization.
     pub team_id: TeamId,
     /// Original requesting admin; revalidated before claim/reclaim.
-    pub requested_by: MacroUserIdStr<'static>,
+    pub requested_by: RoxUserIdStr<'static>,
     /// Full selected source metadata.
     pub metadata: ConversationMetadata,
     /// Verified users payload, required even for shape-only imports.
@@ -921,7 +921,7 @@ pub struct SourceMessageId {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum HistoricalSender {
     /// Raw lowercase-email identity, without roster lookup.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
     /// Fallback for unknown authors, accompanied by `imported_author`.
     SystemBot,
 }
@@ -948,7 +948,7 @@ pub struct HistoricalMessage {
     pub content: String,
     /// Only user identities emitted by conversion outside code; never rediscover
     /// these by parsing the serialized body.
-    pub user_mentions: Vec<MacroUserIdStr<'static>>,
+    pub user_mentions: Vec<RoxUserIdStr<'static>>,
     /// Typed occurrences against the safe initial content, never speculative IDs.
     pub body_references: Vec<super::slack::references::ReferenceIntent>,
     /// Deterministic source ordering for equal-time historical display.
@@ -961,7 +961,7 @@ pub struct HistoricalMessage {
 #[derive(Debug, Clone, Serialize)]
 pub struct HistoricalReaction {
     /// Raw lowercase email mapped to a Rox identity.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Supported Unicode reaction, after shortcode conversion.
     pub emoji: String,
     /// Original reaction time or its source-message fallback.

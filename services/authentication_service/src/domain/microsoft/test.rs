@@ -10,8 +10,8 @@ type Service = MicrosoftAuthService<
 
 fn attempt() -> LinkAttempt {
     LinkAttempt {
-        id: macro_uuid::generate_uuid_v7(),
-        owner: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
+        owner: rox_uuid::generate_uuid_v7(),
         identity_provider_id: "microsoft".into(),
         redirect_uri: "https://auth.example.com/callback".into(),
         return_uri: Some("https://app.example.com".into()),
@@ -146,7 +146,7 @@ async fn lost_rotation_fence_never_returns_or_caches_the_access_token() {
                 "Mail.ReadWrite".into(),
                 "Mail.Send".into(),
             ],
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             generation: 1,
             revision: 0,
             owner: "owner".into(),
@@ -181,7 +181,7 @@ async fn lost_rotation_fence_never_returns_or_caches_the_access_token() {
     let service = Service::new(repo, provider, Arc::new(cipher));
     assert!(matches!(
         service
-            .access_token(macro_uuid::generate_uuid_v7(), 1, 1, false)
+            .access_token(rox_uuid::generate_uuid_v7(), 1, 1, false)
             .await,
         Err(MicrosoftAuthError::Busy)
     ));
@@ -190,7 +190,7 @@ async fn lost_rotation_fence_never_returns_or_caches_the_access_token() {
 
 #[tokio::test]
 async fn revoked_grants_are_checked_before_cache_hits() {
-    let grant_id = macro_uuid::generate_uuid_v7();
+    let grant_id = rox_uuid::generate_uuid_v7();
     let mut repo = MockMicrosoftGrantRepository::new();
     repo.expect_active_grant()
         .once()
@@ -210,7 +210,7 @@ async fn revoked_grants_are_checked_before_cache_hits() {
     );
     assert!(matches!(
         service
-            .access_token(macro_uuid::generate_uuid_v7(), 1, 1, false)
+            .access_token(rox_uuid::generate_uuid_v7(), 1, 1, false)
             .await,
         Err(MicrosoftAuthError::ReauthorizationRequired)
     ));
@@ -264,7 +264,7 @@ async fn free_account_at_mixed_provider_limit_cannot_start_a_new_connection() {
         service
             .start_link(
                 Uuid::now_v7(),
-                &MacroUserIdStr::parse_from_str("macro|person@example.com").unwrap(),
+                &RoxUserIdStr::parse_from_str("macro|person@example.com").unwrap(),
                 "https://macro.test/callback".into(),
                 None,
                 false,
@@ -277,7 +277,7 @@ async fn free_account_at_mixed_provider_limit_cannot_start_a_new_connection() {
 
 #[tokio::test]
 async fn new_connections_need_the_switch_and_the_users_flag() {
-    let user = MacroUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
     let cases = [
         // (switch, flags configured, the user's flag load, admitted)
         (
@@ -332,7 +332,7 @@ async fn new_connections_need_the_switch_and_the_users_flag() {
 
 #[tokio::test]
 async fn flagged_off_user_cannot_start_a_new_connection() {
-    let user = MacroUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
     for load in [
         Ok(FlagSnapshot::new([(
             OUTLOOK_FLAG.into(),
@@ -375,7 +375,7 @@ async fn flagged_off_user_cannot_start_a_new_connection() {
 
 #[tokio::test]
 async fn flagged_on_user_starts_a_new_connection() {
-    let user = MacroUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
     let mut repo = MockMicrosoftGrantRepository::new();
     repo.expect_connection_facts().once().returning(|_, _| {
         Ok(email::domain::inbox_entitlement::InboxConnectionFacts {
@@ -423,7 +423,7 @@ async fn flagged_on_user_starts_a_new_connection() {
 
 #[tokio::test]
 async fn reconnecting_an_inbox_never_depends_on_the_flag_or_the_switch() {
-    let user = MacroUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|person@example.com".to_string()).unwrap();
     let reconnect = Uuid::now_v7();
     for load in [
         Ok(FlagSnapshot::new([(
@@ -476,7 +476,7 @@ async fn reconnecting_an_inbox_never_depends_on_the_flag_or_the_switch() {
 
 #[tokio::test]
 async fn tokens_report_whether_the_cache_served_them() {
-    let grant_id = macro_uuid::generate_uuid_v7();
+    let grant_id = rox_uuid::generate_uuid_v7();
     let mut repo = MockMicrosoftGrantRepository::new();
     repo.expect_active_grant()
         .times(2)
@@ -512,7 +512,7 @@ async fn tokens_report_whether_the_cache_served_them() {
         .once()
         .returning(|_, _, _| Ok(MicrosoftRefreshToken::new("refresh".into())));
     let service = Service::new(repo, provider, Arc::new(cipher));
-    let link = macro_uuid::generate_uuid_v7();
+    let link = rox_uuid::generate_uuid_v7();
 
     let refreshed = service.access_token(link, 1, 1, false).await.unwrap();
     let cached = service.access_token(link, 1, 1, false).await.unwrap();

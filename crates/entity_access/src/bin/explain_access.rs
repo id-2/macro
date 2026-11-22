@@ -4,8 +4,8 @@ use entity_access::{
     domain::{explain::ExplainAccessServiceImpl, models::EntityType, ports::ExplainAccessService},
     outbound::PgExplainAccessRepository,
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_entrypoint::RoxEntrypoint;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::postgres::PgPoolOptions;
 use std::str::FromStr;
 
@@ -46,10 +46,10 @@ fn parse_cli_entity_type(value: &str) -> Result<EntityType, String> {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
     let args = Args::parse();
-    let user = MacroUserIdStr::try_from(args.user)?;
+    let user = RoxUserIdStr::try_from(args.user)?;
     let database_url = DatabaseUrl::new()?;
     let pool = PgPoolOptions::new()
         .min_connections(1)

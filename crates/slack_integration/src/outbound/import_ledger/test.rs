@@ -1,6 +1,6 @@
 use super::*;
 use import::domain::ports::{ImportError as LedgerError, Result as LedgerResult};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 struct Canonical {
     binding: Option<ledger::ImportSourceBinding>,
@@ -46,7 +46,7 @@ impl CanonicalImportRepo for Canonical {
     }
     async fn reserve_target(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         key: &ledger::ImportTargetKey,
         kind: ledger::ImportTargetKind,
         existing: Option<Uuid>,
@@ -115,7 +115,7 @@ async fn translates_binding_without_exposing_ledger_internals() {
 
 #[tokio::test]
 async fn reservation_passes_requester_explicit_team_and_authorized_target_for_every_kind() {
-    let requester = MacroUserIdStr::parse_from_str("macro|admin@example.com")
+    let requester = RoxUserIdStr::parse_from_str("macro|admin@example.com")
         .unwrap()
         .into_owned();
     for (source_kind, kind) in [
@@ -173,7 +173,7 @@ fn unexpected_ai_admission_error_fails_closed() {
 
 #[tokio::test]
 async fn ambiguous_mapping_fails_closed_without_target_disclosure() {
-    let requester = MacroUserIdStr::parse_from_str("macro|admin@example.com")
+    let requester = RoxUserIdStr::parse_from_str("macro|admin@example.com")
         .unwrap()
         .into_owned();
     let adapter = CanonicalImportLedger::new(Canonical {

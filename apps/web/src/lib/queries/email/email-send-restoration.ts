@@ -3,6 +3,7 @@ import type {
   LocalDraftAttachment,
 } from '@app/features/email-compose/core/local-draft';
 import type { DraftStorageSession } from './local-draft-store';
+import { readBodyRox, readRestoreBodyRox } from './body-rox-compat';
 import { type EmailSendIntent, isEmailSendIntent } from './send-intent';
 
 export type RestoredEmailSend = { draft: LocalDraft; intent: EmailSendIntent };
@@ -133,7 +134,8 @@ export function restoreEmailSendTransaction(
                 include_signature: input.includeSignature,
                 body_html: input.restoreBodyHtml ?? frozen.bodyHtml,
                 body_text: input.restoreBodyText ?? frozen.bodyText,
-                body_macro: input.restoreBodyMacro ?? frozen.bodyMacro,
+                body_rox:
+                  readRestoreBodyRox(input) ?? readBodyRox(frozen),
               },
               attachments: restoreAttachments(intent),
             };

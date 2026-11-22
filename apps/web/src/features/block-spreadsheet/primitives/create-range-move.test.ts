@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { initSync } from '@ironcalc/wasm';
-import { moveWorkbookRange } from '@macro-inc/spreadsheet/workbook-structure';
+import { moveWorkbookRange } from '@rox-one/spreadsheet/workbook-structure';
 import { LoroDoc } from 'loro-crdt';
 import { createRoot } from 'solid-js';
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';

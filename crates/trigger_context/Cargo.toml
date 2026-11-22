@@ -9,12 +9,12 @@ version = "0.1.0"
 # session control API can carry it without the producers' dependencies.
 [features]
 # OpenAPI schema for the origin a session reports through its API.
-schema = ["bot_id/schema", "dep:utoipa", "macro_user_id/schema"]
+schema = ["bot_id/schema", "dep:utoipa", "rox_user_id/schema"]
 
 [dependencies]
 bot_id = { path = "../bot_id" }
 chrono = { workspace = true, features = ["serde"] }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 serde = { workspace = true }
 serde_json = { workspace = true }
 utoipa = { workspace = true, optional = true }

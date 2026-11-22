@@ -1,6 +1,6 @@
 import type { PresentView } from '../../../generated/agent-harness/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { AgentSession } from './agent-session';
 import type { CodeExecution } from './code-execution';
 
@@ -12,7 +12,7 @@ export type SessionView = PresentView['view'];
  * checked and drawn at once; one that does not match throws with what to fix.
  */
 export async function presentView(
-  client: MacroClient,
+  client: RoxClient,
   session: AgentSession,
   view: SessionView,
   execution?: CodeExecution,

@@ -5,7 +5,7 @@ use std::sync::Arc;
 use agent::structured_output::{DynamicSchema, dynamic_structured_completion};
 use agent::{Message, PredefinedModel};
 use agent_session::domain::model::AgentSession;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde::Deserialize;
 use serde_json::json;
 
@@ -48,7 +48,7 @@ impl RepositoryChoiceModel for HaikuRepositoryChooser {
     )]
     async fn decide(
         &self,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
         prompt: &str,
         candidates: &[String],
         recent: &[AgentSession],

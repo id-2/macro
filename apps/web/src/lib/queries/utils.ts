@@ -1,4 +1,4 @@
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 import type { MutationOptions } from '@tanstack/solid-query';
 
 /**

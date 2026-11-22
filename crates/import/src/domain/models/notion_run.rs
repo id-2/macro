@@ -3,7 +3,7 @@
 
 use agent_session::domain::model::AgentSessionId;
 use import_notion::domain::model::{ImportScope, NotionId};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{NotionSharing, RunStatus};
@@ -35,7 +35,7 @@ pub enum NotionJob {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AdoptedRun {
     /// Whose import it is.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// `running` (planning) or `importing` (writing).
     pub status: RunStatus,
     /// The job to resume; `None` when its process stopped before recording it.

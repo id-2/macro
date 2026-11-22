@@ -5,7 +5,7 @@ use crate::outbound::pg_billing_repo::PgBillingRepo;
 use ai_usage::AiFeature;
 use ai_usage::domain::ports::InvocationFunding;
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const DOLLAR: u64 = 1_000_000_000_000;
 
@@ -380,8 +380,8 @@ async fn delayed_renewal_does_not_convert_a_legacy_period_already_in_use(pool: P
     );
 }
 
-fn user(name: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap()
+fn user(name: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{name}@example.com")).unwrap()
 }
 
 fn period() -> FundingPeriod {
@@ -873,7 +873,7 @@ async fn historical_v1_charges_are_not_legacy_coverage(pool: PgPool) {
     sqlx::query!(
         "INSERT INTO ai_overage_charge (id, user_id, period_start, amount_cents, status, accounting_policy)
          VALUES ($1, $2, $3, 105, 'paid', 'public_allowance_v1')",
-        macro_uuid::generate_uuid_v7(), payer.as_ref(), period().period.start,
+        rox_uuid::generate_uuid_v7(), payer.as_ref(), period().period.start,
     ).execute(&pool).await.unwrap();
     let ledger = billing
         .period_ledger(&user("payer"), period().period.start)
@@ -1174,7 +1174,7 @@ async fn free_to_pro_upgrade_preserves_the_new_public_funding_policy(pool: PgPoo
 trait UpgradeFixture {
     async fn reset_usage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         start: chrono::DateTime<Utc>,
         at: chrono::DateTime<Utc>,
         previous: Option<i64>,
@@ -1184,7 +1184,7 @@ trait UpgradeFixture {
 impl UpgradeFixture for crate::outbound::PgBillingRepo {
     async fn reset_usage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         start: chrono::DateTime<Utc>,
         at: chrono::DateTime<Utc>,
         previous: Option<i64>,

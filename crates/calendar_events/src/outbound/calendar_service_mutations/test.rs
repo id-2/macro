@@ -320,14 +320,14 @@ fn create_body_asks_for_a_macro_call_only_when_requested() {
 
 #[test]
 fn macro_call_failures_round_trip_to_the_meeting_link_error() {
-    let api_error = CalendarMutationApiError::from(MacroCallEventError::MeetingLink(
+    let api_error = CalendarMutationApiError::from(RoxCallEventError::MeetingLink(
         MeetingLinkError::Failed("down".to_string()),
     ));
     let body = serde_json::to_string(&api_error).unwrap();
     let parsed = macro_call_error_from_response(StatusCode::SERVICE_UNAVAILABLE, Some(body));
     assert!(matches!(
         parsed,
-        MacroCallEventError::MeetingLink(MeetingLinkError::Failed(_))
+        RoxCallEventError::MeetingLink(MeetingLinkError::Failed(_))
     ));
 
     let api_error = CalendarMutationApiError::from(CalendarMutationError::NoWritableCalendar);
@@ -335,12 +335,12 @@ fn macro_call_failures_round_trip_to_the_meeting_link_error() {
     let parsed = macro_call_error_from_response(StatusCode::CONFLICT, Some(body));
     assert!(matches!(
         parsed,
-        MacroCallEventError::Calendar(CalendarMutationError::NoWritableCalendar)
+        RoxCallEventError::Calendar(CalendarMutationError::NoWritableCalendar)
     ));
 
     let parsed = macro_call_error_from_response(StatusCode::SERVICE_UNAVAILABLE, None);
     assert!(matches!(
         parsed,
-        MacroCallEventError::Calendar(CalendarMutationError::Retryable(_))
+        RoxCallEventError::Calendar(CalendarMutationError::Retryable(_))
     ));
 }

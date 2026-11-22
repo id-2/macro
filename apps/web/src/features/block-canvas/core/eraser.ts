@@ -12,7 +12,7 @@ import {
   transformPoint,
   worldBounds,
   worldMatrix,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 
 /** Sample the entire swept path, including fast moves between pointer events. */
 export function eraserHits(

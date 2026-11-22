@@ -1,7 +1,7 @@
 use crate::cognition::api::context::DcsAuthorizationService;
 use axum::{extract, response::IntoResponse};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_env_var::maybe_env_vars;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_env_var::maybe_env_vars;
 
 #[cfg(test)]
 mod test;
@@ -15,7 +15,7 @@ maybe_env_vars! {
 /// A non-streaming proxy to the chatgpt api
 #[tracing::instrument(err(Debug), skip(_user, body))]
 pub async fn handler(
-    _user: MacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
+    _user: RoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternal>,
     extract::Json(mut body): extract::Json<serde_json::Value>,
 ) -> impl IntoResponse {
     if let Some(obj) = body.as_object_mut() {

@@ -3,7 +3,7 @@
 use agent_runtime_protocol::domain::action::AgentActionId;
 use agent_session::domain::{error::Result, model::AgentSessionId};
 use bot_id::BotId;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use sqlx::PgPool;
 
 #[cfg(test)]

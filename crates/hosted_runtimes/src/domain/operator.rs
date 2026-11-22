@@ -673,9 +673,9 @@ where
     pub async fn macrod_connected(
         &self,
         harness_id: HarnessId,
-    ) -> Result<MacrodConnected, ComputerError> {
+    ) -> Result<RoxdConnected, ComputerError> {
         let Some(computer_id) = self.computer_of(harness_id).await? else {
-            return Ok(MacrodConnected::NotAComputer);
+            return Ok(RoxdConnected::NotAComputer);
         };
         let computer = self.computer(computer_id).await?;
         use tracing::Instrument;
@@ -690,7 +690,7 @@ where
         &self,
         harness_id: HarnessId,
         computer: Computer,
-    ) -> Result<MacrodConnected, ComputerError> {
+    ) -> Result<RoxdConnected, ComputerError> {
         let now = self.clock.now();
         self.repo
             .set_harness(computer.id, harness_id)
@@ -704,7 +704,7 @@ where
             .apply(computer.id, Event::RoxdConnected, now)
             .await
             .map_err(internal)?;
-        let mut connected = MacrodConnected::Computer;
+        let mut connected = RoxdConnected::Computer;
         if computer.enrolled_at.is_none() {
             super::telemetry::provisioned(
                 (now - computer.created_at).num_milliseconds() as f64 / 1000.0,
@@ -715,7 +715,7 @@ where
                 .create_default_agent_unless_teammate(&computer, harness_id)
                 .await
             {
-                connected = MacrodConnected::AgentBound;
+                connected = RoxdConnected::AgentBound;
             }
         }
         // The pairing is claimed, so the code is useless; remove it anyway.
@@ -803,7 +803,7 @@ where
 
 /// What macrod connecting on a harness did.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum MacrodConnected {
+pub enum RoxdConnected {
     /// The harness is not a computer's.
     NotAComputer,
     /// A computer's macrod connected; the agents bound to it are unchanged.
@@ -812,7 +812,7 @@ pub enum MacrodConnected {
     AgentBound,
 }
 
-impl MacrodConnected {
+impl RoxdConnected {
     /// Whether the harness is a computer's.
     #[must_use]
     pub fn is_computer(self) -> bool {

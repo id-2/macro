@@ -20,7 +20,7 @@ const telemetry = vi.hoisted(() => ({
   }[],
 }));
 vi.mock('@core/util/hash', () => ({ contentHash: telemetry.hash }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     anonymousSpan: (name: string) => {
       const completed = Promise.withResolvers<void>();

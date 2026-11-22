@@ -18,7 +18,7 @@ use crate::domain::{
     meeting_links::first_macro_call_url,
     models::{AttendeeResponseStatus, CalendarEventPatch, ConferenceChange, GuestPolicy},
     ports::{
-        CalendarMacroCallService, CalendarMutationService, CalendarOccurrenceService,
+        CalendarRoxCallService, CalendarMutationService, CalendarOccurrenceService,
         CalendarRsvpScope, CalendarUpdateScope, MeetingLinkProvider,
     },
 };
@@ -298,7 +298,7 @@ impl ToolAnnotated for UpdateCalendarEvent {
 #[async_trait]
 impl<M, O, L> AsyncTool<CalendarToolContext<M, O, L>> for UpdateCalendarEvent
 where
-    M: CalendarMutationService + CalendarMacroCallService,
+    M: CalendarMutationService + CalendarRoxCallService,
     O: CalendarOccurrenceService,
     L: MeetingLinkProvider,
 {

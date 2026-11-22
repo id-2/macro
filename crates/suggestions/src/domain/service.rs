@@ -13,8 +13,8 @@ use std::sync::Arc;
 use chrono::Utc;
 use feature_flags::FeatureFlags;
 use futures::StreamExt as _;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use model_owner::CreationPrincipal;
 
@@ -176,7 +176,7 @@ where
     /// a write never fails for it.
     async fn waiting_on(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         about: &[Target],
         known: Option<Waiting>,
     ) -> Option<Waiting> {
@@ -201,7 +201,7 @@ where
     /// each card still has its title and summary. How many are left without.
     async fn attach_routine_texts(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         timezone: chrono_tz::Tz,
         suggestions: impl IntoIterator<Item = &mut Suggestion>,
     ) -> usize {
@@ -241,7 +241,7 @@ where
     /// says the caller saw it; when it changed, the suggestion as it is now.
     async fn move_as_shown(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         suggestion: &Suggestion,
         from: &[SuggestionState],
         to: SuggestionState,
@@ -281,7 +281,7 @@ where
     #[tracing::instrument(name = "suggestions.flag", err, skip_all, fields(
         suggestions.flag.cached = tracing::field::Empty,
     ))]
-    async fn require_flag(&self, user: &MacroUserIdStr<'_>) -> Result<(), SuggestionError> {
+    async fn require_flag(&self, user: &RoxUserIdStr<'_>) -> Result<(), SuggestionError> {
         let Some(flags) = &self.flags else {
             return Err(SuggestionError::NotFound);
         };
@@ -381,7 +381,7 @@ where
     /// Items in `targets` the person can't open, as problems.
     async fn inaccessible(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         targets: &[Target],
         problems: &mut Vec<String>,
     ) -> Result<(), SuggestionError> {
@@ -421,7 +421,7 @@ where
     /// Whether the person can open every item `suggestion` is about.
     async fn viewable(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         suggestion: &Suggestion,
     ) -> Result<bool, SuggestionError> {
         for target in &suggestion.about {
@@ -440,7 +440,7 @@ where
     /// Those of `ordered` the person can open every item of, in order. A
     /// suggestion whose items can't be checked is left out and logged: one
     /// failing check never fails the feed.
-    async fn viewable_all(&self, user: &MacroUserIdStr<'_>, ordered: Vec<Suggestion>) -> Viewable {
+    async fn viewable_all(&self, user: &RoxUserIdStr<'_>, ordered: Vec<Suggestion>) -> Viewable {
         let mut viewable = Viewable::default();
         // Up to 30 open suggestions, and those done in a day, of up to 5 items
         // each: check a few at a time, in order. Every one is checked, since
@@ -470,7 +470,7 @@ where
 
     /// Count the person in for nightly generations, in `timezone`: at most once
     /// an hour per timezone, never failing the read.
-    async fn count_in(&self, user: &MacroUserIdStr<'_>, timezone: chrono_tz::Tz) {
+    async fn count_in(&self, user: &RoxUserIdStr<'_>, timezone: chrono_tz::Tz) {
         let now = tokio::time::Instant::now();
         if self.readers.get(user.as_ref(), now) == Some(timezone) {
             return;
@@ -484,7 +484,7 @@ where
     /// The suggestion as stored after a write.
     async fn reread(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<SuggestionWriteOutcome, SuggestionError> {
         match self
@@ -594,7 +594,7 @@ where
     ), err)]
     async fn feed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         timezone: Option<chrono_tz::Tz>,
         limit: Option<usize>,
@@ -664,7 +664,7 @@ where
     ), err)]
     async fn viewed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
     ) -> Result<(), SuggestionError> {
         self.require_flag(user).await?;
@@ -698,7 +698,7 @@ where
     ), err)]
     async fn accept(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         id: Uuid,
         accept: Accept,
@@ -805,7 +805,7 @@ where
     ), err)]
     async fn dismiss(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         id: Uuid,
     ) -> Result<(), SuggestionError> {
@@ -863,7 +863,7 @@ where
     ), err)]
     async fn restore(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         id: Uuid,
     ) -> Result<(), SuggestionError> {

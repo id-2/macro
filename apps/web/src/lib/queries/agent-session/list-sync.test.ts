@@ -27,7 +27,7 @@ const mocks = vi.hoisted(() => ({
 }));
 
 /** Records each span with the span it was started from; never an ambient one. */
-vi.mock('@macro-inc/observability', () => {
+vi.mock('@rox-one/observability', () => {
   type Recorded = (typeof mocks.spans)[number];
   const start = (name: string, parent: Recorded | null) => {
     const record: Recorded = { name, parent: parent?.name ?? null, attrs: {} };

@@ -10,7 +10,7 @@
  * session begins.
  */
 
-import { WebsocketEvent } from '@macro-inc/collaboration/websocket';
+import { WebsocketEvent } from '@rox-one/collaboration/websocket';
 import { ws } from '@service-connection/websocket';
 import type { AgentSessionQueueEvent } from './realtime-protocol';
 

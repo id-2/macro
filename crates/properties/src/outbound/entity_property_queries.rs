@@ -119,7 +119,7 @@ pub async fn set_entity_values_in_transaction(
     for (entity_id, value) in values {
         match value {
             Some(value) => {
-                ids.push(macro_uuid::generate_uuid_v7());
+                ids.push(rox_uuid::generate_uuid_v7());
                 set.push(entity_id.clone());
                 stored.push(serde_json::to_value(value)?);
             }
@@ -309,7 +309,7 @@ where
 
     let value = update(previous.flatten())?;
 
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
 
     // Serialize PropertyValue to JSONB (or NULL if None)
     let value_json = match value {
@@ -377,7 +377,7 @@ pub async fn add_entity_property_option(
         &[option_id],
     )
     .await?;
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
 
     let row = sqlx::query_as!(
         EntityPropertyMutationRow,
@@ -526,7 +526,7 @@ pub async fn bulk_update_entity_property_options(
         // blocks on the unique index here until it commits, after which this
         // insert is a no-op and the FOR UPDATE below sequences the two writers.
         if has_additions {
-            let id = macro_uuid::generate_uuid_v7();
+            let id = rox_uuid::generate_uuid_v7();
             sqlx::query!(
                 r#"
                 INSERT INTO entity_properties (id, entity_id, entity_type, property_definition_id, values)

@@ -22,8 +22,29 @@ import {
   SettingsSection,
 } from './primitives';
 
-// Russian captions for the two addresses live only in
-// lib/i18n/locales/ru-pending/mail.json. This screen does not load that file.
+// Подписи этого экрана живут здесь: отдельный словарь почты не подключается.
+
+const FOLDER_COPY = {
+  inbox: {
+    name: 'Входящие',
+    detail: 'Папка по умолчанию. Входящая почта остаётся здесь.',
+  },
+  sent: {
+    name: 'Отправленные',
+    detail: 'Почта, отправленная из этого ящика.',
+  },
+  drafts: {
+    name: 'Черновики',
+    detail: 'Сообщения, которые ещё не отправлены.',
+  },
+  archive: {
+    name: 'Архив',
+    detail: 'Почта, убранная из входящих.',
+  },
+} as const satisfies Record<
+  (typeof ROX_MAILBOX_FOLDERS)[number]['id'],
+  { name: string; detail: string }
+>;
 
 const inputClass = 'settings-input w-full min-w-0';
 
@@ -77,7 +98,10 @@ export function RoxMailboxSettings() {
     const typed = name().trim();
     return isAllowedHandle(typed) ? mailboxAddress(typed) : undefined;
   };
-  const nameError = () => mailboxNameError(name().trim());
+  const nameError = () =>
+    mailboxNameError(name().trim())
+      ? 'Используйте от 3 до 32 строчных букв, цифр, точек, подчёркиваний или дефисов. Служебные имена, точка в начале или конце и повторяющиеся точки не допускаются.'
+      : undefined;
   const channelOptions = () =>
     channelContext
       .channels()
@@ -108,17 +132,17 @@ export function RoxMailboxSettings() {
       const opened = await initEmailLink();
       if (opened.isErr()) {
         toast.failure(
-          'The name was saved, but the Rox mailbox could not be opened.'
+          'Имя сохранено, но ящик Rox не удалось открыть.'
         );
         return;
       }
-      toast.success('Rox mailbox is now the default address.');
+      toast.success('Ящик Rox теперь адрес по умолчанию.');
       setName('');
     } catch (cause) {
       toast.failure(
         cause instanceof Error && cause.message === 'taken'
-          ? 'That name is taken, or this account already chose one.'
-          : 'That name could not be claimed.'
+          ? 'Это имя занято, или для этого аккаунта имя уже выбрано.'
+          : 'Это имя не удалось занять.'
       );
     } finally {
       setClaiming(false);
@@ -143,27 +167,27 @@ export function RoxMailboxSettings() {
 
   return (
     <SettingsSection
-      title="Rox mailbox"
-      description="Your default address, separate from the email you signed in with. Google Workspace and Outlook stay connected above."
+      title="Ящик Rox"
+      description="Адрес по умолчанию, отдельно от почты, с которой вы вошли. Google Workspace и Outlook остаются подключёнными выше."
     >
       <SettingsCard>
         <SettingsRow
-          label="Sign-in"
-          description="The address you used to enter. It is not the Rox mailbox."
+          label="Вход"
+          description="Адрес, которым вы вошли. Это не ящик Rox."
         >
           <span class="ph-no-capture text-sm text-ink">
-            {email() || 'No sign-in address'}
+            {email() || 'Нет адреса для входа'}
           </span>
         </SettingsRow>
         <SettingsRow
-          label="Rox mailbox"
-          description="Default address. Incoming mail stays in this inbox."
+          label="Ящик Rox"
+          description="Адрес по умолчанию. Входящая почта остаётся в этом ящике."
         >
           <span class="ph-no-capture flex items-center gap-2 text-sm text-ink">
-            <span>{roxAddress() ?? 'Choose a name'}</span>
+            <span>{roxAddress() ?? 'Выберите имя'}</span>
             <Show when={roxAddress()}>
               <span class="rounded bg-edge-muted px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide text-ink-muted">
-                Default
+                По умолчанию
               </span>
             </Show>
           </span>
@@ -172,8 +196,8 @@ export function RoxMailboxSettings() {
           <SettingsRow
             stackOnNarrow
             align="start"
-            label="Mailbox name"
-            description="3–32 lowercase letters, numbers, dots, underscores, or hyphens. Reserved and taken names are refused."
+            label="Имя ящика"
+            description="От 3 до 32 строчных букв, цифр, точек, подчёркиваний или дефисов. Служебные и занятые имена отклоняются."
           >
             <form
               class="flex min-w-0 flex-col gap-2"
@@ -189,7 +213,7 @@ export function RoxMailboxSettings() {
                 minLength={3}
                 maxLength={32}
                 pattern="[a-z0-9._-]+"
-                aria-label="Mailbox name"
+                aria-label="Имя ящика"
                 value={name()}
                 disabled={claiming()}
                 onInput={(event) => setName(event.currentTarget.value)}
@@ -205,7 +229,7 @@ export function RoxMailboxSettings() {
                 size="sm"
                 disabled={claiming() || !isAllowedHandle(name().trim())}
               >
-                {claiming() ? 'Saving name…' : 'Use this mailbox'}
+                {claiming() ? 'Сохранение имени…' : 'Использовать этот ящик'}
               </Button>
             </form>
           </SettingsRow>
@@ -213,12 +237,15 @@ export function RoxMailboxSettings() {
       </SettingsCard>
 
       <SettingsCard>
-        <SettingsRow label="Folders" description="The Rox mailbox folders." />
+        <SettingsRow label="Папки" description="Папки ящика Rox." />
         <For each={ROX_MAILBOX_FOLDERS}>
           {(folder) => (
-            <SettingsRow label={folder.name} description={folder.detail}>
+            <SettingsRow
+              label={FOLDER_COPY[folder.id].name}
+              description={FOLDER_COPY[folder.id].detail}
+            >
               <Show when={folder.id === 'inbox'}>
-                <span class="text-xs text-ink-muted">Default</span>
+                <span class="text-xs text-ink-muted">По умолчанию</span>
               </Show>
             </SettingsRow>
           )}
@@ -228,8 +255,8 @@ export function RoxMailboxSettings() {
       <SettingsCard>
         <SettingsRow
           stackOnNarrow
-          label="Automatic tags"
-          description="Tags applied by the rules below. They stay on this mailbox."
+          label="Автоматические метки"
+          description="Метки, которые ставят правила ниже. Они остаются на этом ящике."
         >
           <form
             class="flex min-w-0 items-center gap-2"
@@ -241,12 +268,12 @@ export function RoxMailboxSettings() {
             <input
               class={inputClass}
               type="text"
-              aria-label="Automatic tag"
+              aria-label="Автоматическая метка"
               value={tagDraft()}
               onInput={(event) => setTagDraft(event.currentTarget.value)}
             />
             <Button type="submit" variant="secondary" size="sm">
-              Add tag
+              Добавить метку
             </Button>
           </form>
         </SettingsRow>
@@ -256,7 +283,7 @@ export function RoxMailboxSettings() {
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label={`Remove tag ${tag}`}
+                aria-label={`Удалить метку ${tag}`}
                 onClick={() =>
                   save({
                     ...prefs(),
@@ -264,7 +291,7 @@ export function RoxMailboxSettings() {
                   })
                 }
               >
-                Remove
+                Удалить
               </Button>
             </SettingsRow>
           )}
@@ -275,8 +302,8 @@ export function RoxMailboxSettings() {
         <SettingsRow
           stackOnNarrow
           align="start"
-          label="Processing rules"
-          description="When mail arrives from a sender, apply a tag. The message stays in the inbox."
+          label="Правила обработки"
+          description="Когда приходит письмо от отправителя, ставится метка. Сообщение остаётся во входящих."
         >
           <form
             class="flex min-w-0 flex-col gap-2"
@@ -288,21 +315,21 @@ export function RoxMailboxSettings() {
             <input
               class={inputClass}
               type="text"
-              aria-label="Rule sender"
-              placeholder="Sender"
+              aria-label="Отправитель в правиле"
+              placeholder="Отправитель"
               value={ruleFrom()}
               onInput={(event) => setRuleFrom(event.currentTarget.value)}
             />
             <input
               class={inputClass}
               type="text"
-              aria-label="Rule tag"
-              placeholder="Tag"
+              aria-label="Метка правила"
+              placeholder="Метка"
               value={ruleTag()}
               onInput={(event) => setRuleTag(event.currentTarget.value)}
             />
             <Button type="submit" variant="secondary" size="sm">
-              Add rule
+              Добавить правило
             </Button>
           </form>
         </SettingsRow>
@@ -310,12 +337,12 @@ export function RoxMailboxSettings() {
           {(rule) => (
             <SettingsRow
               label={rule.from}
-              description={`Apply tag “${rule.tag}”.`}
+              description={`Ставится метка «${rule.tag}».`}
             >
               <Button
                 variant="ghost"
                 size="sm"
-                aria-label={`Remove rule for ${rule.from}`}
+                aria-label={`Удалить правило для ${rule.from}`}
                 onClick={() =>
                   save({
                     ...prefs(),
@@ -323,7 +350,7 @@ export function RoxMailboxSettings() {
                   })
                 }
               >
-                Remove
+                Удалить
               </Button>
             </SettingsRow>
           )}
@@ -333,12 +360,12 @@ export function RoxMailboxSettings() {
       <SettingsCard>
         <SettingsRow
           stackOnNarrow
-          label="Forwarding"
-          description="Keeps a forwarding address for this mailbox. This screen does not send mail."
+          label="Пересылка"
+          description="Сохраняет адрес пересылки для этого ящика. Этот экран почту не отправляет."
         >
           <ToggleSwitch
             size="md"
-            label="Forward from the Rox mailbox"
+            label="Пересылать из ящика Rox"
             labelClass="sr-only"
             checked={prefs().forwardEnabled}
             onChange={(checked) =>
@@ -346,12 +373,12 @@ export function RoxMailboxSettings() {
             }
           />
         </SettingsRow>
-        <SettingsRow label="Forward to">
+        <SettingsRow label="Пересылать на">
           <input
             class={inputClass}
             type="text"
             autocomplete="off"
-            aria-label="Forwarding address"
+            aria-label="Адрес пересылки"
             value={prefs().forwardTo}
             onInput={(event) =>
               save({ ...prefs(), forwardTo: event.currentTarget.value })
@@ -363,12 +390,12 @@ export function RoxMailboxSettings() {
       <SettingsCard>
         <SettingsRow
           stackOnNarrow
-          label="Channel copy"
-          description="A copy can go to a channel. The message itself stays in the inbox."
+          label="Копия в канал"
+          description="Копия может уйти в канал. Само сообщение остаётся во входящих."
         >
           <ToggleSwitch
             size="md"
-            label="Copy incoming mail to a channel"
+            label="Копировать входящую почту в канал"
             labelClass="sr-only"
             checked={prefs().copyEnabled}
             onChange={(checked) => save({ ...prefs(), copyEnabled: checked })}
@@ -376,12 +403,12 @@ export function RoxMailboxSettings() {
         </SettingsRow>
         <SettingsRow
           stackOnNarrow
-          label="Channel"
-          description="Where the copy is posted. The inbox copy is not removed."
+          label="Канал"
+          description="Куда публикуется копия. Копия во входящих не удаляется."
         >
           <select
             class={inputClass}
-            aria-label="Channel for the inbox copy"
+            aria-label="Канал для копии из входящих"
             value={prefs().channelId ?? ''}
             onChange={(event) =>
               save({
@@ -390,7 +417,7 @@ export function RoxMailboxSettings() {
               })
             }
           >
-            <option value="">Choose a channel</option>
+            <option value="">Выберите канал</option>
             <For each={channelOptions()}>
               {(channel) => <option value={channel.id}>{channel.name}</option>}
             </For>

@@ -14,7 +14,7 @@ import { SidePanel } from '@components/app/side-panel';
 import { useSplitLayout } from '@components/app/split-layout/layout';
 import { useEmail } from '@core/context/user';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { buildMentionMarkdownString } from '@macro-inc/lexical-core';
+import { buildMentionMarkdownString } from '@rox-one/lexical-core';
 import { useInboxEmail } from '@queries/email/inbox-email';
 import { useEmailLinksQuery } from '@queries/email/link';
 import { queryReadyGate } from '@queries/gate';

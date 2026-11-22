@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use gtm_invite::domain::{models::GtmInviteError, ports::GtmInviteService};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sha2::{Digest, Sha256};
 use sqlx::PgPool;
 use teams::domain::model::{CustomerError, SeatPlan, SeatPrices};
@@ -264,9 +264,9 @@ impl<I: GtmInviteService> CheckoutGateway for StripeCheckoutGateway<I> {
 
     async fn customer(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<Self::Customer>, Self::Error> {
-        macro_db_client::user::get::get_stripe_customer_id_by_user_id(&self.db, user)
+        rox_db_client::user::get::get_stripe_customer_id_by_user_id(&self.db, user)
             .await?
             .map(|id| id.parse().map_err(StripeCheckoutError::from))
             .transpose()
@@ -278,7 +278,7 @@ impl<I: GtmInviteService> CheckoutGateway for StripeCheckoutGateway<I> {
 
     async fn invite_promotion(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<String>, Self::Error> {
         Ok(self
             .invites

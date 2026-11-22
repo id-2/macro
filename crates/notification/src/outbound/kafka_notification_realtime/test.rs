@@ -2,11 +2,11 @@ use std::borrow::Cow;
 use std::sync::{Arc, Mutex};
 
 use chrono::Utc;
-use macro_event_broker::{
-    EventBrokerError, EventPublisher, MacroEvent, MacroEventBrokerService, Spawner,
+use rox_event_broker::{
+    EventBrokerError, EventPublisher, RoxEvent, RoxEventBrokerService, Spawner,
 };
-use macro_event_topics::Topic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_topics::Topic;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 
 use super::*;
@@ -57,12 +57,12 @@ impl Spawner for TokioSpawner {
     }
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user ID")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user ID")
 }
 
 fn row(
-    owner_id: MacroUserIdStr<'static>,
+    owner_id: RoxUserIdStr<'static>,
     notification_id: uuid::Uuid,
 ) -> UserNotificationRow<serde_json::Value> {
     UserNotificationRow {
@@ -84,8 +84,8 @@ fn row(
 fn publisher(
     records: Arc<Mutex<Vec<PublishedRecord>>>,
     fail: bool,
-) -> KafkaNotificationRealtimePublisher<MacroEventBrokerService<RecordingPublisher, TokioSpawner>> {
-    KafkaNotificationRealtimePublisher::new(MacroEventBrokerService::new(
+) -> KafkaNotificationRealtimePublisher<RoxEventBrokerService<RecordingPublisher, TokioSpawner>> {
+    KafkaNotificationRealtimePublisher::new(RoxEventBrokerService::new(
         RecordingPublisher { records, fail },
         TokioSpawner,
     ))
@@ -134,7 +134,7 @@ async fn publishes_one_notification_for_many_users_event() {
     );
 
     let decoded =
-        NotificationMacroEvent::<serde_json::Value>::decode(record.key.clone(), &record.payload)
+        NotificationRoxEvent::<serde_json::Value>::decode(record.key.clone(), &record.payload)
             .expect("event round-trips");
     let NotificationTopicEvent::NotificationStatusUpdatedForUsers { users, update } =
         decoded.into_topic_event()
@@ -183,7 +183,7 @@ async fn publishes_many_notifications_for_one_user_event() {
     assert_eq!(payload["metadata"]["updates"].as_array().unwrap().len(), 2);
 
     let decoded =
-        NotificationMacroEvent::<serde_json::Value>::decode(record.key.clone(), &record.payload)
+        NotificationRoxEvent::<serde_json::Value>::decode(record.key.clone(), &record.payload)
             .expect("event round-trips");
     let NotificationTopicEvent::NotificationStatusesUpdatedForUser { user, updates } =
         decoded.into_topic_event()

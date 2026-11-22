@@ -14,7 +14,7 @@ use initiative::domain::{
     ports::InitiativeService,
     reads::{InitiativePageRow, InitiativeRead, InitiativeTasksPage, InitiativeTasksRequest},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 /// Object-safe forwarding future for the request's concrete domain services.
@@ -23,31 +23,31 @@ pub(crate) type ApiFuture<'a, T> =
 
 /// Transport-facing service bundle; implementations mint receipts and delegate policy.
 pub(crate) trait InitiativeApi: Send + Sync {
-    fn read(&self, user: MacroUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, InitiativeRead>;
+    fn read(&self, user: RoxUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, InitiativeRead>;
     fn summarize<'a>(&'a self, read: &'a InitiativeRead) -> ApiFuture<'a, InitiativePageRow>;
     fn ensure_description_surface(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         id: Uuid,
     ) -> ApiFuture<'_, ()>;
     fn tasks(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         id: Uuid,
         input: InitiativeTasksRequest,
     ) -> ApiFuture<'_, InitiativeTasksPage>;
     fn create(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         input: CreateInitiativeRequest,
     ) -> ApiFuture<'_, InitiativeDetail>;
     fn update(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         id: Uuid,
         input: UpdateInitiativeRequest,
     ) -> ApiFuture<'_, InitiativeDetail>;
-    fn delete(&self, user: MacroUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, ()>;
+    fn delete(&self, user: RoxUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, ()>;
 }
 
 /// Request-scoped initiative capability, shared by viewer reads and mutations.
@@ -61,7 +61,7 @@ pub trait InitiativeAuthorizer: Send + Sync + 'static {
     /// Verify the authenticated viewer's required capability for an entity.
     fn authorize<T: RequiredPermission>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: &str,
         entity_type: EntityType,
     ) -> impl Future<Output = Result<EntityAccessReceipt<T>, AccessError>> + Send;
@@ -70,7 +70,7 @@ pub trait InitiativeAuthorizer: Send + Sync + 'static {
 impl<A: EntityAccessService> InitiativeAuthorizer for A {
     async fn authorize<T: RequiredPermission>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: &str,
         entity_type: EntityType,
     ) -> Result<EntityAccessReceipt<T>, AccessError> {
@@ -96,7 +96,7 @@ struct InitiativeApiAdapter<S, A> {
 }
 
 impl<S: InitiativeService, A: InitiativeAuthorizer> InitiativeApi for InitiativeApiAdapter<S, A> {
-    fn read(&self, user: MacroUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, InitiativeRead> {
+    fn read(&self, user: RoxUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, InitiativeRead> {
         Box::pin(async move {
             let receipt = self
                 .access
@@ -112,7 +112,7 @@ impl<S: InitiativeService, A: InitiativeAuthorizer> InitiativeApi for Initiative
 
     fn ensure_description_surface(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         id: Uuid,
     ) -> ApiFuture<'_, ()> {
         Box::pin(async move {
@@ -126,7 +126,7 @@ impl<S: InitiativeService, A: InitiativeAuthorizer> InitiativeApi for Initiative
 
     fn tasks(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         id: Uuid,
         input: InitiativeTasksRequest,
     ) -> ApiFuture<'_, InitiativeTasksPage> {
@@ -141,7 +141,7 @@ impl<S: InitiativeService, A: InitiativeAuthorizer> InitiativeApi for Initiative
 
     fn create(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         input: CreateInitiativeRequest,
     ) -> ApiFuture<'_, InitiativeDetail> {
         Box::pin(async move { self.service.create(&user, input).await })
@@ -149,7 +149,7 @@ impl<S: InitiativeService, A: InitiativeAuthorizer> InitiativeApi for Initiative
 
     fn update(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         id: Uuid,
         input: UpdateInitiativeRequest,
     ) -> ApiFuture<'_, InitiativeDetail> {
@@ -162,7 +162,7 @@ impl<S: InitiativeService, A: InitiativeAuthorizer> InitiativeApi for Initiative
         })
     }
 
-    fn delete(&self, user: MacroUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, ()> {
+    fn delete(&self, user: RoxUserIdStr<'static>, id: Uuid) -> ApiFuture<'_, ()> {
         Box::pin(async move {
             let receipt = self
                 .access

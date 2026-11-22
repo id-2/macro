@@ -423,9 +423,9 @@ async fn seed(args: SeedArgs, ctx: SeedCliContext) -> anyhow::Result<()> {
         id
     } else {
         let macro_id =
-            macro_user_id::user_id::MacroUserIdStr::try_from_email(&seed_data.email_address)
+            rox_user_id::user_id::RoxUserIdStr::try_from_email(&seed_data.email_address)
                 .context("failed to create macro user id from email")?;
-        let email_str = macro_user_id::email::EmailStr::try_from(seed_data.email_address.clone())
+        let email_str = rox_user_id::email::EmailStr::try_from(seed_data.email_address.clone())
             .context("failed to parse email address")?;
 
         let is_primary =
@@ -591,7 +591,7 @@ fn build_thread(
                 labels: msg_labels,
                 body_text,
                 body_html_sanitized: body_html,
-                body_macro: None,
+                body_rox: None,
                 attachments: vec![],
                 attachments_draft: vec![],
                 attachments_forwarded: vec![],

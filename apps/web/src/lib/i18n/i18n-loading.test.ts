@@ -23,7 +23,7 @@ async function startInGerman() {
     if (state === 'hanging') return new Promise(() => {});
     return german;
   });
-  localStorage.setItem('interface-language-v1', 'de');
+  localStorage.setItem('interface-language-v2', 'de');
   return import('./i18n');
 }
 
@@ -33,7 +33,7 @@ async function startInBrowser(languages: string[], stored?: string) {
   vi.doMock('./locales/de', () => german);
   vi.spyOn(navigator, 'language', 'get').mockReturnValue(languages[0]);
   vi.spyOn(navigator, 'languages', 'get').mockReturnValue(languages);
-  if (stored) localStorage.setItem('interface-language-v1', stored);
+  if (stored) localStorage.setItem('interface-language-v2', stored);
   return import('./i18n');
 }
 

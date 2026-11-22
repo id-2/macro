@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import UploadIcon from '@icon/system/regular/upload-simple.svg';
 import { Button, Dialog, Panel, Select } from '@ui';
@@ -44,12 +45,12 @@ export function CrmImport(props: {
   const choices = (): Choice[] => [
     {
       value: 'new:private',
-      label: 'New private pipeline',
+      label: t('crm.newPrivatePipeline'),
       destination: { kind: 'new', sharing: 'private' },
     },
     {
       value: 'new:team',
-      label: 'New team pipeline',
+      label: t('crm.newTeamPipeline'),
       destination: { kind: 'new', sharing: 'team' },
     },
     ...(props.pipelines?.existing() ?? []).map(
@@ -78,18 +79,16 @@ export function CrmImport(props: {
       <Panel class="h-auto">
         <Panel.Header class="px-5 py-3">
           <Dialog.Title class="text-sm font-semibold">
-            Import companies
+            {t('crm.importCompanies')}
           </Dialog.Title>
         </Panel.Header>
         <Panel.Body class="flex flex-col gap-4 p-5">
           <Dialog.Description class="text-sm leading-5 text-ink-muted">
-            Upload a CSV with a domain column and, optionally, a name or company
-            column, such as a Rox CRM export. Review the companies before
-            importing them into your team CRM.
+            {t('crm.importCompaniesDescription')}
           </Dialog.Description>
           <input
             ref={fileInput}
-            aria-label="Companies CSV"
+            aria-label={t('crm.companiesCsv')}
             type="file"
             accept=".csv,text/csv"
             disabled={pending()}
@@ -109,13 +108,13 @@ export function CrmImport(props: {
               onClick={() => fileInput.click()}
             >
               <UploadIcon class="size-3.5 touch:size-6 shrink-0 pointer-events-none" />
-              {fileName() ? 'Change file' : 'Choose file'}
+              {fileName() ? t('crm.changeFile') : t('crm.chooseFile')}
             </Button>
             <span
               role="status"
               class="min-w-0 break-all text-sm text-ink-muted"
             >
-              {fileName() || 'No file selected'}
+              {fileName() || t('crm.noFileSelected')}
             </span>
           </div>
           <Show when={rows().length && !pending()}>
@@ -130,15 +129,16 @@ export function CrmImport(props: {
               </For>
               <Show when={rows().length > PREVIEW_ROWS}>
                 <div class="px-3 py-2 text-sm text-ink-muted">
-                  and {(rows().length - PREVIEW_ROWS).toLocaleString()} more
+                  {t('crm.andMoreRows', {
+                    count: rows().length - PREVIEW_ROWS,
+                  })}
                 </div>
               </Show>
             </div>
           </Show>
           <Show when={skipped() && !done()}>
             <p class="text-sm text-ink-muted">
-              {skipped().toLocaleString()} rows skipped: no domain like
-              acme.com, or a domain listed earlier in the file.
+              {t('crm.rowsSkipped', { count: skipped() })}
             </p>
           </Show>
           <Show when={!pipeline() && pipelineData()}>
@@ -146,14 +146,17 @@ export function CrmImport(props: {
               <p class="text-sm text-ink-muted">
                 <Show
                   when={props.pipelines}
-                  fallback={`${data().fields.join(', ')} won't be imported: pipelines aren't available for your team.`}
+                  fallback={t('crm.fieldsNotImported', {
+                    fields: data().fields.join(', '),
+                  })}
                 >
-                  {data().fields.join(', ')} for the{' '}
-                  {data().csv.rows.length.toLocaleString()} companies that have
-                  them go into
+                  {t('crm.fieldsImport', {
+                    fields: data().fields.join(', '),
+                    count: data().csv.rows.length,
+                  })}{' '}
                   <Show when={destination().kind === 'new'}>
                     {' '}
-                    a pipeline named “{data().name}”
+                    {t('crm.pipelineNamed', { name: data().name })}
                   </Show>
                   :
                 </Show>
@@ -173,7 +176,7 @@ export function CrmImport(props: {
               modal={false}
             >
               <Select.Trigger
-                aria-label="Pipeline for Stage and Owner"
+                aria-label={t('crm.pipelineForStageOwner')}
                 class="h-10 w-full min-w-0 rounded-lg border border-edge bg-surface-2 px-3 text-sm text-ink outline-none focus-visible:ring-2 focus-visible:ring-ink/20 disabled:opacity-50"
               >
                 <Select.Value<Choice>>
@@ -202,20 +205,22 @@ export function CrmImport(props: {
                 role="status"
                 class="flex flex-wrap items-center gap-1 text-sm"
               >
-                {added().added.toLocaleString()} rows added to{' '}
-                {added().pipeline.name}.
+                {t('crm.rowsAdded', {
+                  count: added().added,
+                  pipeline: added().pipeline.name,
+                })}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => props.onOpenPipeline(added().pipeline.id)}
                 >
-                  Open pipeline
+                  {t('crm.openPipeline')}
                 </Button>
               </p>
             )}
           </Show>
           <PipelineImportFailures
-            addLabel="Add deal"
+            addLabel={t('crm.addDeal')}
             failures={pipeline()?.invalid}
           />
           <Show when={error()}>
@@ -226,7 +231,7 @@ export function CrmImport(props: {
         </Panel.Body>
         <Panel.Footer class="flex-wrap justify-end gap-2 px-5 py-3">
           <Button variant="ghost" disabled={pending()} onClick={props.onClose}>
-            Close
+            {t('common.close')}
           </Button>
           <Button
             variant="secondary"
@@ -234,10 +239,13 @@ export function CrmImport(props: {
             onClick={() => fireAndForget(run(), 'crm')}
           >
             {pending()
-              ? `Importing… ${done().toLocaleString()} of ${rows().length.toLocaleString()}`
+              ? t('crm.importingProgress', {
+                  done: done(),
+                  total: rows().length,
+                })
               : rows().length || !runnable()
-                ? `Import ${rows().length ? rows().length.toLocaleString() : ''} companies`
-                : 'Add to pipeline'}
+                ? t('crm.importCompaniesCount', { count: rows().length })
+                : t('crm.addToPipeline')}
           </Button>
         </Panel.Footer>
       </Panel>

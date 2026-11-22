@@ -1,7 +1,7 @@
 import type { SavedViewDefinition } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { Team } from '../teams/team';
 import { User } from '../users/user';
 
@@ -20,12 +20,12 @@ export type SavedViewConfig = Record<string, unknown> & {
  * it matches) shown in the app's sidebar for its kind, such as Email.
  *
  * Writes are guarded by the revision this handle last saw, so a stale handle
- * fails with a conflict ({@link MacroApiError} with status 409) instead of
+ * fails with a conflict ({@link RoxApiError} with status 409) instead of
  * overwriting an edit made elsewhere; reload it with {@link refresh} and retry.
  */
-export class SavedView extends MacroEntity<SavedViewDefinition> {
+export class SavedView extends RoxEntity<SavedViewDefinition> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     id: string,
     seed?: SavedViewDefinition,
   ) {
@@ -41,13 +41,13 @@ export class SavedView extends MacroEntity<SavedViewDefinition> {
   }
 
   /** A handle to a saved view by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): SavedView {
+  static byId(client: RoxClient, id: string): SavedView {
     return new SavedView(client, id);
   }
 
   /** Wrap an already-loaded record. */
   static fromRecord(
-    client: MacroClient,
+    client: RoxClient,
     record: SavedViewDefinition,
   ): SavedView {
     return new SavedView(client, record.id, record);
@@ -55,7 +55,7 @@ export class SavedView extends MacroEntity<SavedViewDefinition> {
 
   /** Create a saved view, private unless shared with a team the caller belongs to. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: { name: string; config: SavedViewConfig; team?: Team },
   ): Promise<SavedView> {
     const record = unwrap(

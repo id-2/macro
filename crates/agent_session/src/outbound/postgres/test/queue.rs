@@ -2,7 +2,7 @@ use super::*;
 use crate::domain::model::StoredQueuedAction;
 use crate::domain::ports::AgentSessionRepo;
 use agent_runtime_protocol::domain::action::{AgentAction, AgentActionId};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 fn stored_prompt(text: &str) -> StoredQueuedAction {
     StoredQueuedAction {

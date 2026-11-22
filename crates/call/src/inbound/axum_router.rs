@@ -36,10 +36,10 @@ use entity_access::{
         ChannelAccessLevelExtractor,
     },
 };
-use macro_authorization::{
-    AnyPrincipal, CODE_EXECUTION_HEADER, CredentialAttribution, CredentialOrigin,
-    MacroAuthorization, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState, OptionalMacroAuthorizationExtractor, UserOrInternal, is_program_run,
+use rox_authorization::{
+    AnyPrincipal, CredentialAttribution, CredentialOrigin,
+    RoxAuthorization, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState, OptionalRoxAuthorizationExtractor, UserOrInternal, is_program_run,
 };
 use model_error_response::ErrorResponse;
 use rate_limit::{RateLimitConfig, RateLimitKey, RateLimitService};
@@ -62,7 +62,7 @@ use crate::domain::ports::{CallService, CallStartLimiter};
 pub struct CallRouterState<S, Svc, Auth> {
     service: Arc<S>,
     access_service: Arc<Svc>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 /// Adapter around the shared rate limit service.
@@ -107,7 +107,7 @@ impl<S: CallService, Svc: EntityAccessService, Auth> CallRouterState<S, Svc, Aut
     pub fn new(
         service: Arc<S>,
         access_service: Arc<Svc>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service,
@@ -123,7 +123,7 @@ impl<S, Svc, Auth> FromRef<CallRouterState<S, Svc, Auth>> for Arc<Svc> {
     }
 }
 
-impl<S, Svc, Auth> FromRef<CallRouterState<S, Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Svc, Auth> FromRef<CallRouterState<S, Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &CallRouterState<S, Svc, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -147,7 +147,7 @@ pub fn call_router<S, Svc, Auth, T>(state: CallRouterState<S, Svc, Auth>) -> Rou
 where
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync,
 {
     Router::new()
@@ -369,9 +369,13 @@ where
 // Internal call access extractor
 // ---------------------------------------------------------------------------
 
-static INTERNAL_CALL_HEADER: &str = "x-macro-internal-call";
+static INTERNAL_CALL_HEADER: &str = "x-rox-internal-call";
 
-/// Axum extractor that validates the `x-macro-internal-call` header against
+/// The name [`INTERNAL_CALL_HEADER`] had before the rename, still accepted
+/// from callers that predate it.
+static LEGACY_INTERNAL_CALL_HEADER: &str = "x-macro-internal-call";
+
+/// Axum extractor that validates the internal-call header against
 /// the shared secret stored in the [`CallService`].
 pub struct InternalCallAccessExtractor(());
 
@@ -388,10 +392,11 @@ where
         let token = parts
             .headers
             .get(INTERNAL_CALL_HEADER)
+            .or_else(|| parts.headers.get(LEGACY_INTERNAL_CALL_HEADER))
             .and_then(|v| v.to_str().ok())
             .ok_or((
                 StatusCode::BAD_REQUEST,
-                Cow::Borrowed("missing x-macro-internal-call header"),
+                Cow::Borrowed("missing x-rox-internal-call header"),
             ))?;
 
         if state.service.validate_internal_call(token) {
@@ -427,11 +432,11 @@ where
 pub async fn get_or_create_call_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
 ) -> Result<Json<CallTokenResponse>, CallError> {
     refuse_program_token(user.authorization.user.attribution(), &headers)?;
@@ -457,7 +462,7 @@ pub async fn get_or_create_call_handler<
 
 /// Why a program may not get a call token: it would reach the model and the
 /// transcript, and it outlives the run and cannot be revoked.
-const PROGRAM_TOKEN_REFUSAL: &str = "An agent's program cannot get a call token: it would reach you and outlive the run. Tell the user to start or join the call in Macro.";
+const PROGRAM_TOKEN_REFUSAL: &str = "An agent's program cannot get a call token: it would reach you and outlive the run. Tell the user to start or join the call in Rox.";
 
 /// Refuse a call token to any program ([`is_program_run`]): its credential's
 /// signed agent or routine claim, which a program cannot shed, or the
@@ -477,7 +482,7 @@ pub(super) fn refuse_program_token(
 /// A guest join carries no credential, so only the code-mode runtime's header
 /// marks a program there.
 pub(super) fn refuse_code_execution_token(headers: &HeaderMap) -> Result<(), CallError> {
-    if headers.contains_key(CODE_EXECUTION_HEADER) {
+    if rox_authorization::marks_code_execution(headers) {
         return Err(CallError::Forbidden(PROGRAM_TOKEN_REFUSAL.to_string()));
     }
     Ok(())
@@ -487,8 +492,8 @@ fn credential_is_program(origin: &CredentialOrigin) -> bool {
     matches!(
         origin,
         CredentialOrigin::UserApiKey
-            | CredentialOrigin::MacroApiJwt
-            | CredentialOrigin::ScopedMacroApiJwt
+            | CredentialOrigin::RoxApiJwt
+            | CredentialOrigin::ScopedRoxApiJwt
     )
 }
 
@@ -496,16 +501,16 @@ fn credential_is_program(origin: &CredentialOrigin) -> bool {
 /// an agent's program (a credential signed for an agent or a routine run, or
 /// the code-mode header) or a bot never mints one; a person shares the call
 /// from Macro. A credential that does not verify is rejected here.
-async fn refuse_program_link<Auth: MacroAuthorizationService>(
-    State(authorization): State<MacroAuthorizationState<Auth>>,
+async fn refuse_program_link<Auth: RoxAuthorizationService>(
+    State(authorization): State<RoxAuthorizationState<Auth>>,
     request: axum::extract::Request,
     next: axum::middleware::Next,
 ) -> axum::response::Response {
     use axum::extract::FromRequestParts as _;
     let (mut parts, body) = request.into_parts();
-    let principal = match macro_authorization::OptionalMacroAuthorizationExtractor::<
+    let principal = match rox_authorization::OptionalRoxAuthorizationExtractor::<
         Auth,
-        macro_authorization::AnyPrincipal,
+        rox_authorization::AnyPrincipal,
     >::from_request_parts(&mut parts, &authorization)
     .await
     {
@@ -513,16 +518,16 @@ async fn refuse_program_link<Auth: MacroAuthorizationService>(
         Err(rejection) => return rejection.into_response(),
     };
     let program = match &principal {
-        Some(macro_authorization::MacroAuthorization::User(user)) => {
-            macro_authorization::is_program_run(user.attribution(), &parts.headers)
+        Some(rox_authorization::RoxAuthorization::User(user)) => {
+            rox_authorization::is_program_run(user.attribution(), &parts.headers)
         }
-        Some(macro_authorization::MacroAuthorization::Bot(_)) => true,
-        _ => parts.headers.contains_key(CODE_EXECUTION_HEADER),
+        Some(rox_authorization::RoxAuthorization::Bot(_)) => true,
+        _ => rox_authorization::marks_code_execution(&parts.headers),
     };
     if program {
         tracing::warn!("refused a meeting link to a program");
         return CallError::Forbidden(
-            "An agent's program cannot make a meeting link for a call: anyone holding it can join as a guest. Tell the user to share the call from Macro.".to_string(),
+            "An agent's program cannot make a meeting link for a call: anyone holding it can join as a guest. Tell the user to share the call from Rox.".to_string(),
         )
         .into_response();
     }
@@ -538,11 +543,11 @@ async fn refuse_program_link<Auth: MacroAuthorizationService>(
 pub async fn start_call_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
     request: Option<Json<JoinCallRequest>>,
 ) -> Result<Json<CallTokenResponse>, CallError> {
@@ -577,11 +582,11 @@ pub async fn start_call_handler<
 pub async fn join_call_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     axum::extract::Path(call_id): axum::extract::Path<Uuid>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     headers: HeaderMap,
     request: Option<Json<JoinCallRequest>>,
 ) -> Result<Json<CallTokenResponse>, CallError> {
@@ -615,11 +620,11 @@ pub async fn join_call_handler<
 pub async fn leave_call_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     axum::extract::Path(call_id): axum::extract::Path<Uuid>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<LeaveCallResponse>, CallError> {
     if !state
         .service
@@ -643,11 +648,11 @@ pub async fn leave_call_handler<
 pub async fn get_call_ring_state_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     axum::extract::Path(call_id): axum::extract::Path<Uuid>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<RingStatusResponse>, CallError> {
     Ok(Json(
         state
@@ -664,10 +669,10 @@ pub async fn get_call_ring_state_handler<
 pub async fn get_live_calls_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<LiveCallsResponse>, CallError> {
     Ok(Json(
         state
@@ -684,11 +689,11 @@ pub async fn get_live_calls_handler<
 pub async fn get_call_participants_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     axum::extract::Path(call_id): axum::extract::Path<Uuid>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<LiveCallParticipantsResponse>, CallError> {
     Ok(Json(
         state
@@ -719,7 +724,7 @@ pub async fn get_call_participants_handler<
 pub async fn check_active_call_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -752,10 +757,10 @@ pub async fn check_active_call_handler<
 pub async fn get_active_calls_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<ActiveCallsResponse>, CallError> {
     let response = state
         .service
@@ -787,11 +792,11 @@ pub async fn get_active_calls_handler<
 pub async fn get_call_record_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallAccessLevelExtractor<ViewAccessLevel, Svc, Auth>,
-    authorization: OptionalMacroAuthorizationExtractor<Auth, AnyPrincipal>,
+    authorization: OptionalRoxAuthorizationExtractor<Auth, AnyPrincipal>,
     headers: HeaderMap,
 ) -> Result<Json<CallRecord>, CallError> {
     let record = state
@@ -799,7 +804,7 @@ pub async fn get_call_record_handler<
         .get_call_record(access.entity_access_receipt)
         .await?;
     let attribution = match &authorization.authorization {
-        Some(MacroAuthorization::User(user)) => user.attribution(),
+        Some(RoxAuthorization::User(user)) => user.attribution(),
         _ => CredentialAttribution::Person,
     };
     Ok(Json(without_presigned_urls_for_programs(
@@ -850,7 +855,7 @@ pub struct RecordingBytes(
 pub async fn get_call_recording_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallAccessLevelExtractor<ViewAccessLevel, Svc, Auth>,
@@ -893,7 +898,7 @@ pub async fn get_call_recording_handler<
 pub async fn delete_call_record_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallAccessLevelExtractor<EditAccessLevel, Svc, Auth>,
@@ -934,7 +939,7 @@ pub async fn delete_call_record_handler<
 pub async fn edit_call_record_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallAccessLevelExtractor<EditAccessLevel, Svc, Auth>,
@@ -978,7 +983,7 @@ pub async fn edit_call_record_handler<
 pub async fn edit_call_transcript_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallAccessLevelExtractor<EditAccessLevel, Svc, Auth>,
@@ -1016,7 +1021,7 @@ pub async fn edit_call_transcript_handler<
 pub async fn toggle_share_with_team_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallAccessLevelExtractor<EditAccessLevel, Svc, Auth>,
@@ -1050,10 +1055,10 @@ pub async fn toggle_share_with_team_handler<
 pub async fn get_batch_call_record_preview_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<GetBatchCallRecordPreviewRequest>,
 ) -> Result<Json<GetBatchCallRecordPreviewResponse>, CallError> {
     if request.call_ids.len() > MAX_BATCH_CALL_IDS {
@@ -1088,11 +1093,11 @@ pub async fn get_batch_call_record_preview_handler<
 pub async fn leave_or_end_call_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallWithChannelIdAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<Json<LeaveCallResponse>, CallError> {
     let channel_id = access.channel_id;
 
@@ -1134,11 +1139,11 @@ pub(crate) type DeclineCallPermission = ViewAccessLevel;
 pub async fn decline_call_handler<
     S: CallService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<CallRouterState<S, Svc, Auth>>,
     access: CallAccessLevelExtractor<DeclineCallPermission, Svc, Auth>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
 ) -> Result<StatusCode, CallError> {
     let call_id = Uuid::parse_str(&access.entity_access_receipt.entity().entity_id)
         .map_err(|_| CallError::Internal(anyhow::anyhow!("invalid call_id in receipt")))?;
@@ -1265,7 +1270,7 @@ pub async fn decline_ring_handler<S: CallService>(
 /// Handler for `POST /call/{channel_id}/transcript`.
 ///
 /// Receives transcript segments from the transcription agent.
-/// Authenticated via the `x-macro-internal-call` shared secret.
+/// Authenticated via the `x-rox-internal-call` shared secret.
 /// Duplicate segments (same `segment_id`) are ignored.
 #[utoipa::path(
     post,

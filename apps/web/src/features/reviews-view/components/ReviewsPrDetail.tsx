@@ -1,6 +1,7 @@
 import { ViewBreadcrumbs, ViewShell } from '@app/components/view-shell';
 import { ChangesSplit } from '@app/features/changes/changes';
 import { useAnalytics } from '@app/lib/analytics/analytics-context';
+import { t } from '@app/lib/i18n';
 import { useRouteParams } from '@app/lib/split-router';
 import { reviewsPrRoute } from '@app/routes/routes';
 import { confirmMergePullRequest } from '@block-pr/component/MergePullRequestButton';
@@ -76,7 +77,7 @@ export function ReviewsPrDetail(props: { foreignEntityId: string }) {
     const data = detail.data();
     return (
       data?.pullRequest.name ??
-      (data ? prDisplayName(data.prRef) : 'Pull request')
+      (data ? prDisplayName(data.prRef) : t('reviews.prFallbackName'))
     );
   };
   const githubUrl = () => {
@@ -112,7 +113,7 @@ export function ReviewsPrDetail(props: { foreignEntityId: string }) {
                 <SplitPanel.CloseButton class="hidden shrink-0 touch:flex" />
               </HeaderIsland>
               <ViewShell.TopBarTitle>
-                <ViewBreadcrumbs.Outlet aria-label="Pull request location" />
+                <ViewBreadcrumbs.Outlet aria-label={t('reviews.pullRequestLocation')} />
               </ViewShell.TopBarTitle>
               <PrDetailActions detail={detail.data()} actions={actions} />
             </ViewShell.TopBar>

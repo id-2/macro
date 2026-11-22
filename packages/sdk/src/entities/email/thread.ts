@@ -9,7 +9,7 @@ import type {
 } from '../../../generated/email/types.gen';
 import type { EmailFollowupCommand } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Calendar } from '../calendar/calendar';
 import { CalendarEvent } from '../calendar/event';
 import type { Channel } from '../channels/channel';
@@ -234,7 +234,7 @@ export class EmailThread extends PropertiedEntity<ThreadDetail> {
   }
 
   /** A handle to a thread by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): EmailThread {
+  static byId(client: RoxClient, id: string): EmailThread {
     return new EmailThread(client, id);
   }
 
@@ -244,7 +244,7 @@ export class EmailThread extends PropertiedEntity<ThreadDetail> {
    * so `subject()` and the timestamps still read the thread.
    */
   static fromPreview(
-    client: MacroClient,
+    client: RoxClient,
     preview: ApiThreadPreviewCursorInner,
   ): EmailThread {
     return new EmailThread(client, preview.id).withListed({
@@ -417,7 +417,7 @@ export class EmailThread extends PropertiedEntity<ThreadDetail> {
    * 100 threads. Resolves to the threads whose state could not change.
    */
   static async archiveMany(
-    client: MacroClient,
+    client: RoxClient,
     threads: EmailThread[],
     archived = true,
   ): Promise<EmailThread[]> {

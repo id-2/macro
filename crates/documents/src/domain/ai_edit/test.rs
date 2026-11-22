@@ -6,7 +6,7 @@ use ai_billing::domain::admission::{AdmissionFuture, AiAdmissionService};
 use ai_usage::AiFeature;
 use bot_id::MACRO_AI_BOT_ID;
 use entity_access::domain::models::{BotReceiptScope, Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use std::sync::Arc;
 
@@ -28,7 +28,7 @@ fn document(file_type: &str) -> DocumentBasic {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
+fn user() -> RoxUserIdStr<'static> {
     "macro|editor@example.com".to_owned().try_into().unwrap()
 }
 
@@ -50,7 +50,7 @@ struct Refuse(AiAdmissionError);
 impl AiAdmissionService for Refuse {
     fn admit<'a>(
         &'a self,
-        caller: &'a MacroUserIdStr<'_>,
+        caller: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {

@@ -11,7 +11,7 @@ use entity_access::domain::{
     models::{EntityType, ViewAccessLevel},
     ports::EntityAccessService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -177,7 +177,7 @@ where
 
         let inbox = service_context
             .service
-            .get_inboxes_for_macro_id(MacroUserIdStr((*request_context.user_id).clone()))
+            .get_inboxes_for_macro_id(RoxUserIdStr((*request_context.user_id).clone()))
             .await
             .map_err(|e| ToolCallError {
                 description: format!("Failed to resolve the thread's inbox: {e}"),

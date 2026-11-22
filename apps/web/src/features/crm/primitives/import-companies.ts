@@ -1,5 +1,6 @@
+import { t } from '@app/lib/i18n';
 import { parseCsv } from '@core/util/csv';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { createSignal, onCleanup } from 'solid-js';
 import type { DatabaseCsv } from '../../database/core/csv';
 import type { CompanyImporter } from '../context/crm-sources';
@@ -33,7 +34,7 @@ function importedPipelineName(fileName: string) {
     fileName
       .replace(/\.csv$/i, '')
       .trim()
-      .slice(0, MAX_PIPELINE_NAME) || 'Imported companies'
+      .slice(0, MAX_PIPELINE_NAME) || t('crm.importedCompaniesName')
   );
 }
 
@@ -80,11 +81,11 @@ export function createCompanyImport(
       const existing = pipelines
         ?.existing()
         .find((pipeline) => pipeline.id === chosen.id);
-      if (!existing) throw new Error('The chosen pipeline is unavailable.');
+      if (!existing) throw new Error(t('crm.chosenPipelineUnavailable'));
       return existing;
     }
     return span.span('crm.companies.import.create_pipeline', async () => {
-      if (!pipelines) throw new Error('Pipelines are unavailable.');
+      if (!pipelines) throw new Error(t('crm.pipelinesUnavailable'));
       return pipelines.create(name, chosen.sharing);
     });
   };
@@ -104,7 +105,7 @@ export function createCompanyImport(
     target = undefined;
     if (!file) return;
     if (file.size > MAX_IMPORT_BYTES) {
-      setError('Choose a CSV smaller than 5 MB.');
+      setError(t('crm.csvTooLarge'));
       return;
     }
     try {
@@ -130,7 +131,7 @@ export function createCompanyImport(
       if (fields)
         setPipelineData({ ...fields, name: importedPipelineName(file.name) });
     } catch {
-      setError('Could not read that file. Please try again.');
+      setError(t('crm.csvReadFailed'));
     }
   }
   async function importRow(row: CompanyImportRow, parent: Span) {

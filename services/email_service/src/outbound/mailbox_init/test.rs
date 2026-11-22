@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 #[derive(Clone)]
 struct Grants(VerifiedMailboxGrant);
@@ -16,9 +16,9 @@ impl CompletedMailboxGrantSource for Grants {
     }
 }
 
-async fn actor(db: &PgPool, email: &str) -> (Uuid, MacroUserIdStr<'static>) {
-    let id = macro_uuid::generate_uuid_v7();
-    let macro_id = MacroUserIdStr::try_from(format!("macro|{email}")).unwrap();
+async fn actor(db: &PgPool, email: &str) -> (Uuid, RoxUserIdStr<'static>) {
+    let id = rox_uuid::generate_uuid_v7();
+    let macro_id = RoxUserIdStr::try_from(format!("macro|{email}")).unwrap();
     sqlx::query!(
         "INSERT INTO macro_user (id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
         id,
@@ -41,8 +41,8 @@ async fn actor(db: &PgPool, email: &str) -> (Uuid, MacroUserIdStr<'static>) {
     (id, macro_id)
 }
 
-async fn attempt(db: &PgPool, actor: (Uuid, MacroUserIdStr<'static>)) -> InitializeMailbox {
-    let id = macro_uuid::generate_uuid_v7();
+async fn attempt(db: &PgPool, actor: (Uuid, RoxUserIdStr<'static>)) -> InitializeMailbox {
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO in_progress_user_link (id,macro_user_id,email_provider,linked_email) VALUES ($1,$2,'OUTLOOK','mailbox@example.com')",id,actor.0)
         .execute(db).await.unwrap();
     InitializeMailbox {
@@ -61,7 +61,7 @@ fn grant(owner: Uuid) -> VerifiedMailboxGrant {
             "Mail.Send".into(),
         ],
         calendar_requested: false,
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         generation: 1,
         owner,
         email: "mailbox@example.com".into(),
@@ -562,14 +562,14 @@ async fn concurrent_gmail_and_outlook_connections_share_one_remaining_free_slot(
 async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
     let owner = actor(&db, "legacy@example.com").await;
     assert_eq!(
-        macro_db_client::macro_user::get_macro_user(&db, &owner.0.to_string())
+        rox_db_client::macro_user::get_macro_user(&db, &owner.0.to_string())
             .await
             .unwrap()
             .username,
         "macro|legacy@example.com"
     );
     assert_eq!(
-        macro_db_client::user::get::get_user_id_by_email(db.clone(), "legacy@example.com")
+        rox_db_client::user::get::get_user_id_by_email(db.clone(), "legacy@example.com")
             .await
             .unwrap(),
         owner.1.as_ref(),
@@ -604,7 +604,7 @@ async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
         .await
         .unwrap()
         .unwrap();
-    let expected_address = format!("ada@{}", macro_user_id::handle::ROX_MAIL_DOMAIN);
+    let expected_address = format!("ada@{}", rox_user_id::handle::ROX_MAIL_DOMAIN);
     assert_eq!(link.email_address.0.as_ref(), expected_address);
     assert_eq!(
         link.provider,
@@ -738,7 +738,7 @@ async fn gmail_connected_after_rox_stays_non_primary(db: PgPool) {
         .unwrap();
 
     let email_address =
-        macro_user_id::email::EmailStr::try_from("owner@gmail.example".to_owned()).unwrap();
+        rox_user_id::email::EmailStr::try_from("owner@gmail.example".to_owned()).unwrap();
     let gmail = models_email::email::service::link::Link {
         id: Uuid::now_v7(),
         macro_id: owner.1.clone(),

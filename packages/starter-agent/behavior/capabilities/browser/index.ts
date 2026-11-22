@@ -2,9 +2,9 @@
  * Browser use: your own Chromium, on your computer's screen, with a profile
  * that stays signed in to what you sign in to.
  */
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { module } from '@macro-inc/muppet/core/capability';
-import type { Target } from '@macro-inc/muppet/utilities/browser';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { module } from '@rox-one/muppet/core/capability';
+import type { Target } from '@rox-one/muppet/utilities/browser';
 import { type Stepped, step } from './browse.ts';
 import { defaultBrowser, variables } from '../../context/startup.ts';
 import type { BrowserContext } from './context.ts';

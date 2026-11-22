@@ -103,7 +103,7 @@ const AGENT_CONTEXT_CLOSE: &str = "</m-agent-context>";
 /// A prompt's text without the leading `<m-agent-context>` block: the context
 /// the harness composes into every prompt it delivers (the time, the agent's
 /// identity, who is asking, a thread's private context). The transcript hides
-/// exactly such a block (`stripAgentContext` in `@macro-inc/lexical-core`): one
+/// exactly such a block (`stripAgentContext` in `@rox-one/lexical-core`): one
 /// at the start, holding a version 1 payload and nothing else, with the blank
 /// line after it. Any other text is returned whole.
 fn without_agent_context(text: &str) -> &str {

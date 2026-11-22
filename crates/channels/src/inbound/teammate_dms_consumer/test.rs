@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::{dm::EnsureDmsSummary, ports::ChannelMutationErr};
-use macro_event_broker::{Event, MacroEvent as _, MacroEventCollection as _, MessageParts};
+use rox_event_broker::{Event, RoxEvent as _, RoxEventCollection as _, MessageParts};
 use std::sync::{Arc, Mutex};
 
 #[derive(Clone, Default)]
@@ -43,8 +43,8 @@ impl MessageParts for TestMessage<'_> {
     }
 }
 
-fn user(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn member_joined() -> TeamsTopicForDms {
@@ -59,20 +59,20 @@ fn member_joined() -> TeamsTopicForDms {
 
 #[test]
 fn subscribes_to_macro_teams() {
-    assert_eq!(DeclaredMacroEvent::topics(), ["macro.teams"]);
+    assert_eq!(DeclaredRoxEvent::topics(), ["macro.teams"]);
 }
 
 #[test]
 fn decodes_member_joined_events() {
     let payload = serde_json::to_vec(&Event::new(member_joined())).expect("serializable");
-    let decoded = DeclaredMacroEvent::decode(&TestMessage {
+    let decoded = DeclaredRoxEvent::decode(&TestMessage {
         topic: "macro.teams",
         payload: &payload,
     })
     .expect("decodable");
 
     match decoded {
-        DeclaredMacroEvent::TeamsMacroEventForDms(event) => {
+        DeclaredRoxEvent::TeamsRoxEventForDms(event) => {
             assert_eq!(event.event().event, member_joined());
         }
     }
@@ -92,14 +92,14 @@ fn decodes_other_team_events_as_ignored() {
         }
     }))
     .expect("serializable");
-    let decoded = DeclaredMacroEvent::decode(&TestMessage {
+    let decoded = DeclaredRoxEvent::decode(&TestMessage {
         topic: "macro.teams",
         payload: &payload,
     })
     .expect("decodable");
 
     match decoded {
-        DeclaredMacroEvent::TeamsMacroEventForDms(event) => {
+        DeclaredRoxEvent::TeamsRoxEventForDms(event) => {
             assert!(matches!(event.event().event, TeamsTopicForDms::Other(_)));
         }
     }
@@ -120,14 +120,14 @@ fn decodes_canonical_member_joined_json() {
         }
     }))
     .expect("serializable");
-    let decoded = DeclaredMacroEvent::decode(&TestMessage {
+    let decoded = DeclaredRoxEvent::decode(&TestMessage {
         topic: "macro.teams",
         payload: &payload,
     })
     .expect("decodable");
 
     match decoded {
-        DeclaredMacroEvent::TeamsMacroEventForDms(event) => {
+        DeclaredRoxEvent::TeamsRoxEventForDms(event) => {
             assert_eq!(event.event().event, member_joined());
         }
     }
@@ -147,14 +147,14 @@ fn missing_teammate_ids_defaults_to_empty() {
         }
     }))
     .expect("serializable");
-    let decoded = DeclaredMacroEvent::decode(&TestMessage {
+    let decoded = DeclaredRoxEvent::decode(&TestMessage {
         topic: "macro.teams",
         payload: &payload,
     })
     .expect("decodable");
 
     match decoded {
-        DeclaredMacroEvent::TeamsMacroEventForDms(event) => {
+        DeclaredRoxEvent::TeamsRoxEventForDms(event) => {
             assert_eq!(
                 event.event().event,
                 TeamsTopicForDms::MemberJoined(MemberJoinedEnvelope::Payload(

@@ -1,11 +1,48 @@
-import type { PropertyDefinitionDomain } from '@property/types';
+import { formatLocale, t } from '@app/lib/i18n';
+import { getPropertyOptionLabel } from '@entity/utils/task-properties';
+import type {
+  PropertyDefinitionDomain,
+  PropertyOptionValue,
+} from '@property/types';
 import {
   formatBoolean,
-  formatDate,
   formatNumber,
   formatOptionValue,
 } from '@property/utils/formatting';
 import { match } from 'ts-pattern';
+
+// One formatter per locale: a feed of a thousand dates would otherwise build
+// a thousand formatters. Written as `23 нояб. 2026 г.` in Russian rather than
+// the interface's English month names.
+const dayFormats = new Map<string, Intl.DateTimeFormat>();
+
+function formatDay(value: string): string {
+  const locale = formatLocale();
+  let formatter = dayFormats.get(locale);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    });
+    dayFormats.set(locale, formatter);
+  }
+  return formatter.format(new Date(value));
+}
+
+/**
+ * The label of one select option: the known Russian wording for a system
+ * option (task status, priority, stage), else the option's own stored name.
+ */
+function optionLabel(
+  id: string,
+  option: { value: PropertyOptionValue } | undefined
+): string | undefined {
+  return (
+    getPropertyOptionLabel(id) ??
+    (option ? formatOptionValue(option) : undefined)
+  );
+}
 
 /** One resolved select option of a stored property value. */
 export type SelectOptionEntry = {
@@ -59,7 +96,11 @@ export function selectOptionEntries(
       const option = definition?.options?.find((o) => o.id === id);
       if (!option) return [];
       return [
-        { id, label: formatOptionValue(option), color: option.color ?? null },
+        {
+          id,
+          label: optionLabel(id, option) ?? formatOptionValue(option),
+          color: option.color ?? null,
+        },
       ];
     });
   return entries.length > 0 ? entries : undefined;
@@ -106,7 +147,7 @@ export function propertyValueLabel(
         : undefined
     )
     .with('Date', () =>
-      typeof tagged.value === 'string' ? formatDate(tagged.value) : undefined
+      typeof tagged.value === 'string' ? formatDay(tagged.value) : undefined
     )
     .with('SelectOption', () => {
       if (!Array.isArray(tagged.value)) return undefined;
@@ -114,7 +155,7 @@ export function propertyValueLabel(
         .filter((id): id is string => typeof id === 'string')
         .map((id) => {
           const option = definition?.options?.find((o) => o.id === id);
-          return option ? formatOptionValue(option) : undefined;
+          return optionLabel(id, option);
         })
         .filter((label): label is string => label !== undefined);
       return labels.length > 0 ? labels.join(', ') : undefined;
@@ -128,8 +169,8 @@ export function propertyValueLabel(
     .with('EntityReference', () =>
       Array.isArray(tagged.value) && tagged.value.length > 0
         ? tagged.value.length === 1
-          ? 'an item'
-          : `${tagged.value.length} items`
+          ? t('activity.entityItem')
+          : t('activity.entityItems', { count: tagged.value.length })
         : undefined
     )
     .otherwise(() => undefined);

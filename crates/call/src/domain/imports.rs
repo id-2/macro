@@ -3,15 +3,15 @@
 #[cfg(test)]
 mod test;
 
-use super::events::{CallMacroEvent, CallRecordImportedMetadata};
+use super::events::{CallRoxEvent, CallRecordImportedMetadata};
 use super::records::{
     CallEntityRecord, CallParticipant, CallProvider, CallSource, CallTranscript, ExternalCallId,
 };
 use super::service::publish_call_event;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Serialize;
 use uuid::Uuid;
 
@@ -76,18 +76,18 @@ pub trait ImportedCallRepository: Send + Sync {
     /// List recent records owned by this user, bounded by the service.
     async fn list_owned(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ImportedCallPreview>, rootcause::Report>;
     /// Every call this user imported from the provider, latest start first.
     async fn list_source_records(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         provider: CallProvider,
     ) -> Result<Vec<ImportedCallRecord>, rootcause::Report>;
     /// Read only when the user owns the imported call.
     async fn read_owned(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<Option<CallEntityRecord>, rootcause::Report>;
 }
@@ -100,18 +100,18 @@ pub trait CallImportService: Send + Sync {
     /// List the caller's imported calls.
     async fn list(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ImportedCallPreview>, rootcause::Report>;
     /// Every call the caller imported from the provider, unbounded, latest start first.
     async fn list_source_records(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         provider: CallProvider,
     ) -> Result<Vec<ImportedCallRecord>, rootcause::Report>;
     /// Read the caller's imported call; other owners' records are invisible.
     async fn read(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<Option<CallEntityRecord>, rootcause::Report>;
 }
@@ -121,7 +121,7 @@ pub trait CallImportService: Send + Sync {
 pub struct CallImportServiceImpl<R, B>(pub R, pub B);
 
 #[async_trait]
-impl<R: ImportedCallRepository, B: MacroEventBroker> CallImportService
+impl<R: ImportedCallRepository, B: RoxEventBroker> CallImportService
     for CallImportServiceImpl<R, B>
 {
     async fn ingest(&self, call: ImportedCall) -> Result<Uuid, rootcause::Report> {
@@ -140,26 +140,26 @@ impl<R: ImportedCallRepository, B: MacroEventBroker> CallImportService
         let call_id = self.0.upsert(call).await?;
         publish_call_event(
             &self.1,
-            &CallMacroEvent::record_imported(CallRecordImportedMetadata { call_id, owner }),
+            &CallRoxEvent::record_imported(CallRecordImportedMetadata { call_id, owner }),
         );
         Ok(call_id)
     }
     async fn list(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ImportedCallPreview>, rootcause::Report> {
         self.0.list_owned(user).await
     }
     async fn list_source_records(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         provider: CallProvider,
     ) -> Result<Vec<ImportedCallRecord>, rootcause::Report> {
         self.0.list_source_records(user, provider).await
     }
     async fn read(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<Option<CallEntityRecord>, rootcause::Report> {
         self.0.read_owned(user, id).await

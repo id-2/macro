@@ -1,5 +1,5 @@
-import type { Transition } from '@macro-inc/machine';
-import { createSolidMachine } from '@macro-inc/machine/solid';
+import type { Transition } from '@rox-one/machine';
+import { createSolidMachine } from '@rox-one/machine/solid';
 import { onCleanup } from 'solid-js';
 
 const SKELETON_SHOW_DELAY_MS = 120;

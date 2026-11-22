@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 // Load the SDK first: documents/document.ts and tasks/task.ts import each other.
 import '../../macro';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Document } from '../documents/document';
 import { EmailThread } from '../email/thread';
 import { Form } from '../forms/form';
@@ -16,7 +16,7 @@ function shareClient() {
         return { data: undefined };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, requests };
 }
 

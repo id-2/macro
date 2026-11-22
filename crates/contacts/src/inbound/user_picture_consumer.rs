@@ -19,17 +19,17 @@ use crate::domain::{
     service::picture_fanout::{UserPictureFanout, coalesce_users},
 };
 use kafka_util::{GroupName, KafkaEventConsumer};
-use macro_event_broker::{
-    KafkaConsumerAdapter, MacroEvent as _, MacroEventCollection as _, MacroEventConsumerService,
+use rox_event_broker::{
+    KafkaConsumerAdapter, RoxEvent as _, RoxEventCollection as _, RoxEventConsumerService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rdkafka::consumer::CommitMode;
 use rdkafka::message::{BorrowedMessage, Message as _};
 use std::future::Future;
 use std::sync::Arc;
 use std::time::Duration;
 use tracing::Instrument as _;
-use user_events::{UserMacroEvent, UserTopicEvent};
+use user_events::{UserRoxEvent, UserTopicEvent};
 
 /// Consumer group for contact picture fan-out.
 struct UserPictureConsumerGroup;
@@ -38,11 +38,11 @@ impl GroupName for UserPictureConsumerGroup {
     const GROUP_NAME: &'static str = "contacts-user-picture";
 }
 
-type UserPictureKafkaAdapter = KafkaConsumerAdapter<UserPictureConsumerGroup, DeclaredMacroEvent>;
+type UserPictureKafkaAdapter = KafkaConsumerAdapter<UserPictureConsumerGroup, DeclaredRoxEvent>;
 type UserPictureKafkaConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, UserPictureKafkaAdapter>;
+    RoxEventConsumerService<DeclaredRoxEvent, UserPictureKafkaAdapter>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: UserMacroEvent);
+rox_event_broker::declare_topics!(DeclaredRoxEvent: UserRoxEvent);
 
 /// How long a batch keeps collecting records after its first one.
 const BATCH_WINDOW: Duration = Duration::from_millis(250);
@@ -57,7 +57,7 @@ const MAX_ATTEMPTS: u32 = 3;
 const RETRY_BASE_DELAY: Duration = Duration::from_secs(1);
 
 /// The user a `macro.users` event asks to fan out, if any.
-pub(crate) fn picture_changed_user(event: &UserTopicEvent) -> Option<MacroUserIdStr<'static>> {
+pub(crate) fn picture_changed_user(event: &UserTopicEvent) -> Option<RoxUserIdStr<'static>> {
     match event {
         UserTopicEvent::PictureChanged(metadata) => Some(metadata.user_id.clone()),
     }
@@ -76,7 +76,7 @@ fn commit_logged(consumer: &UserPictureKafkaConsumer, message: &BorrowedMessage<
 
 async fn fan_out_with_retries<R, N>(
     fanout: &UserPictureFanout<R, N>,
-    user: &MacroUserIdStr<'static>,
+    user: &RoxUserIdStr<'static>,
 ) where
     R: ContactsPageRepository,
     N: UserPictureNotifier,
@@ -110,11 +110,11 @@ where
 {
     let consumer = KafkaEventConsumer::<UserPictureConsumerGroup>::from_env(brokers)?;
     let consumer = KafkaConsumerAdapter::<UserPictureConsumerGroup, ()>::new(consumer)
-        .subscribe::<DeclaredMacroEvent>()
+        .subscribe::<DeclaredRoxEvent>()
         .map_err(|error| rootcause::report!("failed to subscribe to user events: {error:?}"))?;
     let consumer = UserPictureKafkaConsumer::new(consumer);
     tracing::info!(
-        topics = ?DeclaredMacroEvent::topics(),
+        topics = ?DeclaredRoxEvent::topics(),
         group = UserPictureConsumerGroup::GROUP_NAME,
         "user picture consumer listening"
     );
@@ -152,7 +152,7 @@ where
             let span =
                 kafka_util::consumer_span(kafka_message, UserPictureConsumerGroup::GROUP_NAME);
             match message.decode_payload() {
-                Ok(DeclaredMacroEvent::UserMacroEvent(event)) => {
+                Ok(DeclaredRoxEvent::UserRoxEvent(event)) => {
                     if let Some(user) = picture_changed_user(&event.event().event) {
                         latest.push((user, span));
                     }

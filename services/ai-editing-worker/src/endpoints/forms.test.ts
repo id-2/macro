@@ -1,5 +1,5 @@
 import { readFileSync } from 'node:fs';
-import { applyLayout, readLayout } from '@macro-inc/collaboration/forms/layout';
+import { applyLayout, readLayout } from '@rox-one/collaboration/forms/layout';
 import { LoroDoc } from 'loro-crdt';
 import { describe, expect, it } from 'vitest';
 import forms from './forms';

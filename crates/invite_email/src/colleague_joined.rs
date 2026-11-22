@@ -5,11 +5,11 @@ use super::*;
 /// one-time notice that names who set the team up rather than announcing a sign-up.
 #[derive(Debug, Clone, Serialize, Deserialize, Template)]
 #[template(path = "colleague_joined_rox.html")]
-pub struct ColleagueJoinedMacro {
+pub struct ColleagueJoinedRox {
     /// The team the recipient joins automatically when they sign up.
     pub team_name: String,
     /// The colleague who joined Rox.
-    pub joined_by: MacroUserIdStr<'static>,
+    pub joined_by: RoxUserIdStr<'static>,
     /// The colleague's display name from an untrusted source. It is shown on one line, capped,
     /// and escaped.
     pub joined_name: Option<String>,
@@ -17,7 +17,7 @@ pub struct ColleagueJoinedMacro {
     pub recipient_email: EmailStr<'static>,
 }
 
-impl ColleagueJoinedMacro {
+impl ColleagueJoinedRox {
     fn display_name(&self) -> Option<String> {
         single_line_name(self.joined_name.as_deref())
     }
@@ -40,11 +40,11 @@ impl ColleagueJoinedMacro {
     }
 }
 
-impl Notification for ColleagueJoinedMacro {
+impl Notification for ColleagueJoinedRox {
     const TYPE_NAME: &'static str = "colleague_joined_macro";
 }
 
-impl NotificationExtEmail for ColleagueJoinedMacro {
+impl NotificationExtEmail for ColleagueJoinedRox {
     fn format_email(&self) -> EmailContent {
         EmailContent::new(
             "A team has been created for your organization".to_string(),

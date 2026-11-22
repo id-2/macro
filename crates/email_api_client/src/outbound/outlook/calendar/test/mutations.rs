@@ -5,8 +5,8 @@ use calendar_events::{
 };
 use chrono::{Days, Duration};
 use chrono_tz::America::Los_Angeles;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
 use wiremock::{Request, Respond, matchers::path_regex};
@@ -249,7 +249,7 @@ async fn an_event_created_on_a_chosen_outlook_calendar_is_posted_there_and_liste
         repo,
         api,
         IssuedToken,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         NoOpenClients,
     )
     .create_event(
@@ -360,7 +360,7 @@ async fn an_all_day_outlook_event_is_sent_as_utc_midnights_and_listed_on_its_dat
         repo,
         api,
         IssuedToken,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         NoOpenClients,
     )
     .create_event(
@@ -492,7 +492,7 @@ async fn moving_a_synced_outlook_meeting_patches_only_its_times_and_lists_it_at_
         repo,
         api,
         IssuedToken,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         NoOpenClients,
     )
     .update_event(
@@ -602,7 +602,7 @@ async fn deleting_a_synced_outlook_event_deletes_it_in_graph_and_drops_it_from_t
         .unwrap();
     assert_eq!(synced.len(), 1);
 
-    CalendarMutationServiceImpl::new(repo, api, IssuedToken, NoopMacroEventBroker, NoOpenClients)
+    CalendarMutationServiceImpl::new(repo, api, IssuedToken, NoopRoxEventBroker, NoOpenClients)
         .delete_event(OWNER, synced[0].event.id, None, CalendarDeletionScope::All)
         .await
         .unwrap();
@@ -802,10 +802,10 @@ fn mutations(
     PgCalendarRepository,
     OutlookApiClientRepository,
     IssuedToken,
-    NoopMacroEventBroker,
+    NoopRoxEventBroker,
     NoOpenClients,
 > {
-    CalendarMutationServiceImpl::new(repo, api, IssuedToken, NoopMacroEventBroker, NoOpenClients)
+    CalendarMutationServiceImpl::new(repo, api, IssuedToken, NoopRoxEventBroker, NoOpenClients)
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]

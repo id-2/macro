@@ -4,7 +4,7 @@ use axum::{Json, extract::State};
 use entity_access::domain::models::OwnerAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::InitiativeAccessExtractor;
-use macro_authorization::MacroAuthorizationService;
+use rox_authorization::RoxAuthorizationService;
 use model_error_response::ErrorResponse;
 
 use super::{GenericSuccessResponse, InitiativeIdParams, InitiativeRouterState};
@@ -33,7 +33,7 @@ pub async fn delete_initiative_handler<S, Eas, Auth>(
 where
     S: InitiativeService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state.service.delete(access.entity_access_receipt).await?;
     Ok(Json(GenericSuccessResponse { success: true }))

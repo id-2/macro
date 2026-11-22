@@ -1,7 +1,8 @@
 //! The runtime gateway: where user-run harnesses dial in to serve their agents.
 //!
 //! `GET /runtime/ws`, authenticated with the harness credential header
-//! (`x-macro-harness-token`) - a WebSocket upgrade is an ordinary HTTP request,
+//! (`x-rox-harness-token`, and the earlier `x-macro-harness-token` still
+//! accepted) - a WebSocket upgrade is an ordinary HTTP request,
 //! and every runtime dialing in is a real client that can set headers.
 //!
 //! One connection per harness, not per bot or per session. ACP initializes per
@@ -28,7 +29,8 @@ use std::sync::{Arc, Mutex, PoisonError};
 use std::time::Duration;
 
 use agent_runtime_protocol::domain::schema::v0::{
-    ACCEPTS_AGENTS_CHANGED, RUNTIME_ACCEPTS_HEADER, ToRuntimeMessage, ToServerMessage,
+    ACCEPTS_AGENTS_CHANGED, LEGACY_RUNTIME_ACCEPTS_HEADER, RUNTIME_ACCEPTS_HEADER,
+    ToRuntimeMessage, ToServerMessage,
 };
 use agent_runtime_protocol::outbound::websocket::connect_socket;
 use axum::Router;
@@ -39,8 +41,8 @@ use axum::http::{HeaderMap, StatusCode};
 use axum::response::{IntoResponse as _, Response};
 use axum::routing::get;
 use harness_id::HarnessId;
-use macro_authorization::{
-    HarnessOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    HarnessOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 use tokio::time::Instant;
 use tracing::Instrument as _;
@@ -56,7 +58,7 @@ pub type GatewaySender = tokio::sync::mpsc::UnboundedSender<ToRuntimeMessage>;
 /// State for the runtime gateway route.
 pub struct RuntimeGatewayState<Auth> {
     runtimes: Arc<RuntimeRegistry<GatewaySender>>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
     dials: Arc<DialBudget>,
 }
 
@@ -64,7 +66,7 @@ impl<Auth> RuntimeGatewayState<Auth> {
     /// Create gateway state with the default [`DialBudget`].
     pub fn new(
         runtimes: Arc<RuntimeRegistry<GatewaySender>>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             runtimes,
@@ -91,7 +93,7 @@ impl<Auth> Clone for RuntimeGatewayState<Auth> {
     }
 }
 
-impl<Auth> FromRef<RuntimeGatewayState<Auth>> for MacroAuthorizationState<Auth> {
+impl<Auth> FromRef<RuntimeGatewayState<Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &RuntimeGatewayState<Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -100,7 +102,7 @@ impl<Auth> FromRef<RuntimeGatewayState<Auth>> for MacroAuthorizationState<Auth> 
 /// Build the router serving `GET /ws`. Mount it under `/runtime`.
 pub fn runtime_gateway_router<Auth, S>(state: RuntimeGatewayState<Auth>) -> Router<S>
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -121,12 +123,12 @@ where
 )]
 async fn dial_handler<Auth>(
     State(state): State<RuntimeGatewayState<Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, HarnessOnly>,
+    caller: RoxAuthorizationExtractor<Auth, HarnessOnly>,
     headers: HeaderMap,
     ws: WebSocketUpgrade,
 ) -> Response
 where
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let harness = caller.authorization.harness_id;
     let span = tracing::Span::current();
@@ -170,11 +172,13 @@ where
 }
 
 /// The optional messages the dialing runtime listed in
-/// [`RUNTIME_ACCEPTS_HEADER`]. Runtimes that predate the header list none.
+/// [`RUNTIME_ACCEPTS_HEADER`], or under its pre-rename name. Runtimes that
+/// predate both list none. Each name may appear more than once and each
+/// value is a comma-separated list, so every value of both names is read.
 fn runtime_accepts(headers: &HeaderMap) -> RuntimeAccepts {
-    let listed = headers
-        .get_all(RUNTIME_ACCEPTS_HEADER)
-        .iter()
+    let listed = [RUNTIME_ACCEPTS_HEADER, LEGACY_RUNTIME_ACCEPTS_HEADER]
+        .into_iter()
+        .flat_map(|name| headers.get_all(name).iter())
         .filter_map(|value| value.to_str().ok())
         .flat_map(|value| value.split(','))
         .map(str::trim);

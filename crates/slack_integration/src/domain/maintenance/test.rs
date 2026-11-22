@@ -1,6 +1,6 @@
 use super::*;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
 
@@ -26,7 +26,7 @@ impl ExecutionRepo for Fake {
     async fn requester(
         &self,
         _: &ImportEvent,
-    ) -> PortResult<Option<(TeamId, MacroUserIdStr<'static>)>> {
+    ) -> PortResult<Option<(TeamId, RoxUserIdStr<'static>)>> {
         unreachable!()
     }
     async fn claim(&self, _: &ImportEvent, _: WorkerId) -> PortResult<ClaimOutcome> {

@@ -262,7 +262,7 @@ the notification appears (`channels.md`, `home.md`, `notifications.md`, ...).
 - **Renaming.** Keep the old tag readable with `#[serde(alias = "<old>")]` on the
   variant and a migration rewriting `notification.notification_event_type` and
   `user_notification_type_preference.notification_event_type`. Copy
-  `crates/macro_db_client/migrations/20260618152324_rename_call_started_notification_type.sql`
+  `crates/rox_db_client/migrations/20260618152324_rename_call_started_notification_type.sql`
   (generate the file with `sqlx migrate add`; see the
   [database guide](../development/database.md)).
 - **Privacy.** Never put notification payloads on spans or in logs. Use

@@ -1,5 +1,5 @@
 import { throwOnErr } from '@core/util/result';
-import { NOOP_SPAN, type Span } from '@macro-inc/observability';
+import { NOOP_SPAN, type Span } from '@rox-one/observability';
 import { fetchSyncDocumentOpenContext } from '@queries/storage/documentLoad/sync-document-context';
 import type { AccessLevel } from '@service-storage/generated/schemas/accessLevel';
 import type { DocumentMetadata } from '@service-storage/generated/schemas/documentMetadata';

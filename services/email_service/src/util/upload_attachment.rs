@@ -4,8 +4,8 @@ use base64::engine::general_purpose::STANDARD;
 use document_storage_service_client::DocumentStorageServiceClient;
 use document_storage_service_client::document::CreateDocumentInternalError;
 use email_api_client::domain::models::EmailApiError;
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
 use model::document::response::{CreateDocumentRequest, CreateDocumentResponse};
 use model::document::{FileTypeExt, MAX_DOCUMENT_NAME_GRAPHEMES};
 use model_file_type::FileType;
@@ -149,7 +149,7 @@ async fn upload_media_attachment(
         .map_err(|e| UploadAttachmentError::SfsUploadFailed(e.to_string()))?;
 
     // Store metadata in email_attachments_sfs table
-    let attachment_sfs_id = macro_uuid::generate_uuid_v7();
+    let attachment_sfs_id = rox_uuid::generate_uuid_v7();
     let sfs_id = Uuid::parse_str(&sfs_response.id).map_err(|e| {
         UploadAttachmentError::ParseError(format!("Failed to parse SFS ID as UUID: {}", e))
     })?;
@@ -470,8 +470,8 @@ fn email_attachment_property(p: &AttachmentUploadArgs) -> EmailAttachmentPropert
     }
 }
 
-fn macro_user_id(p: &AttachmentUploadArgs, email: &str) -> Option<MacroUserId<Lowercase<'static>>> {
-    match MacroUserIdStr::try_from_email(email) {
+fn macro_user_id(p: &AttachmentUploadArgs, email: &str) -> Option<RoxUserId<Lowercase<'static>>> {
+    match RoxUserIdStr::try_from_email(email) {
         Ok(id) => Some(id.0),
         // The parse error echoes the address, so it stays out of the log.
         Err(_) => {

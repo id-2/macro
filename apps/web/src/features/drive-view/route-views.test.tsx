@@ -1,6 +1,7 @@
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { createSignal, type ParentProps } from 'solid-js';
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, expect, it, vi } from 'vitest';
 
 const [authenticated, setAuthenticated] = createSignal<boolean | undefined>();
 const mountPrivateDrive = vi.fn();
@@ -62,6 +63,8 @@ beforeEach(() => {
   mountPrivateDrive.mockClear();
 });
 afterEach(cleanup);
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 it('mounts shared details without mounting private Drive sources when signed out', () => {
   setAuthenticated(false);

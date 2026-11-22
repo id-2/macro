@@ -13,7 +13,7 @@ impl SessionTasks for OwnerOnlyTasks {
     fn link_task<'a>(
         &'a self,
         session: AgentSessionId,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         task: &'a str,
     ) -> BoxFuture<'a, Result<LinkedTask, SessionTaskError>> {
         self.calls
@@ -40,7 +40,7 @@ impl SessionTasks for OwnerOnlyTasks {
 
     fn task_pull_requests<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'static>,
+        _: &'a RoxUserIdStr<'static>,
         _: &'a str,
     ) -> BoxFuture<'a, Result<TaskPullRequests, SessionTaskError>> {
         Box::pin(async { unreachable!("not routed") })
@@ -49,14 +49,14 @@ impl SessionTasks for OwnerOnlyTasks {
     fn link_session_pull_request<'a>(
         &'a self,
         _: AgentSessionId,
-        _: &'a MacroUserIdStr<'static>,
+        _: &'a RoxUserIdStr<'static>,
     ) -> BoxFuture<'a, Result<(), SessionTaskError>> {
         Box::pin(async { unreachable!("not routed") })
     }
 }
 
 fn task_router(tasks: Arc<OwnerOnlyTasks>) -> Router {
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".into(),
@@ -68,7 +68,7 @@ fn task_router(tasks: Arc<OwnerOnlyTasks>) -> Router {
     crate::inbound::axum_router::task::agent_session_task_router(AgentSessionRouterState::new(
         tasks as Arc<dyn SessionTasks>,
         Arc::new(entity_access::domain::ports::NoOpEntityAccessService),
-        MacroAuthorizationState::new(Arc::new(auth)),
+        RoxAuthorizationState::new(Arc::new(auth)),
     ))
 }
 

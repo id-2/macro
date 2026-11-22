@@ -23,11 +23,11 @@ use axum::{
     response::{IntoResponse, Response},
     routing::{get, patch, post, put},
 };
-use macro_authorization::{
-    CredentialOrigin, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    CredentialOrigin, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState, UserOnly,
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 use std::sync::Arc;
 use uuid::Uuid;
@@ -41,7 +41,7 @@ pub struct AgentRouterState<A> {
     /// Agent vault use cases; owns every policy decision.
     pub service: Arc<AgentVaultService>,
     /// Shared Macro credential-validation boundary.
-    pub authorization: MacroAuthorizationState<A>,
+    pub authorization: RoxAuthorizationState<A>,
 }
 impl<A> Clone for AgentRouterState<A> {
     fn clone(&self) -> Self {
@@ -51,14 +51,14 @@ impl<A> Clone for AgentRouterState<A> {
         }
     }
 }
-impl<A> FromRef<AgentRouterState<A>> for MacroAuthorizationState<A> {
+impl<A> FromRef<AgentRouterState<A>> for RoxAuthorizationState<A> {
     fn from_ref(state: &AgentRouterState<A>) -> Self {
         state.authorization.clone()
     }
 }
 
 /// Agent routes, nested at `/passwords/agent`.
-pub fn agent_router<A: MacroAuthorizationService, T: Send + Sync + 'static>(
+pub fn agent_router<A: RoxAuthorizationService, T: Send + Sync + 'static>(
     state: AgentRouterState<A>,
 ) -> Router<T> {
     Router::new()
@@ -82,7 +82,7 @@ pub fn agent_router<A: MacroAuthorizationService, T: Send + Sync + 'static>(
 }
 
 /// Human review routes for agent access, merged into `/passwords`.
-pub fn review_router<A: MacroAuthorizationService, T: Send + Sync + 'static>(
+pub fn review_router<A: RoxAuthorizationService, T: Send + Sync + 'static>(
     state: AgentRouterState<A>,
 ) -> Router<T> {
     Router::new()
@@ -241,8 +241,8 @@ impl IntoResponse for AgentApiError {
 }
 
 /// Only the agent's own user API key reaches agent routes.
-fn call<A: MacroAuthorizationService>(
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+fn call<A: RoxAuthorizationService>(
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     team: Uuid,
     headers: &HeaderMap,
 ) -> Result<AgentCall, Unauthorized> {
@@ -260,8 +260,8 @@ fn call<A: MacroAuthorizationService>(
 }
 
 /// Human review routes keep the human v1 session-only rule.
-fn human<A: MacroAuthorizationService>(
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+fn human<A: RoxAuthorizationService>(
+    user: RoxAuthorizationExtractor<A, UserOnly>,
 ) -> Result<Actor, AgentApiError> {
     if user.authorization.origin != CredentialOrigin::Session {
         return Err(AgentApiError(AgentError::Forbidden));
@@ -310,9 +310,9 @@ pub struct ReviewParams {
 
 #[utoipa::path(operation_id = "passwords_agent_search", get, path = "/passwords/agent/teams/{team}/items", params(("team" = Uuid, Path), ("X-Macro-Agent-Session-Id" = String, Header, description = "Wake UUIDv7"), SearchParams), responses((status = 200, body = AgentSearchPage), (status = 400, body = AgentFailure), (status = 401, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Search the agent's catalog: metadata and current access only.
-pub async fn search<A: MacroAuthorizationService>(
+pub async fn search<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path(team): Path<Uuid>,
     headers: HeaderMap,
     Query(params): Query<SearchParams>,
@@ -325,9 +325,9 @@ pub async fn search<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_disclose", post, path = "/passwords/agent/teams/{team}/items/{item}/disclose", params(("team" = Uuid, Path), ("item" = Uuid, Path), ("X-Macro-Agent-Session-Id" = String, Header, description = "Wake UUIDv7"), ("X-Macro-Passwords" = String, Header, description = "Required CSRF header; send 1")), request_body = DiscloseRequest, responses((status = 200, body = Disclosed), (status = 400, body = AgentFailure), (status = 401, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 409, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Disclose one selected field to the agent's capability.
-pub async fn disclose<A: MacroAuthorizationService>(
+pub async fn disclose<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     headers: HeaderMap,
     bytes: Result<Bytes, BytesRejection>,
@@ -342,9 +342,9 @@ pub async fn disclose<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_totp_code", post, path = "/passwords/agent/teams/{team}/items/{item}/totp/code", params(("team" = Uuid, Path), ("item" = Uuid, Path), ("X-Macro-Agent-Session-Id" = String, Header, description = "Wake UUIDv7"), ("X-Macro-Passwords" = String, Header, description = "Required CSRF header; send 1")), request_body = TotpCodeRequest, responses((status = 200, body = AgentTotpCode), (status = 400, body = AgentFailure), (status = 401, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 409, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// The current verification code of a login or verification-code item.
-pub async fn totp_code<A: MacroAuthorizationService>(
+pub async fn totp_code<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     headers: HeaderMap,
     bytes: Result<Bytes, BytesRejection>,
@@ -359,9 +359,9 @@ pub async fn totp_code<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_create", post, path = "/passwords/agent/teams/{team}/items", params(("team" = Uuid, Path), ("X-Macro-Agent-Session-Id" = String, Header, description = "Wake UUIDv7"), ("X-Macro-Passwords" = String, Header, description = "Required CSRF header; send 1")), request_body = AgentCreateItem, responses((status = 201, body = AgentWriteResult), (status = 200, description = "Replay of an accepted operation", body = AgentWriteResult), (status = 400, body = AgentFailure), (status = 401, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 409, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Create a login or API item attributed to this agent.
-pub async fn create<A: MacroAuthorizationService>(
+pub async fn create<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path(team): Path<Uuid>,
     headers: HeaderMap,
     bytes: Result<Bytes, BytesRejection>,
@@ -376,9 +376,9 @@ pub async fn create<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_update", patch, path = "/passwords/agent/teams/{team}/items/{item}", params(("team" = Uuid, Path), ("item" = Uuid, Path), ("X-Macro-Agent-Session-Id" = String, Header, description = "Wake UUIDv7"), ("X-Macro-Passwords" = String, Header, description = "Required CSRF header; send 1")), request_body = AgentPatchItem, responses((status = 200, body = AgentWriteResult), (status = 400, body = AgentFailure), (status = 401, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 409, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Replace supplied fields of a login or API item.
-pub async fn update<A: MacroAuthorizationService>(
+pub async fn update<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     headers: HeaderMap,
     bytes: Result<Bytes, BytesRejection>,
@@ -390,9 +390,9 @@ pub async fn update<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_set_totp", put, path = "/passwords/agent/teams/{team}/items/{item}/totp", params(("team" = Uuid, Path), ("item" = Uuid, Path), ("X-Macro-Agent-Session-Id" = String, Header, description = "Wake UUIDv7"), ("X-Macro-Passwords" = String, Header, description = "Required CSRF header; send 1")), request_body = AgentSetTotp, responses((status = 204), (status = 400, body = AgentFailure), (status = 401, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 409, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Enroll a verification-code seed on an item this agent created.
-pub async fn set_totp<A: MacroAuthorizationService>(
+pub async fn set_totp<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     headers: HeaderMap,
     bytes: Result<Bytes, BytesRejection>,
@@ -408,9 +408,9 @@ pub async fn set_totp<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_request_access", post, path = "/passwords/agent/teams/{team}/items/{item}/access-requests", params(("team" = Uuid, Path), ("item" = Uuid, Path), ("X-Macro-Agent-Session-Id" = String, Header, description = "Wake UUIDv7"), ("X-Macro-Passwords" = String, Header, description = "Required CSRF header; send 1")), request_body = AccessRequestBody, responses((status = 202, body = AgentAccessRequestState), (status = 200, description = "Already usable", body = AgentAccessRequestState), (status = 400, body = AgentFailure), (status = 401, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 429, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Ask authorized humans for access to an item.
-pub async fn request_access<A: MacroAuthorizationService>(
+pub async fn request_access<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     headers: HeaderMap,
     bytes: Result<Bytes, BytesRejection>,
@@ -429,9 +429,9 @@ pub async fn request_access<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_my_request", get, path = "/passwords/agent/teams/{team}/items/{item}/access-requests/mine", params(("team" = Uuid, Path), ("item" = Uuid, Path), ("X-Macro-Agent-Session-Id" = String, Header, description = "Wake UUIDv7")), responses((status = 200, body = AgentAccessRequestState), (status = 400, body = AgentFailure), (status = 401, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// This agent's own request state for the item.
-pub async fn my_request<A: MacroAuthorizationService>(
+pub async fn my_request<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item)): Path<(Uuid, Uuid)>,
     headers: HeaderMap,
 ) -> Result<Response, Response> {
@@ -445,9 +445,9 @@ pub async fn my_request<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_access_requests", get, path = "/passwords/teams/{team}/agent-access-requests", params(("team" = Uuid, Path), ReviewParams), responses((status = 200, body = AgentAccessRequestPage), (status = 400, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Pending agent requests on items the caller may manage.
-pub async fn pending<A: MacroAuthorizationService>(
+pub async fn pending<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path(team): Path<Uuid>,
     Query(params): Query<ReviewParams>,
 ) -> Result<Json<AgentAccessRequestPage>, AgentApiError> {
@@ -463,9 +463,9 @@ pub async fn pending<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_resolve_request", post, path = "/passwords/teams/{team}/items/{item}/agent-access-requests/{request}/resolve", params(("team" = Uuid, Path), ("item" = Uuid, Path), ("request" = Uuid, Path), ("X-Macro-Passwords" = String, Header, description = "Required CSRF header; send 1")), request_body = ResolveRequest, responses((status = 200, body = AgentAccessRequestState), (status = 400, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 409, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Approve or deny a pending agent request.
-pub async fn resolve<A: MacroAuthorizationService>(
+pub async fn resolve<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item, request)): Path<(Uuid, Uuid, Uuid)>,
     bytes: Result<Bytes, BytesRejection>,
 ) -> Result<Json<AgentAccessRequestState>, AgentApiError> {
@@ -480,14 +480,14 @@ pub async fn resolve<A: MacroAuthorizationService>(
 
 #[utoipa::path(operation_id = "passwords_agent_revoke", post, path = "/passwords/teams/{team}/items/{item}/agents/{agent}/revoke", params(("team" = Uuid, Path), ("item" = Uuid, Path), ("agent" = String, Path), ("X-Macro-Passwords" = String, Header, description = "Required CSRF header; send 1")), request_body = RevokeBody, responses((status = 200, body = AgentItemAccess), (status = 400, body = AgentFailure), (status = 403, body = AgentFailure), (status = 404, body = AgentFailure), (status = 409, body = AgentFailure), (status = 503, body = AgentFailure)), tag = "passwords")]
 /// Revoke an agent's standing approval, or its grant and approval.
-pub async fn revoke<A: MacroAuthorizationService>(
+pub async fn revoke<A: RoxAuthorizationService>(
     State(state): State<AgentRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, item, agent)): Path<(Uuid, Uuid, String)>,
     bytes: Result<Bytes, BytesRejection>,
 ) -> Result<Json<AgentItemAccess>, AgentApiError> {
     let actor = human(user)?;
-    let agent = MacroUserIdStr::parse_from_str(&agent)
+    let agent = RoxUserIdStr::parse_from_str(&agent)
         .map(CowLike::into_owned)
         .map_err(|_| AgentError::Invalid);
     Ok(Json(

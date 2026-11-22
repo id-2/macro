@@ -24,10 +24,7 @@
  * them, regardless of which page or device started the flow.
  */
 import type { AnalyticsInterface } from './analytics';
-import {
-  SIGNUP_LEAD_VALUE_BY_TIER,
-  SIGNUP_LEAD_VALUE_DEFAULT,
-} from './leadValues';
+import { SIGNUP_LEAD_VALUE_BY_TIER } from './leadValues';
 
 const SIGNED_UP_PARAM = 'signed_up';
 const TRACKED_STORAGE_PREFIX = 'macro_sign_up_tracked:';
@@ -107,10 +104,10 @@ export function trackSignupCompletion(
   // GA4 recommended-event name; browser GA has the client id for attribution.
   analytics.track('sign_up', {}, ['ga']);
 
-  // Paid signups return from Stripe with a `type` param; plain signups have
-  // no tier yet and count at the free-signup lead value. Purchase value is
-  // tracked separately via subscription_success. Checked in both the search
-  // and hash query for the same hash-router reason as the signed_up param.
+  // Paid signups return from Stripe with a `type` param. A new account is
+  // already Pro, so the Meta payload matches the create-user webhook even
+  // when the redirect has no tier param. Google still uses an explicit
+  // `type` when one is present.
   const hashQueryIndex = window.location.hash.indexOf('?');
   const hashParams =
     hashQueryIndex !== -1
@@ -119,21 +116,19 @@ export function trackSignupCompletion(
   const tier =
     new URLSearchParams(window.location.search).get('type') ??
     hashParams?.get('type') ??
-    'free';
-  const value = SIGNUP_LEAD_VALUE_BY_TIER[tier] ?? SIGNUP_LEAD_VALUE_DEFAULT;
+    'premium';
+  const value = SIGNUP_LEAD_VALUE_BY_TIER[tier] ?? SIGNUP_LEAD_VALUE_BY_TIER.premium;
 
   analytics.trackMeta(
     'CompleteRegistration',
     // Must mirror the server-side payload in create_user_webhook.rs exactly:
     // the create-user webhook fires this same event through the Conversions
     // API with the same event id, and Meta keeps whichever of the deduped
-    // pair lands first (almost always the server). Accounts are always free
-    // at creation, so both sides report the flat signup value; the tier-based
-    // value below stays on the Google conversion, which is browser-only.
+    // pair lands first (almost always the server).
     {
       content_name: 'account_created',
-      content_category: 'free',
-      value: SIGNUP_LEAD_VALUE_DEFAULT,
+      content_category: 'premium',
+      value: SIGNUP_LEAD_VALUE_BY_TIER.premium,
       currency: 'USD',
     },
     { eventID: `signup:${user.id}` }

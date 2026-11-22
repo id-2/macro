@@ -20,7 +20,7 @@ async fn echo_then_trash(
     echo.subject = Some("Provider draft echo".into());
     echo.body_text = Some("Provider draft body".into());
     echo.body_html_sanitized = Some("<p>Provider draft body</p>".into());
-    let first = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let first = SendAttemptId(rox_uuid::generate_uuid_v7());
     let mut input = prepared();
     input.undo_delay_secs = 120;
     input.message.provider_id = echo.provider_id.clone();
@@ -97,7 +97,7 @@ async fn preserve_replacement(
 ) -> anyhow::Result<()> {
     let (repo, first) = echo_then_trash(&pool, legacy).await?;
     // A second device sees an editable, unscheduled draft and explicitly sends new content.
-    let second = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let second = SendAttemptId(rox_uuid::generate_uuid_v7());
     let mut newer = prepared_generation(1);
     // Delivery deadlines do not define ownership: newer sends may have shorter delays.
     newer.undo_delay_secs = 5;

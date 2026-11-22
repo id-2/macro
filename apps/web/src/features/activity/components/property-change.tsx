@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { PropertyValueIcon } from '@property/component/propertyValue/PropertyValueIcon';
 import { TagDot } from '@property/tags/TagDot';
 import type { PropertyDefinitionDomain } from '@property/types';
@@ -29,7 +30,7 @@ export function PropertyChangeText(props: {
   valueLabel?: (raw: unknown) => string | undefined;
 }) {
   const definition = () => props.definition;
-  const name = () => definition()?.displayName ?? 'a property';
+  const name = () => definition()?.displayName ?? t('activity.propertyFallback');
   const cleared = () =>
     props.action.to === null || props.action.to === undefined;
   const label = (raw: unknown) =>
@@ -42,15 +43,15 @@ export function PropertyChangeText(props: {
       <span class="shrink-0">
         {cleared()
           ? props.capitalize
-            ? 'Cleared'
-            : 'cleared'
+            ? t('activity.clearedCap')
+            : t('activity.cleared')
           : props.capitalize
-            ? 'Changed'
-            : 'changed'}
+            ? t('activity.changedCap')
+            : t('activity.changed')}
       </span>
       <span class="shrink-0 font-medium text-ink">{name()}</span>
       <Show when={hasFrom()}>
-        <span class="shrink-0">from</span>
+        <span class="shrink-0">{t('activity.from')}</span>
         <PropertyValueDisplay
           raw={props.action.from}
           definition={definition()}
@@ -58,7 +59,7 @@ export function PropertyChangeText(props: {
         />
       </Show>
       <Show when={hasTo()}>
-        <span class="shrink-0">to</span>
+        <span class="shrink-0">{t('activity.to')}</span>
         <PropertyValueDisplay
           raw={props.action.to}
           definition={definition()}

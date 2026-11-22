@@ -58,7 +58,7 @@ impl DraftJobStore for Rows {
 
     async fn started(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         client_id: Uuid,
     ) -> Result<Option<DraftJob>> {
         Ok(self
@@ -96,7 +96,7 @@ impl DraftJobStore for Rows {
         })
     }
 
-    async fn jobs(&self, owner: &MacroUserIdStr<'static>, limit: u16) -> Result<Vec<DraftJob>> {
+    async fn jobs(&self, owner: &RoxUserIdStr<'static>, limit: u16) -> Result<Vec<DraftJob>> {
         let mine: Vec<Uuid> = self
             .drafts
             .lock()
@@ -113,7 +113,7 @@ impl DraftJobStore for Rows {
 
     async fn job(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: Uuid,
     ) -> Result<Option<DraftJob>> {
         let mine = self
@@ -127,7 +127,7 @@ impl DraftJobStore for Rows {
 
     async fn cancel_job(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: Uuid,
     ) -> Result<Option<CancelledJob>> {
         let drafts = self.drafts.lock().unwrap();
@@ -194,7 +194,7 @@ impl DraftJobStore for Rows {
 impl Rows {
     /// `owner`'s live job the start with `client_id` began.
     /// How many of `owner`'s jobs started after `since` are drafting.
-    fn drafting(&self, owner: &MacroUserIdStr<'static>, since: DateTime<Utc>) -> u32 {
+    fn drafting(&self, owner: &RoxUserIdStr<'static>, since: DateTime<Utc>) -> u32 {
         let drafts = self.drafts.lock().unwrap();
         self.jobs
             .lock()
@@ -209,7 +209,7 @@ impl Rows {
             .count() as u32
     }
 
-    fn live(&self, owner: &MacroUserIdStr<'static>, client_id: Uuid) -> Option<Uuid> {
+    fn live(&self, owner: &RoxUserIdStr<'static>, client_id: Uuid) -> Option<Uuid> {
         let drafts = self.drafts.lock().unwrap();
         self.jobs
             .lock()
@@ -266,12 +266,12 @@ impl Rows {
 /// waits at `progress` while it is held, as a slow publish would.
 #[derive(Default)]
 struct Published {
-    updates: Mutex<Vec<(MacroUserIdStr<'static>, DraftUpdate)>>,
+    updates: Mutex<Vec<(RoxUserIdStr<'static>, DraftUpdate)>>,
     progress: Gate,
 }
 
 impl RoutineDraftUpdates for Published {
-    async fn publish_draft(&self, owner: &MacroUserIdStr<'static>, update: DraftUpdate) {
+    async fn publish_draft(&self, owner: &RoxUserIdStr<'static>, update: DraftUpdate) {
         if update.state == DraftUpdateState::Drafting {
             self.progress.pass().await;
         }
@@ -342,7 +342,7 @@ impl Replica {
 
     /// Start `request` as a new start.
     async fn start(&self, request: DraftRequest) -> Result<DraftJob> {
-        self.start_as(macro_uuid::generate_uuid_v7(), request).await
+        self.start_as(rox_uuid::generate_uuid_v7(), request).await
     }
 
     /// Start `request` as the start the client gave `client_id`.
@@ -368,8 +368,8 @@ impl Replica {
 
 const TRACEPARENT: &str = "00-0af7651916cd43dd8448eb211c80319c-b7ad6b7169203331-01";
 
-fn stranger() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|stranger@example.com").unwrap()
+fn stranger() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|stranger@example.com").unwrap()
 }
 
 /// A session whose turn checks `steps` once, then keeps running.
@@ -614,7 +614,7 @@ async fn a_start_sent_again_answers_with_the_same_job() {
     let sessions = checks_and_runs(&rows, json!([code_step("Make a task", "good")]));
     let replica = Replica::new(&rows, &sessions);
     let other = Replica::new(&rows, &sessions);
-    let client_id = macro_uuid::generate_uuid_v7();
+    let client_id = rox_uuid::generate_uuid_v7();
 
     let job = replica
         .start_as(client_id, routine(BUG_REPORTS))
@@ -667,7 +667,7 @@ async fn a_start_sent_again_at_the_limit_finds_its_job() {
     for _ in 1..MAX_DRAFTING {
         replica.start(routine(BUG_REPORTS)).await.unwrap();
     }
-    let client_id = macro_uuid::generate_uuid_v7();
+    let client_id = rox_uuid::generate_uuid_v7();
     let job = replica
         .start_as(client_id, routine(BUG_REPORTS))
         .await
@@ -944,7 +944,7 @@ async fn the_sweep_fails_interrupted_drafts_and_keeps_unopened_ones() {
     let replica = Replica::new(&rows, &sessions);
     let begin =
         |phase: DraftJobPhase, started: chrono::Duration, finished: Option<chrono::Duration>| {
-            let session = macro_uuid::generate_uuid_v7();
+            let session = rox_uuid::generate_uuid_v7();
             let now = Utc::now();
             rows.drafts.lock().unwrap().insert(
                 session,
@@ -958,7 +958,7 @@ async fn the_sweep_fails_interrupted_drafts_and_keeps_unopened_ones() {
             rows.jobs.lock().unwrap().insert(
                 session,
                 JobRow {
-                    client_id: macro_uuid::generate_uuid_v7(),
+                    client_id: rox_uuid::generate_uuid_v7(),
                     phase,
                     request: DraftAsked::default(),
                     progress: DraftJobProgress {
@@ -980,7 +980,7 @@ async fn the_sweep_fails_interrupted_drafts_and_keeps_unopened_ones() {
     let forgotten = begin(DraftJobPhase::Failed, days(9), Some(days(8)));
     let abandoned = begin(DraftJobPhase::Cancelled, minutes(10), None);
     // A draft its request waits for is the other sweep's.
-    let waited = macro_uuid::generate_uuid_v7();
+    let waited = rox_uuid::generate_uuid_v7();
     rows.begin(waited, &owner(), bot_id::MACRO_NEW_BOT_ID)
         .await
         .unwrap();
@@ -1117,7 +1117,7 @@ async fn a_refused_start_sent_again_hears_its_job_removed() {
     let sessions = Arc::new(sessions);
     let replica = Replica::new(&rows, &sessions);
     let other = Replica::new(&rows, &sessions);
-    let client_id = macro_uuid::generate_uuid_v7();
+    let client_id = rox_uuid::generate_uuid_v7();
 
     tokio::select! {
         _ = replica.start_as(client_id, routine(BUG_REPORTS)) => {
@@ -1199,7 +1199,7 @@ async fn too_many_drafts_at_once_are_refused() {
         .jobs
         .start(
             stranger(),
-            macro_uuid::generate_uuid_v7(),
+            rox_uuid::generate_uuid_v7(),
             routine(BUG_REPORTS),
             context(),
             None,

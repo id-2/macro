@@ -4,7 +4,7 @@
 mod test;
 
 use chrono::Utc;
-use macro_user_id::{cowlike::CowLike, email::Email, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, email::Email, user_id::RoxUserIdStr};
 use uuid::Uuid;
 
 use crate::domain::{
@@ -34,7 +34,7 @@ impl<R: GtmInviteRepo> GtmInviteService for GtmInviteServiceImpl<R> {
     #[tracing::instrument(skip_all, fields(creator = %creator.as_ref()), err)]
     async fn create_link(
         &self,
-        creator: &MacroUserIdStr<'_>,
+        creator: &RoxUserIdStr<'_>,
         request: CreateInviteLink,
     ) -> Result<InviteLink, GtmInviteError> {
         require_staff(creator)?;
@@ -42,7 +42,7 @@ impl<R: GtmInviteRepo> GtmInviteService for GtmInviteServiceImpl<R> {
 
         let now = Utc::now();
         let link = InviteLink {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             token: InviteToken::generate(),
             first_name: request.first_name,
             recipient_email: request.recipient_email,
@@ -64,7 +64,7 @@ impl<R: GtmInviteRepo> GtmInviteService for GtmInviteServiceImpl<R> {
     #[tracing::instrument(skip_all, fields(caller = %caller.as_ref(), only_mine), err)]
     async fn list_links(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         only_mine: bool,
     ) -> Result<Vec<InviteLink>, GtmInviteError> {
         require_staff(caller)?;
@@ -78,7 +78,7 @@ impl<R: GtmInviteRepo> GtmInviteService for GtmInviteServiceImpl<R> {
     #[tracing::instrument(skip_all, fields(caller = %caller.as_ref(), link_id = %id), err)]
     async fn revoke_link(
         &self,
-        caller: &MacroUserIdStr<'_>,
+        caller: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<InviteLink, GtmInviteError> {
         require_staff(caller)?;
@@ -136,7 +136,7 @@ impl<R: GtmInviteRepo> GtmInviteService for GtmInviteServiceImpl<R> {
     async fn redeem_link(
         &self,
         token: &InviteToken,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<InviteLink, GtmInviteError> {
         let link = self
             .repo
@@ -186,7 +186,7 @@ impl<R: GtmInviteRepo> GtmInviteService for GtmInviteServiceImpl<R> {
     #[tracing::instrument(skip_all, fields(user = %user.as_ref()), err)]
     async fn active_offer_for_user(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<InviteLink>, GtmInviteError> {
         let link = self
             .repo
@@ -203,7 +203,7 @@ impl<R: GtmInviteRepo> GtmInviteService for GtmInviteServiceImpl<R> {
     #[tracing::instrument(skip_all, fields(user = %user.as_ref(), stripe_subscription_id), err)]
     async fn mark_converted(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         stripe_subscription_id: &str,
     ) -> Result<bool, GtmInviteError> {
         self.repo
@@ -213,7 +213,7 @@ impl<R: GtmInviteRepo> GtmInviteService for GtmInviteServiceImpl<R> {
     }
 }
 
-fn require_staff(user: &MacroUserIdStr<'_>) -> Result<(), GtmInviteError> {
+fn require_staff(user: &RoxUserIdStr<'_>) -> Result<(), GtmInviteError> {
     if user.is_macro_staff() {
         Ok(())
     } else {

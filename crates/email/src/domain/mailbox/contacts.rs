@@ -145,7 +145,7 @@ impl<R: AddressBookRepository, G: AddressBookGateway, S: ContactPhotoStorage>
     pub async fn sync_once(&self) -> Result<bool, MailboxError> {
         let Some(work) = self
             .repository
-            .claim(macro_uuid::generate_uuid_v7())
+            .claim(rox_uuid::generate_uuid_v7())
             .await
             .map_err(|error| super::telemetry::claim_failed("contacts", error))?
         else {
@@ -212,7 +212,7 @@ impl<R: AddressBookRepository, G: AddressBookGateway, S: ContactPhotoStorage>
     pub async fn photo_once(&self) -> Result<bool, MailboxError> {
         let Some(lease) = self
             .repository
-            .claim_photo(macro_uuid::generate_uuid_v7())
+            .claim_photo(rox_uuid::generate_uuid_v7())
             .await
             .map_err(|error| super::telemetry::claim_failed("contact_photos", error))?
         else {

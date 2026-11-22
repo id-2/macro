@@ -4,7 +4,7 @@
  * meanwhile. Each attempt gets a deadline and a fresh request; the whole
  * thing stays within about 10 s.
  */
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import { elapsed } from './config.ts';
 
 export type Attempt = {

@@ -11,7 +11,7 @@ import { type Point, pageToScreen } from '@app/features/block-fig/core/camera';
 import { IS_MAC } from '@core/constant/isMac';
 import type { Op, TextLayer } from '@core/psd-engine/types';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createSignal, onCleanup, onMount, Show } from 'solid-js';
 import { gestureKey, newLayerOp } from '../core/ops';
 import {

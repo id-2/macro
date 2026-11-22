@@ -5,7 +5,7 @@
 
 use crate::domain::models::ChannelType;
 use chrono::{DateTime, TimeDelta, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -40,7 +40,7 @@ pub struct ChannelAccessRequest {
     /// Channel the requester asked to join.
     pub channel_id: Uuid,
     /// Person asking to join.
-    pub requester_id: MacroUserIdStr<'static>,
+    pub requester_id: RoxUserIdStr<'static>,
     /// Current outcome.
     pub status: ChannelAccessRequestStatus,
     /// When the requester asked.
@@ -48,7 +48,7 @@ pub struct ChannelAccessRequest {
     /// When the attempt stopped being pending.
     pub resolved_at: Option<DateTime<Utc>>,
     /// Participant who approved or denied it.
-    pub resolved_by: Option<MacroUserIdStr<'static>>,
+    pub resolved_by: Option<RoxUserIdStr<'static>>,
 }
 
 impl ChannelAccessRequest {
@@ -164,7 +164,7 @@ mod ports {
         fn latest_access_request(
             &self,
             channel_id: Uuid,
-            requester: &MacroUserIdStr<'static>,
+            requester: &RoxUserIdStr<'static>,
         ) -> impl Future<Output = anyhow::Result<Option<ChannelAccessRequest>>> + Send;
 
         /// One attempt in this channel.
@@ -185,7 +185,7 @@ mod ports {
         fn cancel_access_request(
             &self,
             channel_id: Uuid,
-            requester: &MacroUserIdStr<'static>,
+            requester: &RoxUserIdStr<'static>,
             at: DateTime<Utc>,
         ) -> impl Future<Output = anyhow::Result<Option<ChannelAccessRequest>>> + Send;
 
@@ -195,7 +195,7 @@ mod ports {
             &self,
             channel_id: Uuid,
             request_id: Uuid,
-            resolver: &MacroUserIdStr<'static>,
+            resolver: &RoxUserIdStr<'static>,
             decision: ChannelAccessDecision,
             at: DateTime<Utc>,
         ) -> impl Future<Output = anyhow::Result<Option<ResolvedChannelAccessRequest>>> + Send;
@@ -207,21 +207,21 @@ mod ports {
         /// access to the channel.
         fn my_access_request(
             &self,
-            user: MacroUserIdStr<'static>,
+            user: RoxUserIdStr<'static>,
             channel_id: Uuid,
         ) -> impl Future<Output = Result<ChannelAccessRequestState, ChannelAccessRequestErr>> + Send;
 
         /// Ask to join. Replaying a pending attempt returns it unchanged.
         fn request_access(
             &self,
-            user: MacroUserIdStr<'static>,
+            user: RoxUserIdStr<'static>,
             channel_id: Uuid,
         ) -> impl Future<Output = Result<ChannelAccessRequest, ChannelAccessRequestErr>> + Send;
 
         /// Withdraw the caller's pending attempt; having none is not an error.
         fn cancel_access_request(
             &self,
-            user: MacroUserIdStr<'static>,
+            user: RoxUserIdStr<'static>,
             channel_id: Uuid,
         ) -> impl Future<Output = Result<(), ChannelAccessRequestErr>> + Send;
 

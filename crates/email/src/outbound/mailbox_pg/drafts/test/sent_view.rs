@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::{PreviewCursorQuery, PreviewView, PreviewViewStandardLabel};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Query, SimpleSortMethod};
 
 async fn sent_threads(repo: &EmailPgRepo, link: Uuid) -> Vec<Uuid> {
@@ -12,7 +12,7 @@ async fn sent_threads(repo: &EmailPgRepo, link: Uuid) -> Vec<Uuid> {
             query: Query::new(None, SimpleSortMethod::UpdatedAt, None),
             team_id: None,
         },
-        MacroUserIdStr::parse_from_str(ACTOR).unwrap().to_owned(),
+        RoxUserIdStr::parse_from_str(ACTOR).unwrap().to_owned(),
     )
     .await
     .unwrap()

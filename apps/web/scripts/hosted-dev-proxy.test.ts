@@ -282,8 +282,8 @@ it('keeps HTTP/2 for remote browsers while proxying', async () => {
 
 it.each([
   { TAURI_ENV_PLATFORM: 'linux' },
-  { MACRO_LOCAL_BACKEND_PROXY: 'https://localhost:8090' },
-  { MACRO_DEV_PROXY: 'false' },
+  { ROX_LOCAL_BACKEND_PROXY: 'https://localhost:8090' },
+  { ROX_DEV_PROXY: 'false' },
 ])('keeps the existing backend selection for %j', async (env) => {
   const config = await resolveConfig(
     { configFile: false, plugins: [hostedDevProxy(env)] },

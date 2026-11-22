@@ -632,7 +632,7 @@ pub trait MessageGroupRecipients: Send + Sync + 'static {
     async fn channel_members(
         &self,
         channel: Uuid,
-    ) -> Result<Vec<macro_user_id::user_id::MacroUserIdStr<'static>>, MessageError>;
+    ) -> Result<Vec<rox_user_id::user_id::RoxUserIdStr<'static>>, MessageError>;
 }
 /// Reject group mentions in contexts that do not supply channel membership.
 pub struct NoMessageGroups;
@@ -641,7 +641,7 @@ impl MessageGroupRecipients for NoMessageGroups {
     async fn channel_members(
         &self,
         _: Uuid,
-    ) -> Result<Vec<macro_user_id::user_id::MacroUserIdStr<'static>>, MessageError> {
+    ) -> Result<Vec<rox_user_id::user_id::RoxUserIdStr<'static>>, MessageError> {
         Err(MessageError::Invalid(
             "channel group mentions are unavailable",
         ))

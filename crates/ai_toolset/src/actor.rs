@@ -1,6 +1,6 @@
 //! Explicit account selection at session tool boundaries.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value, json};
 
@@ -63,9 +63,9 @@ impl ToolActor {
     /// Resolve a choice using trusted session and turn identities only.
     pub fn resolve<'a>(
         self,
-        owner: &'a MacroUserIdStr<'static>,
-        requester: Option<&'a MacroUserIdStr<'static>>,
-    ) -> Result<&'a MacroUserIdStr<'static>, ActorError> {
+        owner: &'a RoxUserIdStr<'static>,
+        requester: Option<&'a RoxUserIdStr<'static>>,
+    ) -> Result<&'a RoxUserIdStr<'static>, ActorError> {
         match self {
             Self::Requester => requester.ok_or(ActorError::NoRequester),
             Self::Owner => Ok(owner),

@@ -10,8 +10,8 @@ use crate::{
     outbound::pg_access_repo::queries::list_entity_access_grants,
 };
 #[cfg(feature = "explain_binary")]
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 #[cfg(feature = "explain_binary")]
 use model_entity::EntityType;
 use sqlx::PgPool;
@@ -31,7 +31,7 @@ struct OwnedEmailThreadRow {
 pub async fn get_owned_email_thread_ids(
     pool: &PgPool,
     thread_ids: &[Uuid],
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<Uuid>, sqlx::Error> {
     let rows = sqlx::query_as::<_, OwnedEmailThreadRow>(
         r#"
@@ -64,7 +64,7 @@ pub async fn get_thread_access(
     pool: &PgPool,
     thread_id: &Uuid,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Option<AccessLevel>, sqlx::Error> {
     let user_id_str = user_id.map(AsRef::as_ref).unwrap_or("");
 
@@ -296,7 +296,7 @@ pub async fn explain_thread_access(
     pool: &PgPool,
     thread_id: &Uuid,
     source_ids: &SourceIds,
-    user_id: Option<&MacroUserId<Lowercase<'_>>>,
+    user_id: Option<&RoxUserId<Lowercase<'_>>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let mut grants = Vec::new();
     if let Some(user_id) = user_id {
@@ -319,7 +319,7 @@ pub async fn explain_thread_access(
 async fn explain_thread_inbox(
     pool: &PgPool,
     thread_id: &Uuid,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let user_id_str = user_id.as_ref();
     let row = sqlx::query!(
@@ -353,7 +353,7 @@ async fn explain_thread_inbox(
     if row.is_owner {
         Ok(vec![AccessGrant::InboxOwner])
     } else {
-        let mailbox_owner = MacroUserIdStr::try_from(row.mailbox_owner)
+        let mailbox_owner = RoxUserIdStr::try_from(row.mailbox_owner)
             .map_err(|error| sqlx::Error::Decode(error.into()))?;
         Ok(vec![AccessGrant::InboxDelegate { mailbox_owner }])
     }
@@ -462,7 +462,7 @@ async fn explain_thread_containing_project(
 async fn explain_thread_crm(
     pool: &PgPool,
     thread_id: &Uuid,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Vec<AccessGrant>, sqlx::Error> {
     let user_id_str = user_id.as_ref();
     let rows = sqlx::query!(

@@ -7,7 +7,7 @@
 //! the terms no indexed text can match, and [`resolve_document_term_matching`]
 //! decides how the remaining terms combine on document content.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_search::{MatchType, TermMatching};
 use models_search_cursor::CursorTermMatching;
 use opensearch_client::search::documents::{DocumentTermMatching, MIN_TERMS_FOR_DYNAMIC_MATCHING};
@@ -118,7 +118,7 @@ pub(in crate::api::search) async fn resolve_document_term_matching(
         Some(CursorTermMatching::Dynamic) => return DocumentTermMatching::Dynamic,
         None => {}
     }
-    let Ok(caller) = MacroUserIdStr::parse_from_str(caller) else {
+    let Ok(caller) = RoxUserIdStr::parse_from_str(caller) else {
         return DocumentTermMatching::All;
     };
     if rollout.dynamic_enabled_for(caller).await {

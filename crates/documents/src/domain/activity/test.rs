@@ -1,11 +1,11 @@
 use ::activity::{Action, activity_id};
 use chrono::{TimeZone as _, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use model_entity::EntityType;
 use uuid::Uuid;
 
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 
 use super::*;
 use crate::domain::events::{
@@ -17,8 +17,8 @@ use model_owner::Owner;
 
 const DOCUMENT_ID: &str = "11111111-1111-1111-1111-111111111111";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn envelope(event: DocumentTopicEvent) -> Event<DocumentTopicEvent> {

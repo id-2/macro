@@ -1,7 +1,7 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
-fn user() -> MacroUserIdStr<'static> {
+fn user() -> RoxUserIdStr<'static> {
     SYSTEM_USER_ID.clone()
 }
 
@@ -335,7 +335,7 @@ async fn missing_audio_rate_keeps_usage_unpriced() {
 
 #[tokio::test]
 async fn both_recording_paths_persist_the_same_counting_policy() {
-    let real_user = MacroUserIdStr::try_from("macro|someone@example.com".to_owned()).unwrap();
+    let real_user = RoxUserIdStr::try_from("macro|someone@example.com".to_owned()).unwrap();
     for enforcement in [AiUsageEnforcement::Disabled, AiUsageEnforcement::Enabled] {
         for actor in [real_user.clone(), SYSTEM_USER_ID.clone()] {
             for feature in [
@@ -398,8 +398,8 @@ async fn both_recording_paths_persist_the_same_counting_policy() {
 async fn usage_on_a_team_provider_key_is_recorded_against_it_and_never_counted() {
     let repo = FakeRepo::default();
     let service = UsageServiceImpl::new(repo.clone()).with_enforcement(AiUsageEnforcement::Enabled);
-    let actor = MacroUserIdStr::try_from("macro|someone@example.com".to_owned()).unwrap();
-    let key = macro_uuid::generate_uuid_v7();
+    let actor = RoxUserIdStr::try_from("macro|someone@example.com".to_owned()).unwrap();
+    let key = rox_uuid::generate_uuid_v7();
     let event = UsageContext::new(AiFeature::AgentSession, actor)
         .with_agent_api_key(key)
         .into_event(
@@ -424,7 +424,7 @@ async fn default_disabled_writes_do_not_change_previously_counted_usage() {
     let repo = FakeRepo::default();
     let enabled = UsageServiceImpl::new(repo.clone()).with_enforcement(AiUsageEnforcement::Enabled);
     let disabled = UsageServiceImpl::new(repo.clone());
-    let actor = MacroUserIdStr::try_from("macro|someone@example.com".to_owned()).unwrap();
+    let actor = RoxUserIdStr::try_from("macro|someone@example.com".to_owned()).unwrap();
     let event = UsageContext::new(AiFeature::Chat, actor).into_event(
         "model".into(),
         UsageAmount::Tokens {
@@ -452,7 +452,7 @@ async fn default_disabled_writes_do_not_change_previously_counted_usage() {
 async fn admin_policy_protects_usage_and_price_changes() {
     let repo = FakeRepo::default();
     let service = UsageServiceImpl::new(repo.clone());
-    let other = MacroUserIdStr::try_from("macro|someone@example.com".to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("macro|someone@example.com".to_owned()).unwrap();
     assert!(matches!(
         service
             .get_usage(other.clone(), UsageApiParams::default())

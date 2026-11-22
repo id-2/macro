@@ -7,9 +7,9 @@
 #[cfg(test)]
 mod test;
 
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroChatsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxChatsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use serde::{Deserialize, Serialize};
 
@@ -35,7 +35,7 @@ pub struct ChatUpdatedMetadata {
     /// Identifier of the updated chat.
     pub chat_id: String,
     /// Authenticated user who updated the chat.
-    pub actor_user_id: MacroUserIdStr<'static>,
+    pub actor_user_id: RoxUserIdStr<'static>,
     /// Requested display name; `None` when unchanged.
     pub name: Option<String>,
     /// Project id before the update.
@@ -54,7 +54,7 @@ pub struct ChatDeletedMetadata {
     pub chat_id: String,
     /// The authenticated user who deleted the chat; `None` for
     /// unauthenticated or internal callers.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Project the chat belonged to, when any.
     pub project_id: Option<String>,
 }
@@ -66,7 +66,7 @@ pub struct ChatPermanentlyDeletedMetadata {
     pub chat_id: String,
     /// The authenticated user who permanently deleted the chat; `None` for
     /// unauthenticated or internal callers.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Project the chat belonged to, when any.
     pub project_id: Option<String>,
 }
@@ -78,7 +78,7 @@ pub struct ChatRestoredMetadata {
     pub chat_id: String,
     /// The authenticated user who restored the chat; `None` for
     /// unauthenticated or internal callers.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Project the chat belongs to, when any.
     pub project_id: Option<String>,
 }
@@ -91,7 +91,7 @@ pub struct ChatCopiedMetadata {
     /// Identifier of the chat that was copied.
     pub source_chat_id: String,
     /// User who owns the new copy (the copier).
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Display name of the new chat.
     pub name: String,
 }
@@ -136,7 +136,7 @@ pub struct ChatMessageSentMetadata {
     /// Model associated with the message.
     pub model: String,
     /// The sender for user messages; `None` for assistant messages.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// Number of attachments on the message.
     pub attachment_count: usize,
 }
@@ -150,7 +150,7 @@ pub struct ChatMessageDeletedMetadata {
     pub message_id: String,
 }
 
-/// Lifecycle and message events published to [`MacroChatsTopic`].
+/// Lifecycle and message events published to [`RoxChatsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum ChatTopicEvent {
@@ -181,18 +181,18 @@ pub enum ChatTopicEvent {
 }
 
 impl TopicEvent for ChatTopicEvent {
-    type Topic = MacroChatsTopic;
+    type Topic = RoxChatsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroChatsTopic`], keyed by the chat's bare id.
-pub struct ChatMacroEvent {
+/// Publishable event for [`RoxChatsTopic`], keyed by the chat's bare id.
+pub struct ChatRoxEvent {
     key: String,
     event: Event<ChatTopicEvent>,
 }
 
-impl ChatMacroEvent {
+impl ChatRoxEvent {
     /// Build a chat-created event keyed by the new chat id.
     pub fn created(metadata: ChatCreatedMetadata) -> Self {
         Self::new(metadata.chat_id.clone(), ChatTopicEvent::Created(metadata))
@@ -253,7 +253,7 @@ impl ChatMacroEvent {
     }
 }
 
-impl MacroEvent for ChatMacroEvent {
+impl RoxEvent for ChatRoxEvent {
     type EventPayload = ChatTopicEvent;
 
     fn key(&self) -> &str {

@@ -2,7 +2,7 @@ import type {
   FormQuestionDetail,
   QuestionOption,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError } from '../../utils';
+import { RoxNotFoundError } from '../../utils';
 import { DatabaseColumn } from '../databases/column';
 import type { Form } from './form';
 
@@ -33,7 +33,7 @@ export class FormQuestion {
       )
       .find((candidate) => candidate.id === this.id);
     if (!question)
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `question ${this.id} is not on form ${this.form.id}`,
       );
     return question;
@@ -96,7 +96,7 @@ export class FormOption {
       (candidate) => candidate.id === this.id,
     );
     if (!option)
-      throw new MacroNotFoundError(
+      throw new RoxNotFoundError(
         `option ${this.id} is not on question ${this.question.id}`,
       );
     return option;

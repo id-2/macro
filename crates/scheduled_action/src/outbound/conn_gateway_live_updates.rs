@@ -3,7 +3,7 @@ use std::sync::Arc;
 use connection_gateway_client::client::ConnectionGatewayClient;
 use model_entity::EntityType;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::drafts::jobs::{DraftUpdate, ROUTINE_DRAFT_UPDATE_MESSAGE_TYPE};
 use crate::domain::models::{SCHEDULED_ACTION_UPDATE_MESSAGE_TYPE, ScheduledActionUpdate};
@@ -48,7 +48,7 @@ impl ScheduledActionLiveUpdate for ConnGatewayLiveUpdates {
 }
 
 impl RoutineDraftUpdates for ConnGatewayLiveUpdates {
-    async fn publish_draft(&self, owner: &MacroUserIdStr<'static>, update: DraftUpdate) {
+    async fn publish_draft(&self, owner: &RoxUserIdStr<'static>, update: DraftUpdate) {
         let payload = match serde_json::to_value(&update) {
             Ok(payload) => payload,
             Err(error) => {

@@ -5,11 +5,11 @@ import {
   ThrownResultError,
   throwOnErr,
 } from '@core/util/result';
-import type { RawUpdate } from '@macro-inc/collaboration/collab/shared';
+import type { RawUpdate } from '@rox-one/collaboration/collab/shared';
 import {
   IDBSnapshotStore,
   LORO_SNAPSHOT_DB_NAME,
-} from '@macro-inc/collaboration/collab/snapshot-store';
+} from '@rox-one/collaboration/collab/snapshot-store';
 import { z } from 'zod';
 import { prefetchUserInfo } from '../../auth/user-info';
 import { queryClient } from '../../client';

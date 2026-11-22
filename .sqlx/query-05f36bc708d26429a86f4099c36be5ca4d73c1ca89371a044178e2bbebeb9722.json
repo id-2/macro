@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "DELETE FROM promoted_shared_mailboxes WHERE macro_id = 'macro|shared@example.com'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "05f36bc708d26429a86f4099c36be5ca4d73c1ca89371a044178e2bbebeb9722"
+}

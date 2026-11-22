@@ -1,0 +1,40 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "SELECT is_draft, body_html_sanitized, body_text, body_rox FROM email_messages WHERE id = $1",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "is_draft",
+        "type_info": "Bool"
+      },
+      {
+        "ordinal": 1,
+        "name": "body_html_sanitized",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 2,
+        "name": "body_text",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 3,
+        "name": "body_rox",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      false,
+      true,
+      true,
+      true
+    ]
+  },
+  "hash": "f4f874374b67ed189e8599e6bd6f2254bda56b858c0de6665e72cca464701c42"
+}

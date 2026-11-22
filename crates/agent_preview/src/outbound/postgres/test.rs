@@ -14,7 +14,7 @@ use axum::{
 use entity_access::domain::models::AccessLevel;
 use futures_util::{SinkExt, StreamExt};
 use http_body_util::BodyExt;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::sync::{Arc, Mutex};
 use tokio::{
     net::{TcpListener, TcpStream},
@@ -32,7 +32,7 @@ impl Events for RecordedEvents {
     async fn changed(
         &self,
         p: &crate::domain::Preview,
-        _: &[MacroUserIdStr<'static>],
+        _: &[RoxUserIdStr<'static>],
     ) -> Result<(), PreviewError> {
         self.changes.lock().unwrap().push(p.clone());
         if p.status == PreviewStatus::Ready {
@@ -555,7 +555,7 @@ async fn concurrent_credentials_are_single_use_host_bound_and_bounded(pool: PgPo
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn expired_watchers_cannot_renew_past_active_limits(pool: PgPool) {
     let repo = repository(pool.clone());
-    let other = MacroUserIdStr::try_from("macro|second@example.com".to_owned()).unwrap();
+    let other = RoxUserIdStr::try_from("macro|second@example.com".to_owned()).unwrap();
     let limits = WatchLimits {
         sessions: 1,
         viewers: 1,

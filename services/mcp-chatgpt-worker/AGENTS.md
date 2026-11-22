@@ -51,9 +51,9 @@ own permission checks and agent attribution apply.
   PERSON_TOKEN_KEY --env <env>`) is required in dev and prod; the Worker
   refuses to start without it. Rotating it voids tokens ChatGPT holds.
 - `RESOURCE_URL` and `AUTHORIZATION_SERVER_URL` mirror
-  `McpChatgptServiceUrl` and `McpPublicUrl` in `crates/macro_service_urls`;
+  `McpChatgptServiceUrl` and `McpPublicUrl` in `crates/rox_service_urls`;
   change all of them together. Service hosts come from the SDK for
-  `MACRO_ENV`; `MACRO_HOSTS` (JSON) only points a local run at a named stack.
+  `MACRO_ENV`; `ROX_HOSTS` (JSON) only points a local run at a named stack.
 - Deploys follow sync-service: every push to main deploys dev (`Deploy on
   Push`), every release deploys prod (`release-production`), and `Deploy MCP
   ChatGPT Worker` can be dispatched by hand. Each run first checks the env has

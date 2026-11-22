@@ -24,7 +24,7 @@ use item_filters::{
     CallStatus,
     ast::{LiteralTree, call::CallLiteral},
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_permissions::share_permission::team_share::TeamShareFacts;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -394,7 +394,7 @@ impl CallRepository for PgCallRepo {
         &self,
         meeting_id: &Uuid,
         call_id: &Uuid,
-        users: &[MacroUserIdStr<'a>],
+        users: &[RoxUserIdStr<'a>],
     ) -> Result<(), CallError> {
         self.persist_meeting_invitees(meeting_id, call_id, users)
             .await
@@ -442,7 +442,7 @@ impl CallRepository for PgCallRepo {
         call_id: &Uuid,
         channel_id: &Uuid,
         room_name: &str,
-        created_by: MacroUserIdStr<'_>,
+        created_by: RoxUserIdStr<'_>,
         channel_thread: bool,
     ) -> Result<Option<Call>, CallError> {
         let mut tx = self.pool.begin().await?;
@@ -621,7 +621,7 @@ impl CallRepository for PgCallRepo {
     #[tracing::instrument(err, skip(self))]
     async fn get_active_calls_for_user<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<Vec<ActiveCallSummary>, Self::Err> {
         // Visibility is plain channel membership, deliberately matching how
         // call_started/call_ended websocket recipients are chosen — badge
@@ -693,7 +693,7 @@ impl CallRepository for PgCallRepo {
     async fn add_participant(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<CallParticipant, AddParticipantError> {
         let mut tx = self
             .pool
@@ -728,7 +728,7 @@ impl CallRepository for PgCallRepo {
     async fn add_meeting_participant(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<CallParticipant, AddParticipantError> {
         let mut tx = self
             .pool
@@ -760,7 +760,7 @@ impl CallRepository for PgCallRepo {
     #[tracing::instrument(err, skip(self))]
     async fn find_active_call_for_user(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<Option<(Uuid, Option<Uuid>)>, Self::Err> {
         let row = sqlx::query!(
             r#"
@@ -782,7 +782,7 @@ impl CallRepository for PgCallRepo {
     async fn remove_participant(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
         sqlx::query!(
             r#"
@@ -867,7 +867,7 @@ impl CallRepository for PgCallRepo {
     async fn get_call_participants_with_team_members(
         &self,
         call_record_id: &Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         let rows = sqlx::query!(
             r#"
             WITH participant_ids AS (
@@ -899,7 +899,7 @@ impl CallRepository for PgCallRepo {
 
         rows.into_iter()
             .map(|row| {
-                MacroUserIdStr::try_from(row.user_id).map_err(|e| sqlx::Error::Decode(Box::new(e)))
+                RoxUserIdStr::try_from(row.user_id).map_err(|e| sqlx::Error::Decode(Box::new(e)))
             })
             .collect()
     }
@@ -924,7 +924,7 @@ impl CallRepository for PgCallRepo {
         .into_iter()
         // A malformed stored id names nobody we can match, so skip it rather
         // than failing the whole lookup for the people who do parse.
-        .filter_map(|user_id| match MacroUserIdStr::try_from(user_id.clone()) {
+        .filter_map(|user_id| match RoxUserIdStr::try_from(user_id.clone()) {
             Ok(user_id) => Some(user_id),
             Err(error) => {
                 tracing::warn!(%call_record_id, user_id, error = ?error, "skipping unparsable call participant id");
@@ -1009,7 +1009,7 @@ impl CallRepository for PgCallRepo {
     async fn record_decline(
         &self,
         call_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
         sqlx::query!(
             r#"
@@ -1612,7 +1612,7 @@ impl CallRepository for PgCallRepo {
     async fn batch_get_call_record_previews<'a>(
         &self,
         call_ids: &[Uuid],
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<Vec<CallRecordPreview>, Self::Err> {
         if call_ids.is_empty() {
             return Ok(Vec::new());
@@ -1715,7 +1715,7 @@ impl CallRepository for PgCallRepo {
     )]
     async fn get_call_records_by_user<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         limit: u32,
         filter: &LiteralTree<CallLiteral>,
         page: CallRecordPage,
@@ -1726,7 +1726,7 @@ impl CallRepository for PgCallRepo {
     #[tracing::instrument(err, skip(self))]
     async fn get_user_profile_picture<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<Option<String>, Self::Err> {
         sqlx::query_scalar!(
             r#"
@@ -1746,7 +1746,7 @@ impl CallRepository for PgCallRepo {
     #[tracing::instrument(err, skip(self))]
     async fn get_user_display_name<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<Option<String>, Self::Err> {
         let row = sqlx::query!(
             r#"
@@ -1775,7 +1775,7 @@ impl CallRepository for PgCallRepo {
     async fn resolve_channel_name<'a>(
         &self,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<Option<String>, Self::Err> {
         let mut map = batch_resolve_channel_names(&self.pool, &[*channel_id], user_id).await?;
         Ok(map.remove(channel_id))
@@ -1785,8 +1785,8 @@ impl CallRepository for PgCallRepo {
     async fn resolve_channel_name_for_viewers<'a>(
         &self,
         channel_id: &Uuid,
-        viewer_ids: &[MacroUserIdStr<'a>],
-    ) -> Result<HashMap<MacroUserIdStr<'static>, String>, Self::Err> {
+        viewer_ids: &[RoxUserIdStr<'a>],
+    ) -> Result<HashMap<RoxUserIdStr<'static>, String>, Self::Err> {
         resolve_channel_name_for_viewers(&self.pool, *channel_id, viewer_ids).await
     }
 

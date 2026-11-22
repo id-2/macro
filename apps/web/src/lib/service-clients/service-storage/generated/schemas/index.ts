@@ -2080,7 +2080,7 @@ export * from './locationResponseV3OneOfFiveType';
 export * from './locationResponseV3OneOfThree';
 export * from './locationResponseV3OneOfThreeType';
 export * from './locationResponseV3OneOfType';
-export * from './macroUserIdStr';
+export * from './roxUserIdStr';
 export * from './mailboxDomainConflict';
 export * from './markRead';
 export * from './meeting';

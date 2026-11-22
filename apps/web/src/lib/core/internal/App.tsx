@@ -1,7 +1,7 @@
 import { BlockRegistry } from '@core/block';
 import { EntityIcon } from '@core/component/EntityIcon';
 import { LiveIndicators } from '@core/component/LiveIndicators';
-import MacroBrandLoader from '@icon/macro-brand-loader.svg';
+import { LoadingSpinner } from '@core/component/LoadingSpinner';
 import MacroGridLoader from '@icon/macro-grid-noise-loader.svg';
 import Acorn from '@icon/system/regular/acorn.svg?component-solid';
 import CaretDown from '@icon/system/regular/caret-down.svg';
@@ -204,7 +204,7 @@ const App: Component = () => {
         />
       </div>
       <div class="flex flex-wrap gap-2 justify-center">
-        <MacroBrandLoader class="text-accent size-24" />
+        <LoadingSpinner class="size-24" />
         <MacroGridLoader class="text-accent size-24" />
       </div>
     </div>

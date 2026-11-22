@@ -10,7 +10,7 @@ chrono = { workspace = true, features = ["serde"] }
 document_sub_type = { path = "../document_sub_type" }
 filter_ast = { path = "../filter_ast" }
 item_filters = { path = "../item_filters" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 model_notifications = { path = "../model_notifications" }
 rootcause = { workspace = true }

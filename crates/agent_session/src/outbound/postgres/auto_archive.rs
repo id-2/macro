@@ -10,7 +10,7 @@ use crate::domain::model::ArchiveCause;
 impl<B: BotFacts + 'static> AutoArchiveRepo for PgAgentSessionRepo<B> {
     async fn user_auto_archive_preferences(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> Result<AutoArchivePreferences> {
         let row = sqlx::query!(
             r#"
@@ -33,7 +33,7 @@ impl<B: BotFacts + 'static> AutoArchiveRepo for PgAgentSessionRepo<B> {
 
     async fn set_user_auto_archive_preferences(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         preferences: AutoArchivePreferences,
     ) -> Result<()> {
         sqlx::query!(

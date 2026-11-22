@@ -4,22 +4,22 @@ import type { DocumentEntity } from '@entity';
 import {
   createLoroManager,
   type LoroManager,
-} from '@macro-inc/collaboration/collab/manager';
-import type { RawUpdate } from '@macro-inc/collaboration/collab/shared';
+} from '@rox-one/collaboration/collab/manager';
+import type { RawUpdate } from '@rox-one/collaboration/collab/shared';
 import {
   IDBSnapshotStore,
   LORO_SNAPSHOT_DB_NAME,
-} from '@macro-inc/collaboration/collab/snapshot-store';
+} from '@rox-one/collaboration/collab/snapshot-store';
 import type {
   InitialSync,
   SyncError,
-} from '@macro-inc/collaboration/collab/source';
+} from '@rox-one/collaboration/collab/source';
 import {
   BrowserWALStore,
   LORO_WAL_DB_NAME,
-} from '@macro-inc/collaboration/collab/wal';
-import { MARKDOWN_LORO_SCHEMA } from '@macro-inc/lexical-core/markdown-loro-schema';
-import type { Span } from '@macro-inc/observability';
+} from '@rox-one/collaboration/collab/wal';
+import { MARKDOWN_LORO_SCHEMA } from '@rox-one/lexical-core/markdown-loro-schema';
+import type { Span } from '@rox-one/observability';
 import { Scroll } from '@ui';
 import type { ResultAsync } from 'neverthrow';
 import {

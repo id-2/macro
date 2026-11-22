@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 use std::sync::Mutex;
 
 const FROM: &str = "no-reply@rox.one";
@@ -111,8 +111,8 @@ impl EmailServiceOps for RecordingEmailService {
     }
 }
 
-fn recipient() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("bob@example.com").unwrap()
+fn recipient() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("bob@example.com").unwrap()
 }
 
 #[tokio::test]

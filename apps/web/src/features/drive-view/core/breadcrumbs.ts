@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { folderAncestors } from './folder-tree';
 import { driveLocationLabel } from './location-label';
 import type { DriveFolder, DriveLocation } from './types';
@@ -37,7 +38,7 @@ export function driveLocationBreadcrumbs(
     {
       type: 'drive-location',
       value: DRIVE_VIEW_BREADCRUMB,
-      label: 'Drive',
+      label: t('drive.title'),
       location: { kind: 'folder', id: null },
     },
     ...(location.id

@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::ports::BotRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 const TEAM: Uuid = Uuid::from_u128(0x91000000_0000_0000_0000_000000000011);

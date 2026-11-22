@@ -113,7 +113,7 @@ async fn real_sdk_nested_calls_are_authenticated_and_concurrent() {
                 assert!(
                     request
                         .to_ascii_lowercase()
-                        .contains("x-macro-code-execution: 1\r\n"),
+                        .contains("x-rox-code-execution: 1\r\n"),
                     "{request}"
                 );
                 assert!(
@@ -141,7 +141,7 @@ async fn real_sdk_nested_calls_are_authenticated_and_concurrent() {
         egress: Egress::Direct,
     };
     let source = r#"
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 import Handlebars from 'handlebars';
 export async function main({token, hosts, macro: supplied, session, execution}) {
   if (!(supplied instanceof Macro) || session.id !== "00000000-0000-0000-0000-000000000001" || execution.id !== "00000000-0000-0000-0000-000000000002") throw new Error("Missing SDK handles");
@@ -290,7 +290,7 @@ async fn links_point_at_the_deployment_web_app() {
         ..RunEnvironment::default()
     };
     let source = r#"
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 export async function main({token, hosts, webAppUrl, macro: supplied}) {
   const constructed = new Macro({token, hosts, webAppUrl});
   return {
@@ -452,7 +452,7 @@ async fn expect_only_the_marked_fetch(listener: TcpListener) {
     assert!(
         request
             .to_ascii_lowercase()
-            .contains("x-macro-code-execution: 1\r\n"),
+            .contains("x-rox-code-execution: 1\r\n"),
         "{request}"
     );
     respond(&mut stream, "{}").await;
@@ -1409,7 +1409,7 @@ async fn a_credential_outside_the_authorization_header_is_still_marked() {
             let lowercase = request.to_ascii_lowercase();
             assert!(!lowercase.contains("authorization:"), "{request}");
             assert!(
-                lowercase.contains("x-macro-code-execution: 1\r\n"),
+                lowercase.contains("x-rox-code-execution: 1\r\n"),
                 "{request}"
             );
             respond(&mut stream, "{}").await;
@@ -1505,7 +1505,7 @@ export async function main({hosts}) {
     let request = server.await.unwrap().to_ascii_lowercase();
     assert!(request.starts_with("get /marked?x=1 "), "{request}");
     assert!(
-        request.contains("x-macro-code-execution: 1\r\n"),
+        request.contains("x-rox-code-execution: 1\r\n"),
         "{request}"
     );
     assert!(!request.contains("x-macro-code-execution: 0"), "{request}");
@@ -1680,7 +1680,7 @@ async fn a_trailing_dot_host_is_still_marked() {
         assert!(
             request
                 .to_ascii_lowercase()
-                .contains("x-macro-code-execution: 1\r\n"),
+                .contains("x-rox-code-execution: 1\r\n"),
             "{request}"
         );
         respond(&mut stream, "{}").await;

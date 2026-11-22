@@ -16,8 +16,8 @@ impl PullRequestSessions for LinkedSessions {
     }
 }
 
-fn pr_updated_event(foreign_entity_ids: Vec<Uuid>) -> DeclaredMacroEvent {
-    DeclaredMacroEvent::GithubPullRequestMacroEvent(GithubPullRequestMacroEvent::updated(
+fn pr_updated_event(foreign_entity_ids: Vec<Uuid>) -> DeclaredRoxEvent {
+    DeclaredRoxEvent::GithubPullRequestRoxEvent(GithubPullRequestRoxEvent::updated(
         github_pull_requests::domain::events::GithubPullRequestUpdated {
             github_key: "macro/app/pull/7".into(),
             foreign_entity_ids,

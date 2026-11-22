@@ -23,14 +23,14 @@ impl<
     E: EntityAccessService,
     N: NotificationIngress,
     V: VoipPushSender,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 > ChannelCallStartup<R, C, Cn, E, N, V, B>
 {
     pub fn spawn(
         self,
         call: Call,
         channel_id: Uuid,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> tokio::task::JoinHandle<()> {
         let span = tracing::info_span!("start_channel_call", call_id = %call.id, %channel_id);
         tokio::spawn(async move {
@@ -52,10 +52,10 @@ impl<
         &self,
         call: &Call,
         channel_id: &Uuid,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
     ) -> anyhow::Result<()> {
         let channel_id_str = channel_id.to_string();
-        let recipient_ids: HashSet<MacroUserIdStr<'_>> = self
+        let recipient_ids: HashSet<RoxUserIdStr<'_>> = self
             .entity_access_service
             .get_users_by_entity(&channel_id_str, EntityType::Channel)
             .await?
@@ -98,7 +98,7 @@ impl<
         // perspective: a DM is named after the other
         // participant, so the caller's view of the name
         // would be the callee's own name.
-        let recipient_vec: Vec<MacroUserIdStr<'static>> = recipient_ids
+        let recipient_vec: Vec<RoxUserIdStr<'static>> = recipient_ids
             .iter()
             .cloned()
             .map(CowLike::into_owned)
@@ -156,7 +156,7 @@ impl<
         // One payload batch per distinct channel name, so
         // each recipient's native sheet shows the name they
         // know the channel by.
-        let mut payloads_by_recipient: HashMap<MacroUserIdStr<'static>, VoipPushPayload> =
+        let mut payloads_by_recipient: HashMap<RoxUserIdStr<'static>, VoipPushPayload> =
             HashMap::new();
         let voip_groups = group_recipients_by_channel_name(
             voip_targets
@@ -165,7 +165,7 @@ impl<
             &channel_names_by_recipient,
         );
         for (voip_channel_name, voip_group_recipients) in voip_groups {
-            let voip_group_recipients: Vec<MacroUserIdStr<'static>> =
+            let voip_group_recipients: Vec<RoxUserIdStr<'static>> =
                 voip_group_recipients.into_iter().collect();
             let payloads = self
                 .rtc_client

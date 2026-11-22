@@ -100,7 +100,7 @@ def patch(documents):
         operation["operationId"] = operation_id
         parameters = copy.deepcopy(source_path.get("parameters", []))
         # Metadata list/scan are deliberately not exposed by this client.
-        parameters.extend([header("X-Vault-Token", operation_id not in ("login_team", "login_lifecycle")), header("x-macro-audit-id", False)])
+        parameters.extend([header("X-Vault-Token", operation_id not in ("login_team", "login_lifecycle")), header("x-rox-audit-id", False)])
         if source == "team":
             parameters.append(header("X-Vault-Namespace", True))
         if operation_id == "read_secret":

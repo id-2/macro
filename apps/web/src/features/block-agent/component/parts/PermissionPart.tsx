@@ -3,6 +3,7 @@
  * above the composer so there is only one place to answer them.
  */
 
+import { t } from '@app/lib/i18n';
 import type { MessagePart } from '@service-agent-fold/generated/types';
 import { Show } from 'solid-js';
 import { match } from 'ts-pattern';
@@ -14,10 +15,10 @@ export function PermissionPart(props: {
   const outcome = () => {
     const resolved = props.part.outcome;
     if (resolved.kind === 'pending') {
-      return 'No longer waiting';
+      return t('agentChat.noLongerWaiting');
     }
     if (resolved.kind === 'cancelled') return 'Cancelled';
-    if (resolved.kind === 'errored') return 'Failed';
+    if (resolved.kind === 'errored') return t('agentChat.failed');
     if (resolved.kind === 'unrecognized') return 'Answered';
     const chosen = props.part.options.find(
       (option) => option.id === resolved.optionId
@@ -34,7 +35,7 @@ export function PermissionPart(props: {
   return (
     <Show when={props.part.outcome.kind !== 'pending'}>
       <ToolCard
-        title="Permission"
+        title={t('agentChat.permission')}
         trailing={<span class="text-ink">{outcome()}</span>}
         status="completed"
       />

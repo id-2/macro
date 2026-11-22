@@ -21,7 +21,7 @@ struct RecordingRepository {
 impl ActiveNotificationIdRepository for RecordingRepository {
     async fn active_notification_ids(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         event_types: &[String],
         limit: u32,
     ) -> Result<Vec<Uuid>, ActiveNotificationIdStorageError> {
@@ -132,7 +132,7 @@ struct FailingRepository {
 impl ActiveNotificationIdRepository for FailingRepository {
     async fn active_notification_ids(
         &self,
-        _user: MacroUserIdStr<'_>,
+        _user: RoxUserIdStr<'_>,
         _event_types: &[String],
         _limit: u32,
     ) -> Result<Vec<Uuid>, ActiveNotificationIdStorageError> {

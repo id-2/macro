@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_links SET is_primary = (id = $1), provider = CASE WHEN id = $1 THEN 'ROX' ELSE provider END",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "a83cecb5ffb3872ecc5992c7e7063676d01550c5ae28fa6ac59154ed6df92974"
+}

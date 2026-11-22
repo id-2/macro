@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { type DateValue, formatDate } from '@core/util/date';
 import { OwnerLabel } from '@entity/owner/owner-display';
 import { type ParentProps, Show } from 'solid-js';
@@ -25,21 +26,21 @@ export function EntityMetadata(
     <div class="flex flex-col gap-2">
       <Show when={props.ownerId}>
         {(owner) => (
-          <EntityMetadataRow label="Owner">
+          <EntityMetadataRow label={t('common.owner')}>
             <OwnerLabel ownerId={owner()} textOnly suppressClick />
           </EntityMetadataRow>
         )}
       </Show>
       <Show when={props.createdAt}>
         {(created) => (
-          <EntityMetadataRow label="Created">
+          <EntityMetadataRow label={t('common.created')}>
             {formatDate(created(), { showTime: true })}
           </EntityMetadataRow>
         )}
       </Show>
       <Show when={props.updatedAt}>
         {(updated) => (
-          <EntityMetadataRow label="Last updated">
+          <EntityMetadataRow label={t('common.lastUpdated')}>
             {formatDate(updated(), { showTime: true })}
           </EntityMetadataRow>
         )}

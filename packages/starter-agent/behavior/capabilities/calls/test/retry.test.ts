@@ -1,5 +1,5 @@
 import { afterEach, expect, jest, test } from 'bun:test';
-import type { Clock } from '@macro-inc/muppet/utilities/time';
+import type { Clock } from '@rox-one/muppet/utilities/time';
 import {
   type Attempt,
   rejoinDelay,

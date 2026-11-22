@@ -1,3 +1,4 @@
+import { formatLocale, t } from '@app/lib/i18n';
 import CalendarIcon from '@icon/system/regular/calendar-blank.svg';
 import { Button } from '@ui';
 import { Show } from 'solid-js';
@@ -12,7 +13,7 @@ export function AutoReloadLimitNotice(props: {
   onAddCredits: (trigger: HTMLButtonElement) => void;
 }) {
   const resetDate = () =>
-    new Date(props.budget.resetsAt).toLocaleDateString(undefined, {
+    new Date(props.budget.resetsAt).toLocaleDateString(formatLocale(), {
       month: 'short',
       day: 'numeric',
       timeZone: 'UTC',
@@ -26,19 +27,20 @@ export function AutoReloadLimitNotice(props: {
         <div class="flex min-w-0 items-start gap-2">
           <CalendarIcon class="mt-0.5 size-4 shrink-0 text-accent" />
           <p class="text-sm font-medium text-ink">
-            Monthly auto-reload {formatCreditBalance(props.budget.limitCents)}{' '}
-            limit reached
+            {t('settingsUsage.autoReloadLimitReached', {
+              amount: formatCreditBalance(props.budget.limitCents),
+            })}
           </p>
         </div>
         <span class="shrink-0 pt-0.5 text-xs text-ink-muted">
-          resets {resetDate()}
+          {t('settingsUsage.resetsLower', { date: resetDate() })}
         </span>
       </div>
       <Show
         when={props.canManage}
         fallback={
           <p class="text-xs text-ink-muted">
-            Ask your team owner to adjust the limit or add credits.
+            {t('settingsUsage.askOwnerToAdjust')}
           </p>
         }
       >
@@ -49,7 +51,7 @@ export function AutoReloadLimitNotice(props: {
             disabled={props.pending}
             onClick={(event) => props.onAdjust(event.currentTarget)}
           >
-            Adjust limit
+            {t('settingsUsage.adjustLimit')}
           </Button>
           <Button
             size="sm"
@@ -57,7 +59,7 @@ export function AutoReloadLimitNotice(props: {
             disabled={props.pending}
             onClick={(event) => props.onAddCredits(event.currentTarget)}
           >
-            Add credits
+            {t('settingsUsage.addCredits')}
           </Button>
         </div>
       </Show>

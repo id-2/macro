@@ -1,5 +1,5 @@
 use filter_ast::{ExpandFrame, Expr, FoldTree, TryExpandNode};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use serde::{Deserialize, Serialize};
 use strum::Display;
 use uuid::Uuid;
@@ -45,7 +45,7 @@ pub enum ChannelLiteral {
     /// the thread id in which we want to find messages
     ThreadId(Uuid),
     /// the message mentions some user x
-    Mention(MacroUserIdStr<'static>),
+    Mention(RoxUserIdStr<'static>),
     /// the message is in some organization
     OrganizationId(i64),
     /// the message is in some team
@@ -53,7 +53,7 @@ pub enum ChannelLiteral {
     /// the message is in some channel id
     ChannelId(Uuid),
     /// the message comes from some sender x
-    Sender(MacroUserIdStr<'static>),
+    Sender(RoxUserIdStr<'static>),
     /// the channel type to filter by
     ChannelType(ChannelTypeFilter),
     /// this node value filters by channel importance. false short-circuits to match nothing.
@@ -92,7 +92,7 @@ impl ExpandFrame<ChannelLiteral> for ChannelFilters {
 
         let mentions = mentions
             .iter()
-            .map(|s| MacroUserIdStr::parse_from_str(s).map(CowLike::into_owned))
+            .map(|s| RoxUserIdStr::parse_from_str(s).map(CowLike::into_owned))
             .try_expand(|r| r.map(ChannelLiteral::Mention), Expr::or)?;
 
         let organizations = org_id
@@ -111,7 +111,7 @@ impl ExpandFrame<ChannelLiteral> for ChannelFilters {
 
         let sender_ids = sender_ids
             .iter()
-            .map(|s| MacroUserIdStr::parse_from_str(s).map(CowLike::into_owned))
+            .map(|s| RoxUserIdStr::parse_from_str(s).map(CowLike::into_owned))
             .try_expand(|r| r.map(ChannelLiteral::Sender), Expr::or)?;
 
         let channel_type_nodes = channel_types
@@ -153,11 +153,11 @@ pub enum ChannelThreadLiteral {
     /// The thread must be in channel with [Uuid].
     ChannelId(Uuid),
     /// The sender of the root thread message must be the included user.
-    RootSender(MacroUserIdStr<'static>),
+    RootSender(RoxUserIdStr<'static>),
     /// The included user must be a participant of the thread: the root message sender,
     /// anyone who replied in the thread, or anyone @-mentioned in the thread (group
     /// mentions like @here count through their per-user expansion at send time).
-    Participant(MacroUserIdStr<'static>),
+    Participant(RoxUserIdStr<'static>),
     /// An entity has a non-deleted notification in this exact state.
     NotificationState(crate::NotificationState),
     /// Whether the thread has at least one undeleted reply.
@@ -189,12 +189,12 @@ impl ExpandFrame<ChannelThreadLiteral> for ChannelThreadFilters {
 
         let root_sender_ids = root_sender_ids
             .iter()
-            .map(|s| MacroUserIdStr::parse_from_str(s).map(CowLike::into_owned))
+            .map(|s| RoxUserIdStr::parse_from_str(s).map(CowLike::into_owned))
             .try_expand(|r| r.map(ChannelThreadLiteral::RootSender), Expr::or)?;
 
         let participant_ids = participant_ids
             .iter()
-            .map(|s| MacroUserIdStr::parse_from_str(s).map(CowLike::into_owned))
+            .map(|s| RoxUserIdStr::parse_from_str(s).map(CowLike::into_owned))
             .try_expand(|r| r.map(ChannelThreadLiteral::Participant), Expr::or)?;
 
         Ok([thread_ids, channel_ids, root_sender_ids, participant_ids]

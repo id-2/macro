@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Mutex;
 
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -18,8 +18,8 @@ const THREAD: &str = "01900000-0000-7000-8000-0000000000a1";
 const CHANNEL: &str = "01900000-0000-7000-8000-0000000000c1";
 const DOCUMENT: &str = "document-1";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 /// People who can't open any item: those in `denied`.
@@ -31,7 +31,7 @@ struct FakeAccess {
 impl SuggestionAccess for FakeAccess {
     type Err = std::convert::Infallible;
 
-    async fn can_view(&self, user: &MacroUserIdStr<'_>, _: &Target) -> Result<bool, Self::Err> {
+    async fn can_view(&self, user: &RoxUserIdStr<'_>, _: &Target) -> Result<bool, Self::Err> {
         Ok(!self.denied.lock().unwrap().contains(user.as_ref()))
     }
 

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { MobileDrawer } from '@components/app/mobile/MobileDrawer';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import CaretDownIcon from '@icon/system/regular/caret-down.svg';
@@ -107,7 +108,7 @@ export function RepositoryPicker(props: {
     });
   const submitRepository = () => {
     if (list.selectSelected()) return;
-    setError('Enter a GitHub repository as owner/repo or a repository URL.');
+    setError(t('repositoryPicker.invalidRepository'));
   };
   const chosen = (choice: RepositoryChoice) =>
     choice.kind === 'automatic'
@@ -115,7 +116,7 @@ export function RepositoryPicker(props: {
       : !!props.repoUrl && sameRepository(props.repoUrl, choice.url);
   const rowLabel = (choice: RepositoryChoice) =>
     match(choice)
-      .with({ kind: 'automatic' }, () => 'Auto-detect')
+      .with({ kind: 'automatic' }, () => t('common.autoDetect'))
       .with({ kind: 'listed' }, ({ url }) => repositoryLabel(url))
       .exhaustive();
   const nothingReachable = () =>
@@ -172,9 +173,7 @@ export function RepositoryPicker(props: {
     });
   const submitBranch = () => {
     if (branchList.selectSelected()) return;
-    setError(
-      'Enter a valid branch name, for example main or feature/my-change.'
-    );
+    setError(t('repositoryPicker.invalidBranch'));
   };
   const nothingListed = () =>
     !props.branchesLoading &&
@@ -193,13 +192,15 @@ export function RepositoryPicker(props: {
             list.setSelectedIndex(0);
           }
         }}
-        label="Repository"
+        label={t('repositoryPicker.repository')}
         triggerClass="pill min-w-0 max-w-full text-ink"
         trigger={
           <>
             <GithubIcon class="size-4 shrink-0" />
             <span class="truncate">
-              {props.repoUrl ? repositoryLabel(props.repoUrl) : 'Auto-detect'}
+              {props.repoUrl
+                ? repositoryLabel(props.repoUrl)
+                : t('common.autoDetect')}
             </span>
             <CaretDownIcon class="size-3 shrink-0" />
           </>
@@ -214,13 +215,13 @@ export function RepositoryPicker(props: {
         >
           <input
             role="combobox"
-            aria-label="Search repositories"
+            aria-label={t('repositoryPicker.searchRepositories')}
             aria-expanded="true"
             aria-controls={listId}
             aria-activedescendant={highlightedId()}
             aria-autocomplete="list"
             autocomplete="off"
-            placeholder="Search, or paste owner/repo"
+            placeholder={t('repositoryPicker.searchRepositoriesPlaceholder')}
             value={search()}
             onInput={(event) => {
               setSearch(event.currentTarget.value);
@@ -249,7 +250,7 @@ export function RepositoryPicker(props: {
         <div
           id={listId}
           role="listbox"
-          aria-label="Repositories"
+          aria-label={t('repositoryPicker.repositories')}
           class="mt-2 max-h-56 overflow-y-auto"
         >
           <For each={choices()}>
@@ -276,25 +277,24 @@ export function RepositoryPicker(props: {
           <Switch>
             <Match when={props.repositoriesError}>
               <div class="flex items-center justify-between gap-2 px-2 py-2 text-xs text-ink-muted">
-                Couldn't load your repositories.
+                {t('repositoryPicker.repositoriesLoadFailed')}
                 <Button
                   variant="secondary"
                   size="sm"
                   onClick={() => props.onRetryRepositories()}
                 >
-                  Retry
+                  {t('common.retry')}
                 </Button>
               </div>
             </Match>
             <Match when={props.repositoriesLoading && offered().length === 0}>
               <div class="px-2 py-2 text-xs text-ink-muted">
-                Loading your repositories…
+                {t('repositoryPicker.repositoriesLoading')}
               </div>
             </Match>
             <Match when={nothingReachable()}>
               <div class="flex flex-col gap-2 px-2 py-2 text-xs text-ink-muted">
-                No repositories yet. Give Rox's GitHub App access to the
-                repositories your coders should work on.
+                {t('repositoryPicker.noRepositories')}
                 <Show when={props.onConnectGitHub}>
                   <Button
                     variant="secondary"
@@ -302,14 +302,16 @@ export function RepositoryPicker(props: {
                     class="self-start"
                     onClick={() => props.onConnectGitHub?.()}
                   >
-                    Connect GitHub
+                    {t('common.connectGitHub')}
                   </Button>
                 </Show>
               </div>
             </Match>
             <Match when={choices().length === 0}>
               <div class="px-2 py-2 text-xs text-ink-muted">
-                No repositories match “{search().trim()}”.
+                {t('repositoryPicker.noMatches', {
+                  query: search().trim(),
+                })}
               </div>
             </Match>
           </Switch>
@@ -327,13 +329,13 @@ export function RepositoryPicker(props: {
               branchList.setSelectedIndex(selected >= 0 ? selected : 0);
             }
           }}
-          label="Starting branch"
-          triggerLabel="Branch"
+          label={t('repositoryPicker.startingBranch')}
+          triggerLabel={t('repositoryPicker.branch')}
           triggerClass="pill min-w-0 max-w-[45%] text-ink"
           disabled={props.branchLocked}
           title={
             props.branchLocked
-              ? 'New local sessions start from main'
+              ? t('repositoryPicker.branchLockedHint')
               : undefined
           }
           trigger={
@@ -355,13 +357,13 @@ export function RepositoryPicker(props: {
           >
             <input
               role="combobox"
-              aria-label="Search branches"
+              aria-label={t('repositoryPicker.searchBranches')}
               aria-expanded="true"
               aria-controls={branchListId}
               aria-activedescendant={highlightedBranchId()}
               aria-autocomplete="list"
               autocomplete="off"
-              placeholder="Search, or type a branch name"
+              placeholder={t('repositoryPicker.searchBranchesPlaceholder')}
               value={branchSearch()}
               onInput={(event) => {
                 setBranchSearch(event.currentTarget.value);
@@ -390,7 +392,7 @@ export function RepositoryPicker(props: {
           <div
             id={branchListId}
             role="listbox"
-            aria-label="Branches"
+            aria-label={t('repositoryPicker.branches')}
             class="mt-2 max-h-56 overflow-y-auto"
           >
             <For each={branchChoices()}>
@@ -409,12 +411,13 @@ export function RepositoryPicker(props: {
                   <GitBranchIcon class="size-4 shrink-0" />
                   <span class="min-w-0 truncate">
                     {choice.kind === 'typed'
-                      ? `Use ${choice.name}`
+                      ? t('repositoryPicker.useBranch', { name: choice.name })
                       : choice.name}
                   </span>
                   <Show when={choice.name === defaultBranch()}>
                     <span class="shrink-0 text-xs text-ink-muted">
-                      {` (default)`}
+                      {' '}
+                      {t('repositoryPicker.defaultBranch')}
                     </span>
                   </Show>
                   <Show when={choice.name === props.branch}>
@@ -426,13 +429,13 @@ export function RepositoryPicker(props: {
             <Switch>
               <Match when={props.branchesError}>
                 <div class="flex items-center justify-between gap-2 px-2 py-2 text-xs text-ink-muted">
-                  Couldn't load this repository's branches.
+                  {t('repositoryPicker.branchesLoadFailed')}
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={() => props.onRetryBranches()}
                   >
-                    Retry
+                    {t('common.retry')}
                   </Button>
                 </div>
               </Match>
@@ -440,17 +443,19 @@ export function RepositoryPicker(props: {
                 when={props.branchesLoading && props.branches.length === 0}
               >
                 <div class="px-2 py-2 text-xs text-ink-muted">
-                  Loading branches…
+                  {t('repositoryPicker.branchesLoading')}
                 </div>
               </Match>
               <Match when={nothingListed()}>
                 <div class="px-2 py-2 text-xs text-ink-muted">
-                  No branches yet. Type a starting branch to use.
+                  {t('repositoryPicker.noBranches')}
                 </div>
               </Match>
               <Match when={branchChoices().length === 0}>
                 <div class="px-2 py-2 text-xs text-ink-muted">
-                  No branches match “{branchSearch().trim()}”.
+                  {t('repositoryPicker.noBranchMatches', {
+                    query: branchSearch().trim(),
+                  })}
                 </div>
               </Match>
             </Switch>

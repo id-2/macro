@@ -10,7 +10,7 @@
 //! using a no-op) never pull `models_email` in.
 
 use crate::domain::crm_enqueuer::CrmEnqueuer;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_email::email::service::backfill::{
     BackfillOperation, BackfillPubsubMessage, DepopulateCrmForUserPayload,
     PopulateCrmForUserPayload,
@@ -38,12 +38,12 @@ impl CrmEnqueuer for SqsCrmEnqueuer {
     #[tracing::instrument(skip(self), err)]
     async fn enqueue_populate_crm_for_user(
         &self,
-        macro_id: &MacroUserIdStr<'_>,
+        macro_id: &RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
         // The payload owns the macro_id with a 'static lifetime — clone
-        // into an owned `MacroUserIdStr<'static>` so it can be serialized
+        // into an owned `RoxUserIdStr<'static>` so it can be serialized
         // and shipped through SQS.
-        let macro_id_owned: MacroUserIdStr<'static> = macro_id.clone().into_owned();
+        let macro_id_owned: RoxUserIdStr<'static> = macro_id.clone().into_owned();
 
         let message = BackfillPubsubMessage {
             backfill_operation: BackfillOperation::PopulateCrmForUser(PopulateCrmForUserPayload {
@@ -58,9 +58,9 @@ impl CrmEnqueuer for SqsCrmEnqueuer {
     async fn enqueue_depopulate_crm_for_user(
         &self,
         team_id: &uuid::Uuid,
-        macro_id: &MacroUserIdStr<'_>,
+        macro_id: &RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
-        let macro_id_owned: MacroUserIdStr<'static> = macro_id.clone().into_owned();
+        let macro_id_owned: RoxUserIdStr<'static> = macro_id.clone().into_owned();
 
         let message = BackfillPubsubMessage {
             backfill_operation: BackfillOperation::DepopulateCrmForUser(

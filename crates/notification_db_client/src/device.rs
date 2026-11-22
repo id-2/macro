@@ -1,4 +1,4 @@
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_notifications::DeviceType;
 use std::collections::HashMap;
 
@@ -33,7 +33,7 @@ pub async fn upsert_user_device(
     device_endpoint: &str,
     device_type: &DeviceType,
 ) -> anyhow::Result<()> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO notification_user_device_registration (id, user_id, device_token, device_endpoint, device_type)
@@ -57,12 +57,12 @@ pub async fn upsert_user_device(
 #[tracing::instrument(skip(db))]
 pub async fn get_users_device_endpoints(
     db: &sqlx::Pool<sqlx::Postgres>,
-    user_ids: &[MacroUserIdStr<'static>],
-) -> anyhow::Result<HashMap<MacroUserIdStr<'static>, Vec<(String, DeviceType)>>> {
+    user_ids: &[RoxUserIdStr<'static>],
+) -> anyhow::Result<HashMap<RoxUserIdStr<'static>, Vec<(String, DeviceType)>>> {
     // initialize hashmap
     // we need to initialize the hashmap here with *all* user ids so we can ensure we have empty
     // vectors for users that don't have any device endpoints
-    let mut result: HashMap<MacroUserIdStr<'static>, Vec<(String, DeviceType)>> =
+    let mut result: HashMap<RoxUserIdStr<'static>, Vec<(String, DeviceType)>> =
         user_ids.iter().map(|id| (id.clone(), Vec::new())).collect();
 
     let ids: Vec<_> = user_ids.iter().map(|r| r.as_ref().to_string()).collect();
@@ -82,7 +82,7 @@ pub async fn get_users_device_endpoints(
     .await?;
 
     for (user_id, device_endpoint, device_type) in device_endpoints {
-        let Ok(res) = MacroUserIdStr::parse_from_str(&user_id) else {
+        let Ok(res) = RoxUserIdStr::parse_from_str(&user_id) else {
             continue;
         };
         result
@@ -158,7 +158,7 @@ pub async fn delete_user_device_by_endpoint(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::MACRO_DB_MIGRATIONS;
     use sqlx::{Pool, Postgres};
 
     #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]

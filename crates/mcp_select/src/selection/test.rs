@@ -1,9 +1,9 @@
 use super::*;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 fn native(url: &str, enabled: bool, authenticated: bool) -> McpServerRecord {
     McpServerRecord {
-        user_id: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
         url: url.to_owned(),
         server_name: "Renamed by user".into(),
         enabled,
@@ -15,7 +15,7 @@ fn native(url: &str, enabled: bool, authenticated: bool) -> McpServerRecord {
 }
 fn pd(slug: &str, enabled: bool) -> PipedreamConnection {
     PipedreamConnection {
-        user_id: MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
+        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap(),
         app_slug: slug.into(),
         server_name: slug.into(),
         account_id: "account".into(),

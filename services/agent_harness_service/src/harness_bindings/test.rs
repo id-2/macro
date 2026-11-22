@@ -2,13 +2,13 @@ use super::*;
 use agent_session::domain::model::AgentSessionId;
 use harnesses::domain::ports::HarnessRepo as _;
 use harnesses::outbound::pg_harness_repo::PgHarnessRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 
 const OWNER: &str = "macro|bindings@example.com";
 
 async fn insert_harness(pool: &PgPool) -> HarnessId {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO harnesses (id, kind, name, owner_user_id, created_by)
@@ -24,7 +24,7 @@ async fn insert_harness(pool: &PgPool) -> HarnessId {
 }
 
 async fn insert_bot(pool: &PgPool, harness: HarnessId) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO bots (id, kind, name, handle, owner_user_id)
@@ -53,7 +53,7 @@ async fn insert_bot(pool: &PgPool, harness: HarnessId) -> Uuid {
 }
 
 async fn insert_session(pool: &PgPool, bot: Uuid, acp_session_id: &str) -> AgentSessionId {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO agent_session
@@ -199,10 +199,10 @@ async fn a_session_untouched_for_a_week_with_nothing_waiting_is_dormant(pool: Pg
                ($3, $2, 'to_server', '{}', now() - interval '1 day'),
                ($4, $5, 'to_server', '{}', now() - interval '9 days')
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         recent_log.as_uuid(),
-        macro_uuid::generate_uuid_v7(),
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         dormant.as_uuid(),
     )
     .execute(&pool)
@@ -244,9 +244,9 @@ async fn a_session_untouched_for_a_week_with_nothing_waiting_is_dormant(pool: Pg
              server_name, tool_name, arguments)
         VALUES ($1, $2, $3, '1', $4, 'macro', 'Macro', 'ReadDocument', '{}')
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         approval.as_uuid(),
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         OWNER,
     )
     .execute(&pool)
@@ -258,13 +258,13 @@ async fn a_session_untouched_for_a_week_with_nothing_waiting_is_dormant(pool: Pg
             (id, session_id, kind, subject_id, payload, dedupe_key, wake)
         VALUES ($1, $2, 'test', 'subject', '{}', 'dedupe', true)
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         notified.as_uuid(),
     )
     .execute(&pool)
     .await
     .unwrap();
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'direct_message', $2)",
         channel,
@@ -467,7 +467,7 @@ async fn a_resident_runs_on_its_owners_access_and_a_coding_agent_on_the_prompter
     .execute(&pool)
     .await
     .unwrap();
-    let stranger = MacroUserIdStr::try_from("macro|stranger@example.com".to_owned()).unwrap();
+    let stranger = RoxUserIdStr::try_from("macro|stranger@example.com".to_owned()).unwrap();
     let bindings = PgHarnessBindings::new(pool.clone());
 
     let facts = bindings
@@ -502,13 +502,13 @@ async fn a_resident_runs_on_its_owners_access_and_a_coding_agent_on_the_prompter
 async fn a_reader_cannot_prompt_a_coding_agent(pool: PgPool) {
     let laptop = insert_harness(&pool).await;
     let coding = BotId::new_from_uuid(insert_bot(&pool, laptop).await);
-    let reader = MacroUserIdStr::try_from("macro|reader@example.com".to_owned()).unwrap();
-    let team_id = macro_uuid::generate_uuid_v7();
+    let reader = RoxUserIdStr::try_from("macro|reader@example.com".to_owned()).unwrap();
+    let team_id = rox_uuid::generate_uuid_v7();
     for (id, email) in [
         (OWNER, "bindings@example.com"),
         (reader.as_ref(), "reader@example.com"),
     ] {
-        let macro_user = macro_uuid::generate_uuid_v7();
+        let macro_user = rox_uuid::generate_uuid_v7();
         sqlx::query!(
             "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
             macro_user,

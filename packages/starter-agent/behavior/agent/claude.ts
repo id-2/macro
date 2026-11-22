@@ -12,7 +12,7 @@ import type {
   EventContext,
   WakeContext,
   Woke,
-} from '@macro-inc/muppet/core/agent';
+} from '@rox-one/muppet/core/agent';
 import { z } from 'zod';
 import { type Guard, refusal } from './guard.ts';
 

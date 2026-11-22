@@ -9,7 +9,7 @@ use chrono::{Duration, Utc};
 use constant_time_eq::constant_time_eq;
 use harness_id::HarnessId;
 use harness_token::HashedHarnessToken;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{
@@ -117,7 +117,7 @@ where
 
     async fn ensure_may_manage(
         &self,
-        caller: &MacroUserIdStr<'static>,
+        caller: &RoxUserIdStr<'static>,
         harness: &Harness,
     ) -> Result<(), HarnessError> {
         // A computer belongs to its team, whoever bought it: the access level
@@ -252,7 +252,7 @@ where
     #[tracing::instrument(skip(self, req, code), fields(caller = %caller), err)]
     async fn approve_pairing(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         code: &str,
         req: ApprovePairingRequest,
     ) -> Result<Harness, HarnessError> {
@@ -361,7 +361,7 @@ where
     #[tracing::instrument(skip(self), fields(caller = %caller), err)]
     async fn list_harnesses(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<Harness>, HarnessError> {
         let harnesses = self
             .repo
@@ -374,7 +374,7 @@ where
     #[tracing::instrument(skip(self), fields(caller = %caller), err)]
     async fn list_directory(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<Harness>, HarnessError> {
         let harnesses = self
             .repo
@@ -387,7 +387,7 @@ where
     #[tracing::instrument(skip(self, req), fields(caller = %caller, team_id = %req.team_id, enabled = req.enabled), err)]
     async fn set_team_access(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
         req: SetHarnessTeamAccessRequest,
     ) -> Result<(), HarnessError> {
@@ -427,7 +427,7 @@ where
     #[tracing::instrument(skip(self), fields(caller = %caller), err)]
     async fn list_residents(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
     ) -> Result<Vec<HarnessResident>, HarnessError> {
         let access = self
@@ -448,7 +448,7 @@ where
     #[tracing::instrument(skip(self, req), fields(caller = %caller), err)]
     async fn patch_harness(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
         req: PatchHarnessRequest,
     ) -> Result<Harness, HarnessError> {
@@ -486,7 +486,7 @@ where
     #[tracing::instrument(skip(self), fields(caller = %caller), err)]
     async fn delete_harness(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
     ) -> Result<(), HarnessError> {
         let harness = self
@@ -688,7 +688,7 @@ where
     #[tracing::instrument(skip(self), fields(caller = %caller), err)]
     async fn authorize_harness(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         harness_id: HarnessId,
         permission: HarnessPermission,
     ) -> Result<Harness, HarnessError> {
@@ -754,7 +754,7 @@ where
     async fn harness_team_agent(
         &self,
         harness_id: HarnessId,
-    ) -> Result<Option<MacroUserIdStr<'static>>, HarnessError> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, HarnessError> {
         let Some(computer_id) = self
             .repo
             .harness_computer(harness_id)

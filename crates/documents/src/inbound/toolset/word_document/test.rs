@@ -43,7 +43,7 @@ fn edit_input_takes_tracking_and_an_author() {
 #[tokio::test]
 async fn cancelled_request_never_starts_the_worker_operation() {
     let req = RequestContext::new(
-        macro_user_id::user_id::MacroUserIdStr::try_from("macro|test@example.com".to_owned())
+        rox_user_id::user_id::RoxUserIdStr::try_from("macro|test@example.com".to_owned())
             .unwrap(),
     );
     req.cancel.cancel();

@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::Language;
 use sqlx::PgPool;
 
@@ -28,7 +28,7 @@ impl UserLanguageRepo for PgUserLanguageRepo {
     #[tracing::instrument(err, skip_all)]
     async fn get_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Option<Option<Language>>, Self::Err> {
         sqlx::query!(
             r#"
@@ -46,7 +46,7 @@ impl UserLanguageRepo for PgUserLanguageRepo {
     #[tracing::instrument(err, skip_all)]
     async fn set_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         language: Option<Language>,
     ) -> Result<bool, Self::Err> {
         let result = sqlx::query!(

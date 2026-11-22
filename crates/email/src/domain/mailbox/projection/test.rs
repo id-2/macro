@@ -3,7 +3,7 @@ use models_email::service::{address::ContactInfo, link::UserProvider};
 
 fn context() -> ProjectionContext {
     let link_id = Uuid::now_v7();
-    let owner = MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
+    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap();
     let now = chrono::Utc::now();
     let message = serde_json::from_value(serde_json::json!({
         "db_id":Uuid::now_v7(),"thread_db_id":Uuid::now_v7(),"link_id":link_id,"provider_id":"message","provider_thread_id":"conversation",
@@ -16,7 +16,7 @@ fn context() -> ProjectionContext {
             id: link_id,
             macro_id: owner.clone(),
             fusionauth_user_id: "owner".into(),
-            email_address: macro_user_id::email::EmailStr::try_from("owner@example.com".to_owned())
+            email_address: rox_user_id::email::EmailStr::try_from("owner@example.com".to_owned())
                 .unwrap(),
             provider: UserProvider::Outlook,
             is_sync_active: true,
@@ -38,7 +38,7 @@ fn context() -> ProjectionContext {
         }),
         viewers: HashSet::from([
             owner,
-            MacroUserIdStr::try_from("macro|staff@rox.one".to_owned()).unwrap(),
+            RoxUserIdStr::try_from("macro|staff@rox.one".to_owned()).unwrap(),
         ]),
     }
 }
@@ -106,7 +106,7 @@ fn notification_retry_preserves_ids_and_staff_push_policy() {
 
 #[test]
 fn user_category_keeps_its_event_type_and_publication_identity() {
-    use macro_event_broker::MacroEvent;
+    use rox_event_broker::RoxEvent;
     let context = context();
     let id = Uuid::now_v7();
     let action = crate::domain::models::mailbox_action::MailboxAction::Category {
@@ -129,7 +129,7 @@ fn user_category_keeps_its_event_type_and_publication_identity() {
 
 #[tokio::test]
 async fn persisted_projection_restores_invocation_when_publishing_later() {
-    use macro_event_broker::MacroEvent;
+    use rox_event_broker::RoxEvent;
     let context = context();
     let id = Uuid::now_v7();
     let event: ProjectionEvent = serde_json::from_value(serde_json::json!({

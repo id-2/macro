@@ -3,7 +3,7 @@
 
 use std::{future::Future, pin::Pin};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::models::EmailErr;
@@ -19,7 +19,7 @@ pub trait SharedThreadReplyAccess: Send + Sync + 'static {
     /// so they can answer it from an inbox of their own; `None` otherwise.
     fn reply_target_inbox<'a>(
         &'a self,
-        actor: &'a MacroUserIdStr<'static>,
+        actor: &'a RoxUserIdStr<'static>,
         message_id: Uuid,
     ) -> ReplyTargetInboxFuture<'a>;
 }
@@ -30,7 +30,7 @@ pub struct NoSharedThreadReplies;
 impl SharedThreadReplyAccess for NoSharedThreadReplies {
     fn reply_target_inbox<'a>(
         &'a self,
-        _actor: &'a MacroUserIdStr<'static>,
+        _actor: &'a RoxUserIdStr<'static>,
         _message_id: Uuid,
     ) -> ReplyTargetInboxFuture<'a> {
         Box::pin(async { Ok(None) })

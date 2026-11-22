@@ -10,6 +10,7 @@ import {
 import { CollectionPanes } from '@app/components/view-shell/CollectionPanes';
 import { ListHeaderSearch } from '@app/components/view-shell/ListHeader';
 import { ViewCreateMenu } from '@app/features/command/view-create-menu';
+import { type TranslationKey, t } from '@app/lib/i18n';
 import {
   createSearchParams,
   SplitRouter,
@@ -90,15 +91,26 @@ import {
 import { ReviewsListHeader } from './views/ReviewsListHeader';
 import { ReviewsListTopBar } from './views/ReviewsListTopBar';
 
-const REVIEW_SCOPE_TITLES: Record<ReviewsScope, string> = {
-  all: 'Pull requests',
-  authored: 'Authored by me',
-  assigned: 'Assigned to me',
-  involving: 'Involves me',
-  review_requests: 'Review requests',
+const REVIEW_SCOPE_LABELS: Record<ReviewsScope, TranslationKey> = {
+  all: 'reviews.scopeAll',
+  authored: 'reviews.scopeAuthored',
+  assigned: 'reviews.scopeAssigned',
+  involving: 'reviews.scopeInvolving',
+  review_requests: 'reviews.scopeReviewRequests',
 };
+
+/** A scope's name in the current interface language. */
+function reviewScopeTitle(scope: ReviewsScope): string {
+  return t(REVIEW_SCOPE_LABELS[scope]);
+}
+
 const REVIEW_SCOPE_TABS: PillTabItem<ReviewsScope>[] = REVIEWS_SCOPES.map(
-  (scope) => ({ value: scope, label: REVIEW_SCOPE_TITLES[scope] })
+  (scope) => ({
+    value: scope,
+    get label() {
+      return reviewScopeTitle(scope);
+    },
+  })
 );
 /** The board's status filter: open pull requests on their way, and merged ones. */
 const BOARD_STATUSES = ['open', 'merged'];
@@ -129,7 +141,7 @@ function ReviewsRoot() {
   const params = useParams<{ foreignEntityId?: string }>();
   const [tabSearch] = createSearchParams(reviewsTabSearch);
   const scope = (): ReviewsScope => tabSearch.tab;
-  const scopeTitle = () => REVIEW_SCOPE_TITLES[scope()];
+  const scopeTitle = () => reviewScopeTitle(scope());
   const [search, setSearch] = createSignal('');
   const [reviewsLayout, setReviewsLayout] = makePersisted(
     createSignal<ReviewsLayout>('list'),
@@ -146,7 +158,7 @@ function ReviewsRoot() {
     scopeId: panel.splitHotkeyScope,
     enabled: () => panel.isPanelActive() && listVisible() && !isTouchDevice(),
     search: {
-      description: 'Search reviews',
+      description: t('reviews.searchReviews'),
       run: () => {
         focusSearch?.();
         return true;
@@ -349,7 +361,7 @@ function ReviewsRoot() {
         when={isTouchDevice()}
         fallback={
           <ReviewsListHeader
-            scope={<ViewBreadcrumbs.Outlet aria-label="Review location" />}
+            scope={<ViewBreadcrumbs.Outlet aria-label={t('reviews.reviewLocation')} />}
             status={statusToggle()}
           >
             <ReviewsControls
@@ -359,7 +371,7 @@ function ReviewsRoot() {
             />
             <ViewCreateMenu presentation="toolbar" />
             <ListHeaderSearch
-              label="Search reviews"
+              label={t('reviews.searchReviews')}
               value={search()}
               onValueChange={setSearch}
               focusResults={() => panel.panelRef()?.focus()}
@@ -386,10 +398,10 @@ function ReviewsRoot() {
               />
             </div>
             <SearchBar
-              label="Search reviews"
+              label={t('reviews.searchReviews')}
               value={search()}
               onValueChange={setSearch}
-              placeholder="Search reviews"
+              placeholder={t('reviews.searchReviews')}
             />
           </div>
           {/* The sidebar holds the toggle; without one it sits above the list. */}
@@ -448,7 +460,7 @@ function ReviewsRoot() {
                 role="status"
                 class="grid size-full place-items-center text-sm text-ink-muted"
               >
-                Loading pull requests…
+                {t('reviews.loadingPullRequests')}
               </div>
             </Match>
             <Match when={listSource.error()}>
@@ -456,7 +468,7 @@ function ReviewsRoot() {
                 role="alert"
                 class="flex size-full flex-col items-center justify-center gap-3 text-sm text-ink-muted"
               >
-                <span>Reviews couldn’t be loaded.</span>
+                <span>{t('reviews.listLoadFailed')}</span>
                 <Button
                   variant="secondary"
                   size="sm"
@@ -464,7 +476,7 @@ function ReviewsRoot() {
                     fireAndForget(listSource.retry(), 'reviews-view')
                   }
                 >
-                  Try again
+                  {t('common.tryAgain')}
                 </Button>
               </div>
             </Match>
@@ -490,7 +502,7 @@ function ReviewsRoot() {
     </>
   );
 
-  onMount(() => panel.handle.setDisplayName('Reviews'));
+  onMount(() => panel.handle.setDisplayName(t('reviews.title')));
   return (
     <ViewBreadcrumbs.Root
       value={
@@ -558,7 +570,7 @@ function ReviewsRoot() {
                     role="status"
                     class="grid size-full place-items-center text-ink-muted"
                   >
-                    Loading reviews…
+                    {t('reviews.loadingReviews')}
                   </div>
                 }
               >

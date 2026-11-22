@@ -1,5 +1,5 @@
 use super::*;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use oauth2::TokenResponse as _;
 use std::sync::Mutex;
 
@@ -33,7 +33,7 @@ impl McpServerStore for MemoryStore {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         Ok(self.rows().into_iter().find(|row| row.url == server_url))
@@ -41,7 +41,7 @@ impl McpServerStore for MemoryStore {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<(), Self::Err> {
         self.rows
@@ -53,7 +53,7 @@ impl McpServerStore for MemoryStore {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         Ok(self.rows())
     }
@@ -66,7 +66,7 @@ struct FixedTokens(anyhow::Result<Option<String>>);
 impl LinkedGithubTokens for FixedTokens {
     async fn access_token(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> anyhow::Result<Option<String>> {
         match &self.0 {
             Ok(token) => Ok(token.clone()),
@@ -77,8 +77,8 @@ impl LinkedGithubTokens for FixedTokens {
 
 const WIKI: &str = "https://wiki.example.com/mcp";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user@example.com")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user@example.com")
         .unwrap()
         .into_owned()
 }

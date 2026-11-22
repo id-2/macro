@@ -3,7 +3,7 @@
 use agent_client_protocol::schema::v1::{McpServer, PermissionOptionId, RequestId, SessionId};
 use agent_runtime_protocol::domain::action::{AgentAction, AgentActionId};
 use agent_runtime_protocol::domain::schema::v0::{ToRuntimeMessage, ToServerMessage};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::error::Result;
 use crate::domain::model::HistoryBoundary;
@@ -11,7 +11,7 @@ use crate::domain::model::HistoryBoundary;
 /// An action accepted before there was a live ACP session to send it through.
 #[derive(Debug)]
 pub(super) struct PendingAction<Token> {
-    pub(super) from: Option<MacroUserIdStr<'static>>,
+    pub(super) from: Option<RoxUserIdStr<'static>>,
     pub(super) action: AgentAction,
     pub(super) action_id: AgentActionId,
     pub(super) token: Token,
@@ -219,7 +219,7 @@ pub enum Input<Token> {
     /// A caller wants this action delivered.
     Command {
         /// The user whose request this is, when it came from one.
-        from: Option<MacroUserIdStr<'static>>,
+        from: Option<RoxUserIdStr<'static>>,
         /// What to deliver.
         action: AgentAction,
         /// The id the action carries onto the wire, minted at accept.
@@ -261,7 +261,7 @@ pub enum Effect<Token> {
     /// Log then send on the transport.
     Send {
         /// The user whose request this is, for the log entry.
-        from: Option<MacroUserIdStr<'static>>,
+        from: Option<RoxUserIdStr<'static>>,
         /// The envelope to deliver.
         message: ToRuntimeMessage,
     },

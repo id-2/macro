@@ -1,4 +1,4 @@
-import { notionMarkdownToLoroSnapshot } from '@macro-inc/lexical-core/notion-markdown';
+import { notionMarkdownToLoroSnapshot } from '@rox-one/lexical-core/notion-markdown';
 import { OpenAPIRoute } from 'chanfana';
 import type { Context } from 'hono';
 import { z } from 'zod';

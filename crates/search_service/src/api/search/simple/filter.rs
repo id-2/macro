@@ -10,7 +10,7 @@ use opensearch_client::search::unified::{
 };
 
 use crate::domain::email_search::{EmailScope, MAX_EMAIL_PROJECTS, ThreadStates, ViewerInboxes};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use uuid::Uuid;
 
 use crate::api::{
@@ -185,7 +185,7 @@ pub(super) fn reject_unsupported_email_filters(
 /// emails are left out or no thread can match.
 pub(super) async fn email_search(
     ctx: &SearchHandlerState,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
     filters: &item_filters::EmailFilters,
     should_include: bool,
 ) -> Result<Option<EmailSearch>, SearchError> {

@@ -9,9 +9,9 @@ use axum::{
     response::IntoResponse,
     routing::{delete, get, post},
 };
-use macro_authorization::{
-    AccountHolderOrInternal, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState, is_program_run,
+use rox_authorization::{
+    AccountHolderOrInternal, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState, is_program_run,
 };
 use model_error_response::ErrorResponse;
 use serde::{Deserialize, Serialize};
@@ -24,7 +24,7 @@ use crate::domain::{
 /// Router state for user API key endpoints.
 pub struct UserApiKeyRouterState<S, Auth> {
     service: Arc<S>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for UserApiKeyRouterState<S, Auth> {
@@ -41,7 +41,7 @@ where
     S: UserApiKeyService,
 {
     /// Create router state from a shared service and authorization state.
-    pub fn new(service: Arc<S>, authorization_state: MacroAuthorizationState<Auth>) -> Self {
+    pub fn new(service: Arc<S>, authorization_state: RoxAuthorizationState<Auth>) -> Self {
         Self {
             service,
             authorization_state,
@@ -49,7 +49,7 @@ where
     }
 }
 
-impl<S, Auth> FromRef<UserApiKeyRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<UserApiKeyRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &UserApiKeyRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -64,7 +64,7 @@ impl<S, Auth> FromRef<UserApiKeyRouterState<S, Auth>> for MacroAuthorizationStat
 pub fn user_api_key_router<S, Auth, T>(state: UserApiKeyRouterState<S, Auth>) -> Router<T>
 where
     S: UserApiKeyService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -120,13 +120,13 @@ const PROGRAM_KEY_REFUSAL: &str = "An agent's program cannot create an API key: 
 #[tracing::instrument(err, skip_all)]
 pub async fn create_user_api_key_handler<S, Auth>(
     State(state): State<UserApiKeyRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     headers: HeaderMap,
     Json(body): Json<CreateUserApiKeyRequest>,
 ) -> Result<(StatusCode, Json<CreatedUserApiKey>), UserApiKeyError>
 where
     S: UserApiKeyService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let attribution = user.authorization.user.attribution();
     if is_program_run(attribution, &headers) {
@@ -155,11 +155,11 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn list_user_api_keys_handler<S, Auth>(
     State(state): State<UserApiKeyRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
 ) -> Result<Json<UserApiKeysList>, UserApiKeyError>
 where
     S: UserApiKeyService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let keys = state
         .service
@@ -185,12 +185,12 @@ where
 #[tracing::instrument(err, skip_all)]
 pub async fn delete_user_api_key_handler<S, Auth>(
     State(state): State<UserApiKeyRouterState<S, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, AccountHolderOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, AccountHolderOrInternal>,
     Path(params): Path<DeleteUserApiKeyParams>,
 ) -> Result<StatusCode, UserApiKeyError>
 where
     S: UserApiKeyService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .service

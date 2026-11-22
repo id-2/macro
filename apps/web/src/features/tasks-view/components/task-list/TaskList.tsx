@@ -319,7 +319,7 @@ export function TaskList(props: TaskListProps) {
     },
     activation: {
       createMetadata: (intent) => ({ newSplit: intent === 'alternate' }),
-      alternateDescription: 'Open in new split',
+      alternateDescription: 'Открыть в новой панели',
     },
     disclosure: {
       isHeader: (row) => row.kind === 'group-header',
@@ -347,7 +347,7 @@ export function TaskList(props: TaskListProps) {
 
   registerHotkey({
     scopeId: panel.splitHotkeyScope,
-    description: 'Add to project…',
+    description: 'Добавить в проект…',
     tags: [HotkeyTags.SelectionModification],
     condition: () => panel.isPanelActive() && selectedTasks().length > 0,
     keyDownHandler: () => {
@@ -442,9 +442,9 @@ export function TaskList(props: TaskListProps) {
   }
 
   const emptyMessage = () => {
-    if (state.search.trim()) return 'No tasks match this search.';
+    if (state.search.trim()) return 'Нет задач по этому поиску.';
 
-    return 'No tasks in this view.';
+    return 'В этом виде нет задач.';
   };
 
   return (
@@ -455,7 +455,7 @@ export function TaskList(props: TaskListProps) {
           props.ref?.(element);
         }}
         role="grid"
-        aria-label="Tasks"
+        aria-label="Задачи"
         aria-multiselectable="true"
         aria-activedescendant={list.focus.key()}
         tabIndex={0}

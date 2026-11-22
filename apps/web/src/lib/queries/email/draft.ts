@@ -2,7 +2,7 @@ import { DraftTransferAborted } from '@app/features/email-compose/context/compos
 import { fireAndForget } from '@core/util/fireAndForget';
 import { ThrownResultError, throwOnErr } from '@core/util/result';
 import { sleep } from '@core/util/sleep';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { invalidateAllSoup, refetchSoupEntity } from '@queries/soup/cache';
 import { emailClient } from '@service-email/client';
 import type {

@@ -17,7 +17,7 @@ mod test;
 
 use std::time::Duration;
 
-use macro_service_urls::MicrosoftGraphUrl;
+use rox_service_urls::MicrosoftGraphUrl;
 use reqwest::Client;
 use url::Url;
 

@@ -6,7 +6,7 @@ use crate::{
     predicate::ProjectionState,
     value::{CacheValue, EntityKey, Record},
 };
-use macro_user_id::{email::ReadEmailParts, user_id::MacroUserIdStr};
+use rox_user_id::{email::ReadEmailParts, user_id::RoxUserIdStr};
 use predicate_index::{
     ExactFact, ExactValue, IndexDocument, Profile, ProjectionIncompleteKind, RecordKey, Token,
     ValidationError,
@@ -65,7 +65,7 @@ pub fn project(
     if user.len() > 1024 {
         return Ok(incomplete());
     }
-    let Ok(user) = MacroUserIdStr::parse_from_str(user) else {
+    let Ok(user) = RoxUserIdStr::parse_from_str(user) else {
         return Ok(incomplete());
     };
     if contact_key(viewer, user.as_ref()).as_ref() != key.as_ref() {

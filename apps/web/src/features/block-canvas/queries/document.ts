@@ -1,5 +1,5 @@
 import { ThrownResultError, throwOnErr } from '@core/util/result';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { waitForDocumentContentReady } from '@queries/storage/document-location';
 import { fetchFileDocumentOpenContext } from '@queries/storage/documentLoad/sync-document-context';
 import type { AccessLevel } from '@service-storage/generated/schemas/accessLevel';

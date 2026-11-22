@@ -7,7 +7,7 @@ use crm::domain::pipelines::{
 };
 use databases::domain::models::{Column, ColumnDetail, ColumnId, DatabaseId, RowId, TableId};
 use entity_access::domain::models::AccessLevel;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::position::key_between;
 use models_properties::{
     DataType,
@@ -35,7 +35,7 @@ struct FakePipelines {
 impl CrmPipelineApi for FakePipelines {
     fn entries<'a>(
         &'a self,
-        _viewer: &'a MacroUserIdStr<'static>,
+        _viewer: &'a RoxUserIdStr<'static>,
         record_type: PipelineRecordType,
         records: &'a [Uuid],
     ) -> std::pin::Pin<
@@ -151,7 +151,7 @@ async fn one_read_per_record_type_answers_every_record_without_its_own_column() 
         },
         calls: Mutex::default(),
     });
-    let viewer = MacroUserIdStr::parse_from_str("macro|viewer@rox.one")
+    let viewer = RoxUserIdStr::parse_from_str("macro|viewer@rox.one")
         .unwrap()
         .into_owned();
     let schema = Schema::build(Query, EmptyMutation, EmptySubscription).finish();

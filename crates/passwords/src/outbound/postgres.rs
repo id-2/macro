@@ -200,8 +200,8 @@ fn decode(
 ) -> Result<Record, Error> {
     Ok(Record {
         metadata: serde_json::from_value(metadata).map_err(|_| Error::Unavailable)?,
-        user_id: macro_user_id::user_id::MacroUserIdStr::parse_from_str(&user_id)
-            .map(macro_user_id::cowlike::CowLike::into_owned)
+        user_id: rox_user_id::user_id::RoxUserIdStr::parse_from_str(&user_id)
+            .map(rox_user_id::cowlike::CowLike::into_owned)
             .map_err(|_| Error::Unavailable)?,
         grants: serde_json::from_value(grants).map_err(|_| Error::Unavailable)?,
         deleting,
@@ -221,7 +221,7 @@ impl Repository for PgRepository {
     }
     async fn is_human(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<bool, Error> {
         sqlx::query_scalar!(
             r#"SELECT EXISTS(SELECT 1 FROM "User" WHERE id=$1 AND NOT "isAgent") AS "human!""#,
@@ -233,7 +233,7 @@ impl Repository for PgRepository {
     }
     async fn is_team_admin(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
         team: TeamId,
     ) -> Result<bool, Error> {
         sqlx::query_scalar!(r#"SELECT EXISTS(SELECT 1 FROM team_user WHERE team_id=$1 AND user_id=$2 AND team_role IN ('owner','admin')) AS "admin!""#,team.0,user.as_ref())
@@ -421,7 +421,7 @@ impl Repository for PgRepository {
         &self,
         operation: Uuid,
         record: &Record,
-        publisher: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        publisher: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<(), Error> {
         let mut transaction = self.bounded_transaction().await?;
         reserve_operation(&mut transaction, operation).await?;
@@ -485,8 +485,8 @@ impl Repository for PgRepository {
         Ok(Some(match (row.agent_user_id, row.agent_action) {
             (None, _) => IntentOrigin::Human,
             (Some(agent), Some(action)) => IntentOrigin::Agent {
-                agent: macro_user_id::cowlike::CowLike::into_owned(
-                    macro_user_id::user_id::MacroUserIdStr::parse_from_str(&agent)
+                agent: rox_user_id::cowlike::CowLike::into_owned(
+                    rox_user_id::user_id::RoxUserIdStr::parse_from_str(&agent)
                         .map_err(|_| Error::Unavailable)?,
                 ),
                 action: serde_json::from_value(serde_json::Value::String(action))
@@ -519,7 +519,7 @@ impl Repository for PgRepository {
         transaction.commit().await.map_err(database_error)
     }
     async fn teams(&self, actor: &Actor) -> Result<Vec<TeamId>, Error> {
-        let teams = macro_db_client::team::get::get_user_teams(&self.pool, actor.user_id.as_ref())
+        let teams = rox_db_client::team::get::get_user_teams(&self.pool, actor.user_id.as_ref())
             .await
             .map_err(|_| Error::Unavailable)?;
         let ids: Vec<_> = teams.iter().map(|team| team.id).collect();

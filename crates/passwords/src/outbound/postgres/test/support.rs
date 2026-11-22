@@ -5,7 +5,7 @@ pub(crate) async fn folder_fixture(pool: PgPool) -> (PgRepository, Actor, Record
     let team = TeamId(Uuid::now_v7());
     let account = Uuid::now_v7();
     let actor = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|folder@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|folder@example.test")
             .expect("fixture")
             .into_owned(),
     };
@@ -73,7 +73,7 @@ pub(crate) async fn another_team(pool: &PgPool) -> (TeamId, Actor) {
     let team = TeamId(Uuid::now_v7());
     let account = Uuid::now_v7();
     let actor = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|other-folder@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|other-folder@example.test")
             .expect("fixture")
             .into_owned(),
     };

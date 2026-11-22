@@ -381,7 +381,7 @@ function SidePanelLayoutInner(
         >
           <MobileDrawer.Portal>
             <MobileDrawer.Overlay />
-            <MobileDrawer.Content aria-label="Item details">
+            <MobileDrawer.Content aria-label={t('agentChat.details')}>
               <MobileDrawer.Handle />
               <MobileDrawer.ScrollBody>
                 <SidePanelOutlet
@@ -416,7 +416,7 @@ function SidePanelLayoutInner(
           >
             <Show when={showFloating()}>
               <aside
-                aria-label="Block details"
+                aria-label={t('agentChat.blockDetails')}
                 inert={!showFloating()}
                 class="absolute flex max-w-full flex-col overflow-hidden rounded-xl border border-edge-frame bg-surface shadow-xl pointer-events-auto"
                 style={{
@@ -453,11 +453,13 @@ function Toggle(props: { size?: 'sm' | 'md' } = {}) {
 
   return (
     <Show when={ctx.hasSections()}>
-      <HeaderActionGroup label="Details" size={props.size}>
+      <HeaderActionGroup label={t('agentChat.details')} size={props.size}>
         <ButtonGroup.Button
           variant="ghost"
           size={iconSize()}
-          aria-label={ctx.isOpen() ? 'Hide details' : 'Show details'}
+          aria-label={
+            ctx.isOpen() ? t('agentChat.hideDetails') : t('agentChat.showDetails')
+          }
           class={cn(
             isTouchDevice() &&
               'border-0 hover:bg-transparent! active:bg-transparent! focus-visible:bg-transparent! active:text-accent',
@@ -466,11 +468,11 @@ function Toggle(props: { size?: 'sm' | 'md' } = {}) {
           tooltip={{
             content: isTouchDevice()
               ? ctx.isOpen()
-                ? 'Hide details'
-                : 'Show details'
+                ? t('agentChat.hideDetails')
+                : t('agentChat.showDetails')
               : ctx.isOpen()
-                ? 'Hide Side Panel'
-                : 'Show Side Panel',
+                ? t('agentChat.hideSidePanel')
+                : t('agentChat.showSidePanel'),
             hotkey: TOKENS.block.toggleSidePanel,
           }}
           aria-haspopup={isTouchDevice() ? 'dialog' : undefined}
@@ -647,7 +649,7 @@ function Footer(props: ParentProps) {
       footer: true,
       component: () => (
         <section
-          aria-label="Details"
+          aria-label={t('agentChat.details')}
           class="border-b border-edge-muted p-3 text-xs leading-relaxed text-ink-muted"
         >
           <Suspense fallback={<Loading />}>{props.children}</Suspense>

@@ -654,8 +654,8 @@ fn a_source_does_not_admit_a_change_made_by_a_bot_or_for_someone_else() {
 
 #[test]
 fn mention_trigger_is_only_for_the_mentioned_user() {
-    let owner = MacroUserIdStr::parse_from_str(HUMAN).unwrap();
-    let other = MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let owner = RoxUserIdStr::parse_from_str(HUMAN).unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
     let event = incoming("channel.mentioned", metadata());
     assert!(event.is_for_owner(&owner));
     assert!(!event.is_for_owner(&other));
@@ -700,9 +700,9 @@ fn started_calls_keep_only_ids_and_belong_to_who_created_them() {
     assert!(!stored.contains("example.com"));
     assert!(!stored.contains(OTHER_ID));
 
-    assert!(event.is_for_owner(&MacroUserIdStr::parse_from_str(HUMAN).unwrap()));
+    assert!(event.is_for_owner(&RoxUserIdStr::parse_from_str(HUMAN).unwrap()));
     assert!(
-        !event.is_for_owner(&MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap())
+        !event.is_for_owner(&RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap())
     );
 }
 
@@ -718,9 +718,9 @@ fn ended_calls_keep_only_ids_and_belong_to_the_people_who_joined() {
     assert!(!stored.contains("example.com"));
     assert!(!stored.contains(OTHER_ID));
 
-    assert!(event.is_for_owner(&MacroUserIdStr::parse_from_str(HUMAN).unwrap()));
+    assert!(event.is_for_owner(&RoxUserIdStr::parse_from_str(HUMAN).unwrap()));
     assert!(
-        !event.is_for_owner(&MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap())
+        !event.is_for_owner(&RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap())
     );
     assert_eq!(
         call_event("call.record_archived", &[]).normalize(),
@@ -737,7 +737,7 @@ fn ended_calls_keep_only_ids_and_belong_to_the_people_who_joined() {
 #[test]
 fn email_receipts_keep_only_ids_and_exclude_spam_and_backfills() {
     use email::domain::events::ThreadBackfilledMetadata;
-    let owner = MacroUserIdStr::parse_from_str(HUMAN).unwrap();
+    let owner = RoxUserIdStr::parse_from_str(HUMAN).unwrap();
     let mut event = IncomingEvent {
         event_id: Uuid::parse_str(EVENT_ID).unwrap(),
         schema_version: 1,
@@ -763,7 +763,7 @@ fn email_receipts_keep_only_ids_and_exclude_spam_and_backfills() {
     assert!(!stored.contains("provider"));
     assert!(event.is_for_owner(&owner));
     assert!(
-        !event.is_for_owner(&MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap())
+        !event.is_for_owner(&RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap())
     );
     if let EventPayload::Email(EmailTopicEvent::MessageReceived(ref mut data)) = event.payload {
         data.is_spam_or_trash = true;
@@ -812,7 +812,7 @@ fn github_stands_alone_and_only_it_takes_a_payload_match() {
 #[test]
 fn github_deliveries_normalize_with_their_payload_and_reject_odd_names() {
     let incoming = |event: &str| IncomingEvent {
-        event_id: macro_uuid::generate_uuid_v7(),
+        event_id: rox_uuid::generate_uuid_v7(),
         schema_version: 1,
         routine_id: None,
         payload: EventPayload::Github(github::broker::GithubWebhookTopicEvent::Received(

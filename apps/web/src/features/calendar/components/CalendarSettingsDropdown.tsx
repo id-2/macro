@@ -193,30 +193,30 @@ function DesktopCalendarSettings(props: {
             ? 'h-(--sidebar-row-height) w-full justify-start gap-(--sidebar-label-gap) rounded-lg border-transparent bg-transparent px-(--sidebar-item-inset) text-left font-normal touch:h-11'
             : 'shrink-0 border-transparent bg-transparent'
         }
-        aria-label="Calendar settings"
+        aria-label="Настройки календаря"
       >
         <Show when={props.sidebar} fallback={<GearIcon class="size-5" />}>
           <ViewSidebar.Icon>
             <GearIcon class="size-4 touch:size-6 shrink-0 pointer-events-none" />
           </ViewSidebar.Icon>
-          <span class="min-w-0 truncate">Settings</span>
+          <span class="min-w-0 truncate">Настройки</span>
         </Show>
       </Dropdown.Trigger>
       <Dropdown.Content class="w-60 max-w-[calc(100vw-1rem)]">
         <Dropdown.Group>
-          <Dropdown.GroupLabel>Display</Dropdown.GroupLabel>
+          <Dropdown.GroupLabel>Вид</Dropdown.GroupLabel>
           <Dropdown.CheckboxItem
             checked={calendarView.displaySettings.showWeekends}
             closeOnSelect={false}
             onChange={controls.changeShowWeekends}
           >
-            <span class="flex-1 truncate">Show weekends</span>
+            <span class="flex-1 truncate">Показывать выходные</span>
           </Dropdown.CheckboxItem>
 
           <Dropdown.Sub>
             <Dropdown.SubTrigger>
               <span class="min-w-0 flex-1 truncate text-xs text-ink-muted">
-                Week starts on
+                Неделя начинается
               </span>
               <span class="text-sm font-medium text-ink">
                 {controls.weekStartLabel()}
@@ -286,7 +286,7 @@ function DesktopCalendarSettings(props: {
         </Dropdown.Group>
 
         <Dropdown.Group>
-          <Dropdown.GroupLabel>Accounts</Dropdown.GroupLabel>
+          <Dropdown.GroupLabel>Аккаунты</Dropdown.GroupLabel>
           <For each={controls.accounts()}>
             {(account) => (
               <Dropdown.Item
@@ -318,7 +318,7 @@ function DesktopCalendarSettings(props: {
           >
             <PlusIcon class="size-3.5 shrink-0 text-ink-muted" />
             <span class="flex min-w-0 flex-1 flex-col">
-              <span class="truncate">Connect another account</span>
+              <span class="truncate">Подключить другой аккаунт</span>
               <span class="truncate text-xs text-ink-muted">
                 Email and calendar together
               </span>
@@ -465,41 +465,41 @@ function MobileCalendarSettings(props: {
             ? 'h-(--sidebar-row-height) w-full justify-start gap-(--sidebar-label-gap) rounded-lg px-(--sidebar-item-inset) text-left font-normal touch:h-11'
             : 'shrink-0 rounded-full'
         }
-        aria-label="Calendar settings"
+        aria-label="Настройки календаря"
       >
         <Show when={props.sidebar} fallback={<GearIcon class="size-6" />}>
           <ViewSidebar.Icon>
             <GearIcon class="size-4 touch:size-6 shrink-0 pointer-events-none" />
           </ViewSidebar.Icon>
-          <span class="min-w-0 truncate">Settings</span>
+          <span class="min-w-0 truncate">Настройки</span>
         </Show>
       </MobileDrawer.Trigger>
 
       <MobileDrawer.Portal>
         <MobileDrawer.Overlay />
-        <MobileDrawer.Content aria-label="Calendar settings">
+        <MobileDrawer.Content aria-label="Настройки календаря">
           <MobileDrawer.Handle />
           <MobileDrawer.ScrollBody>
             <MobilePeriodControls onSelect={() => setOpen(false)} />
 
             <Show when={controls.showCalendarVisibility()}>
-              <MobileDrawer.Label>Calendars</MobileDrawer.Label>
+              <MobileDrawer.Label>Календари</MobileDrawer.Label>
               <MobileCalendarVisibility controls={controls} />
               <div class="mt-4" />
             </Show>
 
-            <MobileDrawer.Label>Display</MobileDrawer.Label>
+            <MobileDrawer.Label>Вид</MobileDrawer.Label>
             <MobileDrawer.Section class="flex shrink-0 flex-col">
               <MobileFilterDrawer.Option
                 checked={calendarView.displaySettings.showWeekends}
                 onChange={controls.changeShowWeekends}
               >
-                Show weekends
+                Показывать выходные
               </MobileFilterDrawer.Option>
             </MobileDrawer.Section>
 
             <MobileDrawer.Label id={weekStartLabelId} class="pt-4">
-              Week starts on
+              Неделя начинается
             </MobileDrawer.Label>
             <MobileDrawer.Section
               role="radiogroup"
@@ -544,7 +544,7 @@ function MobileCalendarSettings(props: {
               </For>
             </MobileDrawer.Section>
 
-            <MobileDrawer.Label class="pt-4">Accounts</MobileDrawer.Label>
+            <MobileDrawer.Label class="pt-4">Аккаунты</MobileDrawer.Label>
             <MobileDrawer.Section class="mb-3 flex shrink-0 flex-col">
               <For each={controls.accounts()}>
                 {(account) => (
@@ -581,7 +581,7 @@ function MobileCalendarSettings(props: {
               >
                 <PlusIcon class="size-4 shrink-0 text-ink-muted" />
                 <span class="flex min-w-0 flex-1 flex-col">
-                  <span class="truncate">Connect another account</span>
+                  <span class="truncate">Подключить другой аккаунт</span>
                   <span class="truncate text-xs text-ink-muted">
                     Email and calendar together
                   </span>

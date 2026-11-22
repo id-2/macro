@@ -27,11 +27,11 @@ pub use upsert_message::notifications::build_notification_recipients;
 pub use upsert_message::{process_and_insert_message, resync_around, upload_claimed_attachments};
 
 use super::connection::ConnectionSourceError;
-use crate::domain::events::EmailMacroEvent;
+use crate::domain::events::EmailRoxEvent;
 use crate::domain::message_labels::gmail_ops::GmailOpsLinks;
 use anyhow::anyhow;
 use delete_message::delete_message;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_email::gmail::inbox_sync::{InboxSyncOperation, InboxSyncPubsubMessage};
 use models_email::service::link::Link;
 use models_email::service::pubsub::{DetailedError, FailureReason, ProcessingError};
@@ -110,7 +110,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     /// Decide admission, processing, and the listener's acknowledgement action.
     pub async fn process(
@@ -151,7 +151,7 @@ where
     R: InboxSyncImportRepository,
     G: InboxSyncImportGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
+    E: RoxEventBroker + InboxSyncRefresher + InboxSyncImportEffects,
 {
     let link = ctx
         .links
@@ -251,7 +251,7 @@ pub fn record_retryable_error(data: &InboxSyncPubsubMessage, e: &DetailedError) 
     tracing::debug!(error = %e, payload = format!("{:?}", data.operation), "Retryable error processing inbox sync message.");
 }
 
-fn publish_email_event<B: MacroEventBroker>(broker: &B, event: &EmailMacroEvent) {
+fn publish_email_event<B: RoxEventBroker>(broker: &B, event: &EmailRoxEvent) {
     let _ = broker
         .send_event(event)
         .inspect_err(|e| tracing::error!(error=?e, "failed to publish email macro event"));

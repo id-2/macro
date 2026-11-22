@@ -1,12 +1,12 @@
 use crate::domain::{
-    models::{AesKey, MacroUserIdStr, McpServerRecord, StoredCredentials},
+    models::{AesKey, RoxUserIdStr, McpServerRecord, StoredCredentials},
     ports::McpServerStore,
 };
 use aes_gcm::{
     Aes256Gcm,
     aead::{Aead, AeadCore, KeyInit, OsRng},
 };
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use sqlx::PgPool;
 
 const NONCE_LEN: usize = 12;
@@ -100,7 +100,7 @@ impl McpServerStore for PgServerRepo {
     #[tracing::instrument(skip_all, err)]
     async fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         let row = sqlx::query!(
@@ -122,7 +122,7 @@ impl McpServerStore for PgServerRepo {
     #[tracing::instrument(skip_all, err)]
     async fn delete(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<(), Self::Err> {
         sqlx::query!(
@@ -142,7 +142,7 @@ impl McpServerStore for PgServerRepo {
     #[tracing::instrument(skip_all, err)]
     async fn list(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         let rows = sqlx::query!(
             r#"
@@ -172,7 +172,7 @@ impl PgServerRepo {
         credentials: Option<Vec<u8>>,
         enabled: bool,
     ) -> Result<McpServerRecord, sqlx::Error> {
-        let user_id = MacroUserIdStr::parse_from_str(&user_id)
+        let user_id = RoxUserIdStr::parse_from_str(&user_id)
             .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
             .into_owned();
 

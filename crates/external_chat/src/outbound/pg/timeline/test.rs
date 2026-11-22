@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::timeline::TimelineRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::Row;
 
 const OWNER: &str = "macro|external-chat-owner@example.com";
@@ -71,7 +71,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
     .await
     .unwrap();
     let repo = PgExternalChatRepository::new(pool.clone());
-    let actor = MacroUserIdStr::try_from(OWNER.to_owned()).unwrap();
+    let actor = RoxUserIdStr::try_from(OWNER.to_owned()).unwrap();
     let update = UpdateSharePermissionRequestV2 {
         link_share: Some(Some(LinkShare::Public)),
         link_share_access_level: Some(Some(AccessLevel::View)),

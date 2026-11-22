@@ -1,6 +1,6 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use models_pagination::Identify;
 use sqlx::Postgres;
@@ -28,7 +28,7 @@ async fn hydrates_only_runtimes_the_viewer_can_see(
         &pool,
         AdvancedSortParams {
             entities: &entities,
-            user_id: MacroUserIdStr::parse_from_str("macro|user-1@example.com")?,
+            user_id: RoxUserIdStr::parse_from_str("macro|user-1@example.com")?,
         },
     )
     .await?;
@@ -94,7 +94,7 @@ async fn a_computer_harness_is_visible_to_its_team_not_its_buyers_teammates(
             &pool,
             AdvancedSortParams {
                 entities: &entities,
-                user_id: MacroUserIdStr::parse_from_str(viewer)?,
+                user_id: RoxUserIdStr::parse_from_str(viewer)?,
             },
         )
         .await?;

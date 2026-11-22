@@ -6,8 +6,8 @@
 
 use std::num::NonZeroU32;
 
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 use super::{BillingError, EntitlementSource, PlanTier, Result};
 
@@ -30,7 +30,7 @@ pub struct CreditGrant {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct GrantTarget {
     /// The account that owns the credit balance: the user, or their team owner.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// The user's own plan.
     pub tier: PlanTier,
 }
@@ -41,14 +41,14 @@ pub trait CreditGrantRepo: Send + Sync + 'static {
     /// the grant's id already exists.
     fn record_credit_grant(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         grant: &CreditGrant,
     ) -> impl Future<Output = Result<bool>> + Send;
 
     /// The payer's prepaid credit balance in customer cents.
     fn credit_grant_balance_cents(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<i64>> + Send;
 }
 
@@ -70,7 +70,7 @@ where
 
     /// Resolve whose balance a grant for `user` would land on. Free users
     /// are hard-capped at their allowance, so credits cannot help them.
-    pub async fn target(&self, user: &MacroUserIdStr<'_>) -> Result<GrantTarget> {
+    pub async fn target(&self, user: &RoxUserIdStr<'_>) -> Result<GrantTarget> {
         let entitlement = self.entitlements.entitlement(user).await?;
         if !entitlement.tier.is_paid() {
             return Err(BillingError::FreePlan);
@@ -82,7 +82,7 @@ where
     }
 
     /// The payer's current credit balance in customer cents.
-    pub async fn balance_cents(&self, payer: &MacroUserIdStr<'_>) -> Result<i64> {
+    pub async fn balance_cents(&self, payer: &RoxUserIdStr<'_>) -> Result<i64> {
         self.repo.credit_grant_balance_cents(payer).await
     }
 
@@ -91,7 +91,7 @@ where
     #[tracing::instrument(skip(self, grant), fields(grant_id = %grant.id, amount_cents = grant.amount_cents), err)]
     pub async fn grant(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         grant: &CreditGrant,
     ) -> Result<(GrantTarget, bool)> {
         let target = self.target(user).await?;

@@ -9,7 +9,7 @@ use std::{future::Future, pin::Pin};
 use agent::types::{ChatMessage, ChatMessageContent, Role};
 use agent_session::domain::model::AgentSessionId;
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use skills::domain::selection::{LoadedSkill, render_loaded};
 use tokio::time::Instant;
 use uuid::Uuid;
@@ -32,7 +32,7 @@ pub trait SkillRoutingPolicy: Send + Sync {
     /// Whether `owner`'s turns route skills; unavailable flags do not.
     fn routes<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'_>,
+        owner: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = bool> + Send + 'a>>;
 }
 
@@ -42,7 +42,7 @@ pub struct NoSkillRouting;
 impl SkillRoutingPolicy for NoSkillRouting {
     fn routes<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = bool> + Send + 'a>> {
         Box::pin(async { false })
     }
@@ -63,7 +63,7 @@ impl<F: FeatureFlags> FlaggedSkillRouting<F> {
 impl<F: FeatureFlags> SkillRoutingPolicy for FlaggedSkillRouting<F> {
     fn routes<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'_>,
+        owner: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = bool> + Send + 'a>> {
         Box::pin(async move {
             self.flags

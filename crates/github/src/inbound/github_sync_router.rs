@@ -18,12 +18,12 @@ use axum::{
 use base64::{Engine, engine::general_purpose::URL_SAFE_NO_PAD};
 use entity_access::{
     domain::{models::MemberTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::OptionalMacroUserTeamExtractorV2,
+    inbound::axum_extractors::OptionalRoxUserTeamExtractorV2,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOnly,
 };
-use macro_service_urls::AppServiceUrl;
+use rox_service_urls::AppServiceUrl;
 use reqwest::StatusCode;
 use uuid::Uuid;
 
@@ -39,7 +39,7 @@ pub struct GithubSyncRouterState<T, Eas, Auth> {
     /// Service used to resolve the authenticated user's optional team.
     pub entity_access_service: Arc<Eas>,
     /// State used to authenticate installation setup requests.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 // Manual Clone impl so the services don't need to be Clone (they are behind Arcs).
@@ -59,7 +59,7 @@ impl<T, Eas, Auth> FromRef<GithubSyncRouterState<T, Eas, Auth>> for Arc<Eas> {
     }
 }
 
-impl<T, Eas, Auth> FromRef<GithubSyncRouterState<T, Eas, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Eas, Auth> FromRef<GithubSyncRouterState<T, Eas, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &GithubSyncRouterState<T, Eas, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -70,7 +70,7 @@ pub fn github_sync_router<T, Eas, Auth, S>(state: GithubSyncRouterState<T, Eas, 
 where
     T: GithubSyncService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()
@@ -102,13 +102,13 @@ where
 #[tracing::instrument(skip(ctx, authorization, team), err)]
 pub async fn install_sync_handler<T, Eas, Auth>(
     State(ctx): State<GithubSyncRouterState<T, Eas, Auth>>,
-    authorization: MacroAuthorizationExtractor<Auth, UserOnly>,
-    team: OptionalMacroUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
+    authorization: RoxAuthorizationExtractor<Auth, UserOnly>,
+    team: OptionalRoxUserTeamExtractorV2<MemberTeamRole, Eas, Auth>,
 ) -> Result<Redirect, GithubError>
 where
     T: GithubSyncService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let team_id = team
         .entity_access_receipt
@@ -158,7 +158,7 @@ pub async fn sync_redirect_handler<T, Eas, Auth>(
 ) -> Redirect
 where
     T: GithubSyncService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let state = params.state.as_deref().unwrap_or_default();
     let setup_action = params.setup_action.as_deref().unwrap_or_default();
@@ -217,7 +217,7 @@ impl<T, Eas, Auth> FromRequest<GithubSyncRouterState<T, Eas, Auth>> for GithubWe
 where
     T: GithubSyncService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     type Rejection = GithubError;
 

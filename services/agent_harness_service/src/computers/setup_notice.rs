@@ -11,7 +11,7 @@ use std::sync::Arc;
 
 use hosted_runtimes::domain::lifecycle::SetupOutcome;
 use hosted_runtimes::domain::ports::{SetupNotice, SetupNotices};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::{ComputerSetupAgent, ComputerSetupMetadata, ComputerSetupOutcome};
 use notification::domain::models::SendNotificationRequestBuilder;
@@ -53,7 +53,7 @@ impl<Ingress: NotificationIngress, Agents: TeamAgentRepository>
     async fn audience(
         &self,
         notice: &SetupNotice,
-    ) -> Result<Option<(MacroUserIdStr<'static>, Option<ComputerSetupAgent>)>, SetupNoticeError>
+    ) -> Result<Option<(RoxUserIdStr<'static>, Option<ComputerSetupAgent>)>, SetupNoticeError>
     {
         let Some(agent_user_id) = &notice.agent else {
             return Ok(Some((notice.buyer.clone(), None)));

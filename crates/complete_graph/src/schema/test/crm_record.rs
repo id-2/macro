@@ -53,7 +53,7 @@ impl PipelineService for RecordingPipelines {
     }
     async fn entries(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         record_type: PipelineRecordType,
         records: &[Uuid],
     ) -> Result<Vec<PipelineEntry>, PipelineError> {
@@ -171,7 +171,7 @@ async fn a_soup_crm_company_resolves_its_pipeline_entries() {
         .soup_service
         .set_raw_response(vec![soup_crm_company(id)]);
     let pipelines = Arc::new(RecordingPipelines::default());
-    let viewer = MacroUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
+    let viewer = RoxUserIdStr::parse_from_str(VALID_USER_ID).unwrap();
     let response = harness
         .schema
         .execute(

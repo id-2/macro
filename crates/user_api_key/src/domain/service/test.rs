@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::sync::{Arc, Mutex};
 
 use chrono::Utc;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::{MAX_KEYS_PER_USER, UserApiKeyServiceImpl};
 use sha2::Digest;
@@ -16,8 +16,8 @@ use crate::domain::ports::{UserApiKeyService, UserApiKeysRepo};
 const USER_A: &str = "macro|user-a@rox.one";
 const USER_B: &str = "macro|user-b@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 #[derive(Clone)]
@@ -71,7 +71,7 @@ impl UserApiKeysRepo for FakeUserApiKeysRepo {
 
     async fn insert_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
         name: &str,
         hash: &[u8; 32],
@@ -98,7 +98,7 @@ impl UserApiKeysRepo for FakeUserApiKeysRepo {
         Ok(info)
     }
 
-    async fn count_keys(&self, user_id: &MacroUserIdStr<'_>) -> Result<i64, Self::Err> {
+    async fn count_keys(&self, user_id: &RoxUserIdStr<'_>) -> Result<i64, Self::Err> {
         if self.fail {
             return Err(FakeRepoError);
         }
@@ -107,7 +107,7 @@ impl UserApiKeysRepo for FakeUserApiKeysRepo {
 
     async fn list_keys(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<UserApiKeyInfo>, Self::Err> {
         if self.fail {
             return Err(FakeRepoError);
@@ -131,7 +131,7 @@ impl UserApiKeysRepo for FakeUserApiKeysRepo {
 
     async fn replace_keys_named(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
         name: &str,
         hash: &[u8; 32],
@@ -147,7 +147,7 @@ impl UserApiKeysRepo for FakeUserApiKeysRepo {
 
     async fn delete_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
     ) -> Result<bool, Self::Err> {
         if self.fail {
@@ -165,7 +165,7 @@ impl UserApiKeysRepo for FakeUserApiKeysRepo {
     async fn find_user_id_by_key(
         &self,
         key: &UserApiKey,
-    ) -> Result<Option<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, Self::Err> {
         if self.fail {
             return Err(FakeRepoError);
         }
@@ -174,7 +174,7 @@ impl UserApiKeysRepo for FakeUserApiKeysRepo {
         for (user_id, set) in keys.iter() {
             if set.iter().any(|stored| stored.hash == hash) {
                 return Ok(Some(
-                    MacroUserIdStr::try_from(user_id.clone()).expect("valid user id"),
+                    RoxUserIdStr::try_from(user_id.clone()).expect("valid user id"),
                 ));
             }
         }

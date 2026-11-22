@@ -32,8 +32,8 @@ mod self_read_guard {
         UserTeamInfo,
     };
     use entity_access::domain::ports::EntityAccessService;
-    use macro_user_id::lowercased::Lowercase;
-    use macro_user_id::user_id::{MacroUserId, MacroUserIdStr};
+    use rox_user_id::lowercased::Lowercase;
+    use rox_user_id::user_id::{RoxUserId, RoxUserIdStr};
     use uuid::Uuid;
 
     /// A [`ChatService`] that panics if any method is invoked — used to prove
@@ -178,7 +178,7 @@ mod self_read_guard {
     impl EntityAccessService for UnreachableAccessService {
         async fn generate_entity_access_receipt<T: RequiredPermission>(
             &self,
-            _user_id: &MacroUserId<Lowercase<'_>>,
+            _user_id: &RoxUserId<Lowercase<'_>>,
             _user_org_id: Option<i64>,
             _entity_id: &str,
             _entity_type: EntityType,
@@ -198,7 +198,7 @@ mod self_read_guard {
 
         async fn get_access_level(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
         ) -> std::result::Result<Option<AccessLevel>, AccessError> {
@@ -207,7 +207,7 @@ mod self_read_guard {
 
         async fn check_access(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
             _required_level: AccessLevel,
@@ -226,7 +226,7 @@ mod self_read_guard {
 
         async fn get_entity_permission(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
             _user_org_id: Option<i64>,
@@ -236,7 +236,7 @@ mod self_read_guard {
 
         async fn get_crm_entity_permission_with_team(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
         ) -> std::result::Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -247,7 +247,7 @@ mod self_read_guard {
             &self,
             _entity_id: &str,
             _entity_type: EntityType,
-        ) -> std::result::Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+        ) -> std::result::Result<Vec<RoxUserIdStr<'static>>, AccessError> {
             unreachable!("guard should short-circuit before checking access")
         }
 
@@ -267,7 +267,7 @@ mod self_read_guard {
 
         async fn get_user_team(
             &self,
-            _user_id: &MacroUserId<Lowercase<'_>>,
+            _user_id: &RoxUserId<Lowercase<'_>>,
         ) -> std::result::Result<Option<UserTeamInfo>, AccessError> {
             unreachable!("guard should short-circuit before checking access")
         }
@@ -443,13 +443,13 @@ mod self_read_guard {
     impl EntityAccessService for StubAccessService {
         async fn generate_entity_access_receipt<T: RequiredPermission>(
             &self,
-            _user_id: &MacroUserId<Lowercase<'_>>,
+            _user_id: &RoxUserId<Lowercase<'_>>,
             _user_org_id: Option<i64>,
             entity_id: &str,
             entity_type: EntityType,
         ) -> std::result::Result<EntityAccessReceipt<T>, AccessError> {
             EntityAccessReceipt::try_new_authenticated_user(
-                MacroUserIdStr::try_from("macro|test@example.com".to_string()).unwrap(),
+                RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap(),
                 Entity {
                     entity_id: entity_id.to_string(),
                     entity_type,
@@ -468,7 +468,7 @@ mod self_read_guard {
             entity_type: EntityType,
         ) -> std::result::Result<EntityAccessReceipt<T>, AccessError> {
             EntityAccessReceipt::try_new_authenticated_user(
-                MacroUserIdStr::try_from("macro|test@example.com".to_string()).unwrap(),
+                RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap(),
                 Entity {
                     entity_id: entity_id.to_string(),
                     entity_type,
@@ -481,7 +481,7 @@ mod self_read_guard {
 
         async fn get_access_level(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
         ) -> std::result::Result<Option<AccessLevel>, AccessError> {
@@ -490,7 +490,7 @@ mod self_read_guard {
 
         async fn check_access(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
             _required_level: AccessLevel,
@@ -509,7 +509,7 @@ mod self_read_guard {
 
         async fn get_entity_permission(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
             _user_org_id: Option<i64>,
@@ -521,7 +521,7 @@ mod self_read_guard {
 
         async fn get_crm_entity_permission_with_team(
             &self,
-            _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+            _user_id: Option<&RoxUserId<Lowercase<'_>>>,
             _entity_id: &str,
             _entity_type: EntityType,
         ) -> std::result::Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -532,7 +532,7 @@ mod self_read_guard {
             &self,
             _entity_id: &str,
             _entity_type: EntityType,
-        ) -> std::result::Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+        ) -> std::result::Result<Vec<RoxUserIdStr<'static>>, AccessError> {
             Ok(vec![])
         }
 
@@ -552,14 +552,14 @@ mod self_read_guard {
 
         async fn get_user_team(
             &self,
-            _user_id: &MacroUserId<Lowercase<'_>>,
+            _user_id: &RoxUserId<Lowercase<'_>>,
         ) -> std::result::Result<Option<UserTeamInfo>, AccessError> {
             unimplemented!()
         }
     }
 
     fn request_context() -> RequestContext {
-        RequestContext::new(MacroUserIdStr::try_from("macro|test@example.com".to_string()).unwrap())
+        RequestContext::new(RoxUserIdStr::try_from("macro|test@example.com".to_string()).unwrap())
     }
 
     #[tokio::test]

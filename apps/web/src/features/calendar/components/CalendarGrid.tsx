@@ -1,8 +1,10 @@
+import ruLocale from '@fullcalendar/core/locales/ru';
 import {
   FullCalendar,
   type FullCalendarContextValue,
   useFullCalendar,
 } from '@app/lib/fullcalendar-solid';
+import { formatLocale, interfaceLanguage } from '@app/lib/i18n';
 import type {
   DateSelectArg,
   DatesSetArg,
@@ -42,24 +44,40 @@ import {
   CALENDAR_TIME_FORMAT_OPTIONS,
   formatCalendarTime,
   formatCompactCalendarTime,
+  resolveCalendarTimeFormat,
 } from '../utils/time-format';
 import { TIME_GRID_OPENING_SCROLL_TIME } from '../utils/time-grid-scroller';
 import { mergeWorkingLocationEvents } from '../utils/working-location-events';
 import { EventContent } from './EventContent';
 import '../calendar.css';
 
-const formatWeekdayHeader = {
-  narrow: new Intl.DateTimeFormat(undefined, {
-    weekday: 'narrow',
-  }).format,
-  short: new Intl.DateTimeFormat(undefined, {
-    weekday: 'short',
-  }).format,
-};
+// Headers follow the interface language, so each locale gets its own formatter.
+const weekdayHeaderFormatters = new Map<string, Intl.DateTimeFormat>();
 
-const formatDayNumber = new Intl.DateTimeFormat(undefined, {
-  day: 'numeric',
-}).format;
+function formatWeekdayHeader(date: Date, width: 'narrow' | 'short'): string {
+  const locale = formatLocale();
+  const key = `${locale}|${width}`;
+  let formatter = weekdayHeaderFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, { weekday: width });
+    weekdayHeaderFormatters.set(key, formatter);
+  }
+  // Russian lowercases weekday names; a column header reads better capitalised.
+  const weekday = formatter.format(date);
+  return weekday.charAt(0).toLocaleUpperCase(locale) + weekday.slice(1);
+}
+
+const dayNumberFormatters = new Map<string, Intl.DateTimeFormat>();
+
+function formatDayNumber(date: Date): string {
+  const locale = formatLocale();
+  let formatter = dayNumberFormatters.get(locale);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, { day: 'numeric' });
+    dayNumberFormatters.set(locale, formatter);
+  }
+  return formatter.format(date);
+}
 
 function CurrentTimeAxisIndicator(props: {
   date: Date;
@@ -232,6 +250,9 @@ export function CalendarGrid(props: CalendarGridProps) {
         timeGridPlugin,
         multiDaySelectionRenderingPlugin,
       ]}
+      // Day headers and the all-day label follow the interface language.
+      locales={[ruLocale]}
+      locale={interfaceLanguage() === 'ru' ? 'ru' : undefined}
       initialView={initialView}
       initialDate={props.initialDate}
       dayCount={props.settings.dayCount}
@@ -247,15 +268,23 @@ export function CalendarGrid(props: CalendarGridProps) {
       expandRows
       fixedWeekCount={false}
       handleWindowResize={false}
-      allDayText="All day"
+      allDayText="Весь день"
       nowIndicator
       headerToolbar={false}
       scrollTime={TIME_GRID_OPENING_SCROLL_TIME}
       scrollTimeReset={false}
       weekends={props.settings.showWeekends}
       firstDay={props.settings.weekStartsOn}
-      slotLabelFormat={CALENDAR_TIME_FORMAT_OPTIONS[props.settings.timeFormat]}
-      eventTimeFormat={CALENDAR_TIME_FORMAT_OPTIONS[props.settings.timeFormat]}
+      slotLabelFormat={
+        CALENDAR_TIME_FORMAT_OPTIONS[
+          resolveCalendarTimeFormat(props.settings.timeFormat)
+        ]
+      }
+      eventTimeFormat={
+        CALENDAR_TIME_FORMAT_OPTIONS[
+          resolveCalendarTimeFormat(props.settings.timeFormat)
+        ]
+      }
       events={renderedEvents()}
       eventAllow={() =>
         props.onEventTimeChange !== undefined &&
@@ -343,11 +372,12 @@ export function CalendarGrid(props: CalendarGridProps) {
             const isSingleDayView =
               view.type === 'timeGridDay' &&
               (props.settings.dayCount ?? 1) === 1;
-            const weekday = isSingleDayView
-              ? formatWeekdayHeader.short(date)
-              : formatWeekdayHeader[
-                  props.settings.useNarrowDayHeaders ? 'narrow' : 'short'
-                ](date);
+            const weekday = formatWeekdayHeader(
+              date,
+              !isSingleDayView && props.settings.useNarrowDayHeaders
+                ? 'narrow'
+                : 'short'
+            );
 
             return (
               <>

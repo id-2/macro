@@ -59,11 +59,11 @@ use github_pull_requests::{
     outbound::pg_github_pull_request_repo::PgGithubPullRequestRepo,
 };
 use lexical_mention_extractor::LexicalMentionExtractor;
-use macro_event_broker::{
-    EventBrokerError, KafkaEventPublisher, MacroEvent, MacroEventBroker, MacroEventBrokerService,
-    NoopMacroEventBroker,
+use rox_event_broker::{
+    EventBrokerError, KafkaEventPublisher, RoxEvent, RoxEventBroker, RoxEventBrokerService,
+    NoopRoxEventBroker,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::property_change_source::PropertyChangeSource;
 use models_properties::service::property_value::PropertyValue;
 use notification::domain::service::SqsNotificationIngress;
@@ -141,7 +141,7 @@ pub type ToolEmailService = EmailServiceImpl<
 
 /// Event broker used by AI tools, with spawned publish tasks tracked for
 /// graceful shutdown by the hosting process.
-pub type ToolEventBroker = MacroEventBrokerService<KafkaEventPublisher, TaskTracker>;
+pub type ToolEventBroker = RoxEventBrokerService<KafkaEventPublisher, TaskTracker>;
 
 /// Event broker for tool domains (bots, properties, databases) across hosts that either do or do
 /// not have Kafka lifecycle publishing configured.
@@ -150,11 +150,11 @@ pub enum MaybeToolEventBroker {
     /// Publish lifecycle events through the shared Kafka broker.
     Real(ToolEventBroker),
     /// Drop lifecycle events in hosts that do not configure Kafka.
-    NoOp(NoopMacroEventBroker),
+    NoOp(NoopRoxEventBroker),
 }
 
-impl MacroEventBroker for MaybeToolEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for MaybeToolEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -368,7 +368,7 @@ fn notification_ingress(
     Arc::new(SqsNotificationIngress {
         queue: notification::outbound::queue::SqsQueue::new(
             clients.sqs.clone(),
-            macro_queues::NotificationIngressQueue::new().to_string(),
+            rox_queues::NotificationIngressQueue::new().to_string(),
         ),
     })
 }
@@ -380,7 +380,7 @@ fn channel_event_dispatcher(
     let contacts_ingress = Arc::new(SqsContactsIngress {
         queue: SqsContactsQueue::new(
             clients.sqs.clone(),
-            macro_queues::ContactsQueue::new().to_string(),
+            rox_queues::ContactsQueue::new().to_string(),
         ),
     });
     let side_effects = ChannelSideEffectService::new(
@@ -521,10 +521,10 @@ pub fn build_team_calendar_tool_context(
 /// `shared_event_copies` lets the agent add copies of channel-shared events.
 pub fn build_calendar_tool_context(
     pool: sqlx::PgPool,
-    calendar_service_url: macro_service_urls::CalendarServiceUrl,
+    calendar_service_url: rox_service_urls::CalendarServiceUrl,
     internal_api_key: String,
     call_service: Arc<ToolCallService>,
-    app_url: macro_service_urls::AppServiceUrl,
+    app_url: rox_service_urls::AppServiceUrl,
     shared_event_copies: bool,
 ) -> ToolCalendarToolContext {
     CalendarToolContext::new(
@@ -559,7 +559,7 @@ pub type ToolBookingLinkToolContext =
 /// Construct scheduling adapters at the AI composition root.
 pub fn build_booking_link_tool_context(
     pool: sqlx::PgPool,
-    environment: macro_env::Environment,
+    environment: rox_env::Environment,
 ) -> ToolBookingLinkToolContext {
     calendar_scheduling::inbound::toolset::BookingLinkToolContext {
         service: Arc::new(calendar_scheduling::domain::service::Service::new(
@@ -570,9 +570,9 @@ pub fn build_booking_link_tool_context(
             )),
         )),
         public_origin: match environment {
-            macro_env::Environment::Production => "https://rox.one",
-            macro_env::Environment::Develop => "https://dev.rox.one",
-            macro_env::Environment::Local => "",
+            rox_env::Environment::Production => "https://rox.one",
+            rox_env::Environment::Develop => "https://dev.rox.one",
+            rox_env::Environment::Local => "",
         }
         .into(),
     }
@@ -585,16 +585,16 @@ pub type ToolBookingManagementToolContext =
     >;
 /// Construct the authenticated scheduling client at the host composition root.
 pub fn build_booking_management_tool_context(
-    calendar_url: macro_service_urls::CalendarServiceUrl,
+    calendar_url: rox_service_urls::CalendarServiceUrl,
     internal_api_key: String,
-    environment: macro_env::Environment,
+    environment: rox_env::Environment,
 ) -> ToolBookingManagementToolContext {
     calendar_scheduling::inbound::toolset::BookingManagementToolContext {
         service: Arc::new(calendar_scheduling::outbound::administration_client::SchedulingAdministrationClient::new(calendar_url.to_string(), internal_api_key)),
         public_origin: match environment {
-            macro_env::Environment::Production => "https://rox.one",
-            macro_env::Environment::Develop => "https://dev.rox.one",
-            macro_env::Environment::Local => "",
+            rox_env::Environment::Production => "https://rox.one",
+            rox_env::Environment::Develop => "https://dev.rox.one",
+            rox_env::Environment::Local => "",
         }.into(),
     }
 }
@@ -788,7 +788,7 @@ impl TaskPropertiesPort for NoOpTaskProperties {
     async fn update_task_status(
         &self,
         _access: &EntityAccessReceipt<EditAccessLevel>,
-        _credited_user: Option<&MacroUserIdStr<'static>>,
+        _credited_user: Option<&RoxUserIdStr<'static>>,
         _source: Option<&PropertyChangeSource>,
         _status: &str,
     ) -> anyhow::Result<()> {
@@ -847,7 +847,7 @@ impl TaskPropertiesPort for TaskPropertiesAdapter {
     async fn update_task_status(
         &self,
         access: &EntityAccessReceipt<EditAccessLevel>,
-        credited_user: Option<&MacroUserIdStr<'static>>,
+        credited_user: Option<&RoxUserIdStr<'static>>,
         source: Option<&PropertyChangeSource>,
         status: &str,
     ) -> anyhow::Result<()> {
@@ -934,7 +934,7 @@ impl ConnectionService for NoOpConnectionService {
 
     async fn send_channel_message<'a>(
         &self,
-        _users: &[MacroUserIdStr<'a>],
+        _users: &[RoxUserIdStr<'a>],
         _message_type: &str,
         _message: serde_json::Value,
     ) -> Result<(), connection::domain::models::ConnectionError> {
@@ -983,7 +983,7 @@ impl CallRtcClient for NoOpCallRtcClient {
     async fn generate_token<'a>(
         &self,
         _room_name: &str,
-        _participant_identity: MacroUserIdStr<'a>,
+        _participant_identity: RoxUserIdStr<'a>,
     ) -> anyhow::Result<String> {
         anyhow::bail!("call RTC client not configured")
     }
@@ -1011,7 +1011,7 @@ impl CallRtcClient for NoOpCallRtcClient {
     async fn generate_named_token<'a>(
         &self,
         _room_name: &str,
-        _participant_identity: MacroUserIdStr<'a>,
+        _participant_identity: RoxUserIdStr<'a>,
         _name: &str,
     ) -> anyhow::Result<String> {
         anyhow::bail!("call RTC client not configured")
@@ -1020,7 +1020,7 @@ impl CallRtcClient for NoOpCallRtcClient {
     async fn generate_program_token<'a>(
         &self,
         _room_name: &str,
-        _participant_identity: MacroUserIdStr<'a>,
+        _participant_identity: RoxUserIdStr<'a>,
         _program: &str,
         _name: Option<String>,
     ) -> anyhow::Result<String> {
@@ -1031,7 +1031,7 @@ impl CallRtcClient for NoOpCallRtcClient {
         &self,
         _request: call::domain::models::VoipPushPayloadRequest<'a>,
     ) -> Vec<(
-        MacroUserIdStr<'static>,
+        RoxUserIdStr<'static>,
         notification::domain::models::apple::VoipPushPayload,
     )> {
         Vec::new()
@@ -1040,7 +1040,7 @@ impl CallRtcClient for NoOpCallRtcClient {
     async fn remove_participant<'a>(
         &self,
         _room_name: &str,
-        _participant_identity: MacroUserIdStr<'a>,
+        _participant_identity: RoxUserIdStr<'a>,
     ) -> anyhow::Result<()> {
         Ok(())
     }
@@ -1640,7 +1640,7 @@ pub struct ToolEntityCreator {
 
 impl ToolEntityCreator {
     pub(crate) fn creation_principal(
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> model_owner::CreationPrincipal {
         model_owner::CreationPrincipal::BotForUser {
             bot: bot_id::MACRO_AI_BOT_ID,
@@ -1652,7 +1652,7 @@ impl ToolEntityCreator {
     /// document tools do before creating inside one.
     pub(crate) async fn authorize_folder(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         folder: uuid::Uuid,
     ) -> anyhow::Result<()> {
         self.entity_access_service
@@ -1670,7 +1670,7 @@ impl ToolEntityCreator {
     #[allow(clippy::too_many_arguments)]
     async fn create_doc(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Option<uuid::Uuid>,
         name: &str,
         content: ImportedContent,
@@ -1733,8 +1733,8 @@ impl ToolEntityCreator {
     /// The user's team id (when they have one) and its member ids.
     pub(crate) async fn team_roster(
         &self,
-        user: &MacroUserIdStr<'static>,
-    ) -> (Option<uuid::Uuid>, Vec<MacroUserIdStr<'static>>) {
+        user: &RoxUserIdStr<'static>,
+    ) -> (Option<uuid::Uuid>, Vec<RoxUserIdStr<'static>>) {
         use teams::domain::team_repo::TeamRepository as _;
         let team_id = match self.entity_access_service.get_user_team(user).await {
             Ok(team) => team.map(|team| team.team_id),
@@ -1751,7 +1751,7 @@ impl ToolEntityCreator {
                 Some(team_id),
                 members
                     .into_iter()
-                    .map(|member| macro_user_id::cowlike::CowLike::into_owned(member.user_id))
+                    .map(|member| rox_user_id::cowlike::CowLike::into_owned(member.user_id))
                     .collect(),
             ),
             Err(e) => {
@@ -1770,7 +1770,7 @@ impl ToolEntityCreator {
     )]
     pub(crate) async fn create_imported_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Option<uuid::Uuid>,
         name: &str,
         content: ImportedContent,
@@ -1804,7 +1804,7 @@ impl ToolEntityCreator {
     )]
     pub(crate) async fn create_imported_document(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Option<uuid::Uuid>,
         name: &str,
         notion: documents::domain::notion_markdown::NotionMarkdown,
@@ -1854,10 +1854,10 @@ impl ToolEntityCreator {
     /// the import.
     pub(crate) async fn apply_task_properties(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         task_id: &str,
         properties: &import::domain::ports::ImportedTaskProperties,
-        roster: &[MacroUserIdStr<'static>],
+        roster: &[RoxUserIdStr<'static>],
     ) {
         use models_properties::api::requests::SetPropertyValue;
         use system_properties::SystemPropertyKey;
@@ -1990,7 +1990,7 @@ fn refuses_view(error: &entity_access::domain::models::AccessError) -> bool {
 impl import::domain::ports::EntityCreator for ToolEntityCreator {
     async fn can_view(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: import::domain::models::ImportSource,
         entity_id: &str,
     ) -> anyhow::Result<bool> {
@@ -2014,7 +2014,7 @@ impl import::domain::ports::EntityCreator for ToolEntityCreator {
 
     async fn create_task(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         markdown: &str,
         properties: &import::domain::ports::ImportedTaskProperties,
@@ -2036,7 +2036,7 @@ impl import::domain::ports::EntityCreator for ToolEntityCreator {
 
     async fn create_notion_document(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         notion_markdown: &str,
         links: &import::domain::ports::NotionLinks,
@@ -2056,7 +2056,7 @@ impl import::domain::ports::EntityCreator for ToolEntityCreator {
 
     async fn create_channel(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         name: &str,
         target: &import::domain::models::ImportTargetReservation,
         participant_emails: &[String],
@@ -2146,8 +2146,8 @@ pub use routines::inbound::RoutineToolContext;
 pub fn build_routine_tool_context() -> anyhow::Result<RoutineToolContext> {
     Ok(RoutineToolContext {
         service: Some(routines::outbound::RoutineClient::new(
-            macro_service_urls::ScheduledActionServiceUrl::new()?.as_ref(),
-            &macro_auth::InternalApiKey::new()?,
+            rox_service_urls::ScheduledActionServiceUrl::new()?.as_ref(),
+            &rox_auth::InternalApiKey::new()?,
         )?),
     })
 }

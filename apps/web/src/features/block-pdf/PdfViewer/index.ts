@@ -1,5 +1,5 @@
 import type { WithRequired } from '@core/util/withRequired';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { debounce } from '@solid-primitives/scheduled';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import type { PDFPageView } from 'pdfjs-dist/web/pdf_viewer';

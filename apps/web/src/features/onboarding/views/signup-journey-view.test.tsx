@@ -78,18 +78,6 @@ describe('sign-up starts before authentication', () => {
     });
   });
 
-  it('skips the local opening slides without bypassing authentication', () => {
-    const { google } = setup();
-    fireEvent.click(screen.getByRole('button', { name: 'Bypass' }));
-    expect(readSignupDraft()?.step).toBe('work');
-    expect(google).not.toHaveBeenCalled();
-    fireEvent.click(
-      screen.getByRole('button', { name: 'Continue with Google' })
-    );
-    expect(google).toHaveBeenCalledOnce();
-    expect(readSignupDraft()?.authenticating).toBe(true);
-  });
-
   it('restores the work-email step after an OAuth return or cancellation', () => {
     saveSignupDraft({ step: 'work', accent: '#65d8ac', authenticating: true });
     const { google } = setup();

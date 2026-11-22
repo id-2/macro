@@ -2,7 +2,7 @@ import type { LocalDraft } from '@app/features/email-compose/core/local-draft';
 import { toast } from '@core/component/Toast/Toast';
 import { optimisticContextOf } from '@graphql-cache/exchange/optimistic';
 import type { MutationSettlement } from '@graphql-cache/protocol';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type {
   DeleteEmailDraftMutation,
   SaveEmailDraftMutation,
@@ -39,7 +39,7 @@ const mocks = vi.hoisted(() => ({
   assertQueueAvailable: vi.fn(),
 }));
 vi.mock('@core/component/Toast/Toast', () => ({ toast: { failure: vi.fn() } }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { error: vi.fn(), info: vi.fn() },
 }));
 vi.mock('@service-storage/graphql-soup', () => ({

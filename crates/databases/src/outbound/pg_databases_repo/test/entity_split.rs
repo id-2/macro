@@ -8,19 +8,19 @@ use models_properties::service::property_value::PropertyValue;
 
 const SPLIT_UP: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../macro_db_client/migrations/20261005183743_separate_database_entity.up.sql"
+    "/../rox_db_client/migrations/20261005183743_separate_database_entity.up.sql"
 ));
 const SPLIT_DOWN: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../macro_db_client/migrations/20261005183743_separate_database_entity.down.sql"
+    "/../rox_db_client/migrations/20261005183743_separate_database_entity.down.sql"
 ));
 const FOLDERS_UP: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../macro_db_client/migrations/20261102210628_databases_in_folders.sql"
+    "/../rox_db_client/migrations/20261102210628_databases_in_folders.sql"
 ));
 const WEBHOOKS_DOWN: &str = include_str!(concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/../macro_db_client/migrations/20261014153433_database_webhooks.down.sql"
+    "/../rox_db_client/migrations/20261014153433_database_webhooks.down.sql"
 ));
 
 fn batch(database_id: DatabaseId, writes: Vec<Write>) -> Writes {
@@ -54,7 +54,7 @@ async fn core_storage_supports_cells_and_versions_without_an_app_entity(pool: Pg
 
     insert_user(&pool).await;
     let table = TableId::new();
-    let definition = macro_uuid::generate_uuid_v7();
+    let definition = rox_uuid::generate_uuid_v7();
     let Write::CreateColumn { column, .. } = bind(table, definition, "80") else {
         unreachable!()
     };

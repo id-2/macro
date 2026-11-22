@@ -9,7 +9,7 @@ use ai_billing::{AiAdmissionError, AiAdmissionService};
 use ai_usage::{AiFeature, UsageContext, UsageRecorder};
 use document_sub_type::DocumentSubType;
 use futures::StreamExt as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_search::channel::ChannelNameSearchRequest;
 use models_search::unified::{
     UnifiedSearchIndex, UnifiedSearchRequest, UnifiedSearchResponseItem,
@@ -53,13 +53,13 @@ pub(super) struct RouterDraftModels {
 // Object-safe (`async_trait`): the drafter holds it as `Arc<dyn DraftModel>`.
 #[async_trait::async_trait]
 impl DraftModel for RouterDraftModels {
-    async fn admit(&self, owner: &MacroUserIdStr<'static>) -> Result<(), AiAdmissionError> {
+    async fn admit(&self, owner: &RoxUserIdStr<'static>) -> Result<(), AiAdmissionError> {
         self.admission.admit(owner, AiFeature::Automation).await
     }
 
     async fn complete(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         call: DraftCall<'_>,
     ) -> Result<String, DraftCallError> {
         agent::complete_with_history_and_params(
@@ -288,7 +288,7 @@ impl NameLookups for SearchNames {
 
     async fn look_up(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         names: &[NameAsked],
     ) -> Result<NameAnswers, NameLookupError> {
         // One deadline for every name, so a name answered in time is kept

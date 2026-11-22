@@ -1,6 +1,6 @@
 use super::PipedreamClient;
 use crate::domain::{
-    models::{MacroUserIdStr, PipedreamConnection},
+    models::{RoxUserIdStr, PipedreamConnection},
     ports::{ConnectorCapabilities, McpConnection},
     service::discovery::ConnectorTool,
 };
@@ -13,7 +13,7 @@ impl ConnectorCapabilities for PipedreamClient {
     #[tracing::instrument(skip_all, err)]
     async fn tools(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> anyhow::Result<Vec<ConnectorTool>> {
         // Pipedream exposes tools/list before user auth. This session is used

@@ -5,7 +5,7 @@ import {
   selectRecords,
 } from '@graphql-cache/exchange/record-selection';
 import type { CacheHost } from '@graphql-cache/host/types';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { previewKeys } from '@queries/preview/keys';
 import { soupKeys } from '@queries/soup/keys';
 import type { AppearanceEntityType } from '@service-storage/entity-appearance';

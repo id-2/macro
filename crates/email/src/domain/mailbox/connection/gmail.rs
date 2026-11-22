@@ -1,6 +1,6 @@
 use super::*;
 use anyhow::Context;
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use models_email::service::link::{Link, UserProvider};
 
 pub(super) async fn connect<L, T, P, G, I, B, N, O>(
@@ -77,7 +77,7 @@ where
                     backfill_job_id: None,
                 });
             }
-            let child_macro_id_owned = MacroUserIdStr::try_from(child_macro_id.to_string())?;
+            let child_macro_id_owned = RoxUserIdStr::try_from(child_macro_id.to_string())?;
             let child_fusion_id = service
                 .links
                 .account_fusion_id(&linked_email)
@@ -243,13 +243,13 @@ where
 
 fn new_gmail_link(
     fusion_user_id: String,
-    macro_id: MacroUserIdStr<'static>,
+    macro_id: RoxUserIdStr<'static>,
     email_address: String,
 ) -> Result<Link, ConnectionError> {
     let email_address = EmailStr::try_from(email_address)?;
     let is_primary = Link::derive_is_primary(UserProvider::Gmail);
     Ok(Link {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         macro_id,
         fusionauth_user_id: fusion_user_id,
         email_address,

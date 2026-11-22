@@ -10,7 +10,7 @@ struct Eligibility(Arc<AtomicBool>);
 impl AgentDmAuthorizer for Eligibility {
     async fn authorize(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: BotId,
     ) -> Result<(), ChannelMutationErr> {
         if self.0.load(Ordering::SeqCst) {
@@ -29,13 +29,13 @@ struct Repo(Arc<AtomicUsize>);
 impl AgentDmRepo for Repo {
     async fn for_user(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
     ) -> Result<Vec<AgentDm>, ChannelMutationErr> {
         unreachable!("creation does not enumerate conversations")
     }
     async fn ensure(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         bot_id: BotId,
     ) -> Result<EnsuredAgentDm, ChannelMutationErr> {
         Ok(EnsuredAgentDm {
@@ -58,8 +58,8 @@ impl ChannelEventDispatcher for Events {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|person@example.com".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|person@example.com".to_owned()).unwrap()
 }
 
 #[tokio::test]

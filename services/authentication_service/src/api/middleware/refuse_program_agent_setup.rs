@@ -8,8 +8,8 @@ use axum::{
     middleware::Next,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationState, OptionalMacroAuthorizationExtractor,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationState, OptionalRoxAuthorizationExtractor,
     is_program_run,
 };
 use model::response::ErrorResponse;
@@ -27,12 +27,12 @@ const PROGRAM_SETUP_REFUSAL: &str = "An agent's program cannot finish an agent a
 /// that does not verify is rejected here, so a failed check cannot let the
 /// request through.
 pub(in crate::api) async fn handler(
-    State(authorization): State<MacroAuthorizationState<AuthorizationService>>,
+    State(authorization): State<RoxAuthorizationState<AuthorizationService>>,
     request: Request,
     next: Next,
 ) -> Response {
     let (mut parts, body) = request.into_parts();
-    let principal = match OptionalMacroAuthorizationExtractor::<AuthorizationService, AnyPrincipal>::from_request_parts(
+    let principal = match OptionalRoxAuthorizationExtractor::<AuthorizationService, AnyPrincipal>::from_request_parts(
         &mut parts,
         &authorization,
     )
@@ -42,16 +42,14 @@ pub(in crate::api) async fn handler(
         Err(rejection) => return rejection.into_response(),
     };
     let attribution = match &principal {
-        Some(MacroAuthorization::User(user)) => Some(user.attribution()),
+        Some(RoxAuthorization::User(user)) => Some(user.attribution()),
         _ => None,
     };
-    let bot = matches!(principal, Some(MacroAuthorization::Bot(_)));
+    let bot = matches!(principal, Some(RoxAuthorization::Bot(_)));
     let program = bot
         || match attribution {
             Some(attribution) => is_program_run(attribution, &parts.headers),
-            None => parts
-                .headers
-                .contains_key(macro_authorization::CODE_EXECUTION_HEADER),
+            None => rox_authorization::marks_code_execution(&parts.headers),
         };
     if program {
         tracing::warn!(?attribution, bot, "refused an agent's setup to a program");

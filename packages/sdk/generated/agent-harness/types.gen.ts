@@ -130,7 +130,7 @@ export type AgentActor = {
     /**
      * The person it acts for.
      */
-    on_behalf_of: MacroUserIdStr;
+    on_behalf_of: RoxUserIdStr;
 };
 
 /**
@@ -979,7 +979,7 @@ export type Caller = {
     /**
      * Who.
      */
-    user: MacroUserIdStr;
+    user: RoxUserIdStr;
 } | (AgentActor & {
     type: 'agent';
 });
@@ -2273,7 +2273,7 @@ export type LogFrameDto = {
     direction: LogDirectionDto;
 };
 
-export type MacroUserIdStr = string;
+export type RoxUserIdStr = string;
 
 /**
  * The entity whose permissions and lifecycle govern a message.
@@ -2815,7 +2815,7 @@ export type Root = {
     /**
      * Who.
      */
-    user: MacroUserIdStr;
+    user: RoxUserIdStr;
 } | {
     /**
      * The routine.
@@ -3096,7 +3096,7 @@ export type TriggerOrigin = {
     /**
      * Who wrote.
      */
-    by: MacroUserIdStr;
+    by: RoxUserIdStr;
     /**
      * The message.
      */
@@ -3130,13 +3130,13 @@ export type TriggerOrigin = {
     /**
      * Who opened it.
      */
-    by: MacroUserIdStr;
+    by: RoxUserIdStr;
     origin: 'requested';
 } | {
     /**
      * The user whose authority the work runs under.
      */
-    on_behalf_of: MacroUserIdStr;
+    on_behalf_of: RoxUserIdStr;
     origin: 'dispatched';
 } | {
     /**

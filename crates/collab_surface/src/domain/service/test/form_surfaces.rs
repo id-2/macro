@@ -315,7 +315,7 @@ async fn a_form_surface_token_requires_edit_on_the_form() {
             .await
             .unwrap();
         let claims: model::document::DocumentPermissionsToken =
-            macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+            rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
         assert_eq!(claims.document_id, id.to_string());
         assert_eq!(claims.access_level, allowed);
     }
@@ -366,6 +366,6 @@ async fn other_parents_keep_view_tokens() {
         .await
         .unwrap();
     let claims: model::document::DocumentPermissionsToken =
-        macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+        rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
     assert_eq!(claims.access_level, AccessLevel::View);
 }

@@ -4,7 +4,7 @@ import {
   COLLABORATION_TAG,
   LOCAL_STATUS_TAG,
   nodeIdPlugin,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   $addUpdateTag,
   $createParagraphNode,

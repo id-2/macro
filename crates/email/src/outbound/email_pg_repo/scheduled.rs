@@ -3,7 +3,7 @@ use crate::domain::{
     models::EmailErr,
     scheduled::{EmailSchedulingRepo, ScheduleChange, SignaturePreparation},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 impl EmailSchedulingRepo for EmailPgRepo {
@@ -11,7 +11,7 @@ impl EmailSchedulingRepo for EmailPgRepo {
         &self,
         link_id: Uuid,
         message_id: Uuid,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         change: ScheduleChange,
         signature: Option<&SignaturePreparation>,
 
@@ -34,7 +34,7 @@ async fn change_schedule(
     pool: &sqlx::PgPool,
     link_id: Uuid,
     message_id: Uuid,
-    actor: &MacroUserIdStr<'_>,
+    actor: &RoxUserIdStr<'_>,
     change: ScheduleChange,
     signature: Option<&SignaturePreparation>,
 

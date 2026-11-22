@@ -1,4 +1,4 @@
-import { encodeCellMention } from '@macro-inc/spreadsheet/cell-mentions';
+import { encodeCellMention } from '@rox-one/spreadsheet/cell-mentions';
 import {
   cleanup,
   fireEvent,

@@ -5,7 +5,7 @@ mod test;
 
 use std::collections::HashSet;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use crate::domain::{
@@ -29,7 +29,7 @@ impl RoxDB {
     /// Add roles to the user
     async fn add_roles_to_user(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         roles: &[impl ToString],
     ) -> Result<(), UserRolesAndPermissionsError> {
         let roles = roles.iter().map(|r| r.to_string()).collect::<Vec<_>>();
@@ -52,7 +52,7 @@ impl RoxDB {
     /// Remove roles from the user
     async fn remove_roles_from_user(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         roles: &[impl ToString],
     ) -> Result<(), UserRolesAndPermissionsError> {
         let roles = roles.iter().map(|r| r.to_string()).collect::<Vec<_>>();
@@ -73,7 +73,7 @@ impl RoxDB {
     /// Get the current permissions for a user
     async fn get_user_permissions(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<HashSet<Permission>, UserRolesAndPermissionsError> {
         let user_permissions: Vec<Permission> = sqlx::query!(
             r#"
@@ -126,7 +126,7 @@ impl UserRolesAndPermissionsRepository for RoxDB {
     #[tracing::instrument(skip(self), err)]
     async fn get_user_roles(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<HashSet<RoleId>, UserRolesAndPermissionsError> {
         let user_roles: Vec<RoleId> = sqlx::query!(
             r#"
@@ -153,14 +153,14 @@ impl UserRolesAndPermissionsRepository for RoxDB {
 
     async fn get_user_permissions(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<HashSet<Permission>, UserRolesAndPermissionsError> {
         self.get_user_permissions(user_id).await
     }
 
     async fn add_roles_to_user(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         role_ids: &[RoleId],
     ) -> Result<(), UserRolesAndPermissionsError> {
         self.add_roles_to_user(user_id, role_ids).await
@@ -168,7 +168,7 @@ impl UserRolesAndPermissionsRepository for RoxDB {
 
     async fn remove_roles_from_user(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         role_ids: &[RoleId],
     ) -> Result<(), UserRolesAndPermissionsError> {
         self.remove_roles_from_user(user_id, role_ids).await

@@ -14,7 +14,7 @@
  */
 
 import type { Room } from '@livekit/rtc-node';
-import type { ScreenFrame, ScreenShare } from '@macro-inc/sdk/calls/node';
+import type { ScreenFrame, ScreenShare } from '@rox-one/sdk/calls/node';
 import type { Trace } from '../../agent/claude.ts';
 import { hostOf } from '../browser/browse.ts';
 import type { CallShare, MakeShare, ShareNeeds } from './types.ts';

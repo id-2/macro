@@ -21,9 +21,12 @@ const CONTENT = {
       return t('crm.searchSalesEmail');
     },
     graphic: EmptyStateEmailGraphic,
-    action: 'New email',
-    description:
-      'Email your CRM companies and people to see those conversations here.',
+    get action() {
+      return t('crm.newEmail');
+    },
+    get description() {
+      return t('crm.activityEmailEmpty');
+    },
   },
   notes: {
     get title() {
@@ -33,9 +36,12 @@ const CONTENT = {
       return t('crm.searchSalesNotes');
     },
     graphic: EmptyStateDocGraphic,
-    action: 'New note',
-    description:
-      'Create a note and link a company or person through its Companies or Contacts property.',
+    get action() {
+      return t('crm.newNote');
+    },
+    get description() {
+      return t('crm.activityNoteEmpty');
+    },
   },
   calls: {
     get title() {
@@ -45,9 +51,12 @@ const CONTENT = {
       return t('crm.searchSalesCalls');
     },
     graphic: EmptyStateCallsGraphic,
-    action: 'New call',
-    description:
-      'Start a call with your CRM contacts, or link a company or person to an existing call.',
+    get action() {
+      return t('crm.newCall');
+    },
+    get description() {
+      return t('crm.activityCallEmpty');
+    },
   },
 };
 
@@ -123,15 +132,15 @@ function ActivityList(props: {
             when={filters.activeCount() === 0}
             fallback={
               <CrmListEmpty
-                title={`No ${props.tab} match these filters`}
-                description="Clear your filters to see all CRM-linked items."
-                action={{ label: 'Clear filters', onClick: filters.clear }}
+                title={t('crm.noActivityMatchFilters')}
+                description={t('crm.clearFiltersHint')}
+                action={{ label: t('crm.clearFilters'), onClick: filters.clear }}
               />
             }
           >
             <CrmListEmpty
               graphic={content().graphic}
-              title={`No ${props.tab} linked yet`}
+              title={t('crm.noActivityLinkedYet')}
               description={content().description}
               action={{ label: content().action, onClick: create }}
             />

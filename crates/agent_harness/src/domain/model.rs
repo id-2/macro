@@ -17,8 +17,8 @@ use agent_session::domain::session::PermissionPolicy;
 #[cfg(test)]
 mod test;
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use messages::domain::events::MessageEventAttachment;
 use trigger_context::TriggerContext;
 mod current_time;
@@ -468,7 +468,7 @@ pub struct ReplyPresentation {
     /// The bot the session speaks as; the message is posted as it.
     pub bot_id: BotId,
     /// Who prompted the turn; the bot writes on their current capability.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
     /// Where the reply is shown.
     pub parent: messages::domain::models::MessageParent,
     /// The thread it is shown in; `None` for a timeline.
@@ -499,7 +499,7 @@ pub struct AgentTypingUpdate {
     /// The bot the session speaks as.
     pub bot_id: BotId,
     /// Who prompted the turn; the bot types on their current capability.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
     /// Where the reply will appear.
     pub parent: messages::domain::models::MessageParent,
     /// The thread it will appear in; `None` for a timeline.
@@ -534,9 +534,9 @@ pub struct AnnounceOrigin {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PromptPeople {
     /// The session's owner.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The prompt's sender; absent when a bot sent it on nobody's behalf.
-    pub sender: Option<MacroUserIdStr<'static>>,
+    pub sender: Option<RoxUserIdStr<'static>>,
 }
 
 /// Do something in a session that already exists.
@@ -548,7 +548,7 @@ pub struct DeliverAction {
     /// What the agent is being asked to do.
     pub action: AgentAction,
     /// The user responsible, absent when nobody in particular is.
-    pub actor: Option<MacroUserIdStr<'static>>,
+    pub actor: Option<RoxUserIdStr<'static>>,
     /// Where to announce this, for prompts that arrived from elsewhere.
     ///
     /// `None` means "do not announce": either the caller drove the session
@@ -635,7 +635,7 @@ pub enum HarnessCommand {
     /// Persist a nonblocking tool card on the replica owning this session.
     PresentTool {
         /// Authenticated session owner.
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         /// Stable component identity and presentation payload.
         presentation: agent_session::domain::model::SessionToolPresentation,
     },
@@ -652,7 +652,7 @@ pub enum HarnessCommand {
         /// The user responsible, judged by the same gates as sending: whoever
         /// may not prompt a session may not rewrite what it is about to be
         /// prompted with.
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
         /// Whether a person or a program for them rewrote it.
         #[serde(default, skip_serializing_if = "PrompterKind::is_user")]
         prompter: PrompterKind,
@@ -662,7 +662,7 @@ pub enum HarnessCommand {
         /// The queue entry to remove.
         action_id: AgentActionId,
         /// The user responsible, as on [`Self::EditQueued`].
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     },
     /// Run a queued action next: move it to the front and, when a turn is in
     /// flight, cancel that turn so this entry flushes ahead of the rest.
@@ -670,7 +670,7 @@ pub enum HarnessCommand {
         /// The queue entry to run next.
         action_id: AgentActionId,
         /// The user responsible, as on [`Self::EditQueued`].
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
     },
     /// The session's fold reported a turn fact: an ended turn clears the
     /// busy mark and dispatches the next queued action; a raised or cleared
@@ -717,7 +717,7 @@ impl DeliverAction {
     /// ride along; `AgentAction::prompt(text)` is the plain-text form.
     pub fn prompt(
         action: AgentAction,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
         announce: Option<AnnounceOrigin>,
     ) -> Self {
         Self {
@@ -767,7 +767,7 @@ pub struct AnnouncePrompt {
     /// The mention's text, shown in the announcement's reply target.
     pub content: String,
     /// Who mentioned the bot.
-    pub sender: MacroUserIdStr<'static>,
+    pub sender: RoxUserIdStr<'static>,
 }
 
 /// Facts required to announce one prompt into its originating context.
@@ -797,7 +797,7 @@ pub struct SessionAnnouncement {
     /// Text of the prompting message, shown in the reply target.
     pub prompted_content: String,
     /// User whose mention triggered the announcement.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
 }
 
 impl SessionAnnouncement {
@@ -833,7 +833,7 @@ pub struct DeclinedMention {
     /// Where the mention was posted, and so where the reply goes.
     pub origin: AnnounceOrigin,
     /// Who mentioned the bot.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
     /// What stands between them and a session.
     pub blocker: SessionBlocker,
 }
@@ -952,7 +952,7 @@ pub struct ResolvedReply {
     /// Channel or document the mention was posted in.
     pub origin_parent: messages::domain::models::MessageParent,
     /// Who prompted the turn.
-    pub triggered_by: MacroUserIdStr<'static>,
+    pub triggered_by: RoxUserIdStr<'static>,
     /// What the reply should say now.
     pub outcome: ReplyOutcome,
     /// The turn the reply answers.

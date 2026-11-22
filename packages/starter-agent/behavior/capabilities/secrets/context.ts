@@ -2,8 +2,8 @@
  * The secrets area's context: the vault client, the clipboard and the poll
  * schedule, built once. The only file of the area that touches the world.
  */
-import { behavior, type ContextOf } from '@macro-inc/muppet/core/behavior';
-import type { Schedules } from '@macro-inc/muppet/utilities/schedules';
+import { behavior, type ContextOf } from '@rox-one/muppet/core/behavior';
+import type { Schedules } from '@rox-one/muppet/utilities/schedules';
 import type { Base } from '../../context/index.ts';
 import { attributionProblem, mintWakeId } from './attribution.ts';
 import { xClipboard } from './clipboard.ts';

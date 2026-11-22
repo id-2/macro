@@ -1,4 +1,4 @@
-import { COLLABORATION_TAG, LOCAL_STATUS_TAG } from '@macro-inc/lexical-core';
+import { COLLABORATION_TAG, LOCAL_STATUS_TAG } from '@rox-one/lexical-core';
 import {
   $addUpdateTag,
   $getRoot,

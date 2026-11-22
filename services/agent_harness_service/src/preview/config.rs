@@ -1,7 +1,7 @@
-//! Typed deployment configuration, loaded through macro_env_var by MacroConfig.
-use macro_env::Environment;
+//! Typed deployment configuration, loaded through macro_env_var by RoxConfig.
+use rox_env::Environment;
 
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     #[macro_config_default(Environment::new_or_prod())]

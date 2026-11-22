@@ -115,7 +115,7 @@ impl PgMailboxSync {
                 VALUES ($1,$2,$3,'mail_folder',$4)
                 ON CONFLICT (link_id,generation,kind,scope_id) DO NOTHING
             "#,
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 lease.mailbox.link_id,
                 lease.mailbox.sync_generation,
                 folder.id.as_str()

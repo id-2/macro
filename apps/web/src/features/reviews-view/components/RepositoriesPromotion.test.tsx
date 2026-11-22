@@ -1,5 +1,6 @@
+import { setInterfaceLanguage } from '@app/lib/i18n';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { RepositoriesPromotion } from './RepositoriesPromotion';
 
 const host = vi.hoisted(() => ({
@@ -46,6 +47,8 @@ afterEach(() => {
   vi.unstubAllGlobals();
   localStorage.clear();
 });
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 describe('RepositoriesPromotion', () => {
   it('opens the GitHub App install page once GitHub is linked', () => {

@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_messages (id,link_id,thread_id,provider_id,provider_thread_id,internal_date_ts,mailbox_state)\n        VALUES ($1,$2,$3,'received','conversation','2026-09-30T12:00:00Z','{\"in_inbox\":false}')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "f77a06f2ffe85e7fad1455b3f16b4e52ded308f460f11799b67eb5cf256d3093"
+}

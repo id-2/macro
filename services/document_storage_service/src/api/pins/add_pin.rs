@@ -9,7 +9,7 @@ use axum::{
 };
 
 use entity_access::inbound::axum_extractors::PinAccessLevelExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{
     GenericErrorResponse, GenericResponse, GenericSuccessResponse, SuccessResponse,
 };
@@ -40,7 +40,7 @@ pub struct Params {
 #[axum::debug_handler(state = ApiContext)]
 pub async fn add_pin_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(Params { pinned_item_id }): Path<Params>,
     PinAccessLevelExtractor {
         pin_type, inner, ..
@@ -51,7 +51,7 @@ pub async fn add_pin_handler(
         AuthorizationService,
     >,
 ) -> impl IntoResponse {
-    match macro_db_client::pins::upsert_pin(
+    match rox_db_client::pins::upsert_pin(
         ctx.db.clone(),
         user.authorization.user.macro_user_id.as_ref(),
         pinned_item_id.as_str(),

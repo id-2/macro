@@ -4,7 +4,7 @@ async fn assert_membership(pool: &Pool<Postgres>) -> anyhow::Result<()> {
     let items = expanded_dynamic_cursor_soup_grouped(
         pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
             limit: 2,
             cursor: Query::Sort(
                 SimpleSortMethod::UpdatedAt.into(),
@@ -97,7 +97,7 @@ async fn source_membership_deduplicates_grants(pool: Pool<Postgres>) -> anyhow::
     let items = expanded_dynamic_cursor_soup_grouped(
         &pool,
         GroupedDynamicCursorArgs {
-            user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com")?,
+            user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
             limit: 50,
             cursor: Query::Sort(
                 SimpleSortMethod::UpdatedAt.into(),
@@ -176,7 +176,7 @@ async fn calendar_owner_or_linked_account_only(pool: Pool<Postgres>) -> anyhow::
         let items = expanded_dynamic_cursor_soup_grouped(
             &pool,
             GroupedDynamicCursorArgs {
-                user_id: MacroUserIdStr::parse_from_str("macro|user-1@test.com")?,
+                user_id: RoxUserIdStr::parse_from_str("macro|user-1@test.com")?,
                 limit: 50,
                 cursor: Query::Sort(SimpleSortMethod::ViewedAt.into(), filter),
                 exclude_frecency: false,

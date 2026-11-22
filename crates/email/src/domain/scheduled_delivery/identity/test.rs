@@ -441,7 +441,7 @@ fn sent() -> MessageToSend {
         bcc: None,
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         attachments: None,
         headers_json: None,
         send_time: None,

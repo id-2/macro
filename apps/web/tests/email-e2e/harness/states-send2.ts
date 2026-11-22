@@ -288,7 +288,7 @@ export async function savedDraft(
     `SELECT id FROM email_messages
      WHERE link_id = '${mailbox.inbox.linkId}' AND is_draft AND ${which}
        AND position(${literal(holding)} IN coalesce(body_text, '')
-         || coalesce(body_macro, '') || coalesce(body_html_sanitized, '')) > 0`
+         || coalesce(body_rox, '') || coalesce(body_html_sanitized, '')) > 0`
   )) as { id: string }[];
   return rows[0]?.id;
 }

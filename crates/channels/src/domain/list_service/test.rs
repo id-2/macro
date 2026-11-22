@@ -19,7 +19,7 @@ impl AggregateFrecencyStorage for PanicFrecencyStorage {
 
     async fn get_aggregate_for_user_entities<'a>(
         &self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
         _entities: &'a [model_entity::Entity<'a>],
     ) -> Result<Vec<AggregateFrecency>, Self::Err> {
         panic!("frecency by-id lookup should not run")
@@ -28,7 +28,7 @@ impl AggregateFrecencyStorage for PanicFrecencyStorage {
 
 #[tokio::test]
 async fn skips_frecency_lookup_when_not_requested() {
-    let user_id = MacroUserIdStr::parse_from_str("macro|test@example.com").unwrap();
+    let user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
     let scores = get_channel_frecency(&PanicFrecencyStorage, false, user_id, &[])
         .await
         .unwrap();

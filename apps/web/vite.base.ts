@@ -1,5 +1,6 @@
 import { exec, execSync } from 'node:child_process';
 import { unwatchFile, watchFile } from 'node:fs';
+import { createRequire } from 'node:module';
 import { resolve } from 'node:path';
 import tailwind from '@tailwindcss/vite';
 import { Features } from 'lightningcss';
@@ -133,6 +134,8 @@ function cloudFrontCompressionLimit(): Plugin {
     name: 'cloudfront-compression-limit',
     apply: 'build',
     generateBundle(_options, bundle) {
+      // Local launch only. A production build still fails above the limit.
+      if (process.env.SITE_BUILD_LOCAL === '1') return;
       const oversized = Object.values(bundle)
         .filter((file) => /\.(js|css|html|json|svg)$/.test(file.fileName))
         .map((file) => ({
@@ -176,6 +179,8 @@ function posthogSourceMapLimit(): Plugin {
     name: 'posthog-source-map-limit',
     apply: 'build',
     generateBundle(_options, bundle) {
+      // Local launch only. A production build still fails on a missing or oversized map.
+      if (process.env.SITE_BUILD_LOCAL === '1') return;
       const problems = Object.values(bundle).flatMap((file) => {
         if (file.type === 'chunk') {
           const mapped =
@@ -521,6 +526,144 @@ function startupChunks(
 }
 
 /**
+ * Vite 8 builds with Rolldown and reads `build.rolldownOptions`, including the
+ * `codeSplitting` groups startupChunks() returns. An older Vite builds with
+ * Rollup: it knows neither option, so the entry chunk keeps every module the
+ * entries import statically — 11,471,512 bytes of generated API clients and
+ * the Zod runtime, above CloudFront's 10,000,000-byte compression limit and
+ * under one 55 MB source map, above PostHog's 25 MB one.
+ */
+const usesRolldown = (() => {
+  try {
+    createRequire(import.meta.url).resolve('rolldown');
+    return true;
+  } catch {
+    return false;
+  }
+})();
+
+/** Generated API code of a service client, such as `service-storage/generated/zod.ts`. */
+const SERVICE_CLIENT_GENERATED =
+  /[\\/]service-clients[\\/][^\\/]+[\\/].*[\\/]generated[\\/]/;
+
+/**
+ * Code bytes per module. Rollup calls `output.manualChunks` before it renders
+ * module code, so the size-ordered plan in rollupStartupChunks() reads sizes
+ * recorded while the module graph was parsed.
+ */
+const moduleCodeBytes = new Map<string, number>();
+
+/** Fills moduleCodeBytes for the Rollup chunking plan. */
+function recordModuleCodeBytes(): Plugin {
+  return {
+    name: 'record-module-code-bytes',
+    moduleParsed(info) {
+      moduleCodeBytes.set(info.id, info.code?.length ?? 0);
+    },
+  };
+}
+
+/** A module of Rollup's module graph, as `output.manualChunks` sees it. */
+type RollupModuleInfo = {
+  isEntry?: boolean;
+  importedIds?: readonly string[];
+} | null;
+
+/** The second argument Rollup passes to `output.manualChunks`. */
+type RollupChunkingContext = {
+  getModuleIds: () => Iterable<string>;
+  getModuleInfo: (id: string) => RollupModuleInfo;
+};
+
+/**
+ * Rollup's equivalent of startupChunks(): Rollup reads `output.manualChunks`
+ * instead of `codeSplitting` groups, so the same plan is cut into chunk names
+ * here. Only modules an entry imports statically are grouped, in the same
+ * kinds and dependency-first order: libraries, then generated API modules,
+ * then the app's code. A chunk therefore imports only chunks captured before
+ * it, and the build fails in acyclicStartupChunks() if that ever stops being
+ * true. Lazy code keeps Rollup's own placement.
+ */
+function rollupStartupChunks() {
+  let plan: Map<string, string> | undefined;
+  const planChunks = (context: RollupChunkingContext) => {
+    plan = new Map<string, string>();
+    const imports = (id: string) => context.getModuleInfo(id)?.importedIds ?? [];
+    const entryIds = new Set(
+      [...context.getModuleIds()].filter(
+        (id) => context.getModuleInfo(id)?.isEntry
+      )
+    );
+    const loaded = new Set<string>();
+    // An entry's own module and the modules it imports directly stay in its
+    // entry chunk, as they do under Rolldown above; moving the entry module
+    // itself would leave the chunk that index.html runs empty.
+    const direct = new Set<string>();
+    for (const entryId of entryIds) {
+      for (const id of imports(entryId)) direct.add(id);
+      const pending = [entryId];
+      for (let id = pending.pop(); id !== undefined; id = pending.pop()) {
+        if (loaded.has(id)) continue;
+        loaded.add(id);
+        pending.push(...imports(id));
+      }
+    }
+
+    // Each moving module's kind, ranked so a kind only imports earlier kinds.
+    // A generated API module moves out only if its imports are libraries, so
+    // it can never import the app code that stays in the entry chunk.
+    const kinds = new Map<string, { order: number; ids: string[] }>();
+    const addToKind = (kind: string, order: number, id: string) => {
+      const members = kinds.get(kind) ?? { order, ids: [] };
+      members.ids.push(id);
+      kinds.set(kind, members);
+    };
+    for (const id of loaded) {
+      if (entryIds.has(id) || direct.has(id)) continue;
+      // Bundler-generated modules (Rollup's `\0commonjsHelpers`, Vite's
+      // preload helper) are imported from every kind and import nothing, so
+      // they belong below all of them; any other placement makes a kind
+      // import the next one in a cycle.
+      if (isNodeModule(id) || id.startsWith('\0')) addToKind('vendor', 0, id);
+      else if (
+        SERVICE_CLIENT_GENERATED.test(id) &&
+        imports(id).every(isNodeModule)
+      ) {
+        addToKind(
+          /[\\/]service-storage[\\/]graphql[\\/]generated[\\/]/.test(id)
+            ? 'api-graphql'
+            : 'api-schemas',
+          1,
+          id
+        );
+      } else addToKind('startup', 2, id);
+    }
+
+    // Cut each kind into parts along the import order, never inside a cycle.
+    const positions = dependencyFirstPositions(loaded, (id) =>
+      imports(id).filter((imported) => loaded.has(imported))
+    );
+    const positionOf = (id: string) => positions.get(id) ?? 0;
+    const ordered = [...kinds].sort(([, a], [, b]) => a.order - b.order);
+    for (const [kind, { ids }] of ordered) {
+      ids.sort((a, b) => positionOf(a) - positionOf(b));
+      const parts = cutIntoParts(
+        ids,
+        positionOf,
+        (id) => moduleCodeBytes.get(id) ?? 0
+      );
+      for (const [index, part] of parts.entries()) {
+        const name = parts.length === 1 ? kind : `${kind}-${index + 1}`;
+        for (const id of part) plan.set(id, name);
+      }
+    }
+    return plan;
+  };
+  return (id: string, context: RollupChunkingContext) =>
+    (plan ?? planChunks(context)).get(id);
+}
+
+/**
  * loro-crdt's `browser` export downloads its 3 MB WASM with a synchronous
  * XMLHttpRequest and compiles it on the main thread, freezing startup for the
  * whole download. Builds use the `bundler` export that dev already resolves
@@ -646,6 +789,8 @@ export const createAppViteConfig = (): UserConfigFn => {
         hostedDevProxy(),
         // solidDevtools({ autoname: true }),
         pureGeneratedZodSchemas(),
+        // Vite 8 chunks through startupChunks() and needs no size bookkeeping.
+        ...(usesRolldown ? [] : [recordModuleCodeBytes()]),
         solid(),
         wasm(),
         loroAsyncWasm(),
@@ -705,34 +850,61 @@ export const createAppViteConfig = (): UserConfigFn => {
         cssTarget: ['esnext', 'safari15'],
         target: esbuildTargets(browserslist),
         outDir: 'dist',
-        emptyOutDir: true,
+        // Local builds keep the previous files: vite empties `dist` at start,
+        // and the proxy serves it live, so emptying it takes the site down for
+        // every build. Hosted builds still start clean.
+        emptyOutDir: !process.env.SITE_BUILD_LOCAL,
         minify: !NO_MINIFY,
         // The gzip-size console report re-compresses every chunk, adding ~20 s
         // to each build; nothing reads it.
         reportCompressedSize: false,
-        rolldownOptions: {
-          input: HTML_ENTRIES,
-          // KaTeX and PDF.js are now reachable through lazy boundaries. Let
-          // Rolldown place them naturally; forcing lazy code into named chunks
-          // hoists shared CommonJS helpers into those chunks and makes the
-          // entry preload otherwise-lazy code.
-          output: NO_MINIFY
-            ? {
-                // remove hashes from output paths
-                // https://github.com/vitejs/vite/issues/378
-                entryFileNames: `assets/[name].js`,
-                chunkFileNames: `assets/[name].js`,
-                assetFileNames: assetFileNames('[name].[ext]'),
-                codeSplitting: startupChunks(HTML_ENTRIES),
-              }
-            : {
-                format: 'es',
-                chunkFileNames: '[name]-[hash].js',
-                entryFileNames: '[name]-[hash].js',
-                assetFileNames: assetFileNames('[name]-[hash][extname]'),
-                codeSplitting: startupChunks(HTML_ENTRIES),
+        ...(usesRolldown
+          ? {
+              rolldownOptions: {
+                input: HTML_ENTRIES,
+                // KaTeX and PDF.js are now reachable through lazy boundaries.
+                // Let Rolldown place them naturally; forcing lazy code into
+                // named chunks hoists shared CommonJS helpers into those chunks
+                // and makes the entry preload otherwise-lazy code.
+                output: NO_MINIFY
+                  ? {
+                      // remove hashes from output paths
+                      // https://github.com/vitejs/vite/issues/378
+                      entryFileNames: `assets/[name].js`,
+                      chunkFileNames: `assets/[name].js`,
+                      assetFileNames: assetFileNames('[name].[ext]'),
+                      codeSplitting: startupChunks(HTML_ENTRIES),
+                    }
+                  : {
+                      format: 'es',
+                      chunkFileNames: '[name]-[hash].js',
+                      entryFileNames: '[name]-[hash].js',
+                      assetFileNames: assetFileNames('[name]-[hash][extname]'),
+                      codeSplitting: startupChunks(HTML_ENTRIES),
+                    },
               },
-        },
+            }
+          : {
+              rollupOptions: {
+                input: HTML_ENTRIES,
+                // Rollup has no `codeSplitting`: the same plan becomes chunk
+                // names through `manualChunks`.
+                output: NO_MINIFY
+                  ? {
+                      entryFileNames: `assets/[name].js`,
+                      chunkFileNames: `assets/[name].js`,
+                      assetFileNames: assetFileNames('[name].[ext]'),
+                      manualChunks: rollupStartupChunks(),
+                    }
+                  : {
+                      format: 'es',
+                      chunkFileNames: '[name]-[hash].js',
+                      entryFileNames: '[name]-[hash].js',
+                      assetFileNames: assetFileNames('[name]-[hash][extname]'),
+                      manualChunks: rollupStartupChunks(),
+                    },
+              },
+            }),
         assetsInlineLimit: (filePath) => {
           if (filePath.includes('.wasm')) return false;
           if (filePath.includes('/lok/')) return false;
@@ -809,19 +981,73 @@ export const createAppViteConfig = (): UserConfigFn => {
         strictPort: true,
         allowedHosts: true,
         cors: true,
+        // The static preview has no gateway of its own. Continue and the other
+        // local calls use these prefixes; send them to the local stack.
+        proxy: localGatewayProxy(),
       },
     };
   };
 };
 
+/** Path prefixes the local gateway owns. A preview must not swallow these. */
+const LOCAL_GATEWAY_PREFIXES = [
+  'auth',
+  'connection-gateway',
+  'contacts',
+  'dss',
+  'email',
+  'calendar',
+  'notification',
+  'unfurl',
+  'image-proxy',
+  'agent-harness',
+  'agent-git',
+  'preview',
+  'scheduled-action',
+  'cognition',
+  'mcp',
+  'websocket',
+  'sync',
+  'i',
+  'lexical',
+  'ai-editing',
+  'local-storage',
+  'static-file',
+] as const;
+
+function localGatewayProxy() {
+  const target = 'https://localhost:24209';
+  return Object.fromEntries(
+    LOCAL_GATEWAY_PREFIXES.map((prefix) => [
+      // Match the prefix itself and its children, not a longer name.
+      `^/${prefix}(?:/|\\?|$)`,
+      {
+        target,
+        changeOrigin: true,
+        secure: false,
+        ws: true,
+      },
+    ])
+  );
+}
+
+
 function getAssetsPath(mode: string, command: string): string {
+  // Every build is served by the proxy under /app; only `vite serve` keeps a
+  // mode-specific folder. A bare '/' turned `%ASSETS_PATH%/rox-mark.png` into
+  // the protocol-relative `//rox-mark.png`, read as a host named rox-mark.png.
+  if (command === 'build') return '/app';
   switch (mode) {
     case 'development':
       return command === 'serve' ? '/local' : '/dev';
     case 'staging':
       return '/staging';
     default:
-      return '/';
+      // The built app is served under /app; a bare '/' here turned
+      // `%ASSETS_PATH%/rox-mark.png` into the protocol-relative
+      // `//rox-mark.png`, which the browser reads as a host named
+      // rox-mark.png.
+      return '/app';
   }
 }
 
@@ -835,16 +1061,22 @@ function defineEnv(mode: string, command: string) {
     mode,
     localBackendOrigin: process.env.VITE_LOCAL_BACKEND_ORIGIN,
   });
+  // A bundle built for one backend origin talks to that origin alone, so the
+  // preconnect must not warm a gateway it never calls. `same-origin` resolves
+  // at runtime, so there is no URL to preconnect to and the gateway stays.
+  const localBackendOrigin = process.env.VITE_LOCAL_BACKEND_ORIGIN?.trim();
+  const gatewayOrigin =
+    localBackendOrigin && localBackendOrigin !== 'same-origin'
+      ? localBackendOrigin
+      : mode === 'development'
+        ? 'https://dev-gateway.rox.one'
+        : 'https://gateway.rox.one';
   return {
     'import.meta.env.__APP_VERSION__': JSON.stringify(appVersion),
     'import.meta.env.__APP_BUILD_TIME__': JSON.stringify(appBuildTime),
     'import.meta.env.ASSETS_PATH': JSON.stringify(getAssetsPath(mode, command)),
     // index.html preconnects to the API gateway; keep in sync with servers.ts.
-    'import.meta.env.GATEWAY_ORIGIN': JSON.stringify(
-      mode === 'development'
-        ? 'https://dev-gateway.rox.one'
-        : 'https://gateway.rox.one'
-    ),
+    'import.meta.env.GATEWAY_ORIGIN': JSON.stringify(gatewayOrigin),
     'import.meta.env.__LOCAL_DOCKER__': process.env.LOCAL_DOCKER === 'true',
     'import.meta.env.__LOCAL_JWT__': JSON.stringify(process.env.LOCAL_JWT),
     'import.meta.env.__GIT_BRANCH__': JSON.stringify(

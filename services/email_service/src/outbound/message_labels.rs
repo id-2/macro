@@ -11,7 +11,7 @@ use email::domain::models::mailbox_action::{
 };
 use email::domain::ports::EmailRepo;
 use email::outbound::label_state_pg::PgLabelState;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service;
 use uuid::Uuid;
 
@@ -56,6 +56,7 @@ where
             provider: match link.provider {
                 service::link::UserProvider::Gmail => UserProvider::Gmail,
                 service::link::UserProvider::Outlook => UserProvider::Outlook,
+                service::link::UserProvider::Rox => UserProvider::Rox,
             },
         }))
     }
@@ -256,7 +257,7 @@ where
     async fn enqueue_mailbox_action(
         &self,
         link_id: Uuid,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         action: &MailboxAction,
         targets: &[MailboxActionTarget],
     ) -> Result<Uuid, Self::Err> {

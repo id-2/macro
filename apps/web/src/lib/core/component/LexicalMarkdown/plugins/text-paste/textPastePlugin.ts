@@ -27,7 +27,7 @@ import {
   PasteNode,
   PullRequestMentionNode,
   parseBookingUrl,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import {
   fetchPullRequestByGithubKey,
   getCachedPullRequestByGithubKey,

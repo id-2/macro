@@ -3,7 +3,7 @@ import type {
   ParsedImportFolder,
   ParsedImportItem,
 } from '@core/password-import/types';
-import { NOOP_SPAN } from '@macro-inc/observability';
+import { NOOP_SPAN } from '@rox-one/observability';
 import { describe, expect, it } from 'vitest';
 import type { ImportBatchBody } from '../context/passwords-context';
 import {

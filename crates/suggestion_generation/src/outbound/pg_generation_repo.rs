@@ -10,8 +10,8 @@
 
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use scheduled_action::domain::suggestions::model::GenerationStatus as RoutineGenerationStatus;
 use scheduled_action::domain::suggestions::ports::GenerationStatuses;
 use sqlx::PgPool;
@@ -54,8 +54,8 @@ impl PgGenerationRepo {
     }
 }
 
-fn user(id: String) -> Result<MacroUserIdStr<'static>, PgGenerationRepoError> {
-    MacroUserIdStr::try_from(id).map_err(|_| PgGenerationRepoError::Decode("a user id"))
+fn user(id: String) -> Result<RoxUserIdStr<'static>, PgGenerationRepoError> {
+    RoxUserIdStr::try_from(id).map_err(|_| PgGenerationRepoError::Decode("a user id"))
 }
 
 fn agent(id: &str) -> Result<BotId, PgGenerationRepoError> {
@@ -114,7 +114,7 @@ impl GenerationRepo for PgGenerationRepo {
 
     async fn admission(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         trigger: GenerationTrigger,
     ) -> Result<AdmissionFacts, Self::Err> {
         let row = sqlx::query!(
@@ -242,7 +242,7 @@ impl GenerationRepo for PgGenerationRepo {
         &self,
         session: Uuid,
         generation: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         agent: BotId,
         kind: SessionKind,
         surfaces: &[String],
@@ -398,7 +398,7 @@ impl GenerationRepo for PgGenerationRepo {
 
     async fn last_routines_ok(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> Result<Option<DateTime<Utc>>, Self::Err> {
         let at = sqlx::query_scalar!(
             "SELECT last_routines_ok_at FROM suggestion_audience WHERE user_id = $1",
@@ -411,7 +411,7 @@ impl GenerationRepo for PgGenerationRepo {
 
     async fn routines_ok(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: &str,
         now: DateTime<Utc>,
     ) -> Result<(), Self::Err> {
@@ -433,7 +433,7 @@ impl GenerationRepo for PgGenerationRepo {
 
     async fn record_nightly(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         outcome: NightlyOutcome,
         next_run: Option<DateTime<Utc>>,
         now: DateTime<Utc>,
@@ -457,7 +457,7 @@ impl GenerationRepo for PgGenerationRepo {
 
     async fn see(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: &str,
         now: DateTime<Utc>,
         next_run: DateTime<Utc>,
@@ -484,7 +484,7 @@ impl GenerationRepo for PgGenerationRepo {
         Ok(())
     }
 
-    async fn account(&self, user: &MacroUserIdStr<'_>) -> Result<Option<Uuid>, Self::Err> {
+    async fn account(&self, user: &RoxUserIdStr<'_>) -> Result<Option<Uuid>, Self::Err> {
         let account = sqlx::query_scalar!(
             r#"SELECT macro_user_id AS "macro_user_id?" FROM "User" WHERE id = $1"#,
             user.as_ref(),
@@ -550,7 +550,7 @@ impl GenerationRepo for PgGenerationRepo {
             .collect()
     }
 
-    async fn overview(&self, user: &MacroUserIdStr<'_>) -> Result<OverviewFacts, Self::Err> {
+    async fn overview(&self, user: &RoxUserIdStr<'_>) -> Result<OverviewFacts, Self::Err> {
         let row = sqlx::query!(
             r#"SELECT running.trigger AS "running_trigger?",
                    running.started_at AS "running_started_at?",
@@ -663,7 +663,7 @@ fn routine_status(status: GenerationStatus) -> RoutineGenerationStatus {
 impl GenerationStatuses for PgGenerationRepo {
     async fn latest(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> anyhow::Result<Option<RoutineGenerationStatus>> {
         // A generation whose process died is marked interrupted by the
         // sweep within minutes: no reader infers it.

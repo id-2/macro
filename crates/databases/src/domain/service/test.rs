@@ -10,8 +10,8 @@ use chrono::Utc;
 use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessReceipt, EntityPermission, EntityType, RequiredPermission,
 };
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::position::Position;
 use models_databases::{
     CellValue, CellWrite, ColumnChange, ColumnKind, ColumnResult, DatabaseOp, NewColumn, NewOption,
@@ -64,8 +64,8 @@ const OWNER: &str = "macro|owner@rox.one";
 const VIEWER: &str = "macro|viewer@rox.one";
 const STRANGER: &str = "macro|stranger@rox.one";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 fn viewer(id: &'static str) -> Viewer {

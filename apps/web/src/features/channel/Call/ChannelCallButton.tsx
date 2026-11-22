@@ -24,8 +24,8 @@ export function ChannelCallButton(props: {
             grouped={props.grouped}
             ref={tourTarget(CHANNEL_TOUR.call)}
             onClick={start}
-            tooltip="Start Call"
-            label="Call"
+            tooltip={t('nav.startCall')}
+            label={t('nav.call')}
             icon={
               <PhoneIcon class="size-3.5 touch:size-6 shrink-0 pointer-events-none" />
             }

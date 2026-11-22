@@ -13,12 +13,12 @@ mod test;
 use super::processing::TriggerInput;
 use super::project_assignment::ProjectTaskAdded;
 use super::task_assignment::TaskAssignment;
-use macro_event_broker::{MacroEvent as _, MacroEventCollection};
-use macro_uuid::Uuid;
-use messages::outbound::broker::{MessageMacroEvent, MessageTopicEvent};
-use properties::domain::events::{PropertyMacroEvent, PropertyTopicEvent};
+use rox_event_broker::{RoxEvent as _, RoxEventCollection};
+use rox_uuid::Uuid;
+use messages::outbound::broker::{MessageRoxEvent, MessageTopicEvent};
+use properties::domain::events::{PropertyRoxEvent, PropertyTopicEvent};
 
-macro_event_broker::declare_topics!(MessageTriggerEvents: MessageMacroEvent, PropertyMacroEvent);
+rox_event_broker::declare_topics!(MessageTriggerEvents: MessageRoxEvent, PropertyRoxEvent);
 
 /// A decoded broker record from the trigger source.
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -37,7 +37,7 @@ pub struct DecodedTrigger {
 }
 
 /// A topic collection whose records may carry a committed post.
-pub trait TriggerEvents: MacroEventCollection + Send + 'static {
+pub trait TriggerEvents: RoxEventCollection + Send + 'static {
     /// Reduce a decoded record to the post it carries, if any.
     fn into_trigger(self) -> DecodedTrigger;
 }
@@ -45,8 +45,8 @@ pub trait TriggerEvents: MacroEventCollection + Send + 'static {
 impl TriggerEvents for MessageTriggerEvents {
     fn into_trigger(self) -> DecodedTrigger {
         let event = match self {
-            Self::MessageMacroEvent(event) => event,
-            Self::PropertyMacroEvent(event) => return property_trigger(event),
+            Self::MessageRoxEvent(event) => event,
+            Self::PropertyRoxEvent(event) => return property_trigger(event),
         };
         let envelope = event.event();
         let (event_type, posted) = match &envelope.event {
@@ -79,7 +79,7 @@ impl TriggerEvents for MessageTriggerEvents {
     }
 }
 
-fn property_trigger(event: PropertyMacroEvent) -> DecodedTrigger {
+fn property_trigger(event: PropertyRoxEvent) -> DecodedTrigger {
     let envelope = event.event();
     let (event_type, assignment, project_task) = match &envelope.event {
         PropertyTopicEvent::EntityPropertyUpdated(updated) => (

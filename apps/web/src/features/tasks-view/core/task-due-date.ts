@@ -3,12 +3,12 @@ import { addDays, format, isMatch, parse, startOfDay } from 'date-fns';
 import { match } from 'ts-pattern';
 
 export const TASK_DUE_DATE_BUCKETS = [
-  { id: 'overdue', label: 'Overdue' },
-  { id: 'today', label: 'Today' },
-  { id: 'tomorrow', label: 'Tomorrow' },
-  { id: 'next_7_days', label: 'Next 7 days' },
-  { id: 'later', label: 'Later' },
-  { id: 'no_due_date', label: 'No due date' },
+  { id: 'overdue', label: 'Просрочено' },
+  { id: 'today', label: 'Сегодня' },
+  { id: 'tomorrow', label: 'Завтра' },
+  { id: 'next_7_days', label: 'Ближайшие 7 дней' },
+  { id: 'later', label: 'Позже' },
+  { id: 'no_due_date', label: 'Без срока' },
 ] as const;
 
 export type TaskDueDateBucket = (typeof TASK_DUE_DATE_BUCKETS)[number]['id'];

@@ -13,7 +13,7 @@
 use agent_egress::domain::model::{
     CustomMcpServerKey, CustomMcpServerListing, McpServerSlug, SessionToken,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::domain::ports::McpServerStore;
 use pipedream_mcp::domain::ports::{ConnectionStore, ConnectorOverlays};
 use std::sync::Arc;
@@ -68,7 +68,7 @@ where
     // loads owner-scoped rows and converts the result to proxy addresses.
     pub async fn advertised_all(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         selection: &AgentMcpServers,
     ) -> Result<(Vec<McpServerSlug>, Vec<CustomMcpServerListing>)> {
         let native = self.custom_servers.list(owner).await.map_err(|error| {
@@ -143,7 +143,7 @@ where
     async fn provision(
         &self,
         session: AgentSessionId,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         selection: &AgentMcpServers,
     ) -> Result<ProvisionedEgress> {
         let token = SessionToken::mint();
@@ -163,7 +163,7 @@ where
     #[tracing::instrument(err, skip(self, session_token), fields(%owner))]
     async fn restore(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session_token: String,
         selection: &AgentMcpServers,
     ) -> Result<SandboxEgress> {

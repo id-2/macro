@@ -7,7 +7,7 @@ fn a_worker_built_under_an_imported_alias_is_seen() {
     let file = syn::parse_file(
         r#"
 fn start() {
-    let contacts = macro_queues::ContactsQueue::new();
+    let contacts = rox_queues::ContactsQueue::new();
     let direct = SQSWorker::new(client.clone(), contacts.to_string(), 1, 1);
     let aliased = Worker::new(client, contacts.to_string(), 1, 1);
 }
@@ -36,7 +36,7 @@ fn a_shadowed_queue_variable_is_ambiguous() {
     let file = syn::parse_file(
         r#"
 fn start() {
-    let queue = macro_queues::ContactsQueue::new();
+    let queue = rox_queues::ContactsQueue::new();
     let queue: String = other_queue_url;
     let worker = SQSWorker::new(client, queue.to_string(), 1, 1);
 }

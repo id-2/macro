@@ -15,7 +15,7 @@ vi.mock('@core/component/Toast/Toast', () => ({
 
 import { createInputAttachmentTracker } from '@channel/Input/attachment-tracker';
 import { getNativeStagedUpload } from '@core/mobile/nativeStagedUpload';
-import type { PendingShareFile } from '@macro/tauri';
+import type { PendingShareFile } from '@rox/tauri';
 import { uploadPendingShareAttachment } from './uploadPendingShareAttachment';
 
 const file: PendingShareFile = {

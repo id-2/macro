@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { MobileDrawer } from '@components/app/mobile/MobileDrawer';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { isMobileWidth } from '@core/mobile/mobileWidth';
@@ -197,8 +198,8 @@ function keepSearchFocused(input: () => HTMLInputElement | undefined) {
 
 /**
  * The one model selector: a searchable popover on desktop and a bottom sheet
- * on touch devices, with Suggested first and the complete catalog behind
- * More models. Composers, sessions, and settings all render this.
+ * on touch devices, with the short list first and the complete catalog behind
+ * the rest. Composers, sessions, and settings all render this.
  */
 export function ModelCatalogPicker(props: ModelCatalogPickerProps) {
   const [open, setOpen] = createSignal(false);
@@ -321,7 +322,7 @@ function ModelCatalogSheet(
     const sections =
       showAll() || queryText || catalog().frontier.length === 0
         ? catalog().providers
-        : [{ label: 'Suggested', options: catalog().frontier }];
+        : [{ label: t('agentControls.suggested'), options: catalog().frontier }];
     return sections
       .map((section) => ({
         ...section,
@@ -390,8 +391,8 @@ function ModelCatalogSheet(
               <Button
                 variant="ghost"
                 size="icon-md"
-                aria-label="Back to Suggested"
-                tooltip="Back to Suggested"
+                aria-label={t('agentControls.backToSuggested')}
+                tooltip={t('agentControls.backToSuggested')}
                 onClick={() => {
                   setShowAll(false);
                   setQuery('');
@@ -410,8 +411,8 @@ function ModelCatalogSheet(
             <input
               ref={searchInput}
               type="text"
-              aria-label={props.searchPlaceholder ?? 'Search models'}
-              placeholder={props.searchPlaceholder ?? 'Search models'}
+              aria-label={props.searchPlaceholder ?? t('agentControls.searchModels')}
+              placeholder={props.searchPlaceholder ?? t('agentControls.searchModels')}
               value={query()}
               onInput={(event) => setQuery(event.currentTarget.value)}
               class="h-full min-w-0 w-full border-0 bg-transparent p-0 text-base outline-none placeholder:text-ink-extra-muted"
@@ -484,7 +485,7 @@ function ModelCatalogSheet(
                   }}
                 >
                   <SquaresFour class="size-4 shrink-0 text-ink-muted" />
-                  <span class="flex-1">More models</span>
+                  <span class="flex-1">{t('agentControls.moreModels')}</span>
                   <CaretRight class="size-4" />
                 </MobileDrawer.Item>
               </MobileDrawer.Section>
@@ -550,8 +551,8 @@ export function ModelCatalogMenu(
               searchEl = element;
               props.searchRef?.(element);
             }}
-            aria-label={props.searchPlaceholder ?? 'Search models'}
-            placeholder={props.searchPlaceholder ?? 'Search models'}
+            aria-label={props.searchPlaceholder ?? t('agentControls.searchModels')}
+            placeholder={props.searchPlaceholder ?? t('agentControls.searchModels')}
             value={query()}
             onInput={(event) => setQuery(event.currentTarget.value)}
             onMouseDown={(event: MouseEvent) => event.stopPropagation()}
@@ -585,7 +586,7 @@ export function ModelCatalogMenu(
               }
             >
               <ModelList
-                label="Suggested"
+                label={t('agentControls.suggested')}
                 options={catalog().frontier}
                 value={props.value}
                 disabled={props.disabled}
@@ -608,7 +609,7 @@ export function ModelCatalogMenu(
                       <Dropdown.Sub>
                         <Dropdown.SubTrigger class="h-8 gap-2">
                           <SquaresFour class="size-4 shrink-0 text-ink-muted" />
-                          <span class="flex-1">More models</span>
+                          <span class="flex-1">{t('agentControls.moreModels')}</span>
                           <CaretRight class="size-3.5" />
                         </Dropdown.SubTrigger>
                         <Dropdown.SubContent
@@ -647,7 +648,7 @@ export function ModelCatalogMenu(
                       }}
                     >
                       <SquaresFour class="size-4 shrink-0 text-ink-muted" />
-                      <span class="flex-1">More models</span>
+                      <span class="flex-1">{t('agentControls.moreModels')}</span>
                       <CaretRight class="size-3.5" />
                     </Dropdown.Item>
                   </Show>
@@ -663,7 +664,7 @@ export function ModelCatalogMenu(
                     searchEl?.focus();
                   }}
                 >
-                  Back to Suggested
+                  {t('agentControls.backToSuggested')}
                 </Dropdown.Item>
               </Show>
               <For each={catalog().providers}>

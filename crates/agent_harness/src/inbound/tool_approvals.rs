@@ -21,11 +21,11 @@ use axum::routing::post;
 use entity_access::domain::models::EditAccessLevel;
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::AgentSessionAccessLevelExtractor;
-use macro_authorization::{
-    CredentialAttribution, MacroAuthorizationExtractor, MacroAuthorizationService,
-    MacroAuthorizationState, UserOnly, is_program_run,
+use rox_authorization::{
+    CredentialAttribution, RoxAuthorizationExtractor, RoxAuthorizationService,
+    RoxAuthorizationState, UserOnly, is_program_run,
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -108,7 +108,7 @@ pub struct AnswerToolApprovalResponse {
 pub struct ToolApprovalsRouterState<Approvals, Access, Auth> {
     approvals: Arc<Approvals>,
     entity_access: Arc<Access>,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 }
 
 impl<Approvals, Access, Auth> ToolApprovalsRouterState<Approvals, Access, Auth> {
@@ -116,7 +116,7 @@ impl<Approvals, Access, Auth> ToolApprovalsRouterState<Approvals, Access, Auth> 
     pub fn new(
         approvals: Arc<Approvals>,
         entity_access: Arc<Access>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             approvals,
@@ -137,7 +137,7 @@ impl<Approvals, Access, Auth> Clone for ToolApprovalsRouterState<Approvals, Acce
 }
 
 impl<Approvals, Access, Auth> FromRef<ToolApprovalsRouterState<Approvals, Access, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &ToolApprovalsRouterState<Approvals, Access, Auth>) -> Self {
         state.authorization.clone()
@@ -159,7 +159,7 @@ pub fn tool_approvals_router<Approvals, Access, Auth, S>(
 where
     Approvals: ToolApprovalAnswers,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -250,7 +250,7 @@ fn refuse_program_approval(
 #[tracing::instrument(skip_all, fields(%session_id, %approval_id), err(Debug))]
 pub async fn answer_tool_approval_handler<Approvals, Access, Auth>(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
-    caller: MacroAuthorizationExtractor<Auth, UserOnly>,
+    caller: RoxAuthorizationExtractor<Auth, UserOnly>,
     headers: HeaderMap,
     State(state): State<ToolApprovalsRouterState<Approvals, Access, Auth>>,
     Path((session_id, approval_id)): Path<(Uuid, Uuid)>,
@@ -259,7 +259,7 @@ pub async fn answer_tool_approval_handler<Approvals, Access, Auth>(
 where
     Approvals: ToolApprovalAnswers,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     refuse_program_approval(request.answer, caller.authorization.attribution(), &headers)
         .map_err(IntoResponse::into_response)?;

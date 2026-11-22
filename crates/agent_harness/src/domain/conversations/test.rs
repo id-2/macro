@@ -41,7 +41,7 @@ struct Eligibility {
 impl AgentDmEligibility for Eligibility {
     async fn authorize_agent_dm(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         _: BotId,
     ) -> Result<(), BotError> {
         self.calls.fetch_add(1, Ordering::SeqCst);
@@ -78,8 +78,8 @@ impl AgentConversationRepo for Sessions {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 fn channel() -> Uuid {
     Uuid::from_u128(1)
@@ -111,7 +111,7 @@ async fn a_teammate_cannot_read_the_personas_conversation_with_its_owner() {
         MockBotRepo::new(),
         Sessions,
     );
-    let teammate = MacroUserIdStr::try_from_email("teammate@example.com").unwrap();
+    let teammate = RoxUserIdStr::try_from_email("teammate@example.com").unwrap();
     assert!(
         service
             .list(teammate.clone(), channel())
@@ -221,7 +221,7 @@ async fn dispatch_rechecks_persona_access_and_the_exact_owner() {
         MockBotRepo::new(),
         Sessions,
     );
-    let teammate = MacroUserIdStr::try_from_email("teammate@example.com").unwrap();
+    let teammate = RoxUserIdStr::try_from_email("teammate@example.com").unwrap();
     let wrong_actor = service
         .authorize_prompt(AgentSessionId::TEST_A, BotId::TEST_A, Some(&teammate))
         .await;

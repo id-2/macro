@@ -6,7 +6,7 @@ use crate::domain::ports::editing::{
     EditMode, EditResult, EditUsage, EditingWorkerService, EditorName,
 };
 use anyhow::Context;
-use macro_sync_service_jwt::DocumentPermissionToken;
+use rox_sync_service_jwt::DocumentPermissionToken;
 use reqwest::Client;
 use std::sync::Arc;
 
@@ -80,7 +80,7 @@ impl ReqwestEditingWorkerClient {
         request: serde_json::Value,
     ) -> anyhow::Result<reqwest::Response> {
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         Ok(self
             .client
             .post(format!("{}/markdown", self.worker_url))
@@ -103,7 +103,7 @@ impl ReqwestEditingWorkerClient {
         change: serde_json::Value,
     ) -> anyhow::Result<reqwest::Response> {
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         Ok(self
             .client
             .post(format!("{}/comment-mark", self.worker_url))
@@ -147,7 +147,7 @@ impl EditingWorkerService for ReqwestEditingWorkerClient {
             body["artifacts"] = serde_json::Value::Bool(true);
         }
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .client
             .post(format!("{}/canvas", self.worker_url))
@@ -224,7 +224,7 @@ impl EditingWorkerService for ReqwestEditingWorkerClient {
         use crate::domain::spreadsheet::SpreadsheetError;
 
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .client
             .post(format!("{}/spreadsheet", self.worker_url))
@@ -277,7 +277,7 @@ impl EditingWorkerService for ReqwestEditingWorkerClient {
         }
 
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .client
             .post(format!("{}/spreadsheet/instructions", self.worker_url))
@@ -323,7 +323,7 @@ impl EditingWorkerService for ReqwestEditingWorkerClient {
         request: &crate::domain::word_document::WordDocumentRequest,
     ) -> anyhow::Result<crate::domain::word_document::WordDocumentResponse> {
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let response = self
             .client
             .post(format!("{}/docx", self.worker_url))
@@ -536,7 +536,7 @@ impl EditingWorkerService for ReqwestEditingWorkerClient {
         // Propagate the current trace so the worker's spans join this
         // service's trace instead of rooting their own.
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
 
         let edit_resp = self
             .client
@@ -589,7 +589,7 @@ impl EditingWorkerService for ReqwestEditingWorkerClient {
         };
 
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
 
         let resp = self
             .client

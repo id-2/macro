@@ -18,6 +18,14 @@ class OpenBaoRequestError(RuntimeError):
         super().__init__(f"OpenBao {method} {path}: HTTP {status}")
 
 
+# The audit-correlation header. OpenBao records only request headers
+# registered in `sys/config/auditing/request-headers`, so both the current
+# name and the pre-rename one stay registered while older clients may still
+# write the old one.
+AUDIT_ID_HEADER = "x-rox-audit-id"
+LEGACY_AUDIT_ID_HEADER = "x-macro-audit-id"
+
+
 class NoRedirect(HTTPRedirectHandler):
     def redirect_request(self, request, response, code, message, headers, new_url):
         raise ValueError("OpenBao redirects are forbidden")
@@ -34,7 +42,7 @@ class OpenBaoClient:
     def request(self, method, path, data=None, namespace=None, missing=False):
         headers = {"X-Vault-Token": self.token, "Content-Type": "application/json"}
         if self.audit_id:
-            headers["x-macro-audit-id"] = self.audit_id
+            headers[AUDIT_ID_HEADER] = self.audit_id
         if namespace:
             headers["X-Vault-Namespace"] = namespace
         body = None if data is None else json.dumps(data).encode()
@@ -72,7 +80,8 @@ def provision_team(client, team_id, public_key, issuer):
         raise ValueError("OpenBao must declare the passwords audit device in its server config")
     if audits["passwords/"]["options"].get("log_raw") != "false":
         raise ValueError("Password audit device must redact sensitive values")
-    client.request("POST", "sys/config/auditing/request-headers/x-macro-audit-id", {"hmac": False})
+    for header in (AUDIT_ID_HEADER, LEGACY_AUDIT_ID_HEADER):
+        client.request("POST", f"sys/config/auditing/request-headers/{header}", {"hmac": False})
     if client.request("GET", f"sys/namespaces/{namespace}", missing=True) is None:
         client.request("POST", f"sys/namespaces/{namespace}", {})
 

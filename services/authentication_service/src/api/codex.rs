@@ -9,12 +9,12 @@ use axum::{
     routing::{get, post, put},
 };
 use codex_connection::domain::{ConnectionError, ConnectionStatus, LoginStatus};
-use macro_authorization::{MacroAuthorizationExtractor, UserOnly};
+use rox_authorization::{RoxAuthorizationExtractor, UserOnly};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-type User = MacroAuthorizationExtractor<AuthorizationService, UserOnly>;
+type User = RoxAuthorizationExtractor<AuthorizationService, UserOnly>;
 
 /// Safe connection metadata; no secret or masked token is returned.
 #[derive(Serialize, Deserialize, ToSchema)]

@@ -3,12 +3,12 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::{
+use rox_user_id::{
     cowlike::CowLike,
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
-use macro_uuid::ShortUuidConverter;
+use rox_uuid::ShortUuidConverter;
 use sqlx::PgPool;
 
 use crate::domain::{
@@ -40,7 +40,7 @@ impl ReferralRepo for PgReferralRepo {
     #[tracing::instrument(skip(self), err)]
     async fn get_referral_code_for_user<'a>(
         &self,
-        user_id: &MacroUserId<Lowercase<'a>>,
+        user_id: &RoxUserId<Lowercase<'a>>,
     ) -> Result<ReferralCode, Self::Err> {
         let fusion_user_id = sqlx::query!(
             r#"
@@ -62,7 +62,7 @@ impl ReferralRepo for PgReferralRepo {
     #[tracing::instrument(skip(self), err)]
     async fn track_referral<'a>(
         &self,
-        referred_user_id: &MacroUserId<Lowercase<'a>>,
+        referred_user_id: &RoxUserId<Lowercase<'a>>,
         referral_code: &ReferralCode,
     ) -> Result<Option<TrackedReferral>, Self::Err> {
         let referrer_id =
@@ -84,7 +84,7 @@ impl ReferralRepo for PgReferralRepo {
         )
         .fetch_one(&self.pool)
         .await?;
-        let referrer = MacroUserIdStr::parse_from_str(&referrer)
+        let referrer = RoxUserIdStr::parse_from_str(&referrer)
             .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
             .into_owned();
 
@@ -96,7 +96,7 @@ impl ReferralRepo for PgReferralRepo {
         .fetch_one(&self.pool)
         .await?;
 
-        let tracking_id = macro_uuid::generate_uuid_v7();
+        let tracking_id = rox_uuid::generate_uuid_v7();
         // A user is referred at most once (unique referred_id), so a repeated
         // signup or login with a code records nothing.
         let inserted = sqlx::query_scalar!(
@@ -122,7 +122,7 @@ impl ReferralRepo for PgReferralRepo {
     #[tracing::instrument(skip(self), err)]
     async fn complete_referral<'a>(
         &self,
-        referred_user_id: &MacroUserId<Lowercase<'a>>,
+        referred_user_id: &RoxUserId<Lowercase<'a>>,
         referral_code: &ReferralCode,
     ) -> Result<(), Self::Err> {
         let referrer_id =
@@ -165,7 +165,7 @@ impl ReferralRepo for PgReferralRepo {
     #[tracing::instrument(skip(self), err)]
     async fn get_sender_info<'a>(
         &self,
-        user_id: &MacroUserId<Lowercase<'a>>,
+        user_id: &RoxUserId<Lowercase<'a>>,
     ) -> Result<(Option<String>, Option<String>), Self::Err> {
         let row = sqlx::query!(
             r#"

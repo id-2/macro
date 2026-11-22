@@ -1,6 +1,6 @@
 //! Public request contracts and workflow values.
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_permissions::share_permission::access_level::AccessLevel;
 use serde::{Deserialize, Serialize};
@@ -79,7 +79,7 @@ pub struct AccessRequest {
     pub id: Uuid,
     /// Person requesting access.
     #[schema(value_type = String)]
-    pub requester_id: MacroUserIdStr<'static>,
+    pub requester_id: RoxUserIdStr<'static>,
     /// Requested upgrade.
     pub requested_level: AccessLevel,
     /// Current outcome.
@@ -170,16 +170,16 @@ pub struct RequestEvent {
     /// Request state; absent for a manual direct-grant change.
     pub request: Option<AccessRequest>,
     /// Actor who caused this event.
-    pub actor: MacroUserIdStr<'static>,
+    pub actor: RoxUserIdStr<'static>,
     /// Responsible human reviewers at the time of the change.
-    pub reviewers: Vec<MacroUserIdStr<'static>>,
+    pub reviewers: Vec<RoxUserIdStr<'static>>,
     /// Everyone whose sharing/access caches changed.
-    pub affected_users: Vec<MacroUserIdStr<'static>>,
+    pub affected_users: Vec<RoxUserIdStr<'static>>,
     /// W3C trace context captured by the persistence adapter for durable delivery.
     #[serde(default, skip_serializing_if = "std::collections::HashMap::is_empty")]
     pub trace_context: std::collections::HashMap<String, String>,
     /// Previous requested notifications and their recipients to complete.
-    pub superseded: Vec<(Uuid, Vec<MacroUserIdStr<'static>>)>,
+    pub superseded: Vec<(Uuid, Vec<RoxUserIdStr<'static>>)>,
     /// Residents this change stopped, when it removed or lowered someone's
     /// access to a runtime their agents live on.
     #[serde(default, skip_serializing_if = "Option::is_none")]
@@ -191,7 +191,7 @@ pub struct RequestEvent {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct StoppedResidents {
     /// The agents' owner, whose access changed.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// The agents that were running and no longer may.
     pub agents: Vec<Resident>,
 }

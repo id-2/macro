@@ -6,6 +6,7 @@ import {
   type SoupGroup,
 } from '@app/features/soup/collection';
 import type { DateValue } from '@core/util/date';
+import { formatLocale } from '@app/lib/i18n';
 import type { EntityData, WithNotification } from '@entity';
 import { differenceInCalendarDays, format, isSameYear } from 'date-fns';
 
@@ -26,8 +27,10 @@ export function groupEmailEntitiesByDate(
   return groupSoupEntities(entities, {
     getGroupId: (entity) =>
       dateBucket(emailSortTimestamp(entity, held), now).key,
-    getGroupLabel: (_groupId, firstEntity) =>
-      dateBucket(emailSortTimestamp(firstEntity, held), now).label,
+    getGroupLabel: (_groupId, firstEntity) => {
+      const bucket = dateBucket(emailSortTimestamp(firstEntity, held), now);
+      return bucket.key === 'today' ? 'Сегодня' : bucket.label;
+    },
   });
 }
 
@@ -63,14 +66,25 @@ export function focusDateBucket(
 
   const daysAgo = differenceInCalendarDays(now, date);
   // A future time (clock skew) reads as today, at the top of the list.
-  if (daysAgo <= 0) return { key: 'today', label: 'Today' };
+  if (daysAgo <= 0) return { key: 'today', label: 'Сегодня' };
   if (daysAgo === 1) return { key: 'yesterday', label: 'Yesterday' };
 
   const key = format(date, 'yyyy-MM-dd');
-  if (daysAgo < 7) return { key, label: format(date, 'EEEE') };
+  if (daysAgo < 7) {
+    return {
+      key,
+      label: date.toLocaleDateString(formatLocale(), { weekday: 'long' }),
+    };
+  }
 
-  const dateFormat = isSameYear(date, now) ? 'MMM d' : 'MMM d, yyyy';
-  return { key, label: format(date, dateFormat) };
+  return {
+    key,
+    label: date.toLocaleDateString(formatLocale(), {
+      month: 'short',
+      day: 'numeric',
+      year: isSameYear(date, now) ? undefined : 'numeric',
+    }),
+  };
 }
 
 /** Focus's rows under its day headers, Today's included. */

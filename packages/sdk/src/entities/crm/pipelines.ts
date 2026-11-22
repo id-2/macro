@@ -3,7 +3,7 @@ import type {
   PipelineEntries,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Company } from './company';
 import type { Contact } from './contact';
 import { CrmPipeline } from './pipeline';
@@ -11,7 +11,7 @@ import { PipelineEntry, type PipelineField } from './pipeline-entry';
 
 /** CRM pipelines in the caller's team. */
 export class PipelineNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /** Construct a lazy pipeline handle. */
   byId(id: string): CrmPipeline {
@@ -58,7 +58,7 @@ export class PipelineNamespace {
    * standard ones. Private unless `sharing` is `team`.
    *
    * @example
-   * await macro.crm.pipelines.create({
+   * await rox.crm.pipelines.create({
    *   name: 'Hiring',
    *   recordType: 'contact',
    *   stages: ['Sourced', 'Interview', 'Offer', 'Hired'],

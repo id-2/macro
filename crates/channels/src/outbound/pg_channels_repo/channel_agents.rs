@@ -1,7 +1,7 @@
 //! Reads of the agents conversing in a channel.
 
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::{
@@ -14,7 +14,7 @@ use super::PgChannelsRepo;
 fn kind(kind: &str, user_id: Option<String>) -> anyhow::Result<ChannelAgentKind> {
     match (kind, user_id) {
         ("direct", Some(user_id)) => Ok(ChannelAgentKind::Direct {
-            user_id: MacroUserIdStr::try_from(user_id)?,
+            user_id: RoxUserIdStr::try_from(user_id)?,
         }),
         ("member", None) => Ok(ChannelAgentKind::Member),
         (kind, _) => anyhow::bail!("unknown channel agent kind {kind}"),

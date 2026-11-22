@@ -2,15 +2,15 @@ use super::{EmailLinkErr, MultiEmailLinkExtractor, resolve_target_link};
 use crate::domain::models::{Link, UserProvider};
 use axum::{body::to_bytes, http::StatusCode, response::IntoResponse};
 use chrono::Utc;
-use macro_authorization::MacroAuthorizationRejection;
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_authorization::RoxAuthorizationRejection;
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use std::{borrow::Cow, marker::PhantomData};
 use uuid::Uuid;
 
 fn test_link(id: Uuid, owner: &str, email: &str, is_primary: bool) -> Link {
     Link {
         id,
-        macro_id: MacroUserIdStr::try_from_email(owner).unwrap(),
+        macro_id: RoxUserIdStr::try_from_email(owner).unwrap(),
         fusionauth_user_id: "fa-user".to_string(),
         email_address: EmailStr::try_from(email.to_string()).unwrap(),
         provider: UserProvider::Gmail,
@@ -21,13 +21,13 @@ fn test_link(id: Uuid, owner: &str, email: &str, is_primary: bool) -> Link {
     }
 }
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("user@test.com").unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("user@test.com").unwrap()
 }
 
 #[tokio::test]
 async fn authorization_error_delegates_response() {
-    let rejection = MacroAuthorizationRejection {
+    let rejection = RoxAuthorizationRejection {
         status: StatusCode::IM_A_TEAPOT,
         message: Cow::Borrowed("safe authorization error"),
     };

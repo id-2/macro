@@ -26,7 +26,7 @@ use entity_access::domain::models::{AccessError, EntityType};
 use entity_access::domain::ports::EntityAccessService;
 use futures::StreamExt as _;
 use futures::stream::BoxStream;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::VecDeque;
 use std::future::Future;
 use std::sync::{Arc, Mutex, MutexGuard, PoisonError};
@@ -270,7 +270,7 @@ pub trait WebhookEventStreamService: Clone + Send + Sync + 'static {
     /// cursor, through the same filters and access checks.
     fn open_stream(
         &self,
-        subscriber: MacroUserIdStr<'static>,
+        subscriber: RoxUserIdStr<'static>,
         scope: WebhookScope,
         filters: WebhookFilters,
         after: Option<StreamCursor>,
@@ -322,7 +322,7 @@ struct StreamState<A, R, C> {
     entity_access_service: Arc<A>,
     workspace_resolver: R,
     contact_checker: C,
-    subscriber: MacroUserIdStr<'static>,
+    subscriber: RoxUserIdStr<'static>,
     scope: WebhookScope,
     filters: WebhookFilters,
 }
@@ -369,7 +369,7 @@ where
                     return Ok(true);
                 }
                 // An unparseable id cannot be anyone's contact.
-                let Ok(user) = MacroUserIdStr::try_from(user_id.clone()) else {
+                let Ok(user) = RoxUserIdStr::try_from(user_id.clone()) else {
                     return Ok(false);
                 };
                 self.contact_checker
@@ -490,7 +490,7 @@ where
     )]
     async fn open_stream(
         &self,
-        subscriber: MacroUserIdStr<'static>,
+        subscriber: RoxUserIdStr<'static>,
         scope: WebhookScope,
         filters: WebhookFilters,
         after: Option<StreamCursor>,

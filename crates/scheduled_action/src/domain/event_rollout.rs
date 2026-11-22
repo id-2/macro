@@ -3,7 +3,7 @@
 use std::future::Future;
 
 use feature_flags::FeatureFlags;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 #[cfg(test)]
@@ -17,7 +17,7 @@ pub trait EventRoutineRollout: Send + Sync + 'static {
     /// A failed flag load is an error; each caller decides its fallback.
     fn enabled_for(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<bool, Report>> + Send;
 }
 
@@ -26,7 +26,7 @@ pub trait EventRoutineRollout: Send + Sync + 'static {
 pub struct EventRoutinesOff;
 
 impl EventRoutineRollout for EventRoutinesOff {
-    async fn enabled_for(&self, _user: &MacroUserIdStr<'_>) -> Result<bool, Report> {
+    async fn enabled_for(&self, _user: &RoxUserIdStr<'_>) -> Result<bool, Report> {
         Ok(false)
     }
 }
@@ -43,14 +43,14 @@ impl<F> FlaggedEventRoutines<F> {
 
 impl<F: FeatureFlags + 'static> EventRoutineRollout for FlaggedEventRoutines<F> {
     #[tracing::instrument(name = "routine.event_routines_flag", err, skip_all)]
-    async fn enabled_for(&self, user: &MacroUserIdStr<'_>) -> Result<bool, Report> {
+    async fn enabled_for(&self, user: &RoxUserIdStr<'_>) -> Result<bool, Report> {
         Ok(self.0.load(user).await?.is_enabled(EVENT_ROUTINES_FLAG))
     }
 }
 
 /// A deployment without a flag source keeps event triggers off.
 impl<R: EventRoutineRollout> EventRoutineRollout for Option<R> {
-    async fn enabled_for(&self, user: &MacroUserIdStr<'_>) -> Result<bool, Report> {
+    async fn enabled_for(&self, user: &RoxUserIdStr<'_>) -> Result<bool, Report> {
         match self {
             Some(rollout) => rollout.enabled_for(user).await,
             None => Ok(false),

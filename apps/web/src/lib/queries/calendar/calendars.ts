@@ -8,6 +8,7 @@ import { CalendarsDocument } from '@service-storage/graphql/generated/graphql';
 import { getGraphqlSoupClient } from '@service-storage/graphql-soup';
 import {
   keepPreviousData,
+  useMutation,
   useQuery,
   useQueryClient,
 } from '@tanstack/solid-query';
@@ -81,9 +82,11 @@ function cachedVisibleCalendarsQueryOptions(
   return {
     queryKey: calendarKeys.visibleCalendars(userId)._ctx.graphql.queryKey,
     queryFn: () => readCalendarList(host),
-    // A list restored from the device is stamped 0 and must be read once.
+    // A list restored from the device is stamped 0 and must be read once. Any
+    // later answer expires: the records a list names can land after it was
+    // read, and an expired answer is re-read from the local cache cheaply.
     staleTime: (query: { state: { dataUpdatedAt: number } }) =>
-      query.state.dataUpdatedAt === 0 ? 0 : Infinity,
+      query.state.dataUpdatedAt === 0 ? 0 : CALENDAR_LIST_STALE_TIME,
     networkMode: 'offlineFirst' as const,
     enabled,
     placeholderData: keepPreviousData,
@@ -122,20 +125,31 @@ async function listCalendars() {
 
 /**
  * Reads the list from the cache. A cache that has not answered a calendar read
- * gets a head start; past it, or if its read fails, the list comes from REST.
+ * gets a head start. An empty answer is not an answer — the records a list
+ * names can arrive after the list itself — so the empty read, a read past the
+ * head start, or a failed read ends at the service. A cache that answered is
+ * still shown when the service cannot be reached.
  */
 async function readCalendarList(host: CacheHost) {
-  if (calendarCacheAnswered(host)) return readCachedCalendars();
-  const cached = await withinCacheHeadStart(
-    (async () => {
-      try {
-        return await readCachedCalendars();
-      } catch {
-        return 'not-ready' as const;
-      }
-    })()
-  );
-  return cached === 'not-ready' ? listCalendars() : cached;
+  const cached = calendarCacheAnswered(host)
+    ? await readCachedCalendarsOrNotReady()
+    : await withinCacheHeadStart(readCachedCalendarsOrNotReady());
+  if (cached !== 'not-ready' && cached.length > 0) return cached;
+  try {
+    return await listCalendars();
+  } catch (error) {
+    if (cached !== 'not-ready') return cached;
+    throw error;
+  }
+}
+
+/** The cache's list, or `not-ready` when its read fails or has no host yet. */
+async function readCachedCalendarsOrNotReady() {
+  try {
+    return await readCachedCalendars();
+  } catch {
+    return 'not-ready' as const;
+  }
 }
 
 /** Reads the calendar list from the cache, fetching it once when absent. */
@@ -146,4 +160,47 @@ async function readCachedCalendars() {
   if (result.error) throw result.error;
   if (!result.data) throw new Error('Calendars returned no data');
   return result.data.user.calendars.map(mapVisibleCalendar);
+}
+
+function withCreatedCalendar(
+  current: VisibleCalendar[] | undefined,
+  created: VisibleCalendar
+): VisibleCalendar[] {
+  if (!current) return [created];
+  return current.some((calendar) => calendar.id === created.id)
+    ? current
+    : [...current, created];
+}
+
+/** Creates a personal Rox calendar and keeps it in the lists the sidebar reads. */
+export function useCreatePersonalCalendarMutation() {
+  const queryClient = useQueryClient();
+  return useMutation(() => ({
+    mutationFn: ({ name, timeZone }: { name: string; timeZone: string }) =>
+      throwOnErr(() => emailClient.createPersonalCalendar(name, timeZone)),
+    onSuccess: async (created) => {
+      const queryKey = calendarKeys.visibleCalendars._def;
+      const keepCreated = (current: VisibleCalendar[] | undefined) =>
+        withCreatedCalendar(current, created);
+      queryClient.setQueriesData<VisibleCalendar[]>(
+        { queryKey },
+        keepCreated
+      );
+      // The cached calendar read serves a stored snapshot that predates the
+      // new calendar, so the list comes from the service itself; the optimistic
+      // patch covers a failed read.
+      try {
+        const calendars = await listCalendars();
+        queryClient.setQueriesData<VisibleCalendar[]>(
+          { queryKey },
+          () => calendars
+        );
+      } catch {
+        queryClient.setQueriesData<VisibleCalendar[]>(
+          { queryKey },
+          keepCreated
+        );
+      }
+    },
+  }));
 }

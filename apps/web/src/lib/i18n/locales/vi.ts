@@ -490,17 +490,20 @@ export default {
     actions: 'Thao tác',
     clear: 'Xóa',
     selectedCount: {
+      one: 'Đã chọn {{count}}',
       other: 'Đã chọn {{count}}',
     },
     undo: 'Hoàn tác',
     toastCopied: 'Đã sao chép',
     toastCopiedCount: {
+      one: 'Đã sao chép {{count}} mục',
       other: 'Đã sao chép {{count}} mục',
     },
     toastIdCopied: 'Đã sao chép ID vào bảng nhớ tạm',
     toastLinkCopied: 'Đã sao chép liên kết vào bảng nhớ tạm',
     toastMovedToTrash: 'Đã chuyển vào Thùng rác',
     toastMovedCountToTrash: {
+      one: 'Đã chuyển {{count}} mục vào Thùng rác',
       other: 'Đã chuyển {{count}} mục vào Thùng rác',
     },
     toastRestoredFromTrash: 'Đã khôi phục từ Thùng rác',
@@ -508,52 +511,64 @@ export default {
     toastMoveToTrashFailed: 'Không thể chuyển vào Thùng rác',
     toastDeleted: 'Đã xóa',
     toastDeletedCount: {
+      one: 'Đã xóa {{count}} mục',
       other: 'Đã xóa {{count}} mục',
     },
     toastDeleteFailed: 'Không thể xóa',
     toastAddedToFavorites: 'Đã thêm vào mục yêu thích',
     toastAddedCountToFavorites: {
+      one: 'Đã thêm {{count}} mục vào mục yêu thích',
       other: 'Đã thêm {{count}} mục vào mục yêu thích',
     },
     toastAddedSomeToFavorites: {
+      one: 'Đã thêm {{succeeded}}/{{count}} mục vào mục yêu thích; {{failed}} mục không thành công',
       other:
         'Đã thêm {{succeeded}}/{{count}} mục vào mục yêu thích; {{failed}} mục không thành công',
     },
     toastRemovedFromFavorites: 'Đã xóa khỏi mục yêu thích',
     toastRemovedCountFromFavorites: {
+      one: 'Đã xóa {{count}} mục khỏi mục yêu thích',
       other: 'Đã xóa {{count}} mục khỏi mục yêu thích',
     },
     toastRemovedSomeFromFavorites: {
+      one: 'Đã xóa {{succeeded}}/{{count}} mục khỏi mục yêu thích; {{failed}} mục không thành công',
       other:
         'Đã xóa {{succeeded}}/{{count}} mục khỏi mục yêu thích; {{failed}} mục không thành công',
     },
     toastFavoritesUpdateFailed: 'Không thể cập nhật mục yêu thích',
     toastMuted: 'Đã tắt thông báo',
     toastMutedCount: {
+      one: 'Đã tắt thông báo cho {{count}} mục',
       other: 'Đã tắt thông báo cho {{count}} mục',
     },
     toastMutedSome: {
+      one: 'Đã tắt thông báo cho {{succeeded}}/{{count}} mục; {{failed}} mục không thành công',
       other:
         'Đã tắt thông báo cho {{succeeded}}/{{count}} mục; {{failed}} mục không thành công',
     },
     toastMuteFailed: 'Không thể tắt thông báo',
     toastUnmuted: 'Đã bật thông báo',
     toastUnmutedCount: {
+      one: 'Đã bật thông báo cho {{count}} mục',
       other: 'Đã bật thông báo cho {{count}} mục',
     },
     toastUnmutedSome: {
+      one: 'Đã bật thông báo cho {{succeeded}}/{{count}} mục; {{failed}} mục không thành công',
       other:
         'Đã bật thông báo cho {{succeeded}}/{{count}} mục; {{failed}} mục không thành công',
     },
     toastUnmuteFailed: 'Không thể bật thông báo',
     toastMarkedDone: 'Đã đánh dấu là xong',
     toastMarkedDoneCount: {
+      one: 'Đã đánh dấu {{count}} mục là xong',
       other: 'Đã đánh dấu {{count}} mục là xong',
     },
     toastMarkedDonePartial: {
+      one: 'Đã đánh dấu {{completed}}/{{count}} mục là xong',
       other: 'Đã đánh dấu {{completed}}/{{count}} mục là xong',
     },
     toastMarkedDonePartialUnsaved: {
+      one: 'Đã đánh dấu {{completed}}/{{count}} mục là xong. Không thể lưu một số thay đổi.',
       other:
         'Đã đánh dấu {{completed}}/{{count}} mục là xong. Không thể lưu một số thay đổi.',
     },
@@ -563,38 +578,46 @@ export default {
     toastUndoFailed: 'Không thể hoàn tác',
     toastMarkedNotDone: 'Đã đánh dấu là chưa xong',
     toastMarkedNotDoneCount: {
+      one: 'Đã đánh dấu {{count}} mục là chưa xong',
       other: 'Đã đánh dấu {{count}} mục là chưa xong',
     },
     toastMarkedNotDonePartial: {
+      one: 'Đã đánh dấu {{accepted}}/{{count}} mục là chưa xong',
       other: 'Đã đánh dấu {{accepted}}/{{count}} mục là chưa xong',
     },
     toastMarkNotDoneFailed: 'Không thể đánh dấu là chưa xong',
     toastCountNotRestored: {
+      one: 'Không thể khôi phục {{count}} mục.',
       other: 'Không thể khôi phục {{count}} mục.',
     },
     toastNotificationsNotRestored: 'Không thể khôi phục một số thông báo.',
     toastWithWarnings: '{{message}}. {{warnings}}',
     toastMarkedRead: 'Đã đánh dấu là đã đọc',
     toastMarkedReadCount: {
+      one: 'Đã đánh dấu {{count}} mục là đã đọc',
       other: 'Đã đánh dấu {{count}} mục là đã đọc',
     },
     toastMarkReadFailed: 'Không thể đánh dấu là đã đọc',
     toastMarkedUnread: 'Đã đánh dấu là chưa đọc',
     toastMarkedUnreadCount: {
+      one: 'Đã đánh dấu {{count}} mục là chưa đọc',
       other: 'Đã đánh dấu {{count}} mục là chưa đọc',
     },
     toastMarkUnreadFailed: 'Không thể đánh dấu là chưa đọc',
     toastMovedToFolder: 'Đã di chuyển vào thư mục',
     toastMovedCount: {
+      one: 'Đã di chuyển {{count}} mục',
       other: 'Đã di chuyển {{count}} mục',
     },
     toastMoveToFolderFailed: 'Không thể di chuyển vào thư mục',
     toastRemovedFromFolder: 'Đã xóa khỏi thư mục',
     toastRemovedCountFromFolder: {
+      one: 'Đã xóa {{count}} mục khỏi thư mục',
       other: 'Đã xóa {{count}} mục khỏi thư mục',
     },
     toastRenamed: 'Đã đổi tên',
     toastRenamedCount: {
+      one: 'Đã đổi tên {{count}} mục',
       other: 'Đã đổi tên {{count}} mục',
     },
     toastRenameFailed: 'Không thể đổi tên',
@@ -740,6 +763,7 @@ export default {
     noSettingsFound: 'Không tìm thấy cài đặt nào',
     searchResults: 'Kết quả tìm kiếm cài đặt',
     searchResultCount: {
+      one: 'Tìm thấy {{count}} cài đặt',
       other: 'Tìm thấy {{count}} cài đặt',
     },
     searchNoResults:
@@ -883,6 +907,7 @@ export default {
     noInboxes: 'Không có hộp thư',
     oneInbox: '1 hộp thư',
     inboxCount: {
+      one: '{{count}} hộp thư',
       other: '{{count}} hộp thư',
     },
     inboxes: 'Hộp thư',

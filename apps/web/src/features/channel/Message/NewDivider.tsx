@@ -1,6 +1,5 @@
-import { formatRelativeDate } from '@core/util/time';
 import { Show } from 'solid-js';
-import { isDateDividerVisible } from './DateDivider';
+import { channelDayLabel, isDateDividerVisible } from './DateDivider';
 import type { ChannelMessageListMeta } from './list-meta';
 import { MessageFlag } from './MessageFlag';
 
@@ -16,7 +15,7 @@ export function NewDivider(props: NewDividerProps) {
     !props.isReply && props.listMeta?.isFirstNewMessage === true;
   const text = () =>
     isDateDividerVisible(props.createdAt, props.listMeta, props.isReply)
-      ? `${formatRelativeDate(props.createdAt)} - New`
+      ? `${channelDayLabel(props.createdAt)} - New`
       : 'New';
 
   return (

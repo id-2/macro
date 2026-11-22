@@ -10,6 +10,7 @@ import { MaybeSoupEntityActionDrawerManager } from '@app/features/soup';
 import { withEntityNotifications } from '@app/features/soup/entity-notifications';
 import { ViewTour } from '@app/features/tours/ViewTour';
 import { TutorialPill } from '@app/features/video-tutorials';
+import { t } from '@app/lib/i18n';
 import { SplitRouter } from '@app/lib/split-router';
 import { usePending } from '@app/observability/flow';
 import { ChannelDetailLayout } from '@channel/Channel/ChannelDetailLayout';
@@ -359,7 +360,7 @@ function ChannelsViewRoot() {
                         <>
                           <ViewShell.TopBar>
                             <ViewSidebar.Title caret={false}>
-                              Chat
+                              {t('nav.chat')}
                             </ViewSidebar.Title>
                           </ViewShell.TopBar>
                           <div class="flex min-h-0 flex-1 items-center justify-center px-6 text-center">

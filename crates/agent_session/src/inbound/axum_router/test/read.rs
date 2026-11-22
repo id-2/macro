@@ -18,7 +18,7 @@ async fn view_router_with_log(log: Vec<crate::domain::model::AgentSessionLog>) -
         purpose: crate::domain::model::SessionPurpose::Standalone,
         repo_branch: None,
         id: AgentSessionId::TEST_A,
-        owner_id: Owner::User(MacroUserIdStr::try_from(OWNER.to_owned()).unwrap()),
+        owner_id: Owner::User(RoxUserIdStr::try_from(OWNER.to_owned()).unwrap()),
         bot_id: BotId::TEST_A,
         thread_id: None,
         originating_message_id: None,
@@ -33,7 +33,7 @@ async fn view_router_with_log(log: Vec<crate::domain::model::AgentSessionLog>) -
     })
     .await
     .unwrap();
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".into(),
@@ -53,7 +53,7 @@ async fn view_router_with_log(log: Vec<crate::domain::model::AgentSessionLog>) -
             ReplicaId::mint(),
         ),
         Arc::new(entity_access::domain::ports::NoOpEntityAccessService),
-        MacroAuthorizationState::new(Arc::new(auth)),
+        RoxAuthorizationState::new(Arc::new(auth)),
     ))
 }
 #[tokio::test]
@@ -80,7 +80,7 @@ async fn detached_session_returns_saved_metadata() {
             Request::builder()
                 .uri(format!("/{}", AgentSessionId::TEST_A))
                 .header(
-                    macro_authorization::INTERNAL_API_KEY_HEADER,
+                    rox_authorization::INTERNAL_API_KEY_HEADER,
                     "test-internal-key",
                 )
                 .body(Body::empty())
@@ -106,7 +106,7 @@ async fn folded_log_serves_the_folded_conversation() {
             Request::builder()
                 .uri(format!("/{}/log/folded", AgentSessionId::TEST_A))
                 .header(
-                    macro_authorization::INTERNAL_API_KEY_HEADER,
+                    rox_authorization::INTERNAL_API_KEY_HEADER,
                     "test-internal-key",
                 )
                 .body(Body::empty())

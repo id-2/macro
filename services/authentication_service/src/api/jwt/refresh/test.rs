@@ -12,7 +12,10 @@ use axum::{
 };
 use fusionauth::FusionAuthClient;
 use jsonwebtoken::{Algorithm, EncodingKey, Header, encode};
-use macro_auth::{constant::MACRO_REFRESH_TOKEN_HEADER, middleware::decode_jwt::JwtValidationArgs};
+use rox_auth::{
+    constant::{LEGACY_REFRESH_TOKEN_HEADER, MACRO_REFRESH_TOKEN_HEADER},
+    middleware::decode_jwt::JwtValidationArgs,
+};
 use model::response::UserTokensResponse;
 use tower::{ServiceBuilder, ServiceExt};
 use tower_cookies::CookieManagerLayer;
@@ -85,6 +88,16 @@ async fn fusionauth(response: ResponseTemplate, calls: u64) -> MockServer {
 }
 
 async fn post_refresh(fusionauth: &MockServer, access_token: &str) -> (StatusCode, String) {
+    post_refresh_with_header(fusionauth, access_token, MACRO_REFRESH_TOKEN_HEADER).await
+}
+
+/// Refresh carrying the refresh token under `header`: the current name or the
+/// pre-rename one.
+async fn post_refresh_with_header(
+    fusionauth: &MockServer,
+    access_token: &str,
+    header: &'static str,
+) -> (StatusCode, String) {
     let auth_client = FusionAuthClient::new(
         "api-key".into(),
         "client-id".into(),
@@ -112,7 +125,7 @@ async fn post_refresh(fusionauth: &MockServer, access_token: &str) -> (StatusCod
                 .method("POST")
                 .uri("/jwt/refresh")
                 .header(AUTHORIZATION, format!("Bearer {access_token}"))
-                .header(MACRO_REFRESH_TOKEN_HEADER, REFRESH_TOKEN)
+                .header(header, REFRESH_TOKEN)
                 .body(Body::empty())
                 .unwrap(),
         )
@@ -121,6 +134,18 @@ async fn post_refresh(fusionauth: &MockServer, access_token: &str) -> (StatusCod
     let status = response.status();
     let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
     (status, String::from_utf8(body.to_vec()).unwrap())
+}
+
+#[tokio::test]
+async fn the_pre_rename_refresh_header_is_accepted() {
+    let fusionauth = fusionauth(refreshed(), 1).await;
+    let access_token = sign(b"", &claims_with_macro_claims(now()));
+    let (status, body) =
+        post_refresh_with_header(&fusionauth, &access_token, LEGACY_REFRESH_TOKEN_HEADER).await;
+
+    assert_eq!(status, StatusCode::OK);
+    let tokens: UserTokensResponse = serde_json::from_str(&body).unwrap();
+    assert_eq!(tokens.refresh_token, "new-refresh-token");
 }
 
 #[tokio::test]

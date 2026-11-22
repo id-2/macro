@@ -14,19 +14,19 @@ import {
 import {
   $createDateMentionNode,
   $isDateMentionNode,
-} from '@macro-inc/lexical-core/nodes/DateMentionNode';
+} from '@rox-one/lexical-core/nodes/DateMentionNode';
 import {
   $createImageNode,
   $isImageNode,
-} from '@macro-inc/lexical-core/nodes/ImageNode';
+} from '@rox-one/lexical-core/nodes/ImageNode';
 import {
   $isTaskListNode,
   TaskListNode,
-} from '@macro-inc/lexical-core/nodes/TaskListNode';
+} from '@rox-one/lexical-core/nodes/TaskListNode';
 import {
   $createVideoNode,
   $isVideoNode,
-} from '@macro-inc/lexical-core/nodes/VideoNode';
+} from '@rox-one/lexical-core/nodes/VideoNode';
 import { $createTextNode, $isElementNode, type LexicalEditor } from 'lexical';
 import { describe, expect, it } from 'vitest';
 import {

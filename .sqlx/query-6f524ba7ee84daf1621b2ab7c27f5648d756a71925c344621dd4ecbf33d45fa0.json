@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO crm_blocked_domains (team_id, domain) VALUES ($1, 'acme.example.com')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "6f524ba7ee84daf1621b2ab7c27f5648d756a71925c344621dd4ecbf33d45fa0"
+}

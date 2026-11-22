@@ -5,8 +5,8 @@ import {
   NodeReplacements,
   ORDERED_LIST_ENTER,
   SupportedNodeTypes,
-} from '@macro-inc/lexical-core';
-import { HR } from '@macro-inc/lexical-core/transformers/transformers';
+} from '@rox-one/lexical-core';
+import { HR } from '@rox-one/lexical-core/transformers/transformers';
 import {
   $createParagraphNode,
   $createTextNode,

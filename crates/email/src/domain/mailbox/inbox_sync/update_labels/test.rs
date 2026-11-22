@@ -1,7 +1,7 @@
 use super::*;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
 }
 
 #[test]

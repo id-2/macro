@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use email::domain::{models::EmailErr, ports::EmailService};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{EmptyResponse, ErrorResponse};
 use uuid::Uuid;
 
@@ -58,7 +58,7 @@ pub struct PathParams {
 #[tracing::instrument(skip(ctx, authorization), err(Debug))]
 pub async fn seen_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(PathParams { id: thread_id }): Path<PathParams>,
 ) -> Result<Response, SeenThreadError> {
     ctx.email_service

@@ -5,7 +5,7 @@ import { EntityType } from '@service-storage/generated/schemas/entityType';
 export const TASK_GRID_COLUMNS = [
   {
     id: 'priority',
-    label: 'Priority',
+    label: 'Приоритет',
     defId: SYSTEM_PROPERTY_IDS.PRIORITY,
     dataType: DataType.SELECT_STRING,
     isMultiSelect: false,
@@ -15,7 +15,7 @@ export const TASK_GRID_COLUMNS = [
   },
   {
     id: 'status',
-    label: 'Status',
+    label: 'Статус',
     defId: SYSTEM_PROPERTY_IDS.STATUS,
     dataType: DataType.SELECT_STRING,
     isMultiSelect: false,
@@ -26,7 +26,7 @@ export const TASK_GRID_COLUMNS = [
   },
   {
     id: 'assignees',
-    label: 'Assignees',
+    label: 'Исполнители',
     defId: SYSTEM_PROPERTY_IDS.ASSIGNEES,
     dataType: DataType.ENTITY,
     isMultiSelect: true,

@@ -3,8 +3,8 @@ use crate::links::get::{
     fetch_owned_link_for_message, fetch_owned_link_for_thread, fetch_primary_link_by_macro_id,
     fetch_readable_owned_inboxes,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::email::db;
 use models_email::service::backfill::BackfillJobStatus;
 use models_email::service::link::UserProvider;
@@ -15,8 +15,8 @@ const CHILD: &str = "macro|sharedbox@corp.test"; // owns the inbox
 const PRIMARY: &str = "macro|primary@corp.test"; // delegate
 const STRANGER: &str = "macro|stranger@corp.test"; // no relationship
 
-fn macro_id(s: &str) -> MacroUserIdStr<'_> {
-    MacroUserIdStr::try_from(s).unwrap()
+fn macro_id(s: &str) -> RoxUserIdStr<'_> {
+    RoxUserIdStr::try_from(s).unwrap()
 }
 
 /// macro_user + "User" rows so macro_user_links FKs resolve.
@@ -673,7 +673,7 @@ async fn fetch_primary_link_uses_first_party_address_not_legacy_user_id(
     insert_user(&pool, CHILD, "sharedbox@corp.test").await;
     let (external, _, _) =
         insert_inbox_with_thread_and_message(&pool, CHILD, "sharedbox@corp.test").await;
-    let rox_address = format!("ada@{macro_user_id::handle::ROX_MAIL_DOMAIN}");
+    let rox_address = format!("ada@{}", rox_user_id::handle::ROX_MAIL_DOMAIN);
     let (rox, _, _) = insert_inbox_with_thread_and_message(&pool, CHILD, &rox_address).await;
     sqlx::query!(
         "UPDATE email_links SET is_primary = (id = $1), provider = CASE WHEN id = $1 THEN 'ROX' ELSE provider END",

@@ -6,7 +6,7 @@ use axum::{
     http::{StatusCode, header},
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use uuid::Uuid;
 
 #[derive(serde::Deserialize)]
@@ -20,7 +20,7 @@ pub struct TokenRequest {
 
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Query(request): Query<TokenRequest>,
 ) -> Response {
     let Some(service) = ctx.microsoft_auth else {
@@ -54,7 +54,7 @@ pub async fn handler(
 /// Internal teardown route; never accepted for active or superseded bindings.
 pub async fn disconnect_handler(
     State(ctx): State<ApiContext>,
-    _authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Query(request): Query<TokenRequest>,
 ) -> Response {
     let Some(service) = ctx.microsoft_auth else {

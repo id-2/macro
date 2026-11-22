@@ -2,7 +2,7 @@
 
 use super::{AllowanceDecision, BillingService, DenyReason};
 use ai_usage::{AiFeature, AiUsageEnforcement};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{future::Future, pin::Pin, sync::Arc};
 
 #[cfg(test)]
@@ -46,7 +46,7 @@ pub type AdmissionFuture<'a> =
 /// Never substitute the system identity for an unknown or missing caller.
 pub trait AiAdmissionService: Send + Sync + 'static {
     /// Validate new AI work. Denial and validation failure both prevent execution.
-    fn admit<'a>(&'a self, user: &'a MacroUserIdStr<'_>, feature: AiFeature)
+    fn admit<'a>(&'a self, user: &'a RoxUserIdStr<'_>, feature: AiFeature)
     -> AdmissionFuture<'a>;
 }
 
@@ -58,7 +58,7 @@ pub struct DisabledAiAdmissionService;
 impl AiAdmissionService for DisabledAiAdmissionService {
     fn admit<'a>(
         &'a self,
-        _user: &'a MacroUserIdStr<'_>,
+        _user: &'a RoxUserIdStr<'_>,
         _feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async { Ok(()) })
@@ -85,7 +85,7 @@ impl<B: BillingService> BillingAdmissionService<B> {
 impl<B: BillingService> AiAdmissionService for BillingAdmissionService<B> {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         // Use exactly the counting policy, before touching any billing port.

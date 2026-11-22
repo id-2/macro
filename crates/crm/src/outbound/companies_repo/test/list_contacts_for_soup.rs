@@ -5,7 +5,7 @@ use crate::domain::{
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
 use filter_ast::Expr;
 use item_filters::ast::crm_contact::CrmContactLiteral as Contact;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 

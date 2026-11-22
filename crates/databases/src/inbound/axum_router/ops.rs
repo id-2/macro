@@ -103,13 +103,13 @@ impl From<OpRefusal> for OpRefusalResponse {
 pub async fn apply_ops_handler<Service, EntityAccess, Authorization>(
     access: DatabaseAccessLevelExtractor<EditAccessLevel, EntityAccess, Authorization>,
     State(state): State<DatabasesRouterState<Service, EntityAccess, Authorization>>,
-    user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     Json(request): Json<ApplyOpsRequest>,
 ) -> Result<Json<ApplyOpsResponse>, DatabaseError>
 where
     Service: DatabasesService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let applied = state
         .service

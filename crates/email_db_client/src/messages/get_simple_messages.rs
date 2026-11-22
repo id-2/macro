@@ -43,7 +43,7 @@ where
             m.from_contact_id, m.sent_at, m.has_attachments, m.is_read, m.is_starred, m.is_sent, m.is_draft,
             NULL::TEXT as body_text,
             NULL::TEXT as body_html_sanitized,
-            NULL::TEXT as body_macro,
+            NULL::TEXT as body_rox,
             m.headers_jsonb, m.created_at, m.updated_at
         FROM email_messages m
         WHERE m.provider_id = $1 AND m.link_id = $2
@@ -101,7 +101,7 @@ pub async fn get_simple_message(
             m.from_contact_id, m.sent_at, m.has_attachments, m.is_read, m.is_starred, m.is_sent, m.is_draft,
             NULL::TEXT as body_text,
             NULL::TEXT as body_html_sanitized,
-            NULL::TEXT as body_macro,
+            NULL::TEXT as body_rox,
             m.headers_jsonb, m.created_at, m.updated_at
         FROM email_messages m
         JOIN email_links l ON m.link_id = l.id
@@ -141,7 +141,7 @@ pub async fn get_simple_messages_batch(
             m.from_contact_id, m.sent_at, m.has_attachments, m.is_read, m.is_starred, m.is_sent, m.is_draft,
             NULL::TEXT as body_text,
             NULL::TEXT as body_html_sanitized,
-            NULL::TEXT as body_macro,
+            NULL::TEXT as body_rox,
             m.headers_jsonb, m.created_at, m.updated_at
         FROM email_messages m
         JOIN email_links l ON m.link_id = l.id
@@ -197,7 +197,7 @@ where
             m.is_draft,
             NULL::TEXT as body_text,
             NULL::TEXT as body_html_sanitized,
-            NULL::TEXT as body_macro,
+            NULL::TEXT as body_rox,
             m.headers_jsonb,
             m.created_at,
             m.updated_at
@@ -239,7 +239,7 @@ pub async fn get_first_simple_message_draft(
             m.from_contact_id, m.sent_at, m.has_attachments, m.is_read, m.is_starred, m.is_sent, m.is_draft,
             NULL::TEXT as body_text,
             NULL::TEXT as body_html_sanitized,
-            NULL::TEXT as body_macro,
+            NULL::TEXT as body_rox,
             m.headers_jsonb, m.created_at, m.updated_at
         FROM email_messages m
         WHERE m.link_id = $1

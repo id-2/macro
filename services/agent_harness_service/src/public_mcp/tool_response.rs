@@ -2,7 +2,7 @@
 
 use crate::public_mcp::markdown_images::{MarkdownImageResolver, tool_result_with_images};
 use futures::future::join_all;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rmcp::model::{CallToolResult, ContentBlock, Resource};
 use serde_json::Value;
 use std::collections::HashSet;
@@ -30,7 +30,7 @@ struct ChannelMedia {
 /// Called only after the tool has authorized and successfully read its data.
 pub(crate) async fn tool_result_with_media<R: MarkdownImageResolver>(
     resolver: &R,
-    user_id: &MacroUserIdStr<'_>,
+    user_id: &RoxUserIdStr<'_>,
     tool_name: &str,
     static_file_base_url: &Url,
     mut value: Value,

@@ -1,0 +1,28 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        SELECT t.provider_id AS \"provider_id!\", crm_email_thread_allowed($1, t.id) AS \"allowed!\"\n        FROM email_threads t WHERE t.provider_id LIKE 'ph:%'\n        ORDER BY 1\n        ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "provider_id!",
+        "type_info": "Text"
+      },
+      {
+        "ordinal": 1,
+        "name": "allowed!",
+        "type_info": "Bool"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      true,
+      null
+    ]
+  },
+  "hash": "fae50f601e0149f318d4d365f30bc2c58c6cd623d6d95d3fd9f70d7a1c1fde63"
+}

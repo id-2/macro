@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO crm_contact_emails (contact_id, email) VALUES ($1, 'selected@client.example')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "86f387e76fa012399aaa1f4ab91ba93e5267e70eaa18d103eb163f626d8518c6"
+}

@@ -26,7 +26,7 @@ async fn completion_rows(pool: &PgPool) -> Vec<CompletionRow> {
     .unwrap()
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn republish_completion_marks_only_the_existing_job_outbox_pending(pool: PgPool) {
     let job = Uuid::now_v7();
     let other_job = Uuid::now_v7();

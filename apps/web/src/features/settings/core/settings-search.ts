@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import type { SettingsTab } from '@core/constant/SettingsState';
 import type {
   SettingsTabGroup,
@@ -7,6 +8,7 @@ import { NOTIFICATION_EVENT_GROUPS } from '../../notifications/notification-even
 import { settingsTarget } from './settings-target';
 
 type Setting = {
+  id: string;
   tab: SettingsTab;
   title: string;
   target?: string;
@@ -21,139 +23,168 @@ export type SettingsSearchResult = Setting & {
   group: string;
 };
 
+/** Notification rows, named as the Notifications page renders them. */
+function notificationSettings(): Setting[] {
+  return NOTIFICATION_EVENT_GROUPS.flatMap((group) =>
+    group.events.map((event) => {
+      const groupLabel = t(group.labelKey);
+      return {
+        id: event.type,
+        tab: 'Notifications' as const,
+        title: `${t(event.labelKey)} · ${groupLabel}`,
+        target: groupLabel,
+        keywords: `${groupLabel} ${t(event.descriptionKey)}`,
+        macroComputers: event.macroComputers,
+      };
+    })
+  );
+}
+
 // Targets are the visible SettingsSection/SettingsRow labels, not DOM selectors.
 // Keep individual controls here so finding a setting doesn't require its page name.
-const SETTINGS: Setting[] = [
+/** The catalog, named as the screens render their sections. */
+function settingsCatalog(): Setting[] {
+  return [
   {
     tab: 'CRM',
-    title: 'Stages',
-    target: 'Stages',
+    id: 'stages',
+    title: t('settingsSearch.stagesTitle'),
+    target: t('settingsSearch.stagesTarget'),
     keywords: 'company deal pipeline reorder rename status sales',
   },
   {
     tab: 'CRM',
-    title: 'Team CRM',
-    target: 'Team CRM',
+    id: 'teamCrm',
+    title: t('settingsSearch.teamCrmTitle'),
+    target: t('settingsSearch.teamCrmTarget'),
     keywords: 'enable disable customers contacts companies team',
   },
   {
     tab: 'Shortcuts',
-    title: 'Search and command menu shortcuts',
-    target: 'Core',
+    id: 'commandShortcuts',
+    title: t('settingsSearch.commandShortcutsTitle'),
+    target: t('settingsSearch.commandShortcutsTarget'),
     keywords: 'keyboard hotkeys find create settings chat',
   },
   {
     tab: 'Shortcuts',
-    title: 'Split navigation shortcuts',
-    target: 'Splits',
+    id: 'splitShortcuts',
+    title: t('settingsSearch.splitShortcutsTitle'),
+    target: t('settingsSearch.splitShortcutsTarget'),
     keywords: 'keyboard hotkeys back forward panel close',
   },
   {
     tab: 'Shortcuts',
-    title: 'List and email shortcuts',
-    target: 'Unified List',
+    id: 'listShortcuts',
+    title: t('settingsSearch.listShortcutsTitle'),
+    target: t('settingsSearch.listShortcutsTarget'),
     keywords: 'keyboard hotkeys select read unread delete preview',
   },
-
-  ...NOTIFICATION_EVENT_GROUPS.flatMap((group) =>
-    group.events.map((event) => ({
-      tab: 'Notifications' as const,
-      title: `${event.label} · ${group.label}`,
-      target: group.label,
-      keywords: `${group.label} ${event.description}`,
-      macroComputers: event.macroComputers,
-    }))
-  ),
   {
     tab: 'Email',
-    title: 'Email accounts',
-    target: 'Accounts',
+    id: 'emailAccounts',
+    title: t('settingsSearch.emailAccountsTitle'),
+    target: t('settingsSearch.emailAccountsTarget'),
     keywords: 'gmail connect add inbox sync reconnect remove',
   },
   {
     tab: 'Email',
-    title: 'Email row style',
-    target: 'Display options',
+    id: 'emailRowStyle',
+    title: t('settingsSearch.emailRowStyleTitle'),
+    target: t('settingsSearch.emailRowStyleTarget'),
     keywords:
       'display options minimalist classic list rows unread bold divider checkbox density',
   },
   {
     tab: 'Email',
-    title: 'Email signatures',
-    target: 'Signatures',
+    id: 'emailSignatures',
+    title: t('settingsSearch.emailSignaturesTitle'),
+    target: t('settingsSearch.emailSignaturesTarget'),
     keywords: 'signature footer signoff formatting image replies forwards',
   },
   {
     tab: 'Calendar',
-    title: 'Connected calendars',
-    target: 'Connected calendars',
+    id: 'connectedCalendars',
+    title: t('settingsSearch.connectedCalendarsTitle'),
+    target: t('settingsSearch.connectedCalendarsTarget'),
     keywords:
       'google gmail connect accounts visibility show hide color colour subcalendar',
   },
   {
     tab: 'Calendar',
-    title: 'Next meeting countdown',
-    target: 'Next meeting countdown',
+    id: 'nextMeeting',
+    title: t('settingsSearch.nextMeetingTitle'),
+    target: t('settingsSearch.nextMeetingTarget'),
     keywords: 'sidebar badge upcoming meeting minutes now timer hide',
   },
   {
     tab: 'Agents',
-    title: 'Team agents',
-    target: 'Team agents',
+    id: 'teamAgents',
+    title: t('settingsSearch.teamAgentsTitle'),
+    target: t('settingsSearch.teamAgentsTarget'),
     keywords: 'shared ai assistant configure',
   },
   {
     tab: 'Agents',
-    title: 'Private agents',
-    target: 'Private agents',
+    id: 'privateAgents',
+    title: t('settingsSearch.privateAgentsTitle'),
+    target: t('settingsSearch.privateAgentsTarget'),
     keywords: 'personal ai assistant configure',
   },
   {
     tab: 'Harness',
-    title: 'Agent machines and credentials',
+    id: 'agentMachines',
+    title: t('settingsSearch.agentMachinesTitle'),
     keywords:
       'cursor harness runtime machine computer api key provider pairing daemon',
   },
   {
     tab: 'Harness',
-    title: 'Run agents on this computer',
+    id: 'localAgents',
+    title: t('settingsSearch.localAgentsTitle'),
     keywords:
       'local runtime roxd this computer machine claude code codex desktop daemon',
   },
   {
     tab: 'Account',
-    title: 'Profile picture',
-    target: 'Profile',
+    id: 'profilePicture',
+    title: t('settingsSearch.profilePictureTitle'),
+    target: t('settingsSearch.profilePictureTarget'),
     keywords: 'avatar photo image',
   },
   {
     tab: 'Account',
-    title: 'Name and email address',
-    target: 'Profile',
+    id: 'nameAndEmail',
+    title: t('settingsSearch.nameAndEmailTitle'),
+    target: t('settingsSearch.nameAndEmailTarget'),
     keywords: 'first last profile account',
   },
   {
     tab: 'Account',
-    title: 'Delete account',
-    target: 'Delete account',
+    id: 'deleteAccount',
+    title: t('settingsSearch.deleteAccountTitle'),
+    target: t('settingsSearch.deleteAccountTarget'),
     keywords: 'remove close deletion',
   },
   {
     tab: 'Appearance',
-    title: 'Color theme',
-    target: 'Color Theme',
+    id: 'colorTheme',
+    title: t('settingsSearch.colorThemeTitle'),
+    target: t('settingsSearch.colorThemeTarget'),
     keywords: 'dark light system mode custom colour',
   },
   {
     tab: 'Appearance',
-    title: 'Monochrome icons',
-    target: 'Monochrome icons',
+    id: 'monochromeIcons',
+    title: t('settingsSearch.monochromeIconsTitle'),
+    target: t('settingsSearch.monochromeIconsTarget'),
     keywords: 'color colourful sidebar',
   },
   {
     tab: 'Appearance',
-    title: 'Interface language',
-    target: 'Language',
+    id: 'interfaceLanguage',
+    title: t('settingsSearch.interfaceLanguageTitle'),
+    target: t('settingsSearch.interfaceLanguageTarget'),
     // The word for "language" in each interface language, so people can find
     // it in their own.
     keywords:
@@ -161,203 +192,238 @@ const SETTINGS: Setting[] = [
   },
   {
     tab: 'Appearance',
-    title: 'Show tooltips',
-    target: 'Show tooltips',
+    id: 'showTooltips',
+    title: t('settingsSearch.showTooltipsTitle'),
+    target: t('settingsSearch.showTooltipsTarget'),
     keywords: 'hover hints help',
   },
   {
     tab: 'Notifications',
-    title: 'Notification delivery',
-    target: 'Delivery',
+    id: 'notificationDelivery',
+    title: t('settingsSearch.notificationDeliveryTitle'),
+    target: t('settingsSearch.notificationDeliveryTarget'),
     keywords: 'push desktop browser mobile alerts permissions',
   },
   {
     tab: 'Notifications',
-    title: 'Email digest',
-    target: 'Email digest',
+    id: 'emailDigest',
+    title: t('settingsSearch.emailDigestTitle'),
+    target: t('settingsSearch.emailDigestTarget'),
     keywords: 'summary notification daily mail',
   },
   {
     tab: 'Notifications',
-    title: 'Quiet hours',
-    target: 'Quiet hours',
+    id: 'quietHours',
+    title: t('settingsSearch.quietHoursTitle'),
+    target: t('settingsSearch.quietHoursTarget'),
     keywords: 'schedule do not disturb dnd silence mute night timezone',
   },
   {
     tab: 'Notifications',
-    title: 'Snoozed items',
-    target: 'Snoozed items',
+    id: 'snoozedItems',
+    title: t('settingsSearch.snoozedItemsTitle'),
+    target: t('settingsSearch.snoozedItemsTarget'),
     keywords: 'pause resume notifications',
   },
   {
     tab: 'Notifications',
-    title: 'Muted items',
-    target: 'Muted items',
+    id: 'mutedItems',
+    title: t('settingsSearch.mutedItemsTitle'),
+    target: t('settingsSearch.mutedItemsTarget'),
     keywords: 'unmute silence notifications',
   },
   {
     tab: 'Billing',
-    title: 'Plan and payment',
-    target: 'Subscription',
+    id: 'planAndPayment',
+    title: t('settingsSearch.planAndPaymentTitle'),
+    target: t('settingsSearch.planAndPaymentTarget'),
     keywords: 'subscription invoice billing credit card cancel manage upgrade',
   },
   {
     tab: 'Billing',
-    title: 'AI usage',
-    target: 'AI usage',
+    id: 'aiUsage',
+    title: t('settingsSearch.aiUsageTitle'),
+    target: t('settingsSearch.aiUsageTarget'),
     keywords: 'limits quota tokens credits consumption',
   },
   {
     tab: 'Team',
-    title: 'Team name and URL',
-    target: 'General',
+    id: 'teamName',
+    title: t('settingsSearch.teamNameTitle'),
+    target: t('settingsSearch.teamNameTarget'),
     keywords: 'workspace slug rename',
   },
   {
     tab: 'Team Members',
-    title: 'Invite people',
+    id: 'invitePeople',
+    title: t('settingsSearch.invitePeopleTitle'),
     keywords: 'invite add teammates coworkers colleagues email join team',
   },
   {
     tab: 'Team Members',
-    title: 'Member roles',
+    id: 'memberRoles',
+    title: t('settingsSearch.memberRolesTitle'),
     keywords: 'admin owner permissions remove users team',
   },
   {
     tab: 'Team Members',
-    title: 'Pending invites',
-    target: 'Pending invites',
+    id: 'pendingInvites',
+    title: t('settingsSearch.pendingInvitesTitle'),
+    target: t('settingsSearch.pendingInvitesTarget'),
     keywords: 'invitations cancel resend copy link team',
   },
   {
     tab: 'Team Members',
-    title: 'Auto-join on domain',
-    target: 'Auto-join on domain',
+    id: 'autoJoinDomain',
+    title: t('settingsSearch.autoJoinDomainTitle'),
+    target: t('settingsSearch.autoJoinDomainTarget'),
     keywords: 'email workspace membership automatic',
   },
   {
     tab: 'Team Members',
-    title: 'Members can invite',
-    target: 'Members can invite',
+    id: 'membersCanInvite',
+    title: t('settingsSearch.membersCanInviteTitle'),
+    target: t('settingsSearch.membersCanInviteTarget'),
     keywords: 'permissions invitation',
   },
   {
     tab: 'Team',
-    title: 'Default link sharing',
-    target: 'Default link sharing',
+    id: 'defaultLinkSharing',
+    title: t('settingsSearch.defaultLinkSharingTitle'),
+    target: t('settingsSearch.defaultLinkSharingTarget'),
     keywords: 'access public private permission',
   },
   {
     tab: 'Tags',
-    title: 'Personal tags',
-    target: 'Personal',
+    id: 'personalTags',
+    title: t('settingsSearch.personalTagsTitle'),
+    target: t('settingsSearch.personalTagsTarget'),
     keywords: 'label organize category',
   },
   {
     tab: 'Tags',
-    title: 'Team tags',
-    target: 'Team',
+    id: 'teamTags',
+    title: t('settingsSearch.teamTagsTitle'),
+    target: t('settingsSearch.teamTagsTarget'),
     keywords: 'shared label workspace category',
   },
-  // Integrations rows are targeted by name.
   {
     tab: 'Connected',
-    title: 'Gmail',
-    target: 'Gmail',
+    id: 'gmail',
+    title: t('settingsSearch.gmailTitle'),
+    target: t('settingsSearch.gmailTarget'),
     keywords: 'email google workspace inbox calendar connect account',
   },
   {
     tab: 'Connected',
-    title: 'Outlook',
-    target: 'Outlook',
+    id: 'outlook',
+    title: t('settingsSearch.outlookTitle'),
+    target: t('settingsSearch.outlookTarget'),
     keywords: 'email microsoft 365 inbox calendar connect account',
   },
   {
     tab: 'Connected',
-    title: 'GitHub',
-    target: 'GitHub',
+    id: 'github',
+    title: t('settingsSearch.githubTitle'),
+    target: t('settingsSearch.githubTarget'),
     keywords:
       'connect integration repository pull request code app install team',
   },
   {
     tab: 'Connected',
-    title: 'Slack',
-    target: 'Slack',
+    id: 'slack',
+    title: t('settingsSearch.slackTitle'),
+    target: t('settingsSearch.slackTarget'),
     keywords: 'chat messages channels agent tools mcp connect',
   },
   {
     tab: 'Connected',
-    title: 'Import from Slack',
-    target: 'Slack',
+    id: 'importSlack',
+    title: t('settingsSearch.importSlackTitle'),
+    target: t('settingsSearch.importSlackTarget'),
     keywords: 'slack export channels messages history team',
   },
   {
     tab: 'Connected',
-    title: 'Linear',
-    target: 'Linear',
+    id: 'linear',
+    title: t('settingsSearch.linearTitle'),
+    target: t('settingsSearch.linearTarget'),
     keywords: 'issues tasks projects agent tools mcp connect import',
   },
   {
     tab: 'Connected',
-    title: 'Notion',
-    target: 'Notion',
+    id: 'notion',
+    title: t('settingsSearch.notionTitle'),
+    target: t('settingsSearch.notionTarget'),
     keywords: 'pages wikis docs agent tools mcp connect import',
   },
   {
     tab: 'Connected',
-    title: 'Granola',
-    target: 'Granola',
+    id: 'granola',
+    title: t('settingsSearch.granolaTitle'),
+    target: t('settingsSearch.granolaTarget'),
     keywords: 'meetings notes transcripts calls import',
   },
   {
     tab: 'Connected',
-    title: 'Claude Code, Codex, and ChatGPT',
-    target: 'Claude Code, Codex, and ChatGPT',
+    id: 'aiApps',
+    title: t('settingsSearch.aiAppsTitle'),
+    target: t('settingsSearch.aiAppsTarget'),
     keywords: 'ai apps mcp ide setup',
   },
   {
     tab: 'Connected',
-    title: 'Coding agents on your computer',
-    target: 'Coding agents on your computer',
+    id: 'codingAgents',
+    title: t('settingsSearch.codingAgentsTitle'),
+    target: t('settingsSearch.codingAgentsTarget'),
     keywords: 'local harness hermes openclaw desktop stream sessions',
   },
   {
     tab: 'Connected',
-    title: 'Custom MCP server',
+    id: 'customMcp',
+    title: t('settingsSearch.customMcpTitle'),
     keywords: 'add mcp server url integration',
   },
   {
     tab: 'Connected',
-    title: 'Agent apps and tools',
+    id: 'agentApps',
+    title: t('settingsSearch.agentAppsTitle'),
     keywords:
       'mcp integration connect external services catalog airtable trello jira asana google drive dropbox',
   },
   {
     tab: 'Agent',
-    title: 'Connect to the Rox MCP server',
+    id: 'connectMcp',
+    title: t('settingsSearch.connectMcpTitle'),
     keywords: 'claude chatgpt external client url setup',
   },
   {
     tab: 'API Keys',
-    title: 'Create and revoke API keys',
+    id: 'apiKeys',
+    title: t('settingsSearch.apiKeysTitle'),
     keywords: 'token secret developer authentication',
   },
   {
     tab: 'Account Managers',
-    title: 'See and revoke the agents managing your account',
+    id: 'accountManagers',
+    title: t('settingsSearch.accountManagersTitle'),
     keywords: 'agent manager token access revoke',
   },
   {
     tab: 'Desktop App',
-    title: 'Desktop app version and download',
+    id: 'desktopApp',
+    title: t('settingsSearch.desktopAppTitle'),
     keywords: 'download mac macos linux version latest release updated',
   },
   {
     tab: 'Mobile App',
-    title: 'Mobile app version and download',
+    id: 'mobileApp',
+    title: t('settingsSearch.mobileAppTitle'),
     keywords: 'download phone ios android qr code version build bundle',
   },
-];
+  ...notificationSettings(),
+  ];
+}
 
 /**
  * Lowercased words with Latin accents stripped. Any script counts, so a label
@@ -427,12 +493,11 @@ export function searchSettings(
       page,
       group,
     },
-    ...SETTINGS.filter(
+    ...settingsCatalog().filter(
       (setting) =>
         setting.tab === page.tab &&
-        (options.emailRowStyle !== false ||
-          setting.title !== 'Email row style') &&
-        (options.outlook !== false || setting.title !== 'Outlook') &&
+        (options.emailRowStyle !== false || setting.id !== 'emailRowStyle') &&
+        (options.outlook !== false || setting.id !== 'outlook') &&
         (options.macroComputers !== false || !setting.macroComputers)
     ).map((setting) => ({
       ...setting,

@@ -20,7 +20,7 @@ import avatarGabriel from '../../../assets/people/gabriel.webp';
 import avatarJacob from '../../../assets/people/jacob-work.webp';
 import avatarTeo from '../../../assets/people/teo.webp';
 import { createVisible } from '../../utils/utilVisible';
-import { MacroMarkIcon } from '../graphics/MacroMarkIcon';
+import { RoxMarkIcon } from '../graphics/RoxMarkIcon';
 
 // ---------------------------------------------------------------------------
 // @mention an agent — a thread playing out: Jacob asks the agent to catch him
@@ -614,7 +614,7 @@ export function AgentThreadGraphic() {
               <div class="atg-agentrow">
                 <Rail h={RAIL_H_FIRST} draw={elbowDraw() * (1 - out())} />
                 <div class="atg-agentface">
-                  <MacroMarkIcon
+                  <RoxMarkIcon
                     style={{ color: '#ff8f00', height: '14px', width: '14px' }}
                   />
                 </div>
@@ -721,7 +721,7 @@ export function AgentThreadGraphic() {
               <div class="atg-agentrow" style={enter(agent2In())}>
                 <Rail h={RAIL_H_REST} draw={agent2In()} />
                 <div class="atg-agentface">
-                  <MacroMarkIcon
+                  <RoxMarkIcon
                     style={{ color: '#ff8f00', height: '14px', width: '14px' }}
                   />
                 </div>

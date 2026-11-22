@@ -4,7 +4,7 @@ use super::super::initialization::{InitializationError, InitializeMailbox};
 use super::{ConnectionError, ConnectionRequest, GoogleConnectionAttempt, SharedInboxPromotion};
 use calendar_events::domain::models::{AppliedGoogleGrant, CalendarGrantIntent};
 use email_api_client::domain::models::{AccessToken, EmailApiError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::link::Link;
 use uuid::Uuid;
 
@@ -19,7 +19,7 @@ pub trait ConnectionLinkLookup: Send + Sync + 'static {
     fn by_identity(
         &self,
         owner: &str,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<Uuid>, Self::Err>> + Send;
     fn by_grant(
         &self,
@@ -46,7 +46,7 @@ pub trait ConnectionLinks: Send + Sync + 'static {
     fn link_for_identity(
         &self,
         owner: &str,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Option<Uuid>, Self::Err>> + Send;
     fn link_for_grant(
         &self,

@@ -31,7 +31,7 @@ pub fn provision_indices(
     let username = env
         .get("OPENSEARCH_USERNAME")
         .cloned()
-        .unwrap_or_else(|| "macrouser".to_string());
+        .unwrap_or_else(|| "roxuser".to_string());
     let password = env
         .get("OPENSEARCH_PASSWORD")
         .cloned()

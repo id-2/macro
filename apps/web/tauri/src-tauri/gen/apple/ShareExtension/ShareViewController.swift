@@ -4,8 +4,8 @@ import UniformTypeIdentifiers
 
 class ShareViewController: UIViewController {
 
-    private let appGroupId = "group.com.macro.app.prod"
-    private let appURLScheme = "macro"
+    private let appGroupId = "group.com.rox.app.prod"
+    private let appURLScheme = "rox"
     private var timeoutWorkItem: DispatchWorkItem?
     private var didComplete = false
 

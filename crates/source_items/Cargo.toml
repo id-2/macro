@@ -5,21 +5,21 @@ publish = false
 version = "0.1.0"
 
 [features]
-cli = ["dep:clap", "dep:macro_env_var", "dep:macro_entrypoint"]
+cli = ["dep:clap", "dep:rox_env_var", "dep:rox_entrypoint"]
 
 [dependencies]
 clap = { workspace = true, features = ["derive"], optional = true }
-macro_env_var = { path = "../macro_env_var", optional = true }
+rox_env_var = { path = "../rox_env_var", optional = true }
 model-entity = { path = "../model-entity" }
 rootcause = { workspace = true }
 sqlx = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "time"] }
 tracing = { workspace = true }
-macro_entrypoint = { path = "../macro_entrypoint", optional = true }
+rox_entrypoint = { path = "../rox_entrypoint", optional = true }
 workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 rand = { workspace = true }
 
 [[bin]]

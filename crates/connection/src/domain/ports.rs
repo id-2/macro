@@ -2,9 +2,9 @@
 //!
 //! These traits define the contracts that adapters must implement.
 
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 
 use crate::domain::models::{ConnectionError, InvalidationEvent};
@@ -17,14 +17,14 @@ pub trait ConnectionGateway: Send + Sync + 'static {
     /// Bulk sends an invalidation event
     fn bulk_send_invalidation_event<'a, T: std::fmt::Debug + serde::Serialize + Send>(
         &self,
-        users: &[MacroUserId<Lowercase<'a>>],
+        users: &[RoxUserId<Lowercase<'a>>],
         invalidation_event: InvalidationEvent<'a, T>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Sends an arbitrary message to a list of users.
     fn batch_send_message<'a>(
         &self,
-        users: &[MacroUserIdStr<'a>],
+        users: &[RoxUserIdStr<'a>],
         message_type: &str,
         message: serde_json::Value,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
@@ -41,7 +41,7 @@ pub trait ConnectionService: Send + Sync + 'static {
     /// Sends an arbitrary message to the given list of users via the connection gateway.
     fn send_channel_message<'a>(
         &self,
-        users: &[MacroUserIdStr<'a>],
+        users: &[RoxUserIdStr<'a>],
         message_type: &str,
         message: serde_json::Value,
     ) -> impl Future<Output = Result<(), ConnectionError>> + Send;

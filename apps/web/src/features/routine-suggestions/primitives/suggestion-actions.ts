@@ -1,6 +1,6 @@
 import { analytics } from '@app/lib/analytics';
 import { t } from '@app/lib/i18n';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { type Accessor, createSignal } from 'solid-js';
 import type { ScheduleDraft } from '../../routines/core/draft';
 import type { Knob } from '../../routines/core/knobs';

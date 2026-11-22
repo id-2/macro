@@ -8,7 +8,7 @@ use agent_session::domain::model::AgentSessionId;
 use agent_session::domain::ports::SessionTurnObserver;
 use agent_session::domain::session::{CloseReason, StopReason};
 use entity_access::domain::models::{EntityAccessReceipt, OwnerAccessLevel, ViewAccessLevel};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio_util::task::TaskTracker;
 
 use super::ArchiveOnRuntimeClosed;
@@ -19,13 +19,13 @@ struct RecordingArchive {
 }
 
 impl AutoArchive for RecordingArchive {
-    async fn preferences(&self, _user: &MacroUserIdStr<'static>) -> Result<AutoArchivePreferences> {
+    async fn preferences(&self, _user: &RoxUserIdStr<'static>) -> Result<AutoArchivePreferences> {
         unreachable!("only runtime_closed is under test")
     }
 
     async fn set_preferences(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _preferences: AutoArchivePreferences,
     ) -> Result<()> {
         unreachable!("only runtime_closed is under test")

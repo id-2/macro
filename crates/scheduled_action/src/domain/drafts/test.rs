@@ -12,13 +12,13 @@ use super::*;
 use crate::domain::code_check::{self, test::Checker};
 use crate::domain::models::{ActionConfiguration, ActionKind, CreatedItem};
 use crate::domain::ports::{HandedBack, StaleDraft};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 pub(super) const OWNER: &str = "macro|owner@example.com";
 pub(super) const BUG_REPORTS: &str = "every time a message gets sent in bug-reports make a task";
 
-pub(super) fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER).unwrap()
+pub(super) fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER).unwrap()
 }
 
 /// Drafts in memory, as the table keeps them; a background draft's row
@@ -26,7 +26,7 @@ pub(super) fn owner() -> MacroUserIdStr<'static> {
 #[derive(Default)]
 pub(super) struct Rows {
     pub(super) drafts:
-        Mutex<HashMap<Uuid, (MacroUserIdStr<'static>, BotId, HandedBack, DateTime<Utc>)>>,
+        Mutex<HashMap<Uuid, (RoxUserIdStr<'static>, BotId, HandedBack, DateTime<Utc>)>>,
     pub(super) jobs: Mutex<HashMap<Uuid, JobRow>>,
     pub(super) finished: Mutex<Vec<Uuid>>,
     /// How many writes of a job's result fail before one succeeds.
@@ -54,7 +54,7 @@ impl DraftHandBacks for Rows {
     async fn begin(
         &self,
         session: Uuid,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: BotId,
     ) -> Result<()> {
         self.drafts.lock().unwrap().insert(
@@ -67,7 +67,7 @@ impl DraftHandBacks for Rows {
     async fn record(
         &self,
         session: Uuid,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         check: &RoutineCheck,
         created: &[CreatedItem],
     ) -> Result<bool> {
@@ -536,12 +536,12 @@ async fn a_draft_runs_in_a_hidden_read_only_session_and_hands_back_its_last_chec
 /// session finds the channel itself and the draft watches it.
 #[tokio::test]
 async fn a_large_workspace_drafts_the_channel_the_description_names() {
-    let bug_reports = macro_uuid::generate_uuid_v7();
+    let bug_reports = rox_uuid::generate_uuid_v7();
     let mut ranked: Vec<(String, Uuid)> = (0..5_000)
         .map(|index| {
             (
                 format!("channel-{index:04}"),
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
             )
         })
         .collect();
@@ -605,7 +605,7 @@ async fn a_large_workspace_drafts_the_channel_the_description_names() {
 /// on its first page; the session pages on until it finds it.
 #[tokio::test]
 async fn a_channel_past_searchs_first_page_is_still_found() {
-    let bug_reports = macro_uuid::generate_uuid_v7();
+    let bug_reports = rox_uuid::generate_uuid_v7();
     let mut ranked: Vec<(String, Uuid)> = [
         "bug-reports-archive",
         "bug-reports-2025",
@@ -615,7 +615,7 @@ async fn a_channel_past_searchs_first_page_is_still_found() {
         "bug-reports-triage",
     ]
     .into_iter()
-    .map(|name| (name.to_owned(), macro_uuid::generate_uuid_v7()))
+    .map(|name| (name.to_owned(), rox_uuid::generate_uuid_v7()))
     .collect();
     ranked.push(("bug-reports".to_owned(), bug_reports));
     let channels = Arc::new(Channels {
@@ -1137,8 +1137,8 @@ async fn the_sweep_deletes_drafts_a_stopped_process_left_behind() {
     let rows = Arc::new(Rows::default());
     let sessions = Arc::new(Sessions::new(&rows, Box::new(|_| Vec::new())));
     let (old, new) = (
-        macro_uuid::generate_uuid_v7(),
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
     );
     rows.begin(old, &owner(), bot_id::MACRO_NEW_BOT_ID)
         .await
@@ -1161,7 +1161,7 @@ async fn the_sweep_deletes_drafts_a_stopped_process_left_behind() {
 /// the database, uses its id, and says it made it, so the review can show it.
 #[tokio::test]
 async fn a_draft_that_needs_a_new_database_creates_it_references_it_and_says_so() {
-    let database = macro_uuid::generate_uuid_v7().to_string();
+    let database = rox_uuid::generate_uuid_v7().to_string();
     let made = database.clone();
     let rows = Arc::new(Rows::default());
     let sessions = Arc::new(Sessions::new(

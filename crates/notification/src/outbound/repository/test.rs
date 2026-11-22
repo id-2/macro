@@ -6,7 +6,7 @@ use crate::domain::models::{Notification, request::NotificationCategory};
 
 use super::*;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use model_entity::EntityType;
 use models_pagination::CreatedAt;
 use serde::{Deserialize, Serialize};
@@ -66,13 +66,13 @@ impl Notification for TestGithubCheckRunNotification {
     const TYPE_NAME: &'static str = "github_pr_check_run";
 }
 
-fn test_user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).unwrap()
+fn test_user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).unwrap()
 }
 
 async fn create_message_notification(
     pool: &Pool<Postgres>,
-    recipient: &MacroUserIdStr<'static>,
+    recipient: &RoxUserIdStr<'static>,
     notification_id: Uuid,
     message_id: &str,
     thread_id: Option<&str>,
@@ -811,7 +811,7 @@ async fn test_get_digest_eligible_notification_ids_empty_input(pool: Pool<Postgr
 async fn test_get_user_notifications(pool: Pool<Postgres>) {
     let result: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications(
-            MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
             10,
             Query::Sort(CreatedAt, ()),
             NotificationListFilters::active(),
@@ -823,7 +823,7 @@ async fn test_get_user_notifications(pool: Pool<Postgres>) {
     let row = &result[0];
     assert_eq!(
         row.owner_id,
-        MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap()
+        RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap()
     );
     assert_eq!(
         row.notification_id,
@@ -840,7 +840,7 @@ async fn test_get_user_notifications(pool: Pool<Postgres>) {
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_get_user_notifications_filters_exact_states(pool: Pool<Postgres>) {
-    let user = MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap();
     let notification_id = uuid::Uuid::parse_str("0193b1ea-a542-7589-893b-2b4a509c1e76").unwrap();
 
     pool.mark_notifications_seen(&user, &[notification_id])
@@ -897,7 +897,7 @@ async fn test_get_user_notifications_filters_exact_states(pool: Pool<Postgres>) 
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_get_user_notifications_filters_type_and_entity(pool: Pool<Postgres>) {
-    let user = MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap();
 
     let document_results: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications(
@@ -1294,7 +1294,7 @@ async fn test_get_user_notifications_filters_github_type_and_entity(pool: Pool<P
 async fn test_get_user_notifications_skips_invalid_entity_type(pool: Pool<Postgres>) {
     let result: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications(
-            MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
             10,
             Query::Sort(CreatedAt, ()),
             NotificationListFilters::active(),
@@ -1327,7 +1327,7 @@ async fn test_get_user_notifications_by_event_item_ids_skips_invalid(pool: Pool<
 
     let result: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications_by_event_item_ids(
-            MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap(),
             &[valid_item, invalid_entity_item, invalid_metadata_item],
             10,
             Query::Sort(CreatedAt, ()),
@@ -1350,7 +1350,7 @@ async fn test_get_user_notifications_by_event_item_ids_skips_invalid(pool: Pool<
 async fn test_get_user_notifications_empty(pool: Pool<Postgres>) {
     let result: Vec<UserNotificationRow<TestNotification>> = pool
         .get_user_notifications(
-            MacroUserIdStr::parse_from_str("macro|nobody@test.com").unwrap(),
+            RoxUserIdStr::parse_from_str("macro|nobody@test.com").unwrap(),
             10,
             Query::Sort(CreatedAt, ()),
             NotificationListFilters::active(),
@@ -1486,7 +1486,7 @@ async fn test_create_notification_stores_bare_metadata(pool: Pool<Postgres>) {
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_delete_all_user_notifications(pool: Pool<Postgres>) {
-    let user = MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap();
     let notification_id = uuid::Uuid::parse_str("0193b1ea-a542-7589-893b-2b4a509c1e76").unwrap();
 
     // Verify the notification exists before deletion
@@ -1532,7 +1532,7 @@ async fn test_delete_all_user_notifications(pool: Pool<Postgres>) {
     fixtures(path = "../../../fixtures", scripts("user_notifications"))
 )]
 async fn test_delete_all_user_notifications_does_not_affect_other_users(pool: Pool<Postgres>) {
-    let user = MacroUserIdStr::parse_from_str("macro|user@test.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user@test.com").unwrap();
     let other_user = test_user("other@test.com");
     let notification_id = uuid::Uuid::parse_str("0193b1ea-a542-7589-893b-2b4a509c1e76").unwrap();
 

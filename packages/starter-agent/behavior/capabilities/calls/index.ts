@@ -5,8 +5,8 @@
  * call, ask it onto one, hang up, post in a call's chat, and read a call
  * back.
  */
-import { behavior } from '@macro-inc/muppet/core/behavior';
-import { module } from '@macro-inc/muppet/core/capability';
+import { behavior } from '@rox-one/muppet/core/behavior';
+import { module } from '@rox-one/muppet/core/capability';
 import { postCallChat } from './capabilities/chat.ts';
 import {
   askOntoCall,

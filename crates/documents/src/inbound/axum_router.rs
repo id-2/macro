@@ -94,7 +94,7 @@ use axum::{
 use entity_access::domain::ports::EntityAccessService;
 use entity_registry::NonUserOwners;
 use lexical_client::LexicalClient;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
 // Existing router composition state; the text handler uses domain services, never SQL.
@@ -232,7 +232,7 @@ pub struct DocumentRouterState<T, Svc, Auth> {
     /// The entity access service for authorization.
     pub access_service: Arc<Svc>,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
     /// The database pool (used by middleware for document lookups).
     pub pool: PgPool,
     /// Task duplicate detection service.
@@ -351,7 +351,7 @@ impl<T, Svc, Auth> FromRef<DocumentRouterState<T, Svc, Auth>> for Arc<Svc> {
     }
 }
 
-impl<T, Svc, Auth> FromRef<DocumentRouterState<T, Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<T, Svc, Auth> FromRef<DocumentRouterState<T, Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &DocumentRouterState<T, Svc, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -374,7 +374,7 @@ pub fn documents_router<T, Svc, Auth, S>(state: DocumentRouterState<T, Svc, Auth
 where
     T: DocumentService + DocumentCreationService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     // Routes that need ensure_document_exists middleware
@@ -608,7 +608,7 @@ pub struct DocumentIdPathParams {
 async fn ensure_document_exists<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
     Path(Params { document_id }): Path<Params>,

@@ -7,7 +7,7 @@ use crate::domain::{
     AiFeature, CompletionUsage, ModelPricing, Price, Result, Usage, UsageAmount, UsageApiParams,
     UsageError, UsageRepo, normalize_model_id,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 /// Postgres-backed [`UsageRepo`].
@@ -25,7 +25,7 @@ impl PgUsageRepo {
 
 impl UsageRepo for PgUsageRepo {
     async fn insert_usage(&self, usage: &CompletionUsage, count_usage: bool) -> Result<()> {
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         let (
             input_tokens,
             output_tokens,
@@ -320,7 +320,7 @@ impl UsageRepo for PgUsageRepo {
                     .feature
                     .parse()
                     .map_err(|e| UsageError::Other(anyhow::anyhow!("invalid feature: {e}")))?;
-                let user = MacroUserIdStr::try_from(r.user_id)
+                let user = RoxUserIdStr::try_from(r.user_id)
                     .map_err(|e| UsageError::Other(anyhow::anyhow!("invalid user id: {e}")))?;
 
                 let price = match (r.price_per_million_in, r.price_per_million_out, r.total) {

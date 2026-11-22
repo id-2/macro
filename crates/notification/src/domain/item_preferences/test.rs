@@ -12,12 +12,12 @@ struct FakeRepository {
 }
 
 impl ItemNotificationPreferenceRepository for FakeRepository {
-    async fn list(&self, _: MacroUserIdStr<'_>) -> Result<Vec<ItemNotificationPreference>, Report> {
+    async fn list(&self, _: RoxUserIdStr<'_>) -> Result<Vec<ItemNotificationPreference>, Report> {
         Ok(vec![])
     }
     async fn set(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         _: Entity<'_>,
         until: Option<DateTime<Utc>>,
     ) -> Result<(), Report> {
@@ -26,7 +26,7 @@ impl ItemNotificationPreferenceRepository for FakeRepository {
     }
     async fn set_mentions_only(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entity: Entity<'_>,
     ) -> Result<(), Report> {
         self.mentions_only
@@ -37,7 +37,7 @@ impl ItemNotificationPreferenceRepository for FakeRepository {
     }
     async fn set_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
         until: Option<DateTime<Utc>>,
     ) -> Result<(), Report> {
@@ -50,7 +50,7 @@ impl ItemNotificationPreferenceRepository for FakeRepository {
     }
     async fn remove_bulk(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         entities: &[Entity<'_>],
     ) -> Result<(), Report> {
         self.removals.lock().unwrap().push((
@@ -59,7 +59,7 @@ impl ItemNotificationPreferenceRepository for FakeRepository {
         ));
         Ok(())
     }
-    async fn remove(&self, _: MacroUserIdStr<'_>, _: Entity<'_>) -> Result<(), Report> {
+    async fn remove(&self, _: RoxUserIdStr<'_>, _: Entity<'_>) -> Result<(), Report> {
         Ok(())
     }
 }
@@ -71,7 +71,7 @@ async fn only_future_deadlines_are_saved_for_the_authenticated_user() {
     for until in [now - Duration::seconds(1), now] {
         let result = service
             .set(
-                MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+                RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
                 EntityType::Document.with_entity_str("document"),
                 Some(until),
                 now,
@@ -86,7 +86,7 @@ async fn only_future_deadlines_are_saved_for_the_authenticated_user() {
     for until in [Some(now + Duration::hours(1)), None] {
         service
             .set(
-                MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
+                RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap(),
                 EntityType::Document.with_entity_str("document"),
                 until,
                 now,
@@ -108,7 +108,7 @@ async fn only_future_deadlines_are_saved_for_the_authenticated_user() {
 #[tokio::test]
 async fn bulk_validates_before_writing_and_deduplicates() {
     let service = ItemNotificationPreferenceService::new(FakeRepository::default());
-    let owner = || MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let owner = || RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
     let now = Utc::now();
     let items = || {
         vec![
@@ -173,7 +173,7 @@ async fn bulk_validates_before_writing_and_deduplicates() {
 #[tokio::test]
 async fn mentions_only_is_saved_for_channels_and_rejected_for_other_items() {
     let service = ItemNotificationPreferenceService::new(FakeRepository::default());
-    let owner = || MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
+    let owner = || RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap();
 
     let rejected = service
         .set_mentions_only(

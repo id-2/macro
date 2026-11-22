@@ -21,15 +21,15 @@ use crate::outbound::mailbox_init::{MicrosoftGrantSource, PgMailboxInitializatio
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
 use entity_access_management::domain::service::EntityAccessManagementServiceImpl;
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
-use macro_auth::InternalApiKey;
-use macro_authorization::{
-    MacroAuthJwtValidator, MacroAuthorizationServiceImpl, MacroAuthorizationState,
+use rox_auth::InternalApiKey;
+use rox_authorization::{
+    RoxAuthJwtValidator, RoxAuthorizationServiceImpl, RoxAuthorizationState,
 };
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use std::sync::Arc;
 use tokio_util::task::TaskTracker;
 
-pub(crate) type AuthorizationService = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+pub(crate) type AuthorizationService = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 pub(crate) type CalendarGrantService = CalendarService<PgCalendarRepository>;
 pub(crate) type CalendarMutationSvc = CalendarMutationServiceImpl<
     PgCalendarRepository,
@@ -44,7 +44,7 @@ pub(crate) type CalendarMutationSvc = CalendarMutationServiceImpl<
 pub(crate) type EmailEntityAccessService = EntityAccessServiceImpl<PgAccessRepository>;
 pub(crate) type EmailEntityAccessManagementService =
     EntityAccessManagementServiceImpl<entity_access_management::outbound::PgRepository>;
-pub(crate) type EmailEventBroker = MacroEventBrokerService<KafkaEventPublisher, TaskTracker>;
+pub(crate) type EmailEventBroker = RoxEventBrokerService<KafkaEventPublisher, TaskTracker>;
 pub(crate) type MailboxInitializer =
     email::domain::mailbox::initialization::MailboxInitializationService<
         PgMailboxInitialization,
@@ -243,7 +243,7 @@ pub(crate) struct ApiContext {
     pub read_receipts: crate::composition::ReadReceipts,
     pub invitations: Arc<InvitationSvc>,
     pub correlation: agent_correlation::inbound::CorrelationState,
-    pub authorization_state: MacroAuthorizationState<AuthorizationService>,
+    pub authorization_state: RoxAuthorizationState<AuthorizationService>,
     pub config: Arc<Config>,
     pub internal_api_key: InternalApiKey,
     pub email_service: EmailRouterState<EmailSvc>,

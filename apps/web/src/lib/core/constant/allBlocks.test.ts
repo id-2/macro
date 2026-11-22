@@ -1,6 +1,6 @@
 import { BlockRegistry } from '@core/block';
 import { createHeadlessEditor } from '@lexical/headless';
-import { DocumentMentionNode } from '@macro-inc/lexical-core';
+import { DocumentMentionNode } from '@rox-one/lexical-core';
 import { describe, expect, it, vi } from 'vitest';
 import { fileTypeToBlockName, verifyBlockName } from './allBlocks';
 

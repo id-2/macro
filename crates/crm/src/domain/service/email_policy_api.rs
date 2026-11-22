@@ -107,7 +107,7 @@ pub(super) fn validate_targets(
 impl<CR: CompaniesRepository, R: CompanyMetadataResolver> CrmServiceImpl<CR, R> {
     pub(super) async fn selective_email_available(
         &self,
-        user: macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> bool {
         match &self.selective_email_gate {
             Some(gate) => gate.enabled_for(user).await,

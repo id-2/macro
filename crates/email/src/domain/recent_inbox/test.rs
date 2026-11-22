@@ -11,7 +11,7 @@ struct Mailboxes(Result<Vec<RecentInboxMailbox>, MailboxError>);
 impl RecentInboxMailboxes for Mailboxes {
     async fn readable_owned_inboxes(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
     ) -> Result<Vec<RecentInboxMailbox>, MailboxError> {
         assert_eq!(actor.as_ref(), ACTOR);
         match &self.0 {
@@ -69,8 +69,8 @@ fn message(inbox: &str, subject: &str, received_at: &str) -> RecentInboxMessage 
     }
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(ACTOR.to_owned()).unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(ACTOR.to_owned()).unwrap()
 }
 
 #[tokio::test]

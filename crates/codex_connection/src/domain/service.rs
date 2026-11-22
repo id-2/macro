@@ -18,7 +18,7 @@ impl<P: OAuth> ConnectionServiceImpl<P> {
         }
     }
     async fn lock(&self, owner: &str) -> Result<Box<dyn ConnectionTransaction>, ConnectionError> {
-        macro_user_id::user_id::MacroUserIdStr::parse_from_str(owner)
+        rox_user_id::user_id::RoxUserIdStr::parse_from_str(owner)
             .map_err(|_| ConnectionError::InvalidInput)?;
         self.repository.lock(owner).await
     }

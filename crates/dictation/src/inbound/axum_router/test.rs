@@ -5,8 +5,8 @@ use axum::{
     http::{Request, header},
 };
 use bytes::Bytes;
-use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rate_limit::domain::models::RateLimitOk;
 use std::sync::{
@@ -44,7 +44,7 @@ impl FakeService {
 impl DictationService for FakeService {
     async fn transcribe(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         audio: Bytes,
         language: Option<LanguageHint>,
     ) -> Result<Transcript, DictationError> {
@@ -105,12 +105,12 @@ impl RateLimitService for FakeRateLimiter {
 #[derive(Clone, Default)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         let user_id = match jwt {
             "valid" => USER_ID,
             "valid-other" => OTHER_USER_ID,
-            _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         };
         Ok(UserContext {
             user_id: user_id.to_owned(),
@@ -121,19 +121,19 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(claims.user_id.map(|user_id| UserContext {
             user_id,
@@ -169,7 +169,7 @@ impl Harness {
         dictation_router::<_, _, _, ()>(DictationRouterState::new(
             self.service.clone(),
             self.limiter.clone(),
-            MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+            RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
         ))
     }
 

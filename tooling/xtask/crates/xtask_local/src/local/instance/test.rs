@@ -24,13 +24,13 @@ fn accepts_valid_names() {
 fn default_instance_uses_fixed_ports() {
     let inst = Instance::derive(None, None).unwrap();
     assert!(inst.is_default());
-    assert_eq!(inst.project_name(), "macro");
+    assert_eq!(inst.project_name(), "rox");
     assert_eq!(inst.port(Port::Postgres), 5432);
     assert_eq!(inst.port(Port::Auth), 8080);
     assert_eq!(inst.port(Port::DocStorage), 8086);
     assert_eq!(inst.port(Port::SdkWebhookSsh), 8788);
     assert_eq!(inst.network_databases(), "databases");
-    assert_eq!(inst.volume_postgres(), "macro_postgres_data");
+    assert_eq!(inst.volume_postgres(), "rox_postgres_data");
 }
 
 #[test]
@@ -42,14 +42,14 @@ fn named_instance_is_isolated_and_deterministic() {
         a2.port_base(),
         "derivation must be deterministic"
     );
-    assert_eq!(a1.project_name(), "macro-agent-a");
+    assert_eq!(a1.project_name(), "rox-agent-a");
     assert!(a1.port(Port::Postgres) >= 20_000);
     assert_eq!(
         a1.port(Port::SdkWebhookSsh),
         a1.port_base() + Port::SdkWebhookSsh.offset()
     );
     assert_eq!(a1.network_databases(), "databases-agent-a");
-    assert_eq!(a1.volume_postgres(), "macro_postgres_data_agent-a");
+    assert_eq!(a1.volume_postgres(), "rox_postgres_data_agent-a");
 }
 
 #[test]
@@ -93,11 +93,11 @@ fn networks_are_carved_from_the_block_in_order() {
                 Some("10.254.9.64/26".to_string())
             ),
             (
-                "macro-agent-a_services".to_string(),
+                "rox-agent-a_services".to_string(),
                 Some("10.254.9.128/26".to_string())
             ),
             (
-                "macro-agent-a_auth-internal".to_string(),
+                "rox-agent-a_auth-internal".to_string(),
                 Some("10.254.9.192/26".to_string())
             ),
         ]

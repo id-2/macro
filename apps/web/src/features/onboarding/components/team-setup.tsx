@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import PlusIcon from '@icon/system/regular/plus.svg';
 import XIcon from '@icon/system/regular/x.svg';
 import { Index, type JSX, Show } from 'solid-js';
@@ -17,11 +18,10 @@ export function TeamSetup(props: {
           tabindex="-1"
           class="whitespace-nowrap font-[Roboto_Slab_Variable] text-[clamp(1.75rem,8vw,3rem)] font-[315] leading-[1.12] tracking-tight outline-none"
         >
-          {props.title ?? 'Built for teams.'}
+          {props.title ?? t('onboarding.builtForTeams')}
         </h1>
         <h2 class="mt-6 max-w-[440px] text-sm font-normal leading-6 text-ink-muted text-balance sm:text-[15px]">
-          {props.subtitle ??
-            'Bring your team into one workspace. Choose Free or upgrade for more AI and storage.'}
+          {props.subtitle ?? t('onboarding.teamIntro')}
         </h2>
       </header>
       <div class="mt-9 w-full">{props.children}</div>
@@ -48,10 +48,10 @@ export function TeamSetupFields(props: {
       class="flex min-w-0 flex-col gap-6 text-left"
     >
       <label class="flex flex-col gap-2.5 text-sm text-ink-muted">
-        Workspace name
+        {t('onboarding.workspaceName')}
         <FormInput
           id={`${props.id}-name`}
-          placeholder="Acme Inc."
+          placeholder={t('onboarding.workspaceNamePlaceholder')}
           value={props.name}
           onInput={props.onNameChange}
         />
@@ -61,8 +61,8 @@ export function TeamSetupFields(props: {
           id={props.id}
           emails={props.emails}
           hint={props.hint}
-          person="Teammate"
-          placeholder="teammate@company.com"
+          person="teammate"
+          placeholder={t('onboarding.teammateEmailPlaceholder')}
           onEmailChange={props.onEmailChange}
           onRemoveEmail={props.onRemoveEmail}
           onAddEmail={props.onAddEmail}
@@ -79,15 +79,15 @@ export function InviteEmailList(props: {
   emails: string[];
   /** One line above the list, e.g. the reward for inviting. */
   hint?: string;
-  /** Who each row invites: "Teammate" labels rows "Teammate 1 email". */
-  person: string;
+  /** Who each row invites; labels read "Teammate 1 email". */
+  person: 'teammate' | 'friend';
   placeholder: string;
   onEmailChange: (index: number, value: string) => void;
   onRemoveEmail: (index: number) => void;
   onAddEmail: () => void;
 }) {
   let inviteList!: HTMLDivElement;
-  const rowId = () => props.person.toLowerCase();
+  const rowId = () => props.person;
   return (
     <div class="flex flex-col gap-6">
       <Show when={props.hint}>
@@ -101,7 +101,12 @@ export function InviteEmailList(props: {
             <div class="relative [&_.obf-input]:pr-12">
               <FormInput
                 id={`${props.id}-${rowId()}-${index}`}
-                label={`${props.person} ${index + 1} email`}
+                label={t(
+                  props.person === 'friend'
+                    ? 'onboarding.friendEmailRow'
+                    : 'onboarding.teammateEmailRow',
+                  { number: index + 1 }
+                )}
                 type="email"
                 placeholder={props.placeholder}
                 value={email()}
@@ -111,7 +116,9 @@ export function InviteEmailList(props: {
               <Show when={email().trim()}>
                 <button
                   type="button"
-                  aria-label={`Don't invite ${email().trim()}`}
+                  aria-label={t('onboarding.removeInvite', {
+                    email: email().trim(),
+                  })}
                   class="absolute top-1/2 right-2 flex size-8 -translate-y-1/2 items-center justify-center rounded-full text-ink-extra-muted hover:bg-ink/5 hover:text-ink focus-visible:outline-2 focus-visible:outline-ink"
                   onClick={() => props.onRemoveEmail(index)}
                 >
@@ -141,7 +148,9 @@ export function InviteEmailList(props: {
         }}
       >
         <PlusIcon class="size-4" aria-hidden="true" />
-        Add another {props.person.toLowerCase()}
+        {props.person === 'friend'
+          ? t('onboarding.addAnotherFriend')
+          : t('onboarding.addAnotherTeammate')}
       </button>
     </div>
   );

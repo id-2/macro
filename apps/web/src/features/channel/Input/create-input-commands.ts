@@ -1,6 +1,6 @@
 import { hapticImpact } from '@core/mobile/haptics';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { Accessor } from 'solid-js';
 import type {
   InputAttachmentData,

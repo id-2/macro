@@ -21,9 +21,9 @@ use entity_access::{
     },
     outbound::PgAccessRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::*;
 use properties::PropertiesPgRepo;
 use serde_json::json;
@@ -35,7 +35,7 @@ const OWNER: &str = "macro|pipeline-owner@rox.one";
 const MEMBER: &str = "macro|pipeline-member@rox.one";
 const OUTSIDER: &str = "macro|pipeline-outsider@rox.one";
 type Access = EntityAccessServiceImpl<PgAccessRepository>;
-type DatabaseService = PgDatabasesService<NoOpTableEventPublisher, NoopMacroEventBroker, Access>;
+type DatabaseService = PgDatabasesService<NoOpTableEventPublisher, NoopRoxEventBroker, Access>;
 type Service = PipelineServiceImpl<
     PgPipelineRepo<PgCellStore<PropertiesPgRepo>>,
     DatabaseService,
@@ -89,8 +89,8 @@ impl StageDefinitionStore for Stages {
         panic!("must not edit the template")
     }
 }
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 fn team_receipt(team: Uuid, id: &str) -> CrmTeamReceipt<MemberTeamRole> {
     CrmTeamReceipt::from_team_receipt(
@@ -171,7 +171,7 @@ async fn fixture(pool: &PgPool) -> (Service, Arc<DatabaseService>, Arc<Access>, 
         pool.clone(),
         a.clone(),
         NoOpTableEventPublisher,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     ));
     let svc = Service::new(
         PgPipelineRepo::new(
@@ -528,7 +528,7 @@ async fn generic_pipeline_holds_free_form_rows_without_record_references(pool: P
     // It shows in navigation, and never as a place a CRM record is tracked.
     let listed = s.list(team_receipt(team, OWNER)).await.unwrap();
     assert!(listed.iter().any(|entry| entry.pipeline.id == p.id));
-    let owner = MacroUserIdStr::try_from(OWNER.to_string()).unwrap();
+    let owner = RoxUserIdStr::try_from(OWNER.to_string()).unwrap();
     assert!(
         s.entries(&owner, PipelineRecordType::Company, &[company])
             .await
@@ -796,7 +796,7 @@ async fn migration_rollback_preserves_records_and_grants(pool: PgPool) {
         .unwrap();
     // Execute the actual rollback DDL in this disposable test database.
     sqlx::raw_sql(include_str!(
-        "../../macro_db_client/migrations/20261007172434_crm_pipeline_entities.down.sql"
+        "../../rox_db_client/migrations/20261007172434_crm_pipeline_entities.down.sql"
     ))
     .execute(&pool)
     .await
@@ -837,9 +837,9 @@ async fn http_creation_listing_schema_and_records_use_pipeline_access(pool: PgPo
         http::{Request, StatusCode},
     };
     use crm::inbound::pipelines::{PipelineRouterState, router};
-    use macro_authorization::{
-        InternalAuthConfig, JwtValidator, MacroAuthorizationError, MacroAuthorizationServiceImpl,
-        MacroAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
+    use rox_authorization::{
+        InternalAuthConfig, JwtValidator, RoxAuthorizationError, RoxAuthorizationServiceImpl,
+        RoxAuthorizationState, NoBotAuthorizer, NoUserApiKeyAuthorizer, ValidatedIdentity,
     };
     use tower::ServiceExt;
     #[derive(Clone)]
@@ -849,16 +849,16 @@ async fn http_creation_listing_schema_and_records_use_pipeline_access(pool: PgPo
             &self,
             jwt: &str,
         ) -> Result<
-            macro_authorization::ValidatedCredential,
-            rootcause::Report<MacroAuthorizationError>,
+            rox_authorization::ValidatedCredential,
+            rootcause::Report<RoxAuthorizationError>,
         > {
             if jwt != "owner" && jwt != "outsider" {
                 return Err(rootcause::Report::new(
-                    MacroAuthorizationError::InvalidCredentials,
+                    RoxAuthorizationError::InvalidCredentials,
                 ));
             }
-            Ok(macro_authorization::ValidatedCredential {
-                origin: macro_authorization::CredentialOrigin::Session,
+            Ok(rox_authorization::ValidatedCredential {
+                origin: rox_authorization::CredentialOrigin::Session,
                 identity: ValidatedIdentity {
                     agent_id: None,
                     agent_via: None,
@@ -877,8 +877,8 @@ async fn http_creation_listing_schema_and_records_use_pipeline_access(pool: PgPo
         router(PipelineRouterState {
             service: Arc::new(service),
             access,
-            authorization: MacroAuthorizationState::new(Arc::new(
-                MacroAuthorizationServiceImpl::new(
+            authorization: RoxAuthorizationState::new(Arc::new(
+                RoxAuthorizationServiceImpl::new(
                     Token,
                     InternalAuthConfig {
                         api_key: "test-only".into(),

@@ -10,7 +10,7 @@ impl<
     C: ConnectionService,
     Eam: EntityAccessManagementService,
     F: ForeignEntityService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     S: DocumentSyncPort,
 > DocumentContentEventService for DocumentServiceImpl<R, U, T, C, Eam, F, B, S>
 {
@@ -28,7 +28,7 @@ impl<
             .map_err(|error| map_basic_document_error(document_id, error.into()))?;
 
         self.macro_event_broker
-            .send_event(&DocumentMacroEvent::content_uploaded(
+            .send_event(&DocumentRoxEvent::content_uploaded(
                 document_id,
                 DocumentContentUploadedMetadata {
                     document_id: document_id.to_string(),
@@ -67,7 +67,7 @@ impl<
         );
         metadata.editors = editors;
         self.macro_event_broker
-            .send_event(&DocumentMacroEvent::sync_content_updated(
+            .send_event(&DocumentRoxEvent::sync_content_updated(
                 document_id,
                 metadata,
             ))

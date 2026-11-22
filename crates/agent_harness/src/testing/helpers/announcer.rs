@@ -136,7 +136,7 @@ impl SessionAnnouncer for AnnouncerMock {
             } else {
                 announcement
                     .reply_message_id
-                    .unwrap_or_else(macro_uuid::generate_uuid_v7)
+                    .unwrap_or_else(rox_uuid::generate_uuid_v7)
             },
         };
         let mut announced = self

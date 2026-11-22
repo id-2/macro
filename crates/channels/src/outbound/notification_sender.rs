@@ -5,7 +5,7 @@ use crate::domain::{
     ports::ChannelNotificationSender,
     side_effects::{ChannelMentionNotification, ChannelNotificationEffect},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_notifications::{
     ChannelAccessRequestedMetadata, ChannelInviteMetadata, ChannelMentionMetadata,
     ChannelMessageReactionMetadata, ChannelMessageSendMetadata, ChannelReplyMetadata,
@@ -70,7 +70,7 @@ pub trait CompleteNotifications: Clone + Send + Sync + 'static {
     fn complete(
         &self,
         notification_id: Uuid,
-        recipients: HashSet<MacroUserIdStr<'static>>,
+        recipients: HashSet<RoxUserIdStr<'static>>,
     ) -> impl Future<Output = anyhow::Result<()>> + Send;
 }
 
@@ -82,7 +82,7 @@ impl CompleteNotifications for UnavailableNotificationCompletion {
     async fn complete(
         &self,
         _notification_id: Uuid,
-        _recipients: HashSet<MacroUserIdStr<'static>>,
+        _recipients: HashSet<RoxUserIdStr<'static>>,
     ) -> anyhow::Result<()> {
         anyhow::bail!("notification completion is not configured")
     }
@@ -117,7 +117,7 @@ impl<N: NotificationReader, W: NotificationWithdrawal> CompleteNotifications
     async fn complete(
         &self,
         notification_id: Uuid,
-        recipients: HashSet<MacroUserIdStr<'static>>,
+        recipients: HashSet<RoxUserIdStr<'static>>,
     ) -> anyhow::Result<()> {
         self.withdrawal
             .withdraw(notification_id)
@@ -167,9 +167,9 @@ fn to_common_metadata(metadata: ChannelMetadata) -> CommonChannelMetadata {
 struct InviteNotificationDelivery {
     message_id: Option<Uuid>,
     channel_id: Uuid,
-    invited_by_user_id: MacroUserIdStr<'static>,
-    registered_recipient_ids: HashSet<MacroUserIdStr<'static>>,
-    unregistered_recipient_ids: HashSet<MacroUserIdStr<'static>>,
+    invited_by_user_id: RoxUserIdStr<'static>,
+    registered_recipient_ids: HashSet<RoxUserIdStr<'static>>,
+    unregistered_recipient_ids: HashSet<RoxUserIdStr<'static>>,
     sender_profile_picture_url: Option<String>,
     message_content: Option<String>,
     common: CommonChannelMetadata,

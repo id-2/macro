@@ -1,11 +1,11 @@
 import type { Env } from '../../../../packages/sdk/src/config';
-import { Macro } from '../../../../packages/sdk/src/macro';
+import { Macro } from '../../../../packages/sdk/src/rox';
 import type { RichMessage } from '../../../../packages/sdk/src/mentions';
 
 export type ChannelConfig = {
   /** UUID of the channel the bot posts to. */
   channelId: string;
-  /** Bot API key (mbot_...), sent as x-macro-bot-token. */
+  /** Bot API key (mbot_...), sent as x-rox-bot-token. */
   botToken: string;
   /** The bot owner's user id (`macro|<email>`); the bot acts as this user. */
   actingUserId: string;
@@ -26,7 +26,7 @@ export type AlertChannel = {
 /**
  * The alerts channel through the Rox SDK.
  *
- * The bot is user-owned and acts as its owner (`x-macro-bot-for-macro-user-id`,
+ * The bot is user-owned and acts as its owner (`x-rox-bot-for-rox-user-id`,
  * user scope), which routes posts through the entity message API: threads,
  * mentions, edits and reactions. Messages show the bot as sender. A team-owned
  * bot would drop `requestedAs` and use the default team scope instead.

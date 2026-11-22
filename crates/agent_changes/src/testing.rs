@@ -6,7 +6,7 @@ use std::sync::{Arc, Mutex};
 
 use agent_session::domain::model::AgentSession;
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use crate::domain::error::ExtractError;
 use crate::domain::model::{

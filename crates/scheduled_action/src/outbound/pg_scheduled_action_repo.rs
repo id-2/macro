@@ -6,8 +6,8 @@ use entity_registry_db_utils::{
     InsertOutcome, NewEntityRecord, OwnedEntityRegistrar, RegisteredEntityType, WriteOutcome,
     delete_entity,
 };
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model_entity::{EntityAppearance, EntityType};
 use model_owner::Owner;
 use serde_json::Value;
@@ -294,7 +294,7 @@ impl<B: BotFacts + 'static> ScheduledActionRepo for PgScheduledActionRepo<B> {
 
     async fn get_owned_actions(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ScheduledAction>> {
         let owner = owner.to_string();
         let rows = sqlx::query_as!(

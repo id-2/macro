@@ -6,7 +6,7 @@ use channels::domain::historical::{HistoricalChannel, HistoricalChannelKind};
 use channels::outbound::pg_channels_repo::PgChannelsRepo;
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
 use import::{domain::ports::CanonicalImportRepo, outbound::pg_import_repo::PgImportRepo};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use slack_integration::{
     domain::{
         importer::targets::{ImportTargets, TargetPlan},
@@ -22,12 +22,12 @@ use super::{
     authorizer::WorkerAuthorizer, channel_sink::ChannelImportSink, target_key, target_kind,
 };
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn code_tags_never_create_mentions_and_reference_reads_recheck_access(pool: PgPool) {
     check_read_access_and_mentions(pool, ConversationKind::PrivateChannel).await;
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn dm_reference_disclosure_is_revoked_without_removing_import_provenance(pool: PgPool) {
     check_read_access_and_mentions(pool, ConversationKind::DirectMessage).await;
 }
@@ -131,7 +131,7 @@ async fn check_read_access_and_mentions(pool: PgPool, kind: ConversationKind) {
     );
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn prior_archived_unselected_channels_resolve_but_selected_absent_targets_wait(pool: PgPool) {
     use slack_integration::domain::slack::{
         mrkdwn::MrkdwnConverter,
@@ -194,11 +194,11 @@ async fn prior_archived_unselected_channels_resolve_but_selected_absent_targets_
 type Access = EntityAccessServiceImpl<PgAccessRepository>;
 type Sink = ChannelImportSink<Access>;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|t17@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|t17@example.com").unwrap()
 }
-fn other() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap()
+fn other() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap()
 }
 fn authorizer(pool: &PgPool) -> WorkerAuthorizer<Access> {
     WorkerAuthorizer::new(
@@ -400,7 +400,7 @@ async fn counts(pool: &PgPool) -> (i64, i64, i64, i64) {
     (row.messages, row.reactions, row.mappings, row.search)
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn failures_after_each_insert_roll_back_every_batch_effect(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::PublicChannel, 1).await;
@@ -455,7 +455,7 @@ async fn failures_after_each_insert_roll_back_every_batch_effect(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn overlapping_jobs_remap_speculative_parents_without_duplicate_reactions(pool: PgPool) {
     let team = team(&pool).await;
     let first = claim(&pool, team, ConversationKind::PublicChannel, 2).await;
@@ -494,7 +494,7 @@ async fn overlapping_jobs_remap_speculative_parents_without_duplicate_reactions(
     assert_eq!(replay, a);
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn stale_lease_and_cancellation_keep_committed_search_work(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::PublicChannel, 2).await;
@@ -550,7 +550,7 @@ async fn stale_lease_and_cancellation_keep_committed_search_work(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn reclaimed_generation_and_admin_revocation_block_writes(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::PublicChannel, 2).await;
@@ -597,12 +597,12 @@ async fn reclaimed_generation_and_admin_revocation_block_writes(pool: PgPool) {
     assert_eq!(counts(&pool).await, before);
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn new_dm_has_exact_pair_and_no_importing_admin(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::DirectMessage, 0).await;
     let mut plan = plan(&pool, &context).await;
-    let stranger = MacroUserIdStr::parse_from_str("macro|stranger@example.com").unwrap();
+    let stranger = RoxUserIdStr::parse_from_str("macro|stranger@example.com").unwrap();
     plan.owner = other();
     plan.members = HashSet::from([other(), stranger]);
     let sink = sink(&pool);
@@ -624,7 +624,7 @@ async fn new_dm_has_exact_pair_and_no_importing_admin(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn stable_reservation_recovers_creation_and_preserves_existing_state(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::PrivateChannel, 0).await;
@@ -678,7 +678,7 @@ async fn stable_reservation_recovers_creation_and_preserves_existing_state(pool:
     assert_eq!(progress.conversations[0].warnings.len(), 1);
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn private_reuse_requires_management_or_compatible_prior_provenance(pool: PgPool) {
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::PrivateChannel, 1).await;
@@ -738,7 +738,7 @@ async fn private_reuse_requires_management_or_compatible_prior_provenance(pool: 
     );
 }
 
-#[sqlx::test(migrations = "../../crates/macro_db_client/migrations")]
+#[sqlx::test(migrations = "../../crates/rox_db_client/migrations")]
 async fn unrelated_dm_pair_is_not_granted_provenance_and_pair_races_fail_closed(pool: PgPool) {
     use channels::{
         domain::{dm::DmPair, historical::DmCreation},
@@ -747,7 +747,7 @@ async fn unrelated_dm_pair_is_not_granted_provenance_and_pair_races_fail_closed(
     let team = team(&pool).await;
     let context = claim(&pool, team, ConversationKind::DirectMessage, 0).await;
     let mut plan = plan(&pool, &context).await;
-    let stranger = MacroUserIdStr::parse_from_str("macro|stranger@example.com").unwrap();
+    let stranger = RoxUserIdStr::parse_from_str("macro|stranger@example.com").unwrap();
     plan.owner = other();
     plan.members = HashSet::from([other(), stranger.clone()]);
     let pair = DmPair::new(other(), stranger.clone()).unwrap();

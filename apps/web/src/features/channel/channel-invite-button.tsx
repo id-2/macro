@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { HeaderActionButton } from '@components/app/HeaderActionButton';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
 import { useUserId } from '@core/context/user';
@@ -28,11 +29,11 @@ export function ChannelInviteButton(props: {
       <HeaderActionGroup label="Sharing">
         <HeaderActionButton
           grouped
-          label="Invite"
+          label={t('nav.invite')}
           icon={
             <UserPlusIcon class="size-3.5 touch:size-6 shrink-0 pointer-events-none" />
           }
-          tooltip="Invite people"
+          tooltip={t('nav.invitePeople')}
           onClick={() => setOpen(true)}
         />
       </HeaderActionGroup>

@@ -4,7 +4,7 @@
 //! carries out billing effects and decides what a subscription change means
 //! for each computer ([`ComputerService::observe_subscription`]).
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
@@ -239,7 +239,7 @@ impl<
 
     async fn require_rollout(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
     ) -> Result<(), ComputerError> {
         if !self.rollout.enabled(user_id).await {
             return Err(ComputerError::RolloutDisabled);
@@ -316,7 +316,7 @@ impl<
     pub async fn offers(
         &self,
         team_id: Uuid,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<SizeOffer>, ComputerError> {
         self.require_rollout(&user_id).await?;
         self.require_attached().await?;

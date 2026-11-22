@@ -10,7 +10,7 @@ import {
   type LiveSyncSource,
   type SyncSourceEvent,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
+} from '@rox-one/collaboration/collab/source';
 import { EphemeralStore, LoroDoc, type VersionVector } from 'loro-crdt';
 import { okAsync } from 'neverthrow';
 import type { DesignConnection } from '../queries/fig-collab';

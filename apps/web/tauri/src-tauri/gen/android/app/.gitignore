@@ -1,5 +1,5 @@
-/src/main/java/com/macro/app/prod/generated
-/src/main/java/com/macro/workspace/mobile/generated
+/src/main/java/com/rox/app/prod/generated
+/src/main/java/com/rox/workspace/mobile/generated
 /src/main/jniLibs/**/*.so
 /src/main/assets/tauri.conf.json
 /tauri.build.gradle.kts

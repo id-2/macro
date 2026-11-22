@@ -1,6 +1,6 @@
 use crate::model::Message;
 use anyhow::{Context, Result};
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use sqlx::{Executor, Postgres};
 use uuid::Uuid;
 
@@ -17,7 +17,7 @@ pub async fn create_message<'e, E>(executor: E, options: CreateMessageOptions) -
 where
     E: Executor<'e, Database = Postgres>,
 {
-    let message_id = macro_uuid::generate_uuid_v7();
+    let message_id = rox_uuid::generate_uuid_v7();
 
     let message = sqlx::query!(
         r#"
@@ -45,7 +45,7 @@ where
             id: row.id,
             channel_id: row.channel_id,
             thread_id: row.thread_id,
-            sender_id: MacroUserIdStr::parse_from_str(&row.sender_id)
+            sender_id: RoxUserIdStr::parse_from_str(&row.sender_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
             content: row.content,

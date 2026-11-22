@@ -11,7 +11,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use futures::StreamExt;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::{
     convert::ConvertQueueMessage,
     document::{BomPart, BomPartWithContent, DocumentMetadata},
@@ -43,12 +43,12 @@ use crate::api::context::{ApiContext, AuthorizationService};
 #[tracing::instrument(skip(ctx, _internal_authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Query(pagination): extract::Query<PaginationQueryParams>,
 ) -> Result<Response, Response> {
     let pagination = Pagination::from_query_params(pagination);
     let (documents, total_count) =
-        macro_db_client::convert::get_docx_files(&ctx.db, pagination.limit, pagination.offset)
+        rox_db_client::convert::get_docx_files(&ctx.db, pagination.limit, pagination.offset)
             .await
             .map_err(|e| {
                 tracing::error!(error=?e, "unable to get documents");
@@ -177,7 +177,7 @@ async fn process_docx(
                 .context("unable to put converted file")?;
 
             return Ok(Some(ConvertQueueMessage {
-                job_id: macro_uuid::generate_uuid_v7().to_string(),
+                job_id: rox_uuid::generate_uuid_v7().to_string(),
                 from_bucket: document_storage_bucket.to_string(),
                 to_bucket: document_storage_bucket.to_string(),
                 from_key: from_key.clone(),

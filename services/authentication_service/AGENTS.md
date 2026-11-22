@@ -31,7 +31,7 @@ key issuance, and account merge/link flows.
   at `/team_agents`, plus its internal enrollment route; computer-facing
   addresses come from `outbound/agent_addresses.rs`).
 - Not here: authorization/permission decisions on other entities →
-  `crates/macro_authorization`; metered AI credits → `crates/ai_billing`;
+  `crates/rox_authorization`; metered AI credits → `crates/ai_billing`;
   team lifecycle and seats → `crates/teams`; a person's interface language
   (`/user/language`) → `crates/user_language`.
 
@@ -212,7 +212,7 @@ inputs cannot select an agent, and ordinary user credentials remain unattributed
 
 ## Gotchas
 
-- The email sign-in (`POST /login/passwordless`, `GET /oauth/passwordless/{code}`) refuses an agent's program (`middleware::refuse_program_sign_in`, 403): one that reads the code from the user's inbox would hold the session. These routes take no credential: inside the sandbox every request carries `x-macro-code-execution`, which is the guard; a sent credential signed for an agent or routine refuses too, though a program outside the sandbox can send none. A credential that does not verify counts as none, so a person with a stale session still signs in.
+- The email sign-in (`POST /login/passwordless`, `GET /oauth/passwordless/{code}`) refuses an agent's program (`middleware::refuse_program_sign_in`, 403): one that reads the code from the user's inbox would hold the session. These routes take no credential: inside the sandbox every request carries `x-rox-code-execution` (or its earlier `x-macro-code-execution` name), which is the guard; a sent credential signed for an agent or routine refuses too, though a program outside the sandbox can send none. A credential that does not verify counts as none, so a person with a stale session still signs in.
 - `POST /login/passwordless` creates an unknown address's account before anyone
   has used a code, and FusionAuth calls it verified. Its FusionAuth user data
   carries `emailCodeSignup`, so the `user.create` webhook records the address

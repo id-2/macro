@@ -3,8 +3,8 @@
 use std::collections::{HashMap, HashSet};
 
 use chrono::{DateTime, Utc};
-use macro_user_id::{
-    cowlike::CowLike, email::Email, lowercased::Lowercase, user_id::MacroUserIdStr,
+use rox_user_id::{
+    cowlike::CowLike, email::Email, lowercased::Lowercase, user_id::RoxUserIdStr,
 };
 use model_user::Language;
 use models_permissions::share_permission::LinkShare;
@@ -400,7 +400,7 @@ pub struct TeamMember<'a> {
     pub team_id: uuid::Uuid,
     /// The user id of the team member
     #[cfg_attr(feature = "axum", schema(value_type = String))]
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// The role of the team member
     pub role: TeamRole,
     /// The paid plan the member's seat is billed at. Meaningful on paying
@@ -544,7 +544,7 @@ pub struct PatchTeamPlanRequest {
 pub struct PatchTeamMemberCrmAccess {
     /// The current member to update.
     #[cfg_attr(feature = "axum", schema(value_type = String))]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Whether the member may use CRM records and team-shared pipelines.
     pub enabled: bool,
 }
@@ -555,7 +555,7 @@ pub struct PatchTeamMemberCrmAccess {
 pub struct PatchTeamUserRole {
     /// The team user you are updating
     #[cfg_attr(feature = "axum", schema(value_type = String))]
-    pub team_user_id: MacroUserIdStr<'static>,
+    pub team_user_id: RoxUserIdStr<'static>,
     /// The new role of the team user
     pub role: TeamRole,
 }
@@ -603,7 +603,7 @@ pub struct Team {
     pub(crate) name: String,
     pub(crate) slug: String,
     #[cfg_attr(feature = "axum", schema(value_type = String))]
-    pub(crate) owner_id: MacroUserIdStr<'static>,
+    pub(crate) owner_id: RoxUserIdStr<'static>,
     /// CRM record availability, always true for teams. This compatibility
     /// field does not indicate whether any mailbox contributes emails.
     pub(crate) crm_enabled: bool,
@@ -633,7 +633,7 @@ impl Team {
         id: uuid::Uuid,
         name: String,
         slug: String,
-        owner_id: MacroUserIdStr<'static>,
+        owner_id: RoxUserIdStr<'static>,
         crm_enabled: bool,
         enterprise: bool,
     ) -> Self {
@@ -786,7 +786,7 @@ pub struct TeamInviteSnapshot<'a> {
     /// The role being invited as
     pub team_role: TeamRole,
     /// The user who sent the invitation
-    pub invited_by: MacroUserIdStr<'a>,
+    pub invited_by: RoxUserIdStr<'a>,
     /// When the invite was created
     pub created_at: DateTime<Utc>,
     /// When the invite was last sent

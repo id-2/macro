@@ -11,7 +11,7 @@ use import::domain::ports::{
 use initiative::domain::models::{
     CreateInitiativeRequest, InitiativeId, MAX_INITIATIVE_NAME_GRAPHEMES,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::MAX_DOCUMENT_NAME_GRAPHEMES;
 use models_properties::{EntityReference, EntityType, api::SetPropertyValue};
 use system_properties::SystemPropertyKey;
@@ -28,7 +28,7 @@ impl ToolEntityCreator {
     #[tracing::instrument(skip_all, fields(project_id = %id), err)]
     pub(crate) async fn create_tracker_project_impl(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         markdown: &str,
@@ -55,7 +55,7 @@ impl ToolEntityCreator {
     #[tracing::instrument(skip_all, fields(task_id = %id), err)]
     pub(crate) async fn create_tracker_task_impl(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         name: &str,
         markdown: &str,
@@ -99,7 +99,7 @@ impl ToolEntityCreator {
     #[tracing::instrument(skip_all, fields(task_id = %id), err)]
     pub(crate) async fn link_tracker_task_impl(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         relations: &TrackerTaskRelations,
     ) -> anyhow::Result<()> {

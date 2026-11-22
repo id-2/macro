@@ -99,14 +99,14 @@ impl Repository for FakeRepository {
     }
     async fn is_human(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<bool, Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
         Ok(!self.agents.lock().unwrap().contains(user.as_ref()))
     }
     async fn is_team_admin(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
         team: TeamId,
     ) -> Result<bool, Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
@@ -314,7 +314,7 @@ impl Repository for FakeRepository {
         &self,
         operation: Uuid,
         record: &Record,
-        publisher: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        publisher: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<(), Error> {
         self.calls.fetch_add(1, Ordering::SeqCst);
         if self
@@ -385,8 +385,8 @@ impl Repository for FakeRepository {
             {
                 None => crate::domain::ports::IntentOrigin::Human,
                 Some((agent, action)) => crate::domain::ports::IntentOrigin::Agent {
-                    agent: macro_user_id::cowlike::CowLike::into_owned(
-                        macro_user_id::user_id::MacroUserIdStr::parse_from_str(agent)
+                    agent: rox_user_id::cowlike::CowLike::into_owned(
+                        rox_user_id::user_id::RoxUserIdStr::parse_from_str(agent)
                             .expect("fixture agent"),
                     ),
                     action: *action,

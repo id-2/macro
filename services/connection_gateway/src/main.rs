@@ -32,14 +32,14 @@ use last_online_tracker::{
     inbound::LastOnlineWorker,
     outbound::{redis::RedisLastOnlineRepo, time::DefaultTime as LastOnlineDefaultTime},
 };
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_entrypoint::MacroEntrypoint;
-use macro_env::Environment;
-use macro_tower_layers::MacroRequestIdAndTracingLayer;
+use rox_entrypoint::RoxEntrypoint;
+use rox_env::Environment;
+use rox_tower_layers::RoxRequestIdAndTracingLayer;
 use service::dynamodb::create_dynamo_db_connection_manager;
 use service::redis::poll_messages;
 use sqlx::postgres::PgPoolOptions;
@@ -49,9 +49,9 @@ use tower_http::cors::CorsLayer;
 #[tokio::main]
 #[tracing::instrument(ret, err)]
 async fn main() -> Result<()> {
-    MacroEntrypoint::default().init();
+    RoxEntrypoint::default().init();
 
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
 
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
@@ -137,13 +137,13 @@ async fn main() -> Result<()> {
     ));
 
     let config = Arc::new(config);
-    let authorization_state = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(jwt_args.clone()),
+    let authorization_state = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(jwt_args.clone()),
         InternalAuthConfig {
             api_key: config.internal_api_key.to_string(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(pgpool.clone())),
     )));
 
@@ -157,7 +157,7 @@ async fn main() -> Result<()> {
             Duration::from_secs(60),
         )),
     })
-    .layer(MacroRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
+    .layer(RoxRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
     .layer(cors)
     .layer(axum::middleware::from_fn_with_state(
         correlation,

@@ -2,13 +2,13 @@ import {
   type DropdownOptions,
   literalListItems,
   validationReference,
-} from '@macro-inc/spreadsheet/data-validation';
+} from '@rox-one/spreadsheet/data-validation';
 import {
   type ComparisonOperator,
   type DataValidation,
   sqrefContains,
-} from '@macro-inc/spreadsheet/sheet-rules';
-import { typedNumber } from '@macro-inc/spreadsheet/typed-number';
+} from '@rox-one/spreadsheet/sheet-rules';
+import { typedNumber } from '@rox-one/spreadsheet/typed-number';
 import { formatCellAddress, parseCellAddress } from './spreadsheet-document';
 
 /** The validation rule of a cell: Excel applies one rule per cell. */

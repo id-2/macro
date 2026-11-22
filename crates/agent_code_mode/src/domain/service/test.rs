@@ -1,6 +1,6 @@
 use super::*;
 use agent_session::testing::test_agent_session;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use std::collections::HashMap;
 use std::sync::Mutex;
@@ -53,15 +53,15 @@ impl ExecutionStore for MemoryStore {
     }
 }
 
-struct TestTurns(Mutex<Option<macro_uuid::Uuid>>);
+struct TestTurns(Mutex<Option<rox_uuid::Uuid>>);
 impl Default for TestTurns {
     fn default() -> Self {
-        Self(Mutex::new(Some(macro_uuid::Uuid::from_u128(1))))
+        Self(Mutex::new(Some(rox_uuid::Uuid::from_u128(1))))
     }
 }
 #[async_trait]
 impl ExecutionTurns for TestTurns {
-    async fn active(&self, _: AgentSessionId) -> Result<Option<macro_uuid::Uuid>, CodeModeError> {
+    async fn active(&self, _: AgentSessionId) -> Result<Option<rox_uuid::Uuid>, CodeModeError> {
         Ok(*self.0.lock().unwrap())
     }
 }
@@ -97,7 +97,7 @@ impl ModelImages for Pixels {
     async fn load_png(
         &self,
         file: &StaticFileId,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> anyhow::Result<ModelImage> {
         anyhow::ensure!(file.as_ref() != "missing", "no such file");
         // test_agent_session's owner.
@@ -160,7 +160,7 @@ fn request() -> ExecuteRequest {
 async fn run_uses_session_owner_and_records_source_and_result_without_credential() {
     let (service, credentials, store, _) = service();
     let mut session =
-        test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+        test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
     session.bot_id = bot_id::BotId::new_from_uuid(uuid::Uuid::from_u128(0xcafe));
     let id = ExecutionId::mint();
     let result = service
@@ -168,7 +168,7 @@ async fn run_uses_session_owner_and_records_source_and_result_without_credential
             &session,
             id,
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
@@ -192,7 +192,7 @@ async fn run_uses_session_owner_and_records_source_and_result_without_credential
             &session,
             id,
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
@@ -206,7 +206,7 @@ async fn run_uses_session_owner_and_records_source_and_result_without_credential
             &session,
             id,
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             changed.clone(),
             CancellationToken::new(),
         )
@@ -232,7 +232,7 @@ async fn run_uses_session_owner_and_records_source_and_result_without_credential
 async fn archived_or_inactive_sessions_never_receive_credentials() {
     let (service, credentials, _, turns) = service();
     let mut session =
-        test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+        test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
     session.archived = Some(agent_session::domain::model::SessionArchive {
         by: agent_session::domain::model::ArchiveCause::User,
         at: chrono::Utc::now(),
@@ -243,7 +243,7 @@ async fn archived_or_inactive_sessions_never_receive_credentials() {
                 &session,
                 ExecutionId::mint(),
                 ai_toolset::actor::ToolActor::Owner,
-                macro_uuid::Uuid::from_u128(1),
+                rox_uuid::Uuid::from_u128(1),
                 request(),
                 CancellationToken::new()
             )
@@ -258,7 +258,7 @@ async fn archived_or_inactive_sessions_never_receive_credentials() {
                 &session,
                 ExecutionId::mint(),
                 ai_toolset::actor::ToolActor::Owner,
-                macro_uuid::Uuid::from_u128(1),
+                rox_uuid::Uuid::from_u128(1),
                 request(),
                 CancellationToken::new()
             )
@@ -270,27 +270,27 @@ async fn archived_or_inactive_sessions_never_receive_credentials() {
 #[tokio::test]
 async fn collision_runs_under_a_fresh_id_without_reading_another_session() {
     let (service, credentials, store, _) = service();
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
     let id = ExecutionId::mint();
     service
         .execute(
             &session,
             id,
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
         .await
         .unwrap();
     let mut other = session.clone();
-    other.id = AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    other.id = AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let receipt = service
         .execute(
             &other,
             id,
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
@@ -307,11 +307,11 @@ async fn collision_runs_under_a_fresh_id_without_reading_another_session() {
 #[tokio::test]
 async fn unfinished_journal_reads_and_retries_report_uncertainty_without_replaying() {
     let (service, credentials, store, _) = service();
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
     let id = ExecutionId::mint();
     let mut record = ExecutionRecord {
         acting_as: Some(ai_toolset::actor::ToolActor::Owner),
-        turn_id: Some(macro_uuid::Uuid::from_u128(1)),
+        turn_id: Some(rox_uuid::Uuid::from_u128(1)),
         execution_id: id,
         source: request().source,
         status: ExecutionStatus::Running,
@@ -333,7 +333,7 @@ async fn unfinished_journal_reads_and_retries_report_uncertainty_without_replayi
             &session,
             id,
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
@@ -405,14 +405,14 @@ async fn optional_reviews_default_to_empty_without_accepting_malformed_results()
             Arc::new(Pixels),
         );
         let session =
-            test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+            test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
         let id = ExecutionId::mint();
         let result = service
             .execute(
                 &session,
                 id,
                 ai_toolset::actor::ToolActor::Owner,
-                macro_uuid::Uuid::from_u128(1),
+                rox_uuid::Uuid::from_u128(1),
                 request(),
                 CancellationToken::new(),
             )
@@ -481,7 +481,7 @@ async fn persists_live_activity_and_marks_unfinished_requests_unknown() {
         Arc::new(TestTurns::default()),
         Arc::new(Pixels),
     );
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
     let id = ExecutionId::mint();
     let session_id = session.id;
     let running = tokio::spawn(async move {
@@ -490,7 +490,7 @@ async fn persists_live_activity_and_marks_unfinished_requests_unknown() {
                 &session,
                 id,
                 ai_toolset::actor::ToolActor::Owner,
-                macro_uuid::Uuid::from_u128(1),
+                rox_uuid::Uuid::from_u128(1),
                 request(),
                 CancellationToken::new(),
             )
@@ -527,7 +527,7 @@ async fn persists_live_activity_and_marks_unfinished_requests_unknown() {
 fn activity_rejects_unknown_operations_and_is_bounded() {
     let mut record = ExecutionRecord {
         acting_as: Some(ai_toolset::actor::ToolActor::Owner),
-        turn_id: Some(macro_uuid::Uuid::from_u128(1)),
+        turn_id: Some(rox_uuid::Uuid::from_u128(1)),
         execution_id: ExecutionId::mint(),
         source: String::new(),
         status: ExecutionStatus::Running,
@@ -625,7 +625,7 @@ async fn cancellation_is_not_blocked_by_a_stalled_activity_save() {
         Arc::new(TestTurns::default()),
         Arc::new(Pixels),
     );
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
     let cancel = CancellationToken::new();
     let token = cancel.clone();
     let run = tokio::spawn(async move {
@@ -634,7 +634,7 @@ async fn cancellation_is_not_blocked_by_a_stalled_activity_save() {
                 &session,
                 ExecutionId::mint(),
                 ai_toolset::actor::ToolActor::Owner,
-                macro_uuid::Uuid::from_u128(1),
+                rox_uuid::Uuid::from_u128(1),
                 request(),
                 token,
             )
@@ -662,7 +662,7 @@ async fn execution_retries_cannot_change_accounts_or_move_between_turns() {
             &session,
             id,
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
@@ -675,20 +675,20 @@ async fn execution_retries_cannot_change_accounts_or_move_between_turns() {
             &session,
             id,
             ai_toolset::actor::ToolActor::Requester,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
         .await
         .unwrap();
     assert_ne!(requester.execution_id, id);
-    *turns.0.lock().unwrap() = Some(macro_uuid::Uuid::from_u128(2));
+    *turns.0.lock().unwrap() = Some(rox_uuid::Uuid::from_u128(2));
     let next_turn = service
         .execute(
             &session,
             id,
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(2),
+            rox_uuid::Uuid::from_u128(2),
             request(),
             CancellationToken::new(),
         )
@@ -702,20 +702,20 @@ async fn execution_retries_cannot_change_accounts_or_move_between_turns() {
         original.acting_as,
         Some(ai_toolset::actor::ToolActor::Owner)
     );
-    assert_eq!(original.turn_id, Some(macro_uuid::Uuid::from_u128(1)));
+    assert_eq!(original.turn_id, Some(rox_uuid::Uuid::from_u128(1)));
 }
 
 #[tokio::test]
 async fn a_delayed_call_cannot_adopt_a_new_turn_or_receive_credentials() {
     let (service, credentials, store, turns) = service();
     let session = test_agent_session(AgentSessionId::new());
-    *turns.0.lock().unwrap() = Some(macro_uuid::Uuid::from_u128(2));
+    *turns.0.lock().unwrap() = Some(rox_uuid::Uuid::from_u128(2));
     let result = service
         .execute(
             &session,
             ExecutionId::mint(),
             ai_toolset::actor::ToolActor::Requester,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
@@ -737,13 +737,13 @@ async fn returned_images_reach_the_model_as_pixels() {
         Arc::new(TestTurns::default()),
         Arc::new(Pixels),
     );
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
     let receipt = service
         .execute(
             &session,
             ExecutionId::mint(),
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )
@@ -771,13 +771,13 @@ async fn an_unreadable_returned_image_is_reported_without_pixels() {
         Arc::new(TestTurns::default()),
         Arc::new(Pixels),
     );
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::generate_uuid_v7()));
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::generate_uuid_v7()));
     let receipt = service
         .execute(
             &session,
             ExecutionId::mint(),
             ai_toolset::actor::ToolActor::Owner,
-            macro_uuid::Uuid::from_u128(1),
+            rox_uuid::Uuid::from_u128(1),
             request(),
             CancellationToken::new(),
         )

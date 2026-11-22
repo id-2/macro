@@ -4,7 +4,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::{Json, extract};
 use email::domain::message_reads::{ThreadMessagesRequest, ThreadReadError};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use sqlx::types::Uuid;
 use strum_macros::AsRefStr;
@@ -79,7 +79,7 @@ pub struct PathParams {
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id), err)]
 pub async fn get_thread_messages_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(PathParams { id }): Path<PathParams>,
     extract::Query(query_params): extract::Query<GetThreadMessagesParams>,
 ) -> Result<Response, GetThreadError> {

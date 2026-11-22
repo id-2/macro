@@ -1,8 +1,8 @@
 //! Broker envelope and publication for verified GitHub App deliveries.
 
 use crate::domain::models::GithubWebhookReceived;
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroGithubWebhooksTopic;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxGithubWebhooksTopic;
 use serde::{Deserialize, Serialize};
 
 /// Facts published to `macro.github_webhooks`.
@@ -15,19 +15,19 @@ pub enum GithubWebhookTopicEvent {
 }
 
 impl TopicEvent for GithubWebhookTopicEvent {
-    type Topic = MacroGithubWebhooksTopic;
+    type Topic = RoxGithubWebhooksTopic;
     const SCHEMA_VERSION: u8 = 1;
 }
 
 /// A delivery keyed by installation, so one installation's deliveries keep
 /// their order.
 #[derive(Debug, Clone)]
-pub struct GithubWebhookMacroEvent {
+pub struct GithubWebhookRoxEvent {
     key: String,
     event: Event<GithubWebhookTopicEvent>,
 }
 
-impl GithubWebhookMacroEvent {
+impl GithubWebhookRoxEvent {
     /// Wrap a verified delivery.
     pub fn received(delivery: GithubWebhookReceived) -> Self {
         Self {
@@ -37,7 +37,7 @@ impl GithubWebhookMacroEvent {
     }
 }
 
-impl MacroEvent for GithubWebhookMacroEvent {
+impl RoxEvent for GithubWebhookRoxEvent {
     type EventPayload = GithubWebhookTopicEvent;
     fn key(&self) -> &str {
         &self.key
@@ -55,7 +55,7 @@ impl MacroEvent for GithubWebhookMacroEvent {
 pub struct BrokerGithubWebhookPublisher<B>(pub B);
 
 #[cfg(feature = "sync")]
-impl<B: macro_event_broker::MacroEventBroker> crate::domain::ports::GithubWebhookPublisher
+impl<B: rox_event_broker::RoxEventBroker> crate::domain::ports::GithubWebhookPublisher
     for BrokerGithubWebhookPublisher<B>
 {
     fn publish_received(
@@ -70,7 +70,7 @@ impl<B: macro_event_broker::MacroEventBroker> crate::domain::ports::GithubWebhoo
     > {
         Box::pin(async move {
             self.0
-                .send_event(&GithubWebhookMacroEvent::received(delivery))
+                .send_event(&GithubWebhookRoxEvent::received(delivery))
                 .map_err(anyhow::Error::from)?
                 .await
                 .map_err(anyhow::Error::from)?

@@ -182,10 +182,10 @@ impl Computers {
             Fleet::Docker => self.docker_env(env)?,
             Fleet::Incus => {
                 let network = IncusNetwork::load()?;
-                let image = macro_env_var::maybe_read_env(INCUS_IMAGE_VARIABLE).with_context(|| {
+                let image = rox_env_var::maybe_read_env(INCUS_IMAGE_VARIABLE).with_context(|| {
                     format!("set {INCUS_IMAGE_VARIABLE} to the macro-box/<version> alias on runtime-dev-1")
                 })?;
-                let agent_image = macro_env_var::maybe_read_env(INCUS_AGENT_IMAGE_VARIABLE)
+                let agent_image = rox_env_var::maybe_read_env(INCUS_AGENT_IMAGE_VARIABLE)
                     .with_context(|| {
                         format!("set {INCUS_AGENT_IMAGE_VARIABLE} to the macro-box-agent/<version> alias on runtime-dev-1")
                     })?;
@@ -381,7 +381,7 @@ struct IncusNetwork {
 
 impl IncusNetwork {
     fn load() -> Result<Self> {
-        let runtime = match macro_env_var::maybe_read_env("COMPUTERS_INCUS_ADDRESS") {
+        let runtime = match rox_env_var::maybe_read_env("COMPUTERS_INCUS_ADDRESS") {
             Some(address) => address,
             None => {
                 let output = Command::new("tailscale")
@@ -482,9 +482,9 @@ impl IncusCredentials {
 
 /// Local Incus credentials directory.
 fn credentials_dir() -> Result<PathBuf> {
-    let config = match macro_env_var::maybe_read_env("XDG_CONFIG_HOME") {
+    let config = match rox_env_var::maybe_read_env("XDG_CONFIG_HOME") {
         Some(dir) => PathBuf::from(dir),
-        None => PathBuf::from(macro_env_var::maybe_read_env("HOME").context("HOME is not set")?)
+        None => PathBuf::from(rox_env_var::maybe_read_env("HOME").context("HOME is not set")?)
             .join(".config"),
     };
     Ok(config.join("macro-computers"))

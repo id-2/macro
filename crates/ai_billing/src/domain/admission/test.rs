@@ -23,13 +23,13 @@ impl FakeBilling {
 impl BillingService for FakeBilling {
     async fn change_plan(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: crate::domain::plan_change::PlanChange,
     ) -> BillingResult<()> {
         panic!("this use case must not change plans")
     }
 
-    async fn check_allowance(&self, user: &MacroUserIdStr<'_>) -> BillingResult<AllowanceDecision> {
+    async fn check_allowance(&self, user: &RoxUserIdStr<'_>) -> BillingResult<AllowanceDecision> {
         assert_eq!(user.as_ref(), "macro|user@example.com");
         self.calls.fetch_add(1, Ordering::SeqCst);
         if self.fail {
@@ -40,15 +40,15 @@ impl BillingService for FakeBilling {
         Ok(self.decision.expect("billing must not be called"))
     }
 
-    async fn snapshot(&self, _: &MacroUserIdStr<'_>) -> BillingResult<UsageSnapshot> {
+    async fn snapshot(&self, _: &RoxUserIdStr<'_>) -> BillingResult<UsageSnapshot> {
         panic!("admission must not call snapshot")
     }
-    async fn settle(&self, _: &MacroUserIdStr<'_>) -> BillingResult<()> {
+    async fn settle(&self, _: &RoxUserIdStr<'_>) -> BillingResult<()> {
         panic!("admission must not settle")
     }
     async fn update_overage(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: bool,
         _: i64,
     ) -> BillingResult<UsageSnapshot> {
@@ -56,7 +56,7 @@ impl BillingService for FakeBilling {
     }
     async fn update_auto_reload(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: bool,
         _: crate::domain::AutoReloadThresholds,
     ) -> BillingResult<UsageSnapshot> {
@@ -64,14 +64,14 @@ impl BillingService for FakeBilling {
     }
     async fn purchase_credits(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: i64,
     ) -> BillingResult<crate::domain::CreditPurchase> {
         panic!("admission must not purchase credits")
     }
     async fn create_credit_checkout(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: i64,
         _: String,
         _: String,
@@ -80,7 +80,7 @@ impl BillingService for FakeBilling {
     }
     async fn apply_credit_purchase(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: i64,
         _: &str,
     ) -> BillingResult<()> {
@@ -88,7 +88,7 @@ impl BillingService for FakeBilling {
     }
     async fn sync_period(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
         _: DateTime<Utc>,
         _: DateTime<Utc>,
         _: Option<crate::domain::period::SubscriptionPeriod>,
@@ -101,15 +101,15 @@ impl BillingService for FakeBilling {
     async fn mark_credit_reload_invoice(
         &self,
         _: &str,
-        _: Option<macro_uuid::Uuid>,
+        _: Option<rox_uuid::Uuid>,
         _: bool,
     ) -> BillingResult<()> {
         panic!("admission must not handle invoices")
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|user@example.com").unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|user@example.com").unwrap()
 }
 
 #[tokio::test]

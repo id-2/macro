@@ -1,9 +1,9 @@
 #![deny(missing_docs)]
 //! Domain models for invitation email notifications.
 //!
-//! Contains the [`InviteToMacro`] referral notification, the [`InviteToTeamMetadata`] team
+//! Contains the [`InviteToRox`] referral notification, the [`InviteToTeamMetadata`] team
 //! invitation notification and its [`InviteePlan`], the [`ChannelInviteMetadata`] channel
-//! invitation, the [`ColleagueJoinedMacro`] colleague join email, and the [`ReferralCode`]
+//! invitation, the [`ColleagueJoinedRox`] colleague join email, and the [`ReferralCode`]
 //! newtype.
 
 #[cfg(test)]
@@ -13,14 +13,14 @@ mod call_invite;
 pub use call_invite::CallInvite;
 
 mod colleague_joined;
-pub use colleague_joined::ColleagueJoinedMacro;
+pub use colleague_joined::ColleagueJoinedRox;
 
 use askama::Template;
-use macro_env::Environment;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::email::EmailStr;
-use macro_user_id::email::ReadEmailParts;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_env::Environment;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::email::EmailStr;
+use rox_user_id::email::ReadEmailParts;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use notification::domain::models::{
     NotifCollapseKey, Notification, NotificationExtEmail, NotificationExtIos, NotificationTitle,
@@ -60,7 +60,7 @@ pub struct ReferralCode(pub String);
 /// The metadata for a referral-to-macro notification.
 #[derive(Debug, Serialize, Deserialize, Clone, Template)]
 #[template(path = "invite.html")]
-pub struct InviteToMacro {
+pub struct InviteToRox {
     /// The recipient email.
     pub recipient_email: EmailStr<'static>,
     /// The referral code which is templated into the email to track the sender
@@ -75,14 +75,14 @@ pub struct InviteToMacro {
     pub sender_email: Option<String>,
 }
 
-impl InviteToMacro {
+impl InviteToRox {
     fn referral_url(&self) -> Url {
         let env = Environment::new_or_prod();
         get_url(env, &self.referral_code)
     }
 }
 
-impl Notification for InviteToMacro {
+impl Notification for InviteToRox {
     const TYPE_NAME: &'static str = "invite_to_macro";
 }
 
@@ -117,7 +117,7 @@ fn get_url(env: Environment, code: &ReferralCode) -> Url {
     url
 }
 
-impl NotificationExtEmail for InviteToMacro {
+impl NotificationExtEmail for InviteToRox {
     fn format_email(&self) -> EmailContent {
         let sender = self
             .sender_name
@@ -154,7 +154,7 @@ pub struct ChannelInviteMetadata {
     /// The user who sent the invitation
     #[serde(alias = "invited_by")]
     #[schema(value_type = String)]
-    pub invited_by: MacroUserIdStr<'static>,
+    pub invited_by: RoxUserIdStr<'static>,
     /// The name of the channel
     #[serde(default)]
     #[serde(alias = "channel_name")]
@@ -169,7 +169,7 @@ pub struct ChannelInviteMetadata {
     pub message_id: Option<Uuid>,
     /// Destination used while building a separate email retry key per recipient.
     #[serde(skip)]
-    pub email_recipient: Option<MacroUserIdStr<'static>>,
+    pub email_recipient: Option<RoxUserIdStr<'static>>,
     /// Message content to show in the invite email, when the invite was triggered by a message.
     #[serde(default)]
     pub message_content: Option<String>,
@@ -195,7 +195,7 @@ impl Notification for ChannelInviteMetadata {
 impl NotificationTitle for ChannelInviteMetadata {
     fn format_title(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         let email = self.invited_by.email_part();
         let sender = email.email_str();
@@ -211,7 +211,7 @@ impl NotificationTitle for ChannelInviteMetadata {
 
     fn format_body(
         &self,
-        _sender_id: Option<MacroUserIdStr<'_>>,
+        _sender_id: Option<RoxUserIdStr<'_>>,
     ) -> Result<String, rootcause::Report> {
         Ok("Open Rox to continue".to_string())
     }
@@ -265,7 +265,7 @@ impl NotificationExtIos for ChannelInviteMetadata {
 
     fn as_apns<'a>(
         &self,
-        sender_id: Option<MacroUserIdStr<'a>>,
+        sender_id: Option<RoxUserIdStr<'a>>,
         _entity: &Entity<'_>,
         notification_id: Uuid,
     ) -> Option<APNSPushNotification<Self::NotifData>> {
@@ -313,7 +313,7 @@ pub struct InviteToTeamMetadata {
     /// The user who sent the invitation
     #[serde(alias = "invited_by")]
     #[schema(value_type = String)]
-    pub invited_by: MacroUserIdStr<'static>,
+    pub invited_by: RoxUserIdStr<'static>,
     /// Role/permission level in the team
     pub role: Option<String>,
 

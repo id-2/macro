@@ -9,7 +9,7 @@ use std::{
 
 use attention_feed::test_support::{FakeNotifications, at, with_state};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::{
     bulk_action::{
         AppliedChunk, ApplyChunk, BulkAction, BulkActionLease, BulkActionStatus, BulkActionStore,
@@ -263,7 +263,7 @@ impl BulkActionStore for FakeClears {
 
     async fn request_undo(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<Option<UndoRequested>, Report> {
         let owned = self
@@ -369,7 +369,7 @@ impl BulkActionStore for FakeClears {
 
     async fn get(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> Result<Option<BulkAction>, Report> {
         Ok(self
@@ -381,7 +381,7 @@ impl BulkActionStore for FakeClears {
             .map(|stored| stored.action.clone()))
     }
 
-    async fn running(&self, user_id: &MacroUserIdStr<'_>) -> Result<Vec<BulkAction>, Report> {
+    async fn running(&self, user_id: &RoxUserIdStr<'_>) -> Result<Vec<BulkAction>, Report> {
         Ok(self
             .stored
             .lock()

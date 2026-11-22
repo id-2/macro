@@ -755,7 +755,8 @@ message, and GraphQL refuses programs. A person reads the email whole.
 ## Agent program sends
 
 An agent's program (a token with agent attribution, or a code-mode request
-marked by `x-macro-code-execution` whose token signs no program;
+marked by `x-rox-code-execution` (or its earlier `x-macro-code-execution` name)
+whose token signs no program;
 `macro_authorization::is_agent_run`) never sends
 an email the user has not seen. The REST send (`POST /email/messages`) and the
 calendar invite forward (`POST /email/calendar-events/{event_id}/forward`)

@@ -9,7 +9,7 @@ use email::domain::{
     },
     ports::EmailUserService,
 };
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use uuid::Uuid;
 
 use super::GraphqlEmailQuery;
@@ -18,7 +18,7 @@ mod senders;
 
 #[derive(Default)]
 struct FakeEmailUserService {
-    requested_users: Mutex<Vec<MacroUserIdStr<'static>>>,
+    requested_users: Mutex<Vec<RoxUserIdStr<'static>>>,
     fail: bool,
     unavailable_inbox: bool,
 }
@@ -26,7 +26,7 @@ struct FakeEmailUserService {
 impl EmailUserService for FakeEmailUserService {
     async fn get_user_email_senders(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
         link_id: Uuid,
     ) -> Result<Vec<email::domain::senders::SendAsAddress>, EmailErr> {
         self.requested_users.lock().unwrap().push(macro_id);
@@ -43,7 +43,7 @@ impl EmailUserService for FakeEmailUserService {
 
     async fn get_user_email_labels(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<LinkLabel>, EmailErr> {
         self.requested_users.lock().unwrap().push(macro_id);
         if self.fail {
@@ -56,7 +56,7 @@ impl EmailUserService for FakeEmailUserService {
 
     async fn get_user_email_links(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<UserEmailLink>, EmailErr> {
         self.requested_users.lock().unwrap().push(macro_id);
         if self.fail {
@@ -74,8 +74,8 @@ impl EmailUserService for FakeEmailUserService {
     }
 }
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|viewer@example.com").unwrap()
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|viewer@example.com").unwrap()
 }
 
 fn label() -> LinkLabel {
@@ -95,7 +95,7 @@ fn link() -> UserEmailLink {
     UserEmailLink {
         draft_is_signal: true,
         id: Uuid::from_u128(2),
-        macro_id: MacroUserIdStr::try_from_email("owner@example.com").unwrap(),
+        macro_id: RoxUserIdStr::try_from_email("owner@example.com").unwrap(),
         email_address: EmailStr::try_from("inbox@example.com".to_owned()).unwrap(),
         photo_url: Some("https://example.com/photo.png".to_owned()),
         provider: UserProvider::Gmail,

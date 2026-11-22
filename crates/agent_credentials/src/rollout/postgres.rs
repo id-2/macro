@@ -1,7 +1,7 @@
 //! Agents' creators from RoxDB's `team_agents` rows.
 
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sqlx::PgPool;
 
@@ -27,8 +27,8 @@ impl PgAgentCreators {
 impl AgentCreators for PgAgentCreators {
     async fn creator_of(
         &self,
-        agent: &MacroUserIdStr<'_>,
-    ) -> Result<Option<MacroUserIdStr<'static>>, Report> {
+        agent: &RoxUserIdStr<'_>,
+    ) -> Result<Option<RoxUserIdStr<'static>>, Report> {
         // A deleted creator clears `created_by`; the team's owner then decides.
         let responsible = sqlx::query_scalar!(
             r#"
@@ -47,7 +47,7 @@ impl AgentCreators for PgAgentCreators {
             return Ok(None);
         };
 
-        let creator = MacroUserIdStr::parse_from_str(&responsible)
+        let creator = RoxUserIdStr::parse_from_str(&responsible)
             .map_err(|_| rootcause::report!("a stored creator id is malformed"))?
             .into_owned();
         Ok(Some(creator))

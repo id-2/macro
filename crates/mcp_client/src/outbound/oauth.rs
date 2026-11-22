@@ -1,7 +1,7 @@
 //! RMCP-backed OAuth adapter for remote MCP servers.
 
 use crate::domain::models::{
-    MCP_CLIENT_NAME, MacroUserIdStr, McpServerRecord, OAuthClientMetadata,
+    MCP_CLIENT_NAME, RoxUserIdStr, McpServerRecord, OAuthClientMetadata,
 };
 use crate::domain::ports::{
     McpServerHttp, McpServerStore, OAuthClient, OAuthStateStore, PendingAuth,
@@ -9,7 +9,7 @@ use crate::domain::ports::{
 #[cfg(feature = "providers")]
 use crate::domain::provider_registry::PreRegisteredProviders;
 use crate::outbound::guarded_http::McpHttp;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use rmcp::transport::auth::{
     AuthorizationManager, AuthorizationMetadata, CredentialStore as _, InMemoryCredentialStore,
     InMemoryStateStore, OAuthClientConfig, StateStore as _, StoredAuthorizationState,
@@ -196,7 +196,7 @@ where
     #[tracing::instrument(skip_all, err)]
     async fn start_authorization(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
         server_name: &str,
     ) -> anyhow::Result<String> {
@@ -285,7 +285,7 @@ where
             .inspect_err(|e| tracing::error!(error = ?e, "credential store load failed"))?
             .ok_or_else(|| anyhow::anyhow!("credentials missing after token exchange"))?;
 
-        let user_id = MacroUserIdStr::parse_from_str(&pending.user_id)
+        let user_id = RoxUserIdStr::parse_from_str(&pending.user_id)
             .map_err(|e| anyhow::anyhow!("invalid user_id in pending context: {e}"))?
             .into_owned();
 

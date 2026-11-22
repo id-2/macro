@@ -28,7 +28,7 @@ import {
   canAssignChannel,
   canLabelChannel,
 } from '../../../core/channel-label-eligibility';
-import { ChannelLabelMenuItems as OriginalChannelLabelMenuItems } from '../ChannelLabelRows';
+import { ChannelLabelMenuItems as OriginalChannelLabelMenuItems, sectionChromeName } from '../ChannelLabelRows';
 import { rowKeyForLabel, useChannelsRail } from '../ChannelsRailContext';
 import { useChannelRailLabelState } from '../hooks/useChannelRailState';
 import { ChannelSectionEmptyState } from './ChannelSectionEmptyState';
@@ -208,8 +208,8 @@ export function ChannelLabelRow(props: { label: ChannelLabel }) {
       >
         <ChannelSectionHeading
           id={state().domId}
-          label={props.label.name}
-          tooltip={props.label.name}
+          label={sectionChromeName(props.label.name)}
+          tooltip={sectionChromeName(props.label.name)}
           open={state().open}
           focused={state().focused}
           unreadCount={state().unreadCount}
@@ -244,7 +244,7 @@ export function ChannelLabelRow(props: { label: ChannelLabel }) {
               variant="ghost"
               size="icon-sm"
               aria-label={t('channelSections.addChannelsTo', {
-                name: props.label.name,
+                name: sectionChromeName(props.label.name),
               })}
               tooltip={t('channelSections.addChannels')}
               disabled={!rail.labelsAvailable()}
@@ -255,7 +255,7 @@ export function ChannelLabelRow(props: { label: ChannelLabel }) {
           </Show>
           <ChannelSectionDropdown
             section={rowKeyForLabel(props.label.id)}
-            label={props.label.name}
+            label={sectionChromeName(props.label.name)}
             before={
               <ChannelLabelActions
                 label={props.label}
@@ -373,7 +373,7 @@ function SectionMenuItems(props: { channel: ChannelEntity }) {
               const automatic = () => Boolean(label.rule);
               const labelText = (
                 <span class="flex min-w-0 flex-1 flex-col">
-                  <span class="truncate">{label.name}</span>
+                  <span class="truncate">{sectionChromeName(label.name)}</span>
                   <Show when={automatic()}>
                     <span class="text-xs text-ink-muted">
                       {t('channelSections.matchedByName')}

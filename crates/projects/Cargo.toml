@@ -15,7 +15,7 @@ axum = [
   "dep:agent_correlation",
   "dep:axum",
   "dep:entity_registry",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:utoipa",
   "entity_access/axum",
   "entity_registry/axum",
@@ -35,7 +35,7 @@ outbound = [
   "dep:enterprise",
   "enterprise/outbound",
   "dep:hex",
-  "dep:macro_sha_count_client",
+  "dep:rox_sha_count_client",
   "dep:share_permission_db_utils",
   "dep:sqlx",
   "dep:sqs_client",
@@ -66,11 +66,11 @@ entity_access_management = { path = "../entity_access_management", default-featu
   "outbound",
   "ports",
 ], optional = true }
-macro_aws_config = { path = "../macro_aws_config", features = ["s3"] }
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
+rox_aws_config = { path = "../rox_aws_config", features = ["s3"] }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
 entity_mutation = { path = "../entity_mutation" }
-macro_user_id = { path = "../macro_user_id" }
+rox_user_id = { path = "../rox_user_id" }
 model = { path = "../model" }
 model-entity = { path = "../model-entity" }
 model_owner = { path = "../model_owner" }
@@ -90,7 +90,7 @@ schemars = { workspace = true, optional = true }
 
 # Axum dependencies
 axum = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = [
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = [
   "axum",
 ] }
 utoipa = { workspace = true, optional = true }
@@ -107,7 +107,7 @@ entity_registry = { path = "../entity_registry/entity_registry", optional = true
 entity_registry_db_utils = { path = "../entity_registry/entity_registry_db_utils", optional = true }
 enterprise = { path = "../enterprise", default-features = false, optional = true }
 hex = { workspace = true, optional = true }
-macro_sha_count_client = { path = "../macro_sha_count_client", optional = true }
+rox_sha_count_client = { path = "../rox_sha_count_client", optional = true }
 share_permission_db_utils = { path = "../share_permission_db_utils", optional = true }
 sqlx = { workspace = true, optional = true }
 sqs_client = { path = "../sqs_client", default-features = false, features = [
@@ -121,9 +121,9 @@ aws-sdk-sqs = { workspace = true }
 bot_id = { path = "../bot_id", features = ["test-utils"] }
 http-body-util = { workspace = true }
 kafka_util = { path = "../kafka_util" }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 # Examples need the Kafka adapter (outbound); the library itself only uses ports.
-macro_event_broker = { path = "../macro_event_broker" }
+rox_event_broker = { path = "../rox_event_broker" }
 mockall = { workspace = true }
 rdkafka = { workspace = true }
 model_user = { path = "../model_user" }
@@ -131,4 +131,4 @@ serde_json = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal"] }
 tower = { workspace = true }
 tracing-subscriber = { workspace = true }
-macro_env_var = { path = "../macro_env_var" }
+rox_env_var = { path = "../rox_env_var" }

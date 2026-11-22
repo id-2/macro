@@ -3,7 +3,7 @@ import PencilSimple from '@icon/system/regular/pencil-simple.svg';
 import type {
   SheetChart,
   SheetDrawing,
-} from '@macro-inc/spreadsheet/sheet-drawings';
+} from '@rox-one/spreadsheet/sheet-drawings';
 import { createMemo, createSignal, For, Match, Show, Switch } from 'solid-js';
 import type { ChartData } from '../core/chart-data';
 import { chartScene } from '../core/chart-scene';

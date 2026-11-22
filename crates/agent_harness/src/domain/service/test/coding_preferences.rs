@@ -36,7 +36,7 @@ fn assignment_command(kind: AgentKind, harness: &str) -> OpenSession {
     command.origin = SessionOrigin::TaskAssignment(TaskAssignmentOrigin {
         trigger_origin: trigger_context::TriggerOrigin::Unknown,
         parent: MessageParent::parse("document", "task-1").unwrap(),
-        discussion_id: macro_uuid::generate_uuid_v7(),
+        discussion_id: rox_uuid::generate_uuid_v7(),
         actor: sender(),
         prompt: "Private assignment instructions".to_owned(),
         context: None,

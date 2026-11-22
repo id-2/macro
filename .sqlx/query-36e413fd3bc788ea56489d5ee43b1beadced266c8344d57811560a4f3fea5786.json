@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_labels (id, link_id, provider_label_id, name, type)\n         VALUES ('10000013-0000-0000-0000-000000000013', $1, 'UNREAD', 'UNREAD', 'System')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "36e413fd3bc788ea56489d5ee43b1beadced266c8344d57811560a4f3fea5786"
+}

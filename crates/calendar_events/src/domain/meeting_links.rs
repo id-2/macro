@@ -79,7 +79,7 @@ pub enum MeetingLinkError {
 
 /// A created event together with the Rox call it carries.
 #[derive(Clone, Debug)]
-pub struct EventWithMacroCall {
+pub struct EventWithRoxCall {
     /// The event as the provider echoed it back.
     pub event: CalendarEvent,
     /// The meeting written into the event's description and location.
@@ -88,7 +88,7 @@ pub struct EventWithMacroCall {
 
 /// Failures writing an event that carries a Rox call.
 #[derive(Debug, thiserror::Error)]
-pub enum MacroCallEventError {
+pub enum RoxCallEventError {
     /// The calendar write failed. A meeting minted for it was cancelled on a
     /// best-effort basis unless the event may have reached the provider.
     #[error(transparent)]
@@ -202,7 +202,7 @@ pub async fn create_event_with_macro_call<M, L>(
     email_link_id: Option<Uuid>,
     calendar_id: Option<Uuid>,
     mut draft: CalendarEventDraft,
-) -> Result<EventWithMacroCall, MacroCallEventError>
+) -> Result<EventWithRoxCall, RoxCallEventError>
 where
     M: CalendarMutationService,
     L: MeetingLinkProvider,
@@ -235,7 +235,7 @@ where
         .create_event(requester_id, email_link_id, calendar_id, draft)
         .await
     {
-        Ok(event) => Ok(EventWithMacroCall {
+        Ok(event) => Ok(EventWithRoxCall {
             event,
             meeting_link: link,
         }),
@@ -263,7 +263,7 @@ pub async fn update_event_with_macro_call<M, L>(
     calendar_id: Option<Uuid>,
     mut patch: CalendarEventPatch,
     scope: CalendarUpdateScope,
-) -> Result<CalendarEvent, MacroCallEventError>
+) -> Result<CalendarEvent, RoxCallEventError>
 where
     M: CalendarMutationService + CalendarEventDetailsReader,
     L: MeetingLinkProvider,

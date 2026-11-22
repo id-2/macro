@@ -1,6 +1,6 @@
 use super::*;
-use crate::domain::models::MacroUserIdStr;
-use macro_user_id::cowlike::CowLike;
+use crate::domain::models::RoxUserIdStr;
+use rox_user_id::cowlike::CowLike;
 use std::sync::Mutex;
 
 /// In-memory [`McpServerStore`] fake that records every save.
@@ -42,7 +42,7 @@ impl McpServerStore for FakeServerStore {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         unimplemented!()
@@ -50,7 +50,7 @@ impl McpServerStore for FakeServerStore {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<(), Self::Err> {
         unimplemented!()
@@ -58,7 +58,7 @@ impl McpServerStore for FakeServerStore {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         unimplemented!()
     }
@@ -66,7 +66,7 @@ impl McpServerStore for FakeServerStore {
 
 fn record() -> McpServerRecord {
     McpServerRecord {
-        user_id: MacroUserIdStr::parse_from_str("macro|test@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|test@example.com")
             .unwrap()
             .into_owned(),
         url: "https://mcp.linear.app/mcp".to_string(),

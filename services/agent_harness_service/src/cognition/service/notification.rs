@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use connection_gateway::service::connection::ConnectionRepo;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::AiResponseMetadata;
 use notification::domain::models::SendNotificationRequestBuilder;
@@ -19,7 +19,7 @@ pub fn notify(
     chat_id: String,
     message_id: String,
     assistant_text: String,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 ) {
     tokio::spawn(async move {
         if let Err(err) = send_chat_notification(
@@ -49,7 +49,7 @@ async fn send_chat_notification(
     chat_id: &str,
     message_id: &str,
     summary: &str,
-    recipient_id: MacroUserIdStr<'static>,
+    recipient_id: RoxUserIdStr<'static>,
 ) -> anyhow::Result<()> {
     let entity = EntityType::Chat.with_entity_str(chat_id);
 

@@ -15,7 +15,7 @@ use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::routing::{get, put};
 use chrono::{DateTime, Utc};
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationState, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationState, UserOrInternal};
 use model::response::ErrorResponse;
 use saved_views::View;
 use saved_views::domain::{Cursor, Error, SavedViewApi, ShareChange, Update};
@@ -37,7 +37,7 @@ pub fn router<S>() -> Router<S>
 where
     S: Clone + Send + Sync + 'static,
     SavedViewDefinitionsState: FromRef<S>,
-    MacroAuthorizationState<AuthorizationService>: FromRef<S>,
+    RoxAuthorizationState<AuthorizationService>: FromRef<S>,
 {
     Router::new()
         .route("/", get(list_handler).post(create_handler))
@@ -50,7 +50,7 @@ where
         )
 }
 
-type Viewer = MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>;
+type Viewer = RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>;
 
 /// A saved filter definition, not a snapshot of matching entities.
 #[derive(Serialize, Deserialize, Debug, ToSchema)]

@@ -10,7 +10,7 @@
  */
 import { readFile } from 'node:fs/promises';
 import { query } from '@anthropic-ai/claude-agent-sdk';
-import { Telemetry } from '@macro-inc/observability/core';
+import { Telemetry } from '@rox-one/observability/core';
 import { guards } from '../../../agent/guards/index.ts';
 import { claude } from '../../../context/children.ts';
 import type { Base } from '../../../context/index.ts';

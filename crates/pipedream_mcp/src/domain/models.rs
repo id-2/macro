@@ -1,4 +1,4 @@
-pub use macro_user_id::user_id::MacroUserIdStr;
+pub use rox_user_id::user_id::RoxUserIdStr;
 pub use mcp_toolset::{MCP_CLIENT_NAME, McpServer, client_info};
 
 /// An MCP connector a user has connected through Pipedream or Rox Connect.
@@ -8,7 +8,7 @@ pub use mcp_toolset::{MCP_CLIENT_NAME, McpServer, client_info};
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PipedreamConnection {
     /// The user who connected the app.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Pipedream app name slug, e.g. `linear` or `notion`.
     pub app_slug: String,
     /// Human-readable display name, e.g. `Linear`.

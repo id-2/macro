@@ -2,7 +2,7 @@ use crate::attachments::provider::{
     LinkedAttachmentDocument, fetch_db_attachments_in_bulk, get_document_by_att_id,
 };
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::types::Uuid;
 use sqlx::{Pool, Postgres};
 

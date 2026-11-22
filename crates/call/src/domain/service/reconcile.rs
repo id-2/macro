@@ -22,7 +22,7 @@ where
     Sm: CallSummarizer + Clone,
     V: VoipPushSender,
     Vr: VoiceRepository + Clone,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 {
     /// Marks participants and guests who are no longer connected as left,
     /// then archives the call if that leaves it empty.
@@ -56,7 +56,7 @@ where
             if !settled(participant.joined_at) || connected.contains(&participant.user_id) {
                 continue;
             }
-            let user_id = MacroUserIdStr::parse_from_str(&participant.user_id)
+            let user_id = RoxUserIdStr::parse_from_str(&participant.user_id)
                 .map_err(|e| CallError::Internal(e.into()))?;
             tracing::info!(user_id = %participant.user_id, "marking disconnected participant as left");
             self.repo

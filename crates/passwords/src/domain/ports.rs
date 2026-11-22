@@ -10,12 +10,12 @@ pub trait Repository: Send + Sync {
     /// Current authoritative account classification; missing accounts are not humans.
     async fn is_human(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<bool, Error>;
     /// Current owner/admin role in this team; this fact never implies human admission.
     async fn is_team_admin(
         &self,
-        user: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        user: &rox_user_id::user_id::RoxUserIdStr<'_>,
         team: TeamId,
     ) -> Result<bool, Error>;
     /// Any retained item, intent, enrollment or namespace closure identity, including tombstones.
@@ -62,7 +62,7 @@ pub trait Repository: Send + Sync {
         &self,
         operation: uuid::Uuid,
         record: &Record,
-        publisher: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        publisher: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<(), Error>;
     /// Who published the intent of this team, item and operation, if one exists.
     async fn intent_origin(
@@ -227,7 +227,7 @@ pub enum IntentOrigin {
     /// An agent's write, with its stored action.
     Agent {
         /// The publishing agent account.
-        agent: macro_user_id::user_id::MacroUserIdStr<'static>,
+        agent: rox_user_id::user_id::RoxUserIdStr<'static>,
         /// The action it staged.
         action: super::agent::AgentAction,
     },

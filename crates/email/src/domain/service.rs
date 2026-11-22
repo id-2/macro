@@ -18,7 +18,7 @@ mod test;
 mod entity_mutation;
 
 use crate::domain::{
-    events::{EmailMacroEvent, ThreadProjectChangedMetadata},
+    events::{EmailRoxEvent, ThreadProjectChangedMetadata},
     models::{
         CreateDraftInput, CreatedDraft, EmailErr, EmailFilter, EmailThreadMailProjection,
         EmailThreadMetadata, EnrichedEmailThreadPreview, GetEmailsRequest, Link, LinkLabel,
@@ -36,8 +36,8 @@ use entity_access::domain::models::{
 };
 use entity_access_management::domain::ports::EntityAccessManagementService;
 use frecency::domain::ports::FrecencyQueryService;
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{RoxEventBroker, NoopRoxEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use models_pagination::{PaginatedCursor, SimpleSortMethod};
 use std::collections::{HashMap, HashSet};
@@ -60,7 +60,7 @@ fn changed_project_ids<'a>(
 }
 
 #[derive(Clone)]
-pub struct EmailServiceImpl<T, U, E, CS, Eam, B = NoopMacroEventBroker> {
+pub struct EmailServiceImpl<T, U, E, CS, Eam, B = NoopRoxEventBroker> {
     pub(crate) email_repo: T,
     pub(crate) frecency_service: U,
     pub(crate) enqueuer: E,
@@ -95,7 +95,7 @@ where
             enqueuer,
             crm_service,
             entity_access_management_service,
-            macro_event_broker: NoopMacroEventBroker,
+            macro_event_broker: NoopRoxEventBroker,
             sent_undo_delay_secs,
             sender_provider: std::sync::Arc::new(
                 crate::domain::senders::UnavailableEmailSenderProvider,
@@ -127,8 +127,8 @@ impl<T, U, E, CS, Eam, B> EmailServiceImpl<T, U, E, CS, Eam, B> {
     }
 
     /// Replace the event broker used to publish `macro.email` events.
-    /// [`new`](Self::new) starts with a [`NoopMacroEventBroker`].
-    pub fn with_macro_event_broker<B2: MacroEventBroker>(
+    /// [`new`](Self::new) starts with a [`NoopRoxEventBroker`].
+    pub fn with_macro_event_broker<B2: RoxEventBroker>(
         self,
         macro_event_broker: B2,
     ) -> EmailServiceImpl<T, U, E, CS, Eam, B2> {
@@ -147,9 +147,9 @@ impl<T, U, E, CS, Eam, B> EmailServiceImpl<T, U, E, CS, Eam, B> {
 
     /// Publish an email event to the `macro.email` topic, logging and
     /// dropping failures — event emission must never fail the operation.
-    pub(crate) fn publish_email_event(&self, event: &EmailMacroEvent)
+    pub(crate) fn publish_email_event(&self, event: &EmailRoxEvent)
     where
-        B: MacroEventBroker,
+        B: RoxEventBroker,
     {
         let _ = self
             .macro_event_broker
@@ -232,13 +232,13 @@ where
     E: EmailMessageEnqueuer,
     CS: CrmService,
     Eam: EntityAccessManagementService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
     anyhow::Error: From<E::Err>,
 {
     async fn resolve_thread_read_id(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         thread_id: Uuid,
     ) -> Result<Uuid, EmailErr> {
         self.resolve_thread_read_id_impl(macro_id, thread_id).await
@@ -254,7 +254,7 @@ where
 
     async fn message_operation_status(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         message_id: Uuid,
     ) -> Result<Option<crate::domain::models::mailbox_operation::MessageOperationStatus>, EmailErr>
     {
@@ -263,7 +263,7 @@ where
 
     async fn resolve_message_operation(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         request: crate::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> Result<Uuid, EmailErr> {
         self.resolve_message_operation_impl(actor, request).await
@@ -272,7 +272,7 @@ where
     async fn get_link_by_auth_id_and_macro_id(
         &self,
         auth_id: &str,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Option<crate::domain::models::Link>, EmailErr> {
         self.get_link_by_auth_id_and_macro_id_impl(auth_id, macro_id)
             .await
@@ -280,7 +280,7 @@ where
 
     async fn get_inboxes_for_macro_id(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Vec<crate::domain::models::Link>, EmailErr> {
         self.email_repo
             .inboxes_for_macro_id(macro_id)
@@ -290,7 +290,7 @@ where
 
     async fn resolve_sending_inbox(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         request: SendingInboxRequest<'_>,
     ) -> Result<ResolvedSendingInbox, EmailErr> {
         self.resolve_sending_inbox_impl(macro_id, request).await
@@ -298,7 +298,7 @@ where
 
     async fn get_owned_link_for_thread(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         thread_id: uuid::Uuid,
     ) -> Result<Option<crate::domain::models::Link>, EmailErr> {
         self.email_repo
@@ -338,7 +338,7 @@ where
 
     async fn save_draft_for_user(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         link_id: Option<uuid::Uuid>,
         input: CreateDraftInput,
     ) -> Result<crate::domain::models::SavedUserDraft, EmailErr> {
@@ -348,7 +348,7 @@ where
 
     async fn delete_draft_for_user(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'_>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'_>,
         draft_id: uuid::Uuid,
 
         expected_generation: i32,
@@ -359,7 +359,7 @@ where
 
     async fn send_message_for_user(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         link_id: Option<Uuid>,
         input: CreateDraftInput,
     ) -> Result<CreatedDraft, EmailErr> {
@@ -397,7 +397,7 @@ where
 
     async fn thread_mailbox_operations(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         thread: Uuid,
     ) -> Result<Vec<crate::domain::models::mailbox_action::MailboxOperation>, EmailErr> {
         let link = self
@@ -414,7 +414,7 @@ where
 
     async fn change_thread_mailbox_state(
         &self,
-        macro_id: MacroUserIdStr<'static>,
+        macro_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         action: crate::domain::models::mailbox_action::MailboxAction,
     ) -> Result<usize, EmailErr> {
@@ -424,7 +424,7 @@ where
 
     async fn mark_thread_seen(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<(), EmailErr> {
         self.mark_thread_seen_impl(macro_id, thread_id)
@@ -434,7 +434,7 @@ where
 
     async fn set_thread_archived(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> Result<(), EmailErr> {
@@ -445,7 +445,7 @@ where
 
     async fn set_threads_archived(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
         archived: bool,
     ) -> Result<crate::domain::models::SetThreadsArchivedResult, EmailErr> {
@@ -455,7 +455,7 @@ where
 
     async fn mark_thread_unread(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<(), EmailErr> {
         self.mark_thread_unread_impl(macro_id, thread_id)
@@ -465,7 +465,7 @@ where
 
     async fn update_thread_labels_for_user(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
         label_id: Uuid,
         add: bool,
@@ -562,7 +562,7 @@ where
                     .await
                 {
                     Ok(Some(link)) => {
-                        self.publish_email_event(&EmailMacroEvent::thread_project_changed(
+                        self.publish_email_event(&EmailRoxEvent::thread_project_changed(
                             ThreadProjectChangedMetadata {
                                 link_id: link.id,
                                 owner: link.macro_id.clone(),
@@ -612,7 +612,7 @@ where
     #[tracing::instrument(skip(self, link, actor, sender_email), fields(link_id = %link.id), err)]
     async fn set_sender_policy(
         &self,
-        actor: &MacroUserIdStr<'_>,
+        actor: &RoxUserIdStr<'_>,
         link: &Link,
         sender_email: &str,
         policy: SenderPolicy,
@@ -652,7 +652,7 @@ where
     E: EmailMessageEnqueuer,
     CS: CrmService,
     Eam: EntityAccessManagementService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
 {
     async fn get_email_thread_metadata(
@@ -670,12 +670,12 @@ where
     E: EmailMessageEnqueuer,
     CS: CrmService,
     Eam: EntityAccessManagementService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
 {
     async fn get_email_thread_mail_projections(
         &self,
-        viewer: macro_user_id::user_id::MacroUserIdStr<'static>,
+        viewer: rox_user_id::user_id::RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
     ) -> Result<HashMap<Uuid, EmailThreadMailProjection>, EmailErr> {
         self.get_email_thread_mail_projections_impl(viewer, receipts)
@@ -690,12 +690,12 @@ where
     E: EmailMessageEnqueuer,
     CS: CrmService,
     Eam: EntityAccessManagementService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
 {
     async fn get_email_thread_previews_by_receipts(
         &self,
-        viewer: macro_user_id::user_id::MacroUserIdStr<'static>,
+        viewer: rox_user_id::user_id::RoxUserIdStr<'static>,
         receipts: Vec<EntityAccessReceipt<ViewAccessLevel>>,
     ) -> Result<Vec<EnrichedEmailThreadPreview>, EmailErr> {
         self.get_email_thread_previews_by_receipts_impl(viewer, receipts)
@@ -704,7 +704,7 @@ where
 
     async fn get_owned_email_thread_preview(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<Option<EnrichedEmailThreadPreview>, EmailErr> {
         self.get_owned_email_thread_preview_impl(macro_id, thread_id)
@@ -719,7 +719,7 @@ where
     E: EmailMessageEnqueuer,
     CS: CrmService,
     Eam: EntityAccessManagementService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
 {
     async fn get_latest_messages_parsed(

@@ -5,7 +5,7 @@
 use crate::domain::{models::MemoryKind, ports::*};
 use ai_usage::{AiFeature, UsageContext};
 use jev::domain::{JevError, YesNoClassifier, YesNoQuestion};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use strum::{EnumIter, IntoEnumIterator, IntoStaticStr};
 
@@ -177,7 +177,7 @@ impl<C: YesNoClassifier> JevMemoryJudge<C> {
     /// The probability that `content` breaks each rule that applies to `kind`.
     pub async fn scores(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         kind: MemoryKind,
         content: &str,
     ) -> Result<Vec<(Rule, f32)>> {
@@ -249,7 +249,7 @@ impl<C: YesNoClassifier> MemoryJudge for JevMemoryJudge<C> {
     ))]
     async fn review(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         kind: MemoryKind,
         content: &str,
     ) -> Result<()> {
@@ -283,7 +283,7 @@ pub struct UnconfiguredJudge;
 
 #[async_trait::async_trait]
 impl MemoryJudge for UnconfiguredJudge {
-    async fn review(&self, _: MacroUserIdStr<'static>, _: MemoryKind, _: &str) -> Result<()> {
+    async fn review(&self, _: RoxUserIdStr<'static>, _: MemoryKind, _: &str) -> Result<()> {
         Err(MemoryError::ReviewUnavailable)
     }
 }

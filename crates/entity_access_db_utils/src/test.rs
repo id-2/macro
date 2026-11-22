@@ -1,6 +1,6 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_uuid::Uuid;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use model_owner::{Owner, OwnerType};
 use models_permissions::share_permission::access_level::AccessLevel;
@@ -26,9 +26,9 @@ async fn bulk_user_upsert_raises_viewers_and_adds_strangers_but_leaves_the_owner
     pool: Pool<Postgres>,
 ) {
     let session_id = Uuid::from_u128(0x77777777_7777_7777_7777_777777777779);
-    let owner = MacroUserIdStr::try_from_email("owner@rox.one").unwrap();
-    let viewer = MacroUserIdStr::try_from_email("viewer@rox.one").unwrap();
-    let stranger = MacroUserIdStr::try_from_email("stranger@rox.one").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@rox.one").unwrap();
+    let viewer = RoxUserIdStr::try_from_email("viewer@rox.one").unwrap();
+    let stranger = RoxUserIdStr::try_from_email("stranger@rox.one").unwrap();
     let mut tx = pool.begin().await.unwrap();
     for (user, level) in [(&owner, AccessLevel::Owner), (&viewer, AccessLevel::View)] {
         insert_entity_access_for_test(
@@ -55,7 +55,7 @@ async fn bulk_user_upsert_raises_viewers_and_adds_strangers_but_leaves_the_owner
     .unwrap();
 
     let rows = fetch_entity_access_rows(&pool, &session_id, EntityType::AgentSession).await;
-    let level_of = |user: &MacroUserIdStr<'_>| {
+    let level_of = |user: &RoxUserIdStr<'_>| {
         rows.iter()
             .find(|row| row.source_id == user.as_ref())
             .map(|row| row.access_level)
@@ -741,10 +741,10 @@ async fn delete_user_entity_access_rows_removes_targeted_direct_grants_only(pool
     let initiative_id = Uuid::from_u128(0x0b01);
     let other_initiative_id = Uuid::from_u128(0x0b02);
     let root_project_id = ROOT_PROJECT_ID.to_string();
-    let owner = MacroUserIdStr::try_from_email("owner@rox.one").unwrap();
-    let alice = MacroUserIdStr::try_from_email("alice@rox.one").unwrap();
-    let bob = MacroUserIdStr::try_from_email("bob@rox.one").unwrap();
-    let carol = MacroUserIdStr::try_from_email("carol@rox.one").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@rox.one").unwrap();
+    let alice = RoxUserIdStr::try_from_email("alice@rox.one").unwrap();
+    let bob = RoxUserIdStr::try_from_email("bob@rox.one").unwrap();
+    let carol = RoxUserIdStr::try_from_email("carol@rox.one").unwrap();
 
     let mut tx = pool.begin().await.unwrap();
     for (user, access_level, granted_from_project_id) in [
@@ -861,8 +861,8 @@ async fn delete_user_entity_access_rows_removes_targeted_direct_grants_only(pool
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn delete_user_entity_access_rows_without_user_ids_keeps_every_row(pool: Pool<Postgres>) {
     let initiative_id = Uuid::from_u128(0x0b03);
-    let owner = MacroUserIdStr::try_from_email("owner@rox.one").unwrap();
-    let alice = MacroUserIdStr::try_from_email("alice@rox.one").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@rox.one").unwrap();
+    let alice = RoxUserIdStr::try_from_email("alice@rox.one").unwrap();
 
     let mut tx = pool.begin().await.unwrap();
     for (user, access_level) in [(&owner, AccessLevel::Owner), (&alice, AccessLevel::Edit)] {
@@ -898,7 +898,7 @@ async fn delete_user_entity_access_rows_keeps_team_and_channel_grants_that_share
     pool: Pool<Postgres>,
 ) {
     let initiative_id = Uuid::from_u128(0x0b04);
-    let alice = MacroUserIdStr::try_from_email("alice@rox.one").unwrap();
+    let alice = RoxUserIdStr::try_from_email("alice@rox.one").unwrap();
 
     let mut tx = pool.begin().await.unwrap();
     for (source_type, access_level) in [
@@ -942,7 +942,7 @@ const OWNER_TEAM_ID: Uuid = Uuid::from_u128(0x0000000a_0000_0000_0000_0000000000
 const BOT_PRINCIPAL: &str = "bot|0000000b-0000-0000-0000-00000000000b";
 
 fn user_owner() -> Owner {
-    Owner::User(MacroUserIdStr::try_from_email("owner@rox.one").unwrap())
+    Owner::User(RoxUserIdStr::try_from_email("owner@rox.one").unwrap())
 }
 
 async fn grant_owner_committed(pool: &Pool<Postgres>, entity_id: &Uuid, owner: &Owner) {
@@ -1107,7 +1107,7 @@ async fn ensuring_comment_access_upgrades_view_and_preserves_stronger_grants(
         ("commenter@test.com", Some(AccessLevel::Comment)),
         ("new@test.com", None),
     ] {
-        let user = MacroUserIdStr::try_from_email(email)?;
+        let user = RoxUserIdStr::try_from_email(email)?;
         if let Some(level) = existing {
             let mut tx = pool.begin().await?;
             insert_entity_access_row(
@@ -1160,7 +1160,7 @@ async fn participant_grants_reject_channel_calls_nonparticipants_and_departed_us
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let call_id = Uuid::from_u128(0x00000000_0000_0000_0000_0000000ca110);
-    let participant = MacroUserIdStr::try_from_email("user-b@test.com")?;
+    let participant = RoxUserIdStr::try_from_email("user-b@test.com")?;
     ensure_call_participant_comment_access(
         &mut *pool.acquire().await?,
         &call_id,
@@ -1177,7 +1177,7 @@ async fn participant_grants_reject_channel_calls_nonparticipants_and_departed_us
     sqlx::query!("UPDATE calls SET channel_id = NULL WHERE id = $1", call_id)
         .execute(&pool)
         .await?;
-    let stranger = MacroUserIdStr::try_from_email("stranger@test.com")?;
+    let stranger = RoxUserIdStr::try_from_email("stranger@test.com")?;
     ensure_call_participant_comment_access(
         &mut *pool.acquire().await?,
         &call_id,

@@ -1,5 +1,5 @@
 import { staticFileIdEndpoint } from '@core/constant/servers';
-import type { MediaSource } from '@macro-inc/graphics';
+import type { MediaSource } from '@rox-one/graphics';
 import { useBinaryDocumentQuery } from '@queries/storage/binary-document';
 import type { Accessor } from 'solid-js';
 

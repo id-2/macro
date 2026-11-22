@@ -313,7 +313,7 @@ impl PgMessageRepository {
                 r#"INSERT INTO comms_entity_mentions
                     (id, source_entity_type, source_entity_id, entity_type, entity_id, user_id)
                     VALUES ($1, 'message', $2, $3, $4, $5) ON CONFLICT DO NOTHING"#,
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 id.to_string(),
                 mention.entity_type,
                 mention.entity_id,
@@ -764,7 +764,7 @@ impl MessageRepository for PgMessageRepository {
         let mut id = command
             .input
             .id
-            .unwrap_or_else(macro_uuid::generate_uuid_v7);
+            .unwrap_or_else(rox_uuid::generate_uuid_v7);
         let mut tx = self.pool.begin().await.map_err(database_error)?;
         if let Some(root_id) = command.canonical_root_id {
             // Serialize the first writers, and coordinate with parent cleanup. A

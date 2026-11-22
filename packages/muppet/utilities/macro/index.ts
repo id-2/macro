@@ -3,12 +3,12 @@
  * `stayOnline` shows the account as online; chat is in its own directory
  * (`./chat`). A call's share lives in the agent (the starter agent's calls).
  *
- *     const apiKey = () => credentials.get("MACRO_API_KEY");
+ *     const apiKey = () => credentials.get("ROX_API_KEY");
  *     const macro = macroClient({ apiKey });
  *     const online = stayOnline({ apiKey });
  *     behavior().use(chat({ macro }))
  */
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 
 /** Rox's connection gateway, which presence is a socket to. */
 export const gateway = 'wss://gateway.rox.one/connection-gateway/';

@@ -204,14 +204,14 @@ fn truncate_preserving_tags(s: &str, max_chars: usize) -> String {
 
 /// macro open/close tags for highlight matches
 #[derive(Debug, PartialEq)]
-pub(crate) enum MacroEm {
+pub(crate) enum RoxEm {
     /// Open tag <macro_em>
     Open,
     /// Close tag </macro_em>
     Close,
 }
 
-impl Display for MacroEm {
+impl Display for RoxEm {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Open => write!(f, "<macro_em>"),

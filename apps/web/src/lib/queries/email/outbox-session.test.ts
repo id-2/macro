@@ -20,7 +20,7 @@ const mocks = vi.hoisted(() => {
     sessionEnded: false,
   };
 });
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: { info: vi.fn(), warn: vi.fn() },
 }));
 vi.mock('@app/observability/reload', () => ({ reloadApp: mocks.reloadApp }));

@@ -1,5 +1,5 @@
 import { recordExternalWrite } from '@graphql-cache/exchange/external-writes';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { stringifyDocument } from '@urql/core';
 import {
   CrmVisibilityCacheWriteDocument,

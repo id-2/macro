@@ -6,7 +6,7 @@ import {
 import type { CommentsContextType } from '@core/comments/Thread';
 import { MARK_SELECTED_COMMENT_COMMAND } from '@core/component/LexicalMarkdown/plugins/comments/commentPlugin';
 import { Dialog } from '@kobalte/core/dialog';
-import { CommentNode } from '@macro-inc/lexical-core';
+import { CommentNode } from '@rox-one/lexical-core';
 import { cleanup, fireEvent, render, screen } from '@solidjs/testing-library';
 import { COMMAND_PRIORITY_EDITOR, createEditor } from 'lexical';
 import { createContext, createSignal, useContext } from 'solid-js';

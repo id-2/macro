@@ -22,8 +22,8 @@ use email::domain::events::{
     ThreadReadMetadata, ThreadSpamChangedMetadata, ThreadTrashedMetadata, ThreadsReindexReason,
     ThreadsReindexRequestedMetadata,
 };
-use macro_event_broker::{Event, EventBrokerError, MacroEventCollection as _, MessageParts};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, EventBrokerError, RoxEventCollection as _, MessageParts};
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::events::{
     MessageAttachmentCreatedMetadata, MessageDeletedMetadata, MessageEventAttachment,
     MessagePostedMetadata,
@@ -57,14 +57,14 @@ impl MessageParts for TestMessage {
     }
 }
 
-fn decode_payload(payload: Vec<u8>) -> Result<DeclaredMacroEvent, EventBrokerError> {
-    DeclaredMacroEvent::decode(&TestMessage { payload })
+fn decode_payload(payload: Vec<u8>) -> Result<DeclaredRoxEvent, EventBrokerError> {
+    DeclaredRoxEvent::decode(&TestMessage { payload })
 }
 
 const DOCUMENT_ID: &str = "00000000-0000-0000-0000-000000000001";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid user id")
 }
 
 fn updated_event() -> Event<DocumentTopicEvent> {
@@ -117,7 +117,7 @@ fn flaky_service(failures: usize) -> FlakyService {
 #[test]
 fn subscribes_to_all_existing_soup_source_topics() {
     assert_eq!(
-        DeclaredMacroEvent::topics(),
+        DeclaredRoxEvent::topics(),
         [
             "macro.github_pull_requests",
             "macro.documents",
@@ -771,7 +771,7 @@ fn deleting_a_root_channel_message_deletes_its_thread_patch() {
 
 #[tokio::test]
 async fn updated_payload_maps_to_document_patch_and_commits() {
-    let event = DeclaredMacroEvent::DocumentMacroEvent(DocumentMacroEvent::with_event(
+    let event = DeclaredRoxEvent::DocumentRoxEvent(DocumentRoxEvent::with_event(
         DOCUMENT_ID,
         updated_event(),
     ));
@@ -809,7 +809,7 @@ fn malformed_and_unknown_events_are_rejected_by_the_declared_collection() {
 
 #[tokio::test(start_paused = true)]
 async fn transient_service_failures_are_retried_before_committing() {
-    let event = DeclaredMacroEvent::DocumentMacroEvent(DocumentMacroEvent::with_event(
+    let event = DeclaredRoxEvent::DocumentRoxEvent(DocumentRoxEvent::with_event(
         DOCUMENT_ID,
         updated_event(),
     ));
@@ -830,7 +830,7 @@ async fn transient_service_failures_are_retried_before_committing() {
 
 #[tokio::test(start_paused = true)]
 async fn exhausted_service_retries_drop_and_commit_the_event() {
-    let event = DeclaredMacroEvent::DocumentMacroEvent(DocumentMacroEvent::with_event(
+    let event = DeclaredRoxEvent::DocumentRoxEvent(DocumentRoxEvent::with_event(
         DOCUMENT_ID,
         updated_event(),
     ));
@@ -875,8 +875,8 @@ async fn dropped_event_does_not_prevent_later_events_from_being_processed() {
     assert_eq!(*committed_offsets.lock().expect("offsets lock"), vec![0, 1]);
 }
 
-fn reindex_event(thread_ids: Vec<Uuid>) -> DeclaredMacroEvent {
-    DeclaredMacroEvent::EmailMacroEvent(EmailMacroEvent::threads_reindex_requested(
+fn reindex_event(thread_ids: Vec<Uuid>) -> DeclaredRoxEvent {
+    DeclaredRoxEvent::EmailRoxEvent(EmailRoxEvent::threads_reindex_requested(
         ThreadsReindexRequestedMetadata {
             link_id: Uuid::now_v7(),
             owner: user(),

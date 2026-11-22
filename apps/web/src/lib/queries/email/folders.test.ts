@@ -22,7 +22,7 @@ vi.mock('../soup/normalized-cache', () => ({
 vi.mock('../soup/graphql/active-queries', () => ({
   refreshActiveGraphqlSoupQueries: mocks.refreshLists,
 }));
-vi.mock('@macro-inc/observability', () => {
+vi.mock('@rox-one/observability', () => {
   // Match the browser context manager: active context ends at an await.
   const run = <T>(work: () => T): T => {
     const previous = mocks.spanActive;

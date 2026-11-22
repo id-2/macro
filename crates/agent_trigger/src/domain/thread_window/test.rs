@@ -1,15 +1,15 @@
 use super::*;
 
 use chrono::TimeZone as _;
-use macro_user_id::cowlike::CowLike as _;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike as _;
+use rox_user_id::user_id::RoxUserIdStr;
 
 fn thread(len: u128) -> Vec<ThreadMessage> {
     (0..len)
         .map(|index| ThreadMessage {
             id: Uuid::from_u128(index),
             sender: ChannelSender::new_from_user(
-                MacroUserIdStr::parse_from_str("macro|thread-window-test@rox.one")
+                RoxUserIdStr::parse_from_str("macro|thread-window-test@rox.one")
                     .expect("a valid user id")
                     .into_owned(),
             ),

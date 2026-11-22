@@ -3,7 +3,7 @@ use crate::domain::companies_repo::*;
 use crate::domain::model::CrmCompanyForSoup;
 use crate::outbound::companies_repo::*;
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use uuid::Uuid;

@@ -9,7 +9,7 @@ use favorites::domain::{
 use graphql_common::require_authenticated_user;
 use graphql_entity_mutation::{EntityRefInput, GraphqlEntityMutationResult};
 use graphql_soup::SoupEntityEdges;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 
 use crate::objects::GraphqlFavorite;
@@ -51,7 +51,7 @@ impl FavoritesMutationService for NoOpFavoriteMutationService {
 
     async fn reorder_favorites(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         _ordered: Vec<Entity<'static>>,
     ) -> Result<Vec<Favorite>, FavoritesError> {
         Err(FavoritesError::BadRequest(

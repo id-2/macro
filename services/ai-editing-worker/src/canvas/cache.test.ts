@@ -1,4 +1,4 @@
-import { createScene } from '@macro-inc/graphics';
+import { createScene } from '@rox-one/graphics';
 import { describe, expect, it, vi } from 'vitest';
 import { CanvasCache } from './cache';
 import { canvasRevision } from './revision';

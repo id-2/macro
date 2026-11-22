@@ -3,6 +3,7 @@ import {
   useViewShell,
   ViewSidebar,
 } from '@app/components/view-shell';
+import { ActionItem } from '@app/components/view-shell/SidebarActionItem';
 import { CopyAvailabilityButton } from '@app/features/calendar/availability/CopyAvailabilityButton';
 import { useCalendarPager } from '@app/features/calendar/components/CalendarPagerContext';
 import { CalendarSettingsDropdown } from '@app/features/calendar/components/CalendarSettingsDropdown';
@@ -18,16 +19,16 @@ import { SidebarRoutineSuggestions } from '@app/features/routine-suggestions/rou
 import { CalendarSchedulingActions } from '@app/features/scheduling/calendar-actions';
 import { TutorialSidebarItem } from '@app/features/video-tutorials';
 import { ShowFeatureFlag } from '@app/lib/analytics/posthog';
-import { t } from '@app/lib/i18n';
+import { formatLocale, t } from '@app/lib/i18n';
 import { UserIcon } from '@core/component/UserIcon';
 import { enableCalendarTeamOoo } from '@core/constant/featureFlags';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import CaretDownIcon from '@icon/system/regular/caret-down.svg';
 import PlusIcon from '@icon/system/regular/plus.svg';
 import { Key } from '@solid-primitives/keyed';
-import { Button, Checkbox, cn, Calendar as MiniCalendar } from '@ui';
+import { Button, Checkbox, cn, Calendar as MiniCalendar, useImperativeDialog } from '@ui';
 import { tourTarget } from '@ui/components/Tour';
-import { format, getDaysInMonth } from 'date-fns';
+import { getDaysInMonth } from 'date-fns';
 import { createMemo, createSignal, For, Match, Show, Switch } from 'solid-js';
 import { CalendarCallSidebar } from '../calendar-call-sidebar';
 import { useCalendarFocus } from '../calendar-focus-target';
@@ -39,6 +40,7 @@ import {
 } from './CalendarCreateItems';
 import { CalendarCreateMenu } from './CalendarCreateMenu';
 import { ConnectCalendarsPromotion } from './ConnectCalendarsPromotion';
+import { CreateRoxCalendarDialog } from './CreateRoxCalendarDialog';
 
 export function CalendarMiniCalendar() {
   const calendarView = useCalendarView();
@@ -86,7 +88,7 @@ function UpcomingEventsSection() {
     <CollapsibleSection.Root open={open()} onOpenChange={setOpen}>
       <CollapsibleSection.Header ref={tourTarget(CALENDAR_TOUR.upcoming)}>
         <CollapsibleSection.Trigger class="min-w-0 flex-1">
-          <span class="min-w-0 truncate">Upcoming events</span>
+          <span class="min-w-0 truncate">Ближайшие события</span>
           <CollapsibleSection.Indicator />
         </CollapsibleSection.Trigger>
         <CopyAvailabilityButton class="size-(--sidebar-control-size) rounded-lg" />
@@ -103,10 +105,12 @@ function CalendarSourcesSection() {
   const [open, setOpen] = createSignal(true);
 
   return (
-    <Show when={calendarView.sources().length > 1}>
+    <Show
+      when={calendarView.sources().some((source) => source.id !== 'calendar')}
+    >
       <CollapsibleSection.Root open={open()} onOpenChange={setOpen}>
         <CollapsibleSection.Trigger>
-          <span class="min-w-0 truncate">Calendars</span>
+          <span class="min-w-0 truncate">Календари</span>
           <CollapsibleSection.Indicator />
         </CollapsibleSection.Trigger>
         <CollapsibleSection.Content>
@@ -127,9 +131,16 @@ const UPCOMING_SHOWN_MAX = 10;
 
 function windowDateLabel(window: TeamOooWindow): string {
   const lastDay = new Date(window.end.getTime() - 1);
-  return window.start.toDateString() === lastDay.toDateString()
-    ? format(window.start, 'EEE, MMM d')
-    : `${format(window.start, 'MMM d')} – ${format(lastDay, 'MMM d')}`;
+  const sameDay = window.start.toDateString() === lastDay.toDateString();
+  const formatDay = (date: Date) =>
+    date.toLocaleDateString(formatLocale(), {
+      weekday: sameDay ? 'short' : undefined,
+      month: 'short',
+      day: 'numeric',
+    });
+  return sameDay
+    ? formatDay(window.start)
+    : `${formatDay(window.start)} – ${formatDay(lastDay)}`;
 }
 
 function TeamOooSkeleton() {
@@ -207,7 +218,7 @@ export function TeamOooUpcomingList() {
         </Match>
         <Match when={windows().length === 0}>
           <span class="px-2 py-1 text-xs text-ink-muted">
-            No shared time off in the next 90 days
+            Нет общих отпусков в ближайшие 90 дней
           </span>
         </Match>
         <Match when={windows().length > 0}>
@@ -286,18 +297,18 @@ function CalendarTeamOooSection() {
             onChange={(visible) =>
               calendarView.setSourceVisibility(TEAM_OOO_SOURCE_ID, visible)
             }
-            title="Show on calendar"
+            title="Показывать в календаре"
             class="h-full shrink-0 pr-1 pl-(--sidebar-item-inset)"
           >
             <Checkbox.Control />
             <Checkbox.Label class="absolute inset-0">
               <span class="sr-only">
-                Show team out of office on the calendar
+                Показывать отсутствия команды в календаре
               </span>
             </Checkbox.Label>
           </Checkbox>
           <CollapsibleSection.Trigger class="min-w-0 flex-1 pl-1">
-            <span class="min-w-0 truncate">Team out of office</span>
+            <span class="min-w-0 truncate">Команда вне офиса</span>
             <CollapsibleSection.Indicator />
           </CollapsibleSection.Trigger>
         </CollapsibleSection.Header>
@@ -311,6 +322,7 @@ function CalendarTeamOooSection() {
 
 export function CalendarSidebar() {
   const shell = useViewShell();
+  const createCalendar = useImperativeDialog(CreateRoxCalendarDialog);
   const closeOverlay = () => {
     if (shell.aside.isOverlay()) shell.aside.collapse();
   };
@@ -320,30 +332,44 @@ export function CalendarSidebar() {
       <ViewSidebar.Header>
         <div class="flex min-w-0 items-center gap-1">
           <ViewSidebar.CloseButton />
-          <ViewSidebar.Title>Calendar</ViewSidebar.Title>
+          <ViewSidebar.Title>Календарь</ViewSidebar.Title>
         </div>
       </ViewSidebar.Header>
       <ViewSidebar.Primary>
-        <CalendarCreateMenu
-          presentation={isTouchDevice() ? undefined : 'sidebar'}
-          size="md"
-          class="h-(--sidebar-row-height) w-full min-w-0 justify-start gap-(--sidebar-label-gap) px-(--sidebar-item-inset) text-left touch:h-11"
-          trigger={
-            <>
-              <ViewSidebar.Icon>
-                <PlusIcon class="size-4" />
-              </ViewSidebar.Icon>
-              <span class="min-w-0 flex-1 truncate">New</span>
-              <CaretDownIcon class="size-3.5 shrink-0" />
-            </>
-          }
-        >
-          <CalendarCreateEventItem onSelect={closeOverlay} />
-          <CalendarCreateCallItem onSelect={closeOverlay} />
-          <CalendarCreateBookingLinkItem onSelect={closeOverlay} />
-        </CalendarCreateMenu>
+        <div class="flex min-w-0 flex-col gap-1">
+          <ActionItem
+            icon={PlusIcon}
+            label="Создать календарь Rox"
+            gradient
+            onPress={() => {
+              closeOverlay();
+              createCalendar.open({});
+            }}
+          />
+          <CalendarCreateMenu
+            presentation={isTouchDevice() ? undefined : 'sidebar'}
+            size="md"
+            class="h-(--sidebar-row-height) w-full min-w-0 justify-start gap-(--sidebar-label-gap) px-(--sidebar-item-inset) text-left touch:h-11"
+            trigger={
+              <>
+                <ViewSidebar.Icon>
+                  <PlusIcon class="size-4" />
+                </ViewSidebar.Icon>
+                <span class="min-w-0 flex-1 truncate">New</span>
+                <CaretDownIcon class="size-3.5 shrink-0" />
+              </>
+            }
+          >
+            <CalendarCreateEventItem onSelect={closeOverlay} />
+            <CalendarCreateCallItem onSelect={closeOverlay} />
+            <CalendarCreateBookingLinkItem onSelect={closeOverlay} />
+          </CalendarCreateMenu>
+        </div>
       </ViewSidebar.Primary>
       <ViewSidebar.Content class="pt-2">
+        {/* The calendar list is the rail's working part, so it sits first and
+            needs no scrolling; the tutorial, month grid and event list follow. */}
+        <CalendarSourcesSection />
         <SidebarRoutineSuggestions surface="calendar" />
         <ViewSidebar.Nav
           aria-label={t('tutorials.watchTutorial')}
@@ -356,13 +382,13 @@ export function CalendarSidebar() {
           <CalendarSchedulingActions sidebar />
         </Show>
         <UpcomingEventsSection />
-        <CalendarSourcesSection />
         <ShowFeatureFlag flag={enableCalendarTeamOoo}>
           <CalendarTeamOooSection />
         </ShowFeatureFlag>
+        {/* Inside the scrolling list, so the prompt never floats over the
+            rail's own controls. */}
+        <ConnectCalendarsPromotion class="mt-auto pt-2" />
       </ViewSidebar.Content>
-      {/* Outside the scrolling list, so a long list never slides it under Settings. */}
-      <ConnectCalendarsPromotion class="px-(--sidebar-gutter) pt-2" />
       <ViewSidebar.Footer class="border-0 touch:pb-[calc(var(--mobile-content-inset-bottom,0px)+0.75rem)]">
         <ViewSidebar.Nav aria-label="Calendar tools">
           <CalendarSettingsDropdown sidebar />

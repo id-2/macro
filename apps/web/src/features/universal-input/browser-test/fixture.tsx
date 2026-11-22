@@ -11,7 +11,7 @@ import type {
 } from '@core/context/quickAccess/types';
 import { attachGlobalDOMScope, useHotKeyRoot } from '@core/hotkey/hotkeys';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { $createUserMentionNode } from '@macro-inc/lexical-core';
+import { $createUserMentionNode } from '@rox-one/lexical-core';
 import { useContactRecipientSource } from '@queries/contacts/recipient-source';
 import { propertiesKeys } from '@queries/properties/keys';
 import type { TagSetResponse } from '@service-properties/generated/schemas/tagSetResponse';

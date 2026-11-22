@@ -84,7 +84,7 @@ fn cancellation_with_missing_or_invalid_stamp_survives_a_timestamped_request() {
 #[tokio::test]
 async fn composed_service_resolves_the_authorized_threads_saved_invitations() {
     use entity_access::domain::models::ViewAccessLevel;
-    use macro_user_id::user_id::MacroUserIdStr;
+    use rox_user_id::user_id::RoxUserIdStr;
     use model_entity::EntityType;
     use std::sync::{Arc, Mutex};
 
@@ -126,7 +126,7 @@ async fn composed_service_resolves_the_authorized_threads_saved_invitations() {
         Arc::new(()),
     );
     let receipt = EntityAccessReceipt::<ViewAccessLevel>::dangerously_assert_authenticated_user(
-        MacroUserIdStr::try_from_email("reader@example.com").unwrap(),
+        RoxUserIdStr::try_from_email("reader@example.com").unwrap(),
         &thread_id.to_string(),
         EntityType::EmailThread,
     );

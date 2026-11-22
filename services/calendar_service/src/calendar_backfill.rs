@@ -21,7 +21,7 @@ use calendar_events::domain::{
 };
 use calendar_events::outbound::{google::GoogleCalendarClient, pg::PgCalendarRepository};
 use chrono::Utc;
-use macro_event_broker::{KafkaEventPublisher, MacroEventBrokerService};
+use rox_event_broker::{KafkaEventPublisher, RoxEventBrokerService};
 use models_email::email::service::link::Link;
 use redis::aio::MultiplexedConnection;
 use sqlx::PgPool;
@@ -37,7 +37,7 @@ use crate::calendar_reauth::LinkManagerReauthNotifier;
 use crate::pubsub_util::cg_refresh_calendar;
 
 /// The event broker used by the backfill coordinator.
-pub type CalendarEventBroker = MacroEventBrokerService<KafkaEventPublisher, TaskTracker>;
+pub type CalendarEventBroker = RoxEventBrokerService<KafkaEventPublisher, TaskTracker>;
 
 /// Concrete Google Calendar backfill coordinator for this service.
 type GoogleCalendarBackfillService = GoogleCalendarBackfillCoordinator<

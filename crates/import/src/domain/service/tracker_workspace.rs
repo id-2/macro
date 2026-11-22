@@ -4,7 +4,7 @@
 use futures::StreamExt;
 use import_notion::domain::ports::NotionConnections;
 use import_tracker::domain::model::{Group, Inventory, Issue, TrackerError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::ConnectorSelect;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -63,7 +63,7 @@ where
     #[tracing::instrument(skip_all, fields(source = self.workspace_source.as_ref()), err)]
     pub(super) async fn plan_tracker(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         sharing: NotionSharing,
         control: &JobControl,
     ) -> Result<()> {
@@ -146,7 +146,7 @@ where
 
     pub(super) async fn start_tracker_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review: Uuid,
         choices: NotionWriteChoices,
     ) -> Result<NotionImportReport> {
@@ -245,7 +245,7 @@ where
     #[tracing::instrument(skip_all, fields(source = self.workspace_source.as_ref(), %review), err)]
     pub(super) async fn write_tracker(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review: Uuid,
         control: &JobControl,
     ) -> Result<usize> {
@@ -411,7 +411,7 @@ where
 
     async fn write_tracker_object(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         row: &ImportEntity,
         meta: &TrackerMeta,
         team: Option<Uuid>,

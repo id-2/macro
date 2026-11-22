@@ -2,7 +2,7 @@
 
 use agent_runtime_protocol::domain::action::AgentActionId;
 use bots::domain::models::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::model::{
@@ -13,7 +13,7 @@ use crate::domain::model::{
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ValidateRoutineSession {
     /// User whose authority and credentials execution spends.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Selected persona, not a runtime allowlist entry.
     pub bot_id: BotId,
     /// Omitted means the persona's current default at preparation time.
@@ -76,7 +76,7 @@ pub struct PreparedRoutineSession {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RoutineSessionAction {
     /// Claimed routine owner, checked against the immutable session owner.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Persona the routine selected, checked against the session.
     pub bot_id: BotId,
     /// Caller-generated UUIDv7 session id.

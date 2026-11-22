@@ -1,6 +1,6 @@
 use std::future::Future;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use opentelemetry::trace::TracerProvider as _;
 use opentelemetry_sdk::trace::{InMemorySpanExporter, SdkTracerProvider, SpanData};
 use serde_json::{Value, json};
@@ -148,11 +148,11 @@ async fn an_inbox_refresh_reaches_its_owner_and_each_delegate_once(pool: PgPool)
     // A promoted shared mailbox: the edges name the mailbox as their child
     // while its older events still carry the owner, who is a delegate too.
     for primary in [OWNER, DELEGATE] {
-        macro_db_client::macro_user_links::insert_edge(&pool, primary, MAILBOX, link)
+        rox_db_client::macro_user_links::insert_edge(&pool, primary, MAILBOX, link)
             .await
             .unwrap();
     }
-    macro_db_client::macro_user_links::insert_edge(&pool, OTHER_DELEGATE, MAILBOX, other_link)
+    rox_db_client::macro_user_links::insert_edge(&pool, OTHER_DELEGATE, MAILBOX, other_link)
         .await
         .unwrap();
     let (server, client) = gateway().await;
@@ -204,7 +204,7 @@ async fn a_failed_send_shows_on_the_span_and_the_rest_still_go_out(pool: PgPool)
     }
     let link = insert_link(&pool, MAILBOX).await;
     for primary in [OWNER, DELEGATE] {
-        macro_db_client::macro_user_links::insert_edge(&pool, primary, MAILBOX, link)
+        rox_db_client::macro_user_links::insert_edge(&pool, primary, MAILBOX, link)
             .await
             .unwrap();
     }

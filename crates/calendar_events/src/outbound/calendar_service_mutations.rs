@@ -20,13 +20,13 @@ use serde::Deserialize;
 use uuid::Uuid;
 
 use crate::domain::{
-    meeting_links::{MacroCallEventError, MeetingLinkError},
+    meeting_links::{RoxCallEventError, MeetingLinkError},
     models::{
         AttendeeResponseStatus, CalendarAttendeeInput, CalendarEvent, CalendarEventDraft,
         CalendarEventPatch, VisibleCalendar,
     },
     ports::{
-        CalendarDeletionScope, CalendarMacroCallService, CalendarMutationError,
+        CalendarDeletionScope, CalendarRoxCallService, CalendarMutationError,
         CalendarMutationService, CalendarRsvpScope, CalendarUpdateScope,
     },
 };
@@ -192,15 +192,15 @@ fn fallback_error(status: StatusCode, message: String) -> CalendarMutationError 
 /// Map an error response of a create carrying a Rox call. The calendar
 /// service reports a meeting it could not mint under its own code; every
 /// other failure is the calendar write's.
-fn macro_call_error_from_response(status: StatusCode, body: Option<String>) -> MacroCallEventError {
+fn macro_call_error_from_response(status: StatusCode, body: Option<String>) -> RoxCallEventError {
     let parsed = body
         .as_deref()
         .and_then(|body| serde_json::from_str::<MutationErrorWire>(body).ok());
     match parsed {
         Some(error) if error.code == "macro_call_failed" => {
-            MacroCallEventError::MeetingLink(MeetingLinkError::Failed(error.message))
+            RoxCallEventError::MeetingLink(MeetingLinkError::Failed(error.message))
         }
-        _ => MacroCallEventError::Calendar(error_from_response(status, body)),
+        _ => RoxCallEventError::Calendar(error_from_response(status, body)),
     }
 }
 
@@ -354,7 +354,7 @@ fn rsvp_body(
     }
 }
 
-impl CalendarMacroCallService for CalendarServiceMutations {
+impl CalendarRoxCallService for CalendarServiceMutations {
     #[tracing::instrument(skip(self, requester_id, draft), err)]
     async fn create_event_with_macro_call(
         &self,
@@ -362,7 +362,7 @@ impl CalendarMacroCallService for CalendarServiceMutations {
         email_link_id: Option<Uuid>,
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
-    ) -> Result<CalendarEvent, MacroCallEventError> {
+    ) -> Result<CalendarEvent, RoxCallEventError> {
         let response = self
             .send_raw(
                 self.request(reqwest::Method::POST, "/events", requester_id)
@@ -388,7 +388,7 @@ impl CalendarMacroCallService for CalendarServiceMutations {
         calendar_id: Option<Uuid>,
         patch: CalendarEventPatch,
         scope: CalendarUpdateScope,
-    ) -> Result<CalendarEvent, MacroCallEventError> {
+    ) -> Result<CalendarEvent, RoxCallEventError> {
         let response = self
             .send_raw(
                 self.request(

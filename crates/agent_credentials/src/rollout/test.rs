@@ -1,14 +1,14 @@
 use feature_flags::outbound::fake::FakeFeatureFlags;
 use feature_flags::{FlagSnapshot, FlagValue};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 use super::*;
 
 const AGENT: &str = "macro|sam-rivera-abc123@agents.macro.invalid";
 const CREATOR: &str = "macro|admin@rox.one";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
 fn rollout(on: bool) -> Result<FlagSnapshot, String> {

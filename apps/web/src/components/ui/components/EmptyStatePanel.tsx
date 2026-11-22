@@ -148,7 +148,7 @@ export function EmptyStatePanel(props: EmptyStatePanelProps) {
                   icon={props.documentationIcon}
                   onClick={() => openExternalUrl(url())}
                 >
-                  {props.documentationLabel ?? 'Documentation'}
+                  {props.documentationLabel ?? 'Документация'}
                 </PillButton>
               )}
             </Show>

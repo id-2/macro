@@ -10,7 +10,7 @@ use axum::{
     response::ErrorResponse,
     routing::get,
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model_entity::Entity;
 use utoipa::ToSchema;
 
@@ -46,7 +46,7 @@ pub struct QueryParams {
 #[tracing::instrument(skip(_internal_authorization, ctx))]
 #[axum::debug_handler(state = AppState)]
 pub async fn get_entity_handler(
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     State(ctx): State<ApiContext>,
     Path(entity): Path<Entity<'static>>,
     Query(query_params): Query<QueryParams>,

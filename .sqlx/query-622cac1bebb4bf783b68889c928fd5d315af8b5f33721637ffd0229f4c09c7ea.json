@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_messages SET subject = 'FYI from the second inbox' WHERE id = $1",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "622cac1bebb4bf783b68889c928fd5d315af8b5f33721637ffd0229f4c09c7ea"
+}

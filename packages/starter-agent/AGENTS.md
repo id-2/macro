@@ -34,7 +34,7 @@ runs: input a function doesn't take is refused with the compiler's error.
 - This checkout is live once the agent is running. Change code in a worktree
   (`.worktrees/`), never here, and bring it in with `bin/agent land`. Memory
   and `AGENT.md` are edited in place.
-- Never edit `node_modules/@macro-inc/muppet`: the library is a dependency.
+- Never edit `node_modules/@rox-one/muppet`: the library is a dependency.
 - Never start a second `bin/agent run`: two would answer the same messages.
 - Nothing in this repository names a particular agent, owner or product,
   outside `agent.json` and `state/`. Keep it that way: it is a template.

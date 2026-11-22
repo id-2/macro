@@ -1,7 +1,7 @@
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent};
-use macro_event_topics::{MacroCallsTopic, Topic};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent};
+use rox_event_topics::{RoxCallsTopic, Topic};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -15,8 +15,8 @@ fn uuid(value: &str) -> Uuid {
     Uuid::parse_str(value).expect("valid uuid")
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid user id")
 }
 
 fn timestamp(value: &str) -> DateTime<Utc> {
@@ -158,19 +158,19 @@ fn topic_events() -> Vec<(CallTopicEvent, Value)> {
     ]
 }
 
-fn macro_events() -> Vec<CallMacroEvent> {
+fn macro_events() -> Vec<CallRoxEvent> {
     topic_events()
         .into_iter()
         .map(|(event, _)| match event {
-            CallTopicEvent::Started(metadata) => CallMacroEvent::started(metadata),
-            CallTopicEvent::RecordArchived(metadata) => CallMacroEvent::record_archived(metadata),
-            CallTopicEvent::RecordUpdated(metadata) => CallMacroEvent::record_updated(metadata),
-            CallTopicEvent::RecordDeleted(metadata) => CallMacroEvent::record_deleted(metadata),
+            CallTopicEvent::Started(metadata) => CallRoxEvent::started(metadata),
+            CallTopicEvent::RecordArchived(metadata) => CallRoxEvent::record_archived(metadata),
+            CallTopicEvent::RecordUpdated(metadata) => CallRoxEvent::record_updated(metadata),
+            CallTopicEvent::RecordDeleted(metadata) => CallRoxEvent::record_deleted(metadata),
             CallTopicEvent::RecordSummarized(metadata) => {
-                CallMacroEvent::record_summarized(metadata)
+                CallRoxEvent::record_summarized(metadata)
             }
-            CallTopicEvent::RecordingReady(metadata) => CallMacroEvent::recording_ready(metadata),
-            CallTopicEvent::RecordImported(metadata) => CallMacroEvent::record_imported(metadata),
+            CallTopicEvent::RecordingReady(metadata) => CallRoxEvent::recording_ready(metadata),
+            CallTopicEvent::RecordImported(metadata) => CallRoxEvent::record_imported(metadata),
         })
         .collect()
 }
@@ -197,11 +197,11 @@ fn every_variant_has_exact_json_envelope() {
 fn every_variant_round_trips() {
     for original in macro_events() {
         let payload = serde_json::to_vec(original.event()).expect("serializable event");
-        let decoded = CallMacroEvent::decode(original.key(), &payload).expect("decodable event");
+        let decoded = CallRoxEvent::decode(original.key(), &payload).expect("decodable event");
 
         assert_eq!(decoded.key(), CALL_ID);
         assert_eq!(decoded.event(), original.event());
-        assert_eq!(decoded.topic(), MacroCallsTopic::TOPIC_STR);
+        assert_eq!(decoded.topic(), RoxCallsTopic::TOPIC_STR);
         assert_eq!(decoded.topic(), "macro.calls");
     }
 }
@@ -234,7 +234,7 @@ fn archived_events_published_before_participants_decode_without_them() {
             "archive_reason": "room_finished",
         },
     });
-    let decoded = CallMacroEvent::decode(CALL_ID, &serde_json::to_vec(&payload).unwrap())
+    let decoded = CallRoxEvent::decode(CALL_ID, &serde_json::to_vec(&payload).unwrap())
         .expect("decodable event");
     let CallTopicEvent::RecordArchived(metadata) = &decoded.event().event else {
         panic!("expected an archived call");

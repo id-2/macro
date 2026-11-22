@@ -19,15 +19,15 @@ use entity_access::domain::{
     },
     ports::EntityAccessService,
 };
-use macro_authorization::{
+use rox_authorization::{
     BOT_FOR_FUSIONAUTH_USER_ID_HEADER, BOT_FOR_MACRO_USER_ID_HEADER,
     BOT_FOR_ORGANIZATION_ID_HEADER, BOT_SCOPE_HEADER, BOT_TOKEN_HEADER,
     BotActingUserClaims as AuthorizationBotActingUserClaims, BotAuthentication, BotAuthorizer,
-    BotScope, InternalAuthConfig, JwtValidator, MacroAuthorizationError,
-    MacroAuthorizationServiceImpl, MacroAuthorizationState, MacroUserAuthentication,
+    BotScope, InternalAuthConfig, JwtValidator, LEGACY_BOT_TOKEN_HEADER, RoxAuthorizationError,
+    RoxAuthorizationServiceImpl, RoxAuthorizationState, RoxUserAuthentication,
     NoUserApiKeyAuthorizer, ValidatedIdentity,
 };
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use rootcause::Report;
 use std::sync::{
     Arc, Mutex,
@@ -64,7 +64,7 @@ enum TestMembershipMode {
 
 #[derive(Debug, Clone)]
 struct CreateCall {
-    caller: MacroUserIdStr<'static>,
+    caller: RoxUserIdStr<'static>,
     channel_id: Uuid,
 }
 
@@ -158,7 +158,7 @@ impl TestBotService {
 impl BotService for TestBotService {
     async fn create_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _req: CreateAgentRequest,
     ) -> Result<Agent, BotError> {
         unimplemented!()
@@ -166,7 +166,7 @@ impl BotService for TestBotService {
 
     async fn update_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: UpdateAgentRequest,
     ) -> Result<Agent, BotError> {
@@ -175,7 +175,7 @@ impl BotService for TestBotService {
 
     async fn manageable_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<Agent, BotError> {
         unimplemented!()
@@ -183,20 +183,20 @@ impl BotService for TestBotService {
 
     async fn patch_agent(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: PatchAgentRequest,
     ) -> Result<Agent, BotError> {
         unimplemented!()
     }
 
-    async fn list_agents(&self, _caller: MacroUserIdStr<'static>) -> Result<Vec<Agent>, BotError> {
+    async fn list_agents(&self, _caller: RoxUserIdStr<'static>) -> Result<Vec<Agent>, BotError> {
         unimplemented!()
     }
 
     async fn create_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _req: CreateBotRequest,
     ) -> Result<Bot, BotError> {
         unimplemented!()
@@ -204,7 +204,7 @@ impl BotService for TestBotService {
 
     async fn create_channel_scoped_bot(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         channel_id: Uuid,
         _req: CreateChannelScopedBotRequest,
     ) -> Result<CreateChannelScopedBotResponse, BotError> {
@@ -218,13 +218,13 @@ impl BotService for TestBotService {
         }
     }
 
-    async fn list_bots(&self, _caller: MacroUserIdStr<'static>) -> Result<Vec<Bot>, BotError> {
+    async fn list_bots(&self, _caller: RoxUserIdStr<'static>) -> Result<Vec<Bot>, BotError> {
         unimplemented!()
     }
 
     async fn get_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<Bot, BotError> {
         unimplemented!()
@@ -240,7 +240,7 @@ impl BotService for TestBotService {
 
     async fn patch_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: PatchBotRequest,
     ) -> Result<Bot, BotError> {
@@ -249,7 +249,7 @@ impl BotService for TestBotService {
 
     async fn delete_bot(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<(), BotError> {
         unimplemented!()
@@ -265,7 +265,7 @@ impl BotService for TestBotService {
 
     async fn remove_bot_from_channel(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _channel_id: Uuid,
         _bot_id: BotId,
     ) -> Result<(), BotError> {
@@ -286,7 +286,7 @@ impl BotService for TestBotService {
 
     async fn create_token(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _req: CreateBotTokenRequest,
     ) -> Result<CreateBotTokenResponse, BotError> {
@@ -295,7 +295,7 @@ impl BotService for TestBotService {
 
     async fn list_tokens(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
     ) -> Result<Vec<BotToken>, BotError> {
         unimplemented!()
@@ -303,7 +303,7 @@ impl BotService for TestBotService {
 
     async fn revoke_token(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _bot_id: BotId,
         _token_id: Uuid,
     ) -> Result<(), BotError> {
@@ -393,7 +393,7 @@ impl TestAccessService {
 impl EntityAccessService for TestAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -413,7 +413,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -422,7 +422,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -441,7 +441,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -451,7 +451,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, uuid::Uuid, TeamRole), AccessError> {
@@ -462,7 +462,7 @@ impl EntityAccessService for TestAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unimplemented!()
     }
 
@@ -482,7 +482,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!()
     }
@@ -652,7 +652,7 @@ enum TestBotAuthorizationMode {
         expected_claims: Option<AuthorizationBotActingUserClaims>,
         authentication: Box<BotAuthentication>,
     },
-    Reject(MacroAuthorizationError),
+    Reject(RoxAuthorizationError),
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
@@ -684,7 +684,7 @@ impl TestBotAuthorizer {
         }
     }
 
-    fn rejecting(error: MacroAuthorizationError) -> Self {
+    fn rejecting(error: RoxAuthorizationError) -> Self {
         Self {
             mode: TestBotAuthorizationMode::Reject(error),
             calls: Arc::new(Mutex::new(Vec::new())),
@@ -705,7 +705,7 @@ impl BotAuthorizer for TestBotAuthorizer {
         bot_token: &str,
         bot_scope: BotScope,
         acting_user: Option<AuthorizationBotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         self.calls
             .lock()
             .expect("bot authorization calls mutex poisoned")
@@ -726,7 +726,7 @@ impl BotAuthorizer for TestBotAuthorizer {
                 Ok(authentication)
             }
             TestBotAuthorizationMode::Ok { .. } => {
-                Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+                Err(Report::new(RoxAuthorizationError::InvalidCredentials))
             }
             TestBotAuthorizationMode::Reject(error) => Err(Report::new(*error)),
         }
@@ -740,9 +740,9 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -756,12 +756,12 @@ impl JwtValidator for FakeJwtValidator {
     }
 }
 
-type TestAuthorizationService = MacroAuthorizationServiceImpl<FakeJwtValidator>;
+type TestAuthorizationService = RoxAuthorizationServiceImpl<FakeJwtValidator>;
 
 fn authorization_state(
     bot_authorizer: TestBotAuthorizer,
-) -> MacroAuthorizationState<TestAuthorizationService> {
-    let service = MacroAuthorizationServiceImpl::new(
+) -> RoxAuthorizationState<TestAuthorizationService> {
+    let service = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: "test-internal-key".to_string(),
@@ -770,7 +770,7 @@ fn authorization_state(
         bot_authorizer,
         NoUserApiKeyAuthorizer,
     );
-    MacroAuthorizationState::new(Arc::new(service))
+    RoxAuthorizationState::new(Arc::new(service))
 }
 
 async fn attach_default_bearer(mut request: Request<Body>) -> Request<Body> {
@@ -791,7 +791,7 @@ fn router(
         Arc::new(poster),
         TestAccessService::new(role),
         authorization_state(TestBotAuthorizer::rejecting(
-            MacroAuthorizationError::InvalidCredentials,
+            RoxAuthorizationError::InvalidCredentials,
         )),
     ))
     .layer(axum::middleware::map_request(attach_default_bearer))
@@ -815,7 +815,7 @@ fn webhook_router_with_authorizer(
 }
 
 fn rejecting_bot_authorizer() -> TestBotAuthorizer {
-    TestBotAuthorizer::rejecting(MacroAuthorizationError::InvalidCredentials)
+    TestBotAuthorizer::rejecting(RoxAuthorizationError::InvalidCredentials)
 }
 
 fn bot_authentication(bot_id: BotId) -> BotAuthentication {
@@ -834,12 +834,12 @@ fn bot_authentication_with_acting_user(bot_id: BotId) -> BotAuthentication {
         token_id: Uuid::new_v4(),
         bot_scope: BotScope::User,
         team_id: None,
-        acting_user: Some(MacroUserAuthentication {
-            origin: macro_authorization::CredentialOrigin::Bot,
+        acting_user: Some(RoxUserAuthentication {
+            origin: rox_authorization::CredentialOrigin::Bot,
             agent_id: None,
             agent_via: None,
             routine_id: None,
-            macro_user_id: MacroUserIdStr::parse_from_str("macro|acting-bot@example.com").unwrap(),
+            macro_user_id: RoxUserIdStr::parse_from_str("macro|acting-bot@example.com").unwrap(),
             user_context: Default::default(),
         }),
     }
@@ -942,7 +942,7 @@ async fn an_agents_program_cannot_create_a_scoped_bot_with_its_token() {
         .method("POST")
         .uri(format!("/channels/{channel_id}/bots/scoped"))
         .header("content-type", "application/json")
-        .header(macro_authorization::CODE_EXECUTION_HEADER, "1")
+        .header(rox_authorization::CODE_EXECUTION_HEADER, "1")
         .body(scoped_bot_request_body())
         .unwrap();
 
@@ -1357,7 +1357,7 @@ async fn channel_webhook_router_rejected_acting_user_is_forbidden_without_postin
     let channel_id = Uuid::new_v4();
     let service = TestBotService::unauthorized_webhook();
     let poster = TestChannelPoster::new();
-    let authorizer = TestBotAuthorizer::rejecting(MacroAuthorizationError::ActingUserNotAuthorized);
+    let authorizer = TestBotAuthorizer::rejecting(RoxAuthorizationError::ActingUserNotAuthorized);
     let request = webhook_request(channel_id)
         .header(BOT_TOKEN_HEADER, "mbot_test_forbidden_claims")
         .header(BOT_SCOPE_HEADER, BotScope::User.as_str())
@@ -1463,6 +1463,62 @@ async fn channel_webhook_router_raw_body_starting_with_brace_posts_as_bot() {
     assert_eq!(call.actor, Sender::new_from_bot(bot_id));
     assert_eq!(call.channel_id, channel_id);
     assert_eq!(call.req.content, content);
+}
+
+#[tokio::test]
+async fn channel_webhook_router_accepts_the_pre_rename_channel_token_header() {
+    let channel_id = Uuid::new_v4();
+    let bot_id = BotId::new_from_uuid(Uuid::new_v4());
+    let token = "mbot_test_valid";
+    let service = TestBotService::for_webhook(channel_id, token, bot_id);
+    let poster = TestChannelPoster::new();
+    let request = Request::builder()
+        .method("POST")
+        .uri(format!("/channels/{channel_id}/webhook"))
+        .header("content-type", "application/json")
+        .header(LEGACY_CHANNEL_BOT_TOKEN_HEADER, token)
+        .body(Body::from(
+            serde_json::json!({ "content": "hello" }).to_string(),
+        ))
+        .unwrap();
+
+    let response = webhook_router(service.clone(), poster.clone())
+        .oneshot(request)
+        .await
+        .unwrap();
+
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(service.auth_calls.load(Ordering::SeqCst), 1);
+    let calls = poster.calls.lock().expect("posted message mutex poisoned");
+    assert_eq!(calls.len(), 1);
+    assert_eq!(calls[0].actor, Sender::new_from_bot(bot_id));
+}
+
+#[tokio::test]
+async fn channel_webhook_router_prefers_the_rename_but_refuses_mixed_ambiguous_credentials() {
+    let channel_id = Uuid::new_v4();
+    let bot_id = BotId::new_from_uuid(Uuid::new_v4());
+    let service = TestBotService::for_webhook(channel_id, "mbot_test_legacy", bot_id);
+    let poster = TestChannelPoster::new();
+    let authorizer = rejecting_bot_authorizer();
+    let request = webhook_request(channel_id)
+        .header(LEGACY_BOT_TOKEN_HEADER, "mbot_test_invalid_preferred")
+        .header(BOT_SCOPE_HEADER, BotScope::User.as_str())
+        .header(CHANNEL_BOT_TOKEN_HEADER, "mbot_test_legacy")
+        .body(Body::from(
+            serde_json::json!({ "content": "ambiguous" }).to_string(),
+        ))
+        .unwrap();
+
+    let response =
+        webhook_router_with_authorizer(service.clone(), poster.clone(), authorizer.clone())
+            .oneshot(request)
+            .await
+            .unwrap();
+
+    assert_eq!(response.status(), StatusCode::BAD_REQUEST);
+    assert_eq!(authorizer.call_count(), 0);
+    assert_eq!(service.auth_calls.load(Ordering::SeqCst), 0);
 }
 
 #[tokio::test]

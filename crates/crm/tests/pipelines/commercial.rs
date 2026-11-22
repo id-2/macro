@@ -7,14 +7,14 @@ use super::*;
 async fn run_backfill(pool: &PgPool) {
     let mut transaction = pool.begin().await.unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../macro_db_client/migrations/20261113162435_crm_pipeline_commercial_fields_backfill.sql"
+        "../../../rox_db_client/migrations/20261113162435_crm_pipeline_commercial_fields_backfill.sql"
     ))
     .execute(&mut *transaction)
     .await
     .unwrap();
     transaction.commit().await.unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../macro_db_client/migrations/20261113174353_crm_pipeline_commercial_fields_seed_rows.sql"
+        "../../../rox_db_client/migrations/20261113174353_crm_pipeline_commercial_fields_seed_rows.sql"
     ))
     .execute(pool)
     .await

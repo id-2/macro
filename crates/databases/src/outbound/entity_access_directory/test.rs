@@ -5,9 +5,9 @@ use std::sync::Arc;
 
 use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -20,15 +20,15 @@ use crate::outbound::pg_databases_repo::PgDatabasesRepo;
 
 /// A user id no other test in this process shares, so the source-id cache
 /// cannot carry one test's answer into another's database.
-fn unique_user() -> MacroUserIdStr<'static> {
+fn unique_user() -> RoxUserIdStr<'static> {
     let id = format!("macro|databases-dir-{}@rox.one", Uuid::new_v4());
-    MacroUserIdStr::parse_from_str(&id)
+    RoxUserIdStr::parse_from_str(&id)
         .expect("valid user id")
         .into_owned()
 }
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let macro_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
         macro_user_id,
@@ -47,7 +47,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) {
     .expect("user should insert");
 }
 
-async fn create_database(pool: &PgPool, owner: &MacroUserIdStr<'static>) -> Database {
+async fn create_database(pool: &PgPool, owner: &RoxUserIdStr<'static>) -> Database {
     PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool.clone()))
         .create_database(
             &CreateDatabase {
@@ -71,7 +71,7 @@ fn directory(pool: &PgPool) -> EntityAccessDirectory<EntityAccessServiceImpl<PgA
     )))
 }
 
-fn viewer(user: &MacroUserIdStr<'static>) -> Viewer {
+fn viewer(user: &RoxUserIdStr<'static>) -> Viewer {
     Viewer {
         user_id: user.clone(),
         acting_bot: None,

@@ -2,8 +2,8 @@
 
 use std::collections::HashSet;
 
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use rootcause::Report;
 use serde::Serialize;
@@ -32,9 +32,9 @@ pub trait WebSocketGatewayOps {
     /// (i.e., users who had an active WebSocket connection).
     fn send_to_users<'a, T: Serialize + Send + Sync>(
         &self,
-        user_ids: &[MacroUserIdStr<'a>],
+        user_ids: &[RoxUserIdStr<'a>],
         payload: &T,
-    ) -> impl std::future::Future<Output = Result<HashSet<MacroUserIdStr<'static>>, Report>> + Send;
+    ) -> impl std::future::Future<Output = Result<HashSet<RoxUserIdStr<'static>>, Report>> + Send;
 }
 
 /// Receipt from the connection gateway indicating delivery status.
@@ -167,9 +167,9 @@ impl WebSocketGatewayOps for ConnectionGatewayClient {
     #[tracing::instrument(err, skip(self, payload))]
     async fn send_to_users<'a, T: Serialize + Send + Sync>(
         &self,
-        user_ids: &[MacroUserIdStr<'a>],
+        user_ids: &[RoxUserIdStr<'a>],
         payload: &T,
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         if user_ids.is_empty() {
             return Ok(HashSet::new());
         }
@@ -188,7 +188,7 @@ impl WebSocketGatewayOps for ConnectionGatewayClient {
             .into_iter()
             .filter(|r| r.delivery_count > 0)
             .filter_map(|r| {
-                MacroUserIdStr::parse_from_str(&r.user_id)
+                RoxUserIdStr::parse_from_str(&r.user_id)
                     .map(CowLike::into_owned)
                     .ok()
             })
@@ -201,9 +201,9 @@ impl WebSocketGatewayOps for ConnectionGatewayClient {
 impl<W: WebSocketGatewayOps + Send + Sync + 'static> RealtimeSender for WebSocketGatewayAdapter<W> {
     async fn send_notifications<'a, T: Serialize + Send + Sync>(
         &self,
-        recipients: &[MacroUserIdStr<'a>],
+        recipients: &[RoxUserIdStr<'a>],
         notification: &T,
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         self.gateway.send_to_users(recipients, notification).await
     }
 }

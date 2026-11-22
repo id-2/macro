@@ -1,3 +1,4 @@
+import { formatLocale, t } from '@app/lib/i18n';
 import { tz } from '@date-fns/tz';
 import {
   compareAsc,
@@ -33,10 +34,9 @@ export const formatTime = (
 ): string => {
   if (!date) return '';
   const d = date instanceof Date ? date : toDate(date);
-  return d.toLocaleTimeString('en-US', {
+  return d.toLocaleTimeString(formatLocale(), {
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true,
     timeZone,
   });
 };
@@ -79,24 +79,26 @@ export const formatDate = (
   }
 
   if (isYesterday(date, timeZoneOpts)) {
-    return `${shortWeekday ? 'Yest' : 'Yesterday'} at ${time}`;
+    return t(shortWeekday ? 'common.yesterdayShortAt' : 'common.yesterdayAt', {
+      time,
+    });
   }
 
   if (differenceInCalendarDays(now, d, timeZoneOpts) < 7) {
-    const weekday = d.toLocaleDateString(undefined, {
+    const weekday = d.toLocaleDateString(formatLocale(), {
       weekday: shortWeekday ? 'short' : 'long',
       timeZone,
     });
-    return showTime ? `${weekday} at ${time}` : weekday;
+    return showTime ? t('common.weekdayAt', { day: weekday, time }) : weekday;
   }
 
-  const displayDate = d.toLocaleDateString(undefined, {
+  const displayDate = d.toLocaleDateString(formatLocale(), {
     month: '2-digit',
     day: '2-digit',
     year: '2-digit',
     timeZone,
   });
-  return showTime ? `${displayDate} at ${time}` : displayDate;
+  return showTime ? t('common.dateAt', { date: displayDate, time }) : displayDate;
 };
 
 /**
@@ -106,17 +108,18 @@ export const formatDate = (
  */
 export const formatEmailDate = (date: DateValue) => {
   const d = toDate(date);
-  const weekday = d.toLocaleDateString('en-US', { weekday: 'short' });
-  const month = d.toLocaleDateString('en-US', { month: 'short' });
-  const day = d.getDate();
-  const year = d.getFullYear();
-  const time = d.toLocaleTimeString('en-US', {
+  const datePart = d.toLocaleDateString(formatLocale(), {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const time = d.toLocaleTimeString(formatLocale(), {
     hour: 'numeric',
     minute: '2-digit',
-    hour12: true,
   });
 
-  return `${weekday}, ${month} ${day}, ${year} at ${time}`;
+  return t('common.dateAt', { date: datePart, time });
 };
 
 /**

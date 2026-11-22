@@ -30,7 +30,7 @@ export type CalendarTimeFormat = '12-hour' | '24-hour';
 
 /** A calendar source used to group and style events. */
 export interface CalendarSource {
-  provider?: 'google' | 'outlook';
+  provider?: 'google' | 'outlook' | 'rox';
   capabilities?: import('@service-calendar/generated/schemas/calendarCapabilities').CalendarCapabilities;
   /** Stable source identifier. */
   id: string;

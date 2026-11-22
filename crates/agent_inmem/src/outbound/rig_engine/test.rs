@@ -177,7 +177,7 @@ async fn shared_definitions_keep_the_callers_context_and_check_each_sessions_gat
         let result = tools
             .dispatch_tool_call(
                 label.to_owned(),
-                RequestContext::new(MacroUserIdStr::try_from(user.to_owned()).unwrap()),
+                RequestContext::new(RoxUserIdStr::try_from(user.to_owned()).unwrap()),
                 "ReadTurnContext",
                 &serde_json::json!({"acting_as":"owner"}),
             )
@@ -564,7 +564,7 @@ fn opening_transcript_leaves_out_the_hidden_agent_context() {
     );
 }
 
-struct SelectedActor(MacroUserIdStr<'static>);
+struct SelectedActor(RoxUserIdStr<'static>);
 impl NativeToolGate for SelectedActor {
     fn check<'a>(
         &'a self,
@@ -586,7 +586,7 @@ impl NativeToolGate for SelectedActor {
 
 #[tokio::test]
 async fn native_dispatch_uses_the_resolved_account_and_strips_routing_arguments() {
-    let requester = MacroUserIdStr::try_from_email("requester@example.com").unwrap();
+    let requester = RoxUserIdStr::try_from_email("requester@example.com").unwrap();
     let tools = GatedToolSet {
         tools: Arc::new(AsyncToolCollection::<String>::new().add_tool::<ReadTurnContext, String>()),
         gate: Arc::new(SelectedActor(requester.clone())),
@@ -598,7 +598,7 @@ async fn native_dispatch_uses_the_resolved_account_and_strips_routing_arguments(
     let result = tools
         .dispatch_tool_call(
             "context".into(),
-            RequestContext::new(MacroUserIdStr::try_from_email("owner@example.com").unwrap()),
+            RequestContext::new(RoxUserIdStr::try_from_email("owner@example.com").unwrap()),
             "ReadTurnContext",
             &serde_json::json!({"acting_as":"requester"}),
         )
@@ -659,7 +659,7 @@ async fn cancelling_the_turn_ends_a_call_held_for_the_owner_and_a_later_approval
         reviewed_tools: Vec::new(),
         remote: None,
     });
-    let request = RequestContext::new(MacroUserIdStr::try_from_email("owner@example.com").unwrap());
+    let request = RequestContext::new(RoxUserIdStr::try_from_email("owner@example.com").unwrap());
     let cancel = request.cancel.clone();
     let call = tokio::spawn({
         let tools = Arc::clone(&tools);
@@ -687,7 +687,7 @@ async fn cancelling_the_turn_ends_a_call_held_for_the_owner_and_a_later_approval
     assert!(
         approve
             .send(NativeToolVerdict::RunAs(
-                MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+                RoxUserIdStr::try_from_email("owner@example.com").unwrap()
             ))
             .is_err(),
         "nobody is left waiting to act on a later approval"
@@ -800,7 +800,7 @@ async fn a_remote_mcp_tool_runs_only_when_the_gate_lets_it() {
         reviewed_tools: Vec::new(),
         remote: Some(remote.clone()),
     };
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     for refused in ["mcp__slack__send_message", "mcp__macro_internal__post"] {
         let result = tools
             .dispatch_tool_call(
@@ -936,7 +936,7 @@ async fn a_tool_that_uses_nobodys_access_still_asks_the_gate() {
         reviewed_tools: Vec::new(),
         remote: None,
     };
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let fetch = serde_json::json!({"url": "https://example.com/?q=secret"});
     let refused = tools
         .dispatch_tool_call(

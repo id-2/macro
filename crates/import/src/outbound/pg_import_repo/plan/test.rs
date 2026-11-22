@@ -3,8 +3,8 @@
 
 use std::time::Duration;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
 use sqlx::PgPool;
 
 use super::*;
@@ -13,7 +13,7 @@ use crate::domain::ports::{ImportRepo, NotionRunRepo};
 
 const ROADMAP: &str = "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
 
-async fn member(pool: &PgPool, label: &str, team: Uuid) -> MacroUserIdStr<'static> {
+async fn member(pool: &PgPool, label: &str, team: Uuid) -> RoxUserIdStr<'static> {
     let id = Uuid::now_v7();
     let email = format!("{label}@example.com");
     let user_id = format!("macro|{email}");
@@ -51,13 +51,13 @@ async fn member(pool: &PgPool, label: &str, team: Uuid) -> MacroUserIdStr<'stati
     .execute(pool)
     .await
     .unwrap();
-    MacroUserIdStr::parse_from_str(&user_id)
+    RoxUserIdStr::parse_from_str(&user_id)
         .unwrap()
         .into_owned()
 }
 
 /// `user`'s one-page plan of the Roadmap, staged.
-async fn roadmap_plan(repo: &PgImportRepo, user: &MacroUserIdStr<'static>) -> Uuid {
+async fn roadmap_plan(repo: &PgImportRepo, user: &RoxUserIdStr<'static>) -> Uuid {
     let staged = repo
         .replace_plan(
             user,
@@ -78,7 +78,7 @@ async fn roadmap_plan(repo: &PgImportRepo, user: &MacroUserIdStr<'static>) -> Uu
 }
 
 /// `user`'s run, writing, held by a live process.
-async fn writing(repo: &PgImportRepo, user: &MacroUserIdStr<'static>, lease: Duration) {
+async fn writing(repo: &PgImportRepo, user: &RoxUserIdStr<'static>, lease: Duration) {
     repo.start_run(user, ImportSource::Notion, &[])
         .await
         .unwrap();

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { useChannel } from '@core/context/channels';
 import { formatDate } from '@core/util/date';
 import ChannelIcon from '@icon/system/regular/hash-straight.svg';
@@ -40,7 +41,7 @@ export function ChannelCreatedIndicator(props: ChannelCreatedIndicatorProps) {
             </Avatar>
             <div class="flex min-w-0 flex-col justify-center">
               <span class="text-sm text-ink">
-                Channel <span class="font-semibold">{c().name}</span> created
+                {t('nav.channelCreated', { name: c().name ?? 'канал' })}
               </span>
               <span class="text-xs text-ink-extra-muted">
                 {formatDate(c().created_at, { showTime: true })}

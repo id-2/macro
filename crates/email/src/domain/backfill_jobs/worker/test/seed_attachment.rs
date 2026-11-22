@@ -88,7 +88,7 @@ async fn each_seed_filter_preserves_valid_neighbors_and_original_recipient_order
                 *connection,
                 std::collections::HashSet::from([
                     link().macro_id,
-                    macro_user_id::user_id::MacroUserIdStr::try_from_email(recipient).unwrap()
+                    rox_user_id::user_id::RoxUserIdStr::try_from_email(recipient).unwrap()
                 ])
             );
         }

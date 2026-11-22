@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { touchHandler } from '@core/directive/touchHandler';
 import DotsThreeIcon from '@icon/system/regular/dots-three.svg';
 import { createElementSize } from '@solid-primitives/resize-observer';
@@ -511,7 +512,7 @@ function MenuOverflowPillTabs<T extends string>(props: PillTabsProps<T>) {
             />
             <MobileDrawer.Portal>
               <MobileDrawer.Overlay />
-              <MobileDrawer.Content aria-label="More tabs">
+              <MobileDrawer.Content aria-label={t('nav.moreTabs')}>
                 <MobileDrawer.Handle />
                 <MobileDrawer.ScrollBody>
                   <div class="mx-3 flex flex-col gap-1 px-1">
@@ -532,7 +533,7 @@ function MenuOverflowPillTabs<T extends string>(props: PillTabsProps<T>) {
                     </For>
                     <div class="-mx-1 h-px shrink-0 bg-edge" />
                     <MobileDrawer.Close
-                      aria-label="Tabs"
+                      aria-label={t('nav.tabs')}
                       class="flex h-9 shrink-0 items-center px-3 text-sm font-medium text-ink-muted"
                     >
                       Tabs

@@ -4,8 +4,8 @@ import {
   type Websocket,
   WebsocketBuilder,
   WebsocketEvent,
-} from '@macro-inc/collaboration/websocket';
-import { createWebsocketStateSignal } from '@macro-inc/collaboration/websocket/solid/state-signal';
+} from '@rox-one/collaboration/websocket';
+import { createWebsocketStateSignal } from '@rox-one/collaboration/websocket/solid/state-signal';
 import { createEffect, createSignal, onCleanup } from 'solid-js';
 import { v7 as uuidv7 } from 'uuid';
 import { createSessionWebsocketTelemetry } from '../session-websocket-telemetry';

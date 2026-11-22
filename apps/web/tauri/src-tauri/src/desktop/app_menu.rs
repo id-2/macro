@@ -69,12 +69,12 @@ fn build(app: &AppHandle<AppRuntime>) -> tauri::Result<Menu<AppRuntime>> {
 
     let file_menu = Submenu::with_items(
         app,
-        "File",
+        "Файл",
         true,
         &[&MenuItem::with_id(
             app,
             CLOSE_TAB_ID,
-            "Close Tab",
+            "Закрыть вкладку",
             true,
             Some("CmdOrCtrl+W"),
         )?],
@@ -82,7 +82,7 @@ fn build(app: &AppHandle<AppRuntime>) -> tauri::Result<Menu<AppRuntime>> {
 
     let edit_menu = Submenu::with_items(
         app,
-        "Edit",
+        "Правка",
         true,
         &[
             &PredefinedMenuItem::undo(app, None)?,
@@ -97,7 +97,7 @@ fn build(app: &AppHandle<AppRuntime>) -> tauri::Result<Menu<AppRuntime>> {
 
     let view_menu = Submenu::with_items(
         app,
-        "View",
+        "Вид",
         true,
         &[&PredefinedMenuItem::fullscreen(app, None)?],
     )?;
@@ -105,17 +105,17 @@ fn build(app: &AppHandle<AppRuntime>) -> tauri::Result<Menu<AppRuntime>> {
     let window_menu = Submenu::with_id_and_items(
         app,
         WINDOW_SUBMENU_ID,
-        "Window",
+        "Окно",
         true,
         &[
             &PredefinedMenuItem::minimize(app, None)?,
             &PredefinedMenuItem::maximize(app, None)?,
             &PredefinedMenuItem::separator(app)?,
-            &MenuItem::with_id(app, CLOSE_WINDOW_ID, "Close Window", true, None::<&str>)?,
+            &MenuItem::with_id(app, CLOSE_WINDOW_ID, "Закрыть окно", true, None::<&str>)?,
         ],
     )?;
 
-    let help_menu = Submenu::with_id_and_items(app, HELP_SUBMENU_ID, "Help", true, &[])?;
+    let help_menu = Submenu::with_id_and_items(app, HELP_SUBMENU_ID, "Справка", true, &[])?;
 
     Menu::with_items(
         app,

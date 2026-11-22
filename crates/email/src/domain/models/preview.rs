@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EntityAccessReceipt, MemberTeamRole};
 use frecency::domain::models::AggregateFrecency;
 use item_filters::ast::{CrmScope, LiteralTree, email::EmailLiteral};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Identify, Query, SimpleSortMethod, SortOn};
 use serde_with::{DeserializeFromStr, SerializeDisplay};
 use std::str::FromStr;
@@ -80,7 +80,7 @@ impl FromStr for PreviewView {
 pub struct EmailThreadPreview {
     pub id: Uuid,
     pub provider_id: Option<String>,
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     pub inbox_visible: bool,
     pub is_read: bool,
     pub is_draft: bool,
@@ -145,7 +145,7 @@ pub struct GetEmailsRequest {
     /// the caller has linked secondary inboxes or has been delegated access
     /// via macro_user_links.
     pub link_ids: Vec<Uuid>,
-    pub macro_id: MacroUserIdStr<'static>,
+    pub macro_id: RoxUserIdStr<'static>,
     pub limit: Option<u32>,
     pub query: Query<Uuid, SimpleSortMethod, LiteralTree<EmailLiteral>>,
     /// Whether aggregate frecency should be loaded for the returned threads.

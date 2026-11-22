@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::{
-    AppJwt, GithubAppInstallationSource, GithubKey, MacroTaskId, ResolvedTeamTaskReference,
+    AppJwt, GithubAppInstallationSource, GithubKey, RoxTaskId, ResolvedTeamTaskReference,
     TeamTaskReference,
 };
 use std::collections::HashMap;
@@ -12,8 +12,8 @@ const TEST_PEM: &str = include_str!("../installation_tokens/test_key.pem");
 const PERSONAL_INSTALLATION: &str = "42";
 const TEAM_INSTALLATION: &str = "77";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").expect("a valid user id")
 }
 
 fn config() -> InstallationTokenConfig {
@@ -75,14 +75,14 @@ impl GithubSyncRepo for FakeRepo {
         unimplemented!("listing goes from user to installations, not the other way")
     }
 
-    async fn get_task_ids(&self, _github_key: GithubKey) -> Result<Vec<MacroTaskId>, Self::Err> {
+    async fn get_task_ids(&self, _github_key: GithubKey) -> Result<Vec<RoxTaskId>, Self::Err> {
         unimplemented!("listing repositories does not read tasks")
     }
 
     async fn upsert_task_ids(
         &self,
         _github_key: GithubKey,
-        _task_ids: &[MacroTaskId],
+        _task_ids: &[RoxTaskId],
     ) -> Result<(), Self::Err> {
         unimplemented!("listing repositories does not write tasks")
     }
@@ -90,8 +90,8 @@ impl GithubSyncRepo for FakeRepo {
     async fn filter_duplicate_tasks(
         &self,
         _github_key: GithubKey,
-        _task_ids: &[MacroTaskId],
-    ) -> Result<Vec<MacroTaskId>, Self::Err> {
+        _task_ids: &[RoxTaskId],
+    ) -> Result<Vec<RoxTaskId>, Self::Err> {
         unimplemented!("listing repositories does not read tasks")
     }
 
@@ -120,7 +120,7 @@ impl GithubSyncRepo for FakeRepo {
     async fn get_team_member_ids(
         &self,
         _team_id: uuid::Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         unimplemented!("listing repositories does not list team members")
     }
 

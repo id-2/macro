@@ -122,12 +122,5 @@ export function createFlowFinish(
     startPremiumCheckout,
     /** Finish after checkout confirmed payment, recording the tier Stripe returned. */
     finishPremium: (tier: PaidPlanTier = 'premium') => complete(tier, false),
-    /** Leave from any step, recorded server-side as skipped. */
-    bypass: (step: string) =>
-      leave({
-        skipped: true,
-        target: afterTarget(),
-        onCompleted: () => context.track('onboarding_v4_bypassed', { step }),
-      }),
   };
 }

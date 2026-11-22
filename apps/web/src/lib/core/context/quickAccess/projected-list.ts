@@ -14,7 +14,7 @@ import {
   type CacheErrorCode,
   classifyCacheError,
 } from '@graphql-cache/telemetry';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   type Accessor,
   createEffect,

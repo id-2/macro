@@ -19,7 +19,7 @@ export function ThinkingBlock(props: {
           class="size-4 shrink-0 transition-transform"
           classList={{ 'rotate-90': expanded() }}
         />
-        <span>{props.isStreaming ? 'Thinking' : 'Thought'}</span>
+        <span>{props.isStreaming ? 'Думаю' : 'Размышление'}</span>
       </button>
       <Show when={expanded()}>
         <div class="pb-0 pl-5 text-ink-muted">

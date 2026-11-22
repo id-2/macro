@@ -1,6 +1,6 @@
 //! Provider-neutral flag loading and immutable evaluation results.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::{collections::HashMap, future::Future};
 
@@ -63,7 +63,7 @@ pub trait FeatureFlags: Send + Sync {
     /// Await evaluation once, then use synchronous reads on the returned snapshot.
     fn load(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<FlagSnapshot, Report>> + Send;
 }
 

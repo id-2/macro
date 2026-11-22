@@ -2,8 +2,11 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { Stepper } from '@ui/components/Stepper';
 import {
   type Accessor,
+  createEffect,
+  createSignal,
   type JSX,
   Match,
+  onCleanup,
   onMount,
   Show,
   Switch,
@@ -44,6 +47,8 @@ export type SignupJourneySlots = {
 /** Sign-in and sign-up by an emailed code, then whatever comes next. */
 export function AuthView(props: {
   intent: AuthIntent;
+  /** No provider buttons: the entry opens on the email form. */
+  emailOnly?: boolean;
   showApple: boolean;
   /** The header yields to the on-screen keyboard on phones. */
   compact: boolean;
@@ -73,12 +78,44 @@ export function AuthView(props: {
     intent: props.intent,
     initialEmail: props.initialEmail,
     autoStart: props.autoStart,
+    startAtEmail: props.emailOnly,
     onVerified: props.onVerified,
     fallbackNotice: props.ssoFallbackNotice,
   });
   createSessionIdentity(context);
   redeemSessionToken(context, () => props.token);
   onMount(() => context.pageView(props.intent));
+
+  /*
+   * The address step stays put while its button shows the accepted check: the
+   * claim itself advances `login.step()` straight away, so the stepper is fed
+   * a held index until the mark has been read.
+   */
+  const CLAIM_CHECK_MS = 420;
+  const [holding, setHolding] = createSignal(false);
+  let holdTimer: ReturnType<typeof setTimeout> | undefined;
+  const releaseHold = () => {
+    clearTimeout(holdTimer);
+    holdTimer = undefined;
+    setHolding(false);
+  };
+  const holdAddress = () => {
+    clearTimeout(holdTimer);
+    holdTimer = undefined;
+    setHolding(true);
+  };
+  const releaseAfterCheck = () => {
+    clearTimeout(holdTimer);
+    holdTimer = setTimeout(releaseHold, CLAIM_CHECK_MS);
+  };
+  onCleanup(() => clearTimeout(holdTimer));
+  const backFromAddress = () => {
+    releaseHold();
+    login.back();
+  };
+  /** The step the stepper shows, which lags the login's own while held. */
+  const heldStep = (map: Record<LoginStep, number>) =>
+    holding() ? Math.min(map[login.step()], map.address) : map[login.step()];
 
   const user = () => {
     const session = context.session();
@@ -99,14 +136,19 @@ export function AuthView(props: {
             emailForm: (
               <Show when={login.step() !== 'choose'}>
                 <Stepper
-                  step={JOURNEY_STEP[login.step()]}
+                  step={heldStep(JOURNEY_STEP)}
                   transition={Stepper.transitions.scale}
                 >
                   <Stepper.Step>
                     <EmailStep login={login} />
                   </Stepper.Step>
                   <Stepper.Step>
-                    <AddressStep login={login} />
+                    <AddressStep
+                      login={login}
+                      onHold={holdAddress}
+                      onClaimed={releaseAfterCheck}
+                      onBack={backFromAddress}
+                    />
                   </Stepper.Step>
                   <Stepper.Step>
                     <VerifyStep login={login} />
@@ -124,9 +166,10 @@ export function AuthView(props: {
         <LoginCard
           compact={props.compact}
           agentSignup={props.intent === 'agent-signup'}
+          hideHeader={heldStep(STEP_INDEX) === STEP_INDEX.address}
         >
           <Stepper
-            step={STEP_INDEX[login.step()]}
+            step={heldStep(STEP_INDEX)}
             transition={Stepper.transitions.scale}
           >
             <Stepper.Step>
@@ -139,10 +182,15 @@ export function AuthView(props: {
               />
             </Stepper.Step>
             <Stepper.Step>
-              <EmailStep login={login} />
+              <EmailStep login={login} showBack={!props.emailOnly} />
             </Stepper.Step>
             <Stepper.Step>
-              <AddressStep login={login} />
+              <AddressStep
+                login={login}
+                onHold={holdAddress}
+                onClaimed={releaseAfterCheck}
+                onBack={backFromAddress}
+              />
             </Stepper.Step>
             <Stepper.Step>
               <VerifyStep login={login} />
@@ -187,7 +235,7 @@ const JOURNEY_STEP = {
   passkey: 3,
 } as const satisfies Record<LoginStep, number>;
 
-function EmailStep(props: { login: EmailLogin }) {
+function EmailStep(props: { login: EmailLogin; showBack?: boolean }) {
   return (
     <EmailForm
       email={props.login.email()}
@@ -198,20 +246,36 @@ function EmailStep(props: { login: EmailLogin }) {
       onEmailInput={props.login.setEmail}
       onPasswordInput={props.login.setPassword}
       onSubmit={props.login.submitEmail}
-      onBack={props.login.back}
+      onBack={props.showBack === false ? undefined : props.login.back}
     />
   );
 }
 
-function AddressStep(props: { login: EmailLogin }) {
+function AddressStep(props: {
+  login: EmailLogin;
+  /** Keeps the step on screen from the click until the address is accepted. */
+  onHold: () => void;
+  /** The address was accepted: hold it long enough to show the check. */
+  onClaimed: () => void;
+  onBack: () => void;
+}) {
+  const claimed = () =>
+    props.login.createdAccount() && props.login.step() !== 'address';
+  createEffect(() => {
+    if (claimed()) props.onClaimed();
+  });
   return (
     <AddressForm
       local={props.login.handle()}
       sending={props.login.sending()}
+      claimed={claimed()}
       error={props.login.sendError()}
       onLocalInput={props.login.setHandle}
-      onSubmit={props.login.submitAddress}
-      onBack={props.login.back}
+      onSubmit={() => {
+        props.onHold();
+        props.login.submitAddress();
+      }}
+      onBack={props.onBack}
     />
   );
 }

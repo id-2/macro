@@ -12,9 +12,9 @@ use axum::{
     extract::{FromRef, FromRequestParts, Path},
     http::request::Parts,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
-    OptionalMacroAuthorizationExtractor,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
+    OptionalRoxAuthorizationExtractor,
 };
 use tracing::Level;
 
@@ -44,8 +44,8 @@ where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
     Svc: EntityAccessService,
-    MacroAuthorizationState<Auth>: FromRef<S>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<S>,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -55,7 +55,7 @@ where
         let service = <Arc<Svc>>::from_ref(state);
 
         let authorization =
-            OptionalMacroAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(
+            OptionalRoxAuthorizationExtractor::<Auth, AnyPrincipal>::from_request_parts(
                 parts, state,
             )
             .await
@@ -74,7 +74,7 @@ where
             ))?
             .clone();
 
-        if let Some(MacroAuthorization::Bot(authentication)) = authorization.as_ref() {
+        if let Some(RoxAuthorization::Bot(authentication)) = authorization.as_ref() {
             let entity_access_receipt = generate_bot_entity_access_receipt::<T>(
                 service.as_ref(),
                 authentication,
@@ -91,10 +91,10 @@ where
 
         let is_internal_access = authorization
             .as_ref()
-            .is_some_and(MacroAuthorization::is_internal);
+            .is_some_and(RoxAuthorization::is_internal);
         let macro_user_id = authorization
             .as_ref()
-            .and_then(MacroAuthorization::acting_user)
+            .and_then(RoxAuthorization::acting_user)
             .map(|user| user.macro_user_id.clone());
 
         if macro_user_id.is_none() && is_internal_access {

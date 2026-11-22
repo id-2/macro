@@ -11,7 +11,7 @@ use entity_access::outbound::get_user_source_ids;
 use filter_ast::Expr;
 use item_filters::SharedEmailFilter;
 use item_filters::ast::email::EmailLiteral;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Query, SimpleSortMethod};
 use owned_scope::OwnedRead;
 pub(crate) use owned_scope::{OwnedReadStats, OwnedReadTuning};
@@ -1371,7 +1371,7 @@ async fn read_page(
     let project_scope = if project_ids.is_empty() {
         None
     } else {
-        let user = MacroUserIdStr::parse_from_str(user_id).ok();
+        let user = RoxUserIdStr::parse_from_str(user_id).ok();
         match get_user_source_ids(pool, user.as_deref()).await {
             Ok(source_ids) => Some(ProjectScope {
                 project_ids,

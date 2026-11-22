@@ -8,14 +8,14 @@ version = "0.1.0"
 default = []
 inbound = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:utoipa",
 ]
 outbound = [
   "dep:channels",
   "dep:entity_access",
-  "dep:macro_service_urls",
+  "dep:rox_service_urls",
   "dep:messages",
 ]
 postgres = ["dep:sqlx"]
@@ -25,9 +25,9 @@ axum = { workspace = true, optional = true }
 channels = { path = "../channels", optional = true, default-features = false, features = ["ports"] }
 chrono = { workspace = true, features = ["serde"] }
 entity_access = { path = "../entity_access", optional = true, default-features = false, features = ["ports"] }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = ["axum"] }
-macro_service_urls = { path = "../macro_service_urls", optional = true }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = ["axum"] }
+rox_service_urls = { path = "../rox_service_urls", optional = true }
+rox_user_id = { path = "../rox_user_id" }
 messages = { path = "../messages", optional = true, default-features = false, features = ["ports"] }
 model-error-response = { path = "../model-error-response", optional = true }
 rootcause = { workspace = true }
@@ -45,7 +45,7 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 account_manager = { path = ".", features = ["inbound"] }
 bot_id = { path = "../bot_id" }
 tower = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 # The crate depends on itself in tests to turn on `inbound`, which shear reads as unused.

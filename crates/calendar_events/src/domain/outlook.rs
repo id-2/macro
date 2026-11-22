@@ -755,7 +755,7 @@ pub struct CalendarProjectionRelay<R, B, N> {
 }
 impl<
     R: CalendarProjectionOutbox,
-    B: macro_event_broker::MacroEventBroker,
+    B: rox_event_broker::RoxEventBroker,
     N: CalendarRefreshNotifier,
 > CalendarProjectionRelay<R, B, N>
 {
@@ -855,7 +855,7 @@ impl<
         err(level = tracing::Level::DEBUG)
     )]
     async fn publish(&self, lease: &CalendarProjectionLease) -> Result<(), Report> {
-        let event = super::events::CalendarMacroEvent::for_change(lease.event.clone());
+        let event = super::events::CalendarRoxEvent::for_change(lease.event.clone());
         self.broker
             .send_event(&event)
             .map_err(|e| rootcause::report!(e))?

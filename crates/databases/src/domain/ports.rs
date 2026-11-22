@@ -7,7 +7,7 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::{
     AccessLevel, EditAccessLevel, EntityAccessReceipt, OwnerAccessLevel, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::service::property_definition_with_options::PropertyDefinitionWithOptions;
 use models_properties::service::property_option::PropertyOptionValue;
 use models_properties::service::property_value::PropertyValue;
@@ -151,7 +151,7 @@ pub trait DatabasesRepo: Send + Sync + 'static {
         &self,
         database_id: Option<DatabaseId>,
         definition: &QueryDefinition,
-        created_by: &MacroUserIdStr<'_>,
+        created_by: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<SavedQuery, Self::Error>> + Send;
 
     /// A saved query, if it exists.
@@ -297,7 +297,7 @@ pub trait CreatorAccess: Send + Sync + 'static {
     /// longer edit it.
     fn edit_receipt(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         database_id: DatabaseId,
     ) -> impl Future<
         Output = Result<Option<EntityAccessReceipt<EditAccessLevel>>, rootcause::Report>,
@@ -378,7 +378,7 @@ pub trait TableEventPublisher: Send + Sync + 'static {
     fn awareness(
         &self,
         database_id: DatabaseId,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         can_edit: bool,
         state: &Awareness,
     ) -> impl Future<Output = Result<(), Self::Error>> + Send;

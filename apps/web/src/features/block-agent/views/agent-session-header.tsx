@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ChangesToggle } from '@app/features/changes/changes';
 import { BlockToolbar } from '@components/app/block-toolbar';
 import { HeaderActionGroup } from '@components/app/HeaderActionGroup';
@@ -55,7 +56,7 @@ export function AgentSessionHeader(props: {
             {(url) => <AgentPullRequestChip url={url()} />}
           </Show>
           <ChangesToggle />
-          <HeaderActionGroup label="Session actions">
+          <HeaderActionGroup label={t('agentChat.sessionActions')}>
             <Show when={actions.openExternally.condition?.()}>
               <ToolButton tool={actions.openExternally} grouped />
             </Show>

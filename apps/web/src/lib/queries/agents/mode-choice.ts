@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { agentHarnessServiceClient } from '@service-agent-harness/client';
 import type { AgentMode } from '@service-agent-harness/generated/schemas';
 

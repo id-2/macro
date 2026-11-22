@@ -1,6 +1,6 @@
 /// The main entry point: [`AgentLoop`] and [`Session`].
 use crate::error::AgentError;
-use crate::hook::{BridgeInputs, RegisterFn, ToolLoads, ToolRouter, UserToolFinisher};
+use crate::hook::{BridgeInputs, RegisterFn, ToolLoads, ToolRouter, UnadvertiseFn, UserToolFinisher};
 use crate::model::metering::MeteringContext;
 use crate::model::metering_http::MeteredHttpClient;
 use crate::model::router::{ModelRouter, ProviderAgent};
@@ -393,6 +393,32 @@ impl AgentLoop {
             })
         };
 
+        // Drops a tool the model can no longer use: the definition is removed
+        // from the live tool server, so the next request stops advertising
+        // every form of the name (native or behind an MCP server prefix).
+        let unadvertise: UnadvertiseFn = {
+            let handle = handle.clone();
+            Arc::new(move |name: String| {
+                let handle = handle.clone();
+                Box::pin(async move {
+                    let suffix = format!("__{name}");
+                    let matches: Vec<String> = handle
+                        .get_tool_defs(None)
+                        .await
+                        .unwrap_or_default()
+                        .into_iter()
+                        .map(|definition| definition.name)
+                        .filter(|advertised| {
+                            advertised == &name || advertised.ends_with(&suffix)
+                        })
+                        .collect();
+                    for advertised in matches {
+                        handle.remove_tool(&advertised).await;
+                    }
+                }) as Pin<Box<dyn Future<Output = ()> + Send>>
+            })
+        };
+
         // Tell the model which model it is. Done here (not on the frontend)
         // so the system prompt always reflects the model actually serving the
         // request. A model's training data predates its own release, so a
@@ -453,6 +479,7 @@ impl AgentLoop {
                 routing,
                 loaded_buffer,
                 register_loaded,
+                unadvertise,
                 tool_loads: tool_search.loads.clone(),
                 user_tool_finisher: self.user_tool_finisher.clone(),
                 stream_tool_calls: self.stream_tool_calls,

@@ -24,7 +24,7 @@ use rootcause::prelude::ResultExt as _;
 use crate::computer::ENROLLED_MARKER;
 use crate::config::{Config, HarnessCredentials};
 use crate::outbound::pairing::{ClaimStatus, PairingClient};
-use crate::service::ServiceOptions;
+use crate::service::{DeploymentUrls as ServiceDeploymentUrls, ServiceOptions};
 use crate::tui::config_form::ConfigForm;
 
 #[cfg(test)]
@@ -296,7 +296,7 @@ struct DeploymentUrls {
 
 impl DeploymentUrls {
     fn from_deployment(deployment: &hosted_runtimes::domain::enrollment::Deployment) -> Self {
-        let trim = |url: &macro_service_urls::Url| url.as_str().trim_end_matches('/').to_owned();
+        let trim = |url: &rox_service_urls::Url| url.as_str().trim_end_matches('/').to_owned();
         Self {
             egress_url: trim(&deployment.egress_url),
             api_url: trim(&deployment.agent_harness_url),
@@ -320,8 +320,11 @@ fn write_config(
             profile: None,
             agent: None,
             workspace: Some(options.workspace.clone()),
+            deployment: ServiceDeploymentUrls::default(),
+            approval_token: None,
         },
         agent,
+        &ServiceDeploymentUrls::default(),
     )?;
     let mut form = ConfigForm::load(&options.config)?;
     form.set_deployment_urls(&urls.api_url, &urls.storage_url, &urls.web_url);

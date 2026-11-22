@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { type Accessor, createSignal, onCleanup } from 'solid-js';
 import { Tab } from 'tab-election';
 

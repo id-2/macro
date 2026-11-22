@@ -9,7 +9,7 @@ fn derives_host_endpoints_and_test_environment_from_the_instance() {
     assert_eq!(endpoints.frontend_url, "http://localhost:31010/app");
     assert_eq!(
         endpoints.postgres_url,
-        "postgres://user:password@localhost:31000/macrodb"
+        "postgres://user:password@localhost:31000/roxdb"
     );
     assert_eq!(endpoints.fusionauth_url, "http://localhost:31005");
     assert_eq!(endpoints.localstack_url, "http://localhost:31006");

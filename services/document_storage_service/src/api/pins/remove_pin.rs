@@ -7,7 +7,7 @@ use axum::{
     http::StatusCode,
     response::IntoResponse,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{
     GenericErrorResponse, GenericResponse, GenericSuccessResponse, SuccessResponse,
 };
@@ -35,11 +35,11 @@ pub struct Params {
 #[tracing::instrument(skip(ctx, user), fields(user_id=?user.authorization.user.macro_user_id))]
 pub async fn remove_pin_handler(
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(Params { pinned_item_id }): Path<Params>,
     Json(req): Json<PinRequest>,
 ) -> impl IntoResponse {
-    match macro_db_client::pins::remove_pin(
+    match rox_db_client::pins::remove_pin(
         ctx.db.clone(),
         user.authorization.user.macro_user_id.as_ref(),
         pinned_item_id.as_str(),

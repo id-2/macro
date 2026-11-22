@@ -5,7 +5,7 @@ import {
   $createAwaitNode,
   $createDocumentMentionNode,
   $isAwaitNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { createDatabase } from '@queries/storage/databases';
 import {
   $createParagraphNode,

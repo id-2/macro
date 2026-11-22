@@ -1,7 +1,7 @@
 use super::*;
 use crate::domain::models::ReferencedShareItemType;
 use chrono::{Duration, SubsecRound};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const CHANNEL: Uuid = Uuid::from_u128(100);
 const THREAD_ROOT: Uuid = Uuid::from_u128(1);
@@ -10,8 +10,8 @@ const OTHER_BOT: BotId = BotId::TEST_B;
 const PERSON: &str = "macro|person@example.com";
 const SOMEONE_ELSE: &str = "macro|someone-else@example.com";
 
-fn person() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(PERSON.to_owned()).unwrap()
+fn person() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(PERSON.to_owned()).unwrap()
 }
 
 async fn post(pool: &PgPool, id: Uuid, thread_id: Option<Uuid>, sender: &str, at: DateTime<Utc>) {

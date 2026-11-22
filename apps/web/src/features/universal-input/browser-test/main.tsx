@@ -1,11 +1,11 @@
 import { initializeUiOperationTelemetry } from '@app/observability/ui-operation';
 import { UserMention } from '@core/component/LexicalMarkdown/component/decorator/UserMention';
-import { setDecorator, UserMentionNode } from '@macro-inc/lexical-core';
-import { Telemetry } from '@macro-inc/observability';
+import { setDecorator, UserMentionNode } from '@rox-one/lexical-core';
+import { Telemetry } from '@rox-one/observability';
 import {
   createWebTracingProvider,
   StackContextManager,
-} from '@macro-inc/observability/web';
+} from '@rox-one/observability/web';
 import { render } from 'solid-js/web';
 import { UniversalInputFixture } from './fixture';
 

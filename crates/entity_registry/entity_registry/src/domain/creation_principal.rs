@@ -9,7 +9,7 @@ mod test;
 use std::str::ParseBoolError;
 
 use bot_id::NonSystemBotId;
-use macro_authorization::{BotAuthentication, BotScope, MacroAuthorization};
+use rox_authorization::{BotAuthentication, BotScope, RoxAuthorization};
 use model_owner::CreationPrincipal;
 
 /// Whether a creation may be owned by something other than a user.
@@ -65,13 +65,13 @@ pub enum CreationPrincipalError {
 /// team scope with a verified team and no acting user owns what it creates,
 /// and only while `non_user_owners` is enabled.
 pub fn resolve_creation_principal(
-    authorization: &MacroAuthorization,
+    authorization: &RoxAuthorization,
     non_user_owners: NonUserOwners,
 ) -> Result<CreationPrincipal, CreationPrincipalError> {
     match authorization {
         // A token signed for an agent still acts as its user, who owns the
         // result, but the agent is who did it.
-        MacroAuthorization::User(user) | MacroAuthorization::Internal(Some(user)) => {
+        RoxAuthorization::User(user) | RoxAuthorization::Internal(Some(user)) => {
             Ok(match user.agent_id {
                 Some(bot) => CreationPrincipal::BotForUser {
                     bot,
@@ -80,9 +80,9 @@ pub fn resolve_creation_principal(
                 None => CreationPrincipal::User(user.macro_user_id.clone()),
             })
         }
-        MacroAuthorization::Bot(bot) => resolve_bot(bot, non_user_owners),
-        MacroAuthorization::Internal(None) => Err(CreationPrincipalError::InternalWithoutUser),
-        MacroAuthorization::Harness(_) => Err(CreationPrincipalError::Harness),
+        RoxAuthorization::Bot(bot) => resolve_bot(bot, non_user_owners),
+        RoxAuthorization::Internal(None) => Err(CreationPrincipalError::InternalWithoutUser),
+        RoxAuthorization::Harness(_) => Err(CreationPrincipalError::Harness),
     }
 }
 

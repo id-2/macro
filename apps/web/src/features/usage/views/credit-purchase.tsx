@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { ThrownResultError, thrownResultErrorHasCode } from '@core/util/result';
@@ -13,7 +14,7 @@ function purchaseRejection(error: unknown) {
     error.errors.find((e) => e.code === 'CREDIT_PURCHASE_REJECTED')?.message;
   return message
     ? `${message.charAt(0).toUpperCase()}${message.slice(1)}.`
-    : "Couldn't buy credits. Please try again.";
+    : t('settingsUsage.buyFailed');
 }
 
 export function CreditPurchaseView(props: {
@@ -37,20 +38,23 @@ export function CreditPurchaseView(props: {
     props.context.summary()?.billingAccess === 'team-member';
   const notice = () => {
     if (previewing())
-      return 'Credit purchases are disabled during the developer preview.';
+      return t('settingsUsage.purchaseDisabledPreview');
     const summary = props.context.summary();
     if (summary?.unlimited)
-      return 'Your plan includes unlimited AI usage. No additional credits are needed.';
+      return t('settingsUsage.unlimitedNoCredits');
     if (summary?.billingAccess === 'free')
-      return 'Subscribe to a paid plan to buy additional usage credits.';
+      return t('settingsUsage.subscribeToBuy');
     const amount = amountCents();
     if (amount === undefined)
-      return 'Enter an amount greater than $0, using at most two decimal places.';
+      return t('settingsUsage.enterAmountError');
     if (!props.context.creditPurchase.supportedAmounts().includes(amount))
-      return 'Custom credit amounts are not available yet. Choose $25, $50, or $100.';
+      return t('settingsUsage.customAmountsUnavailable');
     const limit = summary?.purchaseLimit;
     if (limit && amount > limit.remainingCents)
-      return `${formatCreditBalance(limit.remainingCents)} of ${teamCard() ? "your team's" : 'your'} ${formatCreditBalance(limit.limitCents)} monthly credit limit is left. ${teamCard() ? 'Ask your team owner to raise it.' : 'Raise it in Automatic reload settings.'}`;
+      return `${t('settingsUsage.creditLimitLeft', {
+        remaining: formatCreditBalance(limit.remainingCents),
+        limit: formatCreditBalance(limit.limitCents),
+      })} ${teamCard() ? t('settingsUsage.askOwnerToRaise') : t('settingsUsage.raiseInAutoReload')}`;
   };
   /** The card on file can't be charged off-session (none on file, or it
    * needs 3-D Secure): the payer pays this pack through Stripe Checkout. */
@@ -61,8 +65,8 @@ export function CreditPurchaseView(props: {
     if (teamCard()) {
       setError(
         reason === 'payment_method_required'
-          ? "Your team doesn't have a card on file. Ask your team owner to add one."
-          : "Your team's card needs verification. Ask your team owner to buy credits or update the card."
+          ? t('settingsUsage.teamNoCard')
+          : t('settingsUsage.teamCardNeedsVerification')
       );
       return;
     }
@@ -71,7 +75,7 @@ export function CreditPurchaseView(props: {
         await props.context.creditPurchase.checkout(amount)
       );
     } catch {
-      setError("Couldn't open checkout. Please try again.");
+      setError(t('settingsUsage.checkoutFailed'));
     }
   };
   const buy = async () => {
@@ -96,19 +100,23 @@ export function CreditPurchaseView(props: {
       if (status === 'declined') {
         setError(
           teamCard()
-            ? "Your team's card was declined. Ask your team owner to update it."
-            : 'Your card was declined. Update your payment method, then try again.'
+            ? t('settingsUsage.teamCardDeclined')
+            : t('settingsUsage.ownCardDeclined')
         );
         return;
       }
       props.onClose();
-      toast.success(`Added ${formatCreditBalance(charged)} in credits.`);
+      toast.success(
+        t('settingsUsage.creditsAdded', {
+          amount: formatCreditBalance(charged),
+        })
+      );
     } catch (error) {
       const needsPlan = thrownResultErrorHasCode(error, 'PAID_PLAN_REQUIRED');
       setSubscriptionRequired(needsPlan);
       setError(
         needsPlan
-          ? 'Subscribe to a paid plan to buy additional usage credits.'
+          ? t('settingsUsage.subscribeToBuy')
           : purchaseRejection(error)
       );
     }

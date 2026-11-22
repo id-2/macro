@@ -89,7 +89,7 @@ where
         &self,
         session_id: AgentSessionId,
         action: &AgentAction,
-        actor: Option<&MacroUserIdStr<'static>>,
+        actor: Option<&RoxUserIdStr<'static>>,
     ) -> Result<Option<String>> {
         if !matches!(action, AgentAction::Prompt(_)) {
             return Ok(None);
@@ -124,7 +124,7 @@ where
         session_id: AgentSessionId,
         action_id: AgentActionId,
         origin: Option<&AnnounceOrigin>,
-        actor: Option<MacroUserIdStr<'static>>,
+        actor: Option<RoxUserIdStr<'static>>,
         reason: &str,
     ) -> Result<()> {
         let conversation_store = self.conversation_turns.as_ref().filter(|_| {
@@ -309,8 +309,8 @@ where
         &self,
         session_id: AgentSessionId,
         action_id: AgentActionId,
-        actor: Option<MacroUserIdStr<'static>>,
-        announcement_message_id: Option<macro_uuid::Uuid>,
+        actor: Option<RoxUserIdStr<'static>>,
+        announcement_message_id: Option<rox_uuid::Uuid>,
         failure: CommandFailure,
     ) {
         self.publish_lifecycle(session_id, |identity| {
@@ -329,7 +329,7 @@ where
         &self,
         bot: BotId,
         harness: &str,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> Result<()> {
         if macro_funded(AgentKind::for_session(bot, harness)) {
             self.admission.admit(owner, AiFeature::AgentSession).await?;
@@ -339,12 +339,12 @@ where
 }
 
 /// Seeds [`refusal_message_id`], so a redelivered refusal finds its message.
-const REFUSAL_MESSAGE_NAMESPACE: macro_uuid::Uuid =
-    macro_uuid::Uuid::from_u128(0x6c0f_3a5e_9d21_4b7e_8f30_2a41_c7d5_e913);
+const REFUSAL_MESSAGE_NAMESPACE: rox_uuid::Uuid =
+    rox_uuid::Uuid::from_u128(0x6c0f_3a5e_9d21_4b7e_8f30_2a41_c7d5_e913);
 
 /// The message that tells a conversation why one prompt was refused.
-fn refusal_message_id(session_id: AgentSessionId, action_id: AgentActionId) -> macro_uuid::Uuid {
-    macro_uuid::Uuid::new_v5(
+fn refusal_message_id(session_id: AgentSessionId, action_id: AgentActionId) -> rox_uuid::Uuid {
+    rox_uuid::Uuid::new_v5(
         &REFUSAL_MESSAGE_NAMESPACE,
         format!("{session_id}:{action_id}").as_bytes(),
     )

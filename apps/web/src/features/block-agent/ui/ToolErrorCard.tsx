@@ -8,6 +8,7 @@
  * tokens and Tailwind.
  */
 
+import { t, type TranslationKey } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import Check from '@icon/system/regular/check.svg';
 import Copy from '@icon/system/regular/copy.svg';
@@ -15,20 +16,23 @@ import { Button } from '@ui';
 import { createMemo, createSignal, Show } from 'solid-js';
 import { ToolCard } from './ToolCard';
 
-/** Display names for well-known tool ids (from opencode's v1 card). */
-const TOOL_NAMES: Record<string, string> = {
-  read: 'Read',
-  list: 'List',
-  glob: 'Glob',
-  grep: 'Grep',
-  task: 'Task',
-  webfetch: 'Webfetch',
-  websearch: 'Web Search',
-  bash: 'Shell',
-  shell: 'Shell',
-  patch: 'Patch',
-  apply_patch: 'Patch',
-  question: 'Questions',
+/**
+ * Display names for well-known tool ids (from opencode's v1 card). The keys are
+ * resolved at render so a language switch reaches the title.
+ */
+const TOOL_NAME_KEYS: Record<string, TranslationKey> = {
+  read: 'agentChat.toolRead',
+  list: 'agentChat.toolList',
+  glob: 'agentChat.toolGlob',
+  grep: 'agentChat.toolGrep',
+  task: 'agentChat.toolTask',
+  webfetch: 'agentChat.toolWebfetch',
+  websearch: 'agentChat.toolWebSearch',
+  bash: 'agentChat.toolShell',
+  shell: 'agentChat.toolShell',
+  patch: 'agentChat.toolPatch',
+  apply_patch: 'agentChat.toolPatch',
+  question: 'agentChat.toolQuestions',
 };
 
 export interface ToolErrorCardProps {
@@ -45,7 +49,10 @@ export interface ToolErrorCardProps {
 export function ToolErrorCard(props: ToolErrorCardProps) {
   const [copied, setCopied] = createSignal(false);
 
-  const title = createMemo(() => TOOL_NAMES[props.tool] ?? props.tool);
+  const title = createMemo(() => {
+    const key = TOOL_NAME_KEYS[props.tool];
+    return key ? t(key) : props.tool;
+  });
 
   /** Error text minus any leading "Error: ". */
   const cleaned = createMemo(() =>
@@ -62,9 +69,9 @@ export function ToolErrorCard(props: ToolErrorCardProps) {
   /** First "head: rest" segment of the error, capitalized; "Failed" if none. */
   const subtitle = createMemo(() => {
     const parts = tail().split(': ');
-    if (parts.length <= 1) return 'Failed';
+    if (parts.length <= 1) return t('agentChat.failed');
     const head = (parts[0] ?? '').trim();
-    if (!head) return 'Failed';
+    if (!head) return t('agentChat.failed');
     return head[0].toUpperCase() + head.slice(1);
   });
 
@@ -90,7 +97,7 @@ export function ToolErrorCard(props: ToolErrorCardProps) {
   return (
     <ToolCard
       title={title()}
-      subtitle={subtitle() === 'Failed' ? undefined : subtitle()}
+      subtitle={subtitle() === t('agentChat.failed') ? undefined : subtitle()}
       status="failed"
       open={props.open}
       defaultOpen={props.defaultOpen}
@@ -105,7 +112,7 @@ export function ToolErrorCard(props: ToolErrorCardProps) {
           variant="ghost"
           size="sm"
           class="shrink-0 px-1 text-ink-extra-muted hover:text-ink-muted"
-          aria-label={copied() ? 'Copied' : 'Copy error'}
+          aria-label={copied() ? t('agentChat.copied') : t('agentChat.copyError')}
           onMouseDown={(event) => event.preventDefault()}
           onClick={(event) => {
             event.stopPropagation();

@@ -9,9 +9,9 @@ use axum::{
 };
 use entity_access::{
     domain::{models::AdminTeamRole, ports::EntityAccessService},
-    inbound::axum_extractors::MacroUserTeamExtractorV2,
+    inbound::axum_extractors::RoxUserTeamExtractorV2,
 };
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use model_error_response::ErrorResponse;
 use rootcause::Report;
 
@@ -24,7 +24,7 @@ pub struct DomainNoticeRouterState<D, Eas, Auth> {
     /// The entity access service.
     pub entity_access_service: Arc<Eas>,
     /// State for request authorization.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<D, Eas, Auth> Clone for DomainNoticeRouterState<D, Eas, Auth> {
@@ -44,7 +44,7 @@ impl<D, Eas, Auth> FromRef<DomainNoticeRouterState<D, Eas, Auth>> for Arc<Eas> {
 }
 
 impl<D, Eas, Auth> FromRef<DomainNoticeRouterState<D, Eas, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &DomainNoticeRouterState<D, Eas, Auth>) -> Self {
         state.authorization_state.clone()
@@ -65,7 +65,7 @@ pub fn domain_notice_router<D, Eas, Auth, S>(
 where
     D: DomainNoticeService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()
@@ -93,9 +93,9 @@ where
 pub async fn handler<
     D: DomainNoticeService,
     Eas: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
-    access: MacroUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
+    access: RoxUserTeamExtractorV2<AdminTeamRole, Eas, Auth>,
     State(state): State<DomainNoticeRouterState<D, Eas, Auth>>,
 ) -> Result<Json<SendDomainNoticeResponse>, DomainNoticeHttpError> {
     let report = state

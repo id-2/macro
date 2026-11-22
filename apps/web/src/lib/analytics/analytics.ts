@@ -259,7 +259,9 @@ const tryInitialize = (callback: VoidFunction) => {
 const createAnalytics = () => {
   const posthog = new PostHog();
 
-  const disabled = import.meta.env.DEV === true;
+  // Local self-hosting sends nothing to a third party: no PostHog, Meta or
+  // Google, whatever the account or cookie state says.
+  const disabled = import.meta.env.DEV === true || LOCAL_ONLY;
   // Meta can submit events through hidden frames. Native navigation handlers
   // can mistake those loads for external links and open the system browser.
   const metaPixelEnabled = !isTauri();

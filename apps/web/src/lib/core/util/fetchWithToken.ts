@@ -1,5 +1,5 @@
 import { ENABLE_BEARER_TOKEN_AUTH } from '@core/constant/featureFlags';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 
 import { fetchWithAuth } from '@service-auth/fetch';
 import { err, type Result } from 'neverthrow';

@@ -1,16 +1,33 @@
+import { t } from '@app/lib/i18n';
 import type { CrmCompany } from './company';
 import type { CrmPerson } from './people';
 
 export type ExportColumn = { id: string; label: string; default?: boolean };
 export const PEOPLE_EXPORT_COLUMNS: ExportColumn[] = [
-  { id: 'name', label: 'Name', default: true },
-  { id: 'email', label: 'Email', default: true },
-  { id: 'companyName', label: 'Company', default: true },
-  { id: 'lastInteraction', label: 'Last contacted', default: true },
-  { id: 'firstInteraction', label: 'First contact', default: true },
-  { id: 'createdAt', label: 'Date added' },
-  { id: 'id', label: 'Contact ID' },
-  { id: 'companyId', label: 'Company ID' },
+  { id: 'name', get label() {
+      return t('crm.name');
+    }, default: true },
+  { id: 'email', get label() {
+      return t('crm.email');
+    }, default: true },
+  { id: 'companyName', get label() {
+      return t('crm.company');
+    }, default: true },
+  { id: 'lastInteraction', get label() {
+      return t('crm.lastContacted');
+    }, default: true },
+  { id: 'firstInteraction', get label() {
+      return t('crm.firstContact');
+    }, default: true },
+  { id: 'createdAt', get label() {
+      return t('crm.dateAdded');
+    } },
+  { id: 'id', get label() {
+      return t('crm.contactId');
+    } },
+  { id: 'companyId', get label() {
+      return t('crm.companyId');
+    } },
 ];
 export type ExportRecord = Record<
   string,

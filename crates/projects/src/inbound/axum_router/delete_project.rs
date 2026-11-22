@@ -7,7 +7,7 @@ use entity_access::{
     domain::{models::OwnerAccessLevel, ports::EntityAccessService},
     inbound::axum_extractors::ProjectAccessLevelExtractor,
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOrInternal};
 use model::project::BasicProject;
 use model::response::{GenericSuccessResponse, SuccessResponse, TypedSuccessResponse};
 use serde::{Deserialize, Serialize};
@@ -65,14 +65,14 @@ pub type ProjectDeleteResponse = TypedSuccessResponse<ProjectDeleteResponseData>
 )]
 pub async fn delete_project_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     access: ProjectAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
     project: Extension<BasicProject>,
 ) -> Result<Json<ProjectDeleteResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let service = Arc::clone(&state.service);
     let receipt = access.entity_access_receipt;
@@ -115,14 +115,14 @@ where
 )]
 pub async fn permanently_delete_project_handler<T, Svc, Auth>(
     State(state): State<ProjectRouterState<T, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     access: ProjectAccessLevelExtractor<OwnerAccessLevel, Svc, Auth>,
     Extension(project): Extension<BasicProject>,
 ) -> Result<Json<SuccessResponse>, ProjectError>
 where
     T: ProjectService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let service = Arc::clone(&state.service);
     let receipt = access.entity_access_receipt;

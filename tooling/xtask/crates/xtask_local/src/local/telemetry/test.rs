@@ -141,7 +141,7 @@ fn a_stage_without_a_job_records_its_steps_and_failure() {
 
 #[test]
 fn labels_with_names_become_one_step() {
-    assert_eq!(step_name("Stopping macro-agent-a"), "Stopping stack");
+    assert_eq!(step_name("Stopping rox-agent-a"), "Stopping stack");
     assert_eq!(
         step_name("Reloading document_storage_service, email_service"),
         "Reloading services"
@@ -159,7 +159,7 @@ fn labels_with_names_become_one_step() {
         "Restoring init snapshot"
     );
     assert_eq!(
-        step_name("Building runtime image macro-local-runtime:7a3bece74a68"),
+        step_name("Building runtime image rox-local-runtime:7a3bece74a68"),
         "Building runtime image"
     );
     assert_eq!(step_name("Running migrations"), "Running migrations");
@@ -168,7 +168,7 @@ fn labels_with_names_become_one_step() {
 #[test]
 fn build_output_counts_compiled_units_and_ours() {
     let output = b"   Compiling serde v1.0.219\n\
-        \x20  Compiling macro_db_client v0.1.0 (/repo/crates/macro_db_client)\n\
+        \x20  Compiling macro_db_client v0.1.0 (/repo/crates/rox_db_client)\n\
         warning: unused import\n\
         \x20  Compiling email_service v0.1.0 (/repo/services/email_service)\n\
         \x20   Finished `dev` profile [unoptimized + debuginfo] target(s) in 1m 02s\n";

@@ -1,6 +1,6 @@
 //! Curated session actions; the harness domain services enforce lifecycle and sharing policy.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use std::pin::Pin;
 use uuid::Uuid;
@@ -80,7 +80,7 @@ pub trait SessionActions: Send + Sync + 'static {
     /// Execute with the verified tool caller's identity, never an AI-supplied user id.
     fn execute(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         session_id: Uuid,
         action: SessionAction,
     ) -> Pin<Box<dyn Future<Output = Result<SessionActionResult, SessionActionError>> + Send + '_>>;

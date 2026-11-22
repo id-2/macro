@@ -7,7 +7,7 @@
 #[cfg(not(test))]
 use cached::proc_macro::cached;
 use chrono::{DateTime, Utc};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use models_search_cursor::{SearchCursorOption, SearchMethodCursor};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
@@ -117,7 +117,7 @@ async fn ids_search(
 /// Searches chats by owner or IDs
 async fn owner_search<'a>(
     db: &Pool<Postgres>,
-    macro_user_id: &MacroUserId<Lowercase<'a>>,
+    macro_user_id: &RoxUserId<Lowercase<'a>>,
     chat_ids: &[Uuid],
     search_pattern: String,
     highlight_pattern: String,
@@ -227,7 +227,7 @@ async fn owner_search<'a>(
 )]
 pub async fn search_chat_names<'a>(
     db: &Pool<Postgres>,
-    macro_user_id: &MacroUserId<Lowercase<'a>>,
+    macro_user_id: &RoxUserId<Lowercase<'a>>,
     chat_ids: &[Uuid],
     term: String,
     ids_only: bool,

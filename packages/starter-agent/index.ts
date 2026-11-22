@@ -9,13 +9,13 @@ import 'temporal-polyfill/global';
 import { spawn } from 'node:child_process';
 import { rm } from 'node:fs/promises';
 import { query, type SpawnOptions } from '@anthropic-ai/claude-agent-sdk';
-import { inSubprocess } from '@macro-inc/muppet/core/code';
-import type { Scripts } from '@macro-inc/muppet/runtimes/pieces';
+import { inSubprocess } from '@rox-one/muppet/core/code';
+import type { Scripts } from '@rox-one/muppet/runtimes/pieces';
 import {
   type Checker,
   checker,
   loader,
-} from '@macro-inc/muppet/utilities/scripts';
+} from '@rox-one/muppet/utilities/scripts';
 import { authorized } from './behavior/agent/authority.ts';
 import {
   budgeted,

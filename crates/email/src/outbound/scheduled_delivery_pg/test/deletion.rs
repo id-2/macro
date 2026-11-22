@@ -1,5 +1,5 @@
 use crate::domain::scheduled_delivery::deletion::{MessageDeletion, delete_message_with_tx};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 

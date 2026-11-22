@@ -192,7 +192,7 @@ impl CustomerRepositoryImpl {
         if next.get("metadata").is_none() {
             next["metadata"] = serde_json::json!({});
         }
-        let record_id = macro_uuid::generate_uuid_v7();
+        let record_id = rox_uuid::generate_uuid_v7();
         let effective_at =
             chrono::DateTime::from_timestamp(pending.at, 0).context("invalid scheduled renewal")?;
         let members = serde_json::to_value(&pending.members)

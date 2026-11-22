@@ -1,7 +1,7 @@
 use activity::domain::ports::EntityActivityReads;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use properties::outbound::properties_pg_repo::PropertiesPgRepo;
 use sqlx::PgPool;
 
@@ -103,8 +103,8 @@ impl<Properties> PgDatabasesRepo<Properties> {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(USER)
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(USER)
         .expect("valid user id")
         .into_owned()
 }
@@ -117,7 +117,7 @@ fn viewer() -> Viewer {
 }
 
 async fn insert_user(pool: &PgPool) {
-    let macro_user_id = macro_uuid::generate_uuid_v7();
+    let macro_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
         macro_user_id,
@@ -140,7 +140,7 @@ async fn insert_user(pool: &PgPool) {
 /// column. The definition store port is a separate adapter, so the test mints
 /// one directly.
 async fn insert_definition(pool: &PgPool, display_name: &str) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO property_definitions (id, user_id, display_name, data_type, is_multi_select)
@@ -513,7 +513,7 @@ async fn rows_are_minted_in_order_and_deleted_by_their_table(pool: PgPool) {
     );
     assert_eq!(repo.row_table(first[0].id).await.unwrap(), Some(table.id));
 
-    let other = macro_uuid::generate_uuid_v7();
+    let other = rox_uuid::generate_uuid_v7();
     assert!(
         !repo
             .delete_row(TableId::from_uuid(other), first[0].id)
@@ -550,7 +550,7 @@ async fn appearance_persists_without_changing_content_dates(pool: PgPool) {
     let update = activity::AppearanceUpdate {
         appearance: appearance.clone(),
         attribution: Some(activity::Attribution::direct(
-            activity::Actor::new_from_user(MacroUserIdStr::parse_from_str(USER).unwrap()),
+            activity::Actor::new_from_user(RoxUserIdStr::parse_from_str(USER).unwrap()),
         )),
         event_id: Uuid::now_v7(),
         occurred_at: chrono::Utc::now(),
@@ -627,7 +627,7 @@ async fn history_failure_rolls_back_appearance(pool: PgPool) {
                     color: Some(model_entity::AppearanceColor::Blue),
                 },
                 attribution: Some(activity::Attribution::direct(
-                    activity::Actor::new_from_user(MacroUserIdStr::parse_from_str(USER).unwrap())
+                    activity::Actor::new_from_user(RoxUserIdStr::parse_from_str(USER).unwrap())
                 )),
                 event_id: Uuid::now_v7(),
                 occurred_at: chrono::Utc::now(),

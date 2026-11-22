@@ -145,7 +145,7 @@ fn failed_tool_calls_use_posthogs_error_buckets() {
 #[test]
 fn a_cached_team_is_reused_until_it_expires() {
     let cache = TeamCache::new(10);
-    let user = MacroUserIdStr::parse_from_str("macro|user-1@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user-1@example.com").unwrap();
     let team_id = uuid::Uuid::parse_str("7f9c2b1e-3d4a-4c5b-8e6f-1a2b3c4d5e6f").unwrap();
     let read_at = Instant::now();
 
@@ -165,7 +165,7 @@ fn a_cached_team_is_reused_until_it_expires() {
 #[test]
 fn users_without_a_team_are_cached_as_teamless() {
     let cache = TeamCache::new(10);
-    let user = MacroUserIdStr::parse_from_str("macro|user-1@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|user-1@example.com").unwrap();
     let read_at = Instant::now();
 
     cache.put(user.clone(), None, read_at);

@@ -6,8 +6,8 @@ import {
   TABLE_FILTER_OPERATORS,
   type TableColumnFilter,
   type TableFilterOperator,
-} from '@macro-inc/spreadsheet/sheet-tables';
-import { TABLE_FILTER_LABELS } from '@macro-inc/spreadsheet/table-filters';
+} from '@rox-one/spreadsheet/sheet-tables';
+import { TABLE_FILTER_LABELS } from '@rox-one/spreadsheet/table-filters';
 import { Button } from '@ui/components/Button';
 import { Checkbox } from '@ui/components/Checkbox';
 import { Input } from '@ui/components/Input';

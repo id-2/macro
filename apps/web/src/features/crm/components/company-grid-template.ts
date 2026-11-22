@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { SYSTEM_PROPERTY_IDS } from '@property/constants';
 
 /**
@@ -8,7 +9,9 @@ import { SYSTEM_PROPERTY_IDS } from '@property/constants';
 export const COMPANY_GRID_COLUMNS = [
   {
     id: 'stage',
-    label: 'Stage',
+    get label() {
+      return t('crm.stage');
+    },
     defId: SYSTEM_PROPERTY_IDS.STAGE,
     dataType: 'SELECT_STRING',
     isMultiSelect: false,
@@ -17,7 +20,9 @@ export const COMPANY_GRID_COLUMNS = [
   },
   {
     id: 'owner',
-    label: 'Owner',
+    get label() {
+      return t('crm.owner');
+    },
     defId: SYSTEM_PROPERTY_IDS.COMPANY_OWNER,
     dataType: 'ENTITY',
     isMultiSelect: false,
@@ -26,7 +31,9 @@ export const COMPANY_GRID_COLUMNS = [
   },
   {
     id: 'revenue',
-    label: 'Revenue',
+    get label() {
+      return t('crm.revenue');
+    },
     defId: SYSTEM_PROPERTY_IDS.REVENUE,
     dataType: 'NUMBER',
     isMultiSelect: false,

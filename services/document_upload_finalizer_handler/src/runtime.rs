@@ -5,8 +5,8 @@ use documents::outbound::pg_document_repo::PgDocumentRepo;
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
 use lexical_client::LexicalClient;
-use macro_env_var::env_vars;
-use macro_service_urls::{LexicalServiceUrl, SyncServiceUrl};
+use rox_env_var::env_vars;
+use rox_service_urls::{LexicalServiceUrl, SyncServiceUrl};
 use sqlx::postgres::PgPoolOptions;
 use sync_service_client::SyncServiceClient;
 
@@ -61,11 +61,11 @@ impl AppContext {
             OwnedEntityRegistrar::new(OwnerGrantPolicy::new(PgBotsRepo::new(db_pool.clone())));
         let repo = PgDocumentRepo::new(db_pool, registrar);
         let document_port = PgDocumentUploadPort::new(repo);
-        let s3_client = macro_aws_config::s3_client().await;
+        let s3_client = rox_aws_config::s3_client().await;
         let object_reader = S3DocumentObjectReader::new(s3_client.clone());
-        let convert_queue = macro_queues::ConvertQueue::new();
+        let convert_queue = rox_queues::ConvertQueue::new();
         let sqs_client = sqs_client::SQS::new(aws_sdk_sqs::Client::new(
-            &macro_aws_config::get_macro_aws_config().await,
+            &rox_aws_config::get_macro_aws_config().await,
         ))
         .convert_queue(&convert_queue);
         let upgrade_storage = S3LegacyOfficeUpgradeStorage::new(

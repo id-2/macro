@@ -26,7 +26,7 @@ pub enum PromptSection {
     /// The agent-session preamble.
     Preamble,
     /// The static Macro prompt that comes with the toolset.
-    MacroPrompt,
+    RoxPrompt,
     /// The named agent's identity.
     Identity,
     /// The session's own instructions.
@@ -53,7 +53,7 @@ impl PromptSection {
     pub(crate) fn bytes_key(self) -> &'static str {
         match self {
             Self::Preamble => "macro.genai.prompt.preamble.bytes",
-            Self::MacroPrompt => "macro.genai.prompt.macro_prompt.bytes",
+            Self::RoxPrompt => "macro.genai.prompt.macro_prompt.bytes",
             Self::Identity => "macro.genai.prompt.identity.bytes",
             Self::SessionInstructions => "macro.genai.prompt.session_instructions.bytes",
             Self::SessionNote => "macro.genai.prompt.session_note.bytes",
@@ -70,7 +70,7 @@ impl PromptSection {
     pub(crate) fn hash_key(self) -> &'static str {
         match self {
             Self::Preamble => "macro.genai.prompt.preamble.hash",
-            Self::MacroPrompt => "macro.genai.prompt.macro_prompt.hash",
+            Self::RoxPrompt => "macro.genai.prompt.macro_prompt.hash",
             Self::Identity => "macro.genai.prompt.identity.hash",
             Self::SessionInstructions => "macro.genai.prompt.session_instructions.hash",
             Self::SessionNote => "macro.genai.prompt.session_note.hash",

@@ -3,8 +3,8 @@
 use std::future::Future;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityType;
 use model_owner::CreationPrincipal;
 
@@ -52,42 +52,42 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// The person's open suggestions, and those done since `done_since`.
     fn shown(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         done_since: DateTime<Utc>,
     ) -> impl Future<Output = Result<Vec<Suggestion>, Self::Err>> + Send;
 
     /// When the person last opened their feed, if ever.
     fn feed_viewed_at(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<DateTime<Utc>>, Self::Err>> + Send;
 
     /// The person opened their feed at `at`; an earlier time than the one
     /// stored changes nothing.
     fn feed_viewed(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         at: DateTime<Utc>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// The person's open suggestions, and the `closed` most recently closed.
     fn for_review(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         closed: u32,
     ) -> impl Future<Output = Result<Vec<Suggestion>, Self::Err>> + Send;
 
     /// The person's suggestion `id`.
     fn suggestion(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> impl Future<Output = Result<Option<Suggestion>, Self::Err>> + Send;
 
     /// The person's suggestion with `dedup_key`.
     fn by_dedup_key(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         dedup_key: &str,
     ) -> impl Future<Output = Result<Option<Suggestion>, Self::Err>> + Send;
 
@@ -163,7 +163,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// `limits`, logging `change`.
     fn create(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         kind: &NewKind,
         content: &SuggestionContent,
@@ -178,7 +178,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     #[expect(clippy::too_many_arguments, reason = "one write, all of its parts")]
     fn replace(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         content: &SuggestionContent,
         from: SuggestionState,
@@ -193,7 +193,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// its unsettled run in the same write.
     fn set_state(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         from: &[SuggestionState],
         to: SuggestionState,
@@ -206,7 +206,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// whether it was open.
     fn set_draft(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         draft: &Target,
         preview: Option<&str>,
@@ -218,7 +218,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// stays cancelled. Whether it came back.
     fn undismiss(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         dismissed_since: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -229,7 +229,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// saw it. Whether it moved.
     fn set_state_as_shown(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         from: &[SuggestionState],
         to: SuggestionState,
@@ -248,7 +248,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// whether it moved. Its unsettled run is cancelled in the same write.
     fn resolve(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         reason: ResolveReason,
         now: DateTime<Utc>,
@@ -259,7 +259,7 @@ pub trait SuggestionRepo: Send + Sync + 'static {
     /// is cleared, as when it is resolved.
     fn answer(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
         now: DateTime<Utc>,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
@@ -273,7 +273,7 @@ pub trait SuggestionAccess: Send + Sync + 'static {
     /// Whether the person can at least view `target`'s item.
     fn can_view(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 
@@ -305,7 +305,7 @@ pub trait SuggestionDrafts: Send + Sync + 'static {
     /// own inboxes; `None` for anything else.
     fn email_draft(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         draft: Uuid,
     ) -> impl Future<Output = Result<Option<FoundDraft>, Self::Err>> + Send;
 }
@@ -328,7 +328,7 @@ pub trait ReplyWaits: Send + Sync + 'static {
     /// for any other item, or one with no such message.
     async fn waiting(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         target: &Target,
     ) -> Result<Option<Waiting>, rootcause::Report>;
 }
@@ -364,7 +364,7 @@ pub trait SuggestionAudience: Send + Sync + 'static {
     /// The person opened their suggestions at `now`, in IANA zone `timezone`.
     async fn seen(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: &str,
         now: DateTime<Utc>,
     ) -> Result<(), rootcause::Report>;
@@ -378,7 +378,7 @@ pub trait RoutineSuggestions: Send + Sync + 'static {
     /// and its routine suggestion are dismissed together. Whether it was theirs.
     async fn dismiss_suggestion(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         suggestion: Uuid,
     ) -> Result<bool, rootcause::Report>;
 
@@ -387,7 +387,7 @@ pub trait RoutineSuggestions: Send + Sync + 'static {
     /// drafted no routine are left out.
     async fn texts(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         suggestions: &[Uuid],
         timezone: chrono_tz::Tz,
     ) -> Result<Vec<(Uuid, RoutineText)>, rootcause::Report>;
@@ -430,7 +430,7 @@ pub trait SuggestionApi: Send + Sync + 'static {
     /// is the person or their own agent; a generation session is refused.
     fn feed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         timezone: Option<chrono_tz::Tz>,
         limit: Option<usize>,
@@ -440,7 +440,7 @@ pub trait SuggestionApi: Send + Sync + 'static {
     /// no longer new. `caller` is refused as for [`Self::feed`].
     fn viewed(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
     ) -> impl Future<Output = Result<(), SuggestionError>> + Send;
 
@@ -452,7 +452,7 @@ pub trait SuggestionApi: Send + Sync + 'static {
     /// Any other is done.
     fn accept(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         id: Uuid,
         accept: Accept,
@@ -461,7 +461,7 @@ pub trait SuggestionApi: Send + Sync + 'static {
     /// The person, or their own agent, isn't interested in an open suggestion.
     fn dismiss(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         id: Uuid,
     ) -> impl Future<Output = Result<(), SuggestionError>> + Send;
@@ -471,7 +471,7 @@ pub trait SuggestionApi: Send + Sync + 'static {
     /// again, and a run the dismissal cancelled stays cancelled.
     fn restore(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         caller: SuggestionCaller,
         id: Uuid,
     ) -> impl Future<Output = Result<(), SuggestionError>> + Send;

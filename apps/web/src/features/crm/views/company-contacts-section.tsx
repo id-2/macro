@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { usePending } from '@app/observability/flow';
 import { debouncedDependent } from '@core/util/debounce';
 import { fireAndForget } from '@core/util/fireAndForget';
@@ -158,7 +159,7 @@ export function CompanyContactsSection(props: {
 
   return (
     <RecordSection
-      title="Team"
+      title={t('crm.team')}
       actions={
         <RecordVisibilityFilter
           archived={archived()}
@@ -170,10 +171,10 @@ export function CompanyContactsSection(props: {
       }
       search={search()}
       onSearchChange={setSearch}
-      searchPlaceholder="Search contacts…"
+      searchPlaceholder={t('crm.searchContacts')}
       onSearchEscape={() => setSearch('')}
       createAction={{
-        label: 'Add contact',
+        label: t('crm.addContact'),
         onClick: createContact,
         disabled: !props.company || props.company.hidden,
       }}
@@ -181,38 +182,38 @@ export function CompanyContactsSection(props: {
     >
       <Switch>
         <Match when={!props.company || source.isPending}>
-          <CrmListSkeleton label="Loading contacts" />
+          <CrmListSkeleton label={t('crm.loadingContacts')} />
         </Match>
         <Match when={source.isError}>
           <CrmListError
-            title="Couldn't load contacts."
+            title={t('crm.couldNotLoadContacts')}
             onRetry={() => source.refetch()}
           />
         </Match>
         <Match when={!filtered().length && source.isSearching}>
-          <CrmListSkeleton label="Searching contacts" />
+          <CrmListSkeleton label={t('crm.searchingContacts')} />
         </Match>
         <Match when={!filtered().length && !source.hasNextPage}>
           <Show
             when={search().trim()}
             fallback={
               <CrmListEmpty
-                title={archived() ? 'No archived people' : 'No contacts yet'}
+                title={archived() ? t('crm.noArchivedPeople') : t('crm.noContactsYet')}
                 description={
                   archived() || props.company?.hidden
                     ? undefined
-                    : 'Add a contact to this company to see them here.'
+                    : t('crm.addContactHint')
                 }
                 action={
                   props.company && !props.company.hidden && !archived()
-                    ? { label: 'Add contact', onClick: createContact }
+                    ? { label: t('crm.addContact'), onClick: createContact }
                     : undefined
                 }
               />
             }
           >
             <CrmListSearchEmpty
-              title="No matching contacts."
+              title={t('crm.noMatchingContacts')}
               onClearSearch={() => setSearch('')}
             />
           </Show>
@@ -247,7 +248,7 @@ export function CompanyContactsSection(props: {
             when={!source.isFetchNextPageError}
             fallback={
               <CrmListRetry
-                message="Couldn't load more contacts."
+                message={t('crm.couldNotLoadMoreContacts')}
                 onRetry={() => source.fetchNextPage()}
               />
             }
@@ -256,7 +257,7 @@ export function CompanyContactsSection(props: {
               <div ref={setSentinelRef} class="h-px" />
             </Show>
             <Show when={source.isFetchingNextPage}>
-              <CrmListSkeleton label="Loading more contacts" count={2} />
+              <CrmListSkeleton label={t('crm.loadingMoreContacts')} count={2} />
             </Show>
           </Show>
         </Match>

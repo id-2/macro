@@ -1,7 +1,7 @@
 import {
   createLoroSeed,
   readLoroGraphicsDocument,
-} from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics/loro';
 import { LoroDoc } from 'loro-crdt';
 import { type CanvasFile, readCanvasFile } from './document-format';
 

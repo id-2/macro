@@ -1,6 +1,7 @@
 import type { PropertyDefinition } from '@service-properties/generated/schemas/propertyDefinition';
 import type { PropertyOption } from '@service-properties/generated/schemas/propertyOption';
 import { match } from 'ts-pattern';
+import { systemPropertyDisplayName } from '../identifiers';
 import type {
   Property,
   PropertyApiValues,
@@ -71,7 +72,10 @@ export function toPropertyDefinitionDomain(
 ): PropertyDefinitionDomain {
   return {
     id: definition.id,
-    displayName: definition.display_name,
+    displayName: systemPropertyDisplayName(
+      definition.id,
+      definition.display_name
+    ),
     valueType: definition.data_type,
     isMultiSelect: definition.is_multi_select,
     isMetadata: definition.is_metadata,

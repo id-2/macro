@@ -37,7 +37,7 @@ platforms = [
 # also means manage-deps does not add the workspace-hack dep to it.
 [traversal-excludes]
 # xtask: dev-only automation (see above).
-# macro_sync_service_jwt and the sync-service packages must stay wasm-safe, so
+# rox_sync_service_jwt and the sync-service packages must stay wasm-safe, so
 # they must not gain the workspace-hack dep, which pulls native-only features.
 workspace-members = [
     # Standalone protocol library. Until a deployable service consumes it,
@@ -59,7 +59,7 @@ workspace-members = [
     "xtask_local",
     "xtask_ports",
     "xtask_local_telemetry",
-    "macro_sync_service_jwt",
+    "rox_sync_service_jwt",
     "sync_service",
     "sync_service_bebop_schema",
     "worker-rs-otel",
@@ -88,14 +88,14 @@ workspace-members = [
     "filter_ast",
     "document_sub_type",
     "model_file_type",
-    "macro_user_id",
+    "rox_user_id",
     # Typed owner reference and the bot id it parses. The filter literals'
     # owner is a `model_owner::Owner`, so both are now in the browser-side
     # filter model chain (item_filters -> item-filter-index ->
     # soup-filter-cache-adapter -> cache-wasm) and must stay wasm-safe.
     "model_owner",
     "bot_id",
-    "macro_uuid",
+    "rox_uuid",
     "non_empty",
     "cowlike",
     # database_sql: the SQL-subset parser/compiler for Macro databases runs in

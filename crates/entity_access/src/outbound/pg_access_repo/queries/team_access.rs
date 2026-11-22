@@ -4,7 +4,7 @@
 mod test;
 
 use crate::domain::models::{TeamRole, UserTeamInfo};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use sqlx::PgPool;
 
 /// Look up the team a user belongs to and the role they hold.
@@ -17,7 +17,7 @@ use sqlx::PgPool;
 #[tracing::instrument(err, skip(pool, user_id))]
 pub async fn get_user_team(
     pool: &PgPool,
-    user_id: &MacroUserId<Lowercase<'_>>,
+    user_id: &RoxUserId<Lowercase<'_>>,
 ) -> Result<Option<UserTeamInfo>, sqlx::Error> {
     let row = sqlx::query!(
         r#"

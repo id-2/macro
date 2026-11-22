@@ -4,7 +4,7 @@ use std::{
 };
 
 use contacts::domain::{models::messages::ContactConnection, ports::ContactsIngress};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 use super::*;
@@ -17,7 +17,7 @@ struct FakeContactsIngress {
 impl ContactsIngress for FakeContactsIngress {
     async fn enqueue_contacts(
         &self,
-        _users: HashSet<MacroUserIdStr<'static>>,
+        _users: HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), Report> {
         panic!("unexpected complete-graph contacts enqueue")
     }
@@ -34,8 +34,8 @@ impl ContactsIngress for FakeContactsIngress {
     }
 }
 
-fn macro_user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid macro user id")
+fn macro_user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid macro user id")
 }
 
 #[tokio::test]

@@ -1,6 +1,6 @@
 import { throwOnErr } from '@core/util/result';
 import type { CacheHost } from '@graphql-cache/index';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import { subscribeToVisibleCacheChanges } from '@queries/subscribe-to-visible-cache-changes';
 import { storageServiceClient } from '@service-storage/client';

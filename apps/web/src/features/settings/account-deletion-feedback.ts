@@ -2,30 +2,40 @@ import type {
   AccountDeletionReason,
   AppEvents,
 } from '@app/lib/analytics/app-events';
+import type { TranslationKey } from '@app/lib/i18n';
 
 export const ACCOUNT_DELETION_FEEDBACK_MAX_LENGTH = 500;
 
 export const ACCOUNT_DELETION_REASON_OPTIONS: ReadonlyArray<{
   value: AccountDeletionReason;
-  label: string;
+  label: TranslationKey;
 }> = [
-  { value: 'not_using_enough', label: "I don't use Rox enough" },
-  { value: 'missing_features', label: "I'm missing features I need" },
-  { value: 'difficult_to_use', label: 'Rox is difficult to use' },
+  {
+    value: 'not_using_enough',
+    label: 'settingsAccount.deletionReasons.notUsingEnough',
+  },
+  {
+    value: 'missing_features',
+    label: 'settingsAccount.deletionReasons.missingFeatures',
+  },
+  {
+    value: 'difficult_to_use',
+    label: 'settingsAccount.deletionReasons.difficultToUse',
+  },
   {
     value: 'bugs_or_performance',
-    label: "I've experienced bugs or performance issues",
+    label: 'settingsAccount.deletionReasons.bugsOrPerformance',
   },
-  { value: 'too_expensive', label: 'Rox is too expensive' },
+  { value: 'too_expensive', label: 'settingsAccount.deletionReasons.tooExpensive' },
   {
     value: 'prefer_another_product',
-    label: 'I prefer another product',
+    label: 'settingsAccount.deletionReasons.preferAnotherProduct',
   },
   {
     value: 'privacy_or_security_concerns',
-    label: 'I have privacy or security concerns',
+    label: 'settingsAccount.deletionReasons.privacyOrSecurity',
   },
-  { value: 'other', label: 'Other' },
+  { value: 'other', label: 'settingsAccount.deletionReasons.other' },
 ];
 
 export function buildAccountDeletionFeedbackPayload(

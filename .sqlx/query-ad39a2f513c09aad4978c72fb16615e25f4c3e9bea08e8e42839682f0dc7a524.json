@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_message_recipients SET recipient_type = $1::text::email_recipient_type WHERE contact_id = '00000000-0000-4000-8000-000000000032'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "ad39a2f513c09aad4978c72fb16615e25f4c3e9bea08e8e42839682f0dc7a524"
+}

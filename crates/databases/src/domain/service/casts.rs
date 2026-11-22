@@ -18,7 +18,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     /// Why a column's type cannot change at all, whatever it holds: a board
     /// groups by it.
@@ -127,7 +127,7 @@ where
     Cells: CellStore,
     Events: TableEventPublisher,
     Access: AccessDirectory,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     /// The values of a column that convert to `to`, by the same cast rule
     /// and converter a type change uses.

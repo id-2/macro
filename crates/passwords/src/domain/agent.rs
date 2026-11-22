@@ -5,7 +5,7 @@ use super::models::{
     Error, ItemId, ItemKind, LoginUrl, Permission, Record, SecretString, SecretValues, TeamId,
 };
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Deserializer, Serialize};
 use uuid::Uuid;
 
@@ -20,11 +20,11 @@ pub(crate) mod test;
 #[derive(Clone, Debug)]
 pub struct DirectoryAgent {
     /// Agent account the key belongs to.
-    pub agent_user_id: MacroUserIdStr<'static>,
+    pub agent_user_id: RoxUserIdStr<'static>,
     /// Team the agent account belongs to.
     pub team_id: TeamId,
     /// Human responsible for the agent; never an implied item manager.
-    pub owner_user_id: MacroUserIdStr<'static>,
+    pub owner_user_id: RoxUserIdStr<'static>,
     /// Whether the agent account is currently enabled.
     pub enabled: bool,
     /// Whether the agent's computer runtime is live and not destroyed.
@@ -40,13 +40,13 @@ pub struct WakeId(pub Uuid);
 /// constructs it, after flags and directory admission.
 #[derive(Clone, Debug)]
 pub struct AdmittedAgent {
-    pub(super) agent_user_id: MacroUserIdStr<'static>,
+    pub(super) agent_user_id: RoxUserIdStr<'static>,
     pub(super) team: TeamId,
     pub(super) wake: WakeId,
 }
 impl AdmittedAgent {
     /// Authenticated agent account.
-    pub fn agent_user_id(&self) -> &MacroUserIdStr<'static> {
+    pub fn agent_user_id(&self) -> &RoxUserIdStr<'static> {
         &self.agent_user_id
     }
     /// Admitted team.
@@ -565,7 +565,7 @@ pub struct AgentAccessRequestState {
     pub item_id: ItemId,
     /// Agent account.
     #[schema(value_type = String)]
-    pub agent_account_id: MacroUserIdStr<'static>,
+    pub agent_account_id: RoxUserIdStr<'static>,
     /// Requested permission; null when none exists.
     pub permission: Option<Permission>,
     /// Request status.
@@ -733,7 +733,7 @@ impl AgentPolicy {
     /// this agent account was created through the agent path.
     pub(crate) fn of(
         record: &Record,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         row: Option<&AgentAccessRow>,
     ) -> Self {
         let grant = record
@@ -818,7 +818,7 @@ impl AgentPolicy {
 
 /// An agent may discover and request a live item shared with its team, or one
 /// it holds a grant on or created. Private human items stay invisible to agents.
-pub(crate) fn requestable(record: &Record, agent: &MacroUserIdStr<'_>) -> bool {
+pub(crate) fn requestable(record: &Record, agent: &RoxUserIdStr<'_>) -> bool {
     use super::models::GranteeKind;
     !record.deleting
         && (record.user_id.as_ref() == agent.as_ref()
@@ -844,7 +844,7 @@ pub(crate) fn hit(record: &Record, policy: &AgentPolicy) -> AgentSearchHit {
 /// Request state for the wire, with `none` when no request exists.
 pub(crate) fn request_state(
     item: ItemId,
-    agent: &MacroUserIdStr<'static>,
+    agent: &RoxUserIdStr<'static>,
     row: Option<&AgentAccessRow>,
     policy: &AgentPolicy,
 ) -> AgentAccessRequestState {

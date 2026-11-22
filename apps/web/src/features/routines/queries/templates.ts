@@ -1,6 +1,6 @@
 import { verifyBlockName } from '@core/constant/allBlocks';
 import { throwOnErr } from '@core/util/result';
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 import { queryClient } from '@queries/client';
 import {
   getItemPreview,

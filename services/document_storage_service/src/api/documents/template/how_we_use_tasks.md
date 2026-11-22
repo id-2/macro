@@ -1,19 +1,19 @@
-At Rox we use Rox to manage the development of Rox. Tasks are one of the most important tools for accomplishing that.
+В Rox мы ведём разработку Rox в самом Rox. Задачи — один из главных инструментов для этого.
 
-For us this process often starts in our Bug Reports channel. Someone reports a bug that they found, and the responsible party creates a task, directly in response to the message—either using the `/task` action in the input, or by pressing the task button in the message hover menu. Doing either of these takes no more than a few seconds.
+У нас процесс часто начинается в канале сообщений об ошибках. Кто-то сообщает о найденной ошибке, и ответственный создаёт задачу прямо в ответ на сообщение: командой `/task` в поле ввода или кнопкой задачи в меню при наведении. И то и другое занимает несколько секунд.
 
 ![](https://static-file-service.rox.one/file/33390b5d-076c-42bd-9cb4-43a1ee503b55)
 
-Now there is a bidirectional link between the initial report and the task itself, so that no matter where conversation happens, the context never gets lost.
+Между первым сообщением и задачей появляется двусторонняя связь, поэтому контекст не теряется, где бы ни шла беседа.
 
-Task creation might also happen in response to a customer support email. A task can be created directly from the email itself.
+Задачу можно создать и в ответ на письмо поддержки. Её можно создать прямо из самого письма.
 
-Other times, tasks will be assigned to you. When a task is assigned to you it shows up in your inbox, alongside channel messages, emails, and PR updates.
+Иногда задачу назначают вам. Назначенная задача появляется во входящих рядом с сообщениями каналов, письмами и обновлениями запросов на слияние.
 
-Sometimes we'll write up documents describing new features. We can then ask the Rox agent to create tasks based on the document and assign them to people.
+Иногда мы пишем документы о новых возможностях. Затем можно попросить агента Rox создать по документу задачи и назначить их людям.
 
 ![](https://static-file-service.rox.one/file/742a705b-ef81-4f2b-aab8-b4358292e1a3)
 
-Managing task status happens automatically, using the GitHub integration. As you create, review, and merge branches, the task automatically moves to “In Progress,” “In Review,” or “Done,” and the task records which pull request is associated with it.
+Статус задачи меняется сам, через связь с GitHub. Когда вы создаёте, проверяете и сливаете ветки, задача сама переходит в «В работе», «На проверке» или «Готово» и запоминает, какой запрос на слияние к ней относится.
 
-The beauty of Rox is that all of the places a conversation about a task might happen—whether it's in the initial report, in the task itself, or on the pull request—all get linked together, automatically, without doing any additional work.
+Сила Rox в том, что все места, где может идти разговор о задаче — первое сообщение, сама задача или запрос на слияние — связываются сами, без лишней работы.

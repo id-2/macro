@@ -1,6 +1,7 @@
 import EmptyStateNoFilterMatchGraphic from '@design/empty-state-no-filter-match.svg';
 import EmptyStateNoSearchMatchGraphic from '@design/empty-state-no-search-match.svg';
 import GitPullRequestIcon from '@icon/system/regular/git-pull-request.svg';
+import { type TranslationKey, t } from '@app/lib/i18n';
 import type { GithubLinkStatus } from '@queries/auth/github-link';
 import { EmptyStatePanel } from '@ui';
 import { Match, Switch } from 'solid-js';
@@ -10,12 +11,12 @@ import {
   scopeMatchesViewerGithubId,
 } from '../reviews-types';
 
-const IDENTITY_SUBJECTS: Record<ReviewsScope, string> = {
-  all: 'pull requests',
-  authored: 'pull requests you authored',
-  assigned: 'pull requests assigned to you',
-  involving: 'pull requests involving you',
-  review_requests: 'pull requests awaiting your review',
+const IDENTITY_SUBJECTS: Record<ReviewsScope, TranslationKey> = {
+  all: 'reviews.identityAll',
+  authored: 'reviews.identityAuthored',
+  assigned: 'reviews.identityAssigned',
+  involving: 'reviews.identityInvolving',
+  review_requests: 'reviews.identityReviewRequests',
 };
 
 export function ReviewsEmptyState(props: {
@@ -28,23 +29,23 @@ export function ReviewsEmptyState(props: {
   onClearFilters: () => void;
 }) {
   const identityCopy = () => {
-    const subject = IDENTITY_SUBJECTS[props.scope];
+    const subject = t(IDENTITY_SUBJECTS[props.scope]);
     return match(props.githubAccountStatus)
       .with('linked', () => ({
-        title: 'GitHub account details unavailable',
-        description: `We could not identify your linked account to find ${subject}. Try again later.`,
+        title: t('reviews.identityUnavailableTitle'),
+        description: t('reviews.identityUnavailableBody', { subject }),
       }))
       .with('reauthentication_required', () => ({
-        title: 'Reconnect your GitHub account',
-        description: `Your GitHub link has expired. Reconnect to see ${subject}.`,
+        title: t('reviews.identityReconnectTitle'),
+        description: t('reviews.identityReconnectBody', { subject }),
       }))
       .with('error', () => ({
-        title: 'Could not check your GitHub account',
-        description: `Try again later to see ${subject}.`,
+        title: t('reviews.identityErrorTitle'),
+        description: t('reviews.identityErrorBody', { subject }),
       }))
       .otherwise(() => ({
-        title: 'Connect your GitHub account',
-        description: `Link GitHub to see ${subject}.`,
+        title: t('reviews.identityConnectTitle'),
+        description: t('reviews.identityConnectBody', { subject }),
       }));
   };
 
@@ -80,10 +81,10 @@ export function ReviewsEmptyState(props: {
         <EmptyStatePanel
           centered
           graphic={EmptyStateNoSearchMatchGraphic}
-          title={`No results for "${props.search.trim()}"`}
-          description="Try another pull request title, repository, number, or author."
+          title={t('reviews.noSearchResults', { search: props.search.trim() })}
+          description={t('reviews.noSearchResultsBody')}
           primaryAction={{
-            label: 'Clear search',
+            label: t('reviews.clearSearch'),
             onClick: props.onClearSearch,
           }}
         />
@@ -92,10 +93,10 @@ export function ReviewsEmptyState(props: {
         <EmptyStatePanel
           centered
           graphic={EmptyStateNoFilterMatchGraphic}
-          title="No pull requests match these filters"
-          description="Try other filters, or clear them."
+          title={t('reviews.noFilterMatch')}
+          description={t('reviews.noFilterMatchBody')}
           primaryAction={{
-            label: 'Clear filters',
+            label: t('reviews.clearFilters'),
             onClick: props.onClearFilters,
           }}
         />
@@ -104,40 +105,40 @@ export function ReviewsEmptyState(props: {
         <EmptyStatePanel
           centered
           graphic={GitPullRequestIcon}
-          title="No pull requests involving you"
-          description="Pull requests you authored, were assigned or asked to review, or participated in will appear here."
+          title={t('reviews.noInvolving')}
+          description={t('reviews.noInvolvingBody')}
         />
       </Match>
       <Match when={props.scope === 'authored'}>
         <EmptyStatePanel
           centered
           graphic={GitPullRequestIcon}
-          title="No pull requests authored by you"
-          description="Pull requests you authored and can access in Rox will appear here."
+          title={t('reviews.noAuthored')}
+          description={t('reviews.noAuthoredBody')}
         />
       </Match>
       <Match when={props.scope === 'assigned'}>
         <EmptyStatePanel
           centered
           graphic={GitPullRequestIcon}
-          title="No pull requests assigned to you"
-          description="Pull requests assigned to you and accessible in Rox will appear here."
+          title={t('reviews.noAssigned')}
+          description={t('reviews.noAssignedBody')}
         />
       </Match>
       <Match when={props.scope === 'review_requests'}>
         <EmptyStatePanel
           centered
           graphic={GitPullRequestIcon}
-          title="No review requests"
-          description="Pull requests waiting on your review will appear here."
+          title={t('reviews.noReviewRequests')}
+          description={t('reviews.noReviewRequestsBody')}
         />
       </Match>
       <Match when={true}>
         <EmptyStatePanel
           centered
           graphic={GitPullRequestIcon}
-          title="No pull requests yet"
-          description="GitHub pull requests accessible in your workspace will appear here."
+          title={t('reviews.noPullRequestsYet')}
+          description={t('reviews.noPullRequestsYetBody')}
         />
       </Match>
     </Switch>

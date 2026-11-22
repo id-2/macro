@@ -220,7 +220,7 @@ export function optimisticDraftEntity(
     scheduledSendStatus: existing?.scheduledSendStatus ?? null,
     bodyText: args.bodyText ?? null,
     bodyHtmlSanitized: args.optimisticBodyHtml,
-    bodyMacro: args.bodyMacro ?? null,
+    bodyRox: args.bodyRox ?? null,
     bodyReplyless: null,
     calendarInvitations: existing?.calendarInvitations ?? [],
     createdAt: existing?.createdAt ?? now,

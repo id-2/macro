@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { MobileFilterDrawer } from '@app/components/view-shell/MobileFilterDrawer';
 import { MobileDrawer } from '@components/app/mobile/MobileDrawer';
 import { Accordion } from '@kobalte/core/accordion';
@@ -22,15 +23,15 @@ export function DriveFilterDrawer() {
     <MobileFilterDrawer
       open={open()}
       onOpenChange={setOpen}
-      triggerLabel="Open file filters"
-      label="File list controls"
+      triggerLabel={t('drive.openFileFilters')}
+      label={t('drive.fileListControls')}
       activeCount={filters.activeCount()}
       onClear={filters.clear}
     >
       {/* Recent keeps the viewer's own interaction order; no sort override. */}
       <Show when={!isRecent()}>
         <MobileDrawer.Label id="drive-sort-label" class="pt-4">
-          Sort
+          {t('viewMenus.sort')}
         </MobileDrawer.Label>
         <MobileDrawer.Section
           role="radiogroup"
@@ -52,7 +53,7 @@ export function DriveFilterDrawer() {
 
       {/* Folder locations offer no filters, matching the desktop header. */}
       <Show when={state.value().location.kind === 'tab'}>
-        <MobileDrawer.Label class="pt-4">Filters</MobileDrawer.Label>
+        <MobileDrawer.Label class="pt-4">{t('viewMenus.filters')}</MobileDrawer.Label>
         <Accordion
           multiple
           collapsible

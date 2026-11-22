@@ -5,8 +5,8 @@ mod test;
 
 use std::pin::Pin;
 
-use crate::domain::events::{AgentSessionLifecycleEvent, AgentSessionLifecycleMacroEvent};
-use macro_event_broker::MacroEventBroker;
+use crate::domain::events::{AgentSessionLifecycleEvent, AgentSessionLifecycleRoxEvent};
+use rox_event_broker::RoxEventBroker;
 
 use crate::domain::ports::AgentSessionLifecyclePublisher;
 
@@ -30,7 +30,7 @@ impl<Broker> BrokerLifecyclePublisher<Broker> {
 
 impl<Broker> AgentSessionLifecyclePublisher for BrokerLifecyclePublisher<Broker>
 where
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
 {
     fn publish(
         &self,
@@ -39,7 +39,7 @@ where
         Box::pin(async move {
             let event_type = event.name();
             let session_id = event.session_id();
-            let macro_event = AgentSessionLifecycleMacroEvent::new(event);
+            let macro_event = AgentSessionLifecycleRoxEvent::new(event);
             let published = match self.broker.send_event(&macro_event) {
                 Ok(handle) => match handle.await {
                     Ok(result) => result.map_err(|error| error.to_string()),

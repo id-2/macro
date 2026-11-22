@@ -25,7 +25,7 @@ impl GmailHistoryRepository for PgMailboxSync {
                     .map_err(|_| MailboxError::Persistence)?;
             sqlx::query!(
                 "INSERT INTO email_mailbox_lifecycle_outbox(id,link_id,payload) VALUES($1,$2,$3)",
-                macro_uuid::generate_uuid_v7(),
+                rox_uuid::generate_uuid_v7(),
                 link,
                 payload
             )

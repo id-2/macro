@@ -7,7 +7,7 @@ use entity_access::domain::models::{EntityAccessReceipt, MemberTeamRole};
 use graphql_soup::{
     SoupEmailThreadReader, SoupItemDataLoader, SoupItemLoader, SoupItemLoaderError,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use models_pagination::{Paginated, PaginatedCursor, SimpleSortMethod};
 use models_properties::service::property_definition_with_options::PropertyDefinitionWithOptions;
@@ -157,7 +157,7 @@ impl SoupService for RecordingSoupService {
 
     async fn group_labels<'a>(
         &'a self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
         _group_by: &'a soup::domain::models::grouping::GroupByField,
         _keys: &'a [String],
     ) -> Result<soup::domain::models::grouping::GroupLabels, SoupErr> {
@@ -166,7 +166,7 @@ impl SoupService for RecordingSoupService {
 
     async fn caller_tag_sets<'a>(
         &self,
-        _user_id: MacroUserIdStr<'a>,
+        _user_id: RoxUserIdStr<'a>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, SoupErr> {
         unreachable!("initiative hydration does not read tag definitions")
     }
@@ -177,7 +177,7 @@ struct NoThreads;
 impl SoupEmailThreadReader for NoThreads {
     async fn read_threads(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         _thread_ids: Vec<Uuid>,
     ) -> Result<
         Vec<models_soup::email_thread::SoupEnrichedEmailThreadPreview<()>>,

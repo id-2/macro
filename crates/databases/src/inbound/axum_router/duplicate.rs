@@ -24,13 +24,13 @@ pub struct DuplicateDatabaseRequest {
 pub async fn duplicate_database_handler<Service, EntityAccess, Authorization>(
     access: DatabaseAccessLevelExtractor<ViewAccessLevel, EntityAccess, Authorization>,
     State(state): State<DatabasesRouterState<Service, EntityAccess, Authorization>>,
-    user: MacroAuthorizationExtractor<Authorization, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Authorization, UserOrInternal>,
     Json(request): Json<DuplicateDatabaseRequest>,
 ) -> Result<(StatusCode, Json<Database>), DatabaseError>
 where
     Service: DatabasesService + DatabaseDuplicateService,
     EntityAccess: EntityAccessService,
-    Authorization: MacroAuthorizationService,
+    Authorization: RoxAuthorizationService,
 {
     let acting_bot = agent_attribution(&user);
     let copy = state

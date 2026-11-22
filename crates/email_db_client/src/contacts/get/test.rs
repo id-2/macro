@@ -3,7 +3,7 @@ use crate::contacts::get::{
     fetch_senders_by_message_ids, fetch_top_sent_contact_emails_by_link_id,
 };
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_email::db::address::EmailRecipientType;
 use models_email::email::service::address::ContactInfoWithInteraction;
 use sqlx::types::Uuid;

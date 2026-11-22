@@ -29,7 +29,7 @@ export function MobileViewsRow(props: { session: MobileSearchSession }) {
   const category = () => props.session.category();
   return (
     <header
-      aria-label="Search filters"
+      aria-label={t('nav.searchFilters')}
       class="pointer-events-none absolute inset-x-0 top-0 z-split-panel-chrome flex pt-[calc(var(--safe-top,0px)+0.5rem)]"
     >
       <PillTabs

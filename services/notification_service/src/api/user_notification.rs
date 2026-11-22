@@ -5,8 +5,8 @@ use axum::extract::State;
 use chrono::{DateTime, Utc};
 use email_formatting::EmailDigestNotification;
 use itertools::{Either, Itertools};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::Entity;
 use model_error_response::ErrorResponse;
 use model_notifications::{
@@ -33,7 +33,7 @@ use crate::api::context::AuthorizationService;
 pub(crate) static BLOCKABLE_NOTIFICATIONS: LazyLock<HashSet<&'static str>> = LazyLock::new(|| {
     HashSet::from([
         EmailDigestNotification::TYPE_NAME,
-        model_notifications::ColleagueJoinedMacro::TYPE_NAME,
+        model_notifications::ColleagueJoinedRox::TYPE_NAME,
         NewEmailMetadata::TYPE_NAME,
         AiResponseMetadata::TYPE_NAME,
         ChannelMessageSendMetadata::TYPE_NAME,
@@ -75,7 +75,7 @@ mod test;
 pub struct ApiUserNotification {
     /// The user who owns this notification.
     #[schema(value_type = String)]
-    pub owner_id: MacroUserIdStr<'static>,
+    pub owner_id: RoxUserIdStr<'static>,
     /// The notification ID.
     #[serde(rename = "id")]
     pub notification_id: uuid::Uuid,
@@ -101,7 +101,7 @@ pub struct ApiUserNotification {
     pub notification_metadata: NotifEvent,
     /// The user who triggered the notification.
     #[schema(value_type = Option<String>)]
-    pub sender_id: Option<MacroUserIdStr<'static>>,
+    pub sender_id: Option<RoxUserIdStr<'static>>,
 }
 
 impl ApiUserNotification {
@@ -203,7 +203,7 @@ async fn list_typed_notifications<S: ::notification::domain::service::Notificati
     State(state): State<
         ::notification::inbound::http::NotificationRouterState<S, AuthorizationService>,
     >,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     query: axum::extract::Query<::notification::inbound::http::Params>,
     cursor: Option<
         models_pagination::CursorWithValAndFilter<uuid::Uuid, models_pagination::CreatedAt, ()>,
@@ -255,7 +255,7 @@ async fn list_typed_notifications<S: ::notification::domain::service::Notificati
 
 struct CleanUpNotificationsTask<S> {
     service: NotificationRouterState<S, AuthorizationService>,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     failed_notifs: Vec<(Uuid, serde_json::Error)>,
 }
 
@@ -316,7 +316,7 @@ async fn bulk_get_typed_notifications_by_event_item_ids<
     state: axum::extract::State<
         ::notification::inbound::http::NotificationRouterState<S, AuthorizationService>,
     >,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     query: axum::extract::Query<::notification::inbound::http::Params>,
     cursor: Option<
         models_pagination::CursorWithValAndFilter<uuid::Uuid, models_pagination::CreatedAt, ()>,
@@ -375,7 +375,7 @@ async fn get_typed_by_event_item_id<S: ::notification::domain::service::Notifica
     state: axum::extract::State<
         ::notification::inbound::http::NotificationRouterState<S, AuthorizationService>,
     >,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     path: axum::extract::Path<::notification::inbound::http::EventItemIdPath>,
     query: axum::extract::Query<::notification::inbound::http::Params>,
     cursor: Option<
@@ -432,7 +432,7 @@ async fn get_typed_notification_by_id<S: ::notification::domain::service::Notifi
     state: axum::extract::State<
         ::notification::inbound::http::NotificationRouterState<S, AuthorizationService>,
     >,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     path: axum::extract::Path<::notification::inbound::http::NotificationIdPath>,
 ) -> Result<
     axum::Json<ApiUserNotification>,

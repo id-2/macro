@@ -12,7 +12,7 @@ use agent_client_protocol::schema::v1::{
     SelectedPermissionOutcome, SessionId, SetSessionConfigOptionRequest,
 };
 use agent_client_protocol::{JsonRpcMessage, RawJsonRpcMessage};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::schema::v0::{AcpMessage, ToRuntimeMessage};
@@ -46,7 +46,7 @@ impl AgentActionId {
     /// Mint a fresh id for an action being accepted.
     #[must_use]
     pub fn mint() -> Self {
-        Self(macro_uuid::generate_uuid_v7())
+        Self(rox_uuid::generate_uuid_v7())
     }
 
     /// The same id as the transport's request id type.

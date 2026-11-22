@@ -4,11 +4,11 @@ import { ViewSkeleton } from '@app/components/view-shell/ViewSkeleton';
 export function TasksViewSkeleton() {
   return (
     <ViewSkeleton.Root asidePreferenceKey="tasks">
-      <ViewSkeleton.Sidebar title="Tasks" createLabel="New task" />
+      <ViewSkeleton.Sidebar title="Задачи" createLabel="Новая задача" />
       <ViewSkeleton.Main
-        title="My tasks"
-        controls={[1, 3, 2, '+ New ⌄', 1]}
-        searchPlaceholder="Search tasks"
+        title="Мои задачи"
+        controls={[1, 3, 2, '+ Новая ⌄', 1]}
+        searchPlaceholder="Поиск задач"
       />
     </ViewSkeleton.Root>
   );

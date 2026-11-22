@@ -2,8 +2,8 @@
 
 use std::{future::Future, pin::Pin, time::Duration};
 
-use macro_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::{Client, Response, StatusCode, Url, header::HeaderValue};
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
 
@@ -97,14 +97,14 @@ impl CodingAgentsClient {
         &self,
         operation: Operation,
         command: &impl Serialize,
-        acting_user: Option<&MacroUserIdStr<'static>>,
+        acting_user: Option<&RoxUserIdStr<'static>>,
     ) -> Result<T, CodingAgentError> {
         let url = self
             .base_url
             .join(operation.path())
             .map_err(|_| CodingAgentError::OperationFailed)?;
         let mut headers = reqwest::header::HeaderMap::new();
-        macro_tower_layers::inject_trace_headers(&mut headers);
+        rox_tower_layers::inject_trace_headers(&mut headers);
         let builder = if operation == Operation::Updates {
             self.client.get(url).header(
                 INTERNAL_MACRO_USER_ID_HEADER,
@@ -168,7 +168,7 @@ impl CodingAgentsClient {
 
 #[derive(Serialize)]
 struct ListRequest {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 }
 
 #[derive(Deserialize)]
@@ -194,7 +194,7 @@ async fn bounded_body(mut response: Response) -> Result<Vec<u8>, CodingAgentErro
 impl CodingAgentService for CodingAgentsClient {
     fn list_updates(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<AgentUpdates, CodingAgentError>> + Send + '_>> {
         Box::pin(async move { self.command(Operation::Updates, &(), Some(&user_id)).await })
     }
@@ -208,7 +208,7 @@ impl CodingAgentService for CodingAgentsClient {
 
     fn list(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Pin<Box<dyn Future<Output = Result<Vec<CodingAgent>, CodingAgentError>> + Send + '_>> {
         Box::pin(async move {
             let response: ListResponse = self

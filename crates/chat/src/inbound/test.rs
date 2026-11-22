@@ -7,12 +7,12 @@ use axum::http::{Request, StatusCode, header};
 use entity_access::domain::models::TeamRole;
 use entity_registry::NonUserOwners;
 use http_body_util::BodyExt;
-use macro_authorization::{
+use rox_authorization::{
     BotActingUserClaims, BotAuthentication, BotScope, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
-    MacroUserAuthentication,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
+    RoxUserAuthentication,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::chat::ChatBasic;
 use model::response::StringIDResponse;
 use model::user::UserContext;
@@ -35,8 +35,8 @@ use entity_access::domain::models::{
     EntityPermission, EntityType, OwnerAccessLevel, UserTeamInfo, ViewAccessLevel,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_user_id::lowercased::Lowercase;
-use macro_user_id::user_id::MacroUserId;
+use rox_user_id::lowercased::Lowercase;
+use rox_user_id::user_id::RoxUserId;
 
 #[derive(Clone, Default)]
 struct MockService {
@@ -397,7 +397,7 @@ impl EntityAccessService for MockAccessService {
         T: entity_access::domain::models::RequiredPermission,
     >(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -421,7 +421,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> std::result::Result<Option<AccessLevel>, AccessError> {
@@ -430,7 +430,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -449,7 +449,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -461,7 +461,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> std::result::Result<(EntityPermission, uuid::Uuid, TeamRole), AccessError> {
@@ -472,7 +472,7 @@ impl EntityAccessService for MockAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> std::result::Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> std::result::Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Ok(vec![])
     }
 
@@ -494,7 +494,7 @@ impl EntityAccessService for MockAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> std::result::Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!()
     }
@@ -506,13 +506,13 @@ const TEAM_ID: Uuid = Uuid::from_u128(0x7EA3);
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
+impl RoxAuthorizationService for FakeAuthorizationService {
     async fn authorize(
         &self,
         jwt: &str,
-    ) -> std::result::Result<UserContext, Report<MacroAuthorizationError>> {
+    ) -> std::result::Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(UserContext {
@@ -527,20 +527,20 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         &self,
         jwt: &str,
     ) -> std::result::Result<
-        macro_authorization::ValidatedCredential,
-        Report<MacroAuthorizationError>,
+        rox_authorization::ValidatedCredential,
+        Report<RoxAuthorizationError>,
     > {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         _provided_key: &str,
         _claims: InternalIdentityClaims,
-    ) -> std::result::Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> std::result::Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 
     async fn authorize_bot(
@@ -548,9 +548,9 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         bot_token: &str,
         bot_scope: BotScope,
         acting_user: Option<BotActingUserClaims>,
-    ) -> std::result::Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> std::result::Result<BotAuthentication, Report<RoxAuthorizationError>> {
         if bot_token != BOT_TOKEN {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(BotAuthentication {
@@ -560,12 +560,12 @@ impl MacroAuthorizationService for FakeAuthorizationService {
             team_id: Some(TEAM_ID),
             acting_user: acting_user
                 .and_then(|claims| claims.user_id)
-                .map(|user_id| MacroUserAuthentication {
-                    origin: macro_authorization::CredentialOrigin::Bot,
+                .map(|user_id| RoxUserAuthentication {
+                    origin: rox_authorization::CredentialOrigin::Bot,
                     agent_id: None,
                     agent_via: None,
                     routine_id: None,
-                    macro_user_id: MacroUserIdStr::try_from(user_id.clone())
+                    macro_user_id: RoxUserIdStr::try_from(user_id.clone())
                         .expect("test user id should be valid"),
                     user_context: UserContext {
                         user_id,
@@ -578,8 +578,8 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     }
 }
 
-fn authorization_state() -> MacroAuthorizationState<FakeAuthorizationService> {
-    MacroAuthorizationState::new(Arc::new(FakeAuthorizationService))
+fn authorization_state() -> RoxAuthorizationState<FakeAuthorizationService> {
+    RoxAuthorizationState::new(Arc::new(FakeAuthorizationService))
 }
 
 /// Fake roles-and-permissions service granting no permissions (free tier).
@@ -591,7 +591,7 @@ impl roles_and_permissions::domain::port::UserRolesAndPermissionsService
 {
     async fn get_user_roles(
         &self,
-        _user_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _user_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> std::result::Result<
         std::collections::HashSet<roles_and_permissions::domain::model::RoleId>,
         roles_and_permissions::domain::model::UserRolesAndPermissionsError,
@@ -601,7 +601,7 @@ impl roles_and_permissions::domain::port::UserRolesAndPermissionsService
 
     async fn get_user_permissions(
         &self,
-        _user_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _user_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> std::result::Result<
         std::collections::HashSet<roles_and_permissions::domain::model::PermissionId>,
         roles_and_permissions::domain::model::UserRolesAndPermissionsError,
@@ -611,7 +611,7 @@ impl roles_and_permissions::domain::port::UserRolesAndPermissionsService
 
     async fn update_user_roles_and_permissions_for_subscription(
         &self,
-        _user_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _user_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _subscription_status: roles_and_permissions::domain::model::SubscriptionStatus,
         _product_tier: roles_and_permissions::domain::model::ProductTier,
     ) -> std::result::Result<(), roles_and_permissions::domain::model::UserRolesAndPermissionsError>
@@ -621,7 +621,7 @@ impl roles_and_permissions::domain::port::UserRolesAndPermissionsService
 
     async fn dangerous_upsert_roles_for_user(
         &self,
-        _user_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _user_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _role_ids: non_empty::NonEmpty<&[roles_and_permissions::domain::model::RoleId]>,
     ) -> std::result::Result<(), roles_and_permissions::domain::model::UserRolesAndPermissionsError>
     {
@@ -630,7 +630,7 @@ impl roles_and_permissions::domain::port::UserRolesAndPermissionsService
 
     async fn dangerous_remove_roles_from_user(
         &self,
-        _user_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _user_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
         _role_ids: &non_empty::NonEmpty<&[roles_and_permissions::domain::model::RoleId]>,
     ) -> std::result::Result<(), roles_and_permissions::domain::model::UserRolesAndPermissionsError>
     {

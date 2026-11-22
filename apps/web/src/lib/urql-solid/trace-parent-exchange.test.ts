@@ -13,7 +13,7 @@ import {
 
 const { active } = vi.hoisted(() => ({ active: [] as string[] }));
 
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   Telemetry: {
     captureContext: () => {
       const captured = active.at(-1);

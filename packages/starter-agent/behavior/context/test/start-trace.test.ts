@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, expect, test } from 'bun:test';
-import { Telemetry } from '@macro-inc/observability/core';
+import { Telemetry } from '@rox-one/observability/core';
 import {
   context,
   propagation,

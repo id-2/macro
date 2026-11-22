@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Initiative } from './initiative';
 
 describe('initiative activity', () => {
@@ -43,7 +43,7 @@ describe('initiative activity', () => {
           return { data: pages[requests.length - 1] };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const entries = [];
     for await (const entry of Initiative.byId(

@@ -10,15 +10,15 @@ use axum::{
     response::{IntoResponse, Response},
 };
 #[allow(deprecated)]
-use macro_authorization::LEGACY_DSS_INTERNAL_API_KEY_HEADER;
-use macro_authorization::{
+use rox_authorization::LEGACY_DSS_INTERNAL_API_KEY_HEADER;
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, BotActingUserClaims, BotAuthentication, BotScope,
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
 };
-use macro_user_id::{
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_user::UserContext;
 use rootcause::Report;
@@ -44,22 +44,22 @@ const DSS_DEFAULT_USER_ID: &str = "macro|INTERNAL@rox.one";
 const INTERNAL_KEY: &str = "valid-internal-key";
 const TEAM_ID: Uuid = Uuid::from_u128(0x6d67fd9b_9906_40aa_9c0e_cab546cb80ad);
 
-type V2Extractor = OptionalMacroUserTeamExtractorV2<
+type V2Extractor = OptionalRoxUserTeamExtractorV2<
     AdminTeamRole,
     FakeEntityAccessService,
     FakeAuthorizationService,
 >;
-type OptionalMemberV2Extractor = OptionalMacroUserTeamExtractorV2<
+type OptionalMemberV2Extractor = OptionalRoxUserTeamExtractorV2<
     MemberTeamRole,
     FakeEntityAccessService,
     FakeAuthorizationService,
 >;
 type RequiredV2Extractor =
-    MacroUserTeamExtractorV2<AdminTeamRole, FakeEntityAccessService, FakeAuthorizationService>;
+    RoxUserTeamExtractorV2<AdminTeamRole, FakeEntityAccessService, FakeAuthorizationService>;
 type RequiredMemberV2Extractor =
-    MacroUserTeamExtractorV2<MemberTeamRole, FakeEntityAccessService, FakeAuthorizationService>;
+    RoxUserTeamExtractorV2<MemberTeamRole, FakeEntityAccessService, FakeAuthorizationService>;
 type RequiredOwnerV2Extractor =
-    MacroUserTeamExtractorV2<OwnerTeamRole, FakeEntityAccessService, FakeAuthorizationService>;
+    RoxUserTeamExtractorV2<OwnerTeamRole, FakeEntityAccessService, FakeAuthorizationService>;
 
 #[derive(Clone, Debug, Default)]
 struct FakeEntityAccessService {
@@ -98,7 +98,7 @@ impl FakeEntityAccessService {
 impl EntityAccessService for FakeEntityAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -149,7 +149,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -158,7 +158,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -177,7 +177,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -187,7 +187,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -198,7 +198,7 @@ impl EntityAccessService for FakeEntityAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         Err(AccessError::internal("test access failure"))
     }
 
@@ -218,7 +218,7 @@ impl EntityAccessService for FakeEntityAccessService {
 
     async fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         self.membership_lookups
             .lock()
@@ -241,22 +241,22 @@ impl FakeAuthorizationService {
     }
 }
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             "valid" => Ok(user_context(USER_ID)),
-            "expired" => Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            "expired" => Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_bot(
@@ -264,11 +264,11 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         token: &str,
         bot_scope: BotScope,
         _claims: Option<BotActingUserClaims>,
-    ) -> Result<BotAuthentication, Report<MacroAuthorizationError>> {
+    ) -> Result<BotAuthentication, Report<RoxAuthorizationError>> {
         match token {
             VALID_BOT_TOKEN => Ok(valid_bot_authentication(bot_scope)),
             MALFORMED_SYSTEM_BOT_TOKEN => Ok(malformed_system_bot_authentication(bot_scope)),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
@@ -276,9 +276,9 @@ impl MacroAuthorizationService for FakeAuthorizationService {
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(claims
@@ -290,7 +290,7 @@ impl MacroAuthorizationService for FakeAuthorizationService {
 
 struct TestState {
     entity_access: Arc<FakeEntityAccessService>,
-    authorization: MacroAuthorizationState<FakeAuthorizationService>,
+    authorization: RoxAuthorizationState<FakeAuthorizationService>,
 }
 
 impl FromRef<TestState> for Arc<FakeEntityAccessService> {
@@ -299,7 +299,7 @@ impl FromRef<TestState> for Arc<FakeEntityAccessService> {
     }
 }
 
-impl FromRef<TestState> for MacroAuthorizationState<FakeAuthorizationService> {
+impl FromRef<TestState> for RoxAuthorizationState<FakeAuthorizationService> {
     fn from_ref(state: &TestState) -> Self {
         state.authorization.clone()
     }
@@ -320,7 +320,7 @@ fn state(
 ) -> TestState {
     TestState {
         entity_access: Arc::new(entity_access),
-        authorization: MacroAuthorizationState::new(Arc::new(authorization)),
+        authorization: RoxAuthorizationState::new(Arc::new(authorization)),
     }
 }
 
@@ -601,7 +601,7 @@ async fn user_scoped_bot_uses_acting_users_team_and_actual_admin_role() {
         TEAM_ID,
         TeamRole::Admin,
         BotReceiptScope::User {
-            acting_user: MacroUserIdStr::try_from(BOT_ACTING_USER_ID.to_string())
+            acting_user: RoxUserIdStr::try_from(BOT_ACTING_USER_ID.to_string())
                 .expect("valid acting user id"),
         },
     );
@@ -614,7 +614,7 @@ async fn user_scoped_bot_uses_acting_users_team_and_actual_admin_role() {
         [BotAccessCall {
             bot_id: BOT_ID,
             scope: BotAccessScope::User {
-                user_id: MacroUserIdStr::try_from(BOT_ACTING_USER_ID.to_string())
+                user_id: RoxUserIdStr::try_from(BOT_ACTING_USER_ID.to_string())
                     .expect("valid acting user id"),
                 user_org_id: Some(i64::from(BOT_ACTING_USER_ORGANIZATION_ID)),
             },
@@ -894,5 +894,5 @@ fn v2_clone_does_not_require_service_types_to_be_clone() {
 
     fn assert_clone<T: Clone>() {}
 
-    assert_clone::<OptionalMacroUserTeamExtractorV2<AdminTeamRole, NotClone, NotClone>>();
+    assert_clone::<OptionalRoxUserTeamExtractorV2<AdminTeamRole, NotClone, NotClone>>();
 }

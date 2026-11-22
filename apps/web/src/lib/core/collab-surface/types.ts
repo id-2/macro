@@ -1,6 +1,6 @@
-import type { LoroManager } from '@macro-inc/collaboration/collab/manager';
-import type { LiveSyncSource } from '@macro-inc/collaboration/collab/source';
-import type { MARKDOWN_LORO_SCHEMA } from '@macro-inc/lexical-core/markdown-loro-schema';
+import type { LoroManager } from '@rox-one/collaboration/collab/manager';
+import type { LiveSyncSource } from '@rox-one/collaboration/collab/source';
+import type { MARKDOWN_LORO_SCHEMA } from '@rox-one/lexical-core/markdown-loro-schema';
 import type { Accessor } from 'solid-js';
 
 /** Session ownership is independent of whether the host is a block or a native view. */

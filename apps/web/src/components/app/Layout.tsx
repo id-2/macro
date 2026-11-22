@@ -1,9 +1,9 @@
 import { ViewSwitcherContext } from '@app/components/view-shell';
-import { ROUTER_BASE_CONCAT } from '@app/constants/routerBase';
 import Banner from '@app/features/auth/banner/Banner';
 import { CalendarPermissionPrompt } from '@app/features/auth/CalendarPermissionPrompt';
 import { GithubReauthenticationPrompt } from '@app/features/auth/GithubReauthenticationPrompt';
 import { GmailReauthenticationPrompt } from '@app/features/auth/GmailReauthenticationPrompt';
+import { NamePrompt } from '@app/features/auth/NamePrompt';
 import { CommandMenu } from '@app/features/command';
 import { FavoritesCommands } from '@app/features/command/FavoritesCommands';
 import {
@@ -23,7 +23,6 @@ import {
   isAddInboxDialogOpen,
 } from '@app/features/inbox/AddInboxDialog';
 import { MacroMcpSetupModal } from '@app/features/integrations/mcp-setup/MacroMcpSetupModal';
-import { onboardingRedirectPath } from '@app/features/onboarding/core/next-target';
 import { AiUsageLimitDialog } from '@app/features/paywall/AiUsageLimitDialog';
 import { observeAiUsageLimitMutations } from '@app/features/paywall/ai-usage-limit-handling';
 import { MobileSettingsProvider } from '@app/features/settings/context/mobile-settings';
@@ -49,15 +48,14 @@ import { enableWhatsappLinked } from '@core/constant/featureFlags';
 import { usePaywallState } from '@core/constant/PaywallState';
 import { attachGlobalDOMScope } from '@core/hotkey/hotkeys';
 import { isMobile } from '@core/mobile/isMobile';
-import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { useNativeNavigationEdge } from '@core/mobile/nativeNavigationEdge';
 import { virtualKeyboardVisible } from '@core/mobile/virtualKeyboard';
 import { hasLoginCookie, updateCookie } from '@core/util/cookies';
 import { lazy } from '@core/util/lazy';
 import { lazyNamed } from '@core/util/lazyNamed';
-import { isDesktopPlatform, isPlatform } from '@core/util/platform';
-import { useDesktopZoom } from '@macro/tauri/zoom';
+import { isDesktopPlatform, isPlatform, isTauri } from '@core/util/platform';
+import { useDesktopZoom } from '@rox/tauri/zoom';
 import { useUserInfoQuery } from '@queries/auth/user-info';
 import { queryClient } from '@queries/client';
 import { useLocation, useNavigate } from '@solidjs/router';
@@ -220,33 +218,23 @@ export function PageContent(props: ParentProps) {
 }
 
 /**
- * Sends first-time desktop users into the onboarding flow at /onboarding, and
- * new agents on any platform to their setup page.
+ * Agents are sent to the page that shows their SDK token.
  * App chrome runs it, so it fires on any app destination (marketing SSO lands
- * on /app, not /login) and never on the onboarding pages themselves.
+ * on /app, not /login).
+ *
+ * People are never redirected out of the app: a new account enters at Home the
+ * same way an existing one does. Onboarding is a page people open themselves
+ * (`/onboarding`, and the row in Account settings), not a gate.
  */
-function useNewOnboardingRedirect() {
+function useNewAgentSetupRedirect() {
   const userInfoQuery = useUserInfoQuery();
   const navigate = useNavigate();
-  const location = useLocation();
   createEffect(() => {
     // A pending read would suspend the chrome; wait for the user instead.
     const data = userInfoQuery.isSuccess ? userInfoQuery.data : undefined;
-    if (data?.authenticated !== true || data.tutorialComplete !== false) {
-      return;
-    }
-    // Agents skip onboarding: their setup page shows their SDK token.
-    if (data.isAgent) {
-      navigate('/agent-setup', { replace: true });
-      return;
-    }
-    if (isMobile() || isNativeMobilePlatform()) return;
-    // Preserve the deep link the user arrived on (a shared doc, an invite)
-    // as ?next, and a lifecycle-email ?step, so finish() and the flow can
-    // resume. Base-relative so navigate() can resolve it against the router.
-    const target =
-      location.pathname.slice(ROUTER_BASE_CONCAT.length - 1) + location.search;
-    navigate(onboardingRedirectPath(target), { replace: true });
+    if (data?.authenticated !== true || !data.isAgent) return;
+    if (data.tutorialComplete !== false) return;
+    navigate('/agent-setup', { replace: true });
   });
 }
 
@@ -262,6 +250,7 @@ const MobileCallIsland = lazyNamed(
 
 export function AppChrome(props: ParentProps) {
   const isAuthenticated = useIsAuthenticated();
+  const userInfoQuery = useUserInfoQuery();
   const navigationEdge = useNativeNavigationEdge();
   const dockEdge = (): 'left' | 'right' | 'bottom' =>
     SearchState.isOpen() ? 'bottom' : navigationEdge();
@@ -278,7 +267,7 @@ export function AppChrome(props: ParentProps) {
 
   // Route mailto: links (via openExternalUrl) to the in-app email composer.
   registerMailtoComposerHandler();
-  useNewOnboardingRedirect();
+  useNewAgentSetupRedirect();
   const { status: systemStatus, dismiss: dismissSystemStatus } =
     useBannerStatus();
 
@@ -299,6 +288,7 @@ export function AppChrome(props: ParentProps) {
           <GithubReauthenticationPrompt />
           <GmailReauthenticationPrompt />
           <CalendarPermissionPrompt />
+          <NamePrompt />
           <ShowFeatureFlag flag={enableWhatsappLinked}>
             <Suspense>
               <WhatsAppHistoryImportPrompt />
@@ -336,10 +326,23 @@ export function AppChrome(props: ParentProps) {
             <AddInboxDialog />
           </Show>
         </Show>
-        <Show when={isAuthenticated() === false}>
-          <Show when={hasLoginCookie()} fallback={<Banner />}>
-            <SessionExpiredRedirect />
-          </Show>
+        <Show when={isAuthenticated() === false && hasLoginCookie()}>
+          <SessionExpiredRedirect />
+        </Show>
+        {/* A guest is a web visitor whose identity the server actually answered
+            for and answered "signed out". The native shells keep their own
+            session outside the browser's cookie jar, so on their origin the
+            user-info query stays disabled (`user-info-gate`) and its `false`
+            means "never asked", not "signed out". */}
+        <Show
+          when={
+            !isTauri() &&
+            isAuthenticated() === false &&
+            !hasLoginCookie() &&
+            userInfoQuery.isFetchedAfterMount
+          }
+        >
+          <Banner />
         </Show>
       </Suspense>
       <Show when={systemStatus()}>

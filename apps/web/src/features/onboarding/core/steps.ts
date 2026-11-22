@@ -27,21 +27,55 @@ export const isStoryStep = (step: OnboardingStep): step is StoryStep =>
   step === 'security' ||
   step === 'tools';
 
+/** Trust proof, the intro slides, inbox import and the routine picker are not shown. */
+const HIDDEN_STEPS: Record<
+  'security' | 'work' | 'personal' | 'welcome' | 'vision' | 'tools',
+  true
+> = {
+  security: true,
+  work: true,
+  personal: true,
+  welcome: true,
+  vision: true,
+  tools: true,
+};
+
+function stepAfter(step: OnboardingStep): OnboardingStep {
+  const index = ONBOARDING_STEPS.indexOf(step);
+  return ONBOARDING_STEPS[Math.min(index + 1, ONBOARDING_STEPS.length - 1)];
+}
+
+/** The first step a person can actually open, skipping trust and inbox import. */
+export function visibleOnboardingStep(step: OnboardingStep): OnboardingStep {
+  let current = step;
+  while (current in HIDDEN_STEPS) {
+    const next = stepAfter(current);
+    if (next === current) break;
+    current = next;
+  }
+  return current;
+}
+
 export function nextOnboardingStep(
   step: OnboardingStep,
   outcome: StepOutcome
 ): OnboardingStep {
   // Without a first account, offering a second account would be misleading.
+  // Both inbox steps are hidden, so either way the flow continues at tools.
   if (step === 'work' && outcome === 'skipped') return 'tools';
-  const index = ONBOARDING_STEPS.indexOf(step);
-  return ONBOARDING_STEPS[Math.min(index + 1, ONBOARDING_STEPS.length - 1)];
+  return visibleOnboardingStep(stepAfter(step));
 }
 
 export function previousOnboardingStep(
   step: OnboardingStep
 ): OnboardingStep | undefined {
-  const index = ONBOARDING_STEPS.indexOf(step);
-  return index > 0 ? ONBOARDING_STEPS[index - 1] : undefined;
+  let index = ONBOARDING_STEPS.indexOf(step);
+  while (index > 0) {
+    index -= 1;
+    const previous = ONBOARDING_STEPS[index];
+    if (!(previous in HIDDEN_STEPS)) return previous;
+  }
+  return undefined;
 }
 
 /** A `?step` value that names a current onboarding step. */
@@ -56,7 +90,7 @@ export function parseOnboardingStepParam(
 /**
  * Where to open the flow.
  * Checkout return, then saved progress (including legacy names), then a
- * `?step` link, then welcome. A Google sign-up return is passed in as `work`.
+ * `?step` link, then welcome. Trust and inbox import never open.
  */
 export function restoreOnboardingStep(
   saved: unknown,
@@ -65,8 +99,10 @@ export function restoreOnboardingStep(
 ): OnboardingStep {
   if (checkoutReturn) return 'plan';
   const resumed = resumeSavedStep(saved);
-  if (resumed) return resumed;
-  return parseOnboardingStepParam(requestedStep) ?? 'welcome';
+  if (resumed) return visibleOnboardingStep(resumed);
+  return visibleOnboardingStep(
+    parseOnboardingStepParam(requestedStep) ?? 'welcome'
+  );
 }
 
 /** Migrate in-progress sessions from the previous flow without losing OAuth returns. */

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { createSignal } from 'solid-js';
 import { AutoReloadDialog } from '../components/auto-reload-dialog';
@@ -13,11 +14,11 @@ export function AutoReloadView(props: {
   const [error, setError] = createSignal<string>();
   const notice = () => {
     if (props.context.autoReload.preview())
-      return 'Developer preview. These settings only change this preview and will not charge your card.';
+      return t('settingsUsage.autoReloadPreviewOnly');
     if (props.context.summary()?.billingAccess === 'team-member')
-      return 'Only the account that pays for this plan can change automatic reload.';
+      return t('settingsUsage.onlyPayerChangesReload');
     if (props.context.autoReload.suspended())
-      return 'Your last automatic reload could not be charged. Update your payment method, then save to try again.';
+      return t('settingsUsage.lastReloadFailed');
   };
   const save = async (enabled: boolean) => {
     const settings = enabled
@@ -35,7 +36,7 @@ export function AutoReloadView(props: {
       await props.context.autoReload.save({ ...settings, enabled });
       props.onClose();
     } catch {
-      setError("Couldn't save Auto-Reload settings. Please try again.");
+      setError(t('settingsUsage.saveAutoReloadFailed'));
     }
   };
   const paymentMethods = async () => {
@@ -51,7 +52,7 @@ export function AutoReloadView(props: {
       const url = await props.context.paymentMethods.open();
       props.context.navigateToPayment(url);
     } catch {
-      setError("Couldn't open payment methods. Please try again.");
+      setError(t('settingsUsage.openPaymentMethodsFailed'));
     }
   };
   return (

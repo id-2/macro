@@ -5,7 +5,7 @@ use crate::domain::{
     contact_listing::CrmContactListScope,
 };
 use crate::outbound::companies_repo::CompaniesRepositoryImpl;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_properties::EntityType;
 use serde_json::{Value, json};
 use sqlx::PgPool;

@@ -10,11 +10,11 @@ across scripts and applications; Rox checks permissions on every request.
 
 ## Quick start
 
-Install the SDK with `npm install @macro-inc/sdk`. Create an API key in Macro's
-**Settings → API Keys**, then set `MACRO_API_KEY` in your script's environment.
+Install the SDK with `npm install @rox-one/sdk`. Create an API key in Macro's
+**Settings → API Keys**, then set `ROX_API_KEY` in your script's environment.
 
 ```ts
-import { Macro } from '@macro-inc/sdk';
+import { Macro } from '@rox-one/sdk';
 
 const macro = new Macro({});
 
@@ -32,7 +32,7 @@ An agent gets its own Rox account and seat. Have a teammate invite you with
 `(await macro.teams.current()).invite('agent@example.com', { agent: true })`, or,
 sign up at https://rox.one/app/signup/agent with Google or an email address. If you use email, verify the code
 sent to your address. Macro then shows your SDK token once. Set it as
-`MACRO_API_KEY`, then introduce yourself:
+`ROX_API_KEY`, then introduce yourself:
 
 ```ts
 const macro = new Macro({});
@@ -47,7 +47,7 @@ await macro.me.update({ name: 'Research Agent', profilePicture: image });
 To get another token, call `macro.apiKeys.create('my token')` and save the
 returned `secret`, or use **Settings → API Keys**.
 
-See {@link src/config!MacroOpts | client options} for explicit credentials, bot identity,
+See {@link src/config!RoxOpts | client options} for explicit credentials, bot identity,
 and service configuration, or {@link src/macro!Macro | the Rox client} for every entry point.
 
 ## Find the right entity
@@ -99,7 +99,7 @@ opens the methods and exact request and response types for that namespace.
 | {@link src/entities/bots/namespace!BotsNamespace | macro.bots} | Bots: create, configure, channel access, webhooks and tokens. |
 | {@link src/entities/ai/namespace!AiNamespace | macro.ai} | AI operations on content you supply: structured generation and yes/no classification with Jev. |
 | {@link src/entities/memory/namespace!MemoryNamespace | macro.memory} | The current user's private explicit AI memory, edited one line at a time. |
-| {@link src/events/receiver!MacroEvents | macro.events} | Live entity events your application can subscribe to through a stream or webhook receiver. |
+| {@link src/events/receiver!RoxEvents | macro.events} | Live entity events your application can subscribe to through a stream or webhook receiver. |
 | {@link src/entities/webhooks/namespace!WebhooksNamespace | macro.webhooks} | Persistent subscriptions that deliver events to your application's URL. |
 
 ### Automation and resource management
@@ -157,5 +157,5 @@ const [name, content] = await Promise.all([
 Follow an entity link above to see its methods, examples, and linked types.
 The reference is generated from the SDK's declarations and comments using
 TypeDoc, including the API request and response types used by those methods.
-For shared behavior, see {@link src/entities/entity!MacroEntity | entity handles},
+For shared behavior, see {@link src/entities/entity!RoxEntity | entity handles},
 {@link src/entities/search!SearchOpts | search options}, and {@link src/mentions!msg | rich messages and mentions}.

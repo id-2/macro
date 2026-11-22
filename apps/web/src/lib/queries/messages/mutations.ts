@@ -5,7 +5,7 @@ import type { DateValue } from '@core/util/date';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { markMessageSent } from '@core/util/message-send-motion';
 import { thrownResultErrorHasCode } from '@core/util/result';
-import { Telemetry, type TraceContext } from '@macro-inc/observability';
+import { Telemetry, type TraceContext } from '@rox-one/observability';
 import {
   messageReferencesCrmRecord,
   refreshCrmAssociatedSoupQueries,

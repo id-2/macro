@@ -77,13 +77,13 @@ export const TASK_GROUP_OPTIONS: {
   id: TaskGroupBy;
   label: string;
 }[] = [
-  { id: 'none', label: 'None' },
-  { id: 'status', label: 'Status' },
-  { id: 'priority', label: 'Priority' },
-  { id: 'assignee', label: 'Assignee' },
-  { id: 'project', label: 'Project' },
-  { id: 'date', label: 'Date' },
-  { id: 'due_date', label: 'Due date' },
+  { id: 'none', label: 'Нет' },
+  { id: 'status', label: 'Статус' },
+  { id: 'priority', label: 'Приоритет' },
+  { id: 'assignee', label: 'Исполнитель' },
+  { id: 'project', label: 'Проект' },
+  { id: 'date', label: 'Дата' },
+  { id: 'due_date', label: 'Срок' },
 ];
 
 export const TASK_SORT_DEFINITIONS: SortDefinition<
@@ -128,9 +128,9 @@ export const TASK_SORT_OPTIONS: {
   /** Unselected direction for sorts without a property. */
   direction?: 'asc' | 'desc';
 }[] = [
-  { id: 'viewed_at', label: 'Viewed' },
-  { id: 'updated_at', label: 'Updated' },
-  { id: 'created_at', label: 'Created' },
+  { id: 'viewed_at', label: 'Просмотрено' },
+  { id: 'updated_at', label: 'Обновлено' },
+  { id: 'created_at', label: 'Создано' },
   {
     id: 'title',
     get label() {
@@ -140,7 +140,7 @@ export const TASK_SORT_OPTIONS: {
   },
   {
     id: 'status',
-    label: 'Status',
+    label: 'Статус',
     property: {
       propertyDefinitionId: SYSTEM_PROPERTY_IDS.STATUS,
       direction: 'asc',
@@ -148,7 +148,7 @@ export const TASK_SORT_OPTIONS: {
   },
   {
     id: 'priority',
-    label: 'Priority',
+    label: 'Приоритет',
     property: {
       propertyDefinitionId: SYSTEM_PROPERTY_IDS.PRIORITY,
       direction: 'desc',
@@ -156,7 +156,7 @@ export const TASK_SORT_OPTIONS: {
   },
   {
     id: 'due_date_earliest',
-    label: 'Due soonest',
+    label: 'Ближайший срок',
     property: {
       propertyDefinitionId: SYSTEM_PROPERTY_IDS.DUE_DATE,
       direction: 'asc',
@@ -164,7 +164,7 @@ export const TASK_SORT_OPTIONS: {
   },
   {
     id: 'due_date_latest',
-    label: 'Due furthest away',
+    label: 'Дальний срок',
     property: {
       propertyDefinitionId: SYSTEM_PROPERTY_IDS.DUE_DATE,
       direction: 'desc',

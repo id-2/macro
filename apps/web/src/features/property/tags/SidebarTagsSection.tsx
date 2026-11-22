@@ -1,4 +1,5 @@
 import { CollapsibleSection, ViewSidebar } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import PlusIcon from '@icon/system/regular/plus.svg';
 import { useCurrentTeamQuery } from '@queries/team/teams';
 import type { TagScope } from '@service-properties/generated/schemas/tagScope';
@@ -83,12 +84,12 @@ export function SidebarTagsSection(props: SidebarTagsSectionProps) {
     >
       <CollapsibleSection.Header>
         <CollapsibleSection.Trigger class="flex-1">
-          <span class="min-w-0 truncate">Tags</span>
+          <span class="min-w-0 truncate">{t('tags.title')}</span>
           <CollapsibleSection.Indicator />
         </CollapsibleSection.Trigger>
         <CollapsibleSection.Action
           type="button"
-          aria-label="New tag"
+          aria-label={t('tags.newTag')}
           onClick={() => setCreating(true)}
         >
           <PlusIcon class="size-3.5" />
@@ -98,10 +99,12 @@ export function SidebarTagsSection(props: SidebarTagsSectionProps) {
         <Show
           when={tree().length > 0}
           fallback={
-            <p class="px-3 py-2 text-sm text-ink-extra-muted">No tags yet</p>
+            <p class="px-3 py-2 text-sm text-ink-extra-muted">
+              {t('tags.empty')}
+            </p>
           }
         >
-          <ViewSidebar.Nav aria-label="Tags">
+          <ViewSidebar.Nav aria-label={t('tags.title')}>
             <TagTree
               nodes={tree()}
               activeIds={props.activeIds}

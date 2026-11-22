@@ -1,0 +1,14 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO email_address_book_sources(link_id,folder_id,provider_id,emails,scan_id,photo_due_at,deleted_at) VALUES\n            ($1,'contacts','later','{}',gen_random_uuid(),now() + interval '1 hour',NULL),\n            ($1,'contacts','deleted','{}',gen_random_uuid(),now() - interval '3 minutes',now()),\n            ($1,'contacts','second','{}',gen_random_uuid(),now() - interval '1 minute',NULL),\n            ($1,'contacts','first','{}',gen_random_uuid(),now() - interval '2 minutes',NULL)\n    ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "cbd86f67b06acb9740f889d661c1e50179530777358eb86bc07b5b770ad56ced"
+}

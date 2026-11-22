@@ -1,4 +1,4 @@
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::str::FromStr;
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -267,8 +267,8 @@ impl Billing for FakeBilling {
     }
 }
 
-pub(crate) fn admin() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap()
+pub(crate) fn admin() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|admin@example.com".to_owned()).unwrap()
 }
 
 pub(crate) fn key(value: &str) -> PurchaseKey {

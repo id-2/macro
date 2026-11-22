@@ -5,7 +5,7 @@ import {
   type Point,
   screenToWorld,
   selectedShapeIds,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { type Accessor, createMemo, createSignal, onCleanup } from 'solid-js';
 import { eraseCommand, eraserHits } from '../core/eraser';
 

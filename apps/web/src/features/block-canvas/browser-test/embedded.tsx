@@ -8,7 +8,7 @@ import {
   createGraphicsEditor,
   type GraphicsEditor,
   translation,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query';
 import { For, onCleanup } from 'solid-js';
 import { render } from 'solid-js/web';

@@ -22,7 +22,7 @@ use agent_inmem::domain::tool_gate::{NativeToolGate, NativeToolVerdict};
 use agent_session::domain::model::{AgentSessionId, TurnPrompter};
 use agent_session::domain::ports::AgentSessionRepo;
 use async_trait::async_trait;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_client::domain::ports::McpServerStore;
 use mcp_client::domain::service::{AddServerError, AddedBy};
 use mcp_client::inbound::toolset::{ConnectMcpServer, ConnectMcpServerResponse};
@@ -50,7 +50,7 @@ pub struct SessionConnectedApps<Egress, Connections, Servers, Sessions> {
 /// the apps its agent was given.
 struct Settled {
     grant: SessionGrant,
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     apps: Vec<ConnectedApp>,
 }
 

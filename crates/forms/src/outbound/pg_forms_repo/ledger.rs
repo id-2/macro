@@ -4,7 +4,7 @@
 //! `form_submission_receipts` does.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -45,7 +45,7 @@ impl TryFrom<ResponseRow> for FormResponse {
 pub(super) async fn response_of(
     pool: &PgPool,
     form: FormId,
-    respondent: &MacroUserIdStr<'_>,
+    respondent: &RoxUserIdStr<'_>,
 ) -> Result<Option<FormResponse>, PgFormsRepoError> {
     sqlx::query_as!(
         ResponseRow,
@@ -66,7 +66,7 @@ pub(super) async fn response_of(
 pub(super) async fn record_stop(
     pool: &PgPool,
     form: FormId,
-    respondent: &MacroUserIdStr<'_>,
+    respondent: &RoxUserIdStr<'_>,
     section: FormSectionId,
     at: DateTime<Utc>,
 ) -> Result<(), PgFormsRepoError> {
@@ -97,7 +97,7 @@ pub(super) async fn record_stop(
 pub(super) async fn record_submission(
     pool: &PgPool,
     form: FormId,
-    respondent: Option<&MacroUserIdStr<'_>>,
+    respondent: Option<&RoxUserIdStr<'_>>,
     row: RowId,
     at: DateTime<Utc>,
 ) -> Result<RecordedResponse, PgFormsRepoError> {
@@ -136,7 +136,7 @@ pub(super) async fn record_submission(
 pub(super) async fn record_anonymous_submission(
     pool: &PgPool,
     form: FormId,
-    voter: Option<&MacroUserIdStr<'_>>,
+    voter: Option<&RoxUserIdStr<'_>>,
     row: RowId,
     day: DateTime<Utc>,
 ) -> Result<RecordedResponse, PgFormsRepoError> {
@@ -184,7 +184,7 @@ pub(super) async fn record_anonymous_submission(
 pub(super) async fn holds_receipt(
     pool: &PgPool,
     form: FormId,
-    voter: &MacroUserIdStr<'_>,
+    voter: &RoxUserIdStr<'_>,
 ) -> Result<bool, PgFormsRepoError> {
     Ok(sqlx::query_scalar!(
         r#"
@@ -277,7 +277,7 @@ pub(super) async fn response_counts(
 pub(super) async fn respondents_by_row(
     pool: &PgPool,
     form: FormId,
-) -> Result<Vec<(RowId, MacroUserIdStr<'static>)>, PgFormsRepoError> {
+) -> Result<Vec<(RowId, RoxUserIdStr<'static>)>, PgFormsRepoError> {
     let rows = sqlx::query!(
         r#"
         SELECT row_id AS "row_id!", respondent_id AS "respondent_id!"
@@ -292,7 +292,7 @@ pub(super) async fn respondents_by_row(
     .await?;
     rows.into_iter()
         .map(|row| {
-            let respondent = MacroUserIdStr::try_from(row.respondent_id.clone()).map_err(|_| {
+            let respondent = RoxUserIdStr::try_from(row.respondent_id.clone()).map_err(|_| {
                 PgFormsRepoError::Corrupt {
                     kind: "respondent",
                     value: row.respondent_id,

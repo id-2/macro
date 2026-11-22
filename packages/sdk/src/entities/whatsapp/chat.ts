@@ -2,9 +2,9 @@ import type {
   ExternalChatCommunity,
   WhatsAppChat as WhatsAppChatRecord,
 } from '../../../generated/storage/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { ExternalChat } from '../external-chat/chat';
 
 /** The WhatsApp community a group belongs to. */
@@ -19,7 +19,7 @@ export type WhatsAppCommunity = {
 
 /** A community reference as a handle on the community's own chat. */
 export function communityOf(
-  client: MacroClient,
+  client: RoxClient,
   record: ExternalChatCommunity,
 ): WhatsAppCommunity {
   return {
@@ -30,21 +30,21 @@ export function communityOf(
 }
 
 /** One chat of the current user's WhatsApp chat list: a group or a direct chat. */
-export class WhatsAppChat extends MacroEntity<WhatsAppChatRecord> {
+export class WhatsAppChat extends RoxEntity<WhatsAppChatRecord> {
   /** Reference a chat by its WhatsApp JID. */
-  static byId(client: MacroClient, id: string): WhatsAppChat {
+  static byId(client: RoxClient, id: string): WhatsAppChat {
     return new WhatsAppChat(client, id);
   }
 
   /** Seed a chat handle from the chat list. */
-  static from(client: MacroClient, record: WhatsAppChatRecord): WhatsAppChat {
+  static from(client: RoxClient, record: WhatsAppChatRecord): WhatsAppChat {
     return new WhatsAppChat(client, record.jid, record);
   }
 
   protected async fetch(): Promise<WhatsAppChatRecord> {
     const { chats } = unwrap(await this.client.storage.whatsappChats());
     const chat = chats.find((record) => record.jid === this.id);
-    if (!chat) throw new MacroNotFoundError('WhatsApp chat is not available');
+    if (!chat) throw new RoxNotFoundError('WhatsApp chat is not available');
     return chat;
   }
 

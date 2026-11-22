@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { TextShimmer } from '@app/features/block-agent/ui';
 import { Key } from '@solid-primitives/keyed';
 import { Match, Switch } from 'solid-js';
@@ -21,7 +22,7 @@ export type ActivityRowView = {
  */
 export function ActivityRows(props: { rows: readonly ActivityRowView[] }) {
   return (
-    <ul class="my-1 flex min-w-0 flex-col gap-0.5" aria-label="Steps">
+    <ul class="my-1 flex min-w-0 flex-col gap-0.5" aria-label={t('agentChat.steps')}>
       {/* Rows can arrive as new objects with every paint. Keyed by step, a
           row updates in place and its shimmer runs on. */}
       <Key each={props.rows} by="id">
@@ -38,10 +39,14 @@ export function ActivityRows(props: { rows: readonly ActivityRowView[] }) {
             </span>
             <Switch>
               <Match when={row().status === 'failed'}>
-                <span class="shrink-0 text-failure">Failed</span>
+                <span class="shrink-0 text-failure">
+                  {t('agentChat.failed')}
+                </span>
               </Match>
               <Match when={row().status === 'interrupted'}>
-                <span class="shrink-0 text-ink-disabled">Interrupted</span>
+                <span class="shrink-0 text-ink-disabled">
+                  {t('agentChat.interrupted')}
+                </span>
               </Match>
             </Switch>
           </li>

@@ -47,7 +47,7 @@ use crate::domain::pending::PendingCommands;
 use crate::domain::ports::{ContainerManager, ReachableRepositories};
 use crate::domain::sandbox::SandboxResizeEffect;
 use agent_session::domain::model::SandboxSize;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[cfg(test)]
 mod test;
@@ -660,7 +660,7 @@ where
     async fn preflight(
         &self,
         _kind: AgentKind,
-        owner: &MacroUserIdStr<'_>,
+        owner: &RoxUserIdStr<'_>,
     ) -> Result<Option<SessionBlocker>> {
         match self.keys.resolve(owner).await {
             Ok(_) => Ok(None),

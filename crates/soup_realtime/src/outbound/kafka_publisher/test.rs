@@ -1,9 +1,9 @@
 use std::sync::{Arc, Mutex};
 
-use macro_event_broker::{
-    EventBrokerError, EventPublisher, GlobalSpawner, MacroEvent, MacroEventBrokerService, Topic,
+use rox_event_broker::{
+    EventBrokerError, EventPublisher, GlobalSpawner, RoxEvent, RoxEventBrokerService, Topic,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 
 use super::*;
@@ -41,8 +41,8 @@ impl EventPublisher for RecordingPublisher {
     }
 }
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|recipient@example.com".to_string()).expect("valid user id")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|recipient@example.com".to_string()).expect("valid user id")
 }
 
 fn document() -> Entity<'static> {
@@ -56,7 +56,7 @@ fn message() -> SoupRealtimeMessage {
 #[tokio::test]
 async fn publishes_recipient_and_entity_patch_in_the_soup_topic_payload() {
     let records = Arc::new(Mutex::new(Vec::new()));
-    let broker = MacroEventBrokerService::new(
+    let broker = RoxEventBrokerService::new(
         RecordingPublisher {
             records: records.clone(),
             fail: false,
@@ -82,7 +82,7 @@ async fn publishes_recipient_and_entity_patch_in_the_soup_topic_payload() {
     assert_eq!(json["metadata"][1]["entity_id"], DOCUMENT_ID);
     assert!(json.to_string().find("document_version_id").is_none());
 
-    let decoded = SoupMacroEvent::decode(record.key, &record.payload).expect("event round-trips");
+    let decoded = SoupRoxEvent::decode(record.key, &record.payload).expect("event round-trips");
     assert_eq!(decoded.event().schema_version, 2);
     assert_eq!(
         decoded.into_message(),
@@ -93,7 +93,7 @@ async fn publishes_recipient_and_entity_patch_in_the_soup_topic_payload() {
 #[tokio::test]
 async fn publishes_deleted_patches() {
     let records = Arc::new(Mutex::new(Vec::new()));
-    let broker = MacroEventBrokerService::new(
+    let broker = RoxEventBrokerService::new(
         RecordingPublisher {
             records: records.clone(),
             fail: false,
@@ -115,7 +115,7 @@ async fn publishes_deleted_patches() {
 
 #[tokio::test]
 async fn propagates_delivery_failures_from_event_broker_service() {
-    let broker = MacroEventBrokerService::new(
+    let broker = RoxEventBrokerService::new(
         RecordingPublisher {
             records: Arc::new(Mutex::new(Vec::new())),
             fail: true,

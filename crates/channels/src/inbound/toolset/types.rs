@@ -7,7 +7,7 @@ use messages::domain::{
 use crate::domain::media_upload::ChannelMediaKind;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
@@ -23,7 +23,7 @@ pub(crate) const DEFAULT_MAX_CHARS_PER_MESSAGE: usize = 4_000;
 pub(crate) const MAX_CHARS_PER_MESSAGE: usize = 16_000;
 
 /// Profile names of the people who sent a set of messages, keyed by user id.
-pub(crate) type SenderNames = HashMap<MacroUserIdStr<'static>, String>;
+pub(crate) type SenderNames = HashMap<RoxUserIdStr<'static>, String>;
 
 /// The name the app shows for a message's sender: an imported author's, the
 /// bot's, a call guest's, or the person's profile name.
@@ -45,7 +45,7 @@ fn sender_name(message: &Message, names: &SenderNames) -> Option<String> {
 /// The people among the senders of `messages`, for one name lookup.
 pub(crate) fn user_senders<'a>(
     messages: impl IntoIterator<Item = &'a Message>,
-) -> HashSet<MacroUserIdStr<'static>> {
+) -> HashSet<RoxUserIdStr<'static>> {
     messages
         .into_iter()
         .filter_map(|message| message.sender_id.as_user().cloned())

@@ -3,7 +3,7 @@ use crate::domain::{
     calendar_invitation_parser::parse_invitation_parts,
     invitation_extraction::InvitationExtractionRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const MESSAGE: Uuid = uuid::uuid!("11111111-aaaa-0001-aaaa-111111111111");
 const THREAD: Uuid = uuid::uuid!("11111111-1111-1111-1111-111111111111");

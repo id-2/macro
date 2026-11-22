@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
 use doppleganger::Doppleganger;
-use macro_user_id::{email::EmailStr, error::ParseErr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, error::ParseErr, user_id::RoxUserIdStr};
 use models_email::service::link::UserProvider;
 use sqlx::{Type, types::Uuid};
 
@@ -85,7 +85,7 @@ impl TryFrom<DbLink> for models_email::email::service::link::Link {
         } = value;
         Ok(models_email::email::service::link::Link {
             id,
-            macro_id: MacroUserIdStr::try_from(macro_id)?,
+            macro_id: RoxUserIdStr::try_from(macro_id)?,
             fusionauth_user_id,
             email_address: EmailStr::try_from(email_address)?,
             provider: match provider {

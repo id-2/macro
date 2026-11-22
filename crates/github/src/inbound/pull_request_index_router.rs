@@ -24,8 +24,8 @@ use axum::{
     extract::{FromRef, State},
     routing::post,
 };
-use macro_authorization::{
-    InternalOnly, MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState,
+use rox_authorization::{
+    InternalOnly, RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState,
 };
 
 use crate::domain::{
@@ -38,7 +38,7 @@ pub struct PullRequestIndexRouterState<S, Auth> {
     /// The index service.
     pub service: Arc<S>,
     /// Authorization state used to require an internal caller.
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<S, Auth> Clone for PullRequestIndexRouterState<S, Auth> {
@@ -50,7 +50,7 @@ impl<S, Auth> Clone for PullRequestIndexRouterState<S, Auth> {
     }
 }
 
-impl<S, Auth> FromRef<PullRequestIndexRouterState<S, Auth>> for MacroAuthorizationState<Auth> {
+impl<S, Auth> FromRef<PullRequestIndexRouterState<S, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &PullRequestIndexRouterState<S, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -62,7 +62,7 @@ pub fn pull_request_index_router<S, Auth, T>(
 ) -> Router<T>
 where
     S: GithubPullRequestIndex,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync + 'static,
 {
     Router::new()
@@ -77,12 +77,12 @@ where
 #[tracing::instrument(skip_all, err)]
 pub async fn index_pull_requests_handler<S, Auth>(
     State(state): State<PullRequestIndexRouterState<S, Auth>>,
-    _internal: MacroAuthorizationExtractor<Auth, InternalOnly>,
+    _internal: RoxAuthorizationExtractor<Auth, InternalOnly>,
     Json(request): Json<PullRequestIndexRequest>,
 ) -> Result<Json<PullRequestIndexPage>, GithubError>
 where
     S: GithubPullRequestIndex,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     Ok(Json(state.service.index_pull_requests(request).await?))
 }

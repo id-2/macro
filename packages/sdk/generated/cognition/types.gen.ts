@@ -454,7 +454,7 @@ export type CompletionUsage = {
     /**
      * User the invocation was performed for.
      */
-    user: MacroUserIdStr;
+    user: RoxUserIdStr;
 };
 
 /**
@@ -1138,7 +1138,7 @@ export type LinearIssueMeta = {
  */
 export type LinkShare = 'PUBLIC' | 'TEAM';
 
-export type MacroUserIdStr = string;
+export type RoxUserIdStr = string;
 
 /**
  * An edit to one one-based line. A revision is required to prevent replay

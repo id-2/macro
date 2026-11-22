@@ -115,7 +115,7 @@ impl DenoChecker {
         // references.
         let imports = serde_json::json!({
             "imports": BTreeMap::from([
-                ("@macro-inc/sdk".to_owned(), format!("{types_url}src/macro.d.ts")),
+                ("@rox-one/sdk".to_owned(), format!("{types_url}src/rox.d.ts")),
                 ("file:///".to_owned(), "file:///unavailable/".to_owned()),
                 (check_url.clone(), check_url.clone()),
                 (types_url.clone(), types_url.clone()),
@@ -215,7 +215,7 @@ impl ProgramChecker for DenoChecker {
 /// `deno check` prints each problem as a block: `TS<code> [ERROR]: …`, the
 /// offending line, a marker and `at <file>:<line>:<column>`. Resolution
 /// problems are single `error: …` lines. Paths become the checked files'
-/// names and `@macro-inc/sdk/…` so diagnostics name no host directory.
+/// names and `@rox-one/sdk/…` so diagnostics name no host directory.
 fn diagnostics(output: &str, check_url: &str, types_url: &str) -> Vec<Diagnostic> {
     output
         .split("\n\n")
@@ -228,7 +228,7 @@ fn diagnostics(output: &str, check_url: &str, types_url: &str) -> Vec<Diagnostic
         .map(|block| {
             let message = block
                 .replace(check_url, "")
-                .replace(types_url, "@macro-inc/sdk/");
+                .replace(types_url, "@rox-one/sdk/");
             Diagnostic {
                 file: located_in(&message),
                 message,

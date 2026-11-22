@@ -21,7 +21,7 @@ use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EditAccessLevel, ViewAccessLevel};
 use entity_access::domain::ports::EntityAccessService;
 use entity_access::inbound::axum_extractors::AgentSessionAccessLevelExtractor;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -43,7 +43,7 @@ mod test;
 pub struct AgentChangesRouterState<Changes, Access, Auth> {
     service: Arc<Changes>,
     entity_access: Arc<Access>,
-    authorization_state: MacroAuthorizationState<Auth>,
+    authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<Changes, Access, Auth> AgentChangesRouterState<Changes, Access, Auth> {
@@ -51,7 +51,7 @@ impl<Changes, Access, Auth> AgentChangesRouterState<Changes, Access, Auth> {
     pub fn new(
         service: Changes,
         entity_access: Arc<Access>,
-        authorization_state: MacroAuthorizationState<Auth>,
+        authorization_state: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self {
             service: Arc::new(service),
@@ -73,7 +73,7 @@ impl<Changes, Access, Auth> Clone for AgentChangesRouterState<Changes, Access, A
 }
 
 impl<Changes, Access, Auth> FromRef<AgentChangesRouterState<Changes, Access, Auth>>
-    for MacroAuthorizationState<Auth>
+    for RoxAuthorizationState<Auth>
 {
     fn from_ref(state: &AgentChangesRouterState<Changes, Access, Auth>) -> Self {
         state.authorization_state.clone()
@@ -97,7 +97,7 @@ pub fn agent_changes_router<Changes, Access, Auth, S>(
 where
     Changes: AgentChanges,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Clone + Send + Sync + 'static,
 {
     Router::new()
@@ -286,7 +286,7 @@ impl IntoResponse for AgentChangesApiError {
 pub async fn get_agent_session_changes_handler<
     Changes: AgentChanges,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentChangesRouterState<Changes, Access, Auth>>,
@@ -314,7 +314,7 @@ pub async fn get_agent_session_changes_handler<
 pub async fn get_agent_session_changes_patch_handler<
     Changes: AgentChanges,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<ViewAccessLevel, Access, Auth>,
     State(state): State<AgentChangesRouterState<Changes, Access, Auth>>,
@@ -342,7 +342,7 @@ pub async fn get_agent_session_changes_patch_handler<
 pub async fn refresh_agent_session_changes_handler<
     Changes: AgentChanges,
     Access: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     access: AgentSessionAccessLevelExtractor<EditAccessLevel, Access, Auth>,
     State(state): State<AgentChangesRouterState<Changes, Access, Auth>>,

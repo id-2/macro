@@ -16,7 +16,7 @@ where
     pub(super) async fn present_to_actor(
         &self,
         id: AgentSessionId,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         presentation: SessionToolPresentation,
     ) -> Result<()> {
         let session = self.repo.get(id).await?;

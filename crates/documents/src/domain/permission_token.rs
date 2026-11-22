@@ -6,8 +6,8 @@ mod test;
 
 use crate::domain::models::DocumentError;
 use entity_access::domain::models::{EntityAccessAuth, EntityAccessReceipt, RequiredPermission};
-use macro_sync_service_jwt::{DocumentPermissionToken, ISSUER, TOKEN_TTL_SECS};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_sync_service_jwt::{DocumentPermissionToken, ISSUER, TOKEN_TTL_SECS};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::CreationPrincipal;
 use models_permissions::share_permission::access_level::AccessLevel;
 use std::time::{SystemTime, UNIX_EPOCH};
@@ -19,7 +19,7 @@ pub(crate) struct PermissionTokenClaims {
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub(crate) agent_correlation_id: Option<uuid::Uuid>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub(crate) user_id: Option<MacroUserIdStr<'static>>,
+    pub(crate) user_id: Option<RoxUserIdStr<'static>>,
     document_id: String,
     pub(crate) access_level: AccessLevel,
     exp: usize,
@@ -37,7 +37,7 @@ pub fn encode_permission_token(
     actor: Option<String>,
 ) -> Result<DocumentPermissionToken, DocumentError> {
     let user_id = user_id
-        .map(MacroUserIdStr::try_from)
+        .map(RoxUserIdStr::try_from)
         .transpose()
         .map_err(|e| DocumentError::Internal(anyhow::anyhow!("invalid user id: {e}")))?;
 
@@ -46,7 +46,7 @@ pub fn encode_permission_token(
         .unwrap()
         .as_secs() as usize;
 
-    Ok(macro_sync_service_jwt::encode(
+    Ok(rox_sync_service_jwt::encode(
         &PermissionTokenClaims {
             agent_correlation_id: agent_correlation::context::current(),
             user_id,
@@ -112,5 +112,5 @@ pub(crate) fn decode_permission_token(
     token: &DocumentPermissionToken,
     jwt_secret: &str,
 ) -> Result<PermissionTokenClaims, DocumentError> {
-    Ok(macro_sync_service_jwt::decode(token.as_str(), jwt_secret)?)
+    Ok(rox_sync_service_jwt::decode(token.as_str(), jwt_secret)?)
 }

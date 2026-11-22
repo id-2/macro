@@ -5,7 +5,7 @@ use crate::domain::scheduled_delivery::state::{
 };
 
 async fn admit_and_claim(pool: &Pool<Postgres>) -> anyhow::Result<(SendAttemptId, DeliveryClaim)> {
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     let generation = sqlx::query_scalar!(
         "SELECT draft_generation FROM email_messages WHERE id=$1",
         message()
@@ -170,7 +170,7 @@ async fn expired_legacy_claim_cannot_be_mistaken_for_safe_preparation(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let repo = EmailPgRepo::new(pool.clone());
-    let attempt = SendAttemptId(macro_uuid::generate_uuid_v7());
+    let attempt = SendAttemptId(rox_uuid::generate_uuid_v7());
     repo.admit_send(&actor(), link(), attempt, prepared())
         .await?;
     sqlx::query!(

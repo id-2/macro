@@ -42,12 +42,12 @@ use github_pull_requests::{
     domain::service::GithubPullRequestServiceImpl,
     outbound::pg_github_pull_request_repo::PgGithubPullRequestRepo,
 };
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationServiceImpl,
-    MacroAuthorizationState, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationServiceImpl,
+    RoxAuthorizationState, PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
-use macro_service_urls::{
+use rox_service_urls::{
     AppServiceUrl, AuthServiceUrl, CalendarServiceUrl, ConnectionGatewayUrl,
     DocumentStorageServiceUrl, EmailServiceUrl, LexicalServiceUrl, StaticFileServiceUrl,
     SyncServiceUrl,
@@ -105,8 +105,8 @@ pub async fn build(
     import_jobs: ai_tools::ImportJobs,
     mcp_http: mcp_client::outbound::guarded_http::McpHttp,
 ) -> anyhow::Result<CognitionRuntime> {
-    let public_url = macro_service_urls::CognitionPublicUrl::new()?;
-    let aws_config = macro_aws_config::get_macro_aws_config().await;
+    let public_url = rox_service_urls::CognitionPublicUrl::new()?;
+    let aws_config = rox_aws_config::get_macro_aws_config().await;
     let secretsmanager_client = secretsmanager_client::SecretsManager::new(
         aws_sdk_secretsmanager::Client::new(&aws_config),
     );
@@ -118,11 +118,11 @@ pub async fn build(
     let dynamodb_client = aws_sdk_dynamodb::Client::new(&aws_config);
     let queue_aws_client = aws_sdk_sqs::Client::new(&aws_config);
 
-    let document_text_extractor_queue = macro_queues::DocumentTextExtractorQueue::new();
-    let chat_delete_queue = macro_queues::ChatDeleteQueue::new();
-    let email_scheduled_queue = macro_queues::EmailScheduledQueue::new();
-    let gmail_ops_queue = macro_queues::GmailOpsQueue::new();
-    let notification_queue = macro_queues::NotificationIngressQueue::new();
+    let document_text_extractor_queue = rox_queues::DocumentTextExtractorQueue::new();
+    let chat_delete_queue = rox_queues::ChatDeleteQueue::new();
+    let email_scheduled_queue = rox_queues::EmailScheduledQueue::new();
+    let gmail_ops_queue = rox_queues::GmailOpsQueue::new();
+    let notification_queue = rox_queues::NotificationIngressQueue::new();
     let sqs_client = sqs_client::SQS::new(queue_aws_client)
         .document_text_extractor_queue(&document_text_extractor_queue)
         .chat_delete_queue(&chat_delete_queue)
@@ -162,13 +162,13 @@ pub async fn build(
             .context("failed to create jwt validation args")?;
 
     let authorization_state =
-        MacroAuthorizationState::new(Arc::new(MacroAuthorizationServiceImpl::new(
-            MacroAuthJwtValidator::new(jwt_args),
+        RoxAuthorizationState::new(Arc::new(RoxAuthorizationServiceImpl::new(
+            RoxAuthJwtValidator::new(jwt_args),
             InternalAuthConfig {
                 api_key: internal_api_key.clone(),
                 default_user_id: None,
             },
-            macro_authorization::NoBotAuthorizer,
+            rox_authorization::NoBotAuthorizer,
             PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
         )));
 
@@ -286,7 +286,7 @@ pub async fn build(
 
     tracing::info!("initialized soup service");
 
-    let s3_client = macro_aws_config::s3_client().await;
+    let s3_client = rox_aws_config::s3_client().await;
     let document_files = documents::outbound::s3_document_files::S3DocumentFiles::new(
         db.clone(),
         s3_client.clone(),
@@ -315,8 +315,8 @@ pub async fn build(
         presigned_url_expiry_seconds: 3600,
         browser_cache_expiry_seconds: 86400,
     };
-    let macro_event_broker = macro_event_broker::MacroEventBrokerService::new(
-        macro_event_broker::KafkaEventPublisher::new(config.kafka_brokers.as_ref())
+    let macro_event_broker = rox_event_broker::RoxEventBrokerService::new(
+        rox_event_broker::KafkaEventPublisher::new(config.kafka_brokers.as_ref())
             .context("failed to create kafka event publisher")?,
         event_broker_tracker.clone(),
     );
@@ -845,7 +845,7 @@ pub async fn build(
         internal_api_key.clone(),
         call_tool_context.service.clone(),
         AppServiceUrl::new()?,
-        macro_env_var::maybe_read_env("ENABLE_CALENDAR_ADD_SHARED_EVENT")
+        rox_env_var::maybe_read_env("ENABLE_CALENDAR_ADD_SHARED_EVENT")
             .and_then(|value| value.parse::<bool>().ok())
             .unwrap_or(false),
     );
@@ -857,11 +857,11 @@ pub async fn build(
         Some(channels_connection_gateway.as_ref().clone()),
         ai_tools::MaybeToolEventBroker::Real(macro_event_broker.clone()),
         ai_tools::FormsToolConfig {
-            app_origin: macro_service_urls::AppServiceUrl::new()?.to_string(),
+            app_origin: rox_service_urls::AppServiceUrl::new()?.to_string(),
             editing_worker_url: config.ai_editing_worker_url.clone(),
             static_files: static_file_service_client::StaticFileServiceClient::new(
                 internal_api_key.clone(),
-                macro_service_urls::StaticFileServiceUrl::new()?.to_string(),
+                rox_service_urls::StaticFileServiceUrl::new()?.to_string(),
             ),
         },
     );
@@ -904,7 +904,7 @@ pub async fn build(
         calendar_tool_context,
         team_calendar_tool_context: ai_tools::build_team_calendar_tool_context(
             db.clone(),
-            macro_env_var::maybe_read_env("CALENDAR_TEAM_SHARING_ENABLED")
+            rox_env_var::maybe_read_env("CALENDAR_TEAM_SHARING_ENABLED")
                 .and_then(|value| value.parse::<bool>().ok())
                 .unwrap_or(false),
         ),
@@ -935,7 +935,7 @@ pub async fn build(
             entity_access_service.clone(),
         ),
         coding_agent_tool_context: ai_tools::build_coding_agent_tool_context(
-            macro_service_urls::AgentHarnessServiceUrl::new()?,
+            rox_service_urls::AgentHarnessServiceUrl::new()?,
             internal_api_key.clone(),
         )?,
         project_tool_context,

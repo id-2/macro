@@ -1,7 +1,7 @@
 use super::*;
-use crate::domain::models::MacroUserIdStr;
+use crate::domain::models::RoxUserIdStr;
 use crate::outbound::guarded_http::{AddressPolicy, McpHttp};
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use rmcp::transport::auth::OAuthTokenResponse;
 
 /// A store nothing here should ever reach: every case below is answered
@@ -17,7 +17,7 @@ impl McpServerStore for UntouchedStore {
 
     async fn load(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         unreachable!()
@@ -25,7 +25,7 @@ impl McpServerStore for UntouchedStore {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<(), Self::Err> {
         unreachable!()
@@ -33,7 +33,7 @@ impl McpServerStore for UntouchedStore {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         unreachable!()
     }
@@ -41,7 +41,7 @@ impl McpServerStore for UntouchedStore {
 
 fn record(credentials: Option<StoredCredentials>) -> McpServerRecord {
     McpServerRecord {
-        user_id: MacroUserIdStr::parse_from_str("macro|owner@example.com")
+        user_id: RoxUserIdStr::parse_from_str("macro|owner@example.com")
             .unwrap()
             .into_owned(),
         url: "https://mcp.example.com/mcp".to_owned(),

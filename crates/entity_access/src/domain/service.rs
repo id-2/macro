@@ -15,8 +15,8 @@ use crate::domain::{
     },
 };
 use futures::{StreamExt, stream};
-use macro_user_id::{
-    cowlike::CowLike, lowercased::Lowercase, user_id::MacroUserId, user_id::MacroUserIdStr,
+use rox_user_id::{
+    cowlike::CowLike, lowercased::Lowercase, user_id::RoxUserId, user_id::RoxUserIdStr,
 };
 use tracing::Level;
 use uuid::Uuid;
@@ -46,7 +46,7 @@ where
     async fn get_optimized_access(
         &self,
         entity_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
         match entity_type {
@@ -104,7 +104,7 @@ where
     async fn get_channel_access(
         &self,
         channel_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let channel_uuid = Uuid::from_str(channel_id)
             .map_err(|_| AccessError::BadRequest("Invalid channel ID format"))?;
@@ -127,7 +127,7 @@ where
     async fn get_foreign_entity_access(
         &self,
         entity_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<AccessLevel>, AccessError> {
         let has_access = self
             .repo
@@ -146,7 +146,7 @@ where
     async fn get_crm_company_access(
         &self,
         entity_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<CrmEntityAccess>, AccessError> {
         self.repo.get_crm_company_access(entity_id, user_id).await
     }
@@ -156,7 +156,7 @@ where
     async fn get_crm_contact_access(
         &self,
         entity_id: &str,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
     ) -> Result<Option<CrmEntityAccess>, AccessError> {
         self.repo.get_crm_contact_access(entity_id, user_id).await
     }
@@ -179,7 +179,7 @@ where
 
     async fn get_user_scope_permission(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -194,7 +194,7 @@ where
 
     async fn get_team_permission(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         entity_id: &str,
     ) -> Result<EntityPermission, AccessError> {
         let requested_team_id = Uuid::parse_str(entity_id)
@@ -318,7 +318,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip(self, user_id))]
     async fn accessible_databases(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         self.repo.list_database_access(user_id).await
     }
@@ -331,7 +331,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip(self, user_id))]
     async fn accessible_forms(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         self.repo.list_form_access(user_id).await
     }
@@ -343,7 +343,7 @@ where
 {
     async fn visible_crm_entities(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         entities: &[(EntityType, String)],
     ) -> Result<std::collections::HashSet<(EntityType, String)>, AccessError> {
         self.repo.visible_crm_entities(user, entities).await
@@ -352,7 +352,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip(self, user_id))]
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -366,7 +366,7 @@ where
         }
 
         Ok(EntityAccessReceipt {
-            auth: EntityAccessAuth::Authenticated(MacroUserIdStr(user_id.clone().into_owned())),
+            auth: EntityAccessAuth::Authenticated(RoxUserIdStr(user_id.clone().into_owned())),
             entity: Entity {
                 entity_id: entity_id.to_string(),
                 entity_type,
@@ -379,7 +379,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip_all, fields(document_count = document_ids.len()))]
     async fn generate_document_view_access_receipts(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         document_ids: &[String],
     ) -> Result<HashMap<String, EntityAccessReceipt<ViewAccessLevel>>, AccessError> {
         let levels = self
@@ -391,7 +391,7 @@ where
             // The permission check the single-document path makes: a level
             // below View is a refusal, so the document is left out.
             if let Ok(receipt) = EntityAccessReceipt::try_new_authenticated_user(
-                MacroUserIdStr(user_id.clone().into_owned()),
+                RoxUserIdStr(user_id.clone().into_owned()),
                 Entity {
                     entity_id: document_id.clone(),
                     entity_type: EntityType::Document,
@@ -407,7 +407,7 @@ where
     #[tracing::instrument(skip_all, fields(row_count = row_ids.len()))]
     async fn generate_database_row_view_access_receipts(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         row_ids: &[String],
     ) -> HashMap<String, Result<EntityAccessReceipt<ViewAccessLevel>, AccessError>> {
         let mut receipts = HashMap::with_capacity(row_ids.len());
@@ -454,7 +454,7 @@ where
                 .ok_or(AccessError::Unauthorized)
                 .and_then(|level| {
                     EntityAccessReceipt::try_new_authenticated_user(
-                        MacroUserIdStr(user_id.clone().into_owned()),
+                        RoxUserIdStr(user_id.clone().into_owned()),
                         Entity {
                             entity_id: row_id.clone(),
                             entity_type: EntityType::DatabaseRow,
@@ -471,7 +471,7 @@ where
 
     async fn generate_email_thread_view_access_receipts(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         user_org_id: Option<i64>,
         thread_ids: &[String],
     ) -> HashMap<String, Result<EntityAccessReceipt<ViewAccessLevel>, AccessError>> {
@@ -519,7 +519,7 @@ where
                 receipts.insert(
                     thread_id.clone(),
                     Ok(EntityAccessReceipt {
-                        auth: EntityAccessAuth::Authenticated(MacroUserIdStr(
+                        auth: EntityAccessAuth::Authenticated(RoxUserIdStr(
                             user_id.clone().into_owned(),
                         )),
                         entity: Entity {
@@ -591,7 +591,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip(self, user_id))]
     async fn get_access_level(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -639,7 +639,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip(self, user_id))]
     async fn check_access(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         required_level: AccessLevel,
@@ -673,7 +673,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip(self, user_id))]
     async fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         user_org_id: Option<i64>,
@@ -791,7 +791,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip(self, user_id))]
     async fn get_crm_entity_permission_with_team(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -822,7 +822,7 @@ where
         &self,
         entity_id: &str,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         match entity_type {
             // Agent sessions grant their owner directly and their originating
             // channel as a channel source, both of which the generic accessor
@@ -905,7 +905,7 @@ where
     #[tracing::instrument(err(level = Level::DEBUG), skip(self, user_id))]
     async fn get_user_team(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         self.repo.get_user_team(user_id).await
     }
@@ -914,7 +914,7 @@ where
 impl<R: AccessRepository> ScheduledActionGrants for EntityAccessServiceImpl<R> {
     async fn accessible_scheduled_action_ids(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<Uuid>, AccessError> {
         self.repo.accessible_scheduled_action_ids(user_id).await
     }
@@ -947,14 +947,14 @@ fn session_permission_from_parent(level: AccessLevel) -> AccessLevel {
 impl<R: AccessRepository> AccessiblePipelines for EntityAccessServiceImpl<R> {
     async fn accessible_pipelines(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Vec<(Uuid, AccessLevel)>, AccessError> {
         self.repo.list_pipeline_access(user_id).await
     }
 
     async fn pipelines_access(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         ids: &[Uuid],
     ) -> Result<HashMap<Uuid, AccessLevel>, AccessError> {
         self.repo.get_pipelines_access(ids, user_id).await

@@ -1,5 +1,5 @@
 import { expect, test } from 'bun:test';
-import type { Woke } from '@macro-inc/muppet/core/agent';
+import type { Woke } from '@rox-one/muppet/core/agent';
 import { fixedClock } from '../../../context/test/fakes.ts';
 import {
   type Beat,

@@ -1,13 +1,13 @@
 # Code-mode dependencies and documentation
 
-This build package bundles the actual public `@macro-inc/sdk` and Handlebars for
+This build package bundles the actual public `@rox-one/sdk` and Handlebars for
 Deno. It adds no tool-name proxy or alternate API. Nested namespaces, entity
 handles, promises and async iterators retain the public SDK implementation.
 
 The agent supplies a JavaScript ES module exporting `async main(context)`. The
 trusted bootstrap provides authenticated `macro`, `session`, and `execution`
 handles plus `token`, `hosts`, `sessionId` and `executionId`. Explicit imports from
-`@macro-inc/sdk` and `handlebars` resolve to local build artifacts; no downloads
+`@rox-one/sdk` and `handlebars` resolve to local build artifacts; no downloads
 or TypeScript compilation happen during a run. SDK local portmap discovery is
 removed from the bundle because service hosts are supplied by the harness.
 
@@ -30,7 +30,7 @@ Individual HTTP calls are no longer represented as synthetic tool receipts.
 interactive after execution. A review is an optional human workflow, not a
 security barrier against direct SDK writes.
 
-The independent `@macro-inc/sdk-docs` package uses TypeDoc and its Markdown plugin to generate the canonical public SDK Markdown
+The independent `@rox-one/sdk-docs` package uses TypeDoc and its Markdown plugin to generate the canonical public SDK Markdown
 hierarchy and an HTML site from one reflection model. The backend catalog is built from those Markdown pages: an index per entity
 (classes, methods with signatures, and types, by symbol) and a reference per
 symbol, each class split into its own methods, with links rewritten to the

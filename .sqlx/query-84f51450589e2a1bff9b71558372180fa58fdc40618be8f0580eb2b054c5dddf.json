@@ -1,0 +1,22 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n            SELECT xmin::text AS \"xmin!\"\n            FROM email_message_recipients\n            WHERE message_id = $1\n            ORDER BY contact_id, recipient_type\n            ",
+  "describe": {
+    "columns": [
+      {
+        "ordinal": 0,
+        "name": "xmin!",
+        "type_info": "Text"
+      }
+    ],
+    "parameters": {
+      "Left": [
+        "Uuid"
+      ]
+    },
+    "nullable": [
+      null
+    ]
+  },
+  "hash": "84f51450589e2a1bff9b71558372180fa58fdc40618be8f0580eb2b054c5dddf"
+}

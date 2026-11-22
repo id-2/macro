@@ -12,6 +12,7 @@ import { MobileSoupViewTabs } from '@app/features/next-soup/soup-view/soup-view-
 import { callsTour } from '@app/features/next-soup/tour';
 import { ViewTour } from '@app/features/tours/ViewTour';
 import { TutorialRow } from '@app/features/video-tutorials';
+import { t } from '@app/lib/i18n';
 import {
   SplitRouter,
   useNavigate,
@@ -56,7 +57,7 @@ export function CallsView() {
   };
   const list = () => (
     <SoupView
-      viewName="Calls"
+      viewName={t('calls.title')}
       initialFilters={preset?.filters}
       initialClientFilters={preset?.clientFilters}
       initialGroupBy={preset?.groupBy}
@@ -119,9 +120,9 @@ export function CallsView() {
           <ViewBreadcrumbs.ReturnButton
             isActive={item.isActive()}
             onClick={item.onSelect}
-            tooltip="Calls"
+            tooltip={t('calls.title')}
           >
-            Calls
+            {t('calls.title')}
           </ViewBreadcrumbs.ReturnButton>
         )}
       </ViewBreadcrumbs.Item>

@@ -29,6 +29,7 @@ fn limited_bridge(
             register_loaded: Arc::new(|_| {
                 Box::pin(async {}) as Pin<Box<dyn Future<Output = ()> + Send>>
             }),
+            unadvertise: crate::hook::keep_all_tools(),
             tool_loads: ToolLoads::default(),
             user_tool_finisher: None,
             stream_tool_calls: false,

@@ -15,8 +15,8 @@ use entity_access::domain::models::{
     EditAccessLevel, EntityAccessReceipt, OwnerAccessLevel, RequiredPermission, ViewAccessLevel,
 };
 use entity_registry::OwnedPurgeOutcome;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityAppearance;
 use model_owner::{CreationPrincipal, Owner};
 use rootcause::Report;
@@ -29,7 +29,7 @@ pub trait TaskTargetValidator: Send + Sync + 'static {
     fn validate_task(
         &self,
         task: &serde_json::Value,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<()>> + Send;
 }
 
@@ -42,7 +42,7 @@ pub trait ScheduledActionRepo: Send + Sync + 'static {
     /// Account cleanup only: `WHERE owner = $1`. Never the HTTP list.
     fn get_owned_actions(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<ScheduledAction>>> + Send;
 
     /// Rows for ids the grants port already allowed. No owner predicate. Missing ids omitted.
@@ -193,7 +193,7 @@ pub trait ScheduledActionReadService: Send + Sync + 'static {
     /// Cron and event actions the user can access, ordered by `(created_at, id)`.
     fn list_accessible(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = std::result::Result<Vec<ScheduledAction>, Report>> + Send;
 }
 
@@ -209,7 +209,7 @@ pub trait ScheduledActionService: Send + Sync + 'static {
     /// and claimed actions. Repeating a completed cleanup succeeds.
     fn delete_user_actions(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Delete one action while `expected_owner` still owns it, including a
@@ -291,7 +291,7 @@ pub trait ScheduledActionService: Send + Sync + 'static {
     /// workers must never authorize through this list.
     fn get_actions(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         include_events: bool,
         scope: ListScope,
     ) -> impl Future<Output = Result<Vec<ListedAction>>> + Send;
@@ -370,7 +370,7 @@ pub trait RoutineDraftService: Send + Sync + 'static {
     /// couldn't; an error means the request can't be drafted at all.
     fn draft(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: super::drafts::DraftRequest,
         context: super::drafts::DraftContext,
     ) -> impl Future<Output = Result<super::drafts::Draft>> + Send;
@@ -394,7 +394,7 @@ pub trait SuggestionOrigins: Send + Sync + 'static {
     /// What suggestion `suggestion`, made to `owner`, was, if it is one.
     async fn origin(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         suggestion: Uuid,
     ) -> Result<Option<SuggestionOrigin>>;
 }
@@ -409,7 +409,7 @@ pub trait DraftHandBacks: Send + Sync + 'static {
     async fn begin(
         &self,
         session: Uuid,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         agent: bot_id::BotId,
     ) -> Result<()>;
 
@@ -419,7 +419,7 @@ pub trait DraftHandBacks: Send + Sync + 'static {
     async fn record(
         &self,
         session: Uuid,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         check: &super::models::RoutineCheck,
         created: &[super::models::CreatedItem],
     ) -> Result<bool>;
@@ -444,13 +444,13 @@ pub trait DraftModel: Send + Sync + 'static {
     /// Admit `owner`'s usage for one draft, before its first call.
     async fn admit(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> Result<(), ai_billing::AiAdmissionError>;
 
     /// One call's answer, as text.
     async fn complete(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         call: super::drafts::finding::DraftCall<'_>,
     ) -> Result<String, super::drafts::finding::DraftCallError>;
 }
@@ -469,7 +469,7 @@ pub trait NameLookups: Send + Sync + 'static {
     /// or for all of them when it names none.
     async fn look_up(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         names: &[super::drafts::finding::NameAsked],
     ) -> Result<super::drafts::finding::NameAnswers, super::drafts::finding::NameLookupError>;
 }
@@ -494,7 +494,7 @@ pub trait DraftJobStore: Send + Sync + 'static {
     /// `owner`'s live job that the start with `client_id` began.
     async fn started(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         client_id: Uuid,
     ) -> Result<Option<super::drafts::jobs::DraftJob>>;
 
@@ -516,14 +516,14 @@ pub trait DraftJobStore: Send + Sync + 'static {
     /// `limit`. Cancelled ones aren't.
     async fn jobs(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         limit: u16,
     ) -> Result<Vec<super::drafts::jobs::DraftJob>>;
 
     /// `owner`'s job `session`, unless it was cancelled.
     async fn job(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: Uuid,
     ) -> Result<Option<super::drafts::jobs::DraftJob>>;
 
@@ -532,7 +532,7 @@ pub trait DraftJobStore: Send + Sync + 'static {
     /// already.
     async fn cancel_job(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         session: Uuid,
     ) -> Result<Option<super::drafts::jobs::CancelledJob>>;
 
@@ -557,7 +557,7 @@ pub trait DraftJobStore: Send + Sync + 'static {
 pub trait RoutineDraftUpdates: Send + Sync + 'static {
     fn publish_draft(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         update: super::drafts::jobs::DraftUpdate,
     ) -> impl Future<Output = ()> + Send;
 }
@@ -572,7 +572,7 @@ pub trait RoutineDraftJobService: Send + Sync + 'static {
     /// nothing. `traceparent` is the starting request's trace context.
     fn start(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         client_id: Uuid,
         request: super::drafts::DraftRequest,
         context: super::drafts::DraftContext,
@@ -582,14 +582,14 @@ pub trait RoutineDraftJobService: Send + Sync + 'static {
     /// `owner`'s jobs drafting, and those finished but not discarded.
     fn jobs(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<Vec<super::drafts::jobs::DraftJob>>> + Send;
 
     /// `owner`'s job `id`; [`super::drafts::jobs::DraftJobError::NotFound`]
     /// for anyone else's.
     fn job(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<super::drafts::jobs::DraftJob>> + Send;
 
@@ -597,7 +597,7 @@ pub trait RoutineDraftJobService: Send + Sync + 'static {
     /// finished.
     fn discard(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<()>> + Send;
 }
@@ -621,7 +621,7 @@ pub struct HandedBack {
 #[derive(Debug, Clone, PartialEq)]
 pub struct StaleDraft {
     pub session: Uuid,
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     pub agent: bot_id::BotId,
 }
 
@@ -698,7 +698,7 @@ pub trait RoutineTemplateService: Send + Sync + 'static {
     /// Read a template by its unguessable ID for a viewer with sharing enabled.
     fn get_template(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         id: Uuid,
     ) -> impl Future<Output = Result<RoutineTemplate>> + Send;
 
@@ -760,7 +760,7 @@ impl RoutineRun<'_> {
 pub trait RoutineEventReader: Send + Sync + 'static {
     fn read_event(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: &AuthorizedEventRun,
     ) -> impl Future<Output = Result<RoutineEvent, Report>> + Send;
 }
@@ -819,7 +819,7 @@ pub trait RoutineAgents: Send + Sync + 'static {
     /// outcome. Never replay the prompt after an ambiguous failure.
     fn run(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         handle: &ExecutionHandle,
         prompt: String,
         context: Option<TriggerContext>,
@@ -829,7 +829,7 @@ pub trait RoutineAgents: Send + Sync + 'static {
     /// when no agent was involved.
     fn cancel(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         handle: &ExecutionHandle,
     ) -> impl Future<Output = Result<()>> + Send;
 }
@@ -855,13 +855,13 @@ pub trait RoutineCode: Send + Sync + 'static {
     /// The IANA time zone of `owner`'s primary calendar, when they have one.
     fn owner_time_zone(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Option<String>> + Send;
 
     /// Run one code step as `owner`. A dry run sends no writes.
     fn run(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         run: CodeRun<'_>,
     ) -> impl Future<Output = CodeOutcome> + Send;
 
@@ -869,7 +869,7 @@ pub trait RoutineCode: Send + Sync + 'static {
     /// method signatures), chosen for `user`.
     fn reference(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         task: &str,
     ) -> impl Future<Output = Result<String, CodeUnavailable>> + Send;
 
@@ -907,7 +907,7 @@ pub trait RoutineCode: Send + Sync + 'static {
     /// owner.
     fn rewrite(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         step: &routine_program::CodeStep,
         steps: &str,
         problems: &[String],
@@ -945,7 +945,7 @@ pub struct CodeRun<'a> {
     pub acts_as: routine_program::CodeIdentity,
     /// The routine it belongs to, stamped on its credential so its writes
     /// never trigger routines.
-    pub routine_id: macro_uuid::Uuid,
+    pub routine_id: rox_uuid::Uuid,
 }
 
 /// What one code step did.
@@ -978,11 +978,11 @@ impl RoutineCode for NoRoutineCode {
         Err(CodeUnavailable(NO_CODE.to_owned()))
     }
 
-    async fn owner_time_zone(&self, _: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn owner_time_zone(&self, _: &RoxUserIdStr<'static>) -> Option<String> {
         None
     }
 
-    async fn run(&self, _: &MacroUserIdStr<'static>, _: CodeRun<'_>) -> CodeOutcome {
+    async fn run(&self, _: &RoxUserIdStr<'static>, _: CodeRun<'_>) -> CodeOutcome {
         CodeOutcome {
             result: Err(NO_CODE.to_owned()),
             calls: Vec::new(),
@@ -993,7 +993,7 @@ impl RoutineCode for NoRoutineCode {
 
     async fn reference(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &str,
     ) -> Result<String, CodeUnavailable> {
         Err(CodeUnavailable(NO_CODE.to_owned()))
@@ -1005,7 +1005,7 @@ impl RoutineCode for NoRoutineCode {
 
     async fn rewrite(
         &self,
-        _: &MacroUserIdStr<'static>,
+        _: &RoxUserIdStr<'static>,
         _: &routine_program::CodeStep,
         _: &str,
         _: &[String],
@@ -1030,14 +1030,14 @@ impl<Code: RoutineCode> RoutineCode for Option<Code> {
         }
     }
 
-    async fn owner_time_zone(&self, owner: &MacroUserIdStr<'static>) -> Option<String> {
+    async fn owner_time_zone(&self, owner: &RoxUserIdStr<'static>) -> Option<String> {
         match self {
             Some(code) => code.owner_time_zone(owner).await,
             None => None,
         }
     }
 
-    async fn run(&self, owner: &MacroUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
+    async fn run(&self, owner: &RoxUserIdStr<'static>, run: CodeRun<'_>) -> CodeOutcome {
         match self {
             Some(code) => code.run(owner, run).await,
             None => NoRoutineCode.run(owner, run).await,
@@ -1046,7 +1046,7 @@ impl<Code: RoutineCode> RoutineCode for Option<Code> {
 
     async fn reference(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         task: &str,
     ) -> Result<String, CodeUnavailable> {
         match self {
@@ -1079,7 +1079,7 @@ impl<Code: RoutineCode> RoutineCode for Option<Code> {
 
     async fn rewrite(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         step: &routine_program::CodeStep,
         steps: &str,
         problems: &[String],
@@ -1187,7 +1187,7 @@ pub enum RunEnd {
 /// A routine run that started and then ended, whatever the outcome.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct FinishedRoutineRun {
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     pub routine_id: Uuid,
     pub routine_name: String,
     /// The name of the routine it follows, when it is a sub-routine.

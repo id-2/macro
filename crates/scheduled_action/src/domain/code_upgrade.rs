@@ -10,8 +10,8 @@
 
 use anyhow::{Result, anyhow, bail};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use routine_program::{CodeIdentity, RoutineProgram, SdkFingerprint};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -79,7 +79,7 @@ pub struct NeedsUpdate(pub String);
 pub async fn current_code(
     code: &impl RoutineCode,
     upgrades: &impl CodeUpgrades,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     action: &ScheduledAction,
     mut program: RoutineProgram,
     context: &Value,
@@ -148,7 +148,7 @@ pub async fn current_code(
 /// that failed, for the owner to review.
 async fn rewrite(
     code: &impl RoutineCode,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     action: &ScheduledAction,
     mut program: RoutineProgram,
     failing: &[StepProblems],
@@ -316,10 +316,10 @@ impl CodeUpgrades for NoCodeUpgrades {
 
 /// What a sweep's dry run of a rewrite tells the code: no trigger, now, as
 /// if its owner ran it by hand.
-fn sweep_context(action: &ScheduledAction, owner: &MacroUserIdStr<'static>) -> Value {
+fn sweep_context(action: &ScheduledAction, owner: &RoxUserIdStr<'static>) -> Value {
     json!({
         "run": {
-            "id": macro_uuid::generate_uuid_v7(),
+            "id": rox_uuid::generate_uuid_v7(),
             "at": Utc::now(),
             "timezone": "UTC",
             "dryRun": true,

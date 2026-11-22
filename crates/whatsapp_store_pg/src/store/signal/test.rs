@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use whatsmeow::store::{IdentityStore, PreKeyStore, SenderKeyStore, SessionStore, StoreError};
 use whatsmeow::types::{DEFAULT_USER_SERVER, HIDDEN_USER_SERVER, new_jid};

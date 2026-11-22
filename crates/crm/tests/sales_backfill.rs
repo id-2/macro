@@ -13,9 +13,9 @@ use entity_access::{
     },
     outbound::PgAccessRepository,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::{DatabaseId, TableId};
 use models_properties::{EntityReference, EntityType, service::property_value::PropertyValue};
 use properties::{PropertiesPgRepo, domain::database_cell_writer::DatabaseCellWriter};
@@ -51,7 +51,7 @@ async fn fixture(pool: &PgPool) -> Uuid {
     };
     before_copy.run(pool).await.unwrap();
     for id in [OWNER, MEMBER, OUTSIDER] {
-        let uid = macro_uuid::generate_uuid_v7();
+        let uid = rox_uuid::generate_uuid_v7();
         sqlx::query!("INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)", uid, id).execute(pool).await.unwrap();
         sqlx::query!(
             r#"INSERT INTO "User" (id, email, macro_user_id) VALUES ($1, $1, $2)"#,
@@ -62,7 +62,7 @@ async fn fixture(pool: &PgPool) -> Uuid {
         .await
         .unwrap();
     }
-    let team = macro_uuid::generate_uuid_v7();
+    let team = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO team (id, name, owner_id) VALUES ($1, 'Migration team', $2)",
         team,
@@ -92,7 +92,7 @@ async fn fixture(pool: &PgPool) -> Uuid {
 }
 
 async fn company(pool: &PgPool, team: Uuid, hidden: bool) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO crm_companies (id, team_id, hidden, first_interaction, last_interaction) VALUES ($1, $2, $3, now(), now())", id, team, hidden).execute(pool).await.unwrap();
     id
 }
@@ -137,7 +137,7 @@ async fn pipeline(pool: &PgPool, team: Uuid) -> (Uuid, Uuid, Uuid) {
 }
 
 async fn other_database_column(pool: &PgPool, position: &str) -> Uuid {
-    let [database, table, definition, column] = [(); 4].map(|_| macro_uuid::generate_uuid_v7());
+    let [database, table, definition, column] = [(); 4].map(|_| rox_uuid::generate_uuid_v7());
     sqlx::query!("INSERT INTO databases (id) VALUES ($1)", database)
         .execute(pool)
         .await
@@ -250,7 +250,7 @@ async fn copies_populated_visible_companies_with_values_and_team_access(pool: Pg
     );
     let access = EntityAccessServiceImpl::new(PgAccessRepository::new(pool.clone()));
     for actor in [OWNER, MEMBER, OUTSIDER] {
-        let user = MacroUserIdStr::parse_from_str(actor).unwrap().into_owned();
+        let user = RoxUserIdStr::parse_from_str(actor).unwrap().into_owned();
         let result = access
             .generate_entity_access_receipt::<ViewAccessLevel>(
                 &user,
@@ -289,7 +289,7 @@ async fn copied_pipelines_open_in_order_and_other_databases_are_untouched(pool: 
         pool.clone(),
         access,
         NoOpTableEventPublisher,
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
     )
     .storage_tables(DatabaseId::from_uuid(database))
     .await
@@ -323,11 +323,11 @@ async fn copied_pipelines_open_in_order_and_other_databases_are_untouched(pool: 
 #[sqlx::test(migrations = false)]
 async fn preserves_custom_stages_and_legacy_rename_mapping(pool: PgPool) {
     let team = fixture(&pool).await;
-    let definition = macro_uuid::generate_uuid_v7();
+    let definition = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO property_definitions (id, team_id, display_name, data_type, is_multi_select, is_system) VALUES ($1, $2, 'Deal Stage', 'SELECT_STRING', false, false)", definition, team).execute(&pool).await.unwrap();
-    let renamed = macro_uuid::generate_uuid_v7();
-    let won = macro_uuid::generate_uuid_v7();
-    let demo = macro_uuid::generate_uuid_v7();
+    let renamed = rox_uuid::generate_uuid_v7();
+    let won = rox_uuid::generate_uuid_v7();
+    let demo = rox_uuid::generate_uuid_v7();
     for (order, (id, label)) in [(renamed, "Discovery"), (won, "Won"), (demo, "DEMO")]
         .into_iter()
         .enumerate()
@@ -448,7 +448,7 @@ async fn reruns_preserve_user_changes_and_deletions(pool: PgPool) {
 async fn invalid_values_roll_back_the_entire_copy_and_can_retry(pool: PgPool) {
     let team = fixture(&pool).await;
     let ids = (0..251)
-        .map(|_| macro_uuid::generate_uuid_v7())
+        .map(|_| rox_uuid::generate_uuid_v7())
         .collect::<Vec<_>>();
     sqlx::query!("INSERT INTO crm_companies (id, team_id, first_interaction, last_interaction) SELECT id, $1, now(), now() FROM UNNEST($2::uuid[]) AS input(id)", team, &ids).execute(&pool).await.unwrap();
     for id in &ids {

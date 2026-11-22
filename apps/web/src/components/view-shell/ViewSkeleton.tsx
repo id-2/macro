@@ -100,7 +100,7 @@ function Sidebar(props: {
           />
         )}
       </Show>
-      {props.children ?? <Rows label={`Loading ${props.title}`} class="mt-3" />}
+      {props.children ?? <Rows label={`Загрузка: ${props.title}`} class="mt-3" />}
     </ViewShell.Aside>
   );
 }
@@ -184,7 +184,7 @@ function Main(props: {
         )}
       </Show>
       {props.children ?? (
-        <Rows label={`Loading ${props.title ?? 'view'}`} class="px-2" />
+        <Rows label={`Загрузка: ${props.title ?? 'раздел'}`} class="px-2" />
       )}
     </ViewShell.Main>
   );

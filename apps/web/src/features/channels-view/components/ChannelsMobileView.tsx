@@ -11,7 +11,6 @@ import {
 import { openEntityInSplitFromUnifiedList } from '@app/features/next-soup/utils';
 import { SoupEntityContextMenu } from '@app/features/soup';
 import { DEBUG_SETTING_KEYS, useDebugSetting } from '@app/lib/debugSettings';
-import { t } from '@app/lib/i18n';
 import { useCallContextOptional } from '@channel/Call/CallContext';
 import { CHANNEL_ACTION_VIEW_CONTEXT } from '@channel/Channel/channel-actions';
 import { useGlobalNotificationSource } from '@components/app/GlobalAppState';
@@ -184,7 +183,7 @@ export function ChannelsMobileView(props: {
     } catch (error) {
       if (request !== opening) return;
       console.error('Failed to open conversation', error);
-      toast.failure('Unable to open conversation. Please try again.');
+      toast.failure('Не удалось открыть разговор. Повторите попытку.');
     } finally {
       finishTouchHighlight?.();
     }
@@ -215,7 +214,7 @@ export function ChannelsMobileView(props: {
         <div class="grid min-h-32 place-items-center text-ink-muted">
           <SpinnerIcon
             aria-hidden={false}
-            aria-label="Loading conversations"
+            aria-label="Загрузка разговоров"
             class="size-5 animate-spin"
           />
         </div>
@@ -228,7 +227,7 @@ export function ChannelsMobileView(props: {
         }
       >
         <div class="flex min-h-32 flex-col items-center justify-center gap-3 px-(--mobile-chrome-gutter) text-sm text-ink-muted">
-          <span>Conversations couldn’t be loaded.</span>
+          <span>Не удалось загрузить разговоры.</span>
           <Button
             variant="secondary"
             size="sm"
@@ -236,7 +235,7 @@ export function ChannelsMobileView(props: {
               fireAndForget(props.source.refresh(), 'channels-view')
             }
           >
-            Try again
+            Повторить
           </Button>
         </div>
       </Match>
@@ -254,15 +253,15 @@ export function ChannelsMobileView(props: {
             <EmptyStatePanel
               centered
               graphic={EmptyStateNoSearchMatchGraphic}
-              title="No results"
+              title="Ничего не найдено"
               description={
                 <span>
-                  No conversations match{' '}
-                  <span class="[overflow-wrap:anywhere]">“{query()}”</span>
+                  Нет разговоров по запросу{' '}
+                  <span class="[overflow-wrap:anywhere]">«{query()}»</span>
                 </span>
               }
               primaryAction={{
-                label: 'Clear search',
+                label: 'Очистить поиск',
                 icon: XIcon,
                 onClick: props.onClearSearch,
               }}
@@ -318,7 +317,7 @@ export function ChannelsMobileView(props: {
                     }
                     preview={
                       channelActivity.incomingCallIds().has(channel.id)
-                        ? t('calls.callingYou')
+                        ? 'Вам звонят'
                         : undefined
                     }
                     trailing={callActions(channel.id)}
@@ -355,7 +354,7 @@ export function ChannelsMobileView(props: {
           <div class="flex h-12 items-center justify-center text-ink-muted">
             <SpinnerIcon
               aria-hidden={false}
-              aria-label="Loading more conversations"
+              aria-label="Загрузка следующих разговоров"
               class="size-4 animate-spin"
             />
           </div>
@@ -368,7 +367,7 @@ export function ChannelsMobileView(props: {
           }
         >
           <div class="flex items-center justify-center gap-2 py-3 text-xs text-ink-muted">
-            <span>Couldn’t load more conversations.</span>
+            <span>Не удалось загрузить остальные разговоры.</span>
             <Button
               variant="secondary"
               size="xs"
@@ -376,7 +375,7 @@ export function ChannelsMobileView(props: {
                 fireAndForget(props.source.refresh(), 'channels-view')
               }
             >
-              Try again
+              Повторить
             </Button>
           </div>
         </Show>

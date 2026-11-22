@@ -57,6 +57,13 @@ function MenuRow(props: {
   );
 }
 
+export function sectionChromeName(name: string) {
+  if (name === 'Example channels') return t('nav.exampleChannels');
+  if (name === 'All channels') return t('channelSections.allChannels');
+  if (name === 'Favorites') return t('channelSections.favorites');
+  return name;
+}
+
 /**
  * A label heading inside the Channels section: the name, how many of
  * its channels are unread, a `···` menu, and the disclosure caret. Clicking
@@ -102,7 +109,7 @@ export function ChannelLabelRow(props: { label: ChannelLabel }) {
             ? t('channelLabels.nameContains', {
                 text: props.label.rule.contains,
               })
-            : props.label.name
+            : sectionChromeName(props.label.name)
         }
         aria-expanded={state().open}
         class={cn(
@@ -115,14 +122,14 @@ export function ChannelLabelRow(props: { label: ChannelLabel }) {
           rail.activateRow(rowKeyForLabel(props.label.id), event);
         }}
       >
-        <span class="min-w-0 flex-1 truncate">{props.label.name}</span>
+        <span class="min-w-0 flex-1 truncate">{sectionChromeName(props.label.name)}</span>
         <ChannelCountPill count={state().unreadCount} />
       </ViewSidebar.Item>
       <span class="absolute right-(--sidebar-action-inset) top-1/2 flex -translate-y-1/2 items-center gap-0.5">
         <Dropdown placement="bottom-end">
           <Dropdown.Trigger
-            aria-label={`Options for ${props.label.name}`}
-            tooltip={`Options for ${props.label.name}`}
+            aria-label={`Параметры: ${props.label.name}`}
+            tooltip={`Параметры: ${props.label.name}`}
             as={ViewSidebar.Control}
             variant="ghost"
             size="icon-sm"
@@ -179,7 +186,7 @@ export function ChannelLabelRow(props: { label: ChannelLabel }) {
           </Dropdown.Content>
         </Dropdown>
         <ViewSidebar.Control
-          aria-label={`${state().open ? 'Collapse' : 'Expand'} ${props.label.name}`}
+          aria-label={`${state().open ? 'Свернуть' : 'Развернуть'} ${props.label.name}`}
           aria-expanded={state().open}
           onMouseDown={(event) => event.stopPropagation()}
           onClick={() => rail.toggleLabel(props.label.id)}
@@ -205,7 +212,7 @@ export function ChannelsCreateMenu() {
       when={rail.channelTagsEnabled() && rail.labelsAvailable()}
       fallback={
         <ViewSidebar.Control
-          aria-label="Create channel"
+          aria-label="Создать канал"
           onClick={openNewChannelModal}
         >
           <PlusIcon class="size-3.5" />
@@ -215,7 +222,7 @@ export function ChannelsCreateMenu() {
       <Dropdown placement="bottom-end">
         <Dropdown.Trigger
           aria-label="Create channel or label"
-          tooltip="Create channel or label"
+          tooltip="Создать канал или метку"
           as={ViewSidebar.Control}
           variant="ghost"
           size="icon-sm"
@@ -311,7 +318,7 @@ export function ChannelLabelMenuItems(props: { channel: ChannelEntity }) {
                   selectorType="radio"
                   value={label.id}
                   groupValue={currentLabel()?.id ?? ''}
-                  text={label.name}
+                  text={sectionChromeName(label.name)}
                 />
               )}
             </For>

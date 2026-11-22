@@ -5,13 +5,13 @@ use std::sync::Mutex;
 struct OneEntitlement(Entitlement);
 
 impl EntitlementSource for OneEntitlement {
-    async fn entitlement(&self, _: &MacroUserIdStr<'_>) -> Result<Entitlement> {
+    async fn entitlement(&self, _: &RoxUserIdStr<'_>) -> Result<Entitlement> {
         Ok(self.0.clone())
     }
-    async fn stripe_customer_id(&self, _: &MacroUserIdStr<'_>) -> Result<Option<String>> {
+    async fn stripe_customer_id(&self, _: &RoxUserIdStr<'_>) -> Result<Option<String>> {
         Ok(None)
     }
-    async fn team_payer(&self, _: Uuid) -> Result<Option<MacroUserIdStr<'static>>> {
+    async fn team_payer(&self, _: Uuid) -> Result<Option<RoxUserIdStr<'static>>> {
         Ok(None)
     }
 }
@@ -24,7 +24,7 @@ struct RecordingRepo {
 impl CreditGrantRepo for RecordingRepo {
     async fn record_credit_grant(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         grant: &CreditGrant,
     ) -> Result<bool> {
         let mut booked = self.booked.lock().unwrap();
@@ -38,15 +38,15 @@ impl CreditGrantRepo for RecordingRepo {
         ));
         Ok(true)
     }
-    async fn credit_grant_balance_cents(&self, _: &MacroUserIdStr<'_>) -> Result<i64> {
+    async fn credit_grant_balance_cents(&self, _: &RoxUserIdStr<'_>) -> Result<i64> {
         Ok(0)
     }
 }
 
 #[tokio::test]
 async fn team_member_grant_lands_on_team_owner_once() {
-    let owner = MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap();
-    let member = MacroUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
+    let owner = RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap();
+    let member = RoxUserIdStr::try_from("macro|member@example.com".to_string()).unwrap();
     let team_id = Uuid::parse_str("01a15302-4b49-7df3-8b84-40b43624d747").unwrap();
     let service = CreditGrantService::new(
         OneEntitlement(Entitlement {
@@ -89,7 +89,7 @@ async fn team_member_grant_lands_on_team_owner_once() {
 
 #[tokio::test]
 async fn free_user_grant_is_refused() {
-    let user = MacroUserIdStr::try_from("macro|free@example.com".to_string()).unwrap();
+    let user = RoxUserIdStr::try_from("macro|free@example.com".to_string()).unwrap();
     let service = CreditGrantService::new(
         OneEntitlement(Entitlement::personal(user.clone(), PlanTier::Free)),
         RecordingRepo::default(),

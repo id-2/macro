@@ -2,7 +2,7 @@
 
 use super::metadata_queries;
 use document_sub_type::DocumentSubType;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
 

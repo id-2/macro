@@ -15,7 +15,7 @@ use axum::{
     routing,
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use macro_auth::middleware::decode_jwt::JwtValidationArgs;
+use rox_auth::middleware::decode_jwt::JwtValidationArgs;
 use serde::Deserialize;
 use tower_http::cors::{AllowOrigin, CorsLayer};
 
@@ -918,17 +918,14 @@ async fn refuse_programs(
     request: axum::extract::Request,
     next: axum::middleware::Next,
 ) -> Response {
-    if request
-        .headers()
-        .contains_key(macro_authorization::CODE_EXECUTION_HEADER)
-    {
+    if rox_authorization::marks_code_execution(request.headers()) {
         tracing::warn!(
             path = request.uri().path(),
             "refused the sign-in broker to a program"
         );
         return (
             axum::http::StatusCode::FORBIDDEN,
-            macro_authorization::PROGRAM_SIGN_IN_REFUSAL,
+            rox_authorization::PROGRAM_SIGN_IN_REFUSAL,
         )
             .into_response();
     }
@@ -1042,6 +1039,7 @@ fn mcp_cors_layer() -> CorsLayer {
         .allow_headers([
             header::CONTENT_TYPE,
             header::AUTHORIZATION,
+            HeaderName::from_static("x-rox-user-api-key"),
             HeaderName::from_static("x-macro-user-api-key"),
             HeaderName::from_static("mcp-protocol-version"),
             HeaderName::from_static("mcp-session-id"),

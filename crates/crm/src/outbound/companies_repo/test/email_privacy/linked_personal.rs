@@ -11,7 +11,7 @@ use entity_access::{
     domain::{models::EntityType, ports::EntityAccessService, service::EntityAccessServiceImpl},
     outbound::PgAccessRepository,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn linked_personal_parent_consent_and_domain_matrix(pool: PgPool) -> anyhow::Result<()> {
@@ -25,7 +25,7 @@ async fn linked_personal_parent_consent_and_domain_matrix(pool: PgPool) -> anyho
     )
     .execute(&pool)
     .await?;
-    let reader = MacroUserIdStr::try_from(member.to_string()).unwrap();
+    let reader = RoxUserIdStr::try_from(member.to_string()).unwrap();
     let access = EntityAccessServiceImpl::new(PgAccessRepository::new(pool.clone()));
     for (index, (case, parent_enabled, consent, block)) in [
         ("enabled", true, true, None),

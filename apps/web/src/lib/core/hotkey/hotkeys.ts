@@ -2,7 +2,7 @@ import { IS_MAC } from '@core/constant/isMac';
 import { hotkeyScopeNeutralSelector } from '@core/dom-selectors';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { isEditableInput } from '@core/util/isEditableInput';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 
 import { getOwner, onCleanup, onMount } from 'solid-js';
 import {

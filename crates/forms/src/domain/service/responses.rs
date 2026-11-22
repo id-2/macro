@@ -9,8 +9,8 @@ use std::collections::HashMap;
 use databases::domain::models::DatabaseError;
 use databases::domain::ports::{DatabaseMetadataReads, DatabaseRowReads, DatabasesService};
 use entity_access::domain::models::{EditAccessLevel, EntityAccessReceipt, ViewAccessLevel};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_databases::{CellValue, ColumnKind, OptionRef, RowId};
 
 use super::layout::question_columns;
@@ -32,7 +32,7 @@ fn tally_of(
     kind: ColumnKind,
     options: &[QuestionOption],
     cells: &HashMap<RowId, CellValue>,
-    voters: Option<&[(RowId, MacroUserIdStr<'static>)]>,
+    voters: Option<&[(RowId, RoxUserIdStr<'static>)]>,
 ) -> (u64, Vec<TallyBucket>) {
     // A count of in-memory cells is a usize, at most 64 bits on every
     // target the service builds for, so it always fits a u64.
@@ -105,7 +105,7 @@ where
     Access: FormAccessDirectory,
     Events: FormEventPublisher,
     Now: Clock,
-    Broker: MacroEventBroker,
+    Broker: RoxEventBroker,
     Drafts: FormDraftStore,
     Images: FormImageFiles,
 {

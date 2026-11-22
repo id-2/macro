@@ -7,7 +7,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use http_body_util::BodyExt;
-use macro_middleware::tracking::ClientIp;
+use rox_middleware::tracking::ClientIp;
 use std::borrow::Cow;
 
 #[derive(serde::Serialize, serde::Deserialize, Debug)]

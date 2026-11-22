@@ -32,12 +32,12 @@ export function EmailMessageBody(props: EmailMessageBodyProps) {
         }}
       >
         <Switch>
-          {/* If available, we use body_macro to render "Rox-fied" email content in static markdown with, e.g. correctly styled document mentions. */}
-          <Match when={!showFullHTML() && props.message.body_macro}>
-            {(bodyMacro) => {
+          {/* If available, we use body_rox to render "Rox-fied" email content in static markdown with, e.g. correctly styled document mentions. */}
+          <Match when={!showFullHTML() && props.message.body_rox}>
+            {(bodyRox) => {
               return (
                 <StaticMarkdown
-                  markdown={bodyMacro()}
+                  markdown={bodyRox()}
                   theme={channelTheme}
                   target="internal"
                 />

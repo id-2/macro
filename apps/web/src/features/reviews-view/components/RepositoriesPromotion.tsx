@@ -1,5 +1,6 @@
 import { PULL_REQUEST_REPOSITORIES_PROMOTION as COPY } from '@app/features/sidebar-promotion/core/promotions';
 import { createLastKnown } from '@app/features/sidebar-promotion/primitives/last-known';
+import { t } from '@app/lib/i18n';
 import {
   allOf,
   SidebarPromotion,
@@ -9,6 +10,7 @@ import { toast } from '@core/component/Toast/Toast';
 import { SERVER_HOSTS } from '@core/constant/servers';
 import { useUserId } from '@core/context/user';
 import { fireAndForget } from '@core/util/fireAndForget';
+import { ThrownResultError } from '@core/util/result';
 import {
   useGithubLinkStatusQuery,
   useInitGithubLinkMutation,
@@ -22,7 +24,19 @@ import { z } from 'zod';
 const GITHUB_APP_INSTALL_URL = `${SERVER_HOSTS['document-storage-service']}/github/install-sync`;
 
 /**
- * The Pull requests sidebar's prompt to sync more GitHub orgs and
+ * The service's own words when it can name the missing setting, else `fallback`.
+ */
+function connectFailureMessage(error: unknown, fallback: string): string {
+  if (error instanceof ThrownResultError) {
+    const message = error.message.trim();
+    // Only its own Russian explanation is worth showing; transport and status
+    // errors keep the localized fallback.
+    if (/[А-Яа-яЁё]/.test(message)) return message;
+  }
+  return fallback;
+}
+
+/** The Pull requests sidebar's prompt to sync more GitHub orgs and
  * repositories. The app install callback needs a linked account, so until
  * one exists the card links the account first, like Settings → GitHub.
  */
@@ -49,13 +63,16 @@ export function RepositoriesPromotion(props: { class?: string }) {
           reconnect
             ? reauthenticateGithub.mutateAsync(callbackUrl)
             : initGithubLink.mutateAsync(callbackUrl),
-        reconnect ? 'Failed to reconnect GitHub' : 'Failed to connect GitHub'
+        reconnect ? t('reviews.reconnectFailed') : t('reviews.connectFailed')
       );
-    } catch {
+    } catch (error) {
       toast.failure(
-        reconnect
-          ? 'Failed to start GitHub reconnect flow'
-          : 'Failed to start GitHub connect flow'
+        connectFailureMessage(
+          error,
+          reconnect
+            ? t('reviews.reconnectFlowFailed')
+            : t('reviews.connectFlowFailed')
+        )
       );
     }
   };
@@ -63,17 +80,17 @@ export function RepositoriesPromotion(props: { class?: string }) {
   const action = () =>
     match(status())
       .with('linked', () => ({
-        label: COPY.action,
+        label: t('reviews.promotionAction'),
         onClick: () =>
           window.open(GITHUB_APP_INSTALL_URL, '_blank', 'noopener'),
       }))
       .with('reauthentication_required', () => ({
-        label: COPY.reconnectAction,
+        label: t('reviews.promotionReconnect'),
         onClick: () =>
           fireAndForget(authorize(true), 'sidebar-promotion.github'),
       }))
       .otherwise(() => ({
-        label: COPY.connectAction,
+        label: t('reviews.promotionConnect'),
         onClick: () =>
           fireAndForget(authorize(false), 'sidebar-promotion.github'),
       }));
@@ -83,10 +100,12 @@ export function RepositoriesPromotion(props: { class?: string }) {
       id={COPY.id}
       applies={allOf(status() === undefined ? undefined : true)}
       logos={COPY.logos}
-      headline={COPY.headline}
-      pitch={COPY.pitch}
+      headline={t('reviews.promotionHeadline')}
+      pitch={t('reviews.promotionPitch')}
       class={props.class}
-      dismissLabel={`Dismiss ${COPY.headline.toLowerCase()}`}
+      dismissLabel={t('reviews.dismissPromotion', {
+        headline: t('reviews.promotionHeadline'),
+      })}
       action={action()}
     />
   );

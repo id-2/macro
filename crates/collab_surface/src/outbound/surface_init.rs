@@ -18,7 +18,7 @@ use sync_service_client::document_state::{DocumentStateError, DocumentUpdate};
 use sync_service_client::initialize::SnapshotAlreadyExists;
 use tokio_retry::{Retry, strategy::FixedInterval};
 
-use macro_sync_service_jwt::DocumentPermissionToken;
+use rox_sync_service_jwt::DocumentPermissionToken;
 
 use crate::domain::models::{CollabSurfaceError, SurfaceSnapshot, SurfaceUpdate};
 use crate::domain::ports::SurfaceInitializer;

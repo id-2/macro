@@ -35,7 +35,7 @@ export function Thought(props: ThoughtProps) {
           <WorkingDots />
         </Show>
         <TextShimmer
-          text={props.active ? 'Thinking' : 'Thought'}
+          text={props.active ? 'Думаю' : 'Размышление'}
           active={props.active ?? false}
         />
         <DisclosureCaret open={expanded()} />

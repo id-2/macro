@@ -6,9 +6,9 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use axum_extra::headers::{Authorization, HeaderMapExt, authorization::Basic};
-use macro_authorization::{
-    MacroAuthorizationRejection, MacroAuthorizationService, MacroAuthorizationState,
-    OptionalMacroAuthorizationExtractor, UserOnly,
+use rox_authorization::{
+    RoxAuthorizationRejection, RoxAuthorizationService, RoxAuthorizationState,
+    OptionalRoxAuthorizationExtractor, UserOnly,
 };
 
 use crate::domain::models::{GitCredential, RepoToken};
@@ -17,7 +17,8 @@ use crate::domain::models::{GitCredential, RepoToken};
 pub(crate) const BASIC_CHALLENGE: &str = "Basic realm=\"Rox agent workspace\"";
 
 /// HTTP Basic (password = repo token, username ignored), else a Rox user
-/// credential (session cookie, bearer JWT, or `x-macro-user-api-key`).
+/// credential (session cookie, bearer JWT, or `x-rox-user-api-key`; the
+/// pre-rename `x-macro-user-api-key` is still accepted).
 pub struct GitCredentialExtractor<Auth> {
     /// The caller.
     pub credential: GitCredential,
@@ -29,7 +30,7 @@ pub enum GitCredentialRejection {
     /// Nothing presented: challenge so git asks for credentials.
     Missing,
     /// A Rox credential failed.
-    Macro(MacroAuthorizationRejection),
+    Macro(RoxAuthorizationRejection),
 }
 
 impl IntoResponse for GitCredentialRejection {
@@ -48,8 +49,8 @@ impl IntoResponse for GitCredentialRejection {
 
 impl<State, Auth> FromRequestParts<State> for GitCredentialExtractor<Auth>
 where
-    MacroAuthorizationState<Auth>: FromRef<State>,
-    Auth: MacroAuthorizationService,
+    RoxAuthorizationState<Auth>: FromRef<State>,
+    Auth: RoxAuthorizationService,
     State: Send + Sync + 'static,
 {
     type Rejection = GitCredentialRejection;
@@ -66,7 +67,7 @@ where
         }
 
         let user =
-            OptionalMacroAuthorizationExtractor::<Auth, UserOnly>::from_request_parts(parts, state)
+            OptionalRoxAuthorizationExtractor::<Auth, UserOnly>::from_request_parts(parts, state)
                 .await
                 .map_err(GitCredentialRejection::Macro)?
                 .authorization

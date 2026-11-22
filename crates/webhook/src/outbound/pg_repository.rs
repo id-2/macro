@@ -10,7 +10,7 @@ use crate::domain::{
     },
     ports::{WebhookRepo, WebhookWorkspaceResolver},
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 use sqlx::PgPool;
 use std::str::FromStr;
@@ -48,7 +48,7 @@ struct WebhookRow {
 
 fn new_webhook_id() -> String {
     // Temporary prefixed UUIDv7 ids. This can be swapped for true ULIDs later.
-    format!("wh_{}", macro_uuid::generate_uuid_v7())
+    format!("wh_{}", rox_uuid::generate_uuid_v7())
 }
 
 fn parse_headers(value: Value) -> WebhookHeaders {
@@ -120,7 +120,7 @@ async fn fetch_webhook(pool: &PgPool, webhook_id: &str) -> Result<Option<Webhook
 
 async fn fetch_user_team_workspace_id(
     pool: &PgPool,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 ) -> Result<Option<String>, sqlx::Error> {
     let team_id = sqlx::query_scalar!(
         r#"
@@ -144,7 +144,7 @@ impl WebhookWorkspaceResolver for PgRepository {
     #[tracing::instrument(skip(self, people), err)]
     async fn resolve_workspace_ids(
         &self,
-        people: Vec<MacroUserIdStr<'static>>,
+        people: Vec<RoxUserIdStr<'static>>,
     ) -> Result<Vec<String>, Self::Err> {
         let mut workspace_ids = people
             .iter()
@@ -178,7 +178,7 @@ impl WebhookWorkspaceResolver for PgRepository {
     #[tracing::instrument(skip(self), err)]
     async fn get_user_team_workspace_id(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Option<String>, Self::Err> {
         fetch_user_team_workspace_id(&self.pool, user_id).await
     }
@@ -190,7 +190,7 @@ impl WebhookRepo for PgRepository {
     #[tracing::instrument(skip(self, request, signing_secret, headers), err)]
     async fn create_webhook(
         &self,
-        created_by_user_id: MacroUserIdStr<'static>,
+        created_by_user_id: RoxUserIdStr<'static>,
         workspace_id: String,
         request: CreateWebhookRequest,
         signing_secret: String,
@@ -413,7 +413,7 @@ impl WebhookRepo for PgRepository {
     #[tracing::instrument(skip(self), err)]
     async fn get_user_team_workspace_id(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Option<String>, Self::Err> {
         fetch_user_team_workspace_id(&self.pool, user_id).await
     }

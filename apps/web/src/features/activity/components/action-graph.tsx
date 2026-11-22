@@ -1,9 +1,13 @@
+import { formatLocale, t } from '@app/lib/i18n';
 import { createElementSize } from '@solid-primitives/resize-observer';
 import { cn, Layer, Tooltip } from '@ui';
-import { format } from 'date-fns';
 import { createEffect, createMemo, createSignal, For, Show } from 'solid-js';
 import { match } from 'ts-pattern';
-import { OVERVIEW_TZ, parseOverviewDate } from '../core/activity-dates';
+import {
+  formatWeekdayAxisLabel,
+  OVERVIEW_TIME_ZONE,
+  parseOverviewDate,
+} from '../core/activity-dates';
 import {
   type ActivityStats,
   formatDayLabel,
@@ -23,21 +27,35 @@ import {
 import type { ActivityOverview } from '../core/event';
 import type { ActivityIntensity } from '../core/intensity';
 
-const WEEKDAY_LABELS = ['', 'M', '', 'W', '', 'F', ''];
+/** Sunday-first sample week at UTC midnight, matching the grid's columns. */
+const WEEKDAY_DATES = Array.from(
+  { length: 7 },
+  (_, index) => new Date(Date.UTC(2024, 0, 7 + index))
+);
+
+function weekdayLabels(): string[] {
+  return WEEKDAY_DATES.map((date, index) =>
+    index === 1 || index === 3 || index === 5
+      ? formatWeekdayAxisLabel(date)
+      : ''
+  );
+}
 
 function dateLabel(date: string): string {
-  return format(parseOverviewDate(date), 'EEE, MMM d, yyyy', {
-    in: OVERVIEW_TZ,
-  });
+  return new Intl.DateTimeFormat(formatLocale(), {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    timeZone: OVERVIEW_TIME_ZONE,
+  }).format(parseOverviewDate(date));
 }
 
 function actionLabel(day: ContributionDay): string {
-  const noun = day.count === 1 ? 'action' : 'actions';
-  return `${day.count.toLocaleString()} ${noun} on ${dateLabel(day.date)}`;
-}
-
-function monthLetter(label: string): string {
-  return label.slice(0, 1);
+  return t('activity.actionCount', {
+    count: day.count,
+    date: dateLabel(day.date),
+  });
 }
 
 function monthStat(yearMonth: string | null): string {
@@ -76,10 +94,7 @@ export function ActionGraph(props: {
   const monthLabels = createMemo(
     () =>
       new Map(
-        grid().monthLabels.map(({ label, weekIndex }) => [
-          weekIndex,
-          monthLetter(label),
-        ])
+        grid().monthLabels.map(({ label, weekIndex }) => [weekIndex, label])
       )
   );
   const stats = createMemo(() => summarizeActivity(props.overview));
@@ -131,7 +146,7 @@ function ActionGraphHeader(props: { total: number; skeleton: boolean }) {
         id="activity-actions-heading"
         class="font-semibold text-ink-muted text-xs"
       >
-        Actions{' '}
+        {t('activity.actions')}{' '}
         <Show when={!props.skeleton} fallback={<SkeletonText class="w-8" />}>
           <span class="text-ink-extra-muted tabular-nums">
             ({props.total.toLocaleString()})
@@ -146,13 +161,13 @@ function ActionGraphHeader(props: { total: number; skeleton: boolean }) {
 function IntensityLegend() {
   return (
     <div class="ml-auto flex shrink-0 items-center gap-1 text-ink-extra-muted">
-      <span class="@max-md/u-list:hidden">Fewer</span>
+      <span class="@max-md/u-list:hidden">{t('activity.fewer')}</span>
       <For each={[0, 1, 2, 3, 4] as const}>
         {(level) => (
           <IntensitySwatch level={level} class="size-2.5 rounded-[3px]" />
         )}
       </For>
-      <span class="@max-md/u-list:hidden">More</span>
+      <span class="@max-md/u-list:hidden">{t('activity.more')}</span>
     </div>
   );
 }
@@ -236,11 +251,11 @@ function ContributionHeatmap(props: {
 
 function WeekdayGutter() {
   return (
-    <div class="mr-1.5 flex w-3.5 shrink-0 flex-col gap-(--heatmap-gap) text-ink-extra-muted text-xs">
+    <div class="mr-1.5 flex w-7 shrink-0 flex-col gap-(--heatmap-gap) text-ink-extra-muted text-xs">
       <span aria-hidden class="mb-1 h-3 shrink-0" />
-      <For each={WEEKDAY_LABELS}>
+      <For each={weekdayLabels()}>
         {(label) => (
-          <span class="flex h-(--heatmap-cell) items-center leading-none">
+          <span class="flex h-(--heatmap-cell) items-center whitespace-nowrap leading-none">
             {label}
           </span>
         )}
@@ -329,22 +344,22 @@ function ActionGraphStats(props: { stats: ActivityStats; skeleton: boolean }) {
   return (
     <dl class="flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2 @max-2xl/u-list:grid @max-2xl/u-list:grid-cols-2 @max-md/u-list:gap-y-2">
       <Stat
-        label="Most active month"
+        label={t('activity.mostActiveMonth')}
         value={monthStat(props.stats.mostActiveMonth)}
         skeleton={props.skeleton}
       />
       <Stat
-        label="Most active day"
+        label={t('activity.mostActiveDay')}
         value={dayStat(props.stats.mostActiveDay)}
         skeleton={props.skeleton}
       />
       <Stat
-        label="Longest streak"
+        label={t('activity.longestStreak')}
         value={formatStreak(props.stats.longestStreak)}
         skeleton={props.skeleton}
       />
       <Stat
-        label="Current streak"
+        label={t('activity.currentStreak')}
         value={formatStreak(props.stats.currentStreak)}
         skeleton={props.skeleton}
       />

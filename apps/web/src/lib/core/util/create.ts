@@ -1,7 +1,7 @@
 import { analytics } from '@app/lib/analytics';
 import type { CodeFileExtension } from '@block-code/util/languageSupport';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { PROPERTY_OPTION_IDS, SYSTEM_PROPERTY_IDS } from '@property/constants';
 import { invalidateUserQuota } from '@queries/auth';
 import {

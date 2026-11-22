@@ -2,8 +2,8 @@ use super::*;
 use agent_session::domain::{agent_conversation::ConversationSession, model::AgentSessionId};
 use bot_id::BotId;
 use channels::domain::{channel_agents::ChannelAgent, ports::ChannelMutationErr};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use std::sync::{
     Arc,
     atomic::{AtomicUsize, Ordering},
@@ -35,7 +35,7 @@ struct Personas(bool);
 impl AgentDmEligibility for Personas {
     async fn authorize_agent_dm(
         &self,
-        _: MacroUserIdStr<'static>,
+        _: RoxUserIdStr<'static>,
         bot: BotId,
     ) -> std::result::Result<(), BotError> {
         assert_eq!(bot, BotId::TEST_A);
@@ -75,8 +75,8 @@ impl AgentConversationRepo for Sessions {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 
 fn direct() -> ChannelAgent {
@@ -141,7 +141,7 @@ async fn a_bot_or_another_user_cannot_spend_the_direct_owners_credentials() {
     for sender in [
         channel_sender::ChannelSender::new_from_bot(BotId::TEST_A),
         channel_sender::ChannelSender::new_from_user(
-            MacroUserIdStr::try_from_email("other@example.com").unwrap(),
+            RoxUserIdStr::try_from_email("other@example.com").unwrap(),
         ),
     ] {
         let mut post = message();

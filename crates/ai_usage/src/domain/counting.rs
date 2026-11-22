@@ -1,6 +1,6 @@
 //! Shared policy for user quota admission and prospective usage counting.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::ports::{AiFeature, SYSTEM_USER_ID};
 
@@ -27,7 +27,7 @@ impl AiUsageEnforcement {
     /// Whether this work requires quota admission and counts toward user usage.
     /// Callers must supply the trusted originating user and server-selected feature;
     /// the system identity is only for work with no originating end-user.
-    pub fn should_count(self, user: &MacroUserIdStr<'_>, feature: AiFeature) -> bool {
+    pub fn should_count(self, user: &RoxUserIdStr<'_>, feature: AiFeature) -> bool {
         self.is_enabled() && is_billable_feature(feature) && user != &*SYSTEM_USER_ID
     }
 }

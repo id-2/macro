@@ -51,7 +51,7 @@ use item_filters::ast::{
     foreign_entity::ForeignEntityLiteral,
     github_pull_request::GithubPullRequestLiteral,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::{Entity, EntityType};
 use models_pagination::{
     Base64Str, Cursor, CursorVal, Frecency, FrecencyValue, Identify, NotifiedAt, Paginate,
@@ -292,7 +292,7 @@ where
 
     async fn favorite_entities(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         ast: Option<&EntityFilterAst>,
     ) -> Result<Option<Vec<Entity<'static>>>, SoupErr> {
         if ast.and_then(|ast| ast.favorites_only) != Some(true) {
@@ -390,7 +390,7 @@ where
     async fn fallback_soup_data(
         &self,
         soup_type: SoupType,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
         frecency_items: impl ExactSizeIterator<Item = SoupCandidate>,
         limit: u16,
         include_projection: bool,
@@ -420,7 +420,7 @@ where
         &self,
         cursor: Query<Uuid, Frecency, Option<EntityFilterAst>>,
         soup_type: SoupType,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         limit: u16,
         include_projection: bool,
     ) -> Result<impl Iterator<Item = SoupCandidate>, SoupErr> {
@@ -495,7 +495,7 @@ where
         &self,
         from_value: Option<(f64, Option<EntityFilterAst>)>,
         soup_type: SoupType,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         limit: u16,
         include_projection: bool,
     ) -> Result<impl Iterator<Item = SoupCandidate>, SoupErr> {
@@ -567,7 +567,7 @@ where
         &self,
         cursor: Query<String, TouchedByMe, Option<EntityFilterAst>>,
         soup_type: SoupType,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         limit: u16,
         link_ids: Vec<Uuid>,
         include_projection: bool,
@@ -772,7 +772,7 @@ where
         &self,
         cursor: Query<String, NotifiedAt, Option<EntityFilterAst>>,
         soup_type: SoupType,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         limit: u16,
         legs: NotifiedHydrationLegs,
         include_projection: bool,
@@ -1062,7 +1062,7 @@ where
         &self,
         entities: &[Entity<'static>],
         soup_type: SoupType,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         legs: &NotifiedHydrationLegs,
         include_projection: bool,
     ) -> Result<HashMap<(EntityType, String), SoupCandidate>, SoupErr> {
@@ -1533,7 +1533,7 @@ where
 
     async fn populate_properties_items(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         items: Vec<SoupCandidate>,
     ) -> Result<Vec<EnrichedSoupItem>, SoupErr> {
         if items.is_empty() {
@@ -1576,7 +1576,7 @@ where
 
     async fn populate_properties_page<Cursor>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         page: Paginated<SoupCandidate, Cursor>,
     ) -> Result<Paginated<EnrichedSoupItem, Cursor>, SoupErr> {
         let (items, next_cursor) = page.into_parts();
@@ -1586,7 +1586,7 @@ where
 
     async fn populate_properties_output<R>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         output: SoupOutput<R, SoupCandidate>,
     ) -> Result<SoupOutput<R, EnrichedSoupItem>, SoupErr> {
         match output {
@@ -1610,7 +1610,7 @@ where
 
     async fn populate_frecency_page<Cursor>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         mut page: Paginated<SoupCandidate, Cursor>,
     ) -> Result<Paginated<SoupCandidate, Cursor>, SoupErr> {
         if page.items.is_empty() {
@@ -1640,7 +1640,7 @@ where
 
     async fn populate_frecency_output<R>(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         output: SoupOutput<R, SoupCandidate>,
     ) -> Result<SoupOutput<R, SoupCandidate>, SoupErr> {
         match output {
@@ -1748,7 +1748,7 @@ where
 
     async fn populate_grouped_items(
         &self,
-        user_id: MacroUserIdStr<'_>,
+        user_id: RoxUserIdStr<'_>,
         items: impl Iterator<Item = ItemGroupingInfo> + Send,
     ) -> Result<impl Iterator<Item = ItemGroupingInfo<SoupPropertiesField>>, SoupErr> {
         let (items, metadata): (Vec<_>, Vec<_>) = items
@@ -2120,7 +2120,7 @@ where
     #[tracing::instrument(err, skip(self, keys), fields(key_count = keys.len()))]
     async fn group_labels<'a>(
         &'a self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         group_by: &'a GroupByField,
         keys: &'a [String],
     ) -> Result<GroupLabels, SoupErr> {
@@ -2285,7 +2285,7 @@ where
 
     async fn caller_tag_sets<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, SoupErr> {
         Ok(self
             .soup_storage

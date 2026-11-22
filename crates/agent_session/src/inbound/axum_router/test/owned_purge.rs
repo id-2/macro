@@ -38,7 +38,7 @@ impl AgentSessionNotificationRecipient for OwnedSessions {
             .push((id, expected_owner.clone()));
         self.answer.ok_or(AgentSessionError::Disconnected(id))
     }
-    async fn delete_user_sessions(&self, _: MacroUserIdStr<'static>) -> SessionResult<()> {
+    async fn delete_user_sessions(&self, _: RoxUserIdStr<'static>) -> SessionResult<()> {
         unreachable!()
     }
     async fn session_deleted(&self, _: AgentSessionId) -> SessionResult<()> {
@@ -59,7 +59,7 @@ impl AgentSessionNotificationRecipient for OwnedSessions {
         _: AgentSessionId,
         _: AgentActionId,
         _: String,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
         _: crate::domain::model::PrompterKind,
     ) -> SessionResult<()> {
         unreachable!()
@@ -68,7 +68,7 @@ impl AgentSessionNotificationRecipient for OwnedSessions {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         unreachable!()
     }
@@ -76,7 +76,7 @@ impl AgentSessionNotificationRecipient for OwnedSessions {
         &self,
         _: AgentSessionId,
         _: AgentActionId,
-        _: Option<MacroUserIdStr<'static>>,
+        _: Option<RoxUserIdStr<'static>>,
     ) -> SessionResult<()> {
         unreachable!()
     }
@@ -92,7 +92,7 @@ impl AgentSessionNotificationRecipient for OwnedSessions {
 }
 
 async fn purge(recipient: &Arc<OwnedSessions>, uri: &str, headers: &[(&str, &str)]) -> StatusCode {
-    let auth = MacroAuthorizationServiceImpl::new(
+    let auth = RoxAuthorizationServiceImpl::new(
         FakeJwtValidator,
         InternalAuthConfig {
             api_key: INTERNAL_KEY.into(),
@@ -105,7 +105,7 @@ async fn purge(recipient: &Arc<OwnedSessions>, uri: &str, headers: &[(&str, &str
     let router: Router = agent_session_control_router(AgentSessionControlState::new(
         Arc::clone(recipient),
         Arc::new(entity_access::domain::ports::NoOpEntityAccessService),
-        MacroAuthorizationState::new(Arc::new(auth)),
+        RoxAuthorizationState::new(Arc::new(auth)),
     ));
     let mut request = Request::builder().method("DELETE").uri(uri);
     for (key, value) in headers {
@@ -122,7 +122,7 @@ async fn purge_internally(recipient: &Arc<OwnedSessions>, uri: &str) -> StatusCo
     purge(
         recipient,
         uri,
-        &[(macro_authorization::INTERNAL_API_KEY_HEADER, INTERNAL_KEY)],
+        &[(rox_authorization::INTERNAL_API_KEY_HEADER, INTERNAL_KEY)],
     )
     .await
 }
@@ -182,7 +182,7 @@ async fn only_the_internal_key_may_purge() {
         vec![("authorization", bearer.as_str())],
         vec![(BOT_TOKEN_HEADER, BOT_TOKEN), (BOT_SCOPE_HEADER, "user")],
         vec![(HARNESS_TOKEN_HEADER, HARNESS_TOKEN)],
-        vec![(macro_authorization::INTERNAL_API_KEY_HEADER, "bad-key")],
+        vec![(rox_authorization::INTERNAL_API_KEY_HEADER, "bad-key")],
     ] {
         let status = purge(&recipient, &team_purge_uri(), &headers).await;
         assert!(status.is_client_error(), "{headers:?} answered {status}");

@@ -82,7 +82,7 @@ fn unserved_topics(reader: &BaseConsumer) -> Result<Vec<&'static str>, Report> {
                     .all(|partition| partition.error().is_none() && partition.leader() >= 0)
         })
     };
-    Ok(macro_event_topics::all_topic_names()
+    Ok(rox_event_topics::all_topic_names()
         .iter()
         .copied()
         .filter(|name| !served(name))
@@ -96,7 +96,7 @@ async fn create_topics(brokers: &str) -> Result<(), Report> {
         .create()
         .context("could not create a Kafka admin client for EMAIL_E2E_KAFKA_BROKERS")?;
 
-    let topics: Vec<NewTopic<'_>> = macro_event_topics::all_topic_names()
+    let topics: Vec<NewTopic<'_>> = rox_event_topics::all_topic_names()
         .iter()
         .map(|name| NewTopic::new(name, 1, TopicReplication::Fixed(1)))
         .collect();
@@ -143,7 +143,7 @@ fn commit_missing_offsets(brokers: &str, group: &str) -> Result<(), Report> {
         .context("could not create a Kafka consumer for EMAIL_E2E_KAFKA_BROKERS")?;
 
     let mut partitions = TopicPartitionList::new();
-    for topic in macro_event_topics::all_topic_names() {
+    for topic in rox_event_topics::all_topic_names() {
         let metadata = consumer
             .fetch_metadata(Some(topic), GROUP_TIMEOUT)
             .context("could not read a Kafka topic's partitions")?;

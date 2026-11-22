@@ -1,4 +1,4 @@
-import { ICON_SECTIONS } from '@macro-inc/entity-icons';
+import { ICON_SECTIONS } from '@rox-one/entity-icons';
 
 export { ICON_SECTIONS };
 

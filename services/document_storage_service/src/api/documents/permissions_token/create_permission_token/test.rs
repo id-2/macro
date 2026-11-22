@@ -1,5 +1,5 @@
 use bot_id::BotId;
-use macro_authorization::{BotAuthentication, BotScope, MacroAuthorization};
+use rox_authorization::{BotAuthentication, BotScope, RoxAuthorization};
 use uuid::Uuid;
 
 use super::token_identity;
@@ -16,7 +16,7 @@ fn bot_tokens_keep_the_actor_without_inventing_a_user() {
     };
 
     assert_eq!(
-        token_identity(Some(&MacroAuthorization::Bot(bot))),
+        token_identity(Some(&RoxAuthorization::Bot(bot))),
         Ok((None, Some(bot_id.into_storage_id().to_string())))
     );
 }
@@ -25,7 +25,7 @@ fn bot_tokens_keep_the_actor_without_inventing_a_user() {
 fn anonymous_and_identityless_internal_tokens_have_no_identity_claims() {
     assert_eq!(token_identity(None), Ok((None, None)));
     assert_eq!(
-        token_identity(Some(&MacroAuthorization::Internal(None))),
+        token_identity(Some(&RoxAuthorization::Internal(None))),
         Ok((None, None))
     );
 }

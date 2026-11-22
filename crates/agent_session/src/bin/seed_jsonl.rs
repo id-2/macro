@@ -39,8 +39,8 @@ use bots::outbound::pg_bots_repo::PgBotsRepo;
 use clap::Parser;
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use serde::Deserialize;
 use sqlx::postgres::PgPoolOptions;
 use std::path::{Path, PathBuf};
@@ -66,7 +66,7 @@ struct Args {
     database_url: String,
 
     /// User who owns the dedicated agent channel the session creates.
-    #[arg(long, default_value = "macro|dev@rox.one")]
+    #[arg(long, default_value = "rox|dev@rox.one")]
     owner: String,
 
     /// Bot the session runs as.
@@ -195,7 +195,7 @@ fn parse_line(
     };
     let user_id = recorded
         .user_id
-        .map(MacroUserIdStr::try_from)
+        .map(RoxUserIdStr::try_from)
         .transpose()
         .map_err(|_| SeedError::Frame {
             line: line_number,
@@ -225,7 +225,7 @@ async fn main() -> ExitCode {
 async fn seed(args: &Args) -> Result<(), SeedError> {
     let session_id = AgentSessionId::new();
     let log = read_recording(&args.recording, session_id)?;
-    let owner = MacroUserIdStr::try_from(args.owner.clone())
+    let owner = RoxUserIdStr::try_from(args.owner.clone())
         .map_err(|error| SeedError::Owner(anyhow::anyhow!("{error}")))?;
 
     let pool = PgPoolOptions::new()

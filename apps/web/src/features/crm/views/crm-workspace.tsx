@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import {
   asideCollapsedPreferenceKey,
   CollectionPanes,
@@ -124,7 +125,7 @@ function PeopleSearchBar(props: {
     scopeId: view.host.scopeId,
     enabled: view.host.isActive,
     search: {
-      description: 'Search people',
+      description: t('crm.searchPeople'),
       run: () => {
         input?.focus();
         input?.select();
@@ -135,8 +136,8 @@ function PeopleSearchBar(props: {
   return (
     <SearchBar
       ref={(element) => (input = element)}
-      label="Search people"
-      placeholder="Search people"
+      label={t('crm.searchPeople')}
+      placeholder={t('crm.searchPeople')}
       value={props.value}
       onValueChange={props.onValueChange}
       onEscape={view.host.focus}
@@ -333,7 +334,7 @@ export function CrmWorkspaceView(props: {
     [...CRM_RECORDS, ...CRM_ACTIVITY_TABS].find(
       (record) => record.id === activeRecord()
     )?.label ??
-    'Companies';
+    t('crm.companies');
   const navigate = (id: string) => {
     settings.close();
     if (!listsEnabled() && id.startsWith('list:')) id = 'active';
@@ -450,7 +451,7 @@ export function CrmWorkspaceView(props: {
       resizable
     >
       <ViewShell.Aside>
-        <Suspense fallback={<CrmListSkeleton label="Loading CRM" />}>
+        <Suspense fallback={<CrmListSkeleton label={t('crm.loadingCrm')} />}>
           <CrmSidebar
             promotion={
               <ConnectorImportSidebar
@@ -460,8 +461,8 @@ export function CrmWorkspaceView(props: {
                 alternatives={[
                   {
                     icon: FileCsvIcon,
-                    label: 'Upload a CSV',
-                    description: 'Import companies from a spreadsheet export.',
+                    label: t('crm.uploadCsv'),
+                    description: t('crm.uploadCsvDescription'),
                     onSelect: () => setImporting(true),
                   },
                 ]}
@@ -538,25 +539,25 @@ export function CrmWorkspaceView(props: {
               <Show when={pipelineId() && !activePipeline()}>
                 <Show
                   when={!pipelines.loading()}
-                  fallback={<CrmListSkeleton label="Loading pipeline" />}
+                  fallback={<CrmListSkeleton label={t('crm.loadingPipeline')} />}
                 >
                   <CrmListError
                     title={
                       pipelines.error()
-                        ? 'Could not load this pipeline.'
-                        : 'This pipeline is unavailable or you no longer have access.'
+                        ? t('crm.couldNotLoadPipeline')
+                        : t('crm.pipelineUnavailable')
                     }
                     onRetry={() => pipelines.refresh()}
                   />
                   <Button variant="ghost" onClick={() => navigate('active')}>
-                    Back to companies
+                    {t('crm.backToCompanies')}
                   </Button>
                 </Show>
               </Show>
               <Show when={!pipelineId() && activityTab()} keyed>
                 {(tab) => (
                   <Suspense
-                    fallback={<CrmListSkeleton label="Loading CRM activity" />}
+                    fallback={<CrmListSkeleton label={t('crm.loadingCrmActivity')} />}
                   >
                     <CrmActivityView
                       tab={tab}
@@ -579,14 +580,14 @@ export function CrmWorkspaceView(props: {
                     }
                   >
                     <Show when={!peopleActive()}>
-                      <HeaderActionGroup label="Company filters" size="md">
+                      <HeaderActionGroup label={t('crm.companyFilters')} size="md">
                         <UnifiedFilterDropdown
                           grouped
                           hideLabel
                           variant="ghost"
                         />
                       </HeaderActionGroup>
-                      <HeaderActionGroup label="Company view options" size="md">
+                      <HeaderActionGroup label={t('crm.companyViewOptions')} size="md">
                         <SoupViewContextSort grouped />
                         <SoupViewContextGroup
                           grouped
@@ -602,7 +603,7 @@ export function CrmWorkspaceView(props: {
                             variant="ghost"
                             onClick={editActiveList}
                           >
-                            Edit list
+                            {t('crm.editList')}
                           </ButtonGroup.Button>
                         </Show>
                       </HeaderActionGroup>
@@ -611,7 +612,9 @@ export function CrmWorkspaceView(props: {
                     {toolbarCreateMenu()}
                     <CrmHeaderSearch
                       label={
-                        peopleActive() ? 'Search people' : 'Search companies'
+                        peopleActive()
+                          ? t('crm.searchPeople')
+                          : t('crm.searchCompaniesAny')
                       }
                       value={
                         peopleActive() ? peopleSearch() : view.searchText()
@@ -654,10 +657,10 @@ export function CrmWorkspaceView(props: {
             <>
               <div class="flex h-12 min-w-0 shrink-0 items-center gap-3 px-4 touch:h-auto touch:min-h-12 touch:pt-[calc(var(--mobile-content-inset-top,var(--safe-top,0px))+0.5rem)] touch:pb-2">
                 <CrmNavigationControls />
-                <Tooltip label="Back">
+                <Tooltip label={t('crm.back')}>
                   <Button
-                    aria-label="Close CRM settings"
-                    tooltip="Close CRM settings"
+                    aria-label={t('crm.closeCrmSettings')}
+                    tooltip={t('crm.closeCrmSettings')}
                     variant="ghost"
                     size="icon-sm"
                     onClick={settings.close}
@@ -666,7 +669,7 @@ export function CrmWorkspaceView(props: {
                   </Button>
                 </Tooltip>
                 <ViewSidebar.Title caret={false} class="h-7 flex-1">
-                  CRM settings
+                  {t('crm.crmSettings')}
                 </ViewSidebar.Title>
               </div>
               {/* The header above already clears the status bar on touch. */}

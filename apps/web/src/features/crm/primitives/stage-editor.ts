@@ -91,7 +91,7 @@ export function createStageEditor(input: {
   const handleCustomize = () =>
     replace(
       dealStages.stages().map((stage) => ({ label: stage.label })),
-      { successMessage: 'Stages are now customizable' }
+      { successMessage: 'Этапы теперь можно настраивать' }
     );
 
   const handleRename = (index: number, label: string) => {
@@ -112,7 +112,7 @@ export function createStageEditor(input: {
     next.splice(toIndex, 0, ...next.splice(fromIndex, 1));
     setPendingOrder(next.map((stage) => stage.id));
     setAnnouncement(
-      `${moved.label} moved to position ${toIndex + 1} of ${stages.length}`
+      `${moved.label} перемещён на позицию ${toIndex + 1} из ${stages.length}`
     );
     replace(toStageInputs(next), { onSettled: () => setPendingOrder(null) });
   };
@@ -141,7 +141,7 @@ export function createStageEditor(input: {
     resetMutation.mutate(undefined, {
       onSuccess: () => {
         setShowResetModal(false);
-        input.onSuccess('Stages reset to Rox defaults');
+        input.onSuccess('Этапы сброшены к значениям Rox по умолчанию');
       },
     });
   };

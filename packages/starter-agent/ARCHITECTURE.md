@@ -1,7 +1,7 @@
 # How the agent is built
 
 The agent is Claude, woken by events, built on the muppet library
-(`@macro-inc/muppet`, in `node_modules`). `AGENT.md` is its
+(`@rox-one/muppet`, in `node_modules`). `AGENT.md` is its
 charter; this file is how the code is laid out and the rules it keeps.
 
 Never modify muppet. Read it; write only here.
@@ -96,7 +96,7 @@ internals:
   `wake.event.payload` with the owning area's zod schema to decide if the
   wake concerns it.
 - **Sources another area pushes to**, e.g. chat's `unanswered`.
-- **Schedules.** Anything on a clock is a schedule (`@macro-inc/muppet/utilities/schedules`,
+- **Schedules.** Anything on a clock is a schedule (`@rox-one/muppet/utilities/schedules`,
   already wired): a handler on `sources.schedules` acts on the firing's
   `name`. Declare a standing schedule by ensuring it exists at startup
   (see lib's `examples/heartbeat/index.ts`), never by a timer of your own.
@@ -131,7 +131,7 @@ restart can find them.
   and returns actions, and is where the tests are. Tests sit in
   `capabilities/<area>/test/*.test.ts`, use `bun:test`, never touch the
   network, and never sleep: time is a `Clock` you move.
-- **Time goes through Temporal** (`@macro-inc/muppet/utilities/time`;
+- **Time goes through Temporal** (`@rox-one/muppet/utilities/time`;
   `temporal-polyfill` installs it, since this Bun has none, with types from
   `temporal-spec`). No `Date`, no epoch
   arithmetic, no comparing ISO strings.

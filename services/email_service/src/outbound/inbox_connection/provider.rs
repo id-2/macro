@@ -10,7 +10,7 @@ pub struct GoogleConnectionProvider {
     pub auth: Arc<AuthServiceClient>,
     /// Resolved once at startup, so an override points scope discovery at a
     /// local Gmail emulator.
-    pub token_info_url: macro_service_urls::GoogleOauthTokenInfoUrl,
+    pub token_info_url: rox_service_urls::GoogleOauthTokenInfoUrl,
 }
 
 impl ConnectionProvider for GoogleConnectionProvider {

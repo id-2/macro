@@ -1,5 +1,5 @@
 use axum::http::request::Builder;
-use macro_authorization::{BOT_FOR_MACRO_USER_ID_HEADER, BOT_SCOPE_HEADER, BOT_TOKEN_HEADER};
+use rox_authorization::{BOT_FOR_MACRO_USER_ID_HEADER, BOT_SCOPE_HEADER, BOT_TOKEN_HEADER};
 use serde_json::{Value, json};
 
 use super::*;
@@ -82,7 +82,7 @@ async fn send(router: Router, builder: Builder) -> (StatusCode, Value) {
 
 fn user_owner(user_id: &str) -> Owner {
     Owner::User(
-        MacroUserIdStr::try_from(user_id.to_string()).expect("test user id should be valid"),
+        RoxUserIdStr::try_from(user_id.to_string()).expect("test user id should be valid"),
     )
 }
 

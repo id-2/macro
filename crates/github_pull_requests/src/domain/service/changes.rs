@@ -12,7 +12,7 @@ use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
 use git_patch::{
     BudgetedPatch, MAX_FILE_PATCH_BYTES, MAX_PATCH_BYTES, budget_patch, parse_git_patch, totals,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use crate::domain::{
@@ -128,7 +128,7 @@ where
     )]
     async fn capture(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         pull_request: &PullRequestRef,
     ) -> Result<GithubPullRequestChangeset, GithubPullRequestChangesError> {
         let diff = self.reader.read(user, pull_request).await?;
@@ -138,7 +138,7 @@ where
     #[tracing::instrument(err, skip(self, user))]
     async fn patch(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<String, GithubPullRequestChangesError> {
         let changeset = self
@@ -265,7 +265,7 @@ fn range_commits(range: &ChangesetRange) -> Result<(&str, &str), GithubPullReque
 
 fn authenticated_user(
     receipt: &EntityAccessReceipt<ViewAccessLevel>,
-) -> Result<MacroUserIdStr<'static>, GithubPullRequestChangesError> {
+) -> Result<RoxUserIdStr<'static>, GithubPullRequestChangesError> {
     receipt
         .get_authenticated_user()
         .cloned()

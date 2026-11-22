@@ -7,7 +7,7 @@ use axum::{
     response::{IntoResponse, Response},
 };
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::{document::DocumentBasic, response::GenericErrorResponse};
 
 use models_permissions::share_permission::access_level::ViewAccessLevel;
@@ -39,10 +39,10 @@ pub async fn get_document_views_handler(
     _access: DocumentAccessExtractor<ViewAccessLevel, EntityAccessService, AuthorizationService>,
     Path(Params { document_id }): Path<Params>,
     State(db): State<PgPool>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     document_context: Extension<DocumentBasic>,
 ) -> Result<Response, Response> {
-    let users = macro_db_client::document::get_document_views(&db, &document_context.document_id)
+    let users = rox_db_client::document::get_document_views(&db, &document_context.document_id)
         .await
         .map_err(|e| {
             tracing::error!(error=?e, "unable to get document views");
@@ -50,7 +50,7 @@ pub async fn get_document_views_handler(
         })?;
 
     let count =
-        macro_db_client::document::get_document_view_count(&db, &document_context.document_id)
+        rox_db_client::document::get_document_view_count(&db, &document_context.document_id)
             .await
             .map_err(|e| {
                 tracing::error!(error=?e, "unable to get document view count");

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { Button, cn } from '@ui';
 import { createSignal, Show } from 'solid-js';
 import {
@@ -31,6 +32,10 @@ export function UsageSettingsView(props: { context: UsageContext }) {
       ? budget
       : undefined;
   };
+  const autoReloadState = () =>
+    props.context.autoReload.settings().enabled
+      ? t('settingsUsage.reloadStateOn')
+      : t('settingsUsage.reloadStateOff');
   const reloadLimitNotice = () => (
     <Show when={reloadLimit()}>
       {(budget) => (
@@ -57,15 +62,15 @@ export function UsageSettingsView(props: { context: UsageContext }) {
     </Show>
   );
   return (
-    <SettingsPage title="Usage">
+    <SettingsPage title={t('settingsNav.tabUsage')}>
       <Show when={!props.context.available()}>
         <SettingsCard>
           <div class="flex flex-col gap-2 p-6" role="status">
             <p class="font-medium text-ink">
-              AI billing changes take effect on October 8, 2026.
+              {t('settingsUsage.notAvailableTitle')}
             </p>
             <p class="text-sm text-ink-muted">
-              Usage is not metered until these changes take effect.
+              {t('settingsUsage.notAvailableBody')}
             </p>
           </div>
         </SettingsCard>
@@ -82,8 +87,8 @@ export function UsageSettingsView(props: { context: UsageContext }) {
               <div class="flex flex-col gap-3 p-6" role="status">
                 <p class="text-sm text-ink-muted">
                   {props.context.failed()
-                    ? "Couldn't load usage. Please try again."
-                    : 'Loading usage…'}
+                    ? t('settingsUsage.loadFailed')
+                    : t('settingsUsage.loading')}
                 </p>
                 <Show when={props.context.failed()}>
                   <Button
@@ -91,7 +96,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                     variant="secondary"
                     onClick={props.context.refresh}
                   >
-                    Try again
+                    {t('settingsUsage.tryAgain')}
                   </Button>
                 </Show>
               </div>
@@ -119,7 +124,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                     }
                   >
                     <p class="mt-3 text-xs text-ink-muted">
-                      This is your personal monthly usage limit.
+                      {t('settingsUsage.personalLimitNote')}
                     </p>
                   </Show>
                 </div>
@@ -132,15 +137,15 @@ export function UsageSettingsView(props: { context: UsageContext }) {
               >
                 <SettingsCard>
                   <SettingsRow
-                    label="Need more AI usage?"
-                    description="Subscribe to a paid plan to keep going."
+                    label={t('settingsUsage.needMoreUsage')}
+                    description={t('settingsUsage.subscribeForMore')}
                   >
                     <Button
                       variant="primary"
                       size="sm"
                       onClick={props.context.openPlans}
                     >
-                      View plans
+                      {t('settingsUsage.viewPlans')}
                     </Button>
                   </SettingsRow>
                 </SettingsCard>
@@ -156,15 +161,15 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                   title={
                     summary().creditScope === 'team' &&
                     summary().billingAccess === 'payer'
-                      ? 'Team Usage Credits'
-                      : 'Usage Credits'
+                      ? t('settingsUsage.teamCredits')
+                      : t('settingsUsage.usageCredits')
                   }
                   description={
                     summary().billingAccess === 'team-member'
                       ? undefined
                       : summary().creditScope === 'team'
-                        ? 'Credits are shared by your entire team.'
-                        : 'Buy credits or turn on automatic reload to continue using Rox AI when you reach usage limits'
+                        ? t('settingsUsage.creditsSharedByTeam')
+                        : t('settingsUsage.creditsExplainer')
                   }
                 >
                   <Show
@@ -176,16 +181,17 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                           <SettingsRow
                             label={
                               <span class="font-medium">
-                                {formatCreditBalance(
-                                  summary().creditBalanceCents
-                                )}{' '}
-                                credits remaining
+                                {t('settingsUsage.creditsRemaining', {
+                                  amount: formatCreditBalance(
+                                    summary().creditBalanceCents
+                                  ),
+                                })}
                               </span>
                             }
                             description={
                               summary().creditScope === 'team'
-                                ? 'Shared team balance'
-                                : 'Current balance'
+                                ? t('settingsUsage.sharedTeamBalance')
+                                : t('settingsUsage.currentBalance')
                             }
                           >
                             <Show when={summary().billingAccess === 'payer'}>
@@ -198,20 +204,19 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                                 class="rounded-full px-4"
                                 onClick={() => setPurchaseOpen(true)}
                               >
-                                Add more
+                                {t('settingsUsage.addMore')}
                               </Button>
                             </Show>
                           </SettingsRow>
                           <SettingsRow
-                            label="Automatic reload"
+                            label={t('settingsUsage.automaticReload')}
                             description={
                               props.context.autoReload.suspended() ? (
                                 <span role="status" class="text-failure">
-                                  Paused — payment failed. Update your payment
-                                  method, then save to retry.
+                                  {t('settingsUsage.pausedPaymentFailed')}
                                 </span>
                               ) : summary().creditScope === 'team' ? (
-                                'Reloads credits for your entire team.'
+                                t('settingsUsage.reloadsTeamCredits')
                               ) : undefined
                             }
                           >
@@ -220,7 +225,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                                 autoReloadTrigger = button;
                               }}
                               type="button"
-                              aria-label="Configure Automatic reload"
+                              aria-label={t('settingsUsage.configureAutomaticReload')}
                               aria-haspopup="dialog"
                               aria-expanded={autoReloadOpen()}
                               class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-accent focus-visible:outline-offset-2 disabled:opacity-50"
@@ -242,13 +247,16 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                               />
                               <span class="sr-only">
                                 {props.context.autoReload.suspended()
-                                  ? 'Paused after a failed payment. Setting currently '
+                                  ? t('settingsUsage.reloadPausedStatus', {
+                                      state: autoReloadState(),
+                                    })
                                   : reloadLimit()
-                                    ? 'Monthly limit reached. Setting currently '
-                                    : 'Currently '}
-                                {props.context.autoReload.settings().enabled
-                                  ? 'on'
-                                  : 'off'}
+                                    ? t('settingsUsage.reloadLimitStatus', {
+                                        state: autoReloadState(),
+                                      })
+                                    : t('settingsUsage.reloadCurrentStatus', {
+                                        state: autoReloadState(),
+                                      })}
                               </span>
                             </button>
                           </SettingsRow>
@@ -260,17 +268,25 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                       <SettingsRow
                         label={
                           <span class="font-medium">
-                            {formatCreditBalance(summary().creditBalanceCents)}{' '}
-                            credits remaining
+                            {t('settingsUsage.creditsRemaining', {
+                              amount: formatCreditBalance(
+                                summary().creditBalanceCents
+                              ),
+                            })}
                           </span>
                         }
                         description={
                           <Show
                             when={summary().purchaseLimit}
-                            fallback="Shared team balance"
+                            fallback={t('settingsUsage.sharedTeamBalance')}
                           >
                             {(limit) =>
-                              `Shared team balance. You can add ${formatCreditBalance(limit().remainingCents)} more this month, within your team's ${formatCreditBalance(limit().limitCents)} limit.`
+                              t('settingsUsage.sharedWithLimit', {
+                                remaining: formatCreditBalance(
+                                  limit().remainingCents
+                                ),
+                                limit: formatCreditBalance(limit().limitCents),
+                              })
                             }
                           </Show>
                         }
@@ -292,7 +308,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                             )}
                           onClick={() => setPurchaseOpen(true)}
                         >
-                          Add more
+                          {t('settingsUsage.addMore')}
                         </Button>
                       </SettingsRow>
                     </SettingsCard>
@@ -306,8 +322,8 @@ export function UsageSettingsView(props: { context: UsageContext }) {
       <Show when={props.context.developer}>
         {(developer) => (
           <SettingsSection
-            title="Developer tools"
-            description="Preview usage states without changing account billing."
+            title={t('settingsUsage.developerTools')}
+            description={t('settingsUsage.developerToolsDescription')}
           >
             <SettingsCard>
               <div class="flex flex-col gap-3 p-4">
@@ -319,7 +335,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                       class="self-start"
                       onClick={open()}
                     >
-                      Open Billing Lab
+                      {t('settingsUsage.openBillingLab')}
                     </Button>
                   )}
                 </Show>
@@ -332,7 +348,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                     aria-pressed={developer().plan() === 'free'}
                     onClick={() => developer().previewPlan('free')}
                   >
-                    Preview Free plan
+                    {t('settingsUsage.previewFreePlan')}
                   </Button>
                   <Button
                     variant={
@@ -342,7 +358,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                     aria-pressed={developer().plan() === 'paid'}
                     onClick={() => developer().previewPlan('paid')}
                   >
-                    Preview paid plan
+                    {t('settingsUsage.previewPaidPlan')}
                   </Button>
                   <Button
                     variant="secondary"
@@ -350,7 +366,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                     disabled={developer().beforeLaunch()}
                     onClick={() => developer().openLimitDialog('free')}
                   >
-                    Open Free usage-limit dialog
+                    {t('settingsUsage.openFreeLimitDialog')}
                   </Button>
                   <Button
                     variant="secondary"
@@ -358,7 +374,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                     disabled={developer().beforeLaunch()}
                     onClick={() => developer().openLimitDialog('paid')}
                   >
-                    Open paid usage-limit dialog
+                    {t('settingsUsage.openPaidLimitDialog')}
                   </Button>
                   <Button
                     variant={
@@ -368,7 +384,7 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                     aria-pressed={developer().beforeLaunch()}
                     onClick={developer().previewBeforeLaunch}
                   >
-                    Preview production before Oct 8
+                    {t('settingsUsage.previewBeforeLaunch')}
                   </Button>
                   <Button
                     variant="ghost"
@@ -376,13 +392,12 @@ export function UsageSettingsView(props: { context: UsageContext }) {
                     disabled={!developer().active()}
                     onClick={developer().reset}
                   >
-                    Reset preview
+                    {t('settingsUsage.resetPreview')}
                   </Button>
                 </div>
                 <Show when={developer().active()}>
                   <p class="text-xs text-ink-muted" role="status">
-                    Developer preview active. No purchases or automatic charges
-                    can be made. Reset the preview to restore real usage.
+                    {t('settingsUsage.developerActive')}
                   </p>
                 </Show>
               </div>

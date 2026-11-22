@@ -1,6 +1,6 @@
 use std::sync::Mutex;
 
-use macro_event_broker::{EventBrokerError, MacroEvent, MacroEventBroker};
+use rox_event_broker::{EventBrokerError, RoxEvent, RoxEventBroker};
 use serde_json::{Value, json};
 
 use super::*;
@@ -17,8 +17,8 @@ struct RecordingEventBroker {
     published: Mutex<Vec<PublishedEvent>>,
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {
@@ -35,8 +35,8 @@ impl MacroEventBroker for RecordingEventBroker {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid owner")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).expect("valid owner")
 }
 
 fn thread_ids(count: usize) -> Vec<Uuid> {
@@ -185,8 +185,8 @@ async fn publishes_ordered_bounded_batches_for_larger_inputs() {
 }
 
 fn link_for(macro_id: &str, email: &str) -> Link {
-    let macro_id = MacroUserIdStr::try_from(macro_id.to_string()).expect("valid macro id");
-    let email_address = macro_user_id::email::EmailStr::try_from(email.to_string()).expect("email");
+    let macro_id = RoxUserIdStr::try_from(macro_id.to_string()).expect("valid macro id");
+    let email_address = rox_user_id::email::EmailStr::try_from(email.to_string()).expect("email");
     Link {
         id: Uuid::nil(),
         is_primary: Link::derive_is_primary(models_email::service::link::UserProvider::Gmail),

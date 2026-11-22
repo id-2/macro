@@ -2,10 +2,10 @@ use crate::api::search::simple::SearchError;
 use calendar_events::domain::ics::content_without_macro_call;
 use calendar_events::domain::labels::{EventLabels, EventRole};
 use indexmap::IndexMap;
-use macro_db_client::calendar_event::get_events_for_search::{
+use rox_db_client::calendar_event::get_events_for_search::{
     CalendarEventSearchInfo, get_calendar_events_for_search,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::{EntityReference, EntityType};
 use models_search::calendar_event::{
     CalendarEventMetadata, CalendarEventOrganizer, CalendarEventSearchOccurrence,
@@ -67,7 +67,7 @@ pub(in crate::api::search) async fn enrich_calendar_events(
         .collect();
     // Scope tags to the viewer so another user's personal tags never leak into
     // the response. System properties still ride along via the key list.
-    let viewer_user_id = MacroUserIdStr::parse_from_str(user_id)
+    let viewer_user_id = RoxUserIdStr::parse_from_str(user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?;
     let properties_map: HashMap<String, Vec<SoupProperty>> =
         properties::outbound::entity_properties_get_query::get_bulk_entity_properties_values_filtered(

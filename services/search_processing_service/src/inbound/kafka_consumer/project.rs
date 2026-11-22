@@ -2,9 +2,9 @@
 
 use std::collections::HashSet;
 
-use macro_event_broker::MacroEvent as _;
+use rox_event_broker::RoxEvent as _;
 use opensearch_client::OpensearchClient;
-use projects::domain::events::{ProjectMacroEvent, ProjectTopicEvent};
+use projects::domain::events::{ProjectRoxEvent, ProjectTopicEvent};
 use sqlx::PgPool;
 use sqs_client::search::project::UpsertProject;
 
@@ -159,7 +159,7 @@ async fn process_project_index_action(
 pub(super) async fn process_project_event(
     db: &PgPool,
     opensearch_client: &OpensearchClient,
-    event: &ProjectMacroEvent,
+    event: &ProjectRoxEvent,
     partition: i32,
     offset: i64,
 ) -> EventOutcome {

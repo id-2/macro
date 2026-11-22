@@ -1,6 +1,6 @@
 import type { RichMessage } from '../../mentions';
-import { MacroError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import type { Document } from '../documents/document';
 import type { StaticImage } from '../images/image';
 import type { Channel } from './channel';
@@ -38,7 +38,7 @@ export type PostOptions = {
  * can't disagree.
  */
 export async function postToChannel(
-  client: MacroClient,
+  client: RoxClient,
   target: Channel | Thread,
   body: RichMessage,
   { images = [], documents = [], silent = false }: PostOptions = {},
@@ -75,7 +75,7 @@ export async function postToChannel(
   }
 
   if (images.length > 0 || documents.length > 0) {
-    throw new MacroError(
+    throw new RoxError(
       'a user-owned bot can only post via the channel webhook endpoint, which ' +
         'does not support attachments — use a team-owned bot, or requestedAs(user), ' +
         'to attach images or documents',
@@ -83,7 +83,7 @@ export async function postToChannel(
   }
 
   if (thread) {
-    throw new MacroError(
+    throw new RoxError(
       'a user-owned bot can only post via the channel webhook endpoint, which ' +
         'does not support threads — use a team-owned bot, or requestedAs(user), ' +
         'to reply in a thread',
@@ -130,7 +130,7 @@ function resolve(target: Channel | Thread): {
  * team-owned — a team-owned bot's participant row grants its role in any
  * channel, so membership alone is enough there too.
  */
-async function hasEntityAccess(client: MacroClient): Promise<boolean> {
+async function hasEntityAccess(client: RoxClient): Promise<boolean> {
   if (client.authConfig.type !== 'bot' || client.hasActingUser()) return true;
   const { owner } = await client.selfBot();
   return owner?.type === 'team';

@@ -19,7 +19,7 @@ impl ConnectionTransactions for PgConnectionTransactions {
         crate::outbound::mailbox_init::lock_gmail_connection(&mut tx, actor, email)
             .await
             .map_err(ConnectionError::MailboxInitialization)?;
-        macro_db_client::macro_user_links::insert_edge(&mut *tx, actor, child, link)
+        rox_db_client::macro_user_links::insert_edge(&mut *tx, actor, child, link)
             .await
             .context("Failed to insert macro_user_links edge")?;
         tx.commit()
@@ -45,7 +45,7 @@ impl ConnectionTransactions for PgConnectionTransactions {
             .await
             .map_err(ConnectionError::MailboxInitialization)?;
         let link = enable_gmail_sync_for(tx.as_mut(), provisional, cursor).await?;
-        macro_db_client::macro_user_links::insert_edge(&mut *tx, actor, child, link.id)
+        rox_db_client::macro_user_links::insert_edge(&mut *tx, actor, child, link.id)
             .await
             .context("Failed to insert macro_user_links edge")?;
         tx.commit()
@@ -94,7 +94,7 @@ impl ConnectionTransactions for PgConnectionTransactions {
         crate::outbound::mailbox_init::lock_gmail_connection(&mut tx, actor, email)
             .await
             .map_err(ConnectionError::MailboxInitialization)?;
-        let promoted = macro_db_client::shared_inbox::promote_link_to_shared(
+        let promoted = rox_db_client::shared_inbox::promote_link_to_shared(
             &mut tx,
             existing.id,
             existing.macro_id.as_ref(),

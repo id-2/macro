@@ -131,12 +131,12 @@ members = [
   "crates/item_filter_index",
   "crates/integration_tests/local_e2e",
   "crates/loops_client",
-  "crates/macro_authorization",
-  "crates/macro_config",
-  "crates/macro_event_broker",
-  "crates/macro_event_topics",
-  "crates/macro_queues",
-  "crates/macro_sync_service_jwt",
+  "crates/rox_authorization",
+  "crates/rox_config",
+  "crates/rox_event_broker",
+  "crates/rox_event_topics",
+  "crates/rox_queues",
+  "crates/rox_sync_service_jwt",
   "crates/maybe_send",
   "crates/memory",
   "crates/messages",
@@ -246,7 +246,7 @@ computer_id = { path = "crates/computer_id" }
 harnessd_protocol = { path = "crates/harnessd_protocol" }
 pairing_id = { path = "crates/pairing_id" }
 openbao_client = { path = "crates/openbao_client" }
-macro_user_id = { path = "crates/macro_user_id" }
+rox_user_id = { path = "crates/rox_user_id" }
 aes = "0.8.4"
 aes-gcm = { version = "0.10.3", features = ["zeroize"] }
 anyhow = "1.0.100"
@@ -281,7 +281,7 @@ aws-config = { version = "1.8.16", features = ["behavior-version-latest"] }
 aws-msk-iam-sasl-signer = "1.0.1"
 # SDK defaults also enable the deprecated `rustls` feature, which pulls in
 # rustls 0.21 / hyper 0.14. Keep the modern HTTPS client and the other defaults;
-# macro_aws_config uses BehaviorVersion::latest() with this transport.
+# rox_aws_config uses BehaviorVersion::latest() with this transport.
 aws-sdk-dynamodb = { version = "1.111.0", default-features = false, features = ["default-https-client", "rt-tokio"] }
 aws-sdk-ecs = { version = "1.124.0", default-features = false, features = ["default-https-client", "rt-tokio"] }
 aws-sdk-kms = { version = "1.104.0", default-features = false, features = ["default-https-client", "rt-tokio"] }
@@ -373,6 +373,7 @@ libc = "0.2"
 libsignal-core = { git = "https://github.com/signalapp/libsignal", tag = "v0.105.2" }
 livekit-api = { version = "0.4.16", default-features = false, features = [
   "access-token",
+  "rustls-tls-native-roots",
   "rustls-tls-webpki-roots",
   "services-tokio",
   "webhooks",
@@ -497,6 +498,7 @@ tokio-rustls = { version = "0.26", default-features = false, features = ["aws_lc
 tokio-stream = { version = "0.1.17" }
 tokio-tungstenite = { version = "0.28", default-features = false, features = [
   "connect",
+  "rustls-tls-native-roots",
   "rustls-tls-webpki-roots",
 ] }
 # Signal's compression fork is based on tungstenite 0.27. Keep its Tokio
@@ -591,9 +593,9 @@ subtle = "2.6.1"
 [patch.crates-io]
 # Only replaces tungstenite 0.27 (GraphQL subscriptions); 0.28/0.29 stay upstream.
 tungstenite = { git = "https://github.com/signalapp/tungstenite-rs", rev = "a1837ccfe96b6895a57352d7f0112e4557516c27" }
-# Writes a checkout-independent embed folder; see vendor/utoipa-swagger-ui/README-MACRO.md.
+# Writes a checkout-independent embed folder; see vendor/utoipa-swagger-ui/README-ROX.md.
 utoipa-swagger-ui = { path = "vendor/utoipa-swagger-ui" }
-# Bundles a newer IANA tzdata release than crates.io; see vendor/chrono-tz/README-MACRO.md.
+# Bundles a newer IANA tzdata release than crates.io; see vendor/chrono-tz/README-ROX.md.
 chrono-tz = { path = "vendor/chrono-tz" }
 
 # cache-turso's storage tests load thousands of rows into the embedded SQL engine

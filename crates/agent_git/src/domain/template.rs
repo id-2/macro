@@ -1,6 +1,6 @@
 //! The workspace every new repo starts from.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::voice::{VOICE_PATH, VoiceConfig, VoiceModel};
@@ -36,7 +36,7 @@ pub struct PersonaSeed {
     /// Creating admin's Rox user ID: the agent's owner, the only account
     /// that gives it orders.
     #[serde(default)]
-    pub creator_id: Option<MacroUserIdStr<'static>>,
+    pub creator_id: Option<RoxUserIdStr<'static>>,
     /// Display name.
     pub name: String,
     /// What the agent is responsible for.
@@ -88,7 +88,7 @@ impl WorkspaceTemplate {
     /// no personality leaves the identity empty, so the agent asks its owner.
     pub fn render(
         &self,
-        agent: &MacroUserIdStr<'_>,
+        agent: &RoxUserIdStr<'_>,
         seed: &PersonaSeed,
     ) -> Result<Vec<RenderedFile>, RenderError> {
         let owner = seed

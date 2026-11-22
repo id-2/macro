@@ -11,13 +11,13 @@ use ::forms::{
 use calendar_scheduling::{
     domain::service::Service as SchedulingService,
     outbound::{
-        macro_services::{MacroCalendars, RoxDirectory},
+        macro_services::{RoxCalendars, RoxDirectory},
         postgres::PostgresRepository,
     },
 };
 use collab_surface::outbound::{PgCollabSurfaceService, pg_collab_surface_service};
 
-type Calendars = MacroCalendars<ToolCalendarReadService, ToolCalendarMutationService>;
+type Calendars = RoxCalendars<ToolCalendarReadService, ToolCalendarMutationService>;
 type Directory = RoxDirectory<TeamRepositoryImpl>;
 /// Liveness is optional only for hosts without a gateway (including isolated tests).
 pub struct ToolFormEvents(Option<GatewayFormEventPublisher>);
@@ -90,7 +90,7 @@ pub fn build_forms_tool_context(
     ));
     let scheduling = Arc::new(SchedulingService::new(
         PostgresRepository::new(pool.clone()),
-        MacroCalendars::new(
+        RoxCalendars::new(
             calendars.occurrences.clone(),
             calendars.mutations.clone(),
             Some(app_origin.clone()),

@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@macro/docs",
+      "name": "@rox/docs",
       "devDependencies": {
         "mint": "^4.2.63",
       },

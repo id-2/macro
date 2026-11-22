@@ -1,11 +1,11 @@
 use chrono::{DateTime, Utc};
-use macro_event_broker::Event;
+use rox_event_broker::Event;
 use serde_json::json;
 
 use super::*;
 
-fn user_id(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user_id(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn timestamp() -> DateTime<Utc> {
@@ -14,11 +14,11 @@ fn timestamp() -> DateTime<Utc> {
         .with_timezone(&Utc)
 }
 
-fn new_contract_events(link_id: Uuid) -> Vec<EmailMacroEvent> {
+fn new_contract_events(link_id: Uuid) -> Vec<EmailRoxEvent> {
     let owner = user_id("macro|owner@example.com");
 
     vec![
-        EmailMacroEvent::message_draft_synced(MessageDraftSyncedMetadata {
+        EmailRoxEvent::message_draft_synced(MessageDraftSyncedMetadata {
             link_id,
             owner: owner.clone(),
             message_id: Uuid::new_v4(),
@@ -27,18 +27,18 @@ fn new_contract_events(link_id: Uuid) -> Vec<EmailMacroEvent> {
             provider_thread_id: "gmail-thread-1".to_string(),
             is_spam_or_trash: false,
         }),
-        EmailMacroEvent::thread_backfilled(ThreadBackfilledMetadata {
+        EmailRoxEvent::thread_backfilled(ThreadBackfilledMetadata {
             link_id,
             owner: owner.clone(),
             thread_id: Uuid::new_v4(),
         }),
-        EmailMacroEvent::threads_reindex_requested(ThreadsReindexRequestedMetadata {
+        EmailRoxEvent::threads_reindex_requested(ThreadsReindexRequestedMetadata {
             link_id,
             owner: owner.clone(),
             thread_ids: vec![Uuid::new_v4(), Uuid::new_v4()],
             reason: ThreadsReindexReason::ContactsChanged,
         }),
-        EmailMacroEvent::thread_spam_changed(ThreadSpamChangedMetadata {
+        EmailRoxEvent::thread_spam_changed(ThreadSpamChangedMetadata {
             link_id,
             owner,
             actor: None,
@@ -171,7 +171,7 @@ fn thread_archived_wire_shape_with_origin() {
 #[test]
 fn decode_round_trips() {
     let link_id = Uuid::new_v4();
-    let original = EmailMacroEvent::message_deleted(MessageDeletedMetadata {
+    let original = EmailRoxEvent::message_deleted(MessageDeletedMetadata {
         link_id,
         owner: user_id("macro|owner@example.com"),
         message_id: Uuid::new_v4(),
@@ -180,7 +180,7 @@ fn decode_round_trips() {
     });
 
     let payload = serde_json::to_vec(original.event()).expect("serializable");
-    let decoded = EmailMacroEvent::decode(original.key(), &payload).expect("decodable payload");
+    let decoded = EmailRoxEvent::decode(original.key(), &payload).expect("decodable payload");
 
     assert_eq!(decoded.key(), link_id.to_string());
     assert_eq!(decoded.event(), original.event());
@@ -192,7 +192,7 @@ fn new_contract_events_decode_round_trip() {
 
     for original in new_contract_events(link_id) {
         let payload = serde_json::to_vec(original.event()).expect("serializable");
-        let decoded = EmailMacroEvent::decode(original.key(), &payload).expect("decodable payload");
+        let decoded = EmailRoxEvent::decode(original.key(), &payload).expect("decodable payload");
 
         assert_eq!(decoded.key(), link_id.to_string());
         assert_eq!(decoded.event(), original.event());
@@ -202,7 +202,7 @@ fn new_contract_events_decode_round_trip() {
 #[test]
 fn events_are_keyed_by_link_id() {
     let link_id = Uuid::new_v4();
-    let event = EmailMacroEvent::link_disconnected(LinkDisconnectedMetadata {
+    let event = EmailRoxEvent::link_disconnected(LinkDisconnectedMetadata {
         link_id,
         owner: user_id("macro|owner@example.com"),
         email_address: "owner@example.com".to_string(),
@@ -236,7 +236,7 @@ fn event_type_strings_follow_dot_convention() {
 
     let cases = vec![
         (
-            EmailMacroEvent::link_connected(LinkConnectedMetadata {
+            EmailRoxEvent::link_connected(LinkConnectedMetadata {
                 link_id,
                 owner: owner.clone(),
                 email_address: "owner@example.com".to_string(),
@@ -247,7 +247,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.link_connected",
         ),
         (
-            EmailMacroEvent::link_disconnected(LinkDisconnectedMetadata {
+            EmailRoxEvent::link_disconnected(LinkDisconnectedMetadata {
                 link_id,
                 owner: owner.clone(),
                 email_address: "owner@example.com".to_string(),
@@ -256,7 +256,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.link_disconnected",
         ),
         (
-            EmailMacroEvent::link_reauth_required(LinkReauthRequiredMetadata {
+            EmailRoxEvent::link_reauth_required(LinkReauthRequiredMetadata {
                 link_id,
                 owner: owner.clone(),
                 email_address: "owner@example.com".to_string(),
@@ -265,7 +265,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.link_reauth_required",
         ),
         (
-            EmailMacroEvent::message_received(MessageReceivedMetadata {
+            EmailRoxEvent::message_received(MessageReceivedMetadata {
                 link_id,
                 owner: owner.clone(),
                 message_id: Uuid::nil(),
@@ -284,7 +284,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.message_received",
         ),
         (
-            EmailMacroEvent::message_draft_synced(MessageDraftSyncedMetadata {
+            EmailRoxEvent::message_draft_synced(MessageDraftSyncedMetadata {
                 link_id,
                 owner: owner.clone(),
                 message_id: Uuid::nil(),
@@ -296,7 +296,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.message_draft_synced",
         ),
         (
-            EmailMacroEvent::message_sent(MessageSentMetadata {
+            EmailRoxEvent::message_sent(MessageSentMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -313,7 +313,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.message_sent",
         ),
         (
-            EmailMacroEvent::message_deleted(MessageDeletedMetadata {
+            EmailRoxEvent::message_deleted(MessageDeletedMetadata {
                 link_id,
                 owner: owner.clone(),
                 message_id: Uuid::nil(),
@@ -323,7 +323,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.message_deleted",
         ),
         (
-            EmailMacroEvent::message_send_queued(MessageSendQueuedMetadata {
+            EmailRoxEvent::message_send_queued(MessageSendQueuedMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -335,7 +335,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.message_send_queued",
         ),
         (
-            EmailMacroEvent::message_send_cancelled(MessageSendCancelledMetadata {
+            EmailRoxEvent::message_send_cancelled(MessageSendCancelledMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -346,7 +346,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.message_send_cancelled",
         ),
         (
-            EmailMacroEvent::thread_archived(ThreadArchivedMetadata {
+            EmailRoxEvent::thread_archived(ThreadArchivedMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -357,7 +357,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.thread_archived",
         ),
         (
-            EmailMacroEvent::thread_trashed(ThreadTrashedMetadata {
+            EmailRoxEvent::thread_trashed(ThreadTrashedMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -368,7 +368,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.thread_trashed",
         ),
         (
-            EmailMacroEvent::thread_read(ThreadReadMetadata {
+            EmailRoxEvent::thread_read(ThreadReadMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -379,7 +379,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.thread_read",
         ),
         (
-            EmailMacroEvent::thread_starred(ThreadStarredMetadata {
+            EmailRoxEvent::thread_starred(ThreadStarredMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -390,7 +390,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.thread_starred",
         ),
         (
-            EmailMacroEvent::thread_spam_changed(ThreadSpamChangedMetadata {
+            EmailRoxEvent::thread_spam_changed(ThreadSpamChangedMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -401,7 +401,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.thread_spam_changed",
         ),
         (
-            EmailMacroEvent::thread_project_changed(ThreadProjectChangedMetadata {
+            EmailRoxEvent::thread_project_changed(ThreadProjectChangedMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: user_id("macro|actor@example.com"),
@@ -412,7 +412,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.thread_project_changed",
         ),
         (
-            EmailMacroEvent::thread_labels_updated(ThreadLabelsUpdatedMetadata {
+            EmailRoxEvent::thread_labels_updated(ThreadLabelsUpdatedMetadata {
                 link_id,
                 owner: owner.clone(),
                 actor: actor.clone(),
@@ -428,7 +428,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.thread_labels_updated",
         ),
         (
-            EmailMacroEvent::thread_backfilled(ThreadBackfilledMetadata {
+            EmailRoxEvent::thread_backfilled(ThreadBackfilledMetadata {
                 link_id,
                 owner: owner.clone(),
                 thread_id: Uuid::nil(),
@@ -436,7 +436,7 @@ fn event_type_strings_follow_dot_convention() {
             "email.thread_backfilled",
         ),
         (
-            EmailMacroEvent::threads_reindex_requested(ThreadsReindexRequestedMetadata {
+            EmailRoxEvent::threads_reindex_requested(ThreadsReindexRequestedMetadata {
                 link_id,
                 owner,
                 thread_ids: vec![Uuid::nil()],
@@ -468,8 +468,8 @@ fn system_label(provider_label_id: &str) -> LabelRef {
     }
 }
 
-fn label_change(label: LabelRef, added: bool) -> Option<EmailMacroEvent> {
-    EmailMacroEvent::thread_label_change(
+fn label_change(label: LabelRef, added: bool) -> Option<EmailRoxEvent> {
+    EmailRoxEvent::thread_label_change(
         Uuid::nil(),
         user_id("macro|owner@example.com"),
         None,

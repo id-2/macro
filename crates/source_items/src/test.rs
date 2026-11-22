@@ -1,5 +1,5 @@
 use crate::{audit, backfill};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Acquire, PgConnection, PgPool};
 
 mod concurrency;

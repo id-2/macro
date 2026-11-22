@@ -1,5 +1,5 @@
-import { REPLY_TARGET_PARENT_TYPES } from '@macro-inc/lexical-core/nodes/ReplyTargetNode';
-import { extractExplicitReply } from '@macro-inc/lexical-core/utils/explicit-reply';
+import { REPLY_TARGET_PARENT_TYPES } from '@rox-one/lexical-core/nodes/ReplyTargetNode';
+import { extractExplicitReply } from '@rox-one/lexical-core/utils/explicit-reply';
 import { OpenAPIRoute } from 'chanfana';
 import type { Context } from 'hono';
 import { z } from 'zod';

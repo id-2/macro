@@ -1,1 +1,1 @@
-export * from '@macro-inc/spreadsheet/grid-selection';
+export * from '@rox-one/spreadsheet/grid-selection';

@@ -5,7 +5,7 @@ import {
   offset,
   shift,
 } from '@floating-ui/dom';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   createEffect,
   createMemo,

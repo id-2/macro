@@ -21,7 +21,7 @@ import { networkInterfaces } from 'node:os';
  * 2. Start this server from apps/web:
  *      just bundle-smoke-server older --host 0.0.0.0 --port 3001
  * 3. Build/run the native app with:
- *      MACRO_BUNDLE_UPDATE_BASE_URL=http://<MAC-LAN-IP>:3001
+ *      ROX_BUNDLE_UPDATE_BASE_URL=http://<MAC-LAN-IP>:3001
  *      BUNDLE_BUILD_NUMBER=100
  *      MIN_NATIVE_BUILD=0
  *    If testing on a physical iPhone with a plain HTTP LAN URL, iOS ATS may
@@ -125,7 +125,7 @@ Runtime controls:
   GET /__scenario/<scenario>
 
 Native build example:
-  MACRO_BUNDLE_UPDATE_BASE_URL=http://<LAN-IP>:3001 \\
+  ROX_BUNDLE_UPDATE_BASE_URL=http://<LAN-IP>:3001 \\
   BUNDLE_BUILD_NUMBER=100 MIN_NATIVE_BUILD=0 just ios-build
 `);
 }

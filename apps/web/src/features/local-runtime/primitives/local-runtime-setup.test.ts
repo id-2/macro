@@ -1,4 +1,4 @@
-import type { RoxdStatus } from '@macro/tauri/roxd';
+import type { RoxdStatus } from '@rox/tauri/roxd';
 import { createRoot } from 'solid-js';
 import { describe, expect, it, vi } from 'vitest';
 import type { NewLocalAgent, SetupCapabilities } from '../core/setup';
@@ -20,10 +20,19 @@ function fakeCapabilities(
 ): SetupCapabilities {
   return {
     detectAgents: async () => [
-      { id: 'codex', name: 'Codex', note: null, needs_install: false },
+      {
+        id: 'codex',
+        name: 'Codex',
+        command: 'codex',
+        config_path: '~/.codex',
+        note: null,
+        needs_install: false,
+      },
       {
         id: 'claude-code',
         name: 'Claude Code',
+        command: 'claude',
+        config_path: '~/.claude',
         note: null,
         needs_install: true,
       },
@@ -80,7 +89,8 @@ describe('createLocalRuntimeSetup', () => {
     expect(createAgent).toHaveBeenCalledWith({
       name: 'Claude Code',
       handle: 'claude-code',
-      description: 'Runs Claude Code on this computer with your own login.',
+      description:
+        'Запускает Claude Code на этом компьютере под вашей учётной записью.',
       harnessId: 'harness-1',
       defaultModel: 'sonnet',
       autoAcceptPermissions: true,

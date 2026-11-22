@@ -1,11 +1,11 @@
 import {
   $isDatabaseQueryNode,
   type DatabaseQueryNode,
-} from '@macro-inc/lexical-core/nodes/DatabaseQueryNode';
+} from '@rox-one/lexical-core/nodes/DatabaseQueryNode';
 import {
   $isDocumentCardNode,
   type DocumentCardNode,
-} from '@macro-inc/lexical-core/nodes/DocumentCardNode';
+} from '@rox-one/lexical-core/nodes/DocumentCardNode';
 import { $getRoot, $isParagraphNode } from 'lexical';
 import { describe, expect, it } from 'vitest';
 import { read, setup } from '../ai-toolkit/_test-helpers';

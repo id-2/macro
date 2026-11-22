@@ -4,6 +4,7 @@ import { useInlinePreviewLayout } from '@app/components/view-shell/use-inline-pr
 import { calendarSearch } from '@app/features/calendar-view/calendar-url';
 import { ViewTour } from '@app/features/tours/ViewTour';
 import { createSearchParams, SplitRouter } from '@app/lib/split-router';
+import { t } from '@app/lib/i18n';
 import { TraceFlow } from '@app/observability/flow';
 import { homeCalendarRoute } from '@app/routes/routes';
 import { DebugSuspense } from '@channel/DebugSuspense';
@@ -113,7 +114,7 @@ function HomeViewRoot() {
 
   // The touch nav item calls this "Notifications".
   onMount(() =>
-    panel.handle.setDisplayName(isTouchDevice() ? 'Notifications' : 'Home')
+    panel.handle.setDisplayName(isTouchDevice() ? t('nav.notifications') : t('nav.home'))
   );
 
   return (
@@ -163,8 +164,8 @@ export function HomePendingView() {
     <div class="flex size-full min-h-0 flex-col">
       <Show when={!isTouchDevice()}>
         <SidebarCreateHeader
-          title="Home"
-          label="New chat"
+          title={t('nav.home')}
+          label={t('home.newChat')}
           onCreate={() => {}}
         />
       </Show>

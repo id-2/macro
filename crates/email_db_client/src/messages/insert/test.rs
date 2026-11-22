@@ -1,6 +1,6 @@
 use super::*;
 use chrono::{DateTime, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_email::email::service::address::ContactInfo;
 use models_email::email::service::attachment::Attachment;
 use models_email::email::service::label::Label;
@@ -64,7 +64,7 @@ fn message_with_oversized_fields(link_id: Uuid, thread_db_id: Uuid) -> message::
         labels: vec![],
         body_text: Some("body".to_string()),
         body_html_sanitized: Some("<p>body</p>".to_string()),
-        body_macro: None,
+        body_rox: None,
         attachments: vec![Attachment {
             db_id: Uuid::now_v7(),
             provider_id: Some("att1".to_string()),
@@ -229,7 +229,7 @@ impl SyncedMessage<'_> {
                 .collect(),
             body_text: Some(self.body.to_string()),
             body_html_sanitized: Some(format!("<p>{}</p>", self.body)),
-            body_macro: None,
+            body_rox: None,
             attachments: vec![],
             attachments_draft: vec![],
             attachments_forwarded: vec![],

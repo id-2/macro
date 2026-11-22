@@ -1,12 +1,12 @@
 use chrono::TimeZone as _;
 use chrono_tz::Tz;
-use macro_user_id::cowlike::CowLike as _;
+use rox_user_id::cowlike::CowLike as _;
 use strum::IntoEnumIterator as _;
 
 use super::*;
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|nightly@rox.one")
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|nightly@rox.one")
         .unwrap()
         .into_owned()
 }

@@ -9,7 +9,7 @@ use std::{
 
 use connection_gateway_client::ConnectionGatewayClient;
 use entity_access::domain::models::EntityType;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::Value;
 
 use crate::domain::{
@@ -47,7 +47,7 @@ impl GatewayImportNotifier {
 impl ImportNotifier for GatewayImportNotifier {
     async fn invalidate(
         &self,
-        requester: &MacroUserIdStr<'_>,
+        requester: &RoxUserIdStr<'_>,
         team: TeamId,
         job: JobId,
         revision: u64,

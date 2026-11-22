@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   buildContributionGrid,
   HEATMAP_MAX_CELL,
@@ -7,6 +8,8 @@ import {
   scrollLeftAtWeeksFromEnd,
   weeksFromEnd,
 } from './contribution-grid';
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 describe('buildContributionGrid', () => {
   it('keeps partial first and last weeks with the outside days null', () => {

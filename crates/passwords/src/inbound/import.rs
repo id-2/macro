@@ -7,7 +7,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOnly};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOnly};
 use uuid::Uuid;
 
 /// Import normalized credentials with independently retryable per-item outcomes.
@@ -20,9 +20,9 @@ use uuid::Uuid;
         (status = 403, body = Failure), (status = 404, body = Failure),
         (status = 409, body = Failure), (status = 413), (status = 503, body = Failure)),
     tag = "passwords")]
-pub async fn import_batch<A: MacroAuthorizationService>(
+pub async fn import_batch<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path((team, import_id)): Path<(Uuid, Uuid)>,
     batch: Result<Json<ImportBatch>, JsonRejection>,
 ) -> Result<Json<ImportBatchResult>, Response> {
@@ -46,9 +46,9 @@ pub async fn import_batch<A: MacroAuthorizationService>(
     responses((status = 200, body = Vec<ItemView>), (status = 400, body = Failure),
         (status = 403, body = Failure), (status = 404, body = Failure), (status = 409, body = Failure)),
     tag = "passwords")]
-pub async fn match_names<A: MacroAuthorizationService>(
+pub async fn match_names<A: RoxAuthorizationService>(
     State(state): State<PasswordRouterState<A>>,
-    user: MacroAuthorizationExtractor<A, UserOnly>,
+    user: RoxAuthorizationExtractor<A, UserOnly>,
     Path(team): Path<Uuid>,
     body: Result<Json<MatchNames>, JsonRejection>,
 ) -> Result<Json<Vec<ItemView>>, Response> {

@@ -14,5 +14,6 @@ mod gemini;
 pub mod metering;
 pub mod metering_http;
 mod openai;
+pub mod provider_keys;
 pub mod router;
 pub(crate) mod usage_amount;

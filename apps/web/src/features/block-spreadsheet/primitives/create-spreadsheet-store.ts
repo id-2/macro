@@ -1,25 +1,25 @@
 import {
   validImageKey,
   validImageUrl,
-} from '@macro-inc/spreadsheet/sheet-drawings';
-import type { SheetTable } from '@macro-inc/spreadsheet/sheet-tables';
+} from '@rox-one/spreadsheet/sheet-drawings';
+import type { SheetTable } from '@rox-one/spreadsheet/sheet-tables';
 import {
   readSpreadsheetSheets,
   type SpreadsheetSheet,
-} from '@macro-inc/spreadsheet/spreadsheet-sheet-registry';
+} from '@rox-one/spreadsheet/spreadsheet-sheet-registry';
 import {
   type SheetChanges,
   tableEditChanges,
-} from '@macro-inc/spreadsheet/table-edits';
+} from '@rox-one/spreadsheet/table-edits';
 import {
   readSheetMetadata,
   readSpreadsheetTables,
   writeSheetMetadata,
-} from '@macro-inc/spreadsheet/table-storage';
+} from '@rox-one/spreadsheet/table-storage';
 import {
   parseWorkbookMetadata,
   type WorkbookSheetMetadata,
-} from '@macro-inc/spreadsheet/workbook-metadata';
+} from '@rox-one/spreadsheet/workbook-metadata';
 import { leadingAndTrailing, throttle } from '@solid-primitives/scheduled';
 import type { LoroDoc, LoroEventBatch } from 'loro-crdt';
 import {

@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
 import type { ColumnDetail, TableDetail } from '../generated/storage/types.gen';
-import { Macro } from '../src/macro';
+import { Macro } from '../src/rox';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {

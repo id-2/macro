@@ -1,6 +1,6 @@
 use super::*;
 use chrono::DateTime;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use opentelemetry::trace::{SpanId, TracerProvider as _};
 use opentelemetry_sdk::trace::{InMemorySpanExporter, SdkTracerProvider, SpanData};
 use rootcause::Report;

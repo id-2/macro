@@ -4,7 +4,7 @@ import LightningIcon from '@icon/system/regular/lightning.svg';
 import {
   type DatabaseQueryDisplayMode,
   isDatabaseQueryChartMode,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 import { cn } from '@ui';
 import { For, Match, Show, Switch } from 'solid-js';
 import { ResizableAnswer } from './resizable-answer';

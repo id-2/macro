@@ -4,14 +4,14 @@ use axum::extract::{Path, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use email::domain::message_reads::ThreadOwnerError;
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use model::response::ErrorResponse;
 use uuid::Uuid;
 
 #[tracing::instrument(skip(ctx))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     Path(thread_id): Path<Uuid>,
 ) -> Result<Response, Response> {
     let response = ctx

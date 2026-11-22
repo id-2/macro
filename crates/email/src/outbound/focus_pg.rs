@@ -3,7 +3,7 @@
 use std::{collections::HashMap, str::FromStr};
 
 use chrono::{DateTime, Duration, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use sqlx::PgPool;
 use uuid::Uuid;
@@ -245,7 +245,7 @@ impl FocusStore for FocusPgRepository {
         Ok(Some(FocusInbox {
             thread_id: row.id,
             link_id: row.link_id,
-            owner: MacroUserIdStr::try_from(row.macro_id)?,
+            owner: RoxUserIdStr::try_from(row.macro_id)?,
             owner_email: row.email_address.to_lowercase(),
             is_signal: row.is_signal,
             inbox_visible: row.inbox_visible,
@@ -488,7 +488,7 @@ impl FocusStore for FocusPgRepository {
             .map(|row| {
                 Ok(FocusInboxOwner {
                     link_id: row.id,
-                    owner: MacroUserIdStr::try_from(row.macro_id)?,
+                    owner: RoxUserIdStr::try_from(row.macro_id)?,
                 })
             })
             .collect()
@@ -505,7 +505,7 @@ impl FocusStore for FocusPgRepository {
             .map(|row| {
                 Ok(FocusInboxOwner {
                     link_id: row.id,
-                    owner: MacroUserIdStr::try_from(row.macro_id)?,
+                    owner: RoxUserIdStr::try_from(row.macro_id)?,
                 })
             })
             .collect()
@@ -514,7 +514,7 @@ impl FocusStore for FocusPgRepository {
     #[tracing::instrument(skip(self), fields(threads = tracing::field::Empty), err)]
     async fn focus_thread_ids(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         since: DateTime<Utc>,
         waiting_before: DateTime<Utc>,
         now: DateTime<Utc>,
@@ -596,7 +596,7 @@ impl FocusStore for FocusPgRepository {
     )]
     async fn focus_for_threads(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         thread_ids: &[Uuid],
         waiting_before: DateTime<Utc>,
         now: DateTime<Utc>,

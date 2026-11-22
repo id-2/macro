@@ -1,5 +1,5 @@
 import { useMeetingSessionOwnerOptional } from '@app/features/meetings/context/meeting-session-owner';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { useLocation, useNavigate } from '@solidjs/router';
 import { useCallContextOptional } from '../CallContext';
 import { getActiveMeetingPath, getMeetingShareToken } from '../call-link';

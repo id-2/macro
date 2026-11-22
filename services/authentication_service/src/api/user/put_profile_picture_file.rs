@@ -1,6 +1,6 @@
 use axum::{Json, extract::State, http::StatusCode};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_db_client::user::update_profile_picture::update_profile_picture;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_db_client::user::update_profile_picture::update_profile_picture;
 use model::response::{EmptyResponse, ErrorResponse};
 use models_sfs::FileMetadata;
 
@@ -139,7 +139,7 @@ fn validate_profile_picture_upload(
 )]
 pub async fn create_upload_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(req): Json<CreateProfilePictureUploadRequest>,
 ) -> Result<Json<ProfilePictureUpload>, (StatusCode, Json<ErrorResponse<'static>>)> {
     validate_profile_picture_upload(&req.content_type, req.size_bytes).map_err(|e| match e {
@@ -237,7 +237,7 @@ pub async fn create_upload_handler(
 )]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Json(req): Json<PutProfilePictureFileRequest>,
 ) -> Result<Json<EmptyResponse>, (StatusCode, Json<ErrorResponse<'static>>)> {
     let file_id = uuid::Uuid::parse_str(&req.file_id)

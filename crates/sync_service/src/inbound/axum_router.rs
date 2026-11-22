@@ -8,8 +8,8 @@ use axum::{
     routing::post,
 };
 
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 
 use crate::domain::{
@@ -19,7 +19,7 @@ use crate::domain::{
 
 pub struct SyncServiceRouterState<Svc, Auth> {
     pub service: Arc<Svc>,
-    pub authorization_state: MacroAuthorizationState<Auth>,
+    pub authorization_state: RoxAuthorizationState<Auth>,
 }
 
 impl<Svc, Auth> Clone for SyncServiceRouterState<Svc, Auth> {
@@ -31,7 +31,7 @@ impl<Svc, Auth> Clone for SyncServiceRouterState<Svc, Auth> {
     }
 }
 
-impl<Svc, Auth> FromRef<SyncServiceRouterState<Svc, Auth>> for MacroAuthorizationState<Auth> {
+impl<Svc, Auth> FromRef<SyncServiceRouterState<Svc, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &SyncServiceRouterState<Svc, Auth>) -> Self {
         state.authorization_state.clone()
     }
@@ -40,7 +40,7 @@ impl<Svc, Auth> FromRef<SyncServiceRouterState<Svc, Auth>> for MacroAuthorizatio
 pub fn sync_service_router<Svc, Auth, S>(state: SyncServiceRouterState<Svc, Auth>) -> Router<S>
 where
     Svc: SyncWakeupService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     Router::new()
@@ -61,12 +61,12 @@ where
 )]
 pub async fn bulk_wakeup_handler<Svc, Auth>(
     State(state): State<SyncServiceRouterState<Svc, Auth>>,
-    _user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    _user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(request): Json<BulkWakeupRequest>,
 ) -> Response
 where
     Svc: SyncWakeupService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let dispatched = state.service.bulk_wakeup(request.document_ids);
 

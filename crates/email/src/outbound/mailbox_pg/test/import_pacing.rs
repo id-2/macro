@@ -6,7 +6,7 @@ use email_api_client::domain::models::{
     EmailApiError, MailFolder, MailboxChangePage, MailboxMessage, ProviderId, StreamPosition,
     StreamToken,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;

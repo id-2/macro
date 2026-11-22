@@ -28,12 +28,12 @@ macro_rules! scenario {
         mod $name {
             use super::*;
 
-            #[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+            #[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
             async fn single_message_writes(pool: PgPool) {
                 run(World::new(pool, $shard, false).await).await;
             }
 
-            #[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+            #[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
             async fn batched_writes(pool: PgPool) {
                 run(World::new(pool, $shard + 100, true).await).await;
             }
@@ -432,7 +432,7 @@ scenario!(
 /// message: an accepted one clears its marker, a rejected one puts its
 /// message back, and one still queued keeps its message archived through a
 /// sync.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn single_message_writes_each_settle_their_own_message(pool: PgPool) {
     let mut world = World::new(pool, 916, false).await;
     let sim = &mut Sim::new(&mut world, 1);
@@ -482,7 +482,7 @@ async fn single_message_writes_each_settle_their_own_message(pool: PgPool) {
 /// request per message. When Gmail rejects one after accepting another, only
 /// the messages it hasn't accepted go back, so the database already agrees
 /// with Gmail and no marker is left.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn a_rejection_partway_through_a_batch_keeps_what_gmail_accepted(pool: PgPool) {
     let mut world = World::new(pool, 917, true).await;
     let sim = &mut Sim::new(&mut world, 1);
@@ -509,7 +509,7 @@ async fn a_rejection_partway_through_a_batch_keeps_what_gmail_accepted(pool: PgP
 /// message and the next one is rate limited. The retry doesn't send the
 /// accepted message again, and when Gmail rejects it, only the messages Gmail
 /// never accepted go back.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn a_rejected_retry_keeps_the_messages_gmail_accepted_before_it(pool: PgPool) {
     let mut world = World::new(pool, 918, true).await;
     let sim = &mut Sim::new(&mut world, 1);
@@ -545,7 +545,7 @@ async fn a_rejected_retry_keeps_the_messages_gmail_accepted_before_it(pool: PgPo
 /// after Gmail applies its first message. The user unarchives the thread and
 /// that write reaches Gmail first. When the archive resumes, it leaves the
 /// other two messages to the unarchive.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn a_resumed_older_write_skips_messages_a_newer_write_took_over(pool: PgPool) {
     let mut world = World::new(pool, 919, true).await;
     let sim = &mut Sim::new(&mut world, 1);
@@ -578,7 +578,7 @@ async fn a_resumed_older_write_skips_messages_a_newer_write_took_over(pool: PgPo
 /// archive drew the earlier id, as when requests race. The unarchive sends t1
 /// before it waits for the archive on t2, and when Gmail rejects the archive,
 /// t2 goes back to the unarchive, which then sends it.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn crossing_bulk_writes_each_send_where_they_are_newest_and_fall_back_on_rejection(
     pool: PgPool,
 ) {
@@ -752,12 +752,12 @@ fn label_writes_and_a_label_sync_fit_on_small_worker_stacks(
     });
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn single_message_writes_and_a_label_sync_fit_on_small_worker_stacks(pool: PgPool) {
     label_writes_and_a_label_sync_fit_on_small_worker_stacks(pool, 915, false);
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn a_label_write_batch_and_a_label_sync_fit_on_small_worker_stacks(pool: PgPool) {
     label_writes_and_a_label_sync_fit_on_small_worker_stacks(pool, 1015, true);
 }

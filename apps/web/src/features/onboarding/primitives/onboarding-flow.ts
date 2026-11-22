@@ -19,6 +19,7 @@ import {
   type OnboardingStep,
   restoreOnboardingStep,
   type StepOutcome,
+  visibleOnboardingStep,
 } from '../core/steps';
 import {
   clearSignupDraft,
@@ -56,6 +57,12 @@ export function createOnboardingFlow(
     signupMethod: Accessor<'google' | 'email_code' | undefined>;
     /** While leaving, a completed tutorial is the flow's own doing. */
     finishing: Accessor<boolean>;
+    /**
+     * The page was opened on purpose (a bookmark, the Account row) rather than
+     * by a sign-in. A finished account walks the flow again and finishes where
+     * it is, instead of bouncing straight out of it.
+     */
+    restart: Accessor<boolean>;
   }
 ) {
   const [step, setStep] = createSignal<OnboardingStep>();
@@ -71,7 +78,8 @@ export function createOnboardingFlow(
     const state = context.viewer();
     return state.t === 'signed-in' ? state.viewer : undefined;
   };
-  const needsOnboarding = () => viewer()?.tutorialComplete === false;
+  const needsOnboarding = () =>
+    options.restart() || viewer()?.tutorialComplete === false;
 
   // Restore once per viewer. Checkout, then a Google sign-up return, then
   // saved progress, then a ?step link, then welcome.
@@ -83,8 +91,13 @@ export function createOnboardingFlow(
       options.checkoutReturn() !== undefined,
       options.requestedStep()
     );
-    const initial =
-      restored === 'handle' && viewer()?.handle ? 'work' : restored;
+    const initial = options.restart() && viewer()?.tutorialComplete
+      ? // A finished account reopening the flow has nothing to do on the
+        // handle step; it starts at the first step it can still act on.
+        visibleOnboardingStep(viewer()?.handle ? 'team' : 'handle')
+      : restored === 'handle' && viewer()?.handle
+        ? 'work'
+        : restored;
     saveStep(userId, initial);
     if (draft?.authenticating && draft.accent)
       context.applyAccent(draft.accent, userId);
@@ -128,6 +141,7 @@ export function createOnboardingFlow(
     if (
       repairing ||
       options.finishing() ||
+      options.restart() ||
       !needsOnboarding() ||
       record.t !== 'ready' ||
       record.value.status !== 'completed'
@@ -143,7 +157,7 @@ export function createOnboardingFlow(
     const state = context.viewer();
     if (state.t === 'loading') return { t: 'loading' };
     if (state.t === 'signed-out') return { t: 'signed-out' };
-    if (!state.viewer.tutorialComplete || options.finishing()) {
+    if (options.restart() || !state.viewer.tutorialComplete || options.finishing()) {
       const current = step();
       return current
         ? { t: 'active', viewer: state.viewer, step: current }

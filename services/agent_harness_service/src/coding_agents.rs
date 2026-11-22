@@ -14,8 +14,8 @@ use bots::domain::ports::BotService;
 use codex_connection::domain::ConnectionService;
 use harness_id::HarnessId;
 use harnesses::domain::ports::HarnessRepo;
-use macro_authorization::{MacroAuthorizationService, MacroAuthorizationState};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationService, RoxAuthorizationState};
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 #[cfg(test)]
@@ -51,7 +51,7 @@ impl<Bots: BotService, Harnesses: HarnessRepo> CodingAgentDirectory
 {
     async fn candidates(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<CodingAgentCandidate>, CodingAgentError> {
         let (agents, cursor) = tokio::try_join!(
             async {
@@ -176,13 +176,13 @@ pub fn router<Directory, Sessions, Updates, Auth>(
     directory: Directory,
     sessions: Sessions,
     updates: Updates,
-    authorization: MacroAuthorizationState<Auth>,
+    authorization: RoxAuthorizationState<Auth>,
 ) -> Router
 where
     Directory: CodingAgentDirectory,
     Sessions: RoutineSessions,
     Updates: CodingAgentUpdatesRepo,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     coding_agents_router(CodingAgentsState::new(
         Arc::new(CodingAgentServiceImpl::new(directory, sessions, updates)),

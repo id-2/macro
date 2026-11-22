@@ -19,7 +19,7 @@ use foreign_entity::domain::{
     ports::{ForeignEntityListQuery, ForeignEntityService},
 };
 use item_filters::ast::{LiteralTree, github_pull_request::GithubPullRequestLiteral};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::{
     events::GithubPullRequestUpdated,
@@ -368,7 +368,7 @@ where
     #[tracing::instrument(err, skip(self, team))]
     async fn github_pull_request_facets(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         team: Option<EntityAccessReceipt<MemberTeamRole>>,
     ) -> Result<GithubPullRequestFacets, GithubPullRequestError> {
         let mut source_ids = vec![SourceId::user(user.as_ref())];

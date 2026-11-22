@@ -3,8 +3,10 @@
 use std::{collections::BTreeMap, future::Future, pin::Pin, sync::Arc, time::Duration};
 
 use cognition::domain::{Cognition, DecisionRequest};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tracing::Instrument as _;
+
+use agent::provider_keys::model_is_callable;
 
 use super::models::resolve;
 
@@ -16,6 +18,17 @@ pub const HIGH_MODEL: &str = "anthropic/claude-opus-5-5";
 
 /// The model a prompt that is neither hard nor simple runs on.
 pub const MID_MODEL: &str = "openai/gpt-6.1-sol";
+
+/// The model a choice runs on when this deployment can call it: Auto's
+/// default when the chosen model's provider key is only a placeholder, so a
+/// classified Auto turn never fails on an unreachable provider.
+fn callable(model: &'static str) -> &'static str {
+    if model_is_callable(model) {
+        model
+    } else {
+        resolve(super::models::AUTO_MODEL)
+    }
+}
 
 /// Asked first: a yes runs the turn on [`HIGH_MODEL`].
 const HIGH_QUESTION: &str = "Does this request require higher intelligence?";
@@ -40,7 +53,7 @@ pub trait AutoModelSelector: Send + Sync {
     /// keeps the turn on Auto's default model.
     fn select<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         prompt: &'a str,
     ) -> Pin<Box<dyn Future<Output = &'static str> + Send + 'a>>;
 }
@@ -51,7 +64,7 @@ pub struct DefaultAutoModel;
 impl AutoModelSelector for DefaultAutoModel {
     fn select<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'static>,
+        _: &'a RoxUserIdStr<'static>,
         _: &'a str,
     ) -> Pin<Box<dyn Future<Output = &'static str> + Send + 'a>> {
         Box::pin(async { resolve(super::models::AUTO_MODEL) })
@@ -75,7 +88,7 @@ impl JevAutoModel {
 impl AutoModelSelector for JevAutoModel {
     fn select<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'static>,
+        owner: &'a RoxUserIdStr<'static>,
         prompt: &'a str,
     ) -> Pin<Box<dyn Future<Output = &'static str> + Send + 'a>> {
         Box::pin(async move {
@@ -110,11 +123,11 @@ impl AutoModelSelector for JevAutoModel {
                     span.record("agent.auto_model.low", low);
                     span.record("agent.auto_model.outcome", "classified");
                     if high >= YES_THRESHOLD {
-                        HIGH_MODEL
+                        callable(HIGH_MODEL)
                     } else if low >= YES_THRESHOLD {
                         resolve(super::models::AUTO_MODEL)
                     } else {
-                        MID_MODEL
+                        callable(MID_MODEL)
                     }
                 }
                 None => {

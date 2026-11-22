@@ -6,7 +6,7 @@ use super::{
 };
 use ai_usage::{AiFeature, UsageContext, UsageRecorder};
 use bytes::Bytes;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::{sync::Arc, time::Duration};
 use tokio::sync::Semaphore;
 
@@ -50,7 +50,7 @@ impl<P: TranscriptionProvider, I: RecordingInspector> DictationService
     ))]
     async fn transcribe(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         audio: Bytes,
         language: Option<LanguageHint>,
     ) -> Result<Transcript, DictationError> {

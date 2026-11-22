@@ -13,7 +13,7 @@ pub struct NoAgents;
 impl AgentDirectory for NoAgents {
     async fn resolve(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> Result<Option<DirectoryAgent>, Error> {
         Ok(None)
     }

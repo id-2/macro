@@ -4,9 +4,9 @@
 mod test;
 
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroProjectsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxProjectsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_owner::Owner;
 use serde::{Deserialize, Serialize};
 
@@ -33,7 +33,7 @@ pub struct ProjectUpdatedMetadata {
     /// The owner of the project.
     pub owner: Owner,
     /// The authenticated user who performed the update, if any.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// The new project name, or `None` when unchanged.
     pub name: Option<String>,
     /// The parent project id before the update.
@@ -52,7 +52,7 @@ pub struct ProjectDeletedMetadata {
     /// The owner of the root project.
     pub owner: Owner,
     /// The authenticated user who performed the deletion, if any.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// The parent of the root project, when any.
     pub parent_project_id: Option<String>,
     /// The ids of all projects deleted in the cascade.
@@ -71,7 +71,7 @@ pub struct ProjectRestoredMetadata {
     /// The owner of the root project.
     pub owner: Owner,
     /// The authenticated user who performed the restoration, if any.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// The parent under which the root project was restored, when any.
     pub parent_project_id: Option<String>,
     /// The ids of all projects restored in the cascade.
@@ -86,7 +86,7 @@ pub struct ProjectPermanentlyDeletedMetadata {
     /// The owner of the root project.
     pub owner: Owner,
     /// The authenticated user who performed the deletion, if any.
-    pub actor_user_id: Option<MacroUserIdStr<'static>>,
+    pub actor_user_id: Option<RoxUserIdStr<'static>>,
     /// The parent of the root project, when any.
     pub parent_project_id: Option<String>,
     /// The ids of all projects purged in the cascade.
@@ -112,7 +112,7 @@ pub struct ProjectUploadedMetadata {
     pub project_ids: Vec<String>,
 }
 
-/// Events that can be published to [`MacroProjectsTopic`].
+/// Events that can be published to [`RoxProjectsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum ProjectTopicEvent {
@@ -137,18 +137,18 @@ pub enum ProjectTopicEvent {
 }
 
 impl TopicEvent for ProjectTopicEvent {
-    type Topic = MacroProjectsTopic;
+    type Topic = RoxProjectsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroProjectsTopic`], keyed by the root project id.
-pub struct ProjectMacroEvent {
+/// Publishable event for [`RoxProjectsTopic`], keyed by the root project id.
+pub struct ProjectRoxEvent {
     key: String,
     event: Event<ProjectTopicEvent>,
 }
 
-impl ProjectMacroEvent {
+impl ProjectRoxEvent {
     /// Builds a created event keyed by the new project id.
     pub fn created(key: impl Into<String>, metadata: ProjectCreatedMetadata) -> Self {
         Self::new(key, ProjectTopicEvent::Created(metadata))
@@ -196,7 +196,7 @@ impl ProjectMacroEvent {
     }
 }
 
-impl MacroEvent for ProjectMacroEvent {
+impl RoxEvent for ProjectRoxEvent {
     type EventPayload = ProjectTopicEvent;
 
     fn key(&self) -> &str {

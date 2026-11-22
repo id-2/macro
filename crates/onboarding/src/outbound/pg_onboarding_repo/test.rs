@@ -1,9 +1,9 @@
 use super::*;
 use crate::domain::models::{OnboardingStatus, PromptId};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
-fn user(email: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email(email).expect("valid test user id")
+fn user(email: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email(email).expect("valid test user id")
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]

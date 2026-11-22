@@ -1,10 +1,10 @@
 import { describe, expect, spyOn, test } from 'bun:test';
 import type { AgentSessionLifecycleEvent } from '../generated/storage/types.gen';
 import { hydrateAgentSessionEvent } from '../src/events/hydrate/agentSession';
-import type { MacroClient } from '../src/utils/client';
+import type { RoxClient } from '../src/utils/client';
 
 // Handles are lazy, so hydration never touches the network.
-const client = {} as MacroClient;
+const client = {} as RoxClient;
 
 const identity = {
   session_id: '01a00000-0000-7000-8000-00000000000a',

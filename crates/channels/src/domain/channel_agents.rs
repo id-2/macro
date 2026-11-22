@@ -3,7 +3,7 @@
 use std::sync::Arc;
 
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::ports::ChannelMutationErr;
@@ -27,7 +27,7 @@ pub enum ChannelAgentKind {
     /// prompts it, and it acts with their access.
     Direct {
         /// The user who owns the conversation.
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     },
     /// A member of a shared channel. Nothing adds these yet, and nothing
     /// routes messages to them until a flow does.

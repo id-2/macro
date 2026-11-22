@@ -11,7 +11,7 @@ use item_filters::ast::{
     project::ProjectLiteral,
     properties::{PropertiesLiteral, PropertyMatchValue},
 };
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use recursion::CollapsibleExt;
 use sqlx::{PgPool, Postgres, QueryBuilder, postgres::PgRow, prelude::FromRow};
@@ -483,7 +483,7 @@ impl AggregateRow {
             recent_events,
         } = self;
 
-        let user_id = MacroUserIdStr::parse_from_str(&user_id)
+        let user_id = RoxUserIdStr::parse_from_str(&user_id)
             .map(|id| id.into_owned())
             .map_err(|e| sqlx::Error::Decode(Box::new(e)))?;
 
@@ -505,7 +505,7 @@ impl AggregateRow {
 #[tracing::instrument(err, skip(db, filter))]
 pub async fn dynamic_get_top_entities(
     db: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     from_score: Option<f64>,
     limit: u32,
     filter: EntityFilterAst,

@@ -1,13 +1,13 @@
 use super::*;
 use crate::domain::events::CallTopicEvent;
 use crate::domain::records::{CallProvider, ExternalCallId};
-use macro_event_broker::{EventBrokerError, MacroEvent};
+use rox_event_broker::{EventBrokerError, RoxEvent};
 use std::sync::{Arc, Mutex};
 
 const CALL_ID: Uuid = Uuid::from_u128(0x0198a1b2_c3d4_7e5f_8061_728394a5b6c7);
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@test.com".to_string()).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@test.com".to_string()).unwrap()
 }
 
 struct FixedRepo;
@@ -19,20 +19,20 @@ impl ImportedCallRepository for FixedRepo {
     }
     async fn list_owned(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
     ) -> Result<Vec<ImportedCallPreview>, rootcause::Report> {
         Ok(vec![])
     }
     async fn list_source_records(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _provider: CallProvider,
     ) -> Result<Vec<ImportedCallRecord>, rootcause::Report> {
         Ok(vec![])
     }
     async fn read_owned(
         &self,
-        _user: &MacroUserIdStr<'static>,
+        _user: &RoxUserIdStr<'static>,
         _id: Uuid,
     ) -> Result<Option<CallEntityRecord>, rootcause::Report> {
         Ok(None)
@@ -42,8 +42,8 @@ impl ImportedCallRepository for FixedRepo {
 #[derive(Clone, Default)]
 struct RecordingBroker(Arc<Mutex<Vec<(String, serde_json::Value)>>>);
 
-impl MacroEventBroker for RecordingBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

@@ -5,14 +5,14 @@ use crate::domain::{
 use ai_billing::domain::admission::AdmissionFuture;
 use ai_usage::UsageEvent;
 use entity_access::domain::models::{Entity, EntityPermission, EntityType};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 
 const DOCUMENT: &str = "019fd3b9-3c6c-7c05-89c2-a27f0121813b";
 const SECRET: &str = "local-spreadsheet-test-secret";
 
-fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|sheets@rox.one".to_owned()).unwrap()
+fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|sheets@rox.one".to_owned()).unwrap()
 }
 
 fn receipt() -> EntityAccessReceipt<EditAccessLevel> {
@@ -41,7 +41,7 @@ struct Admission(Result<(), AiAdmissionError>);
 impl AiAdmissionService for Admission {
     fn admit<'a>(
         &'a self,
-        caller: &'a MacroUserIdStr<'_>,
+        caller: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> AdmissionFuture<'a> {
         Box::pin(async move {
@@ -68,7 +68,7 @@ async fn an_edit_mints_edit_access_and_bills_the_writer() {
         .times(1)
         .returning(|_, token, instructions| {
             let claims: serde_json::Value =
-                macro_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
+                rox_sync_service_jwt::decode(token.as_str(), SECRET).unwrap();
             assert_eq!(claims["access_level"], "edit");
             assert_eq!(claims["user_id"], "macro|sheets@rox.one");
             assert_eq!(instructions, "Add a total row.");

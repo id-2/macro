@@ -16,7 +16,7 @@ use agent_trigger::domain::broker_events::{
 };
 use bot_id::BotId;
 use futures::StreamExt as _;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use tokio::io::{AsyncReadExt as _, AsyncWriteExt as _};
 use tokio::net::{TcpListener, TcpStream};
 use tokio::sync::{Notify, broadcast, mpsc};
@@ -54,7 +54,7 @@ struct ControlPlane {
 impl ControlPlane {
     /// Publish one trigger event: to every open stream, and to the log a
     /// stream resuming with `Last-Event-ID` replays.
-    fn publish(&self, event: &macro_event_broker::Event<AgentTriggerTopicEvent>) {
+    fn publish(&self, event: &rox_event_broker::Event<AgentTriggerTopicEvent>) {
         let mut published = self.published.lock().unwrap();
         let entry = (event.event_id, serde_json::to_string(event).unwrap());
         published.push(entry.clone());
@@ -295,8 +295,8 @@ async fn computer_ready(
 }
 
 /// The composer asking `AGENT` for a new session.
-fn session_request(session: AgentSessionId) -> macro_event_broker::Event<AgentTriggerTopicEvent> {
-    macro_event_broker::Event::new(AgentTriggerTopicEvent::New(
+fn session_request(session: AgentSessionId) -> rox_event_broker::Event<AgentTriggerTopicEvent> {
+    rox_event_broker::Event::new(AgentTriggerTopicEvent::New(
         NewAgentSessionEvent::Requested(AgentSessionRequestedEvent {
             repo_url: None,
             bot_id: AGENT,

@@ -1,7 +1,7 @@
 //! Requests for ordinary timestamp grouping.
 
 use item_filters::ast::{EntityFilterAst, ExpandErr};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_grouping::GroupingConfig;
 use models_pagination::{Base64Str, CursorWithValAndFilter, Query};
 use uuid::Uuid;
@@ -16,7 +16,7 @@ pub struct GroupedSortRequest<'a> {
     /// Timestamp sort, filters, and optional continuation.
     pub cursor: Query<Uuid, DynamicSort, EntityFilterAst>,
     /// Authenticated viewer.
-    pub user_id: MacroUserIdStr<'a>,
+    pub user_id: RoxUserIdStr<'a>,
     /// Group field, optional key, and initial per-group limit.
     pub grouping: GroupingConfig,
 }
@@ -24,7 +24,7 @@ pub struct GroupedSortRequest<'a> {
 impl<'a> GroupedSortRequest<'a> {
     /// Start a timestamp-sorted grouped page.
     pub fn initial(
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         limit: u16,
         sort: impl Into<DynamicSort>,
         filters: EntityFilterAst,
@@ -40,7 +40,7 @@ impl<'a> GroupedSortRequest<'a> {
 
     /// Continue the deployed timestamp format with the caller's page size.
     pub fn continue_from(
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         encoded: String,
         grouping: GroupingConfig,
         limit: Option<u16>,

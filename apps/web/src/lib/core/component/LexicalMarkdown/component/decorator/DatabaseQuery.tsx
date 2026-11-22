@@ -4,8 +4,8 @@ import {
   $createDatabaseQueryNode,
   $isDatabaseQueryNode,
   type DatabaseQueryDecoratorProps,
-} from '@macro-inc/lexical-core/nodes/DatabaseQueryNode';
-import type { DatabaseQueryData } from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/DatabaseQueryNode';
+import type { DatabaseQueryData } from '@rox-one/lexical-core/nodes/databaseQueryData';
 import { cn } from '@ui';
 import {
   $createNodeSelection,

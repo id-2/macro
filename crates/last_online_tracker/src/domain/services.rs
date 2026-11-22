@@ -1,6 +1,6 @@
 use crate::domain::ports::{LastOnlineRepo, SystemTime};
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::time::Duration;
 
@@ -18,21 +18,21 @@ impl<T: SystemTime, R: LastOnlineRepo> LastOnlineService<T, R> {
     }
 
     #[tracing::instrument(err, skip(self))]
-    pub async fn record_last_online(&self, user: MacroUserIdStr<'_>) -> Result<(), Report> {
+    pub async fn record_last_online(&self, user: RoxUserIdStr<'_>) -> Result<(), Report> {
         let now = self.time.now();
         self.repo.set_last_online(user, now).await
     }
 
     pub async fn get_last_online(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> Result<Option<DateTime<Utc>>, Report> {
         self.repo.get_last_online(user).await
     }
 
     pub async fn time_since_last_online(
         &self,
-        user: MacroUserIdStr<'_>,
+        user: RoxUserIdStr<'_>,
     ) -> Result<Option<Duration>, Report> {
         let last = self.get_last_online(user).await?;
         let now = self.time.now();

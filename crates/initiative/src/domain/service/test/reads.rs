@@ -36,7 +36,7 @@ impl InitiativeResources for FakeResources {
     }
     fn set_initial_properties(
         &self,
-        _owner: MacroUserIdStr<'static>,
+        _owner: RoxUserIdStr<'static>,
         _id: InitiativeId,
         _values: Vec<crate::domain::models::InitialPropertyValue>,
     ) -> ResourceFuture<'_, ()> {

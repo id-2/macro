@@ -1,6 +1,6 @@
 import { deepEqual } from '@core/util/compareUtils';
-import { prepareEmailBody } from '@macro-inc/email-renderer';
-import { mountEmailBody } from '@macro-inc/email-renderer/browser';
+import { prepareEmailBody } from '@rox-one/email-renderer';
+import { mountEmailBody } from '@rox-one/email-renderer/browser';
 import {
   type Accessor,
   createEffect,
@@ -49,7 +49,7 @@ export function createEmailMessageBody(
       html: props.message.body_html_sanitized,
       replylessHtml: props.message.body_replyless,
       text: props.message.body_text,
-      macro: props.message.body_macro,
+      macro: props.message.body_rox,
       attachments: props.message.attachments,
       isPersonal: props.isPersonal,
       showFullContent: props.showFullContent,

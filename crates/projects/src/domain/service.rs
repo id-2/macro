@@ -8,8 +8,8 @@ use entity_access::domain::models::{
 };
 use entity_access_management::domain::ports::EntityAccessManagementService;
 use futures::stream::{FuturesUnordered, StreamExt};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::folder::{FileSystemNodeWithIds, UploadFolderRequest, UploadFolderResponseData};
 use model::item::{Item, ItemWithUserAccessLevel};
 use model::project::request::{CreateProjectRequest, PatchProjectRequestV2};
@@ -33,7 +33,7 @@ use unicode_segmentation::UnicodeSegmentation;
 use uuid::Uuid;
 
 use super::events::{
-    ProjectCreatedMetadata, ProjectDeletedMetadata, ProjectMacroEvent,
+    ProjectCreatedMetadata, ProjectDeletedMetadata, ProjectRoxEvent,
     ProjectPermanentlyDeletedMetadata, ProjectRestoredMetadata, ProjectUpdatedMetadata,
     ProjectUploadedMetadata,
 };
@@ -64,7 +64,7 @@ fn record_tree_counts(projects: usize, documents: usize, chats: usize) {
 
 /// The user id to attribute a project lifecycle event to, when the caller is an
 /// authenticated user.
-fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<MacroUserIdStr<'static>> {
+fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<RoxUserIdStr<'static>> {
     match auth {
         EntityAccessAuth::Authenticated(user_id) => Some(user_id.clone()),
         EntityAccessAuth::Bot(_)
@@ -83,7 +83,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// Project repository.
     pub repo: R,
@@ -114,7 +114,7 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// Create a project service from its repository and external-system ports.
     #[allow(clippy::too_many_arguments)]
@@ -143,7 +143,7 @@ where
     }
 
     /// Publish a project lifecycle event; failures are logged and dropped.
-    fn publish_project_event(&self, event: &ProjectMacroEvent) {
+    fn publish_project_event(&self, event: &ProjectRoxEvent) {
         let _ = self
             .macro_event_broker
             .send_event(event)
@@ -221,7 +221,7 @@ where
             }
         }
 
-        self.publish_project_event(&ProjectMacroEvent::created(
+        self.publish_project_event(&ProjectRoxEvent::created(
             project.id.clone(),
             ProjectCreatedMetadata {
                 project_id: project.id.clone(),
@@ -277,11 +277,11 @@ where
     Eam: EntityAccessManagementService,
     Idx: ProjectSearchIndexer,
     Unf: FiledItemsUnfiler,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     async fn list_projects(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<Project>, ProjectError> {
         self.repo
             .get_projects_for_user(user_id.as_ref())
@@ -291,7 +291,7 @@ where
 
     async fn list_accessible_projects(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<Project>, ProjectError> {
         self.repo
             .get_accessible_projects_for_user(user_id.as_ref())
@@ -301,7 +301,7 @@ where
 
     async fn list_pending_projects(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
     ) -> Result<Vec<PendingProject>, ProjectError> {
         let pending_projects = self
             .repo
@@ -587,7 +587,7 @@ where
         }
 
         let project_id = receipt.entity().entity_id.clone();
-        self.publish_project_event(&ProjectMacroEvent::updated(
+        self.publish_project_event(&ProjectRoxEvent::updated(
             project_id.clone(),
             ProjectUpdatedMetadata {
                 project_id,
@@ -649,7 +649,7 @@ where
             });
 
         let project_id = receipt.entity().entity_id.clone();
-        self.publish_project_event(&ProjectMacroEvent::deleted(
+        self.publish_project_event(&ProjectRoxEvent::deleted(
             project_id.clone(),
             ProjectDeletedMetadata {
                 project_id,
@@ -724,7 +724,7 @@ where
         }
 
         let project_id = receipt.entity().entity_id.clone();
-        self.publish_project_event(&ProjectMacroEvent::permanently_deleted(
+        self.publish_project_event(&ProjectRoxEvent::permanently_deleted(
             project_id.clone(),
             ProjectPermanentlyDeletedMetadata {
                 project_id,
@@ -770,7 +770,7 @@ where
         let result = restored.clone();
 
         let project_id = receipt.entity().entity_id.clone();
-        self.publish_project_event(&ProjectMacroEvent::restored(
+        self.publish_project_event(&ProjectRoxEvent::restored(
             project_id.clone(),
             ProjectRestoredMetadata {
                 project_id,
@@ -786,7 +786,7 @@ where
 
     async fn upload_folder(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         internal: bool,
         args: UploadFolderRequest,
     ) -> Result<UploadFolderResponseData, ProjectError> {
@@ -851,7 +851,7 @@ where
                     project_id: root_project_id,
                     ..
                 } => {
-                    self.publish_project_event(&ProjectMacroEvent::uploaded(
+                    self.publish_project_event(&ProjectRoxEvent::uploaded(
                         root_project_id.clone(),
                         ProjectUploadedMetadata {
                             root_project_id: root_project_id.clone(),
@@ -876,7 +876,7 @@ where
 
     async fn create_upload_extract_request(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         args: UploadExtractFolderRequest,
     ) -> Result<UploadExtractFolderResponseData, ProjectError> {
         let request_id = self.fixed_upload_request_id.unwrap_or_else(Uuid::new_v4);
@@ -906,7 +906,7 @@ where
 
     async fn get_upload_extract_status(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         upload_request_id: &str,
     ) -> Result<UploadExtractStatusResponseData, ProjectError> {
         let request = self
@@ -938,7 +938,7 @@ where
             .map_err(|error| internal_error(error, "unable to mark projects uploaded"))?;
 
         if uploaded_tree.upload_pending_transitioned {
-            self.publish_project_event(&ProjectMacroEvent::uploaded(
+            self.publish_project_event(&ProjectRoxEvent::uploaded(
                 uploaded_tree.id.clone(),
                 ProjectUploadedMetadata {
                     root_project_id: uploaded_tree.id,
@@ -955,7 +955,7 @@ where
 
     async fn get_batch_preview(
         &self,
-        _actor: Option<MacroUserIdStr<'static>>,
+        _actor: Option<RoxUserIdStr<'static>>,
         project_ids: Vec<String>,
     ) -> Result<Vec<ProjectPreview>, ProjectError> {
         let unique_project_ids: HashSet<String> = project_ids.into_iter().collect();
@@ -1026,7 +1026,7 @@ where
     }
 }
 
-fn owns(item: &Item, actor: &MacroUserIdStr<'_>) -> bool {
+fn owns(item: &Item, actor: &RoxUserIdStr<'_>) -> bool {
     match item {
         Item::Project(project) => project.user_id.is_user(actor),
         Item::Document(document) => document.owner.is_user(actor),

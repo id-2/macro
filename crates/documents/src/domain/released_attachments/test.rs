@@ -1,5 +1,5 @@
 use super::*;
-use macro_event_broker::{EventBrokerError, MacroEvent};
+use rox_event_broker::{EventBrokerError, RoxEvent};
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 
@@ -45,8 +45,8 @@ impl ReleasedAttachmentRepo for ScriptedQueue {
 #[derive(Clone, Default)]
 struct RecordingBroker(Arc<Mutex<Vec<(String, serde_json::Value)>>>);
 
-impl MacroEventBroker for RecordingBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> Result<tokio::task::JoinHandle<Result<(), EventBrokerError>>, EventBrokerError> {

@@ -6,7 +6,7 @@ use axum::{
     response::{IntoResponse, Response},
     routing::get,
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use reqwest::StatusCode;
 use serde::Deserialize;
 
@@ -48,7 +48,7 @@ pub struct LogoParams {
 #[utoipa::path(get, path = "/logos", params(("domain" = String, Query, description = "Public DNS domain")), responses((status = 200, description = "Cached raster favicon"), (status = 401, description = "Unauthorized")))]
 #[tracing::instrument(skip_all, err)]
 pub(crate) async fn logo_handler(
-    _user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    _user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     State(service): State<LogoService<FaviconProvider>>,
     Query(params): Query<LogoParams>,
 ) -> Result<Response, ProxyError> {

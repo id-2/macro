@@ -1,5 +1,5 @@
-import { WebsocketEvent } from '@macro-inc/collaboration/websocket';
-import { Telemetry } from '@macro-inc/observability';
+import { WebsocketEvent } from '@rox-one/collaboration/websocket';
+import { Telemetry } from '@rox-one/observability';
 import { createClient, type Operation } from '@urql/core';
 import { createRoot, createSignal } from 'solid-js';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';

@@ -233,7 +233,7 @@ async fn a_session_with_work_in_flight_stays_visible(pool: PgPool) {
     );
 
     let answering = create_session(&repo, new_session(bot, None, None)).await;
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'direct_message', $2)",
         channel,

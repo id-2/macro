@@ -25,15 +25,15 @@ use entity_access::domain::{
 };
 use http_body_util::BodyExt;
 #[allow(deprecated)]
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_ORGANIZATION_ID_HEADER, INTERNAL_MACRO_USER_ID_HEADER,
     InternalAuthConfig, JwtValidator, LEGACY_DSS_INTERNAL_API_KEY_HEADER,
-    LEGACY_DSS_INTERNAL_MACRO_USER_ID_HEADER, MacroAuthorizationError,
-    MacroAuthorizationServiceImpl, MacroAuthorizationState, ValidatedIdentity,
+    LEGACY_DSS_INTERNAL_MACRO_USER_ID_HEADER, RoxAuthorizationError,
+    RoxAuthorizationServiceImpl, RoxAuthorizationState, ValidatedIdentity,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use models_pagination::{CreatedAt, PaginateOn, Query};
 use rootcause::Report;
 use std::sync::{
@@ -121,13 +121,13 @@ impl EntityAccessService for TestAccessService {
         &self,
         _entity_id: &str,
         _entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         unimplemented!()
     }
 
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        user_id: &MacroUserId<Lowercase<'_>>,
+        user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         entity_id: &str,
         entity_type: EntityType,
@@ -136,7 +136,7 @@ impl EntityAccessService for TestAccessService {
             return Err(self.access_err());
         }
         EntityAccessReceipt::try_new_authenticated_user(
-            MacroUserIdStr::parse_from_str(user_id.as_ref())
+            RoxUserIdStr::parse_from_str(user_id.as_ref())
                 .unwrap()
                 .into_owned(),
             Entity {
@@ -161,7 +161,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -173,7 +173,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -200,7 +200,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_entity_permission(
         &self,
-        user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         entity_type: EntityType,
         user_org_id: Option<i64>,
@@ -232,7 +232,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, uuid::Uuid, TeamRole), AccessError> {
@@ -255,7 +255,7 @@ impl EntityAccessService for TestAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!()
     }
@@ -342,8 +342,8 @@ impl ChannelService for MockService {
 
     async fn get_user_display_names(
         &self,
-        _user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> Result<std::collections::HashMap<MacroUserIdStr<'static>, String>, ChannelMessagesErr>
+        _user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> Result<std::collections::HashMap<RoxUserIdStr<'static>, String>, ChannelMessagesErr>
     {
         Ok(std::collections::HashMap::new())
     }
@@ -388,8 +388,8 @@ impl ChannelService for ErrorService {
 
     async fn get_user_display_names(
         &self,
-        _user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> Result<std::collections::HashMap<MacroUserIdStr<'static>, String>, ChannelMessagesErr>
+        _user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> Result<std::collections::HashMap<RoxUserIdStr<'static>, String>, ChannelMessagesErr>
     {
         Ok(std::collections::HashMap::new())
     }
@@ -444,8 +444,8 @@ impl ChannelService for ParticipantsService {
 
     async fn get_user_display_names(
         &self,
-        _user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> Result<std::collections::HashMap<MacroUserIdStr<'static>, String>, ChannelMessagesErr>
+        _user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> Result<std::collections::HashMap<RoxUserIdStr<'static>, String>, ChannelMessagesErr>
     {
         Ok(std::collections::HashMap::new())
     }
@@ -518,8 +518,8 @@ impl ChannelService for JoinLinkService {
 
     async fn get_user_display_names(
         &self,
-        _user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> Result<std::collections::HashMap<MacroUserIdStr<'static>, String>, ChannelMessagesErr>
+        _user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> Result<std::collections::HashMap<RoxUserIdStr<'static>, String>, ChannelMessagesErr>
     {
         Ok(std::collections::HashMap::new())
     }
@@ -570,7 +570,7 @@ struct RecordingMutationService {
 impl ChannelService for RecordingMutationService {
     async fn share_referenced_items_with_channel(
         &self,
-        actor: MacroUserIdStr<'static>,
+        actor: RoxUserIdStr<'static>,
         channel_id: Uuid,
         items: Vec<ReferencedShareItem>,
     ) -> Result<Vec<ReferenceShareResult>, ChannelMutationErr> {
@@ -636,8 +636,8 @@ impl ChannelService for RecordingMutationService {
 
     async fn get_user_display_names(
         &self,
-        _user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> Result<std::collections::HashMap<MacroUserIdStr<'static>, String>, ChannelMessagesErr>
+        _user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> Result<std::collections::HashMap<RoxUserIdStr<'static>, String>, ChannelMessagesErr>
     {
         Ok(std::collections::HashMap::new())
     }
@@ -734,18 +734,18 @@ impl JwtValidator for FakeJwtValidator {
     fn validate_credential(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.validation_count.fetch_add(1, Ordering::SeqCst);
 
         let organization_id = match jwt {
             VALID_BEARER_TOKEN => None,
             ORGANIZATION_BEARER_TOKEN => Some(TEST_ORGANIZATION_ID),
-            "expired" => return Err(Report::new(MacroAuthorizationError::CredentialsExpired)),
-            _ => return Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            "expired" => return Err(Report::new(RoxAuthorizationError::CredentialsExpired)),
+            _ => return Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         };
 
-        Ok(macro_authorization::ValidatedCredential {
-            origin: macro_authorization::CredentialOrigin::Session,
+        Ok(rox_authorization::ValidatedCredential {
+            origin: rox_authorization::CredentialOrigin::Session,
             identity: ValidatedIdentity {
                 agent_id: None,
                 agent_via: None,
@@ -759,28 +759,28 @@ impl JwtValidator for FakeJwtValidator {
     }
 }
 
-type TestAuthorizationService = MacroAuthorizationServiceImpl<FakeJwtValidator>;
+type TestAuthorizationService = RoxAuthorizationServiceImpl<FakeJwtValidator>;
 
 fn authorization_state_with_default(
     default_user_id: Option<&str>,
 ) -> (
-    MacroAuthorizationState<TestAuthorizationService>,
+    RoxAuthorizationState<TestAuthorizationService>,
     FakeJwtValidator,
 ) {
     let validator = FakeJwtValidator::default();
-    let service = MacroAuthorizationServiceImpl::new(
+    let service = RoxAuthorizationServiceImpl::new(
         validator.clone(),
         InternalAuthConfig {
             api_key: VALID_INTERNAL_KEY.to_string(),
             default_user_id: default_user_id.map(str::to_string),
         },
-        macro_authorization::NoBotAuthorizer,
-        macro_authorization::NoUserApiKeyAuthorizer,
+        rox_authorization::NoBotAuthorizer,
+        rox_authorization::NoUserApiKeyAuthorizer,
     );
-    (MacroAuthorizationState::new(Arc::new(service)), validator)
+    (RoxAuthorizationState::new(Arc::new(service)), validator)
 }
 
-fn authorization_state() -> MacroAuthorizationState<TestAuthorizationService> {
+fn authorization_state() -> RoxAuthorizationState<TestAuthorizationService> {
     authorization_state_with_default(None).0
 }
 
@@ -1487,8 +1487,8 @@ impl ChannelService for ActivityService {
 
     async fn get_user_display_names(
         &self,
-        _user_ids: Vec<MacroUserIdStr<'static>>,
-    ) -> Result<std::collections::HashMap<MacroUserIdStr<'static>, String>, ChannelMessagesErr>
+        _user_ids: Vec<RoxUserIdStr<'static>>,
+    ) -> Result<std::collections::HashMap<RoxUserIdStr<'static>, String>, ChannelMessagesErr>
     {
         Ok(std::collections::HashMap::new())
     }

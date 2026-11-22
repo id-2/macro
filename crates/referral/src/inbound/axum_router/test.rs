@@ -7,9 +7,9 @@ use axum::{
     http::{StatusCode, header},
 };
 use http_body_util::BodyExt;
-use macro_authorization::{
+use rox_authorization::{
     INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER, InternalIdentityClaims,
-    MacroAuthorizationError, MacroAuthorizationService, MacroAuthorizationState,
+    RoxAuthorizationError, RoxAuthorizationService, RoxAuthorizationState,
 };
 use model_user::UserContext;
 use rate_limit::{
@@ -30,10 +30,10 @@ const VALID_INTERNAL_KEY: &str = "valid-internal-key";
 #[derive(Clone)]
 struct FakeAuthorizationService;
 
-impl MacroAuthorizationService for FakeAuthorizationService {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorizationService {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "valid" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(test_user_context(TEST_USER_ID))
@@ -42,19 +42,19 @@ impl MacroAuthorizationService for FakeAuthorizationService {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
 
     async fn authorize_internal(
         &self,
         provided_key: &str,
         claims: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
         if provided_key != VALID_INTERNAL_KEY {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
 
         Ok(claims.user_id.map(|user_id| test_user_context(&user_id)))
@@ -68,7 +68,7 @@ struct MockReferralService {
 impl ReferralService for MockReferralService {
     async fn get_referral_code_for_user<'a>(
         &self,
-        _user_id: &macro_user_id::user_id::MacroUserId<macro_user_id::lowercased::Lowercase<'a>>,
+        _user_id: &rox_user_id::user_id::RoxUserId<rox_user_id::lowercased::Lowercase<'a>>,
     ) -> Result<ReferralCode, ReferralError> {
         match &self.result {
             Ok(code) => Ok(code.clone()),
@@ -78,8 +78,8 @@ impl ReferralService for MockReferralService {
 
     async fn track_referral<'a>(
         &self,
-        _referred_user_id: &macro_user_id::user_id::MacroUserId<
-            macro_user_id::lowercased::Lowercase<'a>,
+        _referred_user_id: &rox_user_id::user_id::RoxUserId<
+            rox_user_id::lowercased::Lowercase<'a>,
         >,
         _referral_code: &ReferralCode,
     ) -> Result<(), ReferralError> {
@@ -88,8 +88,8 @@ impl ReferralService for MockReferralService {
 
     async fn send_referral_invite(
         &self,
-        _sending_user: macro_user_id::user_id::MacroUserIdStr<'_>,
-        _recipient: macro_user_id::email::EmailStr<'static>,
+        _sending_user: rox_user_id::user_id::RoxUserIdStr<'_>,
+        _recipient: rox_user_id::email::EmailStr<'static>,
     ) -> Result<(), ReferralError> {
         Ok(())
     }
@@ -154,7 +154,7 @@ fn build_router(
     let state = ReferralRouterState {
         service: Arc::new(service),
         rate_limiter,
-        authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuthorizationService)),
+        authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuthorizationService)),
     };
     referral_router(state).layer(Extension(ConnectInfo(SocketAddr::from((
         [127, 0, 0, 1],

@@ -1,6 +1,6 @@
 use super::super::test::fakes::*;
 use super::*;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::sync::atomic::Ordering;
 
 struct Fixture {
@@ -16,7 +16,7 @@ impl Fixture {
         let repository = Arc::new(FakeRepository::new());
         let provider = Arc::new(FakeProvider::new());
         let actor = Actor {
-            user_id: MacroUserIdStr::parse_from_str("macro|creator@example.com")
+            user_id: RoxUserIdStr::parse_from_str("macro|creator@example.com")
                 .unwrap()
                 .into_owned(),
         };
@@ -88,7 +88,7 @@ struct NoFlagEvaluation;
 impl feature_flags::FeatureFlags for NoFlagEvaluation {
     async fn load(
         &self,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<feature_flags::FlagSnapshot, rootcause::Report> {
         panic!("maintenance must not evaluate rollout flags")
     }

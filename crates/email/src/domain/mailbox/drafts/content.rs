@@ -7,7 +7,7 @@ use crate::domain::{
 use email_api_client::domain::models::{EmailApiError, ProviderId, SendRequest};
 use entity_access::domain::{models::ViewAccessLevel, ports::EntityAccessService};
 use futures::future::BoxFuture;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service::{address::ContactInfo, message::MessageToSend};
 use sha2::{Digest, Sha256};
 use std::future::Future;
@@ -78,7 +78,7 @@ impl<R: DraftContentRepository, B: DraftContentBytes, A: EntityAccessService>
 {
     async fn authorize(&self, actor: &str, link: Uuid, thread: Uuid) -> Result<(), MailboxError> {
         let actor =
-            MacroUserIdStr::try_from(actor.to_owned()).map_err(|_| EmailApiError::Forbidden)?;
+            RoxUserIdStr::try_from(actor.to_owned()).map_err(|_| EmailApiError::Forbidden)?;
         let links = self
             .repository
             .user_accessible_inboxes(actor.clone())
@@ -204,7 +204,7 @@ where
                 bcc: Some(input.bcc.iter().map(contact).collect()),
                 body_text: input.body_text.clone(),
                 body_html: input.body_html.clone(),
-                body_macro: input.body_macro.clone(),
+                body_rox: input.body_rox.clone(),
                 attachments: None,
                 headers_json: input.headers_json.clone(),
                 send_time: input.send_time,

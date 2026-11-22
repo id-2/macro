@@ -3,8 +3,8 @@ use bot_id::BotId;
 use chrono::{DateTime, Duration, Utc};
 use chrono_tz::Tz;
 use cron::Schedule as CronSchedule;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use model_entity::EntityAppearance;
 use model_owner::{Owner, OwnerType};
 use serde::{Deserialize, Serialize};
@@ -389,7 +389,7 @@ pub enum Requester {
     /// The person in the app, with a credential signed for no program.
     Person,
     /// A program acting for them: an agent's or a routine's run
-    /// (`macro_authorization::is_program_run`), or an internal caller.
+    /// (`rox_authorization::is_program_run`), or an internal caller.
     Program,
 }
 
@@ -546,7 +546,7 @@ impl ScheduledAction {
     /// creating a chat in their account, reading their memory, spending their
     /// AI budget, notifying them. Asking here fails typed for a bot or team
     /// instead of treating one as a person.
-    pub fn owner_user(&self) -> Result<&MacroUserIdStr<'static>, OwnerNotUserError> {
+    pub fn owner_user(&self) -> Result<&RoxUserIdStr<'static>, OwnerNotUserError> {
         self.owner.as_user().ok_or(OwnerNotUserError {
             owner_type: self.owner.owner_type(),
         })
@@ -753,7 +753,7 @@ pub enum DispatchEvent {
 pub enum ScheduledActionUpdate {
     Started {
         #[schema(value_type = String)]
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         #[schema(value_type = String, format = Uuid)]
         action_id: Uuid,
         chat_id: Option<String>,
@@ -762,7 +762,7 @@ pub enum ScheduledActionUpdate {
     },
     Stopped {
         #[schema(value_type = String)]
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         #[schema(value_type = String, format = Uuid)]
         action_id: Uuid,
         chat_id: Option<String>,
@@ -773,7 +773,7 @@ pub enum ScheduledActionUpdate {
 }
 
 impl ScheduledActionUpdate {
-    pub fn owner(&self) -> &MacroUserIdStr<'static> {
+    pub fn owner(&self) -> &RoxUserIdStr<'static> {
         match self {
             ScheduledActionUpdate::Started { owner, .. } => owner,
             ScheduledActionUpdate::Stopped { owner, .. } => owner,

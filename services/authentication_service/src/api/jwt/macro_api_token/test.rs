@@ -1,11 +1,11 @@
 use super::*;
 use crate::api::context::{MacroApiTokenIssuer, MacroApiTokenPrivateSecretKey};
 use axum::{Router, body::Body, extract::FromRef, http::Request, routing::get};
-use macro_auth::{
+use rox_auth::{
     macro_api_token::encode_macro_api_token, middleware::decode_jwt::JwtValidationArgs,
 };
-use macro_authorization::{
-    InternalAuthConfig, MacroAuthJwtValidator, MacroAuthorizationState,
+use rox_authorization::{
+    InternalAuthConfig, RoxAuthJwtValidator, RoxAuthorizationState,
     PgUserApiKeyAuthorizationRepo, PgUserApiKeyAuthorizer,
 };
 use remote_env_var::LocalOrRemoteSecret;
@@ -23,8 +23,8 @@ const PUBLIC: &str = include_str!(
 #[derive(Clone)]
 struct State {
     db: PgPool,
-    tokens: MacroApiTokenContext,
-    authorization: MacroAuthorizationState<AuthorizationService>,
+    tokens: RoxApiTokenContext,
+    authorization: RoxAuthorizationState<AuthorizationService>,
 }
 
 impl FromRef<State> for PgPool {
@@ -33,13 +33,13 @@ impl FromRef<State> for PgPool {
     }
 }
 
-impl FromRef<State> for MacroApiTokenContext {
+impl FromRef<State> for RoxApiTokenContext {
     fn from_ref(state: &State) -> Self {
         state.tokens.clone()
     }
 }
 
-impl FromRef<State> for MacroAuthorizationState<AuthorizationService> {
+impl FromRef<State> for RoxAuthorizationState<AuthorizationService> {
     fn from_ref(state: &State) -> Self {
         state.authorization.clone()
     }
@@ -49,20 +49,20 @@ impl FromRef<State> for MacroAuthorizationState<AuthorizationService> {
 /// before the profile lookup, so an admitted one fails on the connection.
 fn router() -> Router {
     let db = PgPool::connect_lazy("postgres://nobody@127.0.0.1:1/none").unwrap();
-    let authorization = MacroAuthorizationState::new(Arc::new(AuthorizationService::new(
-        MacroAuthJwtValidator::new(JwtValidationArgs::testing_macro_token("fixture", PUBLIC)),
+    let authorization = RoxAuthorizationState::new(Arc::new(AuthorizationService::new(
+        RoxAuthJwtValidator::new(JwtValidationArgs::testing_macro_token("fixture", PUBLIC)),
         InternalAuthConfig {
             api_key: "test-internal-key".to_owned(),
             default_user_id: None,
         },
-        macro_authorization::NoBotAuthorizer,
+        rox_authorization::NoBotAuthorizer,
         PgUserApiKeyAuthorizer::new(PgUserApiKeyAuthorizationRepo::new(db.clone())),
     )));
     Router::new()
         .route("/jwt/macro_api_token", get(handler))
         .with_state(State {
             db,
-            tokens: MacroApiTokenContext {
+            tokens: RoxApiTokenContext {
                 issuer: MacroApiTokenIssuer::Comptime("fixture"),
                 macro_api_token_private_key: LocalOrRemoteSecret::Local(
                     MacroApiTokenPrivateSecretKey::Comptime(PRIVATE),
@@ -74,7 +74,7 @@ fn router() -> Router {
 }
 
 fn token(agent: Option<Uuid>, routine: Option<Uuid>) -> String {
-    encode_macro_api_token(EncodeMacroApiTokenArgs {
+    encode_macro_api_token(EncodeRoxApiTokenArgs {
         fusionauth_id: "fixture".into(),
         macro_user_id: "macro|owner@example.com".into(),
         organization_id: None,
@@ -95,7 +95,7 @@ async fn mint_with(bearer: &str, code_execution: bool) -> (StatusCode, String) {
     let mut request =
         Request::get("/jwt/macro_api_token").header("authorization", format!("Bearer {bearer}"));
     if code_execution {
-        request = request.header(macro_authorization::CODE_EXECUTION_HEADER, "1");
+        request = request.header(rox_authorization::CODE_EXECUTION_HEADER, "1");
     }
     let response = router()
         .oneshot(request.body(Body::empty()).unwrap())

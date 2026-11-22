@@ -3,7 +3,7 @@ import {
   HeadingNode,
   type HeadingTagType,
 } from '@lexical/rich-text';
-import { $setId } from '@macro-inc/lexical-core';
+import { $setId } from '@rox-one/lexical-core';
 import {
   $createParagraphNode,
   $createTextNode,

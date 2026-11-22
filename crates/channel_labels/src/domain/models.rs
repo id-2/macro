@@ -5,7 +5,7 @@ mod test;
 
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{EntityAccessReceipt, MemberTeamRole};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -163,7 +163,7 @@ pub enum ChannelLabelsScope {
     /// Labels shared by a verified team member.
     Team(Uuid),
     /// Labels private to the authenticated account.
-    User(MacroUserIdStr<'static>),
+    User(RoxUserIdStr<'static>),
 }
 
 impl ChannelLabelsScope {
@@ -217,14 +217,14 @@ impl ChannelLabelsScope {
 #[derive(Debug)]
 pub struct ChannelLabelsReceipt {
     scope: ChannelLabelsScope,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 }
 
 impl ChannelLabelsReceipt {
     /// Resolve shared labels from a verified team receipt, otherwise private
     /// labels from the authenticated identity. The receipt must belong to that identity.
     pub fn from_access(
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         receipt: Option<EntityAccessReceipt<MemberTeamRole>>,
         selection: Option<ChannelLabelScopeSelection>,
     ) -> Result<Self, ChannelLabelsError> {
@@ -261,7 +261,7 @@ impl ChannelLabelsReceipt {
     }
 
     /// Authenticated viewer making the call.
-    pub fn user_id(&self) -> &MacroUserIdStr<'static> {
+    pub fn user_id(&self) -> &RoxUserIdStr<'static> {
         &self.user_id
     }
 
@@ -270,7 +270,7 @@ impl ChannelLabelsReceipt {
     pub(crate) fn dangerously_internal(team_id: Uuid, user_id: &str) -> Self {
         Self {
             scope: ChannelLabelsScope::Team(team_id),
-            user_id: MacroUserIdStr::try_from(user_id.to_owned()).expect("valid user id"),
+            user_id: RoxUserIdStr::try_from(user_id.to_owned()).expect("valid user id"),
         }
     }
 }

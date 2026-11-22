@@ -1,4 +1,4 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use serde_json::{Map, json};
 use strum::VariantArray;
 
@@ -10,8 +10,8 @@ use crate::outbound::pg_scheduled_action_repo::test::{
     USER_A, USER_B, insert_user, sample_action, test_repo, user_owner,
 };
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 fn catalog(key: &str) -> CheckedSuggestion {
@@ -762,13 +762,13 @@ async fn the_state_backfill_derives_what_readers_derived(pool: PgPool) {
     }
 
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20261113042517_backfill_routine_suggestion_state.sql"
+        "../../../../rox_db_client/migrations/20261113042517_backfill_routine_suggestion_state.sql"
     ))
     .execute(&pool)
     .await
     .unwrap();
     sqlx::raw_sql(include_str!(
-        "../../../../macro_db_client/migrations/20261113042518_routine_suggestion_open_catalog_key_concurrently.sql"
+        "../../../../rox_db_client/migrations/20261113042518_routine_suggestion_open_catalog_key_concurrently.sql"
     ))
     .execute(&pool)
     .await

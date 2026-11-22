@@ -84,14 +84,14 @@ const TEST_THREAD_ID: Uuid = Uuid::from_u128(0x7ead);
 impl EmailMutationService for CapturingEmailMutationService {
     async fn resolve_email_message_operation(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         request: email::domain::models::mailbox_operation::MessageResolutionRequest,
     ) -> Result<Uuid, EmailErr> {
         Err(EmailErr::MessageDeliveryConflict(request.message_id))
     }
     async fn set_email_thread_state(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         action: email::domain::models::mailbox_action::MailboxAction,
     ) -> Result<(), EmailErr> {
@@ -104,7 +104,7 @@ impl EmailMutationService for CapturingEmailMutationService {
     }
     async fn send_email_message(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         link_id: Option<Uuid>,
         input: CreateDraftInput,
     ) -> Result<CreatedDraft, EmailErr> {
@@ -120,7 +120,7 @@ impl EmailMutationService for CapturingEmailMutationService {
 
     async fn set_email_thread_archived(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         archived: bool,
     ) -> Result<(), EmailErr> {
@@ -137,7 +137,7 @@ impl EmailMutationService for CapturingEmailMutationService {
 
     async fn set_email_threads_archived(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_ids: Vec<Uuid>,
         archived: bool,
     ) -> Result<SetThreadsArchivedResult, EmailErr> {
@@ -160,7 +160,7 @@ impl EmailMutationService for CapturingEmailMutationService {
 
     async fn mark_email_thread_seen(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<(), EmailErr> {
         self.calls.lock().unwrap().push(CapturedMutation::Seen {
@@ -172,7 +172,7 @@ impl EmailMutationService for CapturingEmailMutationService {
 
     async fn mark_email_thread_unread(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Result<(), EmailErr> {
         self.calls.lock().unwrap().push(CapturedMutation::Unread {
@@ -187,7 +187,7 @@ impl EmailMutationService for CapturingEmailMutationService {
 
     async fn update_email_thread_label(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
         label_id: Uuid,
         value: bool,
@@ -206,7 +206,7 @@ impl EmailMutationService for CapturingEmailMutationService {
 
     async fn save_email_draft(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         link_id: Option<Uuid>,
         input: CreateDraftInput,
     ) -> Result<SavedUserDraft, EmailErr> {
@@ -258,7 +258,7 @@ impl EmailMutationService for CapturingEmailMutationService {
                 bcc: input.bcc,
                 body_text: input.body_text,
                 body_html: input.body_html,
-                body_macro: input.body_macro,
+                body_rox: input.body_rox,
                 headers_json: input.headers_json,
                 send_time: input.send_time,
             },
@@ -283,7 +283,7 @@ impl EmailMutationService for CapturingEmailMutationService {
 
     async fn delete_email_draft(
         &self,
-        user_id: MacroUserIdStr<'static>,
+        user_id: RoxUserIdStr<'static>,
         draft_id: Uuid,
 
         _expected_generation: i32,
@@ -322,9 +322,9 @@ impl EmailMutationService for CapturingEmailMutationService {
 fn test_sending_link(id: Uuid) -> email::domain::models::Link {
     email::domain::models::Link {
         id,
-        macro_id: MacroUserIdStr::try_from_email("viewer@example.com").unwrap(),
+        macro_id: RoxUserIdStr::try_from_email("viewer@example.com").unwrap(),
         fusionauth_user_id: "fa-user".to_string(),
-        email_address: macro_user_id::email::EmailStr::try_from("viewer@example.com".to_string())
+        email_address: rox_user_id::email::EmailStr::try_from("viewer@example.com".to_string())
             .unwrap(),
         provider: email::domain::models::UserProvider::Gmail,
         is_sync_active: true,
@@ -373,7 +373,7 @@ impl EmailThreadMutationOutput for TestEmailThreadOutput {
 
     fn load_email_thread<'ctx>(
         ctx: &'ctx Context<'_>,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
         thread_id: Uuid,
     ) -> Pin<Box<dyn Future<Output = async_graphql::Result<Option<Self::Thread>>> + Send + 'ctx>>
     {
@@ -406,7 +406,7 @@ fn schema(
         EmptySubscription,
     )
     .data(service)
-    .data(MacroUserIdStr::try_from_email("viewer@example.com").unwrap())
+    .data(RoxUserIdStr::try_from_email("viewer@example.com").unwrap())
     .finish()
 }
 

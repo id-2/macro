@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_pending_mailbox_state (message_id,attribute,command_id,desired) VALUES ($1,'in_trash',$2,$3)",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Jsonb"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "7dbda5fe4e45dce34fd6b20c3fd59ad3b75c136edf353667dd2e43281899d916"
+}

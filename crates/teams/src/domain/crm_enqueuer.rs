@@ -12,7 +12,7 @@
 //!
 //! Modeled on [`email::domain::ports::EmailMessageEnqueuer`].
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// Asks the email service to seed or tear down the CRM tables for one
 /// user. Implementations are expected to be best-effort and
@@ -30,7 +30,7 @@ pub trait CrmEnqueuer: Clone + Send + Sync + 'static {
     /// safe.
     fn enqueue_populate_crm_for_user(
         &self,
-        macro_id: &MacroUserIdStr<'_>,
+        macro_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 
     /// Enqueue a request to tear down `team_id`'s CRM rows sourced from
@@ -45,7 +45,7 @@ pub trait CrmEnqueuer: Clone + Send + Sync + 'static {
     fn enqueue_depopulate_crm_for_user(
         &self,
         team_id: &uuid::Uuid,
-        macro_id: &MacroUserIdStr<'_>,
+        macro_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
 }
 
@@ -59,7 +59,7 @@ impl CrmEnqueuer for NoOpCrmEnqueuer {
 
     async fn enqueue_populate_crm_for_user(
         &self,
-        _macro_id: &MacroUserIdStr<'_>,
+        _macro_id: &RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
         Ok(())
     }
@@ -67,7 +67,7 @@ impl CrmEnqueuer for NoOpCrmEnqueuer {
     async fn enqueue_depopulate_crm_for_user(
         &self,
         _team_id: &uuid::Uuid,
-        _macro_id: &MacroUserIdStr<'_>,
+        _macro_id: &RoxUserIdStr<'_>,
     ) -> Result<(), Self::Err> {
         Ok(())
     }

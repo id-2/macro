@@ -69,8 +69,13 @@ export function DriveCreateMenu(props: {
   const destination = () =>
     driveCreateDestinationLabel(state.projectId(), sidebar.folders());
 
+  /** At the root the name is Drive itself, which Russian puts in the locative. */
+  const atRoot = () => !state.projectId();
+
   const label = () =>
-    t('create.newFileOrFolderIn', { destination: destination() });
+    atRoot()
+      ? t('drive.newInRoot')
+      : t('create.newFileOrFolderIn', { destination: destination() });
 
   const options = () =>
     CREATABLE_BLOCKS.filter(
@@ -123,11 +128,18 @@ export function DriveCreateMenu(props: {
       <Dropdown.Content class="w-80 max-w-[calc(100vw-2rem)] max-h-[70vh] overflow-y-auto">
         <Dropdown.Group>
           <Dropdown.GroupLabel class="min-w-0 gap-1.5">
-            <span class="shrink-0">{t('create.createIn')}</span>
-            <FolderIcon aria-hidden="true" class="size-3.5 shrink-0" />
-            <span class="min-w-0 truncate font-medium text-ink-muted">
-              {destination()}
-            </span>
+            <Show
+              when={!atRoot()}
+              fallback={
+                <span class="shrink-0">{t('drive.createInRoot')}</span>
+              }
+            >
+              <span class="shrink-0">{t('create.createIn')}</span>
+              <FolderIcon aria-hidden="true" class="size-3.5 shrink-0" />
+              <span class="min-w-0 truncate font-medium text-ink-muted">
+                {destination()}
+              </span>
+            </Show>
           </Dropdown.GroupLabel>
           <For each={options()}>
             {(option) => (

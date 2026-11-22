@@ -13,10 +13,11 @@ import {
   throwOnErr,
 } from '@core/util/result';
 import { replaceCacheWriteSession } from '@graphql-cache/lifecycle';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { authServiceClient } from '@service-auth/client';
 import { resetGraphqlPresenceRequests } from '@service-storage/graphql-soup';
 import { queryOptions, useQuery } from '@tanstack/solid-query';
+import { pruneDesktopSessionCookies } from '../../tauri/session-cookies';
 import { resetTeamCalendarSession } from '../calendar/team-cache';
 import { queryClient, queryPersistence } from '../client';
 import { resetGraphqlSoupDoneSession } from '../soup/graphql/done-session';
@@ -102,6 +103,9 @@ export function invalidateAllAfterLogin() {
   return Telemetry.anonymousSpan('auth.refresh_after_login', async (span) => {
     const cacheSession = replaceCacheWriteSession();
     try {
+      // Login may replace a session without visiting logout (including native
+      // auth); a cookie scope left by the previous session must not shadow it.
+      await pruneDesktopSessionCookies();
       // Login may replace a session without visiting logout (including native auth).
       // Invalidate old display-intent handles before refetching the new identity.
       resetGraphqlSoupDoneSession();

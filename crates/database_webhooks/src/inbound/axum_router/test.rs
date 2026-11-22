@@ -72,7 +72,7 @@ async fn deliver(
     let state = DatabaseWebhooksRouterState::new(
         service.clone(),
         Arc::new(()),
-        MacroAuthorizationState::new(Arc::new(())),
+        RoxAuthorizationState::new(Arc::new(())),
     );
     let response: Response = deliver_handler::<FakeService, (), ()>(
         State(state),
@@ -168,7 +168,7 @@ async fn an_unknown_or_orphaned_webhook_answers_its_status() {
 mod creation_by_programs {
     use super::*;
     use axum::http::{Request, header};
-    use macro_authorization::{InternalIdentityClaims, MacroAuthorizationError};
+    use rox_authorization::{InternalIdentityClaims, RoxAuthorizationError};
     use model_user::UserContext;
     use rootcause::Report;
     use tower::ServiceExt;
@@ -178,11 +178,11 @@ mod creation_by_programs {
     #[derive(Clone, Default)]
     struct FakeAuthorization;
 
-    impl MacroAuthorizationService for FakeAuthorization {
+    impl RoxAuthorizationService for FakeAuthorization {
         async fn authorize(
             &self,
             jwt: &str,
-        ) -> Result<UserContext, Report<MacroAuthorizationError>> {
+        ) -> Result<UserContext, Report<RoxAuthorizationError>> {
             if matches!(jwt, "valid" | "agent" | "routine") {
                 return Ok(UserContext {
                     user_id: "macro|owner@example.com".to_owned(),
@@ -191,23 +191,23 @@ mod creation_by_programs {
                     permissions: None,
                 });
             }
-            Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+            Err(Report::new(RoxAuthorizationError::InvalidCredentials))
         }
 
         async fn authorize_identity(
             &self,
             jwt: &str,
-        ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>>
+        ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>>
         {
             let context = self.authorize(jwt).await?;
-            let mut credential = macro_authorization::ValidatedCredential::session(context);
+            let mut credential = rox_authorization::ValidatedCredential::session(context);
             match jwt {
                 "agent" => {
-                    credential.origin = macro_authorization::CredentialOrigin::MacroApiJwt;
+                    credential.origin = rox_authorization::CredentialOrigin::RoxApiJwt;
                     credential.identity.agent_id = Some(bot_id::MACRO_AI_BOT_ID);
                 }
                 "routine" => {
-                    credential.origin = macro_authorization::CredentialOrigin::MacroApiJwt;
+                    credential.origin = rox_authorization::CredentialOrigin::RoxApiJwt;
                     credential.identity.routine_id = Some(Uuid::nil());
                 }
                 _ => {}
@@ -219,8 +219,8 @@ mod creation_by_programs {
             &self,
             _: &str,
             _: InternalIdentityClaims,
-        ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-            Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+        ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+            Err(Report::new(RoxAuthorizationError::InvalidCredentials))
         }
     }
 
@@ -229,7 +229,7 @@ mod creation_by_programs {
         Router::new()
             .route("/{id}/webhooks", post(|| async { StatusCode::CREATED }))
             .layer(axum::middleware::from_fn_with_state(
-                MacroAuthorizationState::new(Arc::new(FakeAuthorization)),
+                RoxAuthorizationState::new(Arc::new(FakeAuthorization)),
                 refuse_programs::<FakeAuthorization>,
             ))
     }
@@ -238,7 +238,7 @@ mod creation_by_programs {
         let mut request = Request::post(format!("/{}/webhooks", Uuid::from_u128(1)))
             .header(header::AUTHORIZATION, format!("Bearer {bearer}"));
         if code_execution {
-            request = request.header(macro_authorization::CODE_EXECUTION_HEADER, "1");
+            request = request.header(rox_authorization::CODE_EXECUTION_HEADER, "1");
         }
         router()
             .oneshot(request.body(axum::body::Body::empty()).unwrap())

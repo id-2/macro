@@ -4,7 +4,7 @@ use std::sync::{
 };
 
 use chrono::{Duration, NaiveDate};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use serde_json::Value;
 use sqlx::{Pool, Postgres};
 
@@ -49,11 +49,11 @@ const HIGH_ANSWERS: [f32; 10] = [0.9, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.
 struct NoProfile;
 
 impl ProfileSource for NoProfile {
-    async fn profile(&self, _owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn profile(&self, _owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(None)
     }
 
-    async fn time_zone(&self, _owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn time_zone(&self, _owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(None)
     }
 }
@@ -68,7 +68,7 @@ struct FixedDueDates {
 impl DueDateExtractor for FixedDueDates {
     async fn due_on(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _thread_id: Uuid,
         _input: &DueDateInput,
     ) -> Result<Option<NaiveDate>, Report> {
@@ -87,7 +87,7 @@ struct FixedClassifier {
 impl FocusClassifier for FixedClassifier {
     async fn answer(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _thread_id: Uuid,
         _input: &Value,
         _questions: &[&'static str],
@@ -104,7 +104,7 @@ impl FocusClassifier for FixedClassifier {
 struct EveryoneEnrolled;
 
 impl FocusEnrollment for EveryoneEnrolled {
-    async fn is_enrolled(&self, _owner: &MacroUserIdStr<'static>) -> Result<bool, Report> {
+    async fn is_enrolled(&self, _owner: &RoxUserIdStr<'static>) -> Result<bool, Report> {
         Ok(true)
     }
 }
@@ -112,7 +112,7 @@ impl FocusEnrollment for EveryoneEnrolled {
 struct NoReaders;
 
 impl FocusNotifier for NoReaders {
-    fn focus_changed(&self, _owner: &MacroUserIdStr<'static>, _link_id: Uuid) {}
+    fn focus_changed(&self, _owner: &RoxUserIdStr<'static>, _link_id: Uuid) {}
 }
 
 fn worker(
@@ -173,7 +173,7 @@ async fn insert_message_from(
     is_sent: bool,
     at: DateTime<Utc>,
 ) -> Result<(), Report> {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO email_messages (
@@ -227,8 +227,8 @@ async fn load_thread(
     Ok(Some(FocusThread::new(inbox, mail)))
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@acme.example").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@acme.example").unwrap()
 }
 
 fn record(thread_id: Uuid, message_id: Uuid, at: DateTime<Utc>, importance: u8) -> FocusRecord {
@@ -411,7 +411,7 @@ async fn inboxes_with_focus_are_those_holding_a_focus_thread(
             },
             FocusInboxOwner {
                 link_id: OTHER_LINK,
-                owner: MacroUserIdStr::try_from_email("other@elsewhere.example").unwrap(),
+                owner: RoxUserIdStr::try_from_email("other@elsewhere.example").unwrap(),
             },
         ]
     );
@@ -437,7 +437,7 @@ async fn syncing_inboxes_are_every_connected_inbox_still_syncing(
             },
             FocusInboxOwner {
                 link_id: OTHER_LINK,
-                owner: MacroUserIdStr::try_from_email("other@elsewhere.example").unwrap(),
+                owner: RoxUserIdStr::try_from_email("other@elsewhere.example").unwrap(),
             },
         ]
     );
@@ -588,7 +588,7 @@ async fn focus_list_is_the_owners_inbox_newest_first(pool: Pool<Postgres>) -> Re
     );
 
     // The other inbox's owner sees only their own thread.
-    let stranger = MacroUserIdStr::try_from_email("other@elsewhere.example").unwrap();
+    let stranger = RoxUserIdStr::try_from_email("other@elsewhere.example").unwrap();
     assert_eq!(
         repo.focus_thread_ids(&stranger, since, now, now, 10)
             .await?,
@@ -945,7 +945,7 @@ async fn a_reschedule_reaches_focus_from_outside_the_signal_inbox(
 
 fn invite(method: InvitationMethod, sequence: u32, end: DateTime<Utc>) -> CalendarInvitation {
     CalendarInvitation {
-        id: macro_uuid::generate_uuid_v7().to_string(),
+        id: rox_uuid::generate_uuid_v7().to_string(),
         uid: "event@numbers.example".to_owned(),
         method,
         sequence,
@@ -980,8 +980,8 @@ async fn notice_thread(
     at: DateTime<Utc>,
     filed_under_updates: bool,
 ) -> Result<Uuid, Report> {
-    let thread_id = macro_uuid::generate_uuid_v7();
-    let message_id = macro_uuid::generate_uuid_v7();
+    let thread_id = rox_uuid::generate_uuid_v7();
+    let message_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"
         INSERT INTO email_threads (id, link_id, inbox_visible, is_read, is_signal, created_at, updated_at)
@@ -1404,7 +1404,7 @@ async fn the_sweep_ignores_a_change_only_in_the_owners_mail_or_a_draft(
     let now = Utc::now();
     for (is_sent, is_draft) in [(false, true), (true, false)] {
         let thread = notice_thread(&pool, "Lunch?", None, now - Duration::hours(2), true).await?;
-        let id = macro_uuid::generate_uuid_v7();
+        let id = rox_uuid::generate_uuid_v7();
         sqlx::query!(
             r#"
             INSERT INTO email_messages (

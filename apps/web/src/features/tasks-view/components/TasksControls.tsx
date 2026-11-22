@@ -54,7 +54,7 @@ function DesktopTasksControls() {
     scopeId: panel.splitHotkeyScope,
     enabled: panel.isPanelActive,
     filter: {
-      description: 'Filter tasks',
+      description: 'Фильтровать задачи',
       run: () => {
         if (!filterTrigger) return false;
 
@@ -63,7 +63,7 @@ function DesktopTasksControls() {
       },
     },
     sort: {
-      description: 'Sort tasks',
+      description: 'Сортировать задачи',
       condition: () => !isSearching(),
       run: () => {
         if (!sortTrigger) return false;
@@ -86,12 +86,12 @@ function DesktopTasksControls() {
 
   return (
     <>
-      <HeaderActionGroup label="Task filters" size="md">
+      <HeaderActionGroup label="Фильтры задач" size="md">
         <div class="shrink-0" ref={tourTarget(TASKS_TOUR.filter)}>
           <ListFilterDropdown
             grouped
             size={filters.activeCount() ? 'md' : 'icon-md'}
-            label="Filter tasks"
+            label="Фильтровать задачи"
             activeCount={filters.activeCount()}
             groups={filters.groups()}
             open={openMenu() === 'filters'}
@@ -102,16 +102,16 @@ function DesktopTasksControls() {
             onSelectionChange={filters.setSelected}
             onClear={filters.clear}
             aiFilter={{
-              placeholder: 'Filter with AI…',
+              placeholder: 'Фильтр с ИИ…',
               onSubmit: filters.applyDescription,
             }}
           />
         </div>
       </HeaderActionGroup>
-      <HeaderActionGroup label="Task layout" size="md">
+      <HeaderActionGroup label="Макет задач" size="md">
         <ButtonGroup.Button
-          aria-label="List"
-          tooltip="List"
+          aria-label="Список"
+          tooltip="Список"
           variant="ghost"
           size="icon-md"
           aria-pressed={state.layout === 'list'}
@@ -120,8 +120,8 @@ function DesktopTasksControls() {
           <ListIcon class="size-4" />
         </ButtonGroup.Button>
         <ButtonGroup.Button
-          aria-label="Board"
-          tooltip="Board"
+          aria-label="Доска"
+          tooltip="Доска"
           variant="ghost"
           size="icon-md"
           aria-pressed={state.layout === 'board'}
@@ -131,8 +131,8 @@ function DesktopTasksControls() {
         </ButtonGroup.Button>
         <Show when={ganttEnabled()}>
           <ButtonGroup.Button
-            aria-label="Gantt"
-            tooltip="Gantt"
+            aria-label="Гант"
+            tooltip="Гант"
             variant="ghost"
             size="icon-md"
             aria-pressed={state.layout === 'gantt'}
@@ -142,12 +142,12 @@ function DesktopTasksControls() {
           </ButtonGroup.Button>
         </Show>
       </HeaderActionGroup>
-      <HeaderActionGroup label="Task view options" size="md">
+      <HeaderActionGroup label="Параметры вида задач" size="md">
         <Show when={!isSearching()}>
           <ListSortDropdown
             grouped
             size="icon-md"
-            label="Sort tasks"
+            label="Сортировать задачи"
             value={primarySort()}
             options={TASK_SORT_OPTIONS}
             open={openMenu() === 'sort'}
@@ -159,7 +159,7 @@ function DesktopTasksControls() {
         <ListGroupDropdown
           grouped
           size="icon-md"
-          label="Group by"
+          label="Группировать"
           value={state.groupBy}
           options={groupOptions()}
           onChange={(groupBy) => setState('groupBy', groupBy)}

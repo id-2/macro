@@ -4,10 +4,10 @@ use axum::{
     http::{Request, StatusCode, header},
     routing::post,
 };
-use macro_authorization::{
+use rox_authorization::{
     BOT_SCOPE_HEADER, BOT_TOKEN_HEADER, INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::Deserialize;
 use tower::ServiceExt;
 
@@ -187,7 +187,7 @@ async fn user_scoped_bot_uses_scoped_access_and_preserves_the_typed_body() {
         [BotAccessCall {
             bot_id: BOT_ID,
             scope: BotAccessScope::User {
-                user_id: MacroUserIdStr::parse_from_str(BOT_ACTING_USER_ID)
+                user_id: RoxUserIdStr::parse_from_str(BOT_ACTING_USER_ID)
                     .expect("bot acting user id should be valid"),
                 user_org_id: Some(i64::from(BOT_ACTING_USER_ORGANIZATION_ID)),
             },

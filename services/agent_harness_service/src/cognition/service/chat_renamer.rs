@@ -6,7 +6,7 @@ use chat::domain::ports::ChatRepo;
 use chat::outbound::postgres::PgChatRepo;
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use std::sync::Arc;
 
@@ -36,7 +36,7 @@ Output: Q3 Hiring Plan"#;
 
 pub fn spawn_initial_chat_rename(
     ctx: Arc<ApiContext>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     chat_id: String,
     stream_id: String,
     initial_question: String,
@@ -53,7 +53,7 @@ pub fn spawn_initial_chat_rename(
 #[tracing::instrument(skip(ctx, initial_question), err)]
 async fn rename_initial_chat(
     ctx: Arc<ApiContext>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     chat_id: String,
     stream_id: String,
     initial_question: String,
@@ -115,7 +115,7 @@ async fn rename_initial_chat(
 
 async fn generate_chat_name(
     initial_question: &str,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     chat_id: &str,
     recorder: &dyn ai_usage::UsageRecorder,
 ) -> anyhow::Result<String> {
@@ -124,7 +124,7 @@ async fn generate_chat_name(
         initial_question.trim()
     );
     let usage_ctx = ai_usage::UsageContext::new(ai_usage::AiFeature::ChatRename, user_id)
-        .with_entity(macro_uuid::string_to_uuid(chat_id).ok());
+        .with_entity(rox_uuid::string_to_uuid(chat_id).ok());
     let response = agent::complete(
         PredefinedModel::Fast,
         CHAT_RENAME_SYSTEM_PROMPT,

@@ -1,4 +1,4 @@
-import type { GroupSummary } from '@macro-inc/spreadsheet/table-groups';
+import type { GroupSummary } from '@rox-one/spreadsheet/table-groups';
 
 /** The table dialog: renaming a table, or changing the cells it covers. */
 export type TableDialogState =

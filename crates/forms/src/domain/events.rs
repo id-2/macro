@@ -3,9 +3,9 @@
 
 use activity::Actor;
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent, TopicEvent};
-use macro_event_topics::MacroFormsTopic;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent, TopicEvent};
+use rox_event_topics::RoxFormsTopic;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 
 use crate::domain::models::{DatabaseId, FormId, FormResponseId, RowId};
@@ -18,12 +18,12 @@ pub struct Attribution {
     pub actor: Actor<'static>,
     /// The user the actor acted for, when different from the actor.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub on_behalf_of: Option<MacroUserIdStr<'static>>,
+    pub on_behalf_of: Option<RoxUserIdStr<'static>>,
 }
 
 impl Attribution {
     /// A user acting for themselves.
-    pub fn user(user: MacroUserIdStr<'static>) -> Self {
+    pub fn user(user: RoxUserIdStr<'static>) -> Self {
         Self {
             actor: Actor::new_from_user(user),
             on_behalf_of: None,
@@ -31,7 +31,7 @@ impl Attribution {
     }
 
     /// `user` acting, or `bot` acting for them.
-    pub fn acting(user: MacroUserIdStr<'static>, bot: Option<bot_id::BotId>) -> Self {
+    pub fn acting(user: RoxUserIdStr<'static>, bot: Option<bot_id::BotId>) -> Self {
         match bot {
             Some(bot) => Self {
                 actor: Actor::new_from_bot(bot),
@@ -50,7 +50,7 @@ pub struct FormCreatedMetadata {
     /// The database holding its responses.
     pub database_id: DatabaseId,
     /// Its owner.
-    pub owner: MacroUserIdStr<'static>,
+    pub owner: RoxUserIdStr<'static>,
     /// Its name.
     pub name: String,
     /// When it was created.
@@ -98,7 +98,7 @@ pub struct FormResponseSubmittedMetadata {
     /// The signed-in respondent; `None` for an anonymous visitor or when
     /// the form hides respondents. The ledger still records them.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub respondent: Option<MacroUserIdStr<'static>>,
+    pub respondent: Option<RoxUserIdStr<'static>>,
     /// The row holding the answers.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub row_id: Option<RowId>,
@@ -106,7 +106,7 @@ pub struct FormResponseSubmittedMetadata {
     pub submitted_at: DateTime<Utc>,
 }
 
-/// Events that can be published to [`MacroFormsTopic`].
+/// Events that can be published to [`RoxFormsTopic`].
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(tag = "event_type", content = "metadata")]
 pub enum FormTopicEvent {
@@ -144,18 +144,18 @@ pub enum FormTopicEvent {
 }
 
 impl TopicEvent for FormTopicEvent {
-    type Topic = MacroFormsTopic;
+    type Topic = RoxFormsTopic;
 
     const SCHEMA_VERSION: u8 = 1;
 }
 
-/// Publishable event for [`MacroFormsTopic`], keyed by form id.
-pub struct FormMacroEvent {
+/// Publishable event for [`RoxFormsTopic`], keyed by form id.
+pub struct FormRoxEvent {
     key: String,
     event: Event<FormTopicEvent>,
 }
 
-impl FormMacroEvent {
+impl FormRoxEvent {
     /// Build an event keyed by the form it is about.
     pub fn new(event: FormTopicEvent) -> Self {
         Self::with_event(event.form_id().to_string(), Event::new(event))
@@ -186,7 +186,7 @@ impl FormTopicEvent {
     }
 }
 
-impl MacroEvent for FormMacroEvent {
+impl RoxEvent for FormRoxEvent {
     type EventPayload = FormTopicEvent;
 
     fn key(&self) -> &str {

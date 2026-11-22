@@ -5,7 +5,7 @@ mod test;
 
 use std::collections::{BTreeSet, HashMap};
 
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::EntityType;
 use models_entity_access_management::EntityAccessSourceType;
 use sqlx::PgPool;
@@ -162,7 +162,7 @@ pub async fn get_entity_audiences(
                 .collect::<BTreeSet<_>>()
                 .into_iter()
                 .filter_map(|user_id| {
-                    MacroUserIdStr::parse_from_str(user_id)
+                    RoxUserIdStr::parse_from_str(user_id)
                         .ok()
                         .map(CowLike::into_owned)
                 })

@@ -43,7 +43,7 @@ use super::models::{
     UsageSnapshot,
 };
 use super::pricing::AiPricing;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 /// The overage policy in force for one settlement.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -160,7 +160,7 @@ pub fn plan_reload(state: ReloadState, thresholds: &AutoReloadThresholds) -> Opt
     reason = "snapshot assembly keeps its resolved billing inputs explicit"
 )]
 pub fn build_snapshot(
-    user: &MacroUserIdStr<'_>,
+    user: &RoxUserIdStr<'_>,
     entitlement: &Entitlement,
     settings: &BillingSettings,
     period: BillingPeriod,

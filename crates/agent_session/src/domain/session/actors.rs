@@ -20,7 +20,7 @@ use agent_runtime_protocol::domain::action::{AgentAction, AgentActionId};
 use agent_runtime_protocol::domain::schema::v0::{
     AcpMessage, SystemEvent, ToRuntimeMessage, ToServerMessage,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use tokio::sync::{mpsc, oneshot, watch};
 use tokio::time::Instant;
 use tracing::Instrument as _;
@@ -51,7 +51,7 @@ const TOOL_LISTING_TIMEOUT: Duration = Duration::from_secs(60);
 
 /// A caller's request to deliver one action, and the wire back to them.
 pub(crate) struct SessionCommand {
-    pub(crate) user_id: Option<MacroUserIdStr<'static>>,
+    pub(crate) user_id: Option<RoxUserIdStr<'static>>,
     pub(crate) action: AgentAction,
     pub(crate) action_id: AgentActionId,
     pub(crate) completed: oneshot::Sender<Result<()>>,
@@ -196,7 +196,7 @@ where
                     permission_policy,
                 ),
             }
-            .with_connection_context(macro_uuid::generate_uuid_v7()),
+            .with_connection_context(rox_uuid::generate_uuid_v7()),
             logs,
             commands,
             handshake_span: Some(handshake_span),
@@ -698,7 +698,7 @@ where
     )]
     async fn deliver(
         &mut self,
-        from: Option<MacroUserIdStr<'static>>,
+        from: Option<RoxUserIdStr<'static>>,
         message: ToRuntimeMessage,
     ) -> Result<()> {
         if let Some(method) = acp_method(&message) {
@@ -735,7 +735,7 @@ where
 
     async fn log(
         &mut self,
-        user_id: Option<MacroUserIdStr<'static>>,
+        user_id: Option<RoxUserIdStr<'static>>,
         content: Message,
     ) -> Result<()> {
         let appended = self

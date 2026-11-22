@@ -48,7 +48,7 @@ impl progenitor_client::ClientHooks for generated::Client {
         request: &mut reqwest::Request,
         _: &progenitor_client::OperationInfo,
     ) -> Result<(), progenitor_client::Error<E>> {
-        macro_tower_layers::inject_trace_headers(request.headers_mut());
+        rox_tower_layers::inject_trace_headers(request.headers_mut());
         Ok(())
     }
 }

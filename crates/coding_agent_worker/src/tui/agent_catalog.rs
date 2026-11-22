@@ -21,12 +21,12 @@ pub use npm_adapter::AdapterInstall;
 mod test;
 
 mod environment {
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Home;
     }
     // Windows sets no `HOME`; this is its home directory.
     #[cfg(windows)]
-    macro_env_var::maybe_env_var! {
+    rox_env_var::maybe_env_var! {
         pub struct Userprofile;
     }
 }
@@ -282,6 +282,48 @@ pub fn detected_for(harness: &Harness, commands: &dyn CommandLookup) -> Option<D
         Availability::Available(agent) => Some(agent),
         Availability::Unavailable { .. } => None,
     })
+}
+
+/// The directory an agent keeps its own settings and credentials in, under
+/// the user's home. The conventional location is returned even before the
+/// agent has created it, so setup can show where its login lives.
+pub fn config_dir(kind: AgentKind) -> Option<PathBuf> {
+    let home = environment::Home::new().and_then(|home| home.value().map(PathBuf::from))?;
+    #[cfg(windows)]
+    let home = environment::Userprofile::new()
+        .and_then(|home| home.value().map(PathBuf::from))
+        .unwrap_or(home);
+    let candidates: &[&str] = match kind {
+        AgentKind::ClaudeCode | AgentKind::HerdrClaude => &[".claude"],
+        AgentKind::Codex | AgentKind::HerdrCodex => &[".codex"],
+        AgentKind::OpenCode => &[".config/opencode", ".opencode"],
+        AgentKind::Omp => &[".config/omp", ".omp"],
+        AgentKind::OpenClaw => &[".openclaw"],
+        AgentKind::Hermes => &[".hermes"],
+        AgentKind::Custom => return None,
+    };
+    let mut first = None;
+    for suffix in candidates {
+        let path = home.join(suffix);
+        if path.is_dir() {
+            return Some(path);
+        }
+        first.get_or_insert(path);
+    }
+    first
+}
+
+/// The command that will actually start `agent`, with a bare name resolved
+/// through the same search path detection used.
+pub fn launch_command(agent: &DetectedAgent, commands: &dyn CommandLookup) -> String {
+    let command = &agent.launch.command;
+    if Path::new(command).is_absolute() || command.contains(std::path::MAIN_SEPARATOR) {
+        return command.clone();
+    }
+    commands
+        .resolve(command)
+        .map(|path| path.display().to_string())
+        .unwrap_or_else(|| command.clone())
 }
 
 /// Parse a custom command line into an ACP launch specification.

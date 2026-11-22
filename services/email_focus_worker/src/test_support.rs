@@ -11,7 +11,7 @@ use email::domain::focus::{
     DueDateExtractor, DueDateInput, FocusClassifier, FocusClassifierError, FocusEnrollment,
     FocusNotifier, ProfileSource,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use serde_json::Value;
 use sqlx::{Pool, Postgres};
@@ -28,11 +28,11 @@ pub const OTHERS_THREAD: Uuid = uuid::uuid!("00000000-0000-0000-0000-00000000f20
 pub struct NoProfile;
 
 impl ProfileSource for NoProfile {
-    async fn profile(&self, _owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn profile(&self, _owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(None)
     }
 
-    async fn time_zone(&self, _owner: &MacroUserIdStr<'static>) -> Result<Option<String>, Report> {
+    async fn time_zone(&self, _owner: &RoxUserIdStr<'static>) -> Result<Option<String>, Report> {
         Ok(None)
     }
 }
@@ -69,7 +69,7 @@ impl RecordingClassifier {
 impl FocusClassifier for RecordingClassifier {
     async fn answer(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         thread_id: Uuid,
         _input: &Value,
         questions: &[&'static str],
@@ -98,7 +98,7 @@ impl FocusClassifier for RecordingClassifier {
 pub struct NoReaders;
 
 impl FocusNotifier for NoReaders {
-    fn focus_changed(&self, _owner: &MacroUserIdStr<'static>, _link_id: Uuid) {}
+    fn focus_changed(&self, _owner: &RoxUserIdStr<'static>, _link_id: Uuid) {}
 }
 
 /// Finds no due date after `latency`, counting the calls.
@@ -111,7 +111,7 @@ pub struct NoDueDates {
 impl DueDateExtractor for NoDueDates {
     async fn due_on(
         &self,
-        _owner: &MacroUserIdStr<'static>,
+        _owner: &RoxUserIdStr<'static>,
         _thread_id: Uuid,
         _input: &DueDateInput,
     ) -> Result<Option<NaiveDate>, Report> {
@@ -124,18 +124,18 @@ impl DueDateExtractor for NoDueDates {
 }
 
 /// A fixed set of owners in the rollout.
-pub struct Enrolled(pub HashSet<MacroUserIdStr<'static>>);
+pub struct Enrolled(pub HashSet<RoxUserIdStr<'static>>);
 
 impl Enrolled {
     pub fn owner(email: &str) -> Self {
         Self(HashSet::from([
-            MacroUserIdStr::try_from_email(email).unwrap()
+            RoxUserIdStr::try_from_email(email).unwrap()
         ]))
     }
 }
 
 impl FocusEnrollment for Enrolled {
-    async fn is_enrolled(&self, owner: &MacroUserIdStr<'static>) -> Result<bool, Report> {
+    async fn is_enrolled(&self, owner: &RoxUserIdStr<'static>) -> Result<bool, Report> {
         Ok(self.0.contains(owner))
     }
 }

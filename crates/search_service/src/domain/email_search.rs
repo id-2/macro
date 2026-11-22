@@ -10,7 +10,7 @@
 
 use item_filters::ast::email::AttachmentKind;
 use item_filters::{EmailFilters, EmailSearchView, NotificationState, SharedEmailFilter};
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use rootcause::Report;
 use std::collections::HashSet;
 use uuid::Uuid;
@@ -160,7 +160,7 @@ pub(crate) trait EmailSearchSource {
     /// narrowed to `requested` when it is not empty, at most `limit`.
     fn shared_threads(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         own_link_ids: &[Uuid],
         requested: &[Uuid],
         limit: usize,
@@ -177,7 +177,7 @@ pub(crate) trait EmailSearchSource {
     )]
     fn project_threads(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         own_link_ids: &[Uuid],
         project_ids: &[String],
         requested: &[Uuid],
@@ -190,7 +190,7 @@ pub(crate) trait EmailSearchSource {
     /// to the caller, and the inboxes holding them.
     fn project_shared_threads(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         own_link_ids: &[Uuid],
         thread_ids: &[Uuid],
     ) -> impl Future<Output = Result<Vec<SharedThread>, Report>> + Send;
@@ -206,7 +206,7 @@ pub(crate) trait EmailSearchSource {
     /// Which of `thread_ids` meet every condition in `states`.
     fn threads_in_states(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         thread_ids: &[Uuid],
         states: &ThreadStates,
     ) -> impl Future<Output = Result<HashSet<Uuid>, Report>> + Send;
@@ -219,7 +219,7 @@ impl<S: EmailSearchSource> EmailSearchService<S> {
     /// match nothing.
     pub async fn scope(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         filters: &EmailFilters,
         inboxes: &ViewerInboxes,
     ) -> Result<EmailScope, Report> {
@@ -322,7 +322,7 @@ impl<S: EmailSearchSource> EmailSearchService<S> {
     /// other people's inboxes, which the per-inbox sets do not cover.
     async fn project_scope(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         filters: &EmailFilters,
         inboxes: &ViewerInboxes,
         project_ids: &[String],
@@ -358,7 +358,7 @@ impl<S: EmailSearchSource> EmailSearchService<S> {
     /// inboxes hold more than [`MAX_THREAD_SET_ALLOWLIST`].
     async fn set_allowlist(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         set: ThreadSet,
         shared: SharedEmailFilter,
         inboxes: &ViewerInboxes,
@@ -390,7 +390,7 @@ impl<S: EmailSearchSource> EmailSearchService<S> {
     /// Which of `thread_ids` meet `states`.
     pub async fn matching_threads(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         thread_ids: &[Uuid],
         states: &ThreadStates,
     ) -> Result<HashSet<Uuid>, Report> {
@@ -405,7 +405,7 @@ impl<S: EmailSearchSource> EmailSearchService<S> {
     /// inboxes holding those threads.
     pub async fn shared_among(
         &self,
-        user: &MacroUserId<Lowercase<'_>>,
+        user: &RoxUserId<Lowercase<'_>>,
         inbox_link_ids: &[Uuid],
         thread_ids: &[Uuid],
     ) -> Result<Vec<SharedThread>, Report> {

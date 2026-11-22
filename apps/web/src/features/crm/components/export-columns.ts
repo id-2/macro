@@ -1,18 +1,39 @@
+import { t } from '@app/lib/i18n';
 import { SYSTEM_PROPERTY_IDS } from '@property/constants';
 import type { ExportColumn } from '../core/export';
 export const COMPANY_EXPORT_COLUMNS: ExportColumn[] = [
-  { id: 'name', label: 'Company', default: true },
-  { id: 'domains', label: 'Domains', default: true },
-  { id: 'stage', label: 'Stage', default: true },
-  { id: 'owner', label: 'Owner', default: true },
+  { id: 'name', get label() {
+      return t('crm.company');
+    }, default: true },
+  { id: 'domains', get label() {
+      return t('crm.domains');
+    }, default: true },
+  { id: 'stage', get label() {
+      return t('crm.stage');
+    }, default: true },
+  { id: 'owner', get label() {
+      return t('crm.owner');
+    }, default: true },
   {
     id: `property:${SYSTEM_PROPERTY_IDS.REVENUE}`,
-    label: 'Revenue',
+    get label() {
+      return t('crm.revenue');
+    },
     default: true,
   },
-  { id: 'lastInteraction', label: 'Last interaction', default: true },
-  { id: 'firstInteraction', label: 'First interaction' },
-  { id: 'description', label: 'Description' },
-  { id: 'emailSync', label: 'Email sync' },
-  { id: 'id', label: 'Company ID' },
+  { id: 'lastInteraction', get label() {
+      return t('crm.lastInteractionLower');
+    }, default: true },
+  { id: 'firstInteraction', get label() {
+      return t('crm.firstInteraction');
+    } },
+  { id: 'description', get label() {
+      return t('crm.description');
+    } },
+  { id: 'emailSync', get label() {
+      return t('crm.emailSync');
+    } },
+  { id: 'id', get label() {
+      return t('crm.companyId');
+    } },
 ];

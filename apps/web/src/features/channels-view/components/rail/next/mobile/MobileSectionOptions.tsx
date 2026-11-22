@@ -18,6 +18,7 @@ import { useMutedEntitiesQuery } from '@queries/notification/unsubscribes';
 import type { ChannelLabel } from '@service-storage/generated/schemas/channelLabel';
 import { Button, ToggleSwitch } from '@ui';
 import { createSignal, For, type JSX, Show } from 'solid-js';
+import { sectionChromeName } from '../../ChannelLabelRows';
 import type { ChannelSectionPreferences } from '../../../../types';
 
 export function MobileSectionOptions(props: {
@@ -81,7 +82,7 @@ export function MobileSectionOptions(props: {
             <MobileDrawer.Title class="min-w-0 flex-1 truncate text-lg font-semibold">
               {muteOpen()
                 ? t('channelSections.muteAllChannels')
-                : props.label.name}
+                : sectionChromeName(props.label.name)}
             </MobileDrawer.Title>
             <Show when={!muteOpen()}>
               <Show when={props.label.teamId}>

@@ -20,9 +20,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>macro</string>
+			<string>rox</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
+				<string>rox</string>
 				<string>macro</string>
 			</array>
 		</dict>
@@ -33,14 +34,14 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>macro</string>
+		<string>rox</string>
 	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Macro uses the camera for video calls and for photos and videos you attach.</string>
+	<string>Rox uses the camera for video calls and for photos and videos you attach.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Macro uses the microphone for calls and for videos you record to attach.</string>
+	<string>Rox uses the microphone for calls and for videos you record to attach.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>This app needs access to your photo library to upload attachments.</string>
 	<key>NSUserActivityTypes</key>

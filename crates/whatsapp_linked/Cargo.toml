@@ -9,7 +9,7 @@ default = []
 # Port traits and the domain services built on them.
 ports = [
   "dep:async-trait",
-  "dep:macro_user_id",
+  "dep:rox_user_id",
   "dep:rootcause",
   "external_chat/ports",
 ]
@@ -26,7 +26,7 @@ outbound = [
 # DSS HTTP routes.
 inbound = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "external_chat/inbound",
   "ports",
   "schema",
@@ -40,8 +40,8 @@ chrono = { workspace = true }
 entity_access_db_utils = { path = "../entity_access_db_utils", optional = true }
 entity_registry_db_utils = { path = "../entity_registry/entity_registry_db_utils", optional = true }
 external_chat = { path = "../external_chat" }
-macro_authorization = { path = "../macro_authorization", default-features = false, features = ["axum"], optional = true }
-macro_user_id = { path = "../macro_user_id", optional = true }
+rox_authorization = { path = "../rox_authorization", default-features = false, features = ["axum"], optional = true }
+rox_user_id = { path = "../rox_user_id", optional = true }
 model-entity = { path = "../model-entity" }
 model_owner = { path = "../model_owner", optional = true }
 nom = { workspace = true }
@@ -62,7 +62,7 @@ bot_id = { path = "../bot_id" }
 entity_access = { path = "../entity_access", default-features = false, features = ["inbound", "outbound", "ports"] }
 harness_id = { path = "../harness_id", features = ["test-utils"] }
 image = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 model_user = { path = "../model_user" }
 models_permissions = { path = "../models_permissions" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "time"] }

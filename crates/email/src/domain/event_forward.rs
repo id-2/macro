@@ -28,7 +28,7 @@ use calendar_events::domain::{
     ics::{CalendarEventForwardKind, IcsParticipant},
     ports::CalendarEventForwardSource,
 };
-use macro_user_id::{email::EmailStr, user_id::MacroUserIdStr};
+use rox_user_id::{email::EmailStr, user_id::RoxUserIdStr};
 use uuid::Uuid;
 
 use super::{
@@ -118,7 +118,7 @@ pub async fn forward_event<C, E, F>(
     calendar: &C,
     email: &E,
     sender: &F,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
     event_id: Uuid,
     request: EventForwardRequest,
 ) -> Result<CreatedDraft, EventForwardError>
@@ -145,7 +145,7 @@ async fn send_forward<C, E, F>(
     calendar: &C,
     email: &E,
     sender: &F,
-    actor: MacroUserIdStr<'static>,
+    actor: RoxUserIdStr<'static>,
     event_id: Uuid,
     request: EventForwardRequest,
 ) -> Result<CreatedDraft, EventForwardError>
@@ -239,7 +239,7 @@ where
         bcc: Vec::new(),
         body_html: Some(URL_SAFE_NO_PAD.encode(text_html(&body_text))),
         body_text: Some(body_text),
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: None,

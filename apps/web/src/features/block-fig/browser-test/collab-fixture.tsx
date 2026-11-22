@@ -9,9 +9,9 @@
 
 import { FigEngine } from '@core/fig-engine/client';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { noopChatter } from '@macro-inc/collaboration/collab/chatter';
-import type { SnapshotStore } from '@macro-inc/collaboration/collab/snapshot-store';
-import { InMemoryWALStore } from '@macro-inc/collaboration/collab/wal';
+import { noopChatter } from '@rox-one/collaboration/collab/chatter';
+import type { SnapshotStore } from '@rox-one/collaboration/collab/snapshot-store';
+import { InMemoryWALStore } from '@rox-one/collaboration/collab/wal';
 import {
   createSignal,
   For,

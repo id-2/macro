@@ -1,5 +1,5 @@
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use models_databases::views::LaneKey;
 use models_databases::views::{Lane, ViewLayout, ViewQuery};
 use properties::outbound::properties_pg_repo::PropertiesPgRepo;
@@ -17,13 +17,13 @@ const USER: &str = "macro|starter-database@rox.one";
 
 fn viewer() -> Viewer {
     Viewer {
-        user_id: MacroUserIdStr::parse_from_str(USER).unwrap().into_owned(),
+        user_id: RoxUserIdStr::parse_from_str(USER).unwrap().into_owned(),
         acting_bot: None,
     }
 }
 
 async fn insert_user(pool: &PgPool) {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#, id, USER)
         .execute(pool).await.unwrap();
     sqlx::query!(
@@ -108,9 +108,9 @@ async fn concurrent_starter_requests_create_one_complete_editable_example(pool: 
     let table = created.table_id.unwrap();
     let data = PgDatabasesRepo::new(pool.clone(), PropertiesPgRepo::new(pool.clone()));
     let (database, tables) = data.get_database(id).await.unwrap().unwrap();
-    assert_eq!(database.name, "Getting started");
+    assert_eq!(database.name, "Начало работы");
     assert_eq!(tables.len(), 1);
-    assert_eq!(tables[0].name, "Ideas");
+    assert_eq!(tables[0].name, "Идеи");
     let columns = data.columns_for_tables(&[table]).await.unwrap();
     assert_eq!(columns.len(), 2);
     let rows = data.row_refs(table).await.unwrap();

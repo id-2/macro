@@ -31,35 +31,35 @@ import {
   TableCellHeaderStates,
   type TableNode,
 } from '@lexical/table';
-import { $createAgentSessionMentionNode } from '@macro-inc/lexical-core/nodes/AgentSessionMentionNode';
-import { $createBookingLinkMentionNode } from '@macro-inc/lexical-core/nodes/BookingLinkMentionNode';
-import { $createContactMentionNode } from '@macro-inc/lexical-core/nodes/ContactMentionNode';
+import { $createAgentSessionMentionNode } from '@rox-one/lexical-core/nodes/AgentSessionMentionNode';
+import { $createBookingLinkMentionNode } from '@rox-one/lexical-core/nodes/BookingLinkMentionNode';
+import { $createContactMentionNode } from '@rox-one/lexical-core/nodes/ContactMentionNode';
 import {
   $createDateMentionNode,
   $isDateMentionNode,
-} from '@macro-inc/lexical-core/nodes/DateMentionNode';
-import { $createDocumentCardNode } from '@macro-inc/lexical-core/nodes/DocumentCardNode';
-import { $createDocumentMentionNode } from '@macro-inc/lexical-core/nodes/DocumentMentionNode';
-import { $createEquationNode } from '@macro-inc/lexical-core/nodes/EquationNode';
-import { $createGroupMentionNode } from '@macro-inc/lexical-core/nodes/GroupMentionNode';
-import { $createHorizontalRuleNode } from '@macro-inc/lexical-core/nodes/HorizontalRuleNode';
-import { $createHtmlRenderNode } from '@macro-inc/lexical-core/nodes/HtmlRenderNode';
+} from '@rox-one/lexical-core/nodes/DateMentionNode';
+import { $createDocumentCardNode } from '@rox-one/lexical-core/nodes/DocumentCardNode';
+import { $createDocumentMentionNode } from '@rox-one/lexical-core/nodes/DocumentMentionNode';
+import { $createEquationNode } from '@rox-one/lexical-core/nodes/EquationNode';
+import { $createGroupMentionNode } from '@rox-one/lexical-core/nodes/GroupMentionNode';
+import { $createHorizontalRuleNode } from '@rox-one/lexical-core/nodes/HorizontalRuleNode';
+import { $createHtmlRenderNode } from '@rox-one/lexical-core/nodes/HtmlRenderNode';
 import {
   $createImageNode,
   ImageNode,
-} from '@macro-inc/lexical-core/nodes/ImageNode';
-import { $createPullRequestMentionNode } from '@macro-inc/lexical-core/nodes/PullRequestMentionNode';
-import { $createTagMentionNode } from '@macro-inc/lexical-core/nodes/TagMentionNode';
-import { $createUserMentionNode } from '@macro-inc/lexical-core/nodes/UserMentionNode';
+} from '@rox-one/lexical-core/nodes/ImageNode';
+import { $createPullRequestMentionNode } from '@rox-one/lexical-core/nodes/PullRequestMentionNode';
+import { $createTagMentionNode } from '@rox-one/lexical-core/nodes/TagMentionNode';
+import { $createUserMentionNode } from '@rox-one/lexical-core/nodes/UserMentionNode';
 import {
   $createVideoNode,
   VideoNode,
-} from '@macro-inc/lexical-core/nodes/VideoNode';
+} from '@rox-one/lexical-core/nodes/VideoNode';
 import {
   $getId,
   $setId,
   $updateAllNodeIds,
-} from '@macro-inc/lexical-core/plugins/nodeIdPlugin';
+} from '@rox-one/lexical-core/plugins/nodeIdPlugin';
 import {
   $createLineBreakNode,
   $createParagraphNode,

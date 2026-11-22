@@ -13,7 +13,7 @@ use agent_session::domain::ports::{AgentSessionLogRepo, NoOpRealtime};
 use agent_session::domain::service::{AgentSessionService, AgentSessionServiceImpl};
 use agent_session::testing::InMemoryAgentSessionRepo;
 use bot_id::BotId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::ContainerManager;
 use crate::domain::model::{AgentKind, SpawnContainer};
@@ -24,8 +24,8 @@ use agent_session::domain::ports::{
     NoOpAgentSessionNameGenerator, NoOpTurnObserver, NoopLifecyclePublisher,
 };
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@example.com").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@example.com").unwrap()
 }
 
 fn params(id: AgentSessionId) -> CreateAgentSessionParams {
@@ -36,7 +36,7 @@ fn params(id: AgentSessionId) -> CreateAgentSessionParams {
         repo_branch: None,
         id,
         owner_id: model_owner::Owner::User(owner()),
-        bot_id: BotId::new_from_uuid(macro_uuid::generate_uuid_v7()),
+        bot_id: BotId::new_from_uuid(rox_uuid::generate_uuid_v7()),
         thread_id: None,
         originating_message_id: None,
         model: "claude".to_owned(),

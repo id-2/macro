@@ -163,7 +163,7 @@ async fn a_new_capture_replaces_the_summary_and_drops_the_old_patch() {
 
 #[tokio::test]
 async fn a_pull_request_capture_shares_its_changeset_instead_of_storing_a_copy() {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let extractor = ScriptedExtractor::returning(shared(id));
     extractor.set_pull_request_patch(id, PATCH);
     let (service, _repo, blobs) = service(extractor);
@@ -186,7 +186,7 @@ async fn sharing_a_pull_request_changeset_drops_the_sessions_own_patch() {
     service.capture(SESSION).await.unwrap();
     assert_eq!(blobs.keys().len(), 1);
 
-    extractor.set(shared(macro_uuid::generate_uuid_v7()));
+    extractor.set(shared(rox_uuid::generate_uuid_v7()));
     service.capture(SESSION).await.unwrap();
     assert!(blobs.keys().is_empty());
 }
@@ -194,7 +194,7 @@ async fn sharing_a_pull_request_changeset_drops_the_sessions_own_patch() {
 #[tokio::test]
 async fn a_shared_patch_that_can_no_longer_be_read_is_missing() {
     let (service, _repo, _blobs) = service(ScriptedExtractor::returning(shared(
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
     )));
     service.capture(SESSION).await.unwrap();
     assert!(matches!(

@@ -163,7 +163,7 @@ describe('inbox consent return', () => {
     // What `useAddInboxFlow` stashes before opening the system browser.
     rememberInboxLinkReturn(LINK_ID, { url: '/home', scopes: 'gmail' });
 
-    // What the shell emits for macro:///inbox-link-callback?link_id=<id>&token=<id>,
+    // What the shell emits for rox:///inbox-link-callback?link_id=<id>&token=<id>,
     // the auth service's redirect (`emit_navigate_for_deep_link` in
     // tauri/src-tauri/src/lib.rs).
     deliver({

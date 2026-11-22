@@ -1,4 +1,4 @@
-use crate::scheme::MacroScheme;
+use crate::scheme::RoxScheme;
 use logger::Logger;
 use serde::{Deserialize, Serialize};
 use std::{borrow::Cow, collections::HashMap, path::PathBuf, sync::Arc};
@@ -31,7 +31,7 @@ enum NavigationOutput<'a> {
     /// must not load it — that would replace the running SPA with the live
     /// site — so the navigation is cancelled and re-emitted as a `navigate`
     /// event for the SPA router to handle in-place.
-    AppLink(MacroScheme),
+    AppLink(RoxScheme),
     /// Browser-only URLs and local files outside the allowed cache directory
     /// must not be handed to the operating system's URL handler.
     Blocked,
@@ -61,7 +61,7 @@ pub enum Platform {
 }
 
 #[derive(Clone)]
-pub struct MacroNavigationPlugin {
+pub struct RoxNavigationPlugin {
     internal_domains: Arc<[Url]>,
     app_link_hosts: &'static [&'static str],
     allowed_file_prefix: Option<PathBuf>,
@@ -75,15 +75,15 @@ struct AuthCallbackQuery<'a> {
 }
 
 #[derive(Debug, Serialize)]
-struct MacroCallbackQuery<'a> {
-    original_url: MacroScheme,
+struct RoxCallbackQuery<'a> {
+    original_url: RoxScheme,
     #[serde(flatten, borrow)]
     remaining: HashMap<Cow<'a, str>, Cow<'a, str>>,
 }
 
-impl MacroNavigationPlugin {
+impl RoxNavigationPlugin {
     pub fn new(allow_list: &'static [&'static str]) -> Result<Self, url::ParseError> {
-        Ok(MacroNavigationPlugin {
+        Ok(RoxNavigationPlugin {
             internal_domains: allow_list
                 .iter()
                 .map(|s| s.parse())
@@ -127,14 +127,14 @@ impl MacroNavigationPlugin {
     }
 
     #[tracing::instrument(ret, level = tracing::Level::DEBUG, skip(self))]
-    fn as_app_link(&self, url: &Url) -> Option<MacroScheme> {
-        if url.scheme() == "macro" {
-            return MacroScheme::new(url.clone()).ok();
+    fn as_app_link(&self, url: &Url) -> Option<RoxScheme> {
+        if url.scheme() == scheme::APP_SCHEME || url.scheme() == scheme::LEGACY_APP_SCHEME {
+            return RoxScheme::new(url.clone()).ok();
         }
         if !is_app_link(self.app_link_hosts, url) {
             return None;
         }
-        MacroScheme::from_url(url).ok()
+        RoxScheme::from_url(url).ok()
     }
 
     #[tracing::instrument(ret, level = tracing::Level::DEBUG, skip(self))]
@@ -178,7 +178,7 @@ impl MacroNavigationPlugin {
             }
             // A relative/same-origin app link should use the SPA router, not
             // create a second webview or reload the existing app.
-            NavigationOutput::Internal => MacroScheme::from_url(url)
+            NavigationOutput::Internal => RoxScheme::from_url(url)
                 .map(NavigationOutput::AppLink)
                 .unwrap_or(NavigationOutput::Blocked),
             destination => destination,
@@ -284,13 +284,13 @@ fn transform_external_url(mut url: Url) -> Url {
         remaining,
     }) = serde_qs::from_str(query).log_err()
     {
-        let Ok(macro_scheme) = MacroScheme::from_url(&cb) else {
+        let Ok(rox_scheme) = RoxScheme::from_url(&cb) else {
             return url;
         };
 
         url.set_query(Some(
-            serde_qs::to_string(&MacroCallbackQuery {
-                original_url: macro_scheme,
+            serde_qs::to_string(&RoxCallbackQuery {
+                original_url: rox_scheme,
                 remaining,
             })
             .expect("serialization should not fail")
@@ -307,7 +307,7 @@ fn transform_external_url(mut url: Url) -> Url {
     url
 }
 
-impl<R: Runtime> Plugin<R> for MacroNavigationPlugin {
+impl<R: Runtime> Plugin<R> for RoxNavigationPlugin {
     fn name(&self) -> &'static str {
         std::any::type_name_of_val(self)
     }

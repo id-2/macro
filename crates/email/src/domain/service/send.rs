@@ -1,10 +1,10 @@
 use crate::domain::{
-    events::{EmailMacroEvent, MessageSendQueuedMetadata},
+    events::{EmailRoxEvent, MessageSendQueuedMetadata},
     models::{CreateDraftInput, CreatedDraft, EmailErr, Link},
     ports::{EmailMessageEnqueuer, EmailRepo},
 };
 use frecency::domain::ports::FrecencyQueryService;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 
 use super::EmailServiceImpl;
 
@@ -14,14 +14,14 @@ where
     U: FrecencyQueryService,
     E: EmailMessageEnqueuer,
     CS: crm::domain::service::CrmService,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
     anyhow::Error: From<T::Err>,
     anyhow::Error: From<E::Err>,
 {
     #[tracing::instrument(skip_all, err)]
     pub(crate) async fn send_message_for_user_impl(
         &self,
-        macro_id: macro_user_id::user_id::MacroUserIdStr<'static>,
+        macro_id: rox_user_id::user_id::RoxUserIdStr<'static>,
         link_id: Option<uuid::Uuid>,
         mut input: CreateDraftInput,
     ) -> Result<CreatedDraft, EmailErr> {
@@ -65,7 +65,7 @@ where
         // The undo-window send is now committed and queued; the matching
         // message_sent / message_send_cancelled event resolves it later,
         // reading the actor back off the scheduled row.
-        self.publish_email_event(&EmailMacroEvent::message_send_queued(
+        self.publish_email_event(&EmailRoxEvent::message_send_queued(
             MessageSendQueuedMetadata {
                 link_id: link.id,
                 owner: link.macro_id.clone(),

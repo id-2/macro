@@ -19,8 +19,8 @@ use livekit_protocol::{
     AudioCodec, CreateAgentDispatchRequest, EgressInfo, EgressStatus, EncodedFileOutput,
     EncodedFileType, S3Upload, TrackSource, VideoCodec, encoded_file_output, participant_info,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::models::apple::VoipPushPayload;
 
 use crate::domain::meetings::GuestId;
@@ -193,7 +193,7 @@ impl CallRtcClient for LivekitRtcClient {
     async fn generate_token(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'_>,
+        participant_identity: RoxUserIdStr<'_>,
     ) -> anyhow::Result<String> {
         // Pinned so VoIP-delivered tokens survive push delay and lock-screen ringing.
         // TODO(call-phase-2): add token refresh before supporting calls over 6h.
@@ -216,7 +216,7 @@ impl CallRtcClient for LivekitRtcClient {
     async fn generate_program_token(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'_>,
+        participant_identity: RoxUserIdStr<'_>,
         program: &str,
         name: Option<String>,
     ) -> anyhow::Result<String> {
@@ -267,7 +267,7 @@ impl CallRtcClient for LivekitRtcClient {
     async fn generate_named_token(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'_>,
+        participant_identity: RoxUserIdStr<'_>,
         name: &str,
     ) -> anyhow::Result<String> {
         AccessToken::with_api_key(&self.api_key, &self.api_secret)
@@ -337,7 +337,7 @@ impl CallRtcClient for LivekitRtcClient {
     async fn build_voip_push_payloads<'a>(
         &self,
         request: VoipPushPayloadRequest<'a>,
-    ) -> Vec<(MacroUserIdStr<'static>, VoipPushPayload)> {
+    ) -> Vec<(RoxUserIdStr<'static>, VoipPushPayload)> {
         let room_name = request.room_name;
         let call_id = request.call_id;
         let channel_id = request.channel_id;
@@ -386,7 +386,7 @@ impl CallRtcClient for LivekitRtcClient {
     async fn remove_participant(
         &self,
         room_name: &str,
-        participant_identity: MacroUserIdStr<'_>,
+        participant_identity: RoxUserIdStr<'_>,
     ) -> anyhow::Result<()> {
         ignore_not_found(
             self.room_client
@@ -432,7 +432,7 @@ impl CallRtcClient for LivekitRtcClient {
                 .into_iter()
                 .filter(|participant| participant.kind != participant_info::Kind::Agent as i32)
                 .map(|participant| {
-                    let user_id = MacroUserIdStr::parse_from_str(&participant.identity)
+                    let user_id = RoxUserIdStr::parse_from_str(&participant.identity)
                         .ok()
                         .map(|_| participant.identity.clone());
                     let kind = if user_id.is_some() {
@@ -572,7 +572,7 @@ impl CallRtcClient for LivekitRtcClient {
         let guest_identity = event
             .participant
             .as_ref()
-            .filter(|p| MacroUserIdStr::parse_from_str(&p.identity).is_err())
+            .filter(|p| RoxUserIdStr::parse_from_str(&p.identity).is_err())
             .and_then(|p| GuestId::parse_rtc_identity(&p.identity));
         let bot_identity = event
             .participant
@@ -586,7 +586,7 @@ impl CallRtcClient for LivekitRtcClient {
             id: event.id,
             room_name: event.room.map(|r| r.name),
             participant_identity: event.participant.and_then(|p| {
-                match MacroUserIdStr::parse_from_str(&p.identity) {
+                match RoxUserIdStr::parse_from_str(&p.identity) {
                     Ok(id) => Some(id.into_owned()),
                     Err(_) => {
                         tracing::debug!(

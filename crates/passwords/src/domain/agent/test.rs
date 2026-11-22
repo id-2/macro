@@ -13,7 +13,7 @@ use crate::domain::{
 };
 use chrono::{DateTime, TimeDelta, Utc};
 use fakes::*;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use std::{
     collections::HashMap,
     sync::{
@@ -30,8 +30,8 @@ const AGENT: &str = "macro|agent@example.test";
 const HUMAN: &str = "macro|human@example.test";
 const ADMIN: &str = "macro|admin@example.test";
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap().into_owned()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap().into_owned()
 }
 
 /// One composed agent service over fakes, with the agent admitted, both

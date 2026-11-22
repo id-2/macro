@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { Popover } from '@kobalte/core/popover';
 import { Badge, badgeTriggerClasses, Tooltip } from '@ui';
@@ -11,10 +12,10 @@ export function RecordArchivedStatus(props: {
 }) {
   const explanation = () => {
     if (props.parentArchived)
-      return 'Archived with their company. Restore the company first. The record, history and discussion are kept.';
+      return t('crm.archivedWithCompany');
     if (props.kind === 'company')
-      return 'Excluded from visible CRM lists and search. Records and history are kept. Email syncing is off.';
-    return 'Excluded from visible People, company Team and CRM search results. History and discussion are kept.';
+      return t('crm.archivedCompanyExplanation');
+    return t('crm.archivedContactExplanation');
   };
   return (
     <span
@@ -27,9 +28,9 @@ export function RecordArchivedStatus(props: {
           <Tooltip.Root>
             <Tooltip.Trigger
               class={badgeTriggerClasses({ variant: 'outline', size: 'xs' })}
-              aria-label="Archived — details"
+              aria-label={t('crm.archivedDetails')}
             >
-              Archived
+              {t('crm.archived')}
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content>
@@ -47,13 +48,13 @@ export function RecordArchivedStatus(props: {
               class:
                 "touch:min-h-6 touch:min-w-11 touch:my-2.5 touch:before:absolute touch:before:-inset-x-px touch:before:top-1/2 touch:before:h-11 touch:before:-translate-y-1/2 touch:before:content-['']",
             })}
-            aria-label="Archived — details"
+            aria-label={t('crm.archivedDetails')}
           >
-            Archived
+            {t('crm.archived')}
           </Popover.Trigger>
           <Popover.Portal>
             <Popover.Content class="menu-surface z-modal w-72 max-w-[calc(100vw-2rem)] p-3">
-              <Popover.Title class="sr-only">Archived</Popover.Title>
+              <Popover.Title class="sr-only">{t('crm.archived')}</Popover.Title>
               <Popover.Description class="text-sm text-ink-muted">
                 {explanation()}
               </Popover.Description>
@@ -69,7 +70,7 @@ export function RecordArchivedStatus(props: {
 export function ArchivedRecordBadge() {
   return (
     <Badge variant="outline" size="xs">
-      Archived
+      {t('crm.archived')}
     </Badge>
   );
 }

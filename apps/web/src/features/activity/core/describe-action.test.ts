@@ -1,10 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { setInterfaceLanguage } from '@app/lib/i18n';
+import { beforeAll, describe, expect, it } from 'vitest';
 import {
   describeAction,
   describeActionForEntity,
   describeRun,
 } from './describe-action';
 import type { ActivityAction, ActivityEvent } from './event';
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 const DESCRIBE_CASES: Array<[ActivityAction, string]> = [
   [{ kind: 'created' }, 'created this'],

@@ -6,34 +6,34 @@ export const HOME_TOUR = defineTourTargets('home', ['list', 'filter']);
 
 export const homeTour = defineViewTour({
   id: 'home',
-  title: 'Home',
+  title: 'Главная',
   video: {
     youtubeId: 'Fn5hdzXsQQ8',
-    title: 'Rox Product Demo',
+    title: 'Обзор Rox',
     duration: '4:45',
   },
   steps: [
     {
       target: HOME_TOUR.list,
       entry: VIEW_SHELL_TOUR.sidebarToggle,
-      entryLabel: 'Show your Home list to continue',
-      title: 'See your work together',
+      entryLabel: 'Покажите список на главной, чтобы продолжить',
+      title: 'Всё ваше в одном месте',
       description:
-        'Home brings docs, DMs, emails, tasks, files, agents, and group chats into one place.',
+        'На главной собраны документы, личные сообщения, почта, задачи, файлы, агенты и групповые чаты.',
     },
     {
       target: HOME_TOUR.filter,
       entry: VIEW_SHELL_TOUR.sidebarToggle,
-      entryLabel: 'Show your Home list to continue',
-      title: 'Open the context',
+      entryLabel: 'Покажите список на главной, чтобы продолжить',
+      title: 'Откройте контекст',
       description:
-        'Select an item to preview it beside your list. Use the filter to narrow what you see.',
+        'Выберите элемент, чтобы посмотреть его рядом со списком. Фильтр сузит список.',
     },
     {
       target: VIEW_SHELL_TOUR.main,
-      title: 'Start something new',
+      title: 'Начните что-то новое',
       description:
-        'Choose New to work with an agent, or use Create in the sidebar to start a document, task, or conversation.',
+        'Нажмите «Новое», чтобы поработать с агентом, или «Создать» в боковой панели — для документа, задачи или разговора.',
     },
   ],
 });

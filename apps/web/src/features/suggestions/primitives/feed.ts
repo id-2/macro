@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { type Accessor, createMemo, createSignal } from 'solid-js';
 import type {
   SuggestionActions,

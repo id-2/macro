@@ -756,11 +756,11 @@ fn requests_offer_their_answers_on_the_request() {
 fn rows_say_who_they_are_from() {
     let mut mention = channel_mention(1, CHANNEL, ROOT, None, 1);
     std::sync::Arc::make_mut(&mut mention).sender_id =
-        Some(MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap());
+        Some(RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap());
     assert_eq!(
         channel_rows(&[mention])[0].actor,
         Some(InboxActor::User(
-            MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap()
+            RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap()
         ))
     );
 

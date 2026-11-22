@@ -6,7 +6,7 @@ import {
   markdownToPlainText,
   type ReplyTargetParent,
   stripLeadingReplyTargetMarkdown,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import type { Message } from '@service-storage/messages';
 import type { MessageData } from '../../Message';
 

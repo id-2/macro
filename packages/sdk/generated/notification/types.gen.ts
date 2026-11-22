@@ -1155,7 +1155,7 @@ export type ItemSharedMetadata = {
     userIds: Array<string>;
 };
 
-export type MacroUserIdStr = string;
+export type RoxUserIdStr = string;
 
 /**
  * Notification sent when a user is mentioned in a document comment.
@@ -1581,7 +1581,7 @@ export type RealtimeNotifTaggedContentValue = Entity & {
         content: unknown;
         tag: NotificationTypeName;
     };
-    sender_id?: null | MacroUserIdStr;
+    sender_id?: null | RoxUserIdStr;
     /**
      * Whether the notification has been sent.
      */

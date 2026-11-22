@@ -8,7 +8,7 @@ import { existsSync } from 'node:fs';
 import { mkdtemp, rm, symlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { inSubprocess } from '@macro-inc/muppet/core/code';
+import { inSubprocess } from '@rox-one/muppet/core/code';
 import { childEnvironment } from '../children.ts';
 import { type Relay, startRelay } from '../relay.ts';
 
@@ -95,12 +95,12 @@ test(
             stdout: 'pipe',
             stderr: 'pipe',
             env: childEnvironment(
-              { ...process.env, MACRO_API_KEY: realKey },
+              { ...process.env, ROX_API_KEY: realKey },
               {
                 AGENT_WORKSPACE: workspace,
                 MUPPET_RELAY_URL: relay.url,
                 MUPPET_RELAY_TOKEN: relay.token,
-                MUPPET_CREDENTIAL_NAMES: 'MACRO_API_KEY,MACRO_GATEWAY',
+                MUPPET_CREDENTIAL_NAMES: 'ROX_API_KEY,MACRO_GATEWAY',
               }
             ),
           }
@@ -120,7 +120,7 @@ test(
         `import type { Script } from ${JSON.stringify(join(workspace, 'behavior', 'index.ts'))};`,
         '',
         'export async function main({ context, log }: Script) {',
-        "  const read = await context.credentials.get('MACRO_API_KEY').then(() => 'read', (error: unknown) => String(error));",
+        "  const read = await context.credentials.get('ROX_API_KEY').then(() => 'read', (error: unknown) => String(error));",
         '  log(read);',
         '  return {',
         '    principal: await (await context.macro()).myPrincipalId(),',
@@ -134,7 +134,7 @@ test(
       kind: 'succeeded',
       output: {
         principal: agentId,
-        names: ['MACRO_API_KEY', 'MACRO_GATEWAY'],
+        names: ['ROX_API_KEY', 'MACRO_GATEWAY'],
         inEnvironment: false,
       },
     });
@@ -186,7 +186,7 @@ test('a missing variable, or a credential file it can’t read, exits 78 and say
   expect(malformed.stderr).not.toContain('mak_leaked');
   await Bun.write(
     credentials,
-    'MACRO_API_KEY="mak_real"\nMACRO_GATEWAY="https://gateway.example.com"\n'
+    'ROX_API_KEY="mak_real"\nMACRO_GATEWAY="https://gateway.example.com"\n'
   );
   expect(
     await cli(

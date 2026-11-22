@@ -7,7 +7,7 @@ use crate::domain::InputError;
 use ai_billing::AiAdmissionService;
 use ai_usage::{AiFeature, UsageContext};
 use chrono::NaiveDate;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::{future::Future, sync::Arc};
@@ -199,7 +199,7 @@ impl<E: ThreadFactExtractor> ThreadDueDateService<E> {
     )]
     pub async fn due_date(
         &self,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
         request: ThreadDueDateRequest,
     ) -> Result<ThreadDueDateResponse, InputError> {
         validate(&request)?;

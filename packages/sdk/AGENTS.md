@@ -3,12 +3,12 @@
 ## What it is
 
 The public TypeScript SDK wraps generated service clients in entity handles.
-Authentication and service hosts come from `MacroClient`; permissions remain
+Authentication and service hosts come from `RoxClient`; permissions remain
 enforced by the ordinary backend APIs.
 
 ## Start here
 
-- `src/macro.ts`: public exports and namespace registration.
+- `src/rox.ts`: public exports and namespace registration.
 - `documents.createCanvas()` creates shared content before returning a Document handle;
   it requires no browser open or upload. `document.canvas()` (`entities/canvases/canvas.ts`, its own code-mode entity)
   reads (`scene`), edits (`apply` code against a revision, `edit` by instructions) and
@@ -156,8 +156,8 @@ enforced by the ordinary backend APIs.
   `/initiatives/{id}/activity`. Code mode hides the matching direct tools.
 - `services.ts`, `openapi-ts.config.ts`: generated service contract inputs.
 - `src/calls/`: optional Node and browser LiveKit helpers, exported only as
-  `@macro-inc/sdk/calls/node` and `@macro-inc/sdk/calls/browser`. Keep them out of
-  `src/macro.ts` and its dependency graph; LiveKit runtimes stay optional peers.
+  `@rox-one/sdk/calls/node` and `@rox-one/sdk/calls/browser`. Keep them out of
+  `src/rox.ts` and its dependency graph; LiveKit runtimes stay optional peers.
 - `src/entities/calls/`: live and recorded call handles; token-bearing `CallConnection` never serializes its token.
 
 ## Boundaries
@@ -287,7 +287,7 @@ the existing gateway prefixes.
 - CRM records and initiatives share `messages/discussion.ts`: their comments are
   messages under a `crm_company`, `crm_contact` or `initiative` parent.
 - `crm.blockDomain` refuses domains covering a team member's connected primary
-  mailbox; preserve the server's validation message through `MacroApiError`.
+  mailbox; preserve the server's validation message through `RoxApiError`.
 - Meeting list lookup only covers the owner's newest 100 standalone meetings;
   handles seeded from invitations retain their token for refetching after writes.
 - Team routes act on the caller's current team, which the auth service
@@ -336,6 +336,6 @@ the existing gateway prefixes.
   audio DTX. Unpublish Node tracks by publication SID; browser tracks by object.
 - Keep LiveKit and OpenTelemetry external in the calls build so room objects and
   tracing use the consumer's runtime instances. Do not re-export calls helpers
-  or their runtime types from `src/macro.ts`.
+  or their runtime types from `src/rox.ts`.
 
 - `Team.members()` includes effective `crmAccess`; `Team.setMemberCrmAccess(user, enabled)` changes it through the existing team API. `crm.access()` reads current viewer authority even when denied. Backend permission checks apply equally to SDK and generated MCP operations.

@@ -22,7 +22,7 @@ import type {
   VectorNetwork,
 } from '@core/fig-engine/types';
 import { fireAndForget } from '@core/util/fireAndForget';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { createSignal, onCleanup } from 'solid-js';
 import type { FigSharing } from '../context/fig-viewer-context';
 import { type Alignment, alignOffset, distributeOffsets } from '../core/align';

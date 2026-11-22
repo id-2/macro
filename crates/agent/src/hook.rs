@@ -14,7 +14,7 @@ use rig_agent::tool::ToolOutput;
 use std::collections::HashMap;
 use std::future::Future;
 use std::pin::Pin;
-use std::sync::atomic::{AtomicUsize, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicUsize, Ordering};
 use std::sync::{Arc, Mutex};
 use tokio::sync::mpsc;
 use tokio_util::sync::CancellationToken;
@@ -34,6 +34,39 @@ pub type ToolRouter = Arc<dyn Fn(&str) -> Option<ToolInfo> + Send + Sync>;
 /// session's context); context-erased so the bridge stays generic-free.
 pub type RegisterFn =
     Arc<dyn Fn(Vec<SearchableTool>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
+
+/// Stops advertising a tool to the model for the rest of the run.
+///
+/// Built by the agent layer over the live tool server; the bridge names a tool
+/// whose service answered unavailable, and the server drops every advertised
+/// form of it before the next request.
+pub type UnadvertiseFn =
+    Arc<dyn Fn(String) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
+
+/// An [`UnadvertiseFn`] that drops nothing, for a host that never removes a
+/// tool.
+pub fn keep_all_tools() -> UnadvertiseFn {
+    Arc::new(|_| Box::pin(async {}))
+}
+
+/// The tools that only work when the cognition service does. When it answers
+/// unavailable, they all answer the same way, so a turn removes them at once
+/// rather than let the model retry each in turn.
+pub(crate) const COGNITION_TOOLS: [&str; 4] = [
+    "DescribeCodeTools",
+    "DecideReview",
+    "PresentReview",
+    "GetReview",
+];
+
+/// The first sentence of the cognition service's retryable failure
+/// (`CognitionError::Busy`). Matched on the tool result the model saw.
+const COGNITION_UNAVAILABLE: &str = "Cognition is busy or unavailable";
+
+/// What the model hears instead of that failure, once.
+const COGNITION_WITHOUT_TOOLS: &str = "The cognition service is unavailable, so DescribeCodeTools, \
+     DecideReview, PresentReview and GetReview were removed for this turn; proceed without them \
+     and answer with the tools you have.";
 
 /// A user tool the model called, as the host's [`UserToolFinisher`] sees it.
 ///
@@ -149,6 +182,9 @@ pub struct BridgeInputs {
     pub loaded_buffer: Arc<Mutex<Vec<SearchableTool>>>,
     /// Registers loaded tools with the live tool server.
     pub register_loaded: RegisterFn,
+    /// Drops a tool from the live tool server, so the next request stops
+    /// advertising it (see [`UnadvertiseFn`]).
+    pub unadvertise: UnadvertiseFn,
     /// Records which result loaded which tools.
     pub tool_loads: ToolLoads,
     /// Finishes user tools mid-turn, when the host can.
@@ -209,6 +245,11 @@ pub struct StreamBridge {
     loaded_buffer: Arc<Mutex<Vec<SearchableTool>>>,
     /// Registers drained tools with the live tool server.
     register_loaded: RegisterFn,
+    /// Drops a tool from the live tool server when its service is unavailable.
+    unadvertise: UnadvertiseFn,
+    /// Whether this run already answered a cognition failure by removing
+    /// [`COGNITION_TOOLS`]; the warning and the removal happen once.
+    cognition_tools_removed: Arc<AtomicBool>,
     /// Records which result loaded which tools.
     tool_loads: ToolLoads,
     /// The session's full searchable catalog. Read by
@@ -255,6 +296,7 @@ impl StreamBridge {
             routing,
             loaded_buffer,
             register_loaded,
+            unadvertise,
             tool_loads,
             user_tool_finisher,
             stream_tool_calls,
@@ -267,6 +309,8 @@ impl StreamBridge {
                 routing,
                 loaded_buffer,
                 register_loaded,
+                unadvertise,
+                cognition_tools_removed: Arc::default(),
                 tool_loads,
                 searchable_catalog,
                 unknown_tool_call_retries: Arc::default(),
@@ -561,6 +605,33 @@ impl StreamBridge {
         } else {
             None
         };
+        // One rendering serves the cognition check, the size record and the
+        // streamed error alike.
+        let rendered = presentation.render();
+
+        // The cognition service's failure will not clear within this turn, and
+        // every tool that needs it answers the same way. Say so once and take
+        // those tools off the next request instead of letting the model retry
+        // them one by one (see [`COGNITION_TOOLS`]).
+        if !is_success
+            && rendered.contains(COGNITION_UNAVAILABLE)
+            && !self.cognition_tools_removed.swap(true, Ordering::SeqCst)
+        {
+            tracing::warn!(
+                target: "agent::tool",
+                tool = tool_name,
+                "cognition unavailable; removing its tools for this turn"
+            );
+            for name in COGNITION_TOOLS {
+                (self.unadvertise)(name.to_owned()).await;
+            }
+            let _ = self.tx.send(Ok(StreamPart::ToolResponse(ToolResponse::Err {
+                id,
+                name: tool_name.to_owned(),
+                description: COGNITION_WITHOUT_TOOLS.to_owned(),
+            })));
+            return ToolResultAction::rewrite(COGNITION_WITHOUT_TOOLS);
+        }
 
         // A user tool's pending answer is finished here when the host can:
         // the user reviews the call while the turn waits, and the model reads
@@ -598,7 +669,6 @@ impl StreamBridge {
 
         // The stream carries the whole result; only the model's copy is cut.
         // Images reach the model as images and are never cut as text.
-        let rendered = presentation.render();
         let view = self
             .result_limit
             .as_ref()
@@ -618,7 +688,7 @@ impl StreamBridge {
             ToolResponse::Err {
                 id,
                 name: tool_name.to_owned(),
-                description: presentation.render(),
+                description: rendered,
             }
         };
         let _ = self.tx.send(Ok(StreamPart::ToolResponse(response)));

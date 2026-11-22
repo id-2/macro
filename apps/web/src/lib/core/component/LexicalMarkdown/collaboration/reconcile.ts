@@ -9,7 +9,7 @@ import {
   isSerializedVideoNode,
   type NodeIdMappings,
   stripDraftCommentMarks,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import deepEqual from 'fast-deep-equal';
 import {
   $getEditor,

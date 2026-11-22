@@ -16,7 +16,7 @@ use external_chat::domain::models::{
 use external_chat::domain::ports::ExternalChatResult;
 use external_chat::domain::service::ExternalChatService;
 use external_chat::outbound::pg::PgExternalChatRepository;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::{Connection, PgConnection, PgPool};
 use uuid::Uuid;
 use whatsapp_fake_server::{FakePhone, FakeWhatsApp};
@@ -36,7 +36,7 @@ mod pictures;
 
 const TIMEOUT: Duration = Duration::from_secs(60);
 /// A test user's id, typed.
-fn person(user: &str) -> macro_user_id::user_id::MacroUserIdStr<'static> {
+fn person(user: &str) -> rox_user_id::user_id::RoxUserIdStr<'static> {
     user.to_owned().try_into().expect("test user ids are valid")
 }
 
@@ -876,7 +876,7 @@ async fn a_message_queued_before_a_crash_is_ingested_once(pool: PgPool) {
 impl external_chat::domain::ports::SendRateLimiter for Allow {
     async fn check(
         &self,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> ExternalChatResult<()> {
         Ok(())
     }

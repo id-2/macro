@@ -9,7 +9,7 @@
 
 use std::{collections::HashMap, str::FromStr};
 
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model_entity::{Entity, EntityType};
 use rootcause::Report;
 use sqlx::PgPool;
@@ -20,7 +20,7 @@ use crate::domain::models::{
 
 pub(super) async fn get_filtered_entity_notifications(
     pool: &PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     entities: Vec<Entity<'static>>,
     query: EntityNotificationQuery,
 ) -> Result<HashMap<Entity<'static>, Vec<UserNotificationRow<serde_json::Value>>>, Report> {
@@ -193,7 +193,7 @@ pub(super) async fn get_filtered_entity_notifications(
                 notification_metadata: row.notification_metadata,
                 sender_id: row
                     .sender_id
-                    .map(|sender| MacroUserIdStr::parse_from_str(&sender).map(CowLike::into_owned))
+                    .map(|sender| RoxUserIdStr::parse_from_str(&sender).map(CowLike::into_owned))
                     .transpose()?,
             })
         })();

@@ -54,7 +54,7 @@ fn lifecycle_events_round_trip_all_owner_kinds_with_v1_strings() {
                 "metadata": metadata,
             });
             let decoded =
-                ProjectMacroEvent::decode(PROJECT_ID, &serde_json::to_vec(&payload).unwrap())
+                ProjectRoxEvent::decode(PROJECT_ID, &serde_json::to_vec(&payload).unwrap())
                     .expect("v1 owner strings decode through the broker");
             let owner = match &decoded.event().event {
                 ProjectTopicEvent::Created(metadata) => &metadata.owner,

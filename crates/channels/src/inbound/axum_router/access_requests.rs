@@ -16,7 +16,7 @@ use entity_access::{
     domain::{models::MemberParticipantRole, ports::EntityAccessService},
     inbound::axum_extractors::ChannelAccessLevelExtractor,
 };
-use macro_authorization::{MacroAuthorizationExtractor, MacroAuthorizationService, UserOnly};
+use rox_authorization::{RoxAuthorizationExtractor, RoxAuthorizationService, UserOnly};
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -28,7 +28,7 @@ pub fn channel_access_requests_router<S, Svc, Auth, T>(
 where
     S: ChannelAccessRequestService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     T: Send + Sync,
 {
     Router::new()
@@ -111,10 +111,10 @@ mod test;
 pub async fn my_access_request_handler<
     S: ChannelAccessRequestService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<ChannelPath>,
 ) -> Result<Json<ChannelAccessRequestState>, ChannelAccessRequestErr> {
     Ok(Json(
@@ -145,10 +145,10 @@ pub async fn my_access_request_handler<
 pub async fn request_access_handler<
     S: ChannelAccessRequestService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<ChannelPath>,
 ) -> Result<Json<ChannelAccessRequest>, ChannelAccessRequestErr> {
     Ok(Json(
@@ -176,10 +176,10 @@ pub async fn request_access_handler<
 pub async fn cancel_access_request_handler<
     S: ChannelAccessRequestService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    user: MacroAuthorizationExtractor<Auth, UserOnly>,
+    user: RoxAuthorizationExtractor<Auth, UserOnly>,
     Path(path): Path<ChannelPath>,
 ) -> Result<StatusCode, ChannelAccessRequestErr> {
     state
@@ -210,7 +210,7 @@ pub async fn cancel_access_request_handler<
 pub async fn get_access_request_handler<
     S: ChannelAccessRequestService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,
@@ -248,7 +248,7 @@ pub async fn get_access_request_handler<
 pub async fn resolve_access_request_handler<
     S: ChannelAccessRequestService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
     access: ChannelAccessLevelExtractor<MemberParticipantRole, Svc, Auth>,

@@ -274,7 +274,7 @@ them for one hour (`ttlSeconds` in `infra/stacks/fusionauth-instance`).
 ## User API keys
 
 The harness also wires the existing revocable `UserApiKeyAuthorizer` into the
-mounted MCP router. Clients can send `x-macro-user-api-key` instead of a JWT
+mounted MCP router. Clients can send `x-rox-user-api-key` instead of a JWT
 bearer. Valid keys resolve only their account owner using the same validity and
 scope checks as other user-key routes; revoked or expired keys cannot authenticate.
 A valid bearer still works when no valid key is present. Account/agent claims

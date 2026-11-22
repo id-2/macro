@@ -13,6 +13,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="rox" android:host="android-auth" />
                 <data android:scheme="macro" android:host="android-auth" />
             </intent-filter>
         </activity>

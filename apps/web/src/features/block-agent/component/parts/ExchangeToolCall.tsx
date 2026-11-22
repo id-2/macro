@@ -4,6 +4,7 @@
  * exposed as a fallback disclosure.
  */
 
+import { t } from '@app/lib/i18n';
 import type { ToolDetail } from '@service-agent-fold/generated/types';
 import type { JSX } from 'solid-js';
 import { ToolCard } from '../../ui';
@@ -22,7 +23,7 @@ export function ExchangeToolCall(props: {
       muted={props.common.muted || props.detail.error != null}
       trailing={
         props.common.trailing ??
-        (props.detail.error != null ? 'Failed' : undefined)
+        (props.detail.error != null ? t('agentChat.failed') : undefined)
       }
     />
   );

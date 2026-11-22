@@ -10,8 +10,8 @@ import {
   type DatabaseQueryDisplayMode,
   isDatabaseQueryChartMode,
   isDatabaseQueryDisplayMode,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
+import { Telemetry } from '@rox-one/observability';
 import { Button } from '@ui/components/Button';
 import { Hotkey } from '@ui/components/Hotkey';
 import {

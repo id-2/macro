@@ -1,0 +1,12 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_messages SET from_contact_id = '00000000-0000-4000-8000-000000000032' WHERE id = '00000000-0000-4000-8000-000000000051'",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": []
+    },
+    "nullable": []
+  },
+  "hash": "7705f96b17effbc336cfa294cfa0ea800edb9d2c1895de9521d84035d7ef6a48"
+}

@@ -103,7 +103,7 @@ export function auditStandalone(websiteRoot: string) {
     if (
       APP_ALIASES.test(name) ||
       version.startsWith('workspace:') ||
-      version.startsWith('npm:@macro-inc/') ||
+      version.startsWith('npm:@rox-one/') ||
       (localPath && !inside(real(path.resolve(website, localPath)), website))
     )
       add(

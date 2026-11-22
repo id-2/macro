@@ -1,4 +1,4 @@
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { transcribeAudio } from '@queries/dictation/transcribe';
 import type { LexicalEditor } from 'lexical';
 import { $getRoot } from 'lexical';

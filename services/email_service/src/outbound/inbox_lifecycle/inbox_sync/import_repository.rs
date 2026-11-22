@@ -4,7 +4,7 @@ use email::domain::models::{EmailThreadPreview, PreviewCursorQuery};
 use email::domain::ports::EmailRepo;
 use email::outbound::EmailPgRepo;
 use email::outbound::label_state_pg::PgLabelCatalog;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::service;
 use models_email::service::attachment::AttachmentUploadMetadata;
 use std::collections::{HashMap, HashSet};
@@ -146,14 +146,14 @@ impl InboxSyncNotificationFacts for PgInboxSync {
             .map_err(Into::into)
     }
     async fn primaries(&self, owner: &str, link: Uuid) -> Result<Vec<String>, Self::Err> {
-        macro_db_client::macro_user_links::get_primaries_for_link(&self.0, owner, link)
+        rox_db_client::macro_user_links::get_primaries_for_link(&self.0, owner, link)
             .await
             .map_err(Into::into)
     }
     async fn previews(
         &self,
         query: PreviewCursorQuery,
-        owner: MacroUserIdStr<'static>,
+        owner: RoxUserIdStr<'static>,
     ) -> Result<Vec<EmailThreadPreview>, Self::Err> {
         EmailPgRepo::new(self.0.clone())
             .previews_for_view_cursor(query, owner)

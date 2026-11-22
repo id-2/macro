@@ -76,7 +76,7 @@ export function MobileSearchInput() {
                 <FloatRegion region="accessory" priority={101}>
                   <div
                     data-keep-keyboard
-                    aria-label="Suggested action"
+                    aria-label={t('commandMenu.suggestedAction')}
                     class="pointer-events-auto px-(--mobile-chrome-gutter)"
                     style={{
                       '--universal-input-max-height': `max(0px, calc(var(--dvh, 1dvh) * 100 - var(--mobile-content-inset-top, 0px) - ${inputSize.height ?? 44}px - var(--mobile-chrome-gutter) * 3 - var(--safe-bottom, 0px)))`,

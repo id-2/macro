@@ -8,9 +8,9 @@ mod test;
 pub use ports::*;
 
 use super::{LinkDeletion, purge::PurgePacing};
-use crate::domain::events::{EmailMacroEvent, LinkDisconnectReason, LinkDisconnectedMetadata};
+use crate::domain::events::{EmailRoxEvent, LinkDisconnectReason, LinkDisconnectedMetadata};
 use anyhow::Context;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use models_email::service::{link::Link, pubsub::DeletionReason};
 
 /// Coordinates physical deletion after the lifecycle service permits it.
@@ -39,7 +39,7 @@ where
     C: LinkDeletionCrm,
     P: LinkPurger,
     N: LinkDeletionRefresh,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     async fn delete(&self, link: &Link, reason: &DeletionReason) -> anyhow::Result<()> {
         self.handle_delete(link, reason).await
@@ -54,7 +54,7 @@ where
     C: LinkDeletionCrm,
     P: LinkPurger,
     N: LinkDeletionRefresh,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// notifies downstream dependencies of link deletion, and deletes link (and all data) from database
     #[tracing::instrument(skip(self), fields(link = ?link), err)]
@@ -117,7 +117,7 @@ where
 
         let _ = self
             .broker
-            .send_event(&EmailMacroEvent::link_disconnected(
+            .send_event(&EmailRoxEvent::link_disconnected(
                 LinkDisconnectedMetadata {
                     link_id: link.id,
                     owner: link.macro_id.clone(),

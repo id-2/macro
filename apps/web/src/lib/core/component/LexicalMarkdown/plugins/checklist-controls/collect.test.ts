@@ -8,7 +8,7 @@ import {
   $createDocumentMentionNode,
   $setTaskListViewSettings,
   DocumentMentionNode,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { PROPERTY_OPTION_IDS } from '@property/constants';
 import {
   $createParagraphNode,

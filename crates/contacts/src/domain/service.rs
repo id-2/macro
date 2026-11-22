@@ -10,8 +10,8 @@ use crate::domain::ports::{
     ContactsOutboxService, ContactsPageRepository, ContactsPageService, ContactsRepository,
     ContactsService, PeopleSearchRepository, PeopleSearchService,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 use std::collections::HashSet;
 use std::sync::Arc;
@@ -37,8 +37,8 @@ impl<R: ContactsRepository, N: ContactsNotifier> ContactsDomainService<R, N> {
     #[tracing::instrument(err, skip(self))]
     async fn query_contacts(
         &self,
-        user_id: MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, rootcause::Report> {
+        user_id: RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, rootcause::Report> {
         let mut res = self.repository.get_contacts(user_id.copied()).await?;
         // because the database data is a graph there is no edge from Self<->Self
         // we just aritificially insert self as a special case
@@ -89,8 +89,8 @@ impl<R: ContactsRepository, N: ContactsNotifier> ContactsDomainService<R, N> {
 impl<R: ContactsRepository, N: ContactsNotifier> ContactsService for ContactsDomainService<R, N> {
     async fn query_contacts(
         &self,
-        user_id: MacroUserIdStr<'_>,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, rootcause::Report> {
+        user_id: RoxUserIdStr<'_>,
+    ) -> Result<Vec<RoxUserIdStr<'static>>, rootcause::Report> {
         self.query_contacts(user_id).await
     }
 
@@ -105,16 +105,16 @@ impl<R: ContactsPageRepository, N: ContactsNotifier> ContactsPageService
     #[tracing::instrument(name = "contacts.lookup", skip_all, fields(count = lookup.ids().len() as i64), err)]
     async fn lookup_contact_ids(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         lookup: &ContactLookup,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Report> {
         self.repository.lookup_contact_ids(viewer, lookup).await
     }
 
     #[tracing::instrument(name = "contacts.page", skip_all, fields(limit = i64::from(limit.get()), has_cursor = after.is_some()), err)]
     async fn contact_id_page(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         after: Option<&ContactCursor>,
         limit: ContactPageSize,
     ) -> Result<ContactIdPage, Report> {
@@ -138,7 +138,7 @@ impl<R: PeopleSearchRepository, N: ContactsNotifier> PeopleSearchService
     )]
     async fn search_people(
         &self,
-        viewer: MacroUserIdStr<'_>,
+        viewer: RoxUserIdStr<'_>,
         query: &PeopleSearchQuery,
         limit: PeopleSearchLimit,
     ) -> Result<Vec<PersonMatch>, Report> {
@@ -189,7 +189,7 @@ pub struct SqsContactsIngress<Q> {
 impl<Q: ContactsIngressQueue> ContactsIngress for SqsContactsIngress<Q> {
     async fn enqueue_contacts(
         &self,
-        users: HashSet<MacroUserIdStr<'static>>,
+        users: HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), Report> {
         self.queue.publish_nodes(ContactsNodes { users }).await
     }

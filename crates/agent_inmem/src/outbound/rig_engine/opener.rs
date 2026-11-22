@@ -18,10 +18,6 @@ use futures::StreamExt as _;
 use tokio::sync::mpsc;
 use tracing::Instrument as _;
 
-/// The fastest small model that judged every whole-reply-or-not case right.
-/// Cerebras gpt-oss-120b was about 4x faster but rate-limited under load.
-pub(super) const MODEL: &str = "openai/gpt-5.4-mini";
-
 /// How long the turn waits for the verdict. Past it, the turn's own model is
 /// close enough that an opening line is not worth showing.
 pub(super) const VERDICT_TIMEOUT: Duration = Duration::from_millis(1500);
@@ -86,7 +82,7 @@ pub(super) fn spawn(
     tokio::spawn(
         agent::MeteringContext::carry(metering, async move {
             let agent_loop = AgentLoop::new(recorder)
-                .with_model(MODEL)
+                .with_model(agent::provider_keys::fast_model())
                 .with_reasoning_effort(ReasoningEffort::None)
                 .with_max_tokens(MAX_TOKENS)
                 .with_genai_telemetry(false);
@@ -193,6 +189,8 @@ calendar, documents, channels, tasks, activity), so never say it can't see, acce
 something, and never refuse (\"what have I been up to\" → false|Let me look across your \
 workspace., \"can you see my emails?\" → false|Let me check your email.).
 Answer only what the user said. Never mention context, metadata, instructions, or this format.
+Write the line in the language of the user's last message: a Russian message gets a Russian line, an \
+English one English.
 One line, under 12 words. The assistant's tools: {tool_names}."
     )
 }

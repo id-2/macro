@@ -1,5 +1,5 @@
 use chrono::{DateTime, Duration, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -180,7 +180,7 @@ fn historical_time() -> DateTime<Utc> {
 
 fn message(thread_id: Option<Uuid>, import_order: i64) -> HistoricalMessage {
     HistoricalMessage {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         thread_id,
         sender: USER.try_into().unwrap(),
         imported_author: None,
@@ -196,7 +196,7 @@ fn message(thread_id: Option<Uuid>, import_order: i64) -> HistoricalMessage {
 }
 
 async fn channel(pool: &PgPool) -> Uuid {
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels (id, name, channel_type, owner_id) VALUES ($1, 'History', 'private', $2)",
         id, USER,
@@ -273,7 +273,7 @@ async fn reactions_mentions_are_unique_and_have_no_live_effects(pool: PgPool) {
     root.reactions = vec![reaction.clone(), reaction];
     root.mentions = (0..2)
         .map(|_| HistoricalUserMention {
-            id: macro_uuid::generate_uuid_v7(),
+            id: rox_uuid::generate_uuid_v7(),
             user_id: USER.try_into().unwrap(),
         })
         .collect();
@@ -355,7 +355,7 @@ async fn rejects_foreign_missing_reply_and_deleted_roots(pool: PgPool) {
     for (channel_id, root_id) in [
         (second_channel, root.id),
         (first_channel, reply.id),
-        (first_channel, macro_uuid::generate_uuid_v7()),
+        (first_channel, rox_uuid::generate_uuid_v7()),
     ] {
         let new_root = message(None, 2);
         let result = repo
@@ -456,7 +456,7 @@ async fn existing_id_is_a_conflict_without_partial_writes_or_overwrite(pool: PgP
     let repo = PgMessageRepository::new(pool.clone());
     let mut original = message(None, 0);
     original.mentions.push(HistoricalUserMention {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         user_id: USER.try_into().unwrap(),
     });
     repo.insert_historical(&HistoricalBatch {
@@ -508,7 +508,7 @@ async fn existing_id_is_a_conflict_without_partial_writes_or_overwrite(pool: PgP
 #[test]
 fn validates_timestamps_ids_counts_and_byte_limits() {
     let valid = HistoricalBatch {
-        channel_id: macro_uuid::generate_uuid_v7(),
+        channel_id: rox_uuid::generate_uuid_v7(),
         messages: vec![message(None, 0)],
     };
     valid.validate().unwrap();

@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE crm_email_consent SET enabled = false WHERE team_id = $1 AND user_id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Text"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "c81133fe5aa4735751c0ffe0478b7fd76a241f2fe0246f5d8cec1dcdea7e689c"
+}

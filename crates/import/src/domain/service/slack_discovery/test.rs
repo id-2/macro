@@ -36,7 +36,7 @@ struct FakeSlackSource(FakeSession);
 impl SlackWorkspaceSource for FakeSlackSource {
     type Session = FakeSession;
 
-    async fn open(&self, _: &MacroUserIdStr<'static>) -> Result<FakeSession, SlackSourceError> {
+    async fn open(&self, _: &RoxUserIdStr<'static>) -> Result<FakeSession, SlackSourceError> {
         self.0.0.open_calls.fetch_add(1, Ordering::SeqCst);
         if self.0.0.not_connected {
             return Err(SlackSourceError::NotConnected);
@@ -646,7 +646,7 @@ async fn manual_without_connection_fails_readably_without_loading_connector_tool
 struct MissingTools;
 impl SlackWorkspaceSource for MissingTools {
     type Session = NoSlackSession;
-    async fn open(&self, _: &MacroUserIdStr<'static>) -> Result<NoSlackSession, SlackSourceError> {
+    async fn open(&self, _: &RoxUserIdStr<'static>) -> Result<NoSlackSession, SlackSourceError> {
         Err(SlackSourceError::ToolsUnavailable("members"))
     }
 }

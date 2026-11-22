@@ -43,6 +43,7 @@ fn inputs(
         routing: Arc::new(|_| None),
         loaded_buffer,
         register_loaded: register,
+        unadvertise: crate::hook::keep_all_tools(),
         tool_loads: ToolLoads::default(),
         user_tool_finisher,
         stream_tool_calls: false,

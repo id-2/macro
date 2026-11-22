@@ -1,4 +1,4 @@
-use macro_user_id::email::EmailStr;
+use rox_user_id::email::EmailStr;
 
 use crate::domain::{
     models::{ContactInfo, EmailErr, Link},

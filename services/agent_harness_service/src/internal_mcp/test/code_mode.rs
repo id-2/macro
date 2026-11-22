@@ -18,7 +18,7 @@ impl agent_code_mode::domain::ModelImages for NoImages {
     async fn load_png(
         &self,
         _: &agent_code_mode::domain::StaticFileId,
-        _: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        _: &rox_user_id::user_id::RoxUserIdStr<'_>,
     ) -> anyhow::Result<agent_code_mode::domain::ModelImage> {
         anyhow::bail!("no images in this test")
     }
@@ -54,7 +54,7 @@ impl agent_code_mode::domain::ExecutionCredentials for Credentials {
     }
 }
 
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 #[ignore = "requires pinned Deno runtime"]
 async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: sqlx::PgPool) {
     sqlx::raw_sql(include_str!(
@@ -97,7 +97,7 @@ async fn authenticated_mcp_runs_javascript_and_persists_source_and_result(pool: 
         Arc::new(NoImages),
     ));
     let repo = InMemoryAgentSessionRepo::new();
-    let session = test_agent_session(AgentSessionId::new_from_uuid(macro_uuid::Uuid::from_u128(
+    let session = test_agent_session(AgentSessionId::new_from_uuid(rox_uuid::Uuid::from_u128(
         1,
     )));
     repo.insert_session(session.clone());

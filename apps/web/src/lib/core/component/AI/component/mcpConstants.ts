@@ -3,7 +3,7 @@ export const MACRO_MCP_URL = 'https://mcp-server.rox.one/mcp';
 export const MACRO_MCP_CONFIG = JSON.stringify(
   {
     mcpServers: {
-      macro: {
+      rox: {
         type: 'http',
         url: MACRO_MCP_URL,
       },
@@ -17,12 +17,12 @@ export const CLI_COMMANDS = [
   {
     key: 'claude-cli',
     label: 'Claude Code',
-    command: `claude mcp add --transport http macro ${MACRO_MCP_URL}`,
+    command: `claude mcp add --transport http rox ${MACRO_MCP_URL}`,
   },
   {
     key: 'codex-cli',
     label: 'Codex CLI',
-    command: `codex mcp add macro --url ${MACRO_MCP_URL}`,
+    command: `codex mcp add rox --url ${MACRO_MCP_URL}`,
   },
 ] as const;
 
@@ -30,11 +30,11 @@ export const WEB_CLIENTS = [
   {
     key: 'claude-web',
     label: 'Claude.ai',
-    hint: 'Settings → Connectors → Add custom connector',
+    hint: 'Настройки → Connectors → Add custom connector',
   },
   {
     key: 'chatgpt-web',
     label: 'ChatGPT',
-    hint: 'Settings → Apps → Advanced settings → enable Developer mode, then Create App',
+    hint: 'Настройки → Apps → Advanced settings → включите Developer mode, затем Create App',
   },
 ] as const;

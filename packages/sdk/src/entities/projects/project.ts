@@ -3,7 +3,7 @@ import type {
   GetProjectHandlerResponses,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import type { Channel } from '../channels/channel';
 import { shareWithChannel } from '../channels/share';
 import { PropertiedEntity } from '../entity';
@@ -109,13 +109,13 @@ export class Project extends PropertiedEntity<ProjectDetail> {
   }
 
   /** A handle to a project by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Project {
+  static byId(client: RoxClient, id: string): Project {
     return new Project(client, id);
   }
 
   /** Create a project, optionally nested inside a parent project. */
   static async create(
-    client: MacroClient,
+    client: RoxClient,
     opts: { name: string; parent?: Project },
   ): Promise<Project> {
     const { data } = unwrap(

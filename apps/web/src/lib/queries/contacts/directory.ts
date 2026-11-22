@@ -7,7 +7,7 @@ import {
   type PeopleSearchResult,
 } from '@graphql-cache/people/generated';
 import { isStaleHydrationScopeError } from '@graphql-cache/protocol';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import type { ContactDirectoryFieldsFragment } from '@service-storage/graphql/generated/graphql';
 import { fetchContactDirectoryPage } from '@service-storage/graphql-contacts';
 import { hashKey } from '@tanstack/solid-query';

@@ -17,7 +17,7 @@
 //! stopped, is gone, or was deleted.
 
 use chrono::{DateTime, TimeDelta, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 

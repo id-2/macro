@@ -1,5 +1,5 @@
 use chrono::Duration;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 use crate::domain::account_logins::{AccountLoginChange, AgentProvider, ProviderAccountIdentity};
@@ -9,8 +9,8 @@ use crate::domain::tokens;
 const TEAMMATE_ID: &str = "macro|teammate@example.com";
 const OWNER_ID: &str = "macro|harness-repo@example.com";
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(OWNER_ID.to_string()).unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(OWNER_ID.to_string()).unwrap()
 }
 
 async fn insert_user(pool: &PgPool, user_id: &str) {
@@ -1043,8 +1043,8 @@ async fn grant_directly(pool: &PgPool, harness: HarnessId, user: &str) {
     .unwrap();
 }
 
-fn user(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_owned()).unwrap()
+fn user(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_owned()).unwrap()
 }
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
@@ -1197,7 +1197,7 @@ async fn a_reader_sees_a_runtime_but_cannot_run_on_it(pool: PgPool) {
 fn claude_sign_in(
     credential_id: &str,
     expires_at: &str,
-    signed_in_by: Option<MacroUserIdStr<'static>>,
+    signed_in_by: Option<RoxUserIdStr<'static>>,
 ) -> AccountLoginChange {
     AccountLoginChange::SignedIn {
         provider: AgentProvider::Claude,
@@ -1229,7 +1229,7 @@ async fn each_claude_sign_in_is_a_login_and_one_account_spans_machines(pool: PgP
         .await
         .unwrap();
     }
-    let teammate = MacroUserIdStr::try_from(TEAMMATE_ID.to_owned()).unwrap();
+    let teammate = RoxUserIdStr::try_from(TEAMMATE_ID.to_owned()).unwrap();
 
     assert!(
         repo.record_account_login(
@@ -1334,7 +1334,7 @@ async fn each_claude_sign_in_is_a_login_and_one_account_spans_machines(pool: PgP
     );
     assert_eq!(
         repo.get_harness(mine).await.unwrap().unwrap().claude_mode,
-        ClaudeMode::MacroCredits
+        ClaudeMode::RoxCredits
     );
     let history = sqlx::query_scalar!(
         r#"SELECT count(*) AS "count!" FROM harness_account_logins WHERE harness_id = $1 AND signed_out_at IS NOT NULL"#,

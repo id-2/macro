@@ -1,6 +1,6 @@
 use super::*;
 
-const CONTEXT: &str = r#"import type { Macro } from '@macro-inc/sdk';
+const CONTEXT: &str = r#"import type { Macro } from '@rox-one/sdk';
 declare global {
   interface StepContext { macro: Macro; trigger: Record<string, unknown> }
 }
@@ -195,7 +195,7 @@ async fn the_sdk_declarations_type_check() {
         .current_dir(&checker.types)
         .args(["check", "--quiet", "--no-config"])
         .args(OFFLINE)
-        .arg("src/macro.d.ts")
+        .arg("src/rox.d.ts")
         .output()
         .await
         .unwrap();

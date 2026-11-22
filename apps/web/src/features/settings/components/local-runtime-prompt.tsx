@@ -9,7 +9,7 @@ import {
   roxdStatus,
   roxdSupport,
   onRoxdStatus,
-} from '@macro/tauri/roxd';
+} from '@rox/tauri/roxd';
 import LaptopIcon from '@phosphor/laptop.svg';
 import XIcon from '@phosphor/x.svg';
 import type { UnlistenFn } from '@tauri-apps/api/event';
@@ -137,18 +137,18 @@ export function LocalRuntimePrompt() {
             />
             <span class="min-w-0 flex-1">
               <span class="block text-sm font-medium">
-                Run agents on this computer
+                Запустить агентов на этом компьютере
               </span>
               <span class="block text-xs text-ink-muted">
-                Use your installed agents and local files in Rox.
+                Ваши установленные агенты и локальные файлы — в Rox.
               </span>
             </span>
-            <span class="shrink-0 text-xs font-medium text-accent">Set up</span>
+            <span class="shrink-0 text-xs font-medium text-accent">Настроить</span>
           </button>
           <button
             type="button"
             class="flex size-8 shrink-0 items-center justify-center rounded-lg text-ink-muted hover:bg-hover hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            aria-label="Dismiss Run agents on this computer"
+            aria-label="Скрыть приглашение «Запустить агентов на этом компьютере»"
             onClick={dismiss}
           >
             <XIcon class="size-4" aria-hidden="true" />

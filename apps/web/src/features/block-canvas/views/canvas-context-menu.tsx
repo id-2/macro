@@ -20,7 +20,7 @@ import SelectionSlash from '@icon/system/regular/selection-slash.svg';
 import Stack from '@icon/system/regular/stack.svg';
 import Trash from '@icon/system/regular/trash.svg';
 import { ContextMenu } from '@kobalte/core/context-menu';
-import { selectAllCommand } from '@macro-inc/graphics';
+import { selectAllCommand } from '@rox-one/graphics';
 import { Show } from 'solid-js';
 import type { CanvasClipboard } from '../clipboard';
 import type { CanvasState } from '../primitives/create-canvas-state';

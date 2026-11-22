@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { createSignal } from 'solid-js';
 import {
   type AutoReloadSettings,
@@ -40,7 +41,7 @@ export function createAutoReloadForm(initial: AutoReloadSettings) {
     const value = settings();
     return value
       ? validateAutoReload(value)
-      : 'Enter dollar amounts greater than $0, using at most two decimal places.';
+      : t('settingsUsage.amountsInvalid');
   };
   return {
     minimum,

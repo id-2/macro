@@ -4,7 +4,7 @@ use crate::domain::ports::RepoStore;
 use crate::domain::template::RenderedFile;
 use crate::outbound::bare_repo_store::BareRepoStore;
 use bytes::Bytes;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 async fn git(path: &std::path::Path, args: &[&str], input: &[u8]) -> std::process::Output {
     let mut command = git_command();
@@ -27,9 +27,9 @@ async fn git(path: &std::path::Path, args: &[&str], input: &[u8]) -> std::proces
     output
 }
 
-async fn target(root: &std::path::Path) -> (RepoDirectories, MacroUserIdStr<'static>) {
+async fn target(root: &std::path::Path) -> (RepoDirectories, RoxUserIdStr<'static>) {
     let directories = RepoDirectories::new(root.to_path_buf());
-    let agent = MacroUserIdStr::try_from("macro|agent@example.com".to_owned()).unwrap();
+    let agent = RoxUserIdStr::try_from("macro|agent@example.com".to_owned()).unwrap();
     BareRepoStore::new(directories.clone())
         .create_repo(
             &agent,

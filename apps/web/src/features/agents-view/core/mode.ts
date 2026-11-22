@@ -1,3 +1,5 @@
+import { t } from '@app/lib/i18n';
+
 /** Session kind used for routes and the agent workspace's presentation. */
 export type AgentsMode = 'chat' | 'code';
 
@@ -7,8 +9,10 @@ export type AgentsMode = 'chat' | 'code';
  */
 export type ComposerMode = AgentsMode | 'auto';
 
-/** The composer's mode switch calls chat agents "Chat" and coding agents "Code". */
+/** The composer's mode switch: Авто, Чат, and Код in the interface language. */
 export function agentsModeLabel(mode: ComposerMode): string {
-  if (mode === 'auto') return 'Auto';
-  return mode === 'code' ? 'Code' : 'Chat';
+  if (mode === 'auto') return t('agentControls.modeAuto');
+  return mode === 'code'
+    ? t('agentControls.modeCode')
+    : t('agentControls.modeChat');
 }

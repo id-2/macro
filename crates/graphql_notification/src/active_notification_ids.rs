@@ -1,7 +1,7 @@
 use std::{future::Future, pin::Pin, sync::Arc};
 
 use async_graphql::{Context, ErrorExtensions, ID};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::active_notification_ids::{
     ActiveNotificationIdRepository, ActiveNotificationIdService, ActiveNotificationIdStorageError,
     ActiveNotificationIdsError,
@@ -18,7 +18,7 @@ trait ActiveNotificationIdReader: Send + Sync {
     /// Read the ids through the domain service.
     fn list(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         event_types: Vec<String>,
         limit: Option<u32>,
     ) -> ListFuture<'_>;
@@ -29,7 +29,7 @@ impl<R: ActiveNotificationIdRepository> ActiveNotificationIdReader
 {
     fn list(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         event_types: Vec<String>,
         limit: Option<u32>,
     ) -> ListFuture<'_> {
@@ -64,7 +64,7 @@ impl ActiveNotificationIdsGraphqlContext {
 #[tracing::instrument(skip_all)]
 pub async fn resolve_active_notification_ids(
     ctx: &Context<'_>,
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
     event_types: Vec<String>,
     limit: Option<i32>,
 ) -> async_graphql::Result<Vec<ID>> {

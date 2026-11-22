@@ -4,6 +4,7 @@
  * same part components), and what it reported back.
  */
 
+import { t } from '@app/lib/i18n';
 import { modelLabel } from '@core/component/AI/constant/model-label';
 import type {
   MessagePart,
@@ -102,7 +103,7 @@ export function SubagentToolCall(props: {
   const trailing = () =>
     props.common.trailing ??
     (props.detail.result?.error != null ? (
-      <span class="text-ink">Failed</span>
+      <span class="text-ink">{t('agentChat.failed')}</span>
     ) : working() ? (
       'Running'
     ) : (
@@ -127,7 +128,9 @@ export function SubagentToolCall(props: {
           <Show when={props.detail.prompt}>
             {(prompt) => (
               <section class="flex flex-col gap-1">
-                <h4 class="text-xs text-ink-disabled">Instructions</h4>
+                <h4 class="text-xs text-ink-disabled">
+                {t('agentChat.instructions')}
+              </h4>
                 <blockquote class="max-h-40 overflow-y-auto overscroll-contain border-l-2 border-edge-muted pl-2 text-xs text-ink-muted whitespace-pre-wrap wrap-break-word">
                   {prompt()}
                 </blockquote>
@@ -137,7 +140,7 @@ export function SubagentToolCall(props: {
           <Show when={props.detail.children.length > 0}>
             <div
               role="region"
-              aria-label="Agent activity"
+              aria-label={t('agentChat.activity')}
               tabIndex={0}
               class="flex max-h-40 flex-col overflow-y-auto overscroll-contain border-l-2 border-edge-muted pl-2"
             >
@@ -158,7 +161,9 @@ export function SubagentToolCall(props: {
           <Show when={props.detail.result}>
             {(result) => (
               <section class="flex flex-col gap-1">
-                <h4 class="text-xs text-ink-disabled">Result</h4>
+                <h4 class="text-xs text-ink-disabled">
+                {t('agentChat.result')}
+              </h4>
                 <Show when={result().error}>
                   {(error) => <FoldedOutput text={error()} />}
                 </Show>

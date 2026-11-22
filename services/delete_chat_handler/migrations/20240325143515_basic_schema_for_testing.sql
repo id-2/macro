@@ -1,5 +1,5 @@
 -- NOTE: This is used purely to setup the testing DB
--- Changes from `crates/macro_db_client/migrations` need to be reflected here as raw SQL
+-- Changes from `crates/rox_db_client/migrations` need to be reflected here as raw SQL
 -- Changes here WILL NOT ever make it into the dev/production db.
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 

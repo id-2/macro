@@ -1,6 +1,6 @@
 use super::*;
 use agent_runtime_protocol::domain::notification::NotificationEvent;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn outbox_is_transactional_deduplicated_and_cascades(pool: PgPool) {
@@ -157,9 +157,9 @@ async fn waking_turn_leaves_quiet_events_for_a_real_prompt(pool: PgPool) {
 async fn legacy_review_writes_during_rollout_enter_the_typed_outbox_once(pool: PgPool) {
     sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
-    let review = macro_uuid::generate_uuid_v7();
-    let action = macro_uuid::generate_uuid_v7();
-    let mut record = serde_json::json!({"notificationId":action,"items":[{"id": macro_uuid::generate_uuid_v7(),"status":"submitting"}]});
+    let review = rox_uuid::generate_uuid_v7();
+    let action = rox_uuid::generate_uuid_v7();
+    let mut record = serde_json::json!({"notificationId":action,"items":[{"id": rox_uuid::generate_uuid_v7(),"status":"submitting"}]});
     sqlx::query!(
         "INSERT INTO agent_session_review (id, agent_session_id, record) VALUES ($1,$2,$3)",
         review,
@@ -200,9 +200,9 @@ async fn legacy_review_writes_during_rollout_enter_the_typed_outbox_once(pool: P
         .await
         .unwrap();
 
-    let newer = macro_uuid::generate_uuid_v7();
+    let newer = rox_uuid::generate_uuid_v7();
     set_owner_prompt(&pool, session, newer).await;
-    record["notificationId"] = serde_json::json!(macro_uuid::generate_uuid_v7());
+    record["notificationId"] = serde_json::json!(rox_uuid::generate_uuid_v7());
     sqlx::query!(
         "UPDATE agent_session_review SET record = $2 WHERE id = $1",
         review,

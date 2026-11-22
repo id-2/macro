@@ -3,7 +3,7 @@ use axum::extract::State;
 use axum::http::StatusCode;
 use axum::response::Response;
 use axum::{Extension, Json};
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use models_email::service::link::Link;
 use utoipa::ToSchema;
@@ -32,7 +32,7 @@ pub struct UnblockSenderRequest {
 #[tracing::instrument(skip(ctx, link, req, authorization), fields(link_id = %link.id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     link: Extension<Link>,
     Json(req): Json<UnblockSenderRequest>,
 ) -> Result<StatusCode, Response> {

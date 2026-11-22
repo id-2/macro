@@ -4,7 +4,7 @@
 //! configuration changes and manual/event claims without locking other actions.
 
 use chrono::{DateTime, Utc};
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model_entity::EntityAppearance;
 use model_owner::Owner;
 use rootcause::{Report, bail};

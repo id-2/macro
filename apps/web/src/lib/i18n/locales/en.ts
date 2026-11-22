@@ -1,4 +1,6 @@
 import accountManager from './en/account-manager';
+import agentChat from './en/agent-chat';
+import activity from './en/activity';
 import agentAutoArchive from './en/agent-auto-archive';
 import agentControls from './en/agent-controls';
 import agentNavigation from './en/agent-navigation';
@@ -16,30 +18,43 @@ import computers from './en/computers';
 import create from './en/create';
 import crm from './en/crm';
 import databaseAnswers from './en/database-answers';
+import drive from './en/drive';
+import home from './en/home';
 import emailThread from './en/email-thread';
 import emailViews from './en/email-views';
 import entityActions from './en/entity-actions';
 import entityIcons from './en/entity-icons';
+import fatalError from './en/fatal-error';
+import granolaConnect from './en/granola-connect';
 import importJobs from './en/import-jobs';
 import localRuntime from './en/local-runtime';
 import markdownEditor from './en/markdown-editor';
 import mobile from './en/mobile';
 import nav from './en/nav';
 import notificationsInbox from './en/notifications-inbox';
+import onboarding from './en/onboarding';
 import passwords from './en/passwords';
+import reviews from './en/reviews';
+import repositoryPicker from './en/repository-picker';
 import routineDrafts from './en/routine-drafts';
 import routineMenu from './en/routine-menu';
 import routineSuggestions from './en/routine-suggestions';
 import runtimeSharing from './en/runtime-sharing';
+import settingsAccount from './en/settings-account';
+import settingsAgents from './en/settings-agents';
 import settingsBilling from './en/settings-billing';
 import settingsEmail from './en/settings-email';
 import settingsLanguage from './en/settings-language';
 import settingsMobileApp from './en/settings-mobile-app';
 import settingsNav from './en/settings-nav';
+import settingsNotifications from './en/settings-notifications';
+import settingsSearch from './en/settings-search';
+import settingsUsage from './en/settings-usage';
 import splitMenu from './en/split-menu';
 import subRoutines from './en/sub-routines';
 import suggestions from './en/suggestions';
 import tabs from './en/tabs';
+import tags from './en/tags';
 import teamAgents from './en/team-agents';
 import tutorials from './en/tutorials';
 import viewMenus from './en/view-menus';
@@ -49,11 +64,13 @@ import viewMenus from './en/view-menus';
  * `./en`; translations in `./<language>.ts` mirror these keys.
  */
 export default {
+  activity,
   agentAutoArchive,
   appearance,
   agentControls,
   agentNavigation,
   accountManager,
+  agentChat,
   agentSetup,
   agentWork,
   calls,
@@ -67,10 +84,14 @@ export default {
   create,
   crm,
   databaseAnswers,
+  drive,
+  home,
   emailThread,
   emailViews,
   entityActions,
   entityIcons,
+  fatalError,
+  granolaConnect,
   importJobs,
   suggestions,
   localRuntime,
@@ -78,19 +99,28 @@ export default {
   mobile,
   nav,
   notificationsInbox,
+  onboarding,
   passwords,
+  reviews,
+  repositoryPicker,
   routineDrafts,
   routineMenu,
   routineSuggestions,
+  settingsAccount,
+  settingsAgents,
   settingsBilling,
   settingsEmail,
   runtimeSharing,
   settingsLanguage,
   settingsMobileApp,
   settingsNav,
+  settingsNotifications,
+  settingsSearch,
+  settingsUsage,
   splitMenu,
   subRoutines,
   tabs,
+  tags,
   teamAgents,
   tutorials,
   viewMenus,

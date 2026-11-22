@@ -2,8 +2,8 @@ use super::*;
 
 const ADMIN: &str = "macro|archive@example.com";
 
-fn admin() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(ADMIN).unwrap()
+fn admin() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(ADMIN).unwrap()
 }
 
 async fn fixture(pool: &PgPool) -> (PgSlackImportRepo, TeamId, TeamId) {
@@ -141,7 +141,7 @@ async fn outbox_count(pool: &PgPool, job: JobId) -> i64 {
     .unwrap()
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn create_replays_semantic_metadata_and_scopes_tokens(pool: PgPool) {
     let (repo, team, foreign) = fixture(&pool).await;
     let mut command = command(true, &["C2", "C1"]);
@@ -192,7 +192,7 @@ async fn create_replays_semantic_metadata_and_scopes_tokens(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn confirmed_selection_is_the_durable_upload_and_work_scope(pool: PgPool) {
     use crate::domain::ports::{ExecutionRepo, ImportRepo, SourceMessageReader};
 
@@ -346,7 +346,7 @@ async fn confirmed_selection_is_the_durable_upload_and_work_scope(pool: PgPool) 
     assert_eq!(repo.progress(team, job).await.unwrap().unwrap(), finalized);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn source_binding_and_job_commit_atomically(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let mut known = command(true, &["C1"]);
@@ -381,7 +381,7 @@ async fn source_binding_and_job_commit_atomically(pool: PgPool) {
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn list_is_bounded_exclusive_and_team_scoped(pool: PgPool) {
     let (repo, team, foreign) = fixture(&pool).await;
     let mut ids = Vec::new();
@@ -402,7 +402,7 @@ async fn list_is_bounded_exclusive_and_team_scoped(pool: PgPool) {
     assert!(first.iter().all(|p| p.conversations.is_empty()));
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn completion_requires_seal_and_users_uploaded_last_releases_all(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1", "C2"]).await;
@@ -448,7 +448,7 @@ async fn completion_requires_seal_and_users_uploaded_last_releases_all(pool: PgP
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn seals_reject_missing_middle_wrong_hash_and_truncated_sets_atomically(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1"]).await;
@@ -495,7 +495,7 @@ async fn seals_reject_missing_middle_wrong_hash_and_truncated_sets_atomically(po
     assert_eq!(ready.conversations[0].status, ConversationStatus::Queued);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn descriptors_and_seals_are_immutable_but_exact_retries_succeed(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1"]).await;
@@ -543,7 +543,7 @@ async fn descriptors_and_seals_are_immutable_but_exact_retries_succeed(pool: PgP
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn zero_part_shape_and_empty_history_still_require_users(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     for history in [false, true] {
@@ -588,7 +588,7 @@ async fn zero_part_shape_and_empty_history_still_require_users(pool: PgPool) {
     assert_eq!(outbox_count(&pool, empty_job).await, 0);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn keys_do_not_authorize_foreign_jobs_teams_or_part_identities(pool: PgPool) {
     let (repo, team, foreign) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1"]).await;
@@ -666,7 +666,7 @@ async fn keys_do_not_authorize_foreign_jobs_teams_or_part_identities(pool: PgPoo
     );
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn verification_pins_cannot_change_and_duplicate_completion_is_stable(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1"]).await;
@@ -691,7 +691,7 @@ async fn verification_pins_cannot_change_and_duplicate_completion_is_stable(pool
     assert_eq!(outbox_count(&pool, job).await, 1);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn concurrent_readiness_publishes_one_event_and_counts_bytes_once(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1"]).await;
@@ -724,7 +724,7 @@ async fn concurrent_readiness_publishes_one_event_and_counts_bytes_once(pool: Pg
     assert_eq!(generation, 1);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn registration_racing_seal_cannot_extend_a_sealed_manifest(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1"]).await;
@@ -753,7 +753,7 @@ async fn registration_racing_seal_cannot_extend_a_sealed_manifest(pool: PgPool) 
     assert_eq!(outbox_count(&pool, job).await, 0);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn users_first_and_concurrent_last_completions_queue_only_sealed_work(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1"]).await;
@@ -786,7 +786,7 @@ async fn users_first_and_concurrent_last_completions_queue_only_sealed_work(pool
     assert_eq!(outbox_count(&pool, job).await, 1);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn absent_metadata_stays_absent_and_unknown_binding_can_be_refined(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let mut command = command(false, &["D1"]);
@@ -832,7 +832,7 @@ async fn close(pool: &PgPool, job: JobId) {
     ).execute(pool).await.unwrap();
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn closed_jobs_accept_only_exact_replays_without_resurrection(pool: PgPool) {
     let (repo, team, _) = fixture(&pool).await;
     let job = create(&repo, team, true, &["C1"]).await;
@@ -863,7 +863,7 @@ async fn closed_jobs_accept_only_exact_replays_without_resurrection(pool: PgPool
     assert_eq!(outbox_count(&pool, job).await, 0);
 }
 
-#[sqlx::test(migrations = "../macro_db_client/migrations")]
+#[sqlx::test(migrations = "../rox_db_client/migrations")]
 async fn bounds_and_batch_failures_leave_no_partial_registration(pool: PgPool) {
     let (mut repo, team, _) = fixture(&pool).await;
     repo.limits.selected_bytes = 15;

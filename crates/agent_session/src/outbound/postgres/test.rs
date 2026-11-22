@@ -21,7 +21,7 @@ use bots::outbound::pg_bots_repo::PgBotsRepo;
 use entity_access_db_utils::AccessLevel;
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::Row;
 
 async fn migrate_for_test(pool: &PgPool) {
@@ -47,8 +47,8 @@ async fn migrate_for_test(pool: &PgPool) {
     .unwrap();
 }
 
-fn user_id(value: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(value.to_string()).expect("valid macro user id")
+fn user_id(value: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(value.to_string()).expect("valid macro user id")
 }
 
 /// The fixed owner every [`new_session`] fixture uses.
@@ -67,7 +67,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) {
         ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username
         RETURNING id
         "#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         email,
         email,
         format!("stripe_{email}"),
@@ -104,7 +104,7 @@ pub(super) async fn create_test_bot(pool: &PgPool) -> BotId {
             CreateBotRequest {
                 team_id: None,
                 name: "Test Agent".to_string(),
-                handle: format!("test-agent-{}", macro_uuid::generate_uuid_v7()),
+                handle: format!("test-agent-{}", rox_uuid::generate_uuid_v7()),
                 description: None,
                 avatar_url: None,
                 has_agent: None,
@@ -178,9 +178,9 @@ async fn append_system_event<B: entity_registry::BotFacts + 'static>(
 }
 
 pub(super) async fn insert_originating_thread_fixture(pool: &PgPool) -> (Uuid, Uuid, Uuid) {
-    let channel_id = macro_uuid::generate_uuid_v7();
-    let thread_id = macro_uuid::generate_uuid_v7();
-    let originating_message_id = macro_uuid::generate_uuid_v7();
+    let channel_id = rox_uuid::generate_uuid_v7();
+    let thread_id = rox_uuid::generate_uuid_v7();
+    let originating_message_id = rox_uuid::generate_uuid_v7();
     let owner_id = "macro|agent-session-thread-owner@example.com";
     sqlx::query!(
         "INSERT INTO comms_channels (id, channel_type, owner_id) VALUES ($1, 'private', $2)",
@@ -1063,7 +1063,7 @@ async fn find_for_thread_matches_the_originating_thread_and_bot(pool: PgPool) {
     assert!(matches!(wrong_bot, ThreadSession::None));
 
     let wrong_thread = repo
-        .find_for_thread(Some(macro_uuid::generate_uuid_v7()), Some(bot_b))
+        .find_for_thread(Some(rox_uuid::generate_uuid_v7()), Some(bot_b))
         .await
         .expect("look up an unrelated thread");
     assert!(matches!(wrong_thread, ThreadSession::None));
@@ -1117,7 +1117,7 @@ async fn find_all_for_thread_returns_every_session_on_the_thread(pool: PgPool) {
     );
 
     let empty = repo
-        .find_all_for_thread(macro_uuid::generate_uuid_v7())
+        .find_all_for_thread(rox_uuid::generate_uuid_v7())
         .await
         .expect("list an unrelated thread");
     assert!(empty.is_empty());
@@ -2796,7 +2796,7 @@ async fn a_document_session_preserves_its_origin_and_inherits_live_document_acce
         ports::{CreateMessage, MessageRepository},
     };
     let bot = create_test_bot(&pool).await;
-    let document = macro_uuid::generate_uuid_v7();
+    let document = rox_uuid::generate_uuid_v7();
     let document_id = document.to_string();
     sqlx::query!(r#"INSERT INTO "Document" (id, name, owner, "fileType") VALUES ($1, 'Agent document', $2, 'md')"#, document_id, OWNER)
         .execute(&pool).await.unwrap();
@@ -2995,7 +2995,7 @@ async fn create_batch_fenced_writes_in_order_under_the_given_ids(pool: PgPool) {
     };
     let frames: Vec<AgentSessionLog> = ["one", "two", "three"].into_iter().map(streamed).collect();
     let ids: Vec<Uuid> = (0..frames.len())
-        .map(|_| macro_uuid::generate_uuid_v7())
+        .map(|_| rox_uuid::generate_uuid_v7())
         .collect();
     let entries = ids
         .iter()
@@ -3061,7 +3061,7 @@ async fn create_batch_fenced_refuses_stale_claims_and_foreign_frames(pool: PgPoo
     let stale = claimed(repo.claim(session.id, replica).await.unwrap());
     let current = claimed(repo.claim(session.id, replica).await.unwrap());
     let entry = |log: AgentSessionLog| StoredAgentSessionLog {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         created_at: chrono::Utc::now(),
         entry: log,
     };
@@ -3225,7 +3225,7 @@ async fn the_originating_channel_steers_only_shared_agents_sessions(pool: PgPool
     let repo = test_repo(&pool);
     let private_bot = create_test_bot(&pool).await;
 
-    let team_id = macro_uuid::generate_uuid_v7();
+    let team_id = rox_uuid::generate_uuid_v7();
     let team_owner = "macro|agent-session-team-owner@example.com";
     insert_user(&pool, team_owner).await;
     sqlx::query!(
@@ -3243,7 +3243,7 @@ async fn the_originating_channel_steers_only_shared_agents_sessions(pool: PgPool
             CreateBotRequest {
                 team_id: Some(team_id),
                 name: "Team Agent".to_string(),
-                handle: format!("team-agent-{}", macro_uuid::generate_uuid_v7()),
+                handle: format!("team-agent-{}", rox_uuid::generate_uuid_v7()),
                 description: None,
                 avatar_url: None,
                 has_agent: None,
@@ -3474,7 +3474,7 @@ async fn active_execution_turn_excludes_stopped_archived_and_deleted_sessions(po
     let bot = create_test_bot(&pool).await;
     let session = create_session(&repo, new_session(bot, None, None)).await;
     assert!(repo.active_turn(session.id).await.unwrap().is_none());
-    let action = macro_uuid::generate_uuid_v7();
+    let action = rox_uuid::generate_uuid_v7();
     for (state, active) in [
         ("starting", true),
         ("running", true),
@@ -3524,7 +3524,7 @@ async fn a_turn_keeps_its_prompters_tab_and_only_theirs(pool: PgPool) {
     sqlx::raw_sql("INSERT INTO agent_session (id, owner_id, bot_id, model, harness, workspace) VALUES ('00000000-0000-0000-0000-000000000001','macro|owner@example.com','00000000-0000-0000-0000-00000000a9e7','test','roxd','/workspace')").execute(&pool).await.unwrap();
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
     let repo = test_repo(&pool);
-    let owner = MacroUserIdStr::try_from_email("owner@example.com").unwrap();
+    let owner = RoxUserIdStr::try_from_email("owner@example.com").unwrap();
     let tab = UiClientId::from_uuid(Uuid::from_u128(0xc1));
     let typed = TurnPrompter {
         kind: PrompterKind::User,
@@ -3573,7 +3573,7 @@ async fn system_action_history_and_loads_retain_trusted_provenance(pool: PgPool)
     let session = AgentSessionId::new_from_uuid(Uuid::from_u128(1));
     let action_id = AgentActionId::mint();
     let request = AgentAction::notification(vec![Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "app".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {
@@ -3588,7 +3588,7 @@ async fn system_action_history_and_loads_retain_trusted_provenance(pool: PgPool)
         &crate::domain::model::TurnPrompter {
             kind: crate::domain::model::PrompterKind::System,
             action_id,
-            user: Some(MacroUserIdStr::try_from_email("owner@example.com").unwrap()),
+            user: Some(RoxUserIdStr::try_from_email("owner@example.com").unwrap()),
             client: None,
         },
     )
@@ -3698,7 +3698,7 @@ async fn a_notification_after_a_load_reads_across_the_boundary(pool: PgPool) {
     );
 
     let request = AgentAction::notification(vec![Notification {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         subject_id: "app".into(),
         created_at: "2026-10-21T00:00:00Z".into(),
         event: NotificationEvent::AppConnected {
@@ -3708,7 +3708,7 @@ async fn a_notification_after_a_load_reads_across_the_boundary(pool: PgPool) {
     .to_runtime(&SessionId::new("s"), AgentActionId::mint().to_request_id())
     .unwrap();
     let entry = |content: Message| StoredAgentSessionLog {
-        id: macro_uuid::generate_uuid_v7(),
+        id: rox_uuid::generate_uuid_v7(),
         created_at: chrono::Utc::now(),
         entry: AgentSessionLog {
             agent_session_id: session.id,

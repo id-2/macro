@@ -1,6 +1,6 @@
 import { fileFolderDrop } from '@core/directive/fileFolderDrop';
 import { handleFileFolderDrop } from '@core/util/upload';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { ParentProps } from 'solid-js';
 import type { ChannelDragState } from './create-channel-drag-state';
 

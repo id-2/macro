@@ -10,7 +10,7 @@ use email_api_client::domain::models::{
     Attention, EmailApiError, GateLimit, MailFolder, MailboxChangePage, MailboxMessage,
     MailboxState, ProviderId, RateLimitOrigin, StreamPosition, StreamToken,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};

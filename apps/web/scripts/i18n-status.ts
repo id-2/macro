@@ -39,6 +39,45 @@ type Sources = {
 /** A message: text, or one text per plural category. */
 type Message = string | PluralMessage;
 
+const PLURAL_FORMS: ReadonlySet<string> = new Set([
+  'zero',
+  'one',
+  'two',
+  'few',
+  'many',
+  'other',
+]);
+
+/** A plural message holds only plural forms; anything else is a group. */
+function isPluralMessage(value: object): value is PluralMessage {
+  const keys = Object.keys(value);
+  return keys.length > 0 && keys.every((key) => PLURAL_FORMS.has(key));
+}
+
+/**
+ * Every message in a catalogue at any depth, keyed `namespace.group.message`:
+ * groups nest as deep as the dictionary does, and only their leaves are
+ * messages to compare.
+ */
+function collectMessages(
+  node: unknown,
+  prefix: string,
+  out: Map<string, Message>
+): void {
+  if (typeof node === 'string') {
+    out.set(prefix, node);
+    return;
+  }
+  if (typeof node !== 'object' || node === null) return;
+  if (isPluralMessage(node)) {
+    out.set(prefix, node);
+    return;
+  }
+  for (const [name, child] of Object.entries(node)) {
+    collectMessages(child, prefix ? `${prefix}.${name}` : name, out);
+  }
+}
+
 type LanguageStatus = {
   language: string;
   missing: { key: string; english: Message }[];
@@ -50,13 +89,8 @@ type LanguageStatus = {
   }[];
 };
 
-const english = new Map(
-  Object.entries(en).flatMap(([namespace, messages]) =>
-    Object.entries(messages as Record<string, Message>).map(
-      ([message, text]) => [`${namespace}.${message}`, text] as const
-    )
-  )
-);
+const english = new Map<string, Message>();
+collectMessages(en, '', english);
 
 function texts(message: Message): string[] {
   return typeof message === 'string'
@@ -100,13 +134,9 @@ async function loadTranslation(
   const module: { default: PartialDictionary } = await import(
     `${LOCALES}${language}.ts`
   );
-  return new Map(
-    Object.entries(module.default).flatMap(([namespace, messages]) =>
-      Object.entries((messages ?? {}) as Record<string, Message>).map(
-        ([message, text]) => [`${namespace}.${message}`, text] as const
-      )
-    )
-  );
+  const messages = new Map<string, Message>();
+  collectMessages(module.default, '', messages);
+  return messages;
 }
 
 function readSources(): Sources {

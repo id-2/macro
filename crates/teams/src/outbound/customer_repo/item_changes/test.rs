@@ -2,7 +2,7 @@ use super::*;
 use crate::outbound::customer_repo::test::{
     computer, mount, repo, subscription, subscription_update,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use serde_json::json;
 use wiremock::{
     Mock, MockServer, ResponseTemplate,

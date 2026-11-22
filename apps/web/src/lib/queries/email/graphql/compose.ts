@@ -10,6 +10,7 @@ import {
   type SaveEmailDraftInput,
 } from '@service-storage/graphql/generated/graphql';
 import { getGraphqlSoupClient } from '@service-storage/graphql-soup';
+import { readBodyRox } from '../body-rox-compat';
 import { draftContactInput, draftFailureCode } from './draft';
 
 export function composeDraftInput(
@@ -35,7 +36,7 @@ export function composeDraftInput(
     bcc: draft.bcc?.map(draftContactInput),
     bodyHtml: draft.body_html,
     bodyText: draft.body_text,
-    bodyMacro: draft.body_macro,
+    bodyRox: readBodyRox(draft) ?? undefined,
   };
 }
 

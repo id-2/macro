@@ -105,10 +105,10 @@ fn unusable_settings_leave_a_running_forwarder_alone() {
 }
 
 #[test]
-fn instance_networks_are_the_services_networks_of_macro_projects() {
-    assert!(is_instance_network("macro_services"));
-    assert!(is_instance_network("macro-channels-b_services"));
-    assert!(!is_instance_network("macro-channels-b_auth-internal"));
+fn instance_networks_are_the_services_networks_of_rox_projects() {
+    assert!(is_instance_network("rox_services"));
+    assert!(is_instance_network("rox-channels-b_services"));
+    assert!(!is_instance_network("rox-channels-b_auth-internal"));
     assert!(!is_instance_network("bridge"));
     assert!(!is_instance_network("other_services"));
 }

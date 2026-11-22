@@ -56,8 +56,8 @@ export function EmailViewBreadcrumbItem() {
     savedViewTitle() ??
     tagViewTitle() ??
     (inboxSelected()
-      ? 'Inbox'
-      : (EMAIL_TABS.find((tab) => tab.id === state.tab)?.label ?? 'Email'));
+      ? 'Входящие'
+      : (EMAIL_TABS.find((tab) => tab.id === state.tab)?.label ?? 'Почта'));
 
   return (
     <ViewBreadcrumbs.Item
@@ -72,7 +72,7 @@ export function EmailViewBreadcrumbItem() {
               {tabTitle()}
             </span>
             <span class="hidden @max-[720px]/view-shell:inline">
-              {inboxSelected() ? 'Inbox' : 'Email'}
+              {inboxSelected() ? 'Входящие' : 'Почта'}
             </span>
           </>
         );
@@ -116,8 +116,8 @@ export function EmailHeader(props: EmailHeaderProps) {
     savedViewTitle() ??
     tagViewTitle() ??
     (inboxSelected()
-      ? 'Inbox'
-      : (EMAIL_TABS.find((tab) => tab.id === state.tab)?.label ?? 'Email'));
+      ? 'Входящие'
+      : (EMAIL_TABS.find((tab) => tab.id === state.tab)?.label ?? 'Почта'));
 
   const canSearch = () => canSearchEmailTab(state.tab);
 

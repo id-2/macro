@@ -3,7 +3,7 @@ use crate::api::email::links::access::InboxActionError;
 use axum::extract::{Path, State};
 use axum::response::{IntoResponse, Json, Response};
 use email::domain::mailbox::lifecycle::InboxActor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 use utoipa::ToSchema;
 use uuid::Uuid;
@@ -41,7 +41,7 @@ pub struct ResyncResponse {
 #[tracing::instrument(skip(ctx, authorization), fields(user_id=authorization.authorization.user.user_context.user_id, fusionauth_user_id=authorization.authorization.user.user_context.fusion_user_id), err)]
 pub async fn resync_link_handler(
     State(ctx): State<ApiContext>,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(link_id): Path<Uuid>,
 ) -> Result<Response, InboxActionError> {
     let actor = InboxActor {

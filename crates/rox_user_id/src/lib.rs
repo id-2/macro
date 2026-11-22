@@ -1,0 +1,14 @@
+#![deny(missing_docs)]
+//! This module provides a parsing utility for validating Rox user ids.
+//! Both the current `rox|` prefix and the legacy `macro|` one are accepted.
+//! This follows the newtype pattern and parse don't validate, where possible
+
+pub(crate) mod byte_range;
+pub mod email;
+pub mod error;
+/// Handle validation for first-party Rox mailbox addresses.
+pub mod handle;
+pub mod lowercased;
+pub mod user_id;
+
+pub use cowlike;

@@ -1,5 +1,5 @@
 use entity_access::{domain::service::EntityAccessServiceImpl, outbound::PgAccessRepository};
-use macro_authorization::{MacroAuthJwtValidator, MacroAuthorizationServiceImpl};
+use rox_authorization::{RoxAuthJwtValidator, RoxAuthorizationServiceImpl};
 use notification::domain::service::SqsNotificationIngress;
 use notification::outbound::queue::SqsQueue;
 
@@ -13,7 +13,7 @@ type NotificationIngressType = SqsNotificationIngress<SqsQueue>;
 pub type EntityAccessServiceType = EntityAccessServiceImpl<PgAccessRepository>;
 
 /// Type alias for the request authorization service.
-pub type AuthorizationServiceType = MacroAuthorizationServiceImpl<MacroAuthJwtValidator>;
+pub type AuthorizationServiceType = RoxAuthorizationServiceImpl<RoxAuthJwtValidator>;
 
 /// Type alias for the properties service implementation used throughout the service.
 pub type PropertiesService = PropertiesServiceImpl<

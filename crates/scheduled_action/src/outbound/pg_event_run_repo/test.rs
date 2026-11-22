@@ -1,6 +1,6 @@
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 
 use super::*;
@@ -84,7 +84,7 @@ async fn admit(repo: &PgEventRunRepo, action_id: Uuid, event: &EventReference) {
 
 fn authorized(pending: PendingEventRun) -> AuthorizedEventRun {
     let access = EntityAccessReceipt::<ViewAccessLevel>::dangerously_assert_authenticated_user(
-        MacroUserIdStr::parse_from_str(USER).unwrap(),
+        RoxUserIdStr::parse_from_str(USER).unwrap(),
         &pending.event.entity_id().unwrap().to_string(),
         EntityType::Document,
     );
@@ -270,7 +270,7 @@ struct AllowAccess;
 impl crate::domain::event_runs::CurrentOwnerAccess for AllowAccess {
     async fn authorize(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         event: &EventReference,
     ) -> Result<Option<crate::domain::event_runs::EventAccessCapability>, Report> {
         Ok(Some(

@@ -2,7 +2,7 @@ use super::*;
 use crate::cognition::api::context::test::{
     ADMISSION_TEST_USER, TestAdmission, admission_errors, test_api_context, test_model_access,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 fn admission_request(chat_id: Option<String>) -> HttpSendChatMessageRequest {
     HttpSendChatMessageRequest {
@@ -29,7 +29,7 @@ async fn admission_rejects_before_chat_creation_or_streaming(pool: sqlx::PgPool)
             let result = send_chat_message_inner(
                 state,
                 model_access,
-                MacroUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
+                RoxUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
                 BearerToken(String::new()),
                 admission_request(chat_id),
             )
@@ -77,7 +77,7 @@ async fn permission_failures_precede_admission(pool: sqlx::PgPool) {
         let result = send_chat_message_inner(
             state.clone(),
             test_model_access(&state).await,
-            MacroUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
+            RoxUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
             BearerToken(String::new()),
             admission_request(Some(chat_id.clone())),
         )
@@ -92,7 +92,7 @@ async fn permission_failures_precede_admission(pool: sqlx::PgPool) {
         let result = send_chat_message_inner(
             state.clone(),
             test_model_access(&state).await,
-            MacroUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
+            RoxUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
             BearerToken(String::new()),
             request,
         )
@@ -119,7 +119,7 @@ async fn disabled_admission_allows_authorized_request_to_reach_chat_creation(poo
     let error = send_chat_message_inner(
         state,
         model_access,
-        MacroUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
+        RoxUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
         BearerToken(String::new()),
         admission_request(None),
     )
@@ -158,7 +158,7 @@ async fn a_scoped_session_chats_without_tools(pool: sqlx::PgPool) {
                 send_chat_message_inner(
                     state,
                     model_access,
-                    MacroUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
+                    RoxUserIdStr::parse_from_str(ADMISSION_TEST_USER).unwrap(),
                     BearerToken(String::new()),
                     request,
                 ),

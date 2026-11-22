@@ -3,8 +3,8 @@ use super::coding_agents_client::CodingAgentsClient;
 use crate::domain::tool_actions::{
     SessionAction, SessionActionError, SessionActionResult, SessionActions, SessionControlStatus,
 };
-use macro_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{INTERNAL_API_KEY_HEADER, INTERNAL_MACRO_USER_ID_HEADER};
+use rox_user_id::user_id::RoxUserIdStr;
 use reqwest::{Method, StatusCode};
 use serde::Deserialize;
 use serde_json::json;
@@ -22,7 +22,7 @@ struct ControlReceipt {
 impl SessionActions for CodingAgentsClient {
     fn execute(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         session_id: Uuid,
         action: SessionAction,
     ) -> Pin<Box<dyn Future<Output = Result<SessionActionResult, SessionActionError>> + Send + '_>>
@@ -77,7 +77,7 @@ impl SessionActions for CodingAgentsClient {
                     .join(&path)
                     .map_err(|_| SessionActionError::Unconfirmed)?;
                 let mut headers = reqwest::header::HeaderMap::new();
-                macro_tower_layers::inject_trace_headers(&mut headers);
+                rox_tower_layers::inject_trace_headers(&mut headers);
                 let mut response = self
                     .client
                     .request(method, url)

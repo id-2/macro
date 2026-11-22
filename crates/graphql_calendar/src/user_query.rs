@@ -1,6 +1,6 @@
 use async_graphql::{Context, Object};
 use calendar_events::domain::{models::CalendarOccurrenceCursor, service::CalendarValidationError};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 use crate::{
@@ -18,13 +18,13 @@ mod test;
 
 /// Flattenable calendar fields of the authenticated user.
 pub struct GraphqlCalendarQuery {
-    user_id: MacroUserIdStr<'static>,
+    user_id: RoxUserIdStr<'static>,
 }
 
 impl GraphqlCalendarQuery {
     /// Calendar fields scoped to the authenticated `user_id`. The read service
     /// is resolved from request data per field.
-    pub fn new(user_id: MacroUserIdStr<'static>) -> Self {
+    pub fn new(user_id: RoxUserIdStr<'static>) -> Self {
         Self { user_id }
     }
 

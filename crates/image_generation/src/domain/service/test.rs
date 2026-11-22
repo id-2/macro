@@ -4,7 +4,7 @@ use crate::domain::models::{
     SaveImageError, StoredImage,
 };
 use crate::domain::ports::UnconfiguredImageGenerator;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::collections::VecDeque;
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
@@ -17,7 +17,7 @@ const STATIC_REFERENCE: ImageReference = ImageReference::StaticFile(Uuid::from_u
 fn principal() -> CreationPrincipal {
     CreationPrincipal::BotForUser {
         bot: bot_id::MACRO_AI_BOT_ID,
-        user: MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
+        user: RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap(),
     }
 }
 
@@ -626,7 +626,7 @@ impl RecordingAdmission {
 impl AiAdmissionService for RecordingAdmission {
     fn admit<'a>(
         &'a self,
-        user: &'a MacroUserIdStr<'_>,
+        user: &'a RoxUserIdStr<'_>,
         feature: AiFeature,
     ) -> ai_billing::domain::admission::AdmissionFuture<'a> {
         self.admitted

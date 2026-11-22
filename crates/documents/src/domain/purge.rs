@@ -2,10 +2,10 @@
 //! failed creations, and the documents of an owner being removed.
 
 use super::{
-    events::{DocumentMacroEvent, DocumentPurgedMetadata},
+    events::{DocumentRoxEvent, DocumentPurgedMetadata},
     models::DocumentError,
 };
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 use model_owner::Owner;
 use rootcause::{Report, prelude::*};
 use shared_entity_registry::{OwnedPurgeOutcome, PurgeOwnedEntity};
@@ -100,7 +100,7 @@ where
     R: DocumentPurgeRepository,
     Q: DocumentPurgeQueue,
     S: DocxPartReferences,
-    B: MacroEventBroker + 'static,
+    B: RoxEventBroker + 'static,
 {
     /// Every failure before the row delete leaves the document findable, so
     /// the caller can retry the whole purge. Part references are released
@@ -113,7 +113,7 @@ where
         self.queue
             .enqueue(document_id.clone(), target.owner.clone())
             .await?;
-        let event = DocumentMacroEvent::purged(
+        let event = DocumentRoxEvent::purged(
             document_id.clone(),
             DocumentPurgedMetadata {
                 document_id: document_id.clone(),
@@ -140,7 +140,7 @@ where
     R: DocumentPurgeRepository,
     Q: DocumentPurgeQueue,
     S: DocxPartReferences,
-    B: MacroEventBroker + 'static,
+    B: RoxEventBroker + 'static,
 {
     #[tracing::instrument(skip(self), err)]
     async fn purge(&self, document_id: uuid::Uuid) -> Result<(), DocumentError> {
@@ -157,7 +157,7 @@ where
     R: DocumentPurgeRepository,
     Q: DocumentPurgeQueue,
     S: DocxPartReferences,
-    B: MacroEventBroker + 'static,
+    B: RoxEventBroker + 'static,
 {
     #[tracing::instrument(
         skip(self, expected_owner),

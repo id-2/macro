@@ -4,16 +4,16 @@ use axum::{
     response::{IntoResponse, Json, Response},
 };
 use futures::StreamExt;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_event_broker::MacroEventBroker;
-use macro_user_id::cowlike::CowLike;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_event_broker::RoxEventBroker;
+use rox_user_id::cowlike::CowLike;
 use model::{
     document::BasicDocument,
     response::{ErrorResponse, GenericErrorResponse, GenericSuccessResponse},
 };
 use model_owner::Owner;
 use models_permissions::share_permission::SharePermissionV2;
-use projects_hex::domain::events::{ProjectCreatedMetadata, ProjectMacroEvent};
+use projects_hex::domain::events::{ProjectCreatedMetadata, ProjectRoxEvent};
 use reqwest::StatusCode;
 use s3_key::build_cloud_storage_bucket_document_key;
 
@@ -38,7 +38,7 @@ const CANVAS_TEMPLATE: &str = include_str!("./template/canvas_template.canvas");
 #[tracing::instrument(skip(state, user_context), fields(user_id=?user_context.authorization.user.macro_user_id))]
 pub async fn handler(
     State(state): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<Response, Response> {
     tracing::info!("initialize user documents");
     let start_time = std::time::Instant::now();
@@ -84,7 +84,7 @@ pub async fn handler(
 
     let start_time = std::time::Instant::now();
     let project =
-        macro_db_client::document::initialize_onboarding_documents::create_project_transaction(
+        rox_db_client::document::initialize_onboarding_documents::create_project_transaction(
             &mut transaction,
             user_context.authorization.user.macro_user_id.copied(),
             PROJECT_NAME,
@@ -107,7 +107,7 @@ pub async fn handler(
 
     let start_time = std::time::Instant::now();
     let db_documents =
-        macro_db_client::document::initialize_onboarding_documents::create_onboarding_documents(
+        rox_db_client::document::initialize_onboarding_documents::create_onboarding_documents(
             &mut transaction,
             user_context.authorization.user.macro_user_id.clone(),
             &project.id,
@@ -220,7 +220,7 @@ pub async fn handler(
     tracing::trace!(elapsed_time=?start_time.elapsed(), "copied documents");
 
     // Set the onboarding status to true so we don't do this again
-    macro_db_client::user::onboarding_status::set_onboarding_status(
+    rox_db_client::user::onboarding_status::set_onboarding_status(
         &mut transaction,
         user_context.authorization.user.macro_user_id.as_ref(),
     )
@@ -250,7 +250,7 @@ pub async fn handler(
             .into_response()
     })?;
 
-    let project_event = ProjectMacroEvent::created(
+    let project_event = ProjectRoxEvent::created(
         project.id.clone(),
         ProjectCreatedMetadata {
             project_id: project.id.clone(),

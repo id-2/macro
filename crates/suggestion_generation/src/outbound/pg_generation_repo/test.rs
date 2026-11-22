@@ -2,7 +2,7 @@ use std::collections::HashSet;
 use std::sync::Arc;
 
 use chrono::TimeDelta;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 
@@ -29,11 +29,11 @@ async fn insert_user(pool: &PgPool, id: &str) {
     .unwrap();
 }
 
-fn person(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_owned()).unwrap()
+fn person(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_owned()).unwrap()
 }
 
-fn owner() -> MacroUserIdStr<'static> {
+fn owner() -> RoxUserIdStr<'static> {
     person(OWNER)
 }
 
@@ -1098,7 +1098,7 @@ struct Plans(bool);
 
 #[async_trait::async_trait]
 impl crate::domain::ports::Plans for Plans {
-    async fn paid(&self, _: &MacroUserIdStr<'static>) -> Result<bool, rootcause::Report> {
+    async fn paid(&self, _: &RoxUserIdStr<'static>) -> Result<bool, rootcause::Report> {
         Ok(self.0)
     }
 }

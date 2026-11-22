@@ -1,7 +1,7 @@
 use super::*;
 use chrono::{DateTime, Utc};
 use entity_access::domain::models::{AccessLevel, Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::domain::{
     api::MockMessageReader,
     models::{BotSenderProfile, ImportedAuthor, MessageAttachment, MessageThread, ThreadState},
@@ -100,8 +100,8 @@ fn person(email: &str) -> ContextPerson {
     }
 }
 
-fn actor() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("actor@example.com").unwrap()
+fn actor() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("actor@example.com").unwrap()
 }
 fn document() -> MessageParent {
     MessageParent::parse("document", "doc").unwrap()
@@ -128,7 +128,7 @@ fn posted(
         parent: parent.clone(),
         thread_id: thread.map(Uuid::from_u128),
         sender_id: channel_sender::ChannelSender::new_from_user(
-            MacroUserIdStr::try_from_email(email).unwrap(),
+            RoxUserIdStr::try_from_email(email).unwrap(),
         ),
         triggered_via: None,
         triggered_by: None,

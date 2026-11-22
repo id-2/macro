@@ -1,7 +1,8 @@
 import { perfMark } from '@app/observability/perf-marks';
 import { SERVER_HOSTS } from '@core/constant/servers';
-import { type Span, Telemetry } from '@macro-inc/observability';
+import { type Span, Telemetry } from '@rox-one/observability';
 import { err, ok, type Result } from 'neverthrow';
+import { pruneDesktopSessionCookies } from '../../tauri/session-cookies';
 import { getNativeNetworkAbortSignal } from '../mobile/native-network-status';
 import type { ResultError } from '../util/result';
 import {
@@ -191,6 +192,9 @@ async function requestRefresh(
     }
 
     if (generation === refreshGeneration) refreshedAt = Date.now();
+    // The refresh just replaced the session cookies; a twin left from an older
+    // cookie scope would let the next request send two tokens again.
+    void pruneDesktopSessionCookies();
     return ok(undefined);
   } finally {
     clearTimeout(timer);

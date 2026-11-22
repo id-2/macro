@@ -6,7 +6,7 @@ use entity_access::domain::models::{
     EntityPermission, RequiredPermission, TeamRole, UserTeamInfo,
 };
 use futures::StreamExt as _;
-use macro_user_id::{lowercased::Lowercase, user_id::MacroUserId};
+use rox_user_id::{lowercased::Lowercase, user_id::RoxUserId};
 use std::sync::{Arc, Mutex};
 use uuid::Uuid;
 
@@ -16,8 +16,8 @@ const OTHER_DOCUMENT_ID: &str = "22222222-2222-2222-2222-222222222222";
 const TEAM_WORKSPACE_ID: &str = "33333333-3333-3333-3333-333333333333";
 const FOREIGN_WORKSPACE_ID: &str = "44444444-4444-4444-4444-444444444444";
 
-fn subscriber() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(SUBSCRIBER_ID.to_string()).expect("valid user id")
+fn subscriber() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(SUBSCRIBER_ID.to_string()).expect("valid user id")
 }
 
 fn normalized(event_name: &str, entity_id: &str) -> NormalizedWebhookEvent {
@@ -121,7 +121,7 @@ impl FakeAccessService {
 impl EntityAccessService for FakeAccessService {
     async fn generate_entity_access_receipt<T: RequiredPermission>(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
         _user_org_id: Option<i64>,
         _entity_id: &str,
         _entity_type: EntityType,
@@ -141,7 +141,7 @@ impl EntityAccessService for FakeAccessService {
 
     async fn get_access_level(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<Option<AccessLevel>, AccessError> {
@@ -156,7 +156,7 @@ impl EntityAccessService for FakeAccessService {
 
     async fn check_access(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _required_level: AccessLevel,
@@ -175,7 +175,7 @@ impl EntityAccessService for FakeAccessService {
 
     async fn get_entity_permission(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
         _user_org_id: Option<i64>,
@@ -185,7 +185,7 @@ impl EntityAccessService for FakeAccessService {
 
     async fn get_crm_entity_permission_with_team(
         &self,
-        _user_id: Option<&MacroUserId<Lowercase<'_>>>,
+        _user_id: Option<&RoxUserId<Lowercase<'_>>>,
         _entity_id: &str,
         _entity_type: EntityType,
     ) -> Result<(EntityPermission, Uuid, TeamRole), AccessError> {
@@ -196,7 +196,7 @@ impl EntityAccessService for FakeAccessService {
         &self,
         entity_id: &str,
         entity_type: EntityType,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, AccessError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, AccessError> {
         *self.users_by_entity_calls.lock().unwrap() += 1;
         if entity_type == EntityType::AgentSession {
             return Err(AccessError::BadRequest(
@@ -230,7 +230,7 @@ impl EntityAccessService for FakeAccessService {
 
     async fn get_user_team(
         &self,
-        _user_id: &MacroUserId<Lowercase<'_>>,
+        _user_id: &RoxUserId<Lowercase<'_>>,
     ) -> Result<Option<UserTeamInfo>, AccessError> {
         unimplemented!("not used by webhook event streaming")
     }
@@ -255,7 +255,7 @@ impl WebhookWorkspaceResolver for FakeWorkspaceResolver {
 
     async fn resolve_workspace_ids(
         &self,
-        people: Vec<MacroUserIdStr<'static>>,
+        people: Vec<RoxUserIdStr<'static>>,
     ) -> Result<Vec<String>, Self::Err> {
         let mut ids: Vec<String> = people
             .iter()
@@ -269,7 +269,7 @@ impl WebhookWorkspaceResolver for FakeWorkspaceResolver {
 
     async fn get_user_team_workspace_id(
         &self,
-        _user_id: MacroUserIdStr<'static>,
+        _user_id: RoxUserIdStr<'static>,
     ) -> Result<Option<String>, Self::Err> {
         Ok(self.team_workspace_id.lock().unwrap().clone())
     }
@@ -299,8 +299,8 @@ impl WebhookContactChecker for FakeContactChecker {
 
     async fn is_contact(
         &self,
-        user: MacroUserIdStr<'static>,
-        other: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
+        other: RoxUserIdStr<'static>,
     ) -> Result<bool, Self::Err> {
         *self.calls.lock().unwrap() += 1;
         Ok(self
@@ -659,7 +659,7 @@ fn picture_candidate(team_workspace_ids: &[&str]) -> StreamCandidateEvent {
 /// Whether one picture event reaches a stream with this scope.
 async fn picture_reaches(
     scope: WebhookScope,
-    subscriber: MacroUserIdStr<'static>,
+    subscriber: RoxUserIdStr<'static>,
     contacts: FakeContactChecker,
     candidate: StreamCandidateEvent,
 ) -> bool {
@@ -690,7 +690,7 @@ async fn picture_reaches(
 
 #[tokio::test]
 async fn picture_event_reaches_the_changed_user() {
-    let changed = MacroUserIdStr::try_from(CHANGED_USER_ID.to_string()).unwrap();
+    let changed = RoxUserIdStr::try_from(CHANGED_USER_ID.to_string()).unwrap();
     let contacts = FakeContactChecker::default();
     assert!(
         picture_reaches(
@@ -787,7 +787,7 @@ fn requested_session_candidate_for(
     use agent_trigger::domain::broker_events::{
         AgentSessionRequestedEvent, AgentTriggerTopicEvent, NewAgentSessionEvent,
     };
-    let event = macro_event_broker::Event::new(AgentTriggerTopicEvent::New(
+    let event = rox_event_broker::Event::new(AgentTriggerTopicEvent::New(
         NewAgentSessionEvent::Requested(AgentSessionRequestedEvent {
             origin: trigger_context::TriggerOrigin::Unknown,
             repo_url: None,
@@ -822,7 +822,7 @@ async fn first_after(
     let (service, feed) = service(FakeAccessService::allowing(&[]));
     let mut stream = service
         .open_stream(
-            MacroUserIdStr::try_from(subscriber_id.to_owned()).expect("valid user id"),
+            RoxUserIdStr::try_from(subscriber_id.to_owned()).expect("valid user id"),
             scope,
             filter(&[requested.event.event_name.as_str(), "webhook.created"]),
             None,

@@ -1,5 +1,5 @@
 import X from '@icon/system/regular/x.svg';
-import type { GoalSeekSolution } from '@macro-inc/spreadsheet/goal-seek';
+import type { GoalSeekSolution } from '@rox-one/spreadsheet/goal-seek';
 import { Button } from '@ui/components/Button';
 import { Show } from 'solid-js';
 import { SpreadsheetDialog as Dialog } from './SpreadsheetDialog';

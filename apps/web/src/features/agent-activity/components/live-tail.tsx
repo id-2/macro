@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { Button } from '@ui';
 import { type ParentProps, Show } from 'solid-js';
 
@@ -18,13 +19,13 @@ export function LiveTail(
       {props.children}
       <Show when={props.disconnected}>
         <div class="flex items-center gap-2 text-xs text-ink-muted">
-          <span>Live updates disconnected.</span>
+          <span>{t('agentChat.liveUpdatesDisconnected')}</span>
           <Button
             size="xs"
             variant="ghost"
             onClick={() => props.onReconnect?.()}
           >
-            Reconnect
+            {t('agentChat.reconnect')}
           </Button>
         </div>
       </Show>

@@ -1,33 +1,33 @@
 import { schema } from '@loro-mirror/core';
-import { createAwareness } from '@macro-inc/collaboration/collab/awareness';
-import { SyncEngine } from '@macro-inc/collaboration/collab/engine';
-import { LoroManager } from '@macro-inc/collaboration/collab/manager';
+import { createAwareness } from '@rox-one/collaboration/collab/awareness';
+import { SyncEngine } from '@rox-one/collaboration/collab/engine';
+import { LoroManager } from '@rox-one/collaboration/collab/manager';
 import {
   type InitialSync,
   type LiveSyncSource,
   type SyncError,
   SyncSourceStatus,
-} from '@macro-inc/collaboration/collab/source';
+} from '@rox-one/collaboration/collab/source';
 import {
   InMemoryWALStore,
   WALSyncer,
-} from '@macro-inc/collaboration/collab/wal';
-import type { TextFitEffect, TextFitResult } from '@macro-inc/graphics';
+} from '@rox-one/collaboration/collab/wal';
+import type { TextFitEffect, TextFitResult } from '@rox-one/graphics';
 import {
   type GraphicsDocument,
   worldBounds,
   worldMatrix,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import {
   type ArtifactLibrary,
   createLoroGraphicsBackendFromDoc,
   type PeerPresence,
-} from '@macro-inc/graphics/loro';
+} from '@rox-one/graphics/loro';
 import {
   richTextPlainText,
   validCanvasText,
-} from '@macro-inc/lexical-core/canvas-text';
-import { Telemetry } from '@macro-inc/observability';
+} from '@rox-one/lexical-core/canvas-text';
+import { Telemetry } from '@rox-one/observability';
 import type { ResultAsync } from 'neverthrow';
 import { createRoot } from 'solid-js';
 import {
@@ -80,7 +80,7 @@ export async function withCanvasSession<T>(
   source: CanvasSource,
   signal: AbortSignal,
   run: (session: CanvasSession) => Promise<T>,
-  editorName = 'Macro',
+  editorName = 'Rox',
   artifacts = false
 ): Promise<T> {
   const manager = new LoroManager(schema({}), {

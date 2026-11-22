@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import ArrowDownIcon from '@icon/system/regular/arrow-down.svg';
 import ArrowLeftIcon from '@icon/system/regular/arrow-left.svg';
 import { cn } from '@ui/utils/classname';
@@ -50,7 +51,7 @@ export function OnboardingShell(props: {
         <Show when={props.onBack}>
           <button
             type="button"
-            aria-label="Back to previous step"
+            aria-label="Вернуться на предыдущий шаг"
             onClick={() => props.onBack?.()}
             class="grid size-[68px] -ml-2.5 place-items-center rounded-full text-ink hover:bg-ink/5 focus-visible:outline-2 focus-visible:outline-ink"
           >
@@ -100,7 +101,7 @@ export function OnboardingShell(props: {
                 });
               }}
             >
-              {props.explainerLabel ?? 'Read more'}
+              {props.explainerLabel ?? t('onboarding.readMore')}
               <ArrowDownIcon class="size-5" aria-hidden="true" />
             </button>
           </Show>

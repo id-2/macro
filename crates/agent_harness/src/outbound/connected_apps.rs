@@ -3,7 +3,7 @@
 
 use std::sync::Arc;
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use pipedream_mcp::domain::models::ConnectionProvider;
 use pipedream_mcp::domain::ports::{ConnectionStore, ConnectorOverlays, OverlayConnections};
 
@@ -44,7 +44,7 @@ where
 
     async fn connected_app_name(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         app_slug: &str,
     ) -> Result<Option<String>, ConnectionLookupError> {
         let lookup = |error: &dyn std::fmt::Debug| ConnectionLookupError(format!("{error:?}"));

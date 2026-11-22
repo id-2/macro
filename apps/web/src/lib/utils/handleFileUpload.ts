@@ -6,7 +6,7 @@ import { fireAndForget } from '@core/util/fireAndForget';
 import { type UploadInput, uploadFiles } from '@core/util/upload';
 import ArrowSquareOutIcon from '@icon/system/regular/arrow-square-out.svg';
 import FolderIcon from '@icon/system/regular/folder.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { refetchHistory } from '@queries/history/history';
 import { refetchSoupEntity } from '@queries/soup/cache';
 

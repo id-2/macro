@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use chrono::Duration;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 use crate::domain::account_logins::{AccountLoginNotice, ComputerAccountLogin};
@@ -16,8 +16,8 @@ const MEMBER_ID: &str = "macro|member@example.com";
 const CODE: &str = "KX7M-4QHD";
 const TEAM_ID: Uuid = Uuid::from_u128(7);
 
-fn caller(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).unwrap()
+fn caller(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).unwrap()
 }
 
 fn user_owner(id: &str) -> HarnessOwner {
@@ -42,7 +42,7 @@ fn harness(owner: HarnessOwner) -> Harness {
         last_connected_at: None,
         computer_id: None,
         team_agent_user_id: None,
-        claude_mode: ClaudeMode::MacroCredits,
+        claude_mode: ClaudeMode::RoxCredits,
     }
 }
 
@@ -245,14 +245,14 @@ impl HarnessRepo for FakeRepo {
 
     async fn list_usable_harnesses(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<Harness>, Self::Err> {
         Ok(self.harness.clone().into_iter().collect())
     }
 
     async fn list_directory_harnesses(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
     ) -> Result<Vec<Harness>, Self::Err> {
         Ok(self.harness.clone().into_iter().collect())
     }
@@ -260,7 +260,7 @@ impl HarnessRepo for FakeRepo {
     async fn harness_access(
         &self,
         _harness_id: HarnessId,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
     ) -> Result<HarnessAccess, Self::Err> {
         // As `harness_access_level`: a computer's buyer is not its owner.
         if self.harness.as_ref().is_some_and(|h| {
@@ -325,7 +325,7 @@ impl HarnessRepo for FakeRepo {
 
     async fn user_has_team(
         &self,
-        caller: MacroUserIdStr<'static>,
+        caller: RoxUserIdStr<'static>,
         team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         self.calls
@@ -338,7 +338,7 @@ impl HarnessRepo for FakeRepo {
 
     async fn user_owns_team(
         &self,
-        _caller: MacroUserIdStr<'static>,
+        _caller: RoxUserIdStr<'static>,
         _team_id: Uuid,
     ) -> Result<bool, Self::Err> {
         Ok(self.user_owns_team)
@@ -372,7 +372,7 @@ impl ComputerTeamAgents for FakeTeamAgents {
     async fn team_agents_of(
         &self,
         computers: &[ComputerId],
-    ) -> Result<std::collections::HashMap<ComputerId, MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<std::collections::HashMap<ComputerId, RoxUserIdStr<'static>>, Self::Err> {
         Ok(computers
             .iter()
             .filter(|computer| **computer == AGENT_COMPUTER_ID)

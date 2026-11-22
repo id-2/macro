@@ -5,8 +5,8 @@ use crate::PropertiesServiceImpl;
 use crate::domain::model::{EditReceipt, EntityPropertyMutationSnapshot, canonical_entity_type};
 use crate::domain::ports::{MockNotificationService, MockPermissionService, PropertiesRepo};
 use crate::domain::service::PropertiesService;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::EntityType;
 use models_properties::service::property_value::PropertyValue;
 use sqlx::{Pool, Postgres};
@@ -714,7 +714,7 @@ async fn mutual_subtask_link_fails(pool: Pool<Postgres>) -> anyhow::Result<()> {
 /// returns its id. is_system satisfies the single-owner constraint without
 /// needing a team/user row.
 async fn seed_multi_select_definition(pool: &Pool<Postgres>, display_name: &str) -> Uuid {
-    let def_id = macro_uuid::generate_uuid_v7();
+    let def_id = rox_uuid::generate_uuid_v7();
     sqlx::query(
         r#"
         INSERT INTO property_definitions (id, display_name, data_type, is_multi_select, is_system)
@@ -801,8 +801,8 @@ async fn add_option_attaches_appends_and_dedupes(pool: Pool<Postgres>) -> anyhow
     let repo = PropertiesPgRepo::new(pool.clone());
     let def_id = seed_multi_select_definition(&pool, "Test Tags Add").await;
     let entity_id = "entity-tags-add";
-    let opt_a = macro_uuid::generate_uuid_v7();
-    let opt_b = macro_uuid::generate_uuid_v7();
+    let opt_a = rox_uuid::generate_uuid_v7();
+    let opt_b = rox_uuid::generate_uuid_v7();
     seed_select_options(&pool, def_id, &[opt_a, opt_b]).await?;
 
     // First add attaches the property and returns its complete persisted state.
@@ -845,9 +845,9 @@ async fn remove_option_strips_and_is_tolerant(pool: Pool<Postgres>) -> anyhow::R
     let repo = PropertiesPgRepo::new(pool.clone());
     let def_id = seed_multi_select_definition(&pool, "Test Tags Remove").await;
     let entity_id = "entity-tags-remove";
-    let opt_a = macro_uuid::generate_uuid_v7();
-    let opt_b = macro_uuid::generate_uuid_v7();
-    let opt_c = macro_uuid::generate_uuid_v7();
+    let opt_a = rox_uuid::generate_uuid_v7();
+    let opt_b = rox_uuid::generate_uuid_v7();
+    let opt_c = rox_uuid::generate_uuid_v7();
     seed_select_options(&pool, def_id, &[opt_a, opt_b, opt_c]).await?;
 
     let attached = repo
@@ -872,7 +872,7 @@ async fn remove_option_strips_and_is_tolerant(pool: Pool<Postgres>) -> anyhow::R
     assert!(removed_middle.property.updated_at >= attached.property.updated_at);
 
     // Removing an absent option reports no mutation and leaves the value unchanged.
-    let absent = macro_uuid::generate_uuid_v7();
+    let absent = rox_uuid::generate_uuid_v7();
     let absent_result = repo
         .remove_entity_property_option(entity_id, EntityType::Document, def_id, absent)
         .await?;
@@ -949,9 +949,9 @@ async fn bulk_update_options_composes_and_returns_finals(
     let repo = PropertiesPgRepo::new(pool.clone());
     let def_id = seed_multi_select_definition(&pool, "Bulk Tags Compose").await;
     let entity_id = "entity-bulk-compose";
-    let opt_a = macro_uuid::generate_uuid_v7();
-    let opt_b = macro_uuid::generate_uuid_v7();
-    let opt_c = macro_uuid::generate_uuid_v7();
+    let opt_a = rox_uuid::generate_uuid_v7();
+    let opt_b = rox_uuid::generate_uuid_v7();
+    let opt_c = rox_uuid::generate_uuid_v7();
     seed_select_options(&pool, def_id, &[opt_a, opt_b, opt_c]).await?;
 
     // First bulk update attaches the property and adds A and B.
@@ -1009,8 +1009,8 @@ async fn bulk_update_options_concurrent_no_lost_update(pool: Pool<Postgres>) -> 
     let repo = PropertiesPgRepo::new(pool.clone());
     let def_id = seed_multi_select_definition(&pool, "Bulk Tags Concurrent").await;
     let entity_id = "entity-bulk-concurrent";
-    let opt_a = macro_uuid::generate_uuid_v7();
-    let opt_b = macro_uuid::generate_uuid_v7();
+    let opt_a = rox_uuid::generate_uuid_v7();
+    let opt_b = rox_uuid::generate_uuid_v7();
     seed_select_options(&pool, def_id, &[opt_a, opt_b]).await?;
 
     // Start from {A}.
@@ -1069,11 +1069,11 @@ async fn bulk_update_options_partial_failure_rolls_back(
     let repo = PropertiesPgRepo::new(pool.clone());
     let def_id = seed_multi_select_definition(&pool, "Bulk Tags Rollback").await;
     let entity_id = "entity-bulk-rollback";
-    let existing = macro_uuid::generate_uuid_v7();
-    let attempted = macro_uuid::generate_uuid_v7();
+    let existing = rox_uuid::generate_uuid_v7();
+    let attempted = rox_uuid::generate_uuid_v7();
     // No such property definition, so writing it violates the foreign key.
-    let missing_def_id = macro_uuid::generate_uuid_v7();
-    let orphan_option = macro_uuid::generate_uuid_v7();
+    let missing_def_id = rox_uuid::generate_uuid_v7();
+    let orphan_option = rox_uuid::generate_uuid_v7();
     seed_select_options(&pool, def_id, &[existing, attempted]).await?;
 
     // Establish a committed baseline value on the valid property.
@@ -1123,7 +1123,7 @@ async fn bulk_update_options_removal_only_on_unattached_is_noop(
     let repo = PropertiesPgRepo::new(pool.clone());
     let def_id = seed_multi_select_definition(&pool, "Bulk Tags Noop").await;
     let entity_id = "entity-bulk-noop";
-    let absent = macro_uuid::generate_uuid_v7();
+    let absent = rox_uuid::generate_uuid_v7();
 
     let result = repo
         .bulk_update_entity_property_options(
@@ -1185,7 +1185,7 @@ fn cross_entity_service(
 
 /// An edit receipt for a document entity, minted without an access check.
 fn doc_edit_receipt(entity_id: &str) -> EditReceipt {
-    let user = MacroUserIdStr::parse_from_str("macro|user1@test.com").expect("valid test user id");
+    let user = RoxUserIdStr::parse_from_str("macro|user1@test.com").expect("valid test user id");
     EditReceipt::dangerously_assert_authenticated_user(
         user,
         entity_id,

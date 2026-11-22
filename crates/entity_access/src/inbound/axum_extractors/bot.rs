@@ -3,7 +3,7 @@
 #[cfg(test)]
 mod test;
 
-use macro_authorization::{BotAuthentication, BotScope};
+use rox_authorization::{BotAuthentication, BotScope};
 
 use super::{ExtractorError, RequiredPermission};
 use crate::domain::{

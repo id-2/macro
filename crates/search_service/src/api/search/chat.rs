@@ -1,7 +1,7 @@
 use crate::api::context::SearchHandlerState;
 use crate::api::search::simple::SearchError;
 use indexmap::IndexMap;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_properties::{EntityReference, EntityType};
 use models_search::chat::{
     ChatMessageSearchResult, ChatSearchResponseItem, ChatSearchResponseItemWithMetadata,
@@ -32,7 +32,7 @@ pub(in crate::api::search) async fn enrich_chats(
 
     // Fetch chat metadata from database
     let chat_histories =
-        macro_db_client::chat::get::get_chat_history_info(&ctx.db, user_id, &chat_ids)
+        rox_db_client::chat::get::get_chat_history_info(&ctx.db, user_id, &chat_ids)
             .await
             .map_err(SearchError::InternalError)?;
 
@@ -44,7 +44,7 @@ pub(in crate::api::search) async fn enrich_chats(
         .collect();
     // Scope tags to the viewer so another user's personal tags never leak into
     // the response. System properties still ride along via the key list.
-    let viewer_user_id = MacroUserIdStr::parse_from_str(user_id)
+    let viewer_user_id = RoxUserIdStr::parse_from_str(user_id)
         .map_err(|_| SearchError::InvalidUserId(user_id.to_string()))?;
     let properties_map: HashMap<String, Vec<SoupProperty>> =
         properties::outbound::entity_properties_get_query::get_bulk_entity_properties_values_filtered(
@@ -77,7 +77,7 @@ pub(in crate::api::search) async fn enrich_chats(
 
 pub fn construct_search_result(
     search_results: Vec<opensearch_client::search::model::SearchHit>,
-    chat_histories: HashMap<String, macro_db_client::chat::get::ChatHistoryInfo>,
+    chat_histories: HashMap<String, rox_db_client::chat::get::ChatHistoryInfo>,
     properties_map: HashMap<String, Vec<SoupProperty>>,
 ) -> anyhow::Result<Vec<ChatSearchResponseItemWithMetadata>> {
     // construct entity hit map of id -> vec<hits> using IndexMap to preserve insertion order

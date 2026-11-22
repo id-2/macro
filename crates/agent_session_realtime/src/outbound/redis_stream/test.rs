@@ -1,7 +1,7 @@
 use agent_runtime_protocol::domain::schema::v0::{SystemEvent, ToServerMessage};
 use agent_session::domain::events::{LogAppendedEntry, LogAppendedMetadata};
 use agent_session::domain::model::{AgentSessionId, Message};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use super::*;
 

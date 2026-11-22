@@ -8,7 +8,7 @@ import type {
   Fired,
   Schedule,
   Schedules,
-} from '@macro-inc/muppet/utilities/schedules';
+} from '@rox-one/muppet/utilities/schedules';
 import { z } from 'zod';
 
 /** The heartbeat: every 30 minutes. */

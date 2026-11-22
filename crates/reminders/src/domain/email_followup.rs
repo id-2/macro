@@ -8,7 +8,7 @@
 use super::{models::ReminderError, ports::RemindersRepo};
 use chrono::{DateTime, Utc};
 use email::domain::followup::ReplyBaseline;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -92,7 +92,7 @@ pub struct FollowupRecord {
     /// Public projection.
     pub followup: EmailFollowup,
     /// Authenticated owner, not necessarily the inbox owner for delegation.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Stable reply boundary.
     pub baseline: ReplyBaseline,
     /// Undo restores original visibility, including sent-only conversations.
@@ -171,25 +171,25 @@ pub trait EmailFollowupRepo: RemindersRepo {
     /// Serialize every operation affecting this user/thread, across processes.
     fn lock_followup(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         thread: Uuid,
     ) -> impl Future<Output = Result<Self::Guard, ReminderError>> + Send;
     /// Most recently created workflow for this thread, including terminal state.
     fn thread_followup(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         thread: Uuid,
     ) -> impl Future<Output = Result<Option<FollowupRecord>, ReminderError>> + Send;
     /// Resolve an owned snooze's durable workflow.
     fn reminder_followup(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         reminder: Uuid,
     ) -> impl Future<Output = Result<Option<FollowupRecord>, ReminderError>> + Send;
     /// Return the previously accepted command and associated reminder identity.
     fn previous_operation(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         operation: Uuid,
     ) -> impl Future<Output = Result<Option<(Uuid, EmailFollowupCommand)>, ReminderError>> + Send;
     /// Atomically persist intent, its operation identity and delivery schedule.

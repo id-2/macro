@@ -5,7 +5,7 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::ErrorResponse;
 
 #[derive(Debug, serde::Serialize, utoipa::ToSchema)]
@@ -71,7 +71,7 @@ impl IntoResponse for GetUserOrganizationResponse {
 #[tracing::instrument(skip(ctx, user_context), err, fields(user_id=?user_context.authorization.user.user_context.user_id))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    user_context: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user_context: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
 ) -> Result<GetUserOrganizationResponse, UserOrganizationError> {
     let organization_id = if let Some(organization_id) =
         user_context.authorization.user.user_context.organization_id
@@ -82,7 +82,7 @@ pub async fn handler(
     };
 
     let organization_name =
-        macro_db_client::organization::get::organization::get_organization_name(
+        rox_db_client::organization::get::organization::get_organization_name(
             &ctx.db,
             organization_id,
         )

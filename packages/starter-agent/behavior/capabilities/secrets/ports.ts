@@ -1,4 +1,4 @@
-import type { Schedules } from '@macro-inc/muppet/utilities/schedules';
+import type { Schedules } from '@rox-one/muppet/utilities/schedules';
 import type { Clipboard } from './clipboard.ts';
 import { pollEvery, pollSchedule } from './config.ts';
 import type { Vault } from './vault.ts';

@@ -1,6 +1,6 @@
 use std::sync::{Arc, Mutex};
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -45,7 +45,7 @@ fn address(raw: &str) -> EmailStr<'static> {
 fn inbox() -> Link {
     Link {
         id: Uuid::from_u128(1),
-        macro_id: MacroUserIdStr::try_from_email("base@example.com").unwrap(),
+        macro_id: RoxUserIdStr::try_from_email("base@example.com").unwrap(),
         fusionauth_user_id: "owner-grant".to_owned(),
         email_address: address("base@example.com"),
         provider: UserProvider::Gmail,

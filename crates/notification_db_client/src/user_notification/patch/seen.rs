@@ -12,7 +12,7 @@ pub async fn patch_seen(
             seen_at = COALESCE(seen_at, NOW())
         WHERE notification_id = $1 AND user_id = $2 AND deleted_at IS NULL
         "#,
-        macro_uuid::string_to_uuid(notification_id)?,
+        rox_uuid::string_to_uuid(notification_id)?,
         user_id,
     )
     .execute(db)

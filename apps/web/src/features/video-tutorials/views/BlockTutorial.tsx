@@ -8,7 +8,8 @@ import {
 } from '../components/TutorialEntries';
 import { TutorialSupportLip } from '../components/TutorialSupportLip';
 import { TutorialVideoDialog } from '../components/TutorialVideoDialog';
-import { TUTORIAL_IDS, type TutorialId } from '../core/tutorial-id';
+import type { TutorialId } from '../core/tutorial-id';
+import { tutorialStaff } from '../core/presenter';
 import { createSupportLink } from '../primitives/create-support-link';
 import {
   createTutorialState,
@@ -16,10 +17,9 @@ import {
 } from '../primitives/create-tutorial-state';
 
 /**
- * "Have questions about Rox CRM? Talk to us in your support channel." under
- * the video, when the person has a support channel. Mounts with the open
- * dialog, so the channel list is read only then. Following it closes the
- * dialog.
+ * The strip under the notice, when the person has a support channel. Mounts
+ * with the open dialog, so the channel list is read only then. Following it
+ * closes the dialog.
  */
 function SupportLip(props: { block: string; onFollow: () => void }) {
   const support = createSupportLink();
@@ -47,12 +47,6 @@ function Entry(props: {
 }) {
   const state: TutorialState = createTutorialState(props.tutorial.id);
   const shown = () => TUTORIALS[state.shown()] ?? props.tutorial;
-  // The shelf after a video ends: every other tutorial, in the blocks' order.
-  const more = () =>
-    TUTORIAL_IDS.flatMap((id) => {
-      const tutorial = TUTORIALS[id];
-      return tutorial && id !== state.shown() ? [tutorial] : [];
-    });
   const entry = () => ({
     title: props.tutorial.title,
     snippet: props.tutorial.snippet,
@@ -80,12 +74,8 @@ function Entry(props: {
         open={state.open()}
         onOpenChange={state.setOpen}
         title={shown().title}
-        length={shown().length}
-        videoUrl={shown().videoUrl}
-        posterUrl={shown().posterUrl}
-        onPlayStarted={state.recordPlay}
-        more={more()}
-        onSelectTutorial={state.show}
+        presenterName={tutorialStaff(shown().id).name}
+        presenterPhoto={tutorialStaff(shown().id).photo}
         footer={(close) => (
           <SupportLip
             block={shown().block}

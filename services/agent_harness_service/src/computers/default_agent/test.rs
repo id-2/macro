@@ -15,8 +15,8 @@ use hosted_runtimes::domain::size::{
     CatalogEntryId, ComputerResources, ComputerSize, DiskGib, MemoryGib, Vcpus,
 };
 use hosted_runtimes::outbound::pg::PgComputerRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_event_broker::NoopMacroEventBroker;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_event_broker::NoopRoxEventBroker;
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -81,7 +81,7 @@ async fn team_computer(pool: &PgPool, team_id: Uuid) -> (ComputerId, HarnessId) 
         .create_hosted_pairing(CreateHostedPairing {
             team_id,
             name: "Ada".to_owned(),
-            created_by: MacroUserIdStr::try_from(BUYER.to_owned()).unwrap(),
+            created_by: RoxUserIdStr::try_from(BUYER.to_owned()).unwrap(),
             computer_id,
         })
         .await
@@ -128,10 +128,10 @@ async fn team_computer(pool: &PgPool, team_id: Uuid) -> (ComputerId, HarnessId) 
 
 fn bots(
     pool: &PgPool,
-) -> BotServiceImpl<PgBotsRepo, NoopMacroEventBroker, crate::computers::PgHarnessService> {
+) -> BotServiceImpl<PgBotsRepo, NoopRoxEventBroker, crate::computers::PgHarnessService> {
     BotServiceImpl::new(
         PgBotsRepo::new(pool.clone()),
-        NoopMacroEventBroker,
+        NoopRoxEventBroker,
         crate::computers::harness_service(pool),
     )
 }
@@ -143,7 +143,7 @@ async fn a_ready_computer_gets_one_team_coding_agent(pool: PgPool) {
     // A teammate already took the natural handle on another runtime.
     bots(&pool)
         .create_agent(
-            MacroUserIdStr::try_from(TEAMMATE.to_owned()).unwrap(),
+            RoxUserIdStr::try_from(TEAMMATE.to_owned()).unwrap(),
             CreateAgentRequest {
                 team_id: Some(team_id),
                 harness_id: None,
@@ -166,7 +166,7 @@ async fn a_ready_computer_gets_one_team_coding_agent(pool: PgPool) {
     let agents = BotDefaultAgents::new(bots(&pool), PgBotsRepo::new(pool.clone()), pool.clone());
     let request = DefaultAgentRequest {
         team_id,
-        buyer: MacroUserIdStr::try_from(BUYER.to_owned()).unwrap(),
+        buyer: RoxUserIdStr::try_from(BUYER.to_owned()).unwrap(),
         harness_id,
     };
 
@@ -180,7 +180,7 @@ async fn a_ready_computer_gets_one_team_coding_agent(pool: PgPool) {
 
     // Every teammate sees it: a team agent on the computer, made by the buyer.
     let on_computer: Vec<_> = bots(&pool)
-        .list_agents(MacroUserIdStr::try_from(TEAMMATE.to_owned()).unwrap())
+        .list_agents(RoxUserIdStr::try_from(TEAMMATE.to_owned()).unwrap())
         .await
         .unwrap()
         .into_iter()
@@ -208,8 +208,8 @@ async fn a_ready_computer_gets_one_team_coding_agent(pool: PgPool) {
 async fn revoking_a_computer_deletes_its_agents(pool: PgPool) {
     let team_id = Uuid::new_v4();
     let (computer_id, harness_id) = team_computer(&pool, team_id).await;
-    let buyer = MacroUserIdStr::try_from(BUYER.to_owned()).unwrap();
-    let teammate = MacroUserIdStr::try_from(TEAMMATE.to_owned()).unwrap();
+    let buyer = RoxUserIdStr::try_from(BUYER.to_owned()).unwrap();
+    let teammate = RoxUserIdStr::try_from(TEAMMATE.to_owned()).unwrap();
     let agents = BotDefaultAgents::new(bots(&pool), PgBotsRepo::new(pool.clone()), pool.clone());
     agents
         .create(DefaultAgentRequest {
@@ -393,7 +393,7 @@ async fn revoking_a_computer_deletes_its_agents(pool: PgPool) {
 async fn any_teammate_can_run_agents_on_a_team_computer(pool: PgPool) {
     let team_id = Uuid::new_v4();
     let (_, harness_id) = team_computer(&pool, team_id).await;
-    let teammate = MacroUserIdStr::try_from(TEAMMATE.to_owned()).unwrap();
+    let teammate = RoxUserIdStr::try_from(TEAMMATE.to_owned()).unwrap();
 
     let usable = crate::computers::harness_service(&pool)
         .list_harnesses(teammate.clone())
@@ -438,7 +438,7 @@ async fn any_teammate_can_run_agents_on_a_team_computer(pool: PgPool) {
 async fn agents_on_a_computer_default_to_bypassing_permissions(pool: PgPool) {
     let team_id = Uuid::new_v4();
     let (_, harness_id) = team_computer(&pool, team_id).await;
-    let teammate = MacroUserIdStr::try_from(TEAMMATE.to_owned()).unwrap();
+    let teammate = RoxUserIdStr::try_from(TEAMMATE.to_owned()).unwrap();
 
     let mut permissions = Vec::new();
     for (handle, requested) in [("unsaid", None), ("prompts", Some(false))] {

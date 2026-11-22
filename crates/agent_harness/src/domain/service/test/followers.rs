@@ -1,7 +1,7 @@
 use super::*;
 
-fn other_person() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("editor@example.com").expect("a valid user id")
+fn other_person() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("editor@example.com").expect("a valid user id")
 }
 
 /// Mentioning the agent in a thread, by its starter or anyone following up

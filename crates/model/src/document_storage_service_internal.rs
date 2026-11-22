@@ -1,5 +1,5 @@
 use crate::item::{ShareableItem, UserAccessibleItem};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::channel_share_permission::UpdateOperation;
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
@@ -10,7 +10,7 @@ pub struct UpdateChannelSharePermissionRequest {
     /// The id of the channel to add/remove from the share permissions
     pub channel_id: String,
     /// The user who initiated the update
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// The item id
     pub item_id: String,
     /// The item type
@@ -65,7 +65,7 @@ pub struct GetDocumentsMetadataResponse {
 pub struct DocumentMetadata {
     pub item_id: String,
     pub item_name: String,
-    pub item_owner: MacroUserIdStr<'static>,
+    pub item_owner: RoxUserIdStr<'static>,
     pub file_type: Option<String>,
 }
 

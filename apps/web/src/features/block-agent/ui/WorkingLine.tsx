@@ -10,6 +10,7 @@
  * `Planning`, `Stopping`), so it changes only when the state does.
  */
 
+import { t } from '@app/lib/i18n';
 import { TextShimmer } from './TextShimmer';
 import { WorkingDots } from './WorkingDots';
 
@@ -18,10 +19,10 @@ export interface WorkingLineProps {
   label?: string;
 }
 
-const DEFAULT_LABEL = 'Working';
+const DEFAULT_LABEL = () => t('agentChat.working');
 
 export function WorkingLine(props: WorkingLineProps) {
-  const label = () => props.label ?? DEFAULT_LABEL;
+  const label = () => props.label ?? DEFAULT_LABEL();
 
   return (
     <div class="flex min-h-8 items-center gap-2 py-1 text-sm leading-6 text-ink-extra-muted">

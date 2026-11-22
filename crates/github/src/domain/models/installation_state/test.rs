@@ -3,8 +3,8 @@ use super::*;
 const SECRET: &[u8] = b"a distinct installation state test secret";
 const NOW: i64 = 1_730_000_000;
 
-fn user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|installer@example.com".to_string()).unwrap()
+fn user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|installer@example.com".to_string()).unwrap()
 }
 
 fn state(team_id: Option<Uuid>, exp: i64) -> InstallationState {

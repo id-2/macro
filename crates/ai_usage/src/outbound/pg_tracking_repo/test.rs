@@ -1,6 +1,6 @@
 use super::*;
 use crate::{SYSTEM_USER_ID, UsageTrackingService};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::sync::Arc;
 
 fn request() -> TrackedInvocation {

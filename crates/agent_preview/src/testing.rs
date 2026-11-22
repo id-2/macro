@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessReceipt, EntityPermission, EntityType, RequiredPermission,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::{
     Arc,
     atomic::{AtomicBool, Ordering},
@@ -17,8 +17,8 @@ pub fn session() -> AgentSessionId {
     SESSION.parse().unwrap()
 }
 /// The user every fixture receipt and identity refers to.
-pub fn user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(USER.to_owned()).unwrap()
+pub fn user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(USER.to_owned()).unwrap()
 }
 pub struct TestAuthority(pub AtomicBool, pub Arc<repository::MemoryRepository>);
 #[async_trait]
@@ -32,7 +32,7 @@ impl Authority for TestAuthority {
     async fn viewer(
         &self,
         session: AgentSessionId,
-        _: &MacroUserIdStr<'_>,
+        _: &RoxUserIdStr<'_>,
     ) -> Result<(), PreviewError> {
         self.active(session).await
     }
@@ -50,7 +50,7 @@ impl Events for TestEvents {
     async fn changed(
         &self,
         _: &Preview,
-        _: &[MacroUserIdStr<'static>],
+        _: &[RoxUserIdStr<'static>],
     ) -> Result<(), PreviewError> {
         Ok(())
     }

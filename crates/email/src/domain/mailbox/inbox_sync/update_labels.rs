@@ -5,7 +5,7 @@ use crate::domain::events::{
     EmailEventOrigin, LabelRef, ThreadArchivedMetadata, ThreadLabelsUpdatedMetadata,
     ThreadReadMetadata, ThreadSpamChangedMetadata, ThreadStarredMetadata, ThreadTrashedMetadata,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_email::gmail::inbox_sync::{UpdateLabelsPayload, UpsertMessagePayload};
 use models_email::service::{self, link};
 use uuid::Uuid;
@@ -25,7 +25,7 @@ where
     R: InboxSyncRepository,
     G: InboxSyncGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher,
+    E: RoxEventBroker + InboxSyncRefresher,
 {
     let provider_message_id = &payload.provider_message_id;
 
@@ -236,7 +236,7 @@ const NON_USER_LABELS: [&str; 8] = [
 
 fn build_provider_spam_changed_metadata(
     link_id: Uuid,
-    owner: &MacroUserIdStr<'static>,
+    owner: &RoxUserIdStr<'static>,
     thread_id: Uuid,
     labels_to_add: &[String],
     labels_to_delete: &[String],
@@ -287,7 +287,7 @@ async fn publish_label_diff_events<L, R, G, Q, E>(
     R: InboxSyncRepository,
     G: InboxSyncGmail,
     Q: InboxSyncQueue,
-    E: MacroEventBroker + InboxSyncRefresher,
+    E: RoxEventBroker + InboxSyncRefresher,
 {
     let added = |label: &str| labels_to_add.iter().any(|l| l == label);
     let removed = |label: &str| labels_to_delete.iter().any(|l| l == label);
@@ -308,11 +308,11 @@ async fn publish_label_diff_events<L, R, G, Q, E>(
         None
     };
 
-    let mut events: Vec<EmailMacroEvent> = Vec::new();
+    let mut events: Vec<EmailRoxEvent> = Vec::new();
 
     if added(service::label::system_labels::INBOX) || removed(service::label::system_labels::INBOX)
     {
-        events.push(EmailMacroEvent::thread_archived(ThreadArchivedMetadata {
+        events.push(EmailRoxEvent::thread_archived(ThreadArchivedMetadata {
             link_id: link.id,
             owner: link.macro_id.clone(),
             actor: None,
@@ -327,7 +327,7 @@ async fn publish_label_diff_events<L, R, G, Q, E>(
 
     if added(service::label::system_labels::TRASH) || removed(service::label::system_labels::TRASH)
     {
-        events.push(EmailMacroEvent::thread_trashed(ThreadTrashedMetadata {
+        events.push(EmailRoxEvent::thread_trashed(ThreadTrashedMetadata {
             link_id: link.id,
             owner: link.macro_id.clone(),
             actor: None,
@@ -344,13 +344,13 @@ async fn publish_label_diff_events<L, R, G, Q, E>(
         labels_to_add,
         labels_to_delete,
     ) {
-        events.push(EmailMacroEvent::thread_spam_changed(metadata));
+        events.push(EmailRoxEvent::thread_spam_changed(metadata));
     }
 
     if added(service::label::system_labels::UNREAD)
         || removed(service::label::system_labels::UNREAD)
     {
-        events.push(EmailMacroEvent::thread_read(ThreadReadMetadata {
+        events.push(EmailRoxEvent::thread_read(ThreadReadMetadata {
             link_id: link.id,
             owner: link.macro_id.clone(),
             actor: None,
@@ -366,7 +366,7 @@ async fn publish_label_diff_events<L, R, G, Q, E>(
     if added(service::label::system_labels::STARRED)
         || removed(service::label::system_labels::STARRED)
     {
-        events.push(EmailMacroEvent::thread_starred(ThreadStarredMetadata {
+        events.push(EmailRoxEvent::thread_starred(ThreadStarredMetadata {
             link_id: link.id,
             owner: link.macro_id.clone(),
             actor: None,
@@ -399,7 +399,7 @@ async fn publish_label_diff_events<L, R, G, Q, E>(
         .collect();
 
     if !added_user.is_empty() || !removed_user.is_empty() {
-        events.push(EmailMacroEvent::thread_labels_updated(
+        events.push(EmailRoxEvent::thread_labels_updated(
             ThreadLabelsUpdatedMetadata {
                 link_id: link.id,
                 owner: link.macro_id.clone(),

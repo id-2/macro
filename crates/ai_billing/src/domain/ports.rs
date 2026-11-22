@@ -16,8 +16,8 @@ use ai_usage::domain::financial::{
 };
 use ai_usage::domain::ports::FinancialFuture;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 
 /// Durable V1 funding transactions. All mutations serialize on the existing payer
 /// account row, including legacy settlement, settings and credit purchases. Replays
@@ -26,7 +26,7 @@ pub trait FundingRepo: Send + Sync + 'static {
     /// Resolve the recorded seat policy at occurrence time, never today's role/catalog.
     fn period(
         &self,
-        seat: MacroUserIdStr<'static>,
+        seat: RoxUserIdStr<'static>,
         at: DateTime<Utc>,
     ) -> FinancialFuture<'_, Option<FundingPeriod>>;
     /// Insert immutable verified facts. Reject overlapping or contradictory bindings.
@@ -46,7 +46,7 @@ pub trait FundingRepo: Send + Sync + 'static {
     /// Discover unresolved and ready-but-unallocated work, including old periods.
     fn pending(&self, query: PendingInvocations) -> FinancialFuture<'_, Vec<InvocationId>>;
     /// Process a bounded prefix at the allocation watermark; unresolved work retains holds.
-    fn reconcile(&self, payer: MacroUserIdStr<'static>) -> FinancialFuture<'_, ()>;
+    fn reconcile(&self, payer: RoxUserIdStr<'static>) -> FinancialFuture<'_, ()>;
 }
 
 /// Resolves who a user is billed as.
@@ -54,13 +54,13 @@ pub trait EntitlementSource: Send + Sync + 'static {
     /// The user's plan, payer, and billed seats.
     fn entitlement(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Entitlement>> + Send;
 
     /// The Stripe customer id on file for a user, if any.
     fn stripe_customer_id(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<String>>> + Send;
 
     /// The payer for `team_id`, if the team exists.
@@ -69,7 +69,7 @@ pub trait EntitlementSource: Send + Sync + 'static {
     fn team_payer(
         &self,
         team_id: Uuid,
-    ) -> impl Future<Output = Result<Option<MacroUserIdStr<'static>>>> + Send;
+    ) -> impl Future<Output = Result<Option<RoxUserIdStr<'static>>>> + Send;
 }
 
 /// Reads recorded, metered AI usage at provider cost.
@@ -84,7 +84,7 @@ pub trait UsageReader: Send + Sync + 'static {
     /// returns no rows. Upgrade history does not delete or reclassify recorded costs.
     fn usage_cost_cents_by_user(
         &self,
-        users: &[MacroUserIdStr<'static>],
+        users: &[RoxUserIdStr<'static>],
         period: BillingPeriod,
     ) -> impl Future<Output = Result<Vec<SeatUsage>>> + Send;
 }
@@ -142,7 +142,7 @@ pub enum InvoiceVoid {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ResolvedReload {
     /// Who the credits belong to.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// Amount collected (or not), customer cents.
     pub amount_cents: i64,
     /// Whether Auto-Reload or a one-time purchase charged it.
@@ -181,7 +181,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// A mixed-policy payer must retain only its legacy seats on this path.
     fn legacy_seats(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period: BillingPeriod,
         seats: Vec<SeatAllowance>,
     ) -> impl Future<Output = Result<Vec<SeatAllowance>>> + Send;
@@ -190,14 +190,14 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// metering. Replays preserve the original facts and subsequent usage.
     fn record_plan_change(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         record: super::plan_change::RecordedPlanChange,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// The payer's settings (defaults when no row exists).
     fn settings(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<BillingSettings>> + Send;
 
     /// Card charges counted against the UTC calendar-month credit limit:
@@ -205,14 +205,14 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// failed invoices that may still collect. Checkout purchases are excluded.
     fn credit_reload_committed_cents(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         month: BillingPeriod,
     ) -> impl Future<Output = Result<i64>> + Send;
 
     /// Set overage on/off and the cap. Clears any suspension.
     fn update_overage(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         enabled: bool,
         limit_cents: i64,
     ) -> impl Future<Output = Result<()>> + Send;
@@ -222,7 +222,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// replace it. This does not rewrite allowance or financial period history.
     fn set_period(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
     ) -> impl Future<Output = Result<()>> + Send;
@@ -230,31 +230,31 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// Pause overage after a failed collection.
     fn suspend_overage(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Lift a suspension (a later charge collected).
     fn clear_overage_suspension(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Extra free allowance the user has earned, in cost cents, before the cap.
     fn free_allowance_bonus_cents(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<i64>> + Send;
 
     /// Current prepaid balance, customer cents.
     fn credit_balance_cents(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<i64>> + Send;
 
     /// What has been booked against a period.
     fn period_ledger(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
     ) -> impl Future<Output = Result<PeriodLedger>> + Send;
 
@@ -262,7 +262,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// the open period, if any.
     fn period_allowance(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
     ) -> impl Future<Output = Result<Option<PeriodAllowance>>> + Send;
 
@@ -275,7 +275,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// period start.
     fn frozen_period_starts(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         since: DateTime<Utc>,
         before: DateTime<Utc>,
     ) -> impl Future<Output = Result<Vec<DateTime<Utc>>>> + Send;
@@ -287,7 +287,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// writing the arrays. An unchanged roster does not touch `updated_at`.
     fn store_open_allowance(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period: OpenPeriodStart,
         seats: &[SeatAllowance],
         observed: SeatGeneration,
@@ -300,16 +300,16 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// moves forward, including when no allowance row exists.
     fn release_open_seat(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period: OpenPeriodStart,
-        member: &MacroUserIdStr<'_>,
+        member: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<()>> + Send;
 
     /// Book a credit purchase. Returns `false` when `stripe_reference` was
     /// already booked (webhook retry).
     fn record_credit_purchase(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         amount_cents: i64,
         stripe_reference: &str,
     ) -> impl Future<Output = Result<bool>> + Send;
@@ -341,7 +341,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     ///   usage has since been covered another way stays failed.
     fn apply_settlement(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
         chargeable_customer_cents: i64,
         policy: SettlementPolicy,
@@ -363,14 +363,14 @@ pub trait BillingRepo: Send + Sync + 'static {
         &self,
         stripe_invoice_id: &str,
         status: OverageChargeStatus,
-    ) -> impl Future<Output = Result<Option<MacroUserIdStr<'static>>>> + Send;
+    ) -> impl Future<Output = Result<Option<RoxUserIdStr<'static>>>> + Send;
 
     /// The status of the payer's most recently reserved charge, if any. The
     /// newest outcome is what decides whether overage stays suspended; older
     /// invoices' webhooks may arrive out of order.
     fn latest_charge_status(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<OverageChargeStatus>>> + Send;
 
     /// Set the stored reload opt-in and optionally its thresholds. The service
@@ -379,7 +379,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// reload suspension.
     fn update_auto_reload(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         enabled: bool,
         overage_limit_cents: i64,
         thresholds: Option<&AutoReloadThresholds>,
@@ -401,7 +401,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// reload blocks a new one until Stripe resolves it.
     fn reserve_credit_reload(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         period_start: DateTime<Utc>,
         chargeable_customer_cents: i64,
         now: DateTime<Utc>,
@@ -416,8 +416,8 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// new one; one still pending with Stripe blocks the purchase.
     fn reserve_credit_purchase(
         &self,
-        payer: &MacroUserIdStr<'_>,
-        purchased_by: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
+        purchased_by: &RoxUserIdStr<'_>,
         amount_cents: i64,
         monthly_limit_cents: Option<i64>,
         now: DateTime<Utc>,
@@ -427,7 +427,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// still open (status `failed`), oldest first.
     fn declined_credit_purchases(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<PendingReload>>> + Send;
 
     /// Mark a purchase whose invoice was voided: `failed` with no invoice, so
@@ -447,7 +447,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// reported it).
     fn record_credit_reload(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         amount_cents: i64,
         stripe_invoice_id: &str,
         kind: CreditReloadKind,
@@ -473,7 +473,7 @@ pub trait BillingRepo: Send + Sync + 'static {
     /// stays as it was.
     fn suspend_auto_reload(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<()>> + Send;
 }
 
@@ -483,7 +483,7 @@ pub struct CreditCheckoutRequest {
     /// The payer's Stripe customer.
     pub customer_id: String,
     /// The payer, stamped on the session so the webhook can book it.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// Pack size, customer cents.
     pub amount_cents: i64,
     /// Where Stripe returns the user after paying.
@@ -514,7 +514,7 @@ pub struct CreditReloadRequest {
     /// The payer's Stripe customer.
     pub customer_id: String,
     /// The payer, stamped on the invoice so the webhook can book the credits.
-    pub payer: MacroUserIdStr<'static>,
+    pub payer: RoxUserIdStr<'static>,
     /// The reserved reload; doubles as the idempotency key, so opening the
     /// same reload twice yields the same invoice.
     pub reload_id: Uuid,
@@ -616,14 +616,14 @@ pub trait SettlementCandidates: Send + Sync + 'static {
         &self,
         since: DateTime<Utc>,
         now: DateTime<Utc>,
-    ) -> impl Future<Output = Result<Vec<MacroUserIdStr<'static>>>> + Send;
+    ) -> impl Future<Output = Result<Vec<RoxUserIdStr<'static>>>> + Send;
 }
 
 /// Asks whoever owns Stripe to settle a payer. Fire-and-forget: services that
 /// only read billing state (the gate in DCS) use this instead of settling.
 pub trait SettlementTrigger: Send + Sync + 'static {
     /// Request settlement for `payer`.
-    fn request_settlement(&self, payer: MacroUserIdStr<'static>);
+    fn request_settlement(&self, payer: RoxUserIdStr<'static>);
 }
 
 /// A [`SettlementTrigger`] that does nothing, for services that settle
@@ -632,7 +632,7 @@ pub trait SettlementTrigger: Send + Sync + 'static {
 pub struct NoOpSettlementTrigger;
 
 impl SettlementTrigger for NoOpSettlementTrigger {
-    fn request_settlement(&self, _payer: MacroUserIdStr<'static>) {}
+    fn request_settlement(&self, _payer: RoxUserIdStr<'static>) {}
 }
 
 /// Existing billing use cases offered to inbound adapters and other services.
@@ -647,7 +647,7 @@ pub trait BillingService: Send + Sync + 'static {
     /// recorded costs, prepaid credits and existing charges remain intact.
     fn change_plan(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         change: super::plan_change::PlanChange,
     ) -> impl Future<Output = Result<()>> + Send;
 
@@ -662,13 +662,13 @@ pub trait BillingService: Send + Sync + 'static {
     /// ledger write on every completion; the gate deliberately does not.
     fn check_allowance(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<AllowanceDecision>> + Send;
 
     /// The user's current-period position.
     fn snapshot(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<UsageSnapshot>> + Send;
 
     /// Book each seat's usage beyond its own allowance for the payer of `user`
@@ -679,13 +679,13 @@ pub trait BillingService: Send + Sync + 'static {
     /// action. Only the current period may trigger an automatic credit
     /// reload. A closed period is settled against the per-seat allowances
     /// frozen while it was open, not the live plan or seat list.
-    fn settle(&self, user: &MacroUserIdStr<'_>) -> impl Future<Output = Result<()>> + Send;
+    fn settle(&self, user: &RoxUserIdStr<'_>) -> impl Future<Output = Result<()>> + Send;
 
     /// Retired direct usage opt-in. Enabling is rejected; disabling remains
     /// supported for older clients. Payer only.
     fn update_overage(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         enabled: bool,
         limit_cents: i64,
     ) -> impl Future<Output = Result<UsageSnapshot>> + Send;
@@ -697,7 +697,7 @@ pub trait BillingService: Send + Sync + 'static {
     /// minimum reloads immediately. Disabling keeps the stored thresholds.
     fn update_auto_reload(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         enabled: bool,
         thresholds: AutoReloadThresholds,
     ) -> impl Future<Output = Result<UsageSnapshot>> + Send;
@@ -705,7 +705,7 @@ pub trait BillingService: Send + Sync + 'static {
     /// Start a credit-pack purchase. Payer only. Returns the Checkout URL.
     fn create_credit_checkout(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         amount_cents: i64,
         success_url: String,
         cancel_url: String,
@@ -717,7 +717,7 @@ pub trait BillingService: Send + Sync + 'static {
     /// the plan's default. Credits are booked and usage settled once paid.
     fn purchase_credits(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         amount_cents: i64,
     ) -> impl Future<Output = Result<CreditPurchase>> + Send;
 
@@ -725,7 +725,7 @@ pub trait BillingService: Send + Sync + 'static {
     /// `stripe_reference`.
     fn apply_credit_purchase(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         amount_cents: i64,
         stripe_reference: &str,
     ) -> impl Future<Output = Result<()>> + Send;
@@ -734,7 +734,7 @@ pub trait BillingService: Send + Sync + 'static {
     /// facts feed the gated renewal use case; bare anchors remain legacy-only.
     fn sync_period(
         &self,
-        payer: &MacroUserIdStr<'_>,
+        payer: &RoxUserIdStr<'_>,
         start: DateTime<Utc>,
         end: DateTime<Utc>,
         verified: Option<super::period::SubscriptionPeriod>,

@@ -1,7 +1,7 @@
 //! What a routine suggestion is, as handed back, stored and served.
 
 use chrono::{DateTime, Utc};
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use routine_program::Surface;
 use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value};

@@ -14,7 +14,7 @@ import {
 } from '@core/database-sql/profile';
 import type { DatabaseSqlReadReason } from '@core/database-sql/trace';
 import { buildDatabaseSqlCatalog } from '@core/database-sql/wasm-module';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type {
   DatabaseSqlQuery,
   DatabaseSqlRun,

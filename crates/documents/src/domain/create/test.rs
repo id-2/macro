@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use bot_id::{BotId, NonSystemBotId};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::FileType;
 use model_owner::CreationPrincipal;
 
@@ -25,8 +25,8 @@ use model::document::response::DocumentResponseMetadata;
 const DOCUMENT_ID: &str = "created-task";
 const EMAIL_SEED: &str = r#"<m-document-mention>{"documentId":"thread-7","blockName":"email","documentName":"Re: invoice"}</m-document-mention>"#;
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
 }
 
 fn team_bot() -> CreationPrincipal {
@@ -216,7 +216,7 @@ impl DocumentMentionTrackingPort for &RecordingMentionTracker {
     async fn track_document_mentions(
         &self,
         document_id: &str,
-        user_id: Option<&MacroUserIdStr<'static>>,
+        user_id: Option<&RoxUserIdStr<'static>>,
         markdown: &str,
     ) -> anyhow::Result<()> {
         self.calls.lock().unwrap().push((
@@ -458,7 +458,7 @@ async fn native_spreadsheet_creation_uses_shared_service_without_upload_or_markd
     let project = uuid::Uuid::new_v4();
     let principal = CreationPrincipal::BotForUser {
         bot: bot_id::MACRO_AI_BOT_ID,
-        user: MacroUserIdStr::try_from_email("owner@rox.one").unwrap(),
+        user: RoxUserIdStr::try_from_email("owner@rox.one").unwrap(),
     };
     let result = creator
         .create_spreadsheet(

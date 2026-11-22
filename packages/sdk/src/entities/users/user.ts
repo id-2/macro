@@ -1,8 +1,8 @@
 import type { UserName } from '../../../generated/auth/types.gen';
 import type { Activity } from '../../../generated/cognition/types.gen';
 import { type Mentionable, type MentionPart, wrapXml } from '../../mentions';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Channel } from '../channels/channel';
 import { PropertiedEntity } from '../entity';
 import { type ProfilePicture, toProfilePicture } from './profile-picture';
@@ -29,22 +29,22 @@ export class User extends PropertiedEntity<UserName> implements Mentionable {
       }),
     );
     const entry = names.find((n: UserName) => n.id === this.id);
-    if (!entry) throw new MacroNotFoundError(`user ${this.id} not found`);
+    if (!entry) throw new RoxNotFoundError(`user ${this.id} not found`);
     return entry;
   }
 
   /** A handle to a user by id. */
-  static byId(client: MacroClient, id: string): User {
+  static byId(client: RoxClient, id: string): User {
     return new User(client, id);
   }
 
   /** A user handle seeded with an already loaded auth-service name. */
-  static fromName(client: MacroClient, name: UserName): User {
+  static fromName(client: RoxClient, name: UserName): User {
     return new User(client, name.id, name);
   }
 
   /** A handle to the current authenticated user. */
-  static async me(client: MacroClient): Promise<User> {
+  static async me(client: RoxClient): Promise<User> {
     const { user_id } = unwrap(await client.auth.getUserInfo());
     return new User(client, user_id);
   }
@@ -69,7 +69,7 @@ export class User extends PropertiedEntity<UserName> implements Mentionable {
    *
    * A picture set through Rox is a `StaticImage`; an older picture stored as
    * a bare URL is an `ExternalProfilePicture`. For many users at once use
-   * `macro.users.profilePictures`.
+   * `rox.users.profilePictures`.
    *
    * @returns The picture, or `undefined` if the user has none.
    *
@@ -115,7 +115,7 @@ export class User extends PropertiedEntity<UserName> implements Mentionable {
 
   /**
    * Open (or create) your 1:1 direct-message channel with this user. For a
-   * group DM, use `macro.channels.private(users)`.
+   * group DM, use `rox.channels.private(users)`.
    *
    * @returns The DM `Channel`.
    *
@@ -135,7 +135,7 @@ export class User extends PropertiedEntity<UserName> implements Mentionable {
    * Anyone outside the caller's current teams fails with 403.
    *
    * @example
-   * const me = await macro.users.me();
+   * const me = await rox.users.me();
    * const reports = await me.activity({ start: '2026-10-01', end: '2026-10-31' });
    * const weeks = reports.filter((report) => report.granularity === 'week');
    *

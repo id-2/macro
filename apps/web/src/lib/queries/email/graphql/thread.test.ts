@@ -195,7 +195,7 @@ function threadMessages(offset: number, count: number) {
     labels: [],
     bodyText: null,
     bodyHtmlSanitized: null,
-    bodyMacro: null,
+    bodyRox: null,
     calendarInvitations: [],
     bodyReplyless: null,
     attachments: [],

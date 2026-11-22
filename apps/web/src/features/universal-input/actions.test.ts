@@ -568,7 +568,7 @@ describe('destination adapters', () => {
         db_id: 'draft',
         thread_db_id: 'thread',
       });
-    expect(retry.message.body_macro).toBe('Hello John, see you at one');
+    expect(retry.message.body_rox).toBe('Hello John, see you at one');
   });
   it('saves into the draft a failed send saved', async () => {
     mocks.sendEmail.mockRejectedValueOnce(new Error('refused'));
@@ -725,7 +725,7 @@ describe('destination adapters', () => {
           'Hello José'
         );
         expect(draft.body_text).toBe('Hello José');
-        expect(draft.body_macro).toBe('**Hello José**');
+        expect(draft.body_rox).toBe('**Hello José**');
       } finally {
         dispose();
       }

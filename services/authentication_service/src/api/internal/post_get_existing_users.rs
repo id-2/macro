@@ -6,8 +6,8 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Response},
 };
-use macro_authorization::{InternalOnly, MacroAuthorizationExtractor};
-use macro_user_id::{cowlike::CowLike, lowercased::Lowercase, user_id::MacroUserId};
+use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
+use rox_user_id::{cowlike::CowLike, lowercased::Lowercase, user_id::RoxUserId};
 use model::response::ErrorResponse;
 use utoipa::ToSchema;
 
@@ -27,7 +27,7 @@ pub struct GetExistingUsersResponse {
 pub enum GetExistingUsersError {
     /// Some of the user ids provided are invalid macro user ids
     #[error("invalid macro user id provided")]
-    InvalidMacroId,
+    InvalidRoxId,
     /// Internal error occurred
     #[error("internal error")]
     InternalError(#[from] anyhow::Error),
@@ -36,7 +36,7 @@ pub enum GetExistingUsersError {
 impl IntoResponse for GetExistingUsersError {
     fn into_response(self) -> Response {
         let status_code = match &self {
-            GetExistingUsersError::InvalidMacroId => StatusCode::BAD_REQUEST,
+            GetExistingUsersError::InvalidRoxId => StatusCode::BAD_REQUEST,
             GetExistingUsersError::InternalError(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
 
@@ -65,21 +65,21 @@ impl IntoResponse for GetExistingUsersError {
 #[tracing::instrument(skip(ctx, _internal_authorization))]
 pub async fn handler(
     State(ctx): State<ApiContext>,
-    _internal_authorization: MacroAuthorizationExtractor<AuthorizationService, InternalOnly>,
+    _internal_authorization: RoxAuthorizationExtractor<AuthorizationService, InternalOnly>,
     extract::Json(GetExistingUsersRequest { user_ids }): extract::Json<GetExistingUsersRequest>,
 ) -> Result<Json<GetExistingUsersResponse>, GetExistingUsersError> {
     tracing::info!("internal_get_existing_users");
 
-    let user_ids: Vec<MacroUserId<Lowercase<'_>>> = user_ids
+    let user_ids: Vec<RoxUserId<Lowercase<'_>>> = user_ids
         .into_iter()
         .map(|id| {
-            MacroUserId::parse_from_str(&id.to_lowercase()).map(|id| id.into_owned().lowercase())
+            RoxUserId::parse_from_str(&id.to_lowercase()).map(|id| id.into_owned().lowercase())
         })
         .collect::<Result<Vec<_>, _>>()
-        .map_err(|_| GetExistingUsersError::InvalidMacroId)?;
+        .map_err(|_| GetExistingUsersError::InvalidRoxId)?;
 
     let existing_user_ids =
-        macro_db_client::user::get_all::get_existing_users(&ctx.db, &user_ids).await?;
+        rox_db_client::user::get_all::get_existing_users(&ctx.db, &user_ids).await?;
 
     Ok(Json(GetExistingUsersResponse { existing_user_ids }))
 }

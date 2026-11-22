@@ -2,16 +2,16 @@
 use super::*;
 use crate::domain::models::TeamRole;
 use anyhow::Result;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
 const TEAM_ALPHA: &str = "00000000-0000-0000-0000-0000000ea001";
 const TEAM_BETA: &str = "00000000-0000-0000-0000-0000000ea002";
 
-fn user(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).unwrap()
+fn user(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).unwrap()
 }
 
 #[sqlx::test(

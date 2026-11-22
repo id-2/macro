@@ -5,9 +5,9 @@ mod test;
 
 use std::sync::Arc;
 
-use documents::domain::events::{DocumentMacroEvent, DocumentPurgedMetadata};
+use documents::domain::events::{DocumentRoxEvent, DocumentPurgedMetadata};
 use futures::StreamExt;
-use macro_event_broker::MacroEventBroker;
+use rox_event_broker::RoxEventBroker;
 
 use crate::domain::ports::ProjectSearchIndexer;
 
@@ -19,23 +19,23 @@ const CONCURRENT_DOCUMENT_DELETE_BATCHES: usize = 8;
 
 /// Kafka-backed document search cleanup and SQS-backed document deletion adapter.
 #[derive(Clone)]
-pub struct SqsProjectSearchIndexer<B: MacroEventBroker> {
+pub struct SqsProjectSearchIndexer<B: RoxEventBroker> {
     sqs: Arc<sqs_client::SQS>,
     event_broker: B,
 }
 
-impl<B: MacroEventBroker> SqsProjectSearchIndexer<B> {
+impl<B: RoxEventBroker> SqsProjectSearchIndexer<B> {
     /// Create a project search indexer from the shared SQS client and event broker.
     pub fn new(sqs: Arc<sqs_client::SQS>, event_broker: B) -> Self {
         Self { sqs, event_broker }
     }
 }
 
-impl<B: MacroEventBroker> ProjectSearchIndexer for SqsProjectSearchIndexer<B> {
+impl<B: RoxEventBroker> ProjectSearchIndexer for SqsProjectSearchIndexer<B> {
     #[tracing::instrument(skip(self), err)]
     async fn remove_documents(&self, document_ids: Vec<String>) -> anyhow::Result<()> {
         for document_id in document_ids {
-            let event = DocumentMacroEvent::purged(
+            let event = DocumentRoxEvent::purged(
                 document_id.clone(),
                 DocumentPurgedMetadata { document_id },
             );

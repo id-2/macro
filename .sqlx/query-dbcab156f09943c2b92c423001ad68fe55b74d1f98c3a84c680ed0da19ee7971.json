@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_contacts (id, link_id, email_address) SELECT $1, link_id, 'secret@sub.private.example.com' FROM email_threads WHERE id = $2",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "dbcab156f09943c2b92c423001ad68fe55b74d1f98c3a84c680ed0da19ee7971"
+}

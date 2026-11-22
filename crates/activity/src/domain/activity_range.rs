@@ -13,7 +13,7 @@ use super::{
     ports::{ActivityPropertyMetadata, ActivityReads},
     service::ActivityReadService,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 const MAX_ACTIVITY_RESULTS: u32 = 100;
 
@@ -227,7 +227,7 @@ impl ReadActivityResponse {
     /// with property changes resolved for the subject as viewer.
     pub async fn read<R>(
         service: &ActivityReadService<R>,
-        subject: &MacroUserIdStr<'_>,
+        subject: &RoxUserIdStr<'_>,
         from: DateTime<Utc>,
         to: DateTime<Utc>,
     ) -> Result<Self, ReadActivityError>

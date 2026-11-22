@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::{Value, json};
 use uuid::Uuid;
 
@@ -13,8 +13,8 @@ fn bot_id() -> BotId {
     BotId::parse_uuid_str(BOT_ID).expect("valid bot id")
 }
 
-fn user_id(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user_id(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn timestamp(value: &str) -> DateTime<Utc> {
@@ -155,9 +155,9 @@ fn deleted_event_has_exact_wire_shape() {
 #[test]
 fn constructors_use_bot_topic_bare_uuid_key_and_schema_version_one() {
     let cases = [
-        BotMacroEvent::created(created_metadata()),
-        BotMacroEvent::updated(updated_metadata()),
-        BotMacroEvent::deleted(deleted_metadata()),
+        BotRoxEvent::created(created_metadata()),
+        BotRoxEvent::updated(updated_metadata()),
+        BotRoxEvent::deleted(deleted_metadata()),
     ];
     let expected_event_types = ["bot.created", "bot.updated", "bot.deleted"];
 
@@ -176,14 +176,14 @@ fn constructors_use_bot_topic_bare_uuid_key_and_schema_version_one() {
 #[test]
 fn every_event_variant_round_trips() {
     let cases = [
-        BotMacroEvent::created(created_metadata()),
-        BotMacroEvent::updated(updated_metadata()),
-        BotMacroEvent::deleted(deleted_metadata()),
+        BotRoxEvent::created(created_metadata()),
+        BotRoxEvent::updated(updated_metadata()),
+        BotRoxEvent::deleted(deleted_metadata()),
     ];
 
     for original in cases {
         let payload = serde_json::to_vec(original.event()).expect("serializable event");
-        let decoded = BotMacroEvent::decode(original.key(), &payload).expect("decodable event");
+        let decoded = BotRoxEvent::decode(original.key(), &payload).expect("decodable event");
 
         assert_eq!(decoded.key(), BOT_ID);
         assert_eq!(decoded.event(), original.event());
@@ -201,7 +201,7 @@ fn created_event_serializes_channel_id_when_present() {
     metadata.avatar_url = Some("https://example.com/avatar.png".to_string());
 
     let value =
-        serde_json::to_value(BotMacroEvent::created(metadata).event()).expect("serializable event");
+        serde_json::to_value(BotRoxEvent::created(metadata).event()).expect("serializable event");
 
     assert_eq!(value["metadata"]["channel_id"], channel_id.to_string());
     assert_eq!(value["metadata"]["description"], "Channel automation");
@@ -214,9 +214,9 @@ fn created_event_serializes_channel_id_when_present() {
 #[test]
 fn lifecycle_payloads_exclude_token_fields_and_values() {
     let events = [
-        BotMacroEvent::created(created_metadata()),
-        BotMacroEvent::updated(updated_metadata()),
-        BotMacroEvent::deleted(deleted_metadata()),
+        BotRoxEvent::created(created_metadata()),
+        BotRoxEvent::updated(updated_metadata()),
+        BotRoxEvent::deleted(deleted_metadata()),
     ];
     let forbidden_fields = [
         "token",

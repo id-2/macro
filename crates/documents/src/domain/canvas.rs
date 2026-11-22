@@ -12,7 +12,7 @@ use ai_usage::{AiFeature, UsageAmount, UsageContext, UsageRecorder};
 use entity_access::domain::models::{
     EditAccessLevel, EntityAccessAuth, EntityAccessReceipt, RequiredPermission, ViewAccessLevel,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_permissions::share_permission::access_level::AccessLevel;
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -217,7 +217,7 @@ pub trait CanvasImageStore: Send + Sync + 'static {
     /// Store PNG bytes for `owner` and return where they live.
     async fn save_png(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         name: &str,
         png: Vec<u8>,
     ) -> anyhow::Result<StoredCanvasImage>;
@@ -238,7 +238,7 @@ pub struct StoredCanvasRender {
 #[derive(Debug, Clone)]
 pub struct CanvasCaller {
     /// The user whose access, billing and file ownership apply.
-    pub user: MacroUserIdStr<'static>,
+    pub user: RoxUserIdStr<'static>,
     /// The bot's storage id, as the token's attribution actor.
     pub actor: Option<String>,
     /// The bot's display name for AI presence, when it is a system bot.
@@ -324,7 +324,7 @@ impl<D: CanvasDocumentLookup, W: EditingWorkerService> CanvasService<D, W> {
     pub async fn read(
         &self,
         receipt: EntityAccessReceipt<ViewAccessLevel>,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         actor: Option<&str>,
         item_ids: Option<Vec<String>>,
         format: Option<CanvasReadFormat>,
@@ -353,7 +353,7 @@ impl<D: CanvasDocumentLookup, W: EditingWorkerService> CanvasService<D, W> {
     pub async fn render(
         &self,
         receipt: EntityAccessReceipt<ViewAccessLevel>,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         actor: Option<&str>,
         item_ids: Option<Vec<String>>,
         crop: Option<CanvasBounds>,
@@ -410,7 +410,7 @@ impl<D: CanvasDocumentLookup, W: EditingWorkerService> CanvasService<D, W> {
     pub async fn render_to_file(
         &self,
         receipt: EntityAccessReceipt<ViewAccessLevel>,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         actor: Option<&str>,
         item_ids: Option<Vec<String>>,
         crop: Option<CanvasBounds>,
@@ -440,7 +440,7 @@ impl<D: CanvasDocumentLookup, W: EditingWorkerService> CanvasService<D, W> {
     pub async fn edit(
         &self,
         receipt: EntityAccessReceipt<EditAccessLevel>,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         actor: Option<&str>,
         instructions: String,
         editor_name: Option<EditorName>,
@@ -468,7 +468,7 @@ impl<D: CanvasDocumentLookup, W: EditingWorkerService> CanvasService<D, W> {
             )
             .await?;
         let context = UsageContext::new(AiFeature::AiEditing, user.clone())
-            .with_entity(macro_uuid::string_to_uuid(&receipt.entity().entity_id).ok());
+            .with_entity(rox_uuid::string_to_uuid(&receipt.entity().entity_id).ok());
         for usage in result.usage {
             self.recorder.record(context.clone().into_event(
                 usage.model,
@@ -494,7 +494,7 @@ impl<D: CanvasDocumentLookup, W: EditingWorkerService> CanvasService<D, W> {
     pub async fn apply(
         &self,
         receipt: EntityAccessReceipt<EditAccessLevel>,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         actor: Option<&str>,
         request: CanvasRequest,
     ) -> Result<CanvasResponse, CanvasError> {
@@ -567,7 +567,7 @@ impl<D: CanvasDocumentLookup, W: EditingWorkerService> CanvasService<D, W> {
     async fn run(
         &self,
         document_id: &str,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         actor: Option<&str>,
         access: AccessLevel,
         request: CanvasRequest,

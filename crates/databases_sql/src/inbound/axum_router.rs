@@ -14,8 +14,8 @@ use databases::domain::{
     ports::DatabasesService,
 };
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use model_error_response::ErrorResponse;
 use serde::Deserialize;
@@ -26,7 +26,7 @@ use crate::{ChartColumns, DatabasesSql, SqlError, SqlOutcome, SqlRequest};
 /// SQL service and the same principal authentication used by database routes.
 pub struct SqlRouterState<Databases, Access, Soup, Contacts, Authorization> {
     sql: DatabasesSql<Databases, Access, Soup, Contacts>,
-    authorization: MacroAuthorizationState<Authorization>,
+    authorization: RoxAuthorizationState<Authorization>,
 }
 
 impl<D, A, S, C, Auth> Clone for SqlRouterState<D, A, S, C, Auth> {
@@ -42,13 +42,13 @@ impl<D, A, S, C, Auth> SqlRouterState<D, A, S, C, Auth> {
     /// Wire the domain SQL service and authentication at the composition root.
     pub fn new(
         sql: DatabasesSql<D, A, S, C>,
-        authorization: MacroAuthorizationState<Auth>,
+        authorization: RoxAuthorizationState<Auth>,
     ) -> Self {
         Self { sql, authorization }
     }
 }
 
-impl<D, A, S, C, Auth> FromRef<SqlRouterState<D, A, S, C, Auth>> for MacroAuthorizationState<Auth> {
+impl<D, A, S, C, Auth> FromRef<SqlRouterState<D, A, S, C, Auth>> for RoxAuthorizationState<Auth> {
     fn from_ref(state: &SqlRouterState<D, A, S, C, Auth>) -> Self {
         state.authorization.clone()
     }
@@ -116,7 +116,7 @@ impl IntoResponse for QueryError {
         (status = 404, body = ErrorResponse), (status = 409, body = ErrorResponse), (status = 500, body = ErrorResponse)))]
 #[tracing::instrument(name = "database.query", skip_all, fields(database_id = ?request.database_id, statement_bytes = request.sql.len()), err)]
 pub async fn query_databases_handler<D, A, S, C, Auth>(
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     State(state): State<SqlRouterState<D, A, S, C, Auth>>,
     Json(request): Json<DatabaseQueryRequest>,
 ) -> Result<Json<SqlOutcome>, QueryError>
@@ -125,7 +125,7 @@ where
     A: EntityAccessService,
     S: SoupService,
     C: ContactsService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     state
         .sql
@@ -218,7 +218,7 @@ impl IntoResponse for SaveQueryError {
 )]
 #[tracing::instrument(name = "database.save_query", skip_all, fields(database_id = ?request.database_id, charted = request.chart.is_some()), err)]
 pub async fn save_query_handler<D, A, S, C, Auth>(
-    user: MacroAuthorizationExtractor<Auth, UserOrInternal>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     State(state): State<SqlRouterState<D, A, S, C, Auth>>,
     Json(request): Json<SaveQueryRequest>,
 ) -> Result<(StatusCode, Json<SavedQuery>), SaveQueryError>
@@ -227,7 +227,7 @@ where
     A: EntityAccessService,
     S: SoupService,
     C: ContactsService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 {
     let saved = state
         .sql
@@ -257,7 +257,7 @@ where
     A: EntityAccessService,
     S: SoupService,
     C: ContactsService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     RouterState: Clone + Send + Sync + 'static,
 {
     Router::new()

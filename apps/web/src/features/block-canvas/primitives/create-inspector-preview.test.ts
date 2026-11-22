@@ -2,7 +2,7 @@ import {
   createGraphicsEditor,
   setShapeLabelCommand,
   styleCommand,
-} from '@macro-inc/graphics';
+} from '@rox-one/graphics';
 import { createRoot } from 'solid-js';
 import { afterEach, expect, it, vi } from 'vitest';
 import { createCanvasNextScene } from '../core/seed-scene';

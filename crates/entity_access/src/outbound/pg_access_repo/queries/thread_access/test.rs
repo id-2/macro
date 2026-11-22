@@ -3,8 +3,8 @@ mod thread_exclusions;
 #[allow(unused_imports)]
 use super::*;
 use crate::domain::models::AccessLevel;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -12,8 +12,8 @@ const OWNER: &str = "macro|owner@corp.test";
 const REQUESTER: &str = "macro|requester@corp.test";
 const OTHER: &str = "macro|other@corp.test";
 
-fn user(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).unwrap()
+fn user(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).unwrap()
 }
 
 /// Runs `get_thread_access` as `REQUESTER` (authenticated, so the unauthenticated

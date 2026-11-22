@@ -7,8 +7,8 @@ use crate::{
 
 #[test]
 fn complete_addresses_and_identities_never_match_another_persons_name() {
-    let target = MacroUserIdStr::parse_from_str("macro|person@example.com").unwrap();
-    let other = MacroUserIdStr::parse_from_str("macro|other@example.com").unwrap();
+    let target = RoxUserIdStr::parse_from_str("macro|person@example.com").unwrap();
+    let other = RoxUserIdStr::parse_from_str("macro|other@example.com").unwrap();
     for input in ["person@example.com", "macro|PERSON@example.com"] {
         let query = NameSearch::new(input).unwrap();
         assert_eq!(
@@ -17,7 +17,7 @@ fn complete_addresses_and_identities_never_match_another_persons_name() {
         );
         assert_eq!(query.classify(input, &other), None);
     }
-    let extension = MacroUserIdStr::parse_from_str("macro|person@example.com.example.com").unwrap();
+    let extension = RoxUserIdStr::parse_from_str("macro|person@example.com.example.com").unwrap();
     assert_eq!(
         NameSearch::new("person@example.com")
             .unwrap()
@@ -46,7 +46,7 @@ fn recent_keys_sort_signed_times_then_identity_without_index_row_ids() {
     let mut entries = vec![];
     for time in [i64::MIN, -1, 0, 1, i64::MAX] {
         for id in users {
-            let user = MacroUserIdStr::parse_from_str(id).unwrap();
+            let user = RoxUserIdStr::parse_from_str(id).unwrap();
             entries.push((RecentKey::new(Some(time), &user), time, id));
         }
     }
@@ -62,7 +62,7 @@ fn recent_keys_sort_signed_times_then_identity_without_index_row_ids() {
         assert_eq!(RecentKey::timestamp(key.as_bytes()), Some(*time));
     }
     assert_eq!(RecentKey::timestamp(&[0; 7]), None);
-    let user = MacroUserIdStr::parse_from_str(users[0]).unwrap();
+    let user = RoxUserIdStr::parse_from_str(users[0]).unwrap();
     assert_eq!(RecentKey::new(None, &user), RecentKey::new(Some(0), &user));
     for epoch in [Uuid::nil(), Uuid::from_u128(9), Uuid::from_u128(u128::MAX)] {
         let key = RecentKey::new(None, &user).in_epoch(epoch);
@@ -96,7 +96,7 @@ fn byte_prefix_bounds_preserve_unicode_and_literal_characters() {
 #[test]
 fn indexed_words_are_bounded_with_explicit_overflow_and_sparse_scoped_ranks() {
     let viewer = "macro|viewer@example.com";
-    let user = MacroUserIdStr::parse_from_str("macro|person@example.com").unwrap();
+    let user = RoxUserIdStr::parse_from_str("macro|person@example.com").unwrap();
     let epoch = Uuid::from_u128(7);
     let dm = Uuid::from_u128(8);
     let name = (0..=projection::MAX_NAME_WORDS)

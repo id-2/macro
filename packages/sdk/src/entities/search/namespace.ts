@@ -5,7 +5,7 @@ import type {
   UnifiedSearchResponseItem,
 } from '../../../generated/search/types.gen';
 import { type IterationOptions, iterate, paginate, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { AgentSession } from '../agent-sessions/agent-session';
 import { CalendarEvent } from '../calendar/event';
 import { CallRecord } from '../calls/call-record';
@@ -43,14 +43,14 @@ const searchTypes: readonly SearchType[] = [
  * handles, with the same filters as the per-type searches and more: exact
  * matching, tags, one inbox and agent session transcripts.
  *
- * @routing Use when finding or looking up the user's own Macro content by keyword, across types or in one; not browsing recent items (`macro.workspace`), the web, or one item already in context.
+ * @routing Use when finding or looking up the user's own Macro content by keyword, across types or in one; not browsing recent items (`rox.workspace`), the web, or one item already in context.
  *
  * @agent
  * Search is keyword search, not semantic: pass 1-3 words that would literally appear in the item, not the user's description. Whitespace-separated terms are ANDed; for documents and email each word is a prefix and terms may match different passages, while for other kinds the query is one adjacent phrase prefix, so long phrases match nothing. Quote a multi-word phrase; use matchType 'exact' for a whole word, identifier or email address. Search a person and a topic separately. To find someone's email, search their quoted address, not their name.
  *
- * Use macro.search.all(query) when the request does not name one kind of item, and keep any scope the user gives (types, inbox, tags) on follow-ups and retries. Per-type searches remain for one kind: macro.documents.search returns document handles, macro.email.search email threads, macro.tasks.search tasks. SearchOpts and SearchOptions select searchOn: 'name', 'content', or 'name_content'. These iterators auto-paginate; bound the work explicitly and record when you stop before exhaustion.
+ * Use rox.search.all(query) when the request does not name one kind of item, and keep any scope the user gives (types, inbox, tags) on follow-ups and retries. Per-type searches remain for one kind: rox.documents.search returns document handles, rox.email.search email threads, rox.tasks.search tasks. SearchOpts and SearchOptions select searchOn: 'name', 'content', or 'name_content'. These iterators auto-paginate; bound the work explicitly and record when you stop before exhaustion.
  *
- * For activity rather than keywords ("what happened today", "catch me up", my recent or favorite items, tasks updated this week), browse with macro.workspace.page or macro.workspace.list, filtered by type, time, tags or inbox; for a sample of several kinds, fetch one small page per type concurrently. Read an AI chat's messages with macro.chats.byId(id).history(), or chat.history() on a search or workspace result.
+ * For activity rather than keywords ("what happened today", "catch me up", my recent or favorite items, tasks updated this week), browse with rox.workspace.page or rox.workspace.list, filtered by type, time, tags or inbox; for a sample of several kinds, fetch one small page per type concurrently. Read an AI chat's messages with rox.chats.byId(id).history(), or chat.history() on a search or workspace result.
  *
  * ```javascript
  * export async function main({macro}) {
@@ -58,7 +58,7 @@ const searchTypes: readonly SearchType[] = [
  *   const outcomes = await Promise.allSettled(queries.map(async query => {
  *     const evidence = [];
  *     let stoppedEarly = false;
- *     for await (const result of macro.search.all(query, {searchOn:'content'})) {
+ *     for await (const result of rox.search.all(query, {searchOn:'content'})) {
  *       if (evidence.length === 5) { stoppedEarly = true; break; }
  *       evidence.push({type:result.type, id:result.entity.id, name:result.hit.name,
  *         text: result.type === 'document' ? (await result.entity.content()).slice(0,3000) : undefined});
@@ -71,11 +71,11 @@ const searchTypes: readonly SearchType[] = [
  * ```
  * Preserve useful evidence from each query. A short sample cannot establish corpus-wide completeness or absence. Use precise terms, metadata and relevant reads before expanding breadth. Do not swallow rejected branches. Normal for/while/for-await with break and sequential dependent calls are supported.
  *
- * Skills are instructions to follow. When a request names a skill that is not attached, find it by name with macro.documents.skills({query}), which includes built-in skills, read its instructions with skill.content() before doing the task, and follow them for that request only.
+ * Skills are instructions to follow. When a request names a skill that is not attached, find it by name with rox.documents.skills({query}), which includes built-in skills, read its instructions with skill.content() before doing the task, and follow them for that request only.
  *
  * @example Find a contract across email and documents, in one inbox
  * ```js
- * const page = await macro.search.page('"master services agreement"', {
+ * const page = await rox.search.page('"master services agreement"', {
  *   types: ['email', 'document'], inbox: 'me@example.com', matchType: 'exact',
  * });
  * return {data: page.results.map(r => ({type: r.type, id: r.entity.id, tags: r.tags})),
@@ -83,7 +83,7 @@ const searchTypes: readonly SearchType[] = [
  * ```
  */
 export class SearchNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * One bounded page of matches across every kind of item, most relevant
@@ -250,7 +250,7 @@ function propertiesOf(hit: UnifiedSearchResponseItem) {
 }
 
 function searchResult(
-  client: MacroClient,
+  client: RoxClient,
   hit: UnifiedSearchResponseItem,
   tagMap: Map<string, WorkspaceTag>,
 ): SearchResult {

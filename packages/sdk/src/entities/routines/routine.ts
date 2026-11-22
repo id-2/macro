@@ -15,11 +15,11 @@ import type {
 } from '../../../generated/scheduled-action/types.gen';
 import type { EntityAppearance } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { AgentSession } from '../agent-sessions/agent-session';
 import type { Agent } from '../agents/agent';
 import { Chat } from '../chats/chat';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 import type { EntityReference } from '../reference';
 import { User } from '../users/user';
 
@@ -158,7 +158,7 @@ export interface StepsRoutineOptions extends RoutineCommonOptions {
 export type RoutineOptions = AgentRoutineOptions | StepsRoutineOptions;
 
 /** A scheduled or event-triggered agent task. */
-export class Routine extends MacroEntity<ScheduledActionResponse> {
+export class Routine extends RoxEntity<ScheduledActionResponse> {
   /**
    * The routine's URL in the Rox web app; hand it to users as the link.
    *
@@ -174,12 +174,12 @@ export class Routine extends MacroEntity<ScheduledActionResponse> {
   }
 
   /** Construct a lazy routine handle. */
-  static byId(client: MacroClient, id: string): Routine {
+  static byId(client: RoxClient, id: string): Routine {
     return new Routine(client, id);
   }
 
   /** Seed a handle from a server record. */
-  static from(client: MacroClient, record: ScheduledActionResponse): Routine {
+  static from(client: RoxClient, record: ScheduledActionResponse): Routine {
     if (!record.id) throw new Error('Routine response has no id');
     return new Routine(client, record.id, record);
   }

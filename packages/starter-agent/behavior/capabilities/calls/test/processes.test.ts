@@ -55,7 +55,7 @@ test("a call's process keeps the native-library path its audio needs, and nothin
     joinEnvironment(
       {
         LD_LIBRARY_PATH: '/nix/store/gcc-lib/lib',
-        MACRO_API_KEY: 'mak_secret',
+        ROX_API_KEY: 'mak_secret',
         PATH: '/bin',
       },
       { MUPPET_RELAY_URL: 'http://127.0.0.1:41234' }

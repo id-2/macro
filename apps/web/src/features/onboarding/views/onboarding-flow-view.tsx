@@ -1,37 +1,31 @@
-import { LOCAL_ONLY } from '@core/constant/featureFlags';
 import { fireAndForget } from '@core/util/fireAndForget';
 import {
   createEffect,
   createSignal,
   Match,
   onCleanup,
-  Show,
   Switch,
 } from 'solid-js';
-import { BypassButton } from '../components/bypass-button';
 import {
   animateStepChange,
   focusStepHeading,
 } from '../components/motion/step-change';
 import { OnboardingShell } from '../components/onboarding-shell';
 import { StepFallback } from '../components/step-fallback';
-import { OnboardingTrustDetails } from '../components/trust-details';
 import { useOnboardingContext } from '../context/onboarding-context';
 import type { CheckoutReturn } from '../core/checkout';
-import { canBypassOnboarding } from '../core/staff';
 import {
   isStoryStep,
   type OnboardingStep,
   previousOnboardingStep,
   type StepOutcome,
+  visibleOnboardingStep,
 } from '../core/steps';
 import { createFlowFinish } from '../primitives/flow-finish';
 import { createOnboardingFlow } from '../primitives/onboarding-flow';
-import { EmailStep } from './email-step';
 import { HandleStep } from './handle-step';
 import { PlanComparisonView } from './plan-comparison-view';
 import { type InviteOfferSlot, PlanStep } from './plan-step';
-import { RoutinesStep } from './routines-step';
 import { StoryStageView } from './story-stage-view';
 import { TeamStep } from './team-step';
 import { ToolsStep } from './tools-step';
@@ -49,6 +43,11 @@ export function OnboardingFlowView(props: {
   onSignedOut: () => void;
   /** Shown instead of the trial to an account holding an invite promotion. */
   renderInviteOffer: InviteOfferSlot;
+  /**
+   * The page was opened on purpose. A finished account walks the flow again
+   * instead of being sent straight out of it.
+   */
+  restart?: boolean;
 }) {
   const context = useOnboardingContext();
   const emailAccounts = context.createEmailAccounts();
@@ -59,8 +58,6 @@ export function OnboardingFlowView(props: {
     domain: () => undefined,
     ownEmail: () => undefined,
   });
-  // The work step offers Outlook beside Google; Read more then covers both.
-  const outlookAvailable = context.createOutlookAvailability();
 
   const finish = createFlowFinish(context, {
     next: () => props.next,
@@ -84,6 +81,7 @@ export function OnboardingFlowView(props: {
       return accounts.value.length > 0 ? 'google' : 'email_code';
     },
     finishing: finish.finishing,
+    restart: () => props.restart === true,
   });
 
   // The person's first generation starts as soon as an inbox is connected,
@@ -115,15 +113,25 @@ export function OnboardingFlowView(props: {
   };
   const storyStep = () => {
     const current = step();
-    return current && isStoryStep(current) ? current : undefined;
+    if (!current || current === 'security' || !isStoryStep(current))
+      return undefined;
+    return current;
   };
+  // A handle already on the account used to open inbox import. Land past it.
+  createEffect(() => {
+    const current = step();
+    if (!current) return;
+    const landed = visibleOnboardingStep(current);
+    if (landed !== current) flow.commit(landed);
+  });
 
   const goTo = (next: OnboardingStep | undefined) => {
+    const landed = next ? visibleOnboardingStep(next) : undefined;
     const current = step();
-    if (!next || !current || next === current) return;
+    if (!landed || !current || landed === current) return;
     stopMotion?.();
-    stopMotion = animateStepChange(content, current, next, () => {
-      flow.commit(next);
+    stopMotion = animateStepChange(content, current, landed, () => {
+      flow.commit(landed);
       queueMicrotask(() => focusStepHeading(content));
     });
   };
@@ -174,10 +182,6 @@ export function OnboardingFlowView(props: {
     }
     goTo(skipsTeam ? 'plan' : next);
   };
-  const viewerEmail = () => {
-    const viewer = context.viewer();
-    return viewer.t === 'signed-in' ? viewer.viewer.email : undefined;
-  };
   const showPlanOffer = () => {
     const viewer = context.viewer();
     return (
@@ -200,20 +204,6 @@ export function OnboardingFlowView(props: {
     <OnboardingShell
       wide
       onBack={back()}
-      overlay={
-        <Show
-          when={(LOCAL_ONLY || canBypassOnboarding(viewerEmail())) && step()}
-        >
-          {(current) => (
-            <BypassButton
-              disabled={finish.finishing()}
-              onBypass={() =>
-                fireAndForget(finish.bypass(current()), 'onboarding')
-              }
-            />
-          )}
-        </Show>
-      }
       explainerLabel={showPlanOffer() ? 'See more' : undefined}
       explainer={
         showPlanOffer() ? (
@@ -227,13 +217,6 @@ export function OnboardingFlowView(props: {
                 'onboarding'
               )
             }
-          />
-        ) : step() === 'security' ||
-          step() === 'work' ||
-          step() === 'personal' ? (
-          <OnboardingTrustDetails
-            topic={step() === 'security' ? 'security' : 'google'}
-            microsoft={step() === 'work' && outlookAvailable()}
           />
         ) : undefined
       }
@@ -259,16 +242,7 @@ export function OnboardingFlowView(props: {
           <Match when={step() === 'handle'}>
             <HandleStep onContinue={() => advance()} />
           </Match>
-          <Match when={step() === 'work' || step() === 'personal'}>
-            <EmailStep
-              mode={step() === 'personal' ? 'personal' : 'work'}
-              signupProvider={
-                step() === 'work' ? flow.signupProvider() : undefined
-              }
-              onContinue={() => advance()}
-              onSkip={() => advance('skipped')}
-            />
-          </Match>
+
           <Match when={step() === 'team'}>
             <TeamStep
               finishing={finish.finishing()}
@@ -294,7 +268,7 @@ export function OnboardingFlowView(props: {
             />
           </Match>
           <Match when={step() === 'routines'}>
-            <RoutinesStep
+            <FinishSilently
               finishing={finish.finishing()}
               onFinish={() => fireAndForget(finishOnboarding(), 'onboarding')}
             />
@@ -302,5 +276,23 @@ export function OnboardingFlowView(props: {
         </Switch>
       </div>
     </OnboardingShell>
+  );
+}
+
+/**
+ * Ends onboarding where the routine picker used to open. The step stays in the
+ * graph so plan → finish keeps one path; nothing of it is drawn.
+ */
+function FinishSilently(props: { finishing: boolean; onFinish: () => void }) {
+  let fired = false;
+  createEffect(() => {
+    if (fired) return;
+    fired = true;
+    props.onFinish();
+  });
+  return (
+    <div class="flex min-h-40 items-center justify-center text-sm text-ink-muted">
+      {props.finishing ? 'Открываем рабочее пространство…' : null}
+    </div>
   );
 }

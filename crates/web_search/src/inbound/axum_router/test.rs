@@ -8,11 +8,11 @@ use axum::{
     body::{Body, to_bytes},
     http::{Request, StatusCode, header},
 };
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState, ValidatedCredential,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState, ValidatedCredential,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::UserContext;
 use rate_limit::{
     RateLimitConfig, RateLimitExceeded, RateLimitKey, RateLimitResult, RateLimitService,
@@ -95,7 +95,7 @@ struct Denied;
 impl AiAdmissionService for Denied {
     fn admit<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
         _: AiFeature,
     ) -> ai_billing::AdmissionFuture<'a> {
         Box::pin(async { Err(AiAdmissionError::Denied(DenyReason::AllowanceExhausted)) })
@@ -137,21 +137,21 @@ impl RateLimitService for FakeRateLimiter {
 #[derive(Clone, Default)]
 struct FakeAuthorization;
 
-impl MacroAuthorizationService for FakeAuthorization {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuthorization {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         match jwt {
             "valid" => Ok(UserContext {
                 user_id: USER_ID.to_owned(),
                 ..UserContext::default()
             }),
-            _ => Err(Report::new(MacroAuthorizationError::InvalidCredentials)),
+            _ => Err(Report::new(RoxAuthorizationError::InvalidCredentials)),
         }
     }
 
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt).await.map(ValidatedCredential::session)
     }
 
@@ -159,8 +159,8 @@ impl MacroAuthorizationService for FakeAuthorization {
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -173,7 +173,7 @@ fn router(
     web_router::<_, _, ()>(WebRouterState::new(
         Arc::new(WebSearchService::new(provider, admission, recorder)),
         limiter,
-        MacroAuthorizationState::new(Arc::new(FakeAuthorization)),
+        RoxAuthorizationState::new(Arc::new(FakeAuthorization)),
     ))
 }
 

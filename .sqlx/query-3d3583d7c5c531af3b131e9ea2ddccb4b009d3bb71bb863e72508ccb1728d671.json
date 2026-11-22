@@ -1,0 +1,19 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "\n        INSERT INTO email_thread_focus (\n            thread_id, link_id, classified_message_id, classified_message_ts, is_focus,\n            category, importance, needs_reply, needs_follow_up, scores, model, classified_at\n        )\n        VALUES ($1, $2, $3, $4, true, 'known', 6, false, true, $5, 'jev-earlier', $6)\n        ",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid",
+        "Timestamptz",
+        "Jsonb",
+        "Timestamptz"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "3d3583d7c5c531af3b131e9ea2ddccb4b009d3bb71bb863e72508ccb1728d671"
+}

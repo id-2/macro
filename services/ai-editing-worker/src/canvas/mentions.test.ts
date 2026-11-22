@@ -1,8 +1,8 @@
-import { createScene } from '@macro-inc/graphics';
+import { createScene } from '@rox-one/graphics';
 import {
   plainRichText,
   richTextPlainText,
-} from '@macro-inc/lexical-core/canvas-text';
+} from '@rox-one/lexical-core/canvas-text';
 import { getQuickJS } from 'quickjs-emscripten';
 import { expect, it } from 'vitest';
 import { canvasUserMentions, insertCanvasUserMention } from './mentions';

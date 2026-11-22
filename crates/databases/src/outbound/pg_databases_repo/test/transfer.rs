@@ -15,7 +15,7 @@ async fn an_import_records_initial_values_in_history(pool: PgPool) {
     let postal_code = insert_definition(&pool, "Postal code").await;
     let store = PgCellStore::new(pool.clone(), PropertiesPgRepo::new(pool.clone()));
     let request = ImportTable {
-        request_id: macro_uuid::generate_uuid_v7(),
+        request_id: rox_uuid::generate_uuid_v7(),
         name: "Imported contacts".into(),
         columns: vec!["Name".into(), "Postal code".into()],
         rows: vec![
@@ -82,7 +82,7 @@ async fn imports_are_atomic_and_retries_do_not_duplicate_rows(pool: PgPool) {
     let (repo, existing, definition) = fixture(&pool).await;
     let store = PgCellStore::new(pool.clone(), PropertiesPgRepo::new(pool.clone()));
     let request = ImportTable {
-        request_id: macro_uuid::generate_uuid_v7(),
+        request_id: rox_uuid::generate_uuid_v7(),
         name: "CSV contacts".into(),
         columns: vec!["Name".into()],
         rows: vec![vec!["00123".into()], vec!["a,\"b\nsecond line".into()]],
@@ -154,7 +154,7 @@ async fn imports_are_atomic_and_retries_do_not_duplicate_rows(pool: PgPool) {
         ImportOutcome::KeyConflict
     ));
     let another = ImportTable {
-        request_id: macro_uuid::generate_uuid_v7(),
+        request_id: rox_uuid::generate_uuid_v7(),
         ..request.clone()
     };
     assert!(matches!(
@@ -185,14 +185,14 @@ async fn failed_import_rolls_back_table_columns_and_all_rows(pool: PgPool) {
     let (repo, existing, _) = fixture(&pool).await;
     let store = PgCellStore::new(pool.clone(), PropertiesPgRepo::new(pool.clone()));
     let request = ImportTable {
-        request_id: macro_uuid::generate_uuid_v7(),
+        request_id: rox_uuid::generate_uuid_v7(),
         name: "Rejected import".into(),
         columns: vec!["Name".into()],
         rows: vec![vec!["valid".into()], vec!["also valid".into()]],
     };
     // A definition that does not exist: the column insert violates its
     // foreign key after the table row is already in the transaction.
-    let missing_definition = macro_uuid::generate_uuid_v7();
+    let missing_definition = rox_uuid::generate_uuid_v7();
     let error = store
         .import_table(
             existing.database_id,

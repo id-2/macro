@@ -13,7 +13,7 @@ use crate::{
     },
 };
 use item_filters::ast::EntityFilterAst;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use models_pagination::{Identify, SortOn};
 use models_properties::service::property_definition_with_options::PropertyDefinitionWithOptions;
 use models_soup::{SoupProperty, item::SoupItem};
@@ -343,7 +343,7 @@ impl SoupRepo for PgSoupRepo {
 
     fn populate_properties<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
         items: Vec<SoupItem<()>>,
     ) -> impl Future<Output = Result<Vec<SoupItem<SoupPropertiesField>>, Self::Err>> + Send {
         populate_properties(&self.pool.0, user_id, items)
@@ -351,7 +351,7 @@ impl SoupRepo for PgSoupRepo {
 
     async fn caller_tag_sets<'a>(
         &self,
-        user_id: MacroUserIdStr<'a>,
+        user_id: RoxUserIdStr<'a>,
     ) -> Result<Vec<PropertyDefinitionWithOptions>, Self::Err> {
         properties::outbound::property_definition_queries::get_caller_tag_definitions_with_options(
             &self.pool.0,
@@ -462,7 +462,7 @@ fn type_err<E: std::fmt::Display>(e: E) -> sqlx::Error {
 #[tracing::instrument(err, skip(db, items))]
 pub(crate) async fn populate_properties(
     db: &sqlx::PgPool,
-    user_id: MacroUserIdStr<'_>,
+    user_id: RoxUserIdStr<'_>,
     items: Vec<SoupItem<()>>,
 ) -> Result<Vec<SoupItem<SoupPropertiesField>>, sqlx::Error> {
     let entity_refs = items

@@ -1,7 +1,7 @@
 //! Ports for skill functionality.
 
 use entity_access::domain::models::{EntityAccessReceipt, ViewAccessLevel};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use crate::domain::model::{
     SkillContent, SkillDocumentMetadata, SkillError, SkillMatchType, SkillSummary,
@@ -15,7 +15,7 @@ pub trait SkillSearcher: Send + Sync + 'static {
     /// Search skills visible to `user_id` whose name matches `query`.
     fn search_skills_by_name(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         query: &str,
         match_type: SkillMatchType,
     ) -> impl Future<Output = Result<Vec<SkillSummary>, SkillError>> + Send;
@@ -30,7 +30,7 @@ pub trait SkillLister: Send + Sync + 'static {
     /// first.
     fn list_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         limit: u16,
     ) -> impl Future<Output = Result<Vec<SkillSummary>, SkillError>> + Send;
 }
@@ -40,7 +40,7 @@ pub trait SkillService: Send + Sync + 'static {
     /// Read complete instructions from a visible skill document or a built-in skill.
     fn read_skill(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         document_id: uuid::Uuid,
     ) -> impl Future<Output = Result<SkillContent, SkillError>> + Send;
 
@@ -48,7 +48,7 @@ pub trait SkillService: Send + Sync + 'static {
     /// most recently updated first.
     fn search_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         query: &str,
         match_type: SkillMatchType,
     ) -> impl Future<Output = Result<Vec<SkillSummary>, SkillError>> + Send;
@@ -56,14 +56,14 @@ pub trait SkillService: Send + Sync + 'static {
     /// List the skills visible to `user_id`, most recently updated first.
     fn list_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<SkillSummary>, SkillError>> + Send;
 
     /// The user's skills an agent may load without being asked, as many as
     /// routing considers, most recently updated first, with their descriptions.
     fn list_routable_skills(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Vec<SkillSummary>, SkillError>> + Send;
 }
 
@@ -72,7 +72,7 @@ pub trait SkillReader: Send + Sync + 'static {
     /// Obtain proof that the caller can view the document through entity access.
     fn authorize(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         document_id: uuid::Uuid,
     ) -> impl Future<Output = Result<EntityAccessReceipt<ViewAccessLevel>, SkillError>> + Send;
 

@@ -2,10 +2,22 @@
  * @vitest-environment jsdom
  */
 
+import {
+  interfaceLanguageReady,
+  setInterfaceLanguage,
+} from '@app/lib/i18n';
 import type { TagSetResponse } from '@service-properties/generated/schemas/tagSetResponse';
 import { fireEvent, render, screen } from '@solidjs/testing-library';
 import { createSignal } from 'solid-js';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import {
   SidebarTagsSection,
   type SidebarTagsSectionProps,
@@ -16,6 +28,8 @@ import { TagSetsProvider } from './tag-sets-context';
 const mocks = vi.hoisted(() => ({
   tagEditorDialog: vi.fn(),
 }));
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 beforeEach(() => {
   vi.stubGlobal(
@@ -195,5 +209,18 @@ describe('SidebarTagsSection', () => {
 
     expect(screen.getByText('No tags yet')).toBeTruthy();
     expect(screen.queryByRole('navigation', { name: 'Tags' })).toBeNull();
+  });
+
+  it('reads the heading and empty list in Russian', async () => {
+    setInterfaceLanguage('ru');
+    await interfaceLanguageReady(2000);
+
+    renderSection({}, []);
+
+    expect(screen.getByText('Пока нет тегов')).toBeTruthy();
+    expect(screen.getByText('Теги')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Новый тег' })).toBeTruthy();
+
+    setInterfaceLanguage('en');
   });
 });

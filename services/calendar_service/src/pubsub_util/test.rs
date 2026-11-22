@@ -105,7 +105,7 @@ fn sorted(mut users: Vec<String>) -> Vec<String> {
 /// Teammates see nothing of a sharer whose setting is `none`, so that
 /// sharer's changes refresh no teammate; anyone else's reach every teammate,
 /// including the default for a member who never chose.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn a_sharer_who_shares_nothing_refreshes_no_teammate(db: sqlx::PgPool) {
     team(
         &db,
@@ -129,7 +129,7 @@ async fn a_sharer_who_shares_nothing_refreshes_no_teammate(db: sqlx::PgPool) {
 
 /// Turning sharing off is itself the change teammates must see, so a sharing
 /// change reaches every teammate and the sharer whatever the new setting.
-#[sqlx::test(migrator = "macro_db_migrator::MACRO_DB_MIGRATIONS")]
+#[sqlx::test(migrator = "rox_db_migrator::MACRO_DB_MIGRATIONS")]
 async fn a_sharing_change_reaches_every_teammate_whatever_the_new_setting(db: sqlx::PgPool) {
     team(
         &db,

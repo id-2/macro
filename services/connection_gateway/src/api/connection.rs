@@ -24,8 +24,8 @@ use futures::{
     sink::SinkExt,
     stream::{SplitSink, StreamExt},
 };
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
+use rox_user_id::user_id::RoxUserIdStr;
 use messages::handle_websocket_stream;
 use model::user::UserContext;
 use model_entity::EntityType;
@@ -47,7 +47,7 @@ pub fn router() -> Router<AppState> {
 )]
 pub async fn ws_handler(
     ws: WebSocketUpgrade,
-    authorization: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    authorization: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     State(ctx): State<ApiContext>,
     State(config): State<Arc<Config>>,
 ) -> impl IntoResponse {
@@ -68,7 +68,7 @@ async fn handle_websocket_connection(
     socket: WebSocket,
     ctx: ApiContext,
     config: Arc<Config>,
-    macro_user_id: MacroUserIdStr<'static>,
+    macro_user_id: RoxUserIdStr<'static>,
     user_context: UserContext,
 ) {
     let (sink, stream) = socket.split();

@@ -8,7 +8,7 @@
 import type {
   DatabaseQueryChart,
   DatabaseQueryDisplayMode,
-} from '@macro-inc/lexical-core/nodes/databaseQueryData';
+} from '@rox-one/lexical-core/nodes/databaseQueryData';
 
 /** A durable node id (the `{id}` / `<t id>` the model sees). */
 export type NodeId = string;

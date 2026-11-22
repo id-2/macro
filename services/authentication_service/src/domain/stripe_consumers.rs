@@ -6,7 +6,7 @@ use ai_billing::domain::BillingPeriod;
 use ai_billing::domain::period::{PeriodEvidence, SubscriptionActivity, SubscriptionPeriod};
 use ai_billing::domain::plan_change::PlanChange;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use roles_and_permissions::domain::model::{ProductTier, SubscriptionStatus as RoleStatus};
 use stripe::{EventId, SubscriptionStatus};
 use stripe_inbox::domain::model::{
@@ -383,7 +383,7 @@ pub struct TeamUpdate {
     /// The team's subscription.
     pub subscription_id: stripe::SubscriptionId,
     /// The owner, whose billing anchor and usage policy follow the team.
-    pub owner: Option<MacroUserIdStr<'static>>,
+    pub owner: Option<RoxUserIdStr<'static>>,
     /// Whether the team pays and its members keep their seats.
     pub paying: bool,
     /// Set when the subscription started with this event.

@@ -99,7 +99,7 @@ async function expectLoadedListView(page: Page, id: string) {
       .locator(`${soupListContainerSelector}, [data-soup-empty-state]`)
       .first()
   ).toBeVisible({ timeout: 30_000 });
-  await expect(page.getByText('Something went terribly wrong')).toHaveCount(0);
+  await expect(page.getByText('Что-то сломалось')).toHaveCount(0);
 }
 
 async function expectListViewChrome(page: Page, tabs: readonly string[]) {

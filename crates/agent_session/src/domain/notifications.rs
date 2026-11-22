@@ -4,7 +4,7 @@ use agent_runtime_protocol::domain::{
     action::AgentActionId,
     notification::{Notification, NotificationEvent},
 };
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 use serde_json::{Map, Value};
 use std::{future::Future, pin::Pin};
 
@@ -65,7 +65,7 @@ impl PendingNotification {
         Ok(Self {
             session_id: input.session_id,
             notification: Notification {
-                id: macro_uuid::generate_uuid_v7(),
+                id: rox_uuid::generate_uuid_v7(),
                 subject_id: input.subject_id,
                 created_at: chrono::Utc::now().to_rfc3339(),
                 event: input.event,

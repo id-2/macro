@@ -11,7 +11,7 @@ mod sync;
 
 use email_api_client::OutlookApiClientRepository;
 use email_api_client::domain::models::{AccessToken, ProviderId};
-use macro_service_urls::MicrosoftGraphUrl;
+use rox_service_urls::MicrosoftGraphUrl;
 
 use crate::{OutlookEmulator, Seed};
 

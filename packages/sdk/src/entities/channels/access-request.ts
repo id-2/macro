@@ -3,8 +3,8 @@ import type {
   ChannelAccessRequest as RequestRecord,
 } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
-import { MacroEntity } from '../entity';
+import type { RoxClient } from '../../utils/client';
+import { RoxEntity } from '../entity';
 import { User } from '../users/user';
 import type { Channel } from './channel';
 
@@ -12,9 +12,9 @@ import type { Channel } from './channel';
  * One attempt to join a private or team channel. Any participant of the
  * channel can read and answer it; approving adds the requester as a member.
  */
-export class ChannelAccessRequest extends MacroEntity<RequestRecord> {
+export class ChannelAccessRequest extends RoxEntity<RequestRecord> {
   private constructor(
-    client: MacroClient,
+    client: RoxClient,
     /** Channel the requester asked to join. */
     readonly channel: Channel,
     id: string,
@@ -25,7 +25,7 @@ export class ChannelAccessRequest extends MacroEntity<RequestRecord> {
 
   /** A request to join `channel`, loaded lazily for its participants. */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     channel: Channel,
     id: string,
   ): ChannelAccessRequest {
@@ -34,7 +34,7 @@ export class ChannelAccessRequest extends MacroEntity<RequestRecord> {
 
   /** Seed a request from a response that already carries it. */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     channel: Channel,
     record: RequestRecord,
   ): ChannelAccessRequest {

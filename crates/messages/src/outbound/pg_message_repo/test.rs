@@ -3,7 +3,7 @@ use crate::domain::service::MessageService;
 use crate::domain::service::guest_chat::{
     GuestCallAccess, GuestCallAuthorizer, GuestChatApi, GuestChatPost, GuestChatService,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::sync::Arc;
 
 const USER: &str = "macro|message-test@example.com";
@@ -12,7 +12,7 @@ mod initiative;
 mod schema_drop;
 
 async fn setup(pool: &PgPool) {
-    let user_id = macro_uuid::generate_uuid_v7();
+    let user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'message-test', 'message-test@example.com', 'message-test')"#,
@@ -482,7 +482,7 @@ async fn soft_deleted_parents_disappear_and_cursor_does_not_repeat_roots(pool: P
 async fn pdf_root_tombstone_keeps_anchor_and_thread_deletion_removes_placeable(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
-    let anchor_id = macro_uuid::generate_uuid_v7();
+    let anchor_id = rox_uuid::generate_uuid_v7();
     let mut create = command("message-doc-a", None, "PDF discussion");
     create.input.anchor = Some(NewThreadAnchor::PdfPlaceable {
         anchor_id,
@@ -522,7 +522,7 @@ async fn highlight_attachment_is_scoped_and_explicit_thread_deletion_preserves_h
 ) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
-    let anchor_id = macro_uuid::generate_uuid_v7();
+    let anchor_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(r#"INSERT INTO "PdfHighlightAnchor"
         (uuid, "documentId", owner, page, red, green, blue, alpha, type, text, "pageViewportWidth", "pageViewportHeight")
         VALUES ($1, 'message-doc-a', $2, 1, 255, 255, 0, 0.5, 1, 'selected text', 600, 800)"#, anchor_id, USER)
@@ -567,7 +567,7 @@ async fn highlight_attachment_is_scoped_and_explicit_thread_deletion_preserves_h
 async fn placeable_anchor_creation_is_atomic_with_its_root(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool.clone());
-    let anchor_id = macro_uuid::generate_uuid_v7();
+    let anchor_id = rox_uuid::generate_uuid_v7();
     let placeable = |content: &str| {
         let mut create = command("message-doc-a", None, content);
         create.input.anchor = Some(NewThreadAnchor::PdfPlaceable {
@@ -640,7 +640,7 @@ async fn roots_get_thread_rows_without_the_bookkeeping_trigger(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn channel_and_document_attachments_use_message_parent_identity(pool: PgPool) {
     setup(&pool).await;
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels(id, channel_type, owner_id) VALUES ($1, 'private', $2)",
         channel,
@@ -701,7 +701,7 @@ async fn discussion_delivery_context_reads_document_assignees_and_thread_authors
     sqlx::query!(
         r#"INSERT INTO entity_properties(id, entity_id, entity_type, property_definition_id, values)
         VALUES ($1, 'message-doc-a', 'TASK', $2, $3)"#,
-        macro_uuid::generate_uuid_v7(),
+        rox_uuid::generate_uuid_v7(),
         system_properties::SystemPropertyKey::Assignees.uuid(),
         serde_json::json!({
             "type": "EntityReference", "value": [{"entity_type": "USER", "entity_id": USER}]
@@ -872,7 +872,7 @@ async fn attachments_read_back_in_the_order_they_were_sent(pool: PgPool) {
 #[sqlx::test(migrator = "MACRO_DB_MIGRATIONS")]
 async fn both_parents_use_bounded_previews_and_bidirectional_windows(pool: PgPool) {
     setup(&pool).await;
-    let channel = macro_uuid::generate_uuid_v7();
+    let channel = rox_uuid::generate_uuid_v7();
     sqlx::query!(
         "INSERT INTO comms_channels(id, channel_type, owner_id) VALUES ($1, 'private', $2)",
         channel,
@@ -1186,7 +1186,7 @@ async fn legacy_ids_resolve_through_the_import_mapping_tables(pool: PgPool) {
     // Mappings cannot point at messages that were never written.
     let dangling = sqlx::query!(
         "INSERT INTO migrated_comment_id (comment_id, message_id, document_id) VALUES (12, $1, 'message-doc-a')",
-        macro_uuid::generate_uuid_v7()
+        rox_uuid::generate_uuid_v7()
     )
     .execute(&pool)
     .await
@@ -1201,7 +1201,7 @@ async fn legacy_ids_resolve_through_the_import_mapping_tables(pool: PgPool) {
 async fn client_supplied_ids_are_kept_and_never_reused(pool: PgPool) {
     setup(&pool).await;
     let repo = PgMessageRepository::new(pool);
-    let id = macro_uuid::generate_uuid_v7();
+    let id = rox_uuid::generate_uuid_v7();
     let mut first = command("message-doc-a", None, "first");
     first.input.id = Some(id);
     assert_eq!(repo.create(first).await.unwrap().id, id);
@@ -1228,7 +1228,7 @@ async fn highlight_threads_read_the_text_the_highlight_covers(pool: PgPool) {
     let highlight = |text: &'static str| {
         let pool = pool.clone();
         async move {
-            let anchor_id = macro_uuid::generate_uuid_v7();
+            let anchor_id = rox_uuid::generate_uuid_v7();
             sqlx::query!(r#"INSERT INTO "PdfHighlightAnchor"
                 (uuid, "documentId", owner, page, red, green, blue, alpha, type, text, "pageViewportWidth", "pageViewportHeight")
                 VALUES ($1, 'message-doc-a', $2, 1, 255, 255, 0, 0.5, 1, $3, 600, 800)"#, anchor_id, USER, text)
@@ -1494,9 +1494,9 @@ async fn fig_threads_round_trip_on_layers_and_the_canvas(pool: PgPool) {
 
 async fn setup_call_chat(pool: &PgPool) -> Uuid {
     setup(pool).await;
-    let call_id = macro_uuid::generate_uuid_v7();
-    let channel_id = macro_uuid::generate_uuid_v7();
-    let permission_id = macro_uuid::generate_uuid_v7().to_string();
+    let call_id = rox_uuid::generate_uuid_v7();
+    let channel_id = rox_uuid::generate_uuid_v7();
+    let permission_id = rox_uuid::generate_uuid_v7().to_string();
     sqlx::query!(
         r#"INSERT INTO comms_channels (id, name, channel_type, owner_id)
         VALUES ($1, 'Call chat test', 'public', $2)"#,
@@ -1713,7 +1713,7 @@ async fn scheduled_call_chat_survives_archiving(pool: PgPool) {
 
 async fn setup_meeting_chat(pool: &PgPool, scheduled: bool) -> Uuid {
     let call_id = setup_call_chat(pool).await;
-    let meeting_id = macro_uuid::generate_uuid_v7();
+    let meeting_id = rox_uuid::generate_uuid_v7();
     let start = scheduled.then(chrono::Utc::now);
     let end = start.map(|start| start + chrono::Duration::hours(1));
     sqlx::query!(
@@ -1781,7 +1781,7 @@ async fn retrying_first_call_message_cannot_append_it_twice(pool: PgPool) {
     let call_id = setup_call_chat(&pool).await;
     let repo = PgMessageRepository::new(pool);
     let mut input = call_message(call_id, "First message");
-    input.input.id = Some(macro_uuid::generate_uuid_v7());
+    input.input.id = Some(rox_uuid::generate_uuid_v7());
     let client_message_id = input.input.id.unwrap();
     let actor = input.actor.clone();
     let parent = input.parent.clone();
@@ -1806,7 +1806,7 @@ async fn retrying_first_call_message_cannot_append_it_twice(pool: PgPool) {
     assert_eq!(recovered.content, "First message");
     for (parent, actor) in [
         (
-            MessageParent::Call(macro_uuid::generate_uuid_v7()),
+            MessageParent::Call(rox_uuid::generate_uuid_v7()),
             actor.clone(),
         ),
         (

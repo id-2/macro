@@ -156,7 +156,7 @@ impl MailboxIngest for PgMailboxSync {
             .and_then(|checkpoint| checkpoint.submission_started.then_some(checkpoint.actor_id));
         // Messages are grouped by mailbox + conversation ID without requiring a
         // provider-native thread fetch or manufacturing a complete conversation.
-        let candidate_thread_id = macro_uuid::generate_uuid_v7();
+        let candidate_thread_id = rox_uuid::generate_uuid_v7();
         let thread_id = if let Some(existing) = &existing {
             // A previously linked draft/message keeps its stable Rox thread,
             // including thread sharing and local composer references.
@@ -189,7 +189,7 @@ impl MailboxIngest for PgMailboxSync {
                 && shadow.as_ref().is_none_or(|s| s.base_version != version)
             {
                 sqlx::query!(
-                    "UPDATE email_messages SET body_macro = NULL WHERE id = $1",
+                    "UPDATE email_messages SET body_rox = NULL WHERE id = $1",
                     existing.id
                 )
                 .execute(&mut *tx)
@@ -214,7 +214,7 @@ impl MailboxIngest for PgMailboxSync {
         }
         let message_id = sqlx::query_scalar!(r#"
             UPDATE email_messages SET provider_folder_id = $3,provider_version = $4,mailbox_state = $5,
-                remote_draft_revision = CASE WHEN body_macro IS NULL THEN $4 ELSE remote_draft_revision END,
+                remote_draft_revision = CASE WHEN body_rox IS NULL THEN $4 ELSE remote_draft_revision END,
                 is_read = COALESCE((SELECT (desired #>> '{}')::boolean FROM email_pending_mailbox_state p WHERE p.message_id = email_messages.id AND p.attribute = 'is_read'),is_read),
                 is_starred = COALESCE((SELECT (desired #>> '{}')::boolean FROM email_pending_mailbox_state p WHERE p.message_id = email_messages.id AND p.attribute = 'is_flagged'),is_starred)
             WHERE link_id = $1 AND provider_id = $2 RETURNING id
@@ -235,7 +235,7 @@ impl MailboxIngest for PgMailboxSync {
             let label_id = sqlx::query_scalar!(r#"
                 INSERT INTO email_labels (id,link_id,provider_label_id,name,type) VALUES ($1,$2,$3::text,$3::text,'User')
                 ON CONFLICT (link_id,provider_label_id) DO UPDATE SET name = EXCLUDED.name RETURNING id
-            "#,macro_uuid::generate_uuid_v7(),lease.mailbox.link_id,tag).fetch_one(&mut *tx).await.map_err(db_error)?;
+            "#,rox_uuid::generate_uuid_v7(),lease.mailbox.link_id,tag).fetch_one(&mut *tx).await.map_err(db_error)?;
             sqlx::query!("INSERT INTO email_message_labels (message_id,label_id) VALUES ($1,$2) ON CONFLICT DO NOTHING",message_id,label_id)
                 .execute(&mut *tx).await.map_err(db_error)?;
         }
@@ -280,7 +280,7 @@ impl MailboxIngest for PgMailboxSync {
         sqlx::query!(r#"
             INSERT INTO email_projection_outbox (id,link_id,generation,payload,dedupe_key) VALUES ($1,$2,$3,$4,$5)
             ON CONFLICT (dedupe_key) DO NOTHING
-        "#,macro_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload,dedupe)
+        "#,rox_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload,dedupe)
             .execute(&mut *tx).await.map_err(db_error)?;
         tx.commit().await.map_err(db_error)
     }
@@ -302,7 +302,7 @@ impl MailboxIngest for PgMailboxSync {
         }
         let rows = sqlx::query!(r#"
             UPDATE email_messages SET mailbox_state = COALESCE(mailbox_state,'{}'::jsonb) || '{"provider_missing":true}'::jsonb
-            WHERE link_id = $1 AND provider_id = $2 AND (NOT is_draft OR body_macro IS NULL) RETURNING id,thread_id
+            WHERE link_id = $1 AND provider_id = $2 AND (NOT is_draft OR body_rox IS NULL) RETURNING id,thread_id
         "#,lease.mailbox.link_id,lease.provider_id.as_str()).fetch_all(&mut *tx).await.map_err(db_error)?;
         for row in rows {
             email_db_client::threads::update::recompute_thread_metadata(
@@ -314,7 +314,7 @@ impl MailboxIngest for PgMailboxSync {
             .map_err(db_error)?;
             let payload =
                 serde_json::json!({"kind":"absent","message_id":row.id,"thread_id":row.thread_id});
-            sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload)
+            sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload)
                 .execute(&mut *tx).await.map_err(db_error)?;
         }
         // Keep bodies, local draft revisions and attachments for reconciliation;

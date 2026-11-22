@@ -126,7 +126,7 @@ export function ConversationListControls(props: ConversationListControlsProps) {
   return (
     <div class="flex shrink-0 items-center">
       <ListGroupDropdown
-        label="Group conversations"
+        label={t('agentChat.groupConversations')}
         class="size-(--sidebar-control-size)"
         value={props.grouping}
         options={GROUPING_OPTIONS}
@@ -134,7 +134,7 @@ export function ConversationListControls(props: ConversationListControlsProps) {
       />
       <div class="relative shrink-0">
         <ListFilterDropdown
-          label="Filter conversations"
+          label={t('agentChat.filterConversations')}
           class="size-(--sidebar-control-size)"
           groups={FILTER_GROUPS}
           isSelected={isSelected}

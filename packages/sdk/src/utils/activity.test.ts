@@ -17,10 +17,10 @@ describe('SDK activity', () => {
       {
         async getDocument(options: { headers?: Record<string, string> }) {
           await pending;
-          seen.push(options.headers?.['x-macro-sdk-verb'] ?? '');
+          seen.push(options.headers?.['x-rox-sdk-verb'] ?? '');
         },
         async createDocument(options: { headers?: Record<string, string> }) {
-          seen.push(options.headers?.['x-macro-sdk-verb'] ?? '');
+          seen.push(options.headers?.['x-rox-sdk-verb'] ?? '');
         },
       },
       'storage',
@@ -43,7 +43,7 @@ describe('SDK activity', () => {
     const sdk = observeSdk(
       {
         async listCrmPipelines(options?: { headers?: Record<string, string> }) {
-          seen = options?.headers?.['x-macro-sdk-verb'] ?? '';
+          seen = options?.headers?.['x-rox-sdk-verb'] ?? '';
         },
       },
       'storage',

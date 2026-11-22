@@ -4,7 +4,7 @@ mod test;
 use std::collections::HashMap;
 
 use cursor_api_key::cipher::KmsCiphertexts;
-use macro_uuid::Uuid;
+use rox_uuid::Uuid;
 
 use crate::domain::{
     AgentKeyCipher, AgentKeyError, EncryptedProviderApiKey, ModelProvider, ProviderApiKey, Result,

@@ -139,7 +139,7 @@ async fn mentions_mail_and_calls_only_admit_their_recipient_even_when_others_hav
         subscribed.filters = serde_json::from_value(json!([{"events":[name]}])).unwrap();
         let mut other = subscribed.clone();
         other.action_id = generate_uuid_v7();
-        other.owner = Owner::User(MacroUserIdStr::parse_from_str("macro|other@rox.one").unwrap());
+        other.owner = Owner::User(RoxUserIdStr::parse_from_str("macro|other@rox.one").unwrap());
         let action_id = subscribed.action_id;
         let repo = Arc::new(Repo::default());
         repo.0.lock().unwrap().configurations = vec![subscribed, other];

@@ -1,6 +1,6 @@
 use chrono::{DateTime, Utc};
-use macro_event_broker::{Event, MacroEvent};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{Event, RoxEvent};
+use rox_user_id::user_id::RoxUserIdStr;
 use serde_json::json;
 use uuid::Uuid;
 
@@ -10,8 +10,8 @@ use crate::domain::models::WebhookFilter;
 const WEBHOOK_ID: &str = "wh_01998a2f-aaaa-7bbb-8ccc-dddddddddddd";
 const WORKSPACE_ID: &str = "team_0123";
 
-fn user_id(id: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(id.to_string()).expect("valid user id")
+fn user_id(id: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(id.to_string()).expect("valid user id")
 }
 
 fn timestamp(value: &str) -> DateTime<Utc> {
@@ -212,7 +212,7 @@ fn decodes_v1_created_payload_persisted_before_namespaces_existed() {
     }))
     .expect("serializable payload");
 
-    let decoded = WebhookMacroEvent::decode(WEBHOOK_ID, &payload).expect("decodable v1 event");
+    let decoded = WebhookRoxEvent::decode(WEBHOOK_ID, &payload).expect("decodable v1 event");
     let WebhookTopicEvent::Created(metadata) = &decoded.event().event else {
         panic!("expected a created event");
     };
@@ -223,7 +223,7 @@ fn decodes_v1_created_payload_persisted_before_namespaces_existed() {
 #[test]
 fn constructors_key_events_by_subject_webhook_id() {
     let cases = [
-        WebhookMacroEvent::created(
+        WebhookRoxEvent::created(
             WEBHOOK_ID,
             WebhookCreatedMetadata {
                 webhook_id: WEBHOOK_ID.to_string(),
@@ -239,7 +239,7 @@ fn constructors_key_events_by_subject_webhook_id() {
                 created_at: timestamp("2026-07-20T17:01:02Z"),
             },
         ),
-        WebhookMacroEvent::updated(
+        WebhookRoxEvent::updated(
             WEBHOOK_ID,
             WebhookUpdatedMetadata {
                 webhook_id: WEBHOOK_ID.to_string(),
@@ -255,7 +255,7 @@ fn constructors_key_events_by_subject_webhook_id() {
                 updated_at: timestamp("2026-07-20T17:03:11Z"),
             },
         ),
-        WebhookMacroEvent::deleted(
+        WebhookRoxEvent::deleted(
             WEBHOOK_ID,
             WebhookDeletedMetadata {
                 webhook_id: WEBHOOK_ID.to_string(),
@@ -263,7 +263,7 @@ fn constructors_key_events_by_subject_webhook_id() {
                 actor_user_id: user_id("macro|deleter@example.com"),
             },
         ),
-        WebhookMacroEvent::validated(
+        WebhookRoxEvent::validated(
             WEBHOOK_ID,
             WebhookValidatedMetadata {
                 webhook_id: WEBHOOK_ID.to_string(),
@@ -296,7 +296,7 @@ fn constructors_key_events_by_subject_webhook_id() {
 
 #[test]
 fn macro_event_round_trips_without_exposing_secrets_or_header_values() {
-    let original = WebhookMacroEvent::created(
+    let original = WebhookRoxEvent::created(
         WEBHOOK_ID,
         WebhookCreatedMetadata {
             webhook_id: WEBHOOK_ID.to_string(),
@@ -319,7 +319,7 @@ fn macro_event_round_trips_without_exposing_secrets_or_header_values() {
     assert!(!serialized.contains("secret-value"));
     assert!(!serialized.contains("custom-header-value"));
 
-    let decoded = WebhookMacroEvent::decode(original.key(), &payload).expect("decodable event");
+    let decoded = WebhookRoxEvent::decode(original.key(), &payload).expect("decodable event");
     assert_eq!(decoded.key(), WEBHOOK_ID);
     assert_eq!(decoded.event(), original.event());
     assert_eq!(decoded.topic(), "macro.webhooks");

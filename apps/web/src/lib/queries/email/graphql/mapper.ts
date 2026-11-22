@@ -1,4 +1,5 @@
 import { decodeCalendarInvitations } from '@app/features/email-message/core/calendar-invitation-schema';
+import { readBodyRox } from '@queries/email/body-rox-compat';
 import type {
   AccessLevel,
   ApiContactInfo,
@@ -106,7 +107,7 @@ export function mapGraphqlEmailMessage(
     })),
     bcc: message.bcc.map(mapContact),
     body_html_sanitized: message.bodyHtmlSanitized,
-    body_macro: message.bodyMacro,
+    body_rox: readBodyRox(message),
     body_replyless: message.bodyReplyless,
     calendar_invitations:
       decodeCalendarInvitations(message.calendarInvitations) ?? [],

@@ -67,7 +67,7 @@ pub(in crate::api::search) async fn filter_calendar_events(
                 .iter()
                 .filter_map(|id| Uuid::parse_str(id).ok())
                 .collect();
-            let shared = macro_db_client::calendar_event::get_events_for_search::get_channel_shared_calendar_event_ids(
+            let shared = rox_db_client::calendar_event::get_events_for_search::get_channel_shared_calendar_event_ids(
                 &ctx.db, user_id,
             )
             .await

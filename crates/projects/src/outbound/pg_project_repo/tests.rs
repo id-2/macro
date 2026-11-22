@@ -2,8 +2,8 @@ use std::collections::HashMap;
 
 use entity_registry::{BotFacts, EntityRegistryResult, OwnerGrantPolicy};
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
 use model::document::FileType;
 use model::folder::{FileSystemNode, FileSystemNodeWithIds, FolderItem};
 use model::item::Item;
@@ -81,7 +81,7 @@ const CHAT_ID: &str = "30000000-0000-0000-0000-000000000001";
 const DELETED_CHAT_ID: &str = "30000000-0000-0000-0000-000000000002";
 
 fn project_owner() -> Owner {
-    Owner::User(MacroUserIdStr::try_from("macro|owner@test.com").unwrap())
+    Owner::User(RoxUserIdStr::try_from("macro|owner@test.com").unwrap())
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -187,7 +187,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
         .await
         .unwrap();
     let enable_link = || EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: project.id.clone(),
         name: None,
         update_parent: false,
@@ -240,7 +240,7 @@ async fn concurrent_first_enable_writes_only_one_audit(pool: Pool<Postgres>) {
         .await
         .unwrap();
     let enable_link = || EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: project.id.clone(),
         name: None,
         update_parent: false,
@@ -685,7 +685,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     let repo = test_repo(pool.clone());
     let unchanged = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
             project_id: CHILD_ID.to_owned(),
             name: Some("Renamed".to_owned()),
             update_parent: false,
@@ -698,7 +698,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
 
     let moved = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
             project_id: CHILD_ID.to_owned(),
             name: None,
             update_parent: true,
@@ -714,7 +714,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
 
     let updated = repo
         .edit_project(EditProjectArgs {
-            actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+            actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
             project_id: ROOT_ID.to_owned(),
             name: None,
             update_parent: true,
@@ -738,7 +738,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -761,7 +761,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -785,7 +785,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -805,7 +805,7 @@ async fn edit_supports_parent_flags_and_sharing(pool: Pool<Postgres>) -> anyhow:
     );
 
     repo.edit_project(EditProjectArgs {
-        actor_id: Some(MacroUserIdStr::try_from("macro|owner@test.com").unwrap()),
+        actor_id: Some(RoxUserIdStr::try_from("macro|owner@test.com").unwrap()),
         project_id: ROOT_ID.to_owned(),
         name: None,
         update_parent: false,
@@ -1045,7 +1045,7 @@ fn nested_upload_args() -> anyhow::Result<UploadFolderRepoArgs> {
     let mut share_permission = SharePermissionV2::new_project_share_permission(None);
     share_permission.link_share = Some(LinkShare::Team);
     Ok(UploadFolderRepoArgs {
-        user_id: MacroUserIdStr::parse_from_str("macro|owner@test.com")?.into_owned(),
+        user_id: RoxUserIdStr::parse_from_str("macro|owner@test.com")?.into_owned(),
         share_permission,
         root_folder,
         root_folder_name: "Upload".to_owned(),

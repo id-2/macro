@@ -13,9 +13,9 @@ use axum::{
     extract::{FromRef, FromRequestParts, Path},
     http::request::Parts,
 };
-use macro_authorization::{
-    AnyPrincipal, MacroAuthorization, MacroAuthorizationService, MacroAuthorizationState,
-    OptionalMacroAuthorizationExtractor,
+use rox_authorization::{
+    AnyPrincipal, RoxAuthorization, RoxAuthorizationService, RoxAuthorizationState,
+    OptionalRoxAuthorizationExtractor,
 };
 use tracing::Level;
 
@@ -57,8 +57,8 @@ where
     Permission: RequiredPermission,
     Arc<AccessService>: FromRef<State>,
     AccessService: EntityAccessService,
-    MacroAuthorizationState<Authorization>: FromRef<State>,
-    Authorization: MacroAuthorizationService,
+    RoxAuthorizationState<Authorization>: FromRef<State>,
+    Authorization: RoxAuthorizationService,
     State: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -68,7 +68,7 @@ where
         let service = <Arc<AccessService>>::from_ref(state);
 
         let authorization =
-            OptionalMacroAuthorizationExtractor::<Authorization, AnyPrincipal>::from_request_parts(
+            OptionalRoxAuthorizationExtractor::<Authorization, AnyPrincipal>::from_request_parts(
                 parts, state,
             )
             .await
@@ -79,7 +79,7 @@ where
             .await
             .map_err(|_| ExtractorError::BadRequest("missing id path parameter"))?;
 
-        if let Some(MacroAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
+        if let Some(RoxAuthorization::Bot(authentication)) = authorization.authorization.as_ref()
         {
             let entity_access_receipt = generate_bot_entity_access_receipt::<Permission>(
                 service.as_ref(),
@@ -98,11 +98,11 @@ where
         let is_internal_access = authorization
             .authorization
             .as_ref()
-            .is_some_and(MacroAuthorization::is_internal);
+            .is_some_and(RoxAuthorization::is_internal);
         let macro_user_id = authorization
             .authorization
             .as_ref()
-            .and_then(MacroAuthorization::acting_user)
+            .and_then(RoxAuthorization::acting_user)
             .map(|user| user.macro_user_id.clone());
 
         // An internal service with no acting user is trusted: it is Rox's

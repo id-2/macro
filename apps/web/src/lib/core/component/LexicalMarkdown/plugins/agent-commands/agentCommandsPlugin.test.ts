@@ -1,5 +1,5 @@
 import { registerRichText } from '@lexical/rich-text';
-import { InlineSearchNode } from '@macro-inc/lexical-core';
+import { InlineSearchNode } from '@rox-one/lexical-core';
 import { $createParagraphNode, $getRoot, createEditor } from 'lexical';
 import { afterEach, describe, expect, it } from 'vitest';
 import { createMenuOperations } from '../../shared/inlineMenu';

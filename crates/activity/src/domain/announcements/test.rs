@@ -30,7 +30,7 @@ impl ActivityEventPublisher for RecordingPublisher {
 }
 
 struct FakeAudience {
-    by_entity: HashMap<String, Vec<MacroUserIdStr<'static>>>,
+    by_entity: HashMap<String, Vec<RoxUserIdStr<'static>>>,
 }
 
 impl ActivityAudienceExpander for FakeAudience {
@@ -40,7 +40,7 @@ impl ActivityAudienceExpander for FakeAudience {
         &self,
         _entity_type: EntityType,
         entity_id: &str,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         Ok(self.by_entity.get(entity_id).cloned().unwrap_or_default())
     }
 }
@@ -54,13 +54,13 @@ impl ActivityAudienceExpander for FailingAudience {
         &self,
         _entity_type: EntityType,
         _entity_id: &str,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
         Err(std::io::Error::other("access lookup unavailable"))
     }
 }
 
-fn user(local: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user id")
+fn user(local: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(format!("macro|{local}@example.com")).expect("valid user id")
 }
 
 #[tokio::test]
@@ -118,14 +118,14 @@ async fn project_subject_with_public_link_access_still_receives_activity() {
             &self,
             _: EntityType,
             _: &str,
-        ) -> Result<Vec<MacroUserIdStr<'static>>, Self::Err> {
+        ) -> Result<Vec<RoxUserIdStr<'static>>, Self::Err> {
             Ok(Vec::new())
         }
         async fn viewer_can_see(
             &self,
             _: EntityType,
             _: &str,
-            _: &MacroUserIdStr<'_>,
+            _: &RoxUserIdStr<'_>,
         ) -> Result<bool, Self::Err> {
             Ok(true)
         }

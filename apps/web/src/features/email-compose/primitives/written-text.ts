@@ -1,4 +1,4 @@
-import { $isClassedBlockNode } from '@macro-inc/lexical-core';
+import { $isClassedBlockNode } from '@rox-one/lexical-core';
 import { $getRoot, type LexicalEditor } from 'lexical';
 import { type Accessor, createEffect, createSignal, onCleanup } from 'solid-js';
 

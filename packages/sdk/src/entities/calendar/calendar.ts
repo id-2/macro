@@ -1,8 +1,8 @@
 import type { VisibleCalendar } from '../../../generated/calendar/types.gen';
-import { MacroNotFoundError, unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import { RoxNotFoundError, unwrap } from '../../utils';
+import type { RoxClient } from '../../utils/client';
 import { Link } from '../email/link';
-import { MacroEntity } from '../entity';
+import { RoxEntity } from '../entity';
 
 /**
  * A calendar visible to the requester across their connected inboxes: a
@@ -10,7 +10,7 @@ import { MacroEntity } from '../entity';
  * list. There is no fetch-by-id endpoint, so a bare {@link Calendar.byId}
  * handle loads its detail by listing the caller's calendars and matching on id.
  */
-export class Calendar extends MacroEntity<VisibleCalendar> {
+export class Calendar extends RoxEntity<VisibleCalendar> {
   /**
    * Set whether this calendar contributes to the caller's availability.
    *
@@ -32,17 +32,17 @@ export class Calendar extends MacroEntity<VisibleCalendar> {
   protected async fetch(): Promise<VisibleCalendar> {
     const { calendars } = unwrap(await this.client.calendar.listCalendars());
     const found = calendars.find((calendar) => calendar.id === this.id);
-    if (!found) throw new MacroNotFoundError(`calendar ${this.id} not found`);
+    if (!found) throw new RoxNotFoundError(`calendar ${this.id} not found`);
     return found;
   }
 
   /** A handle to a calendar by id. Detail loads on first access. */
-  static byId(client: MacroClient, id: string): Calendar {
+  static byId(client: RoxClient, id: string): Calendar {
     return new Calendar(client, id);
   }
 
   /** The caller's visible calendars, primaries and writable first. */
-  static async list(client: MacroClient): Promise<Calendar[]> {
+  static async list(client: RoxClient): Promise<Calendar[]> {
     const { calendars } = unwrap(await client.calendar.listCalendars());
     return calendars.map(
       (calendar) => new Calendar(client, calendar.id, calendar),

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { markdownEntityFromMetadata } from '@app/features/entity-appearance/queries/document-appearance';
 import { FindAndReplace } from '@block-md/component/FindAndReplace';
 import { HostedMarkdownHeader } from '@block-md/component/HostedMarkdownHeader';
@@ -53,7 +54,7 @@ export function MarkdownDetailBodyState(props: {
   actionLabel?: string;
   onAction?: () => void;
 }) {
-  const entityLabel = () => props.entityLabel ?? 'document';
+  const entityLabel = () => props.entityLabel ?? t('drive.entityDocument');
 
   return (
     <div class="grid size-full place-items-center text-ink-muted">
@@ -61,19 +62,19 @@ export function MarkdownDetailBodyState(props: {
         fallback={
           <SpinnerIcon
             aria-hidden={false}
-            aria-label={`Loading ${entityLabel()}`}
+            aria-label={t('drive.loadingEntity', { entity: entityLabel() })}
             class="size-5 animate-spin"
           />
         }
       >
         <Match when={props.error !== undefined}>
           <div class="flex max-w-xl flex-col items-center gap-3 px-6 text-center">
-            <span>This {entityLabel()} couldn’t be displayed.</span>
+            <span>{t('drive.couldNotDisplay', { entity: entityLabel() })}</span>
             <pre class="max-h-48 max-w-full overflow-auto whitespace-pre-wrap text-left text-failure text-xs">
               {String(props.error)}
             </pre>
             <Button variant="secondary" size="sm" onClick={props.onAction}>
-              {props.actionLabel ?? 'Reset'}
+              {props.actionLabel ?? t('drive.reset')}
             </Button>
           </div>
         </Match>
@@ -183,7 +184,9 @@ export function MarkdownDetail(props: MarkdownDetailProps) {
     <FileDetailLoadGate
       documentId={props.documentId}
       entityType="md"
-      label={props.kind === 'task' ? 'task' : 'document'}
+      label={
+        props.kind === 'task' ? t('drive.entityTask') : t('drive.entityDocument')
+      }
       load={loadMarkdownDocument}
       dispose={(data) => data.source.cleanup()}
     >

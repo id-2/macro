@@ -26,7 +26,7 @@ pub fn router(state: ApiContext) -> Router<ApiContext> {
                 .layer(
                     ServiceBuilder::new().layer(axum::middleware::from_fn_with_state(
                         state,
-                        macro_middleware::cloud_storage::document::ensure_document_exists::handler,
+                        rox_middleware::cloud_storage::document::ensure_document_exists::handler,
                     )),
                 ),
         )

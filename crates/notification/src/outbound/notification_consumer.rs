@@ -13,26 +13,26 @@ use health::ConsumerHealth;
 use std::{marker::PhantomData, time::Duration};
 
 use kafka_util::{InitialOffset, KafkaEventConsumer, Ungrouped};
-use macro_event_broker::{
-    EventBrokerError, KafkaConsumerAdapter, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    EventBrokerError, KafkaConsumerAdapter, RoxEventCollection, RoxEventConsumerService,
 };
 use rdkafka::message::Message as _;
 use rootcause::prelude::{Report, ResultExt as _};
 use serde::{Serialize, de::DeserializeOwned};
 
 use crate::domain::{
-    models::websocket_notification_event::{JsonNotificationMacroEvent, NotificationTopicEvent},
+    models::websocket_notification_event::{JsonNotificationRoxEvent, NotificationTopicEvent},
     ports::NotificationTopicEventConsumer,
 };
 
 /// Maximum time to wait for notification topic metadata during partition assignment.
 const TOPIC_METADATA_TIMEOUT: Duration = Duration::from_secs(10);
 
-type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredMacroEvent>;
+type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredRoxEvent>;
 type NotificationEventConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
+    RoxEventConsumerService<DeclaredRoxEvent, IndependentKafkaConsumer>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: JsonNotificationMacroEvent);
+rox_event_broker::declare_topics!(DeclaredRoxEvent: JsonNotificationRoxEvent);
 
 /// Independent consumer of all notification topic event variants decoded as `T`.
 ///
@@ -66,7 +66,7 @@ where
                 .context("failed to assign notification topic partitions")?;
 
         tracing::info!(
-            topics = ?DeclaredMacroEvent::topics(),
+            topics = ?DeclaredRoxEvent::topics(),
             "independent notification topic consumer listening"
         );
 
@@ -114,7 +114,7 @@ where
             };
 
             return match event {
-                DeclaredMacroEvent::JsonNotificationMacroEvent(event) => {
+                DeclaredRoxEvent::JsonNotificationRoxEvent(event) => {
                     event.into_topic_event().deserialize_metadata()
                 }
             };

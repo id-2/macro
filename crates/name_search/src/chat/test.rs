@@ -1,6 +1,6 @@
 //! Tests for chat module
 
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use models_search_cursor::{SearchCursorOption, SearchMethodCursor};
 use sqlx::{Pool, Postgres};
 use uuid::Uuid;
@@ -12,7 +12,7 @@ use super::*;
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_empty_term(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -45,7 +45,7 @@ async fn test_search_chat_names_empty_term(pool: Pool<Postgres>) -> anyhow::Resu
 async fn test_search_chat_names_ids_only_with_empty_ids(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -76,7 +76,7 @@ async fn test_search_chat_names_ids_only_with_empty_ids(
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_ids_only_mode(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -133,7 +133,7 @@ async fn test_search_chat_names_ids_only_mode(pool: Pool<Postgres>) -> anyhow::R
 async fn test_search_chat_names_normal_mode_owned_chats(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -181,7 +181,7 @@ async fn test_search_chat_names_normal_mode_owned_chats(
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_case_insensitive(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -241,7 +241,7 @@ async fn test_search_chat_names_case_insensitive(pool: Pool<Postgres>) -> anyhow
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_with_shared_chats(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -284,7 +284,7 @@ async fn test_search_chat_names_with_shared_chats(pool: Pool<Postgres>) -> anyho
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_pagination_limit(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -325,7 +325,7 @@ async fn test_search_chat_names_pagination_limit(pool: Pool<Postgres>) -> anyhow
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_pagination_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -405,7 +405,7 @@ async fn test_search_chat_names_pagination_cursor(pool: Pool<Postgres>) -> anyho
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_no_results(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -434,7 +434,7 @@ async fn test_search_chat_names_no_results(pool: Pool<Postgres>) -> anyhow::Resu
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_partial_match(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -479,7 +479,7 @@ async fn test_search_chat_names_partial_match(pool: Pool<Postgres>) -> anyhow::R
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_user_isolation(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -508,7 +508,7 @@ async fn test_search_chat_names_user_isolation(pool: Pool<Postgres>) -> anyhow::
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_excludes_soft_deleted(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -548,7 +548,7 @@ async fn test_search_chat_names_excludes_soft_deleted(pool: Pool<Postgres>) -> a
     fixtures(path = "../../fixtures", scripts("chat"))
 )]
 async fn test_search_chat_names_rejects_thread_cursor(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -583,7 +583,7 @@ async fn test_search_chat_names_rejects_thread_cursor(pool: Pool<Postgres>) -> a
     fixtures(path = "../../fixtures", scripts("chat", "chat_tags"))
 )]
 async fn test_search_chat_names_tag_filter(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -633,7 +633,7 @@ async fn test_search_chat_names_tag_filter(pool: Pool<Postgres>) -> anyhow::Resu
     fixtures(path = "../../fixtures", scripts("chat", "chat_tags"))
 )]
 async fn test_search_chat_names_tag_filter_ids_only(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -674,7 +674,7 @@ async fn test_search_chat_names_tag_filter_ids_only(pool: Pool<Postgres>) -> any
     fixtures(path = "../../fixtures", scripts("chat", "chat_tags"))
 )]
 async fn test_search_chat_names_tag_filter_match_all(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    let user_id = MacroUserId::parse_from_str("macro|user1@test.com")
+    let user_id = RoxUserId::parse_from_str("macro|user1@test.com")
         .map(|l| l.lowercase())
         .unwrap();
 
@@ -768,7 +768,7 @@ async fn the_search_span_leaves_out_the_term() {
     let db = sqlx::postgres::PgPoolOptions::new()
         .connect_lazy("postgres://localhost/unused")
         .expect("a lazy pool never connects");
-    let user_id = MacroUserId::parse_from_str("macro|user@example.com")
+    let user_id = RoxUserId::parse_from_str("macro|user@example.com")
         .map(|l| l.lowercase())
         .unwrap();
 

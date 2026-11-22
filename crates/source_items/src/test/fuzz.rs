@@ -4,7 +4,7 @@
 
 use super::assert_exact;
 use crate::audit;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use rand::{Rng, SeedableRng, rngs::StdRng};
 use sqlx::{PgConnection, PgPool, Postgres, Transaction};
 use std::collections::BTreeMap;

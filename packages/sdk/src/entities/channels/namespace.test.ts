@@ -5,7 +5,7 @@ import type {
   ApiChannelWithLatest,
   GetChannelsData,
 } from '../../../generated/storage/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { ChannelNamespace } from './namespace';
 
 const NIL = '00000000-0000-0000-0000-000000000000';
@@ -48,7 +48,7 @@ function channelsClient() {
         return { data: pages[options?.query?.cursor ?? 'first'] };
       },
     },
-  } as unknown as MacroClient;
+  } as unknown as RoxClient;
   return { client, requests };
 }
 
@@ -98,7 +98,7 @@ describe('ChannelNamespace', () => {
           };
         },
       },
-    } as unknown as MacroClient;
+    } as unknown as RoxClient;
 
     const ids = [];
     for await (const channel of new ChannelNamespace(client).search('design')) {

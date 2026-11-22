@@ -10,7 +10,7 @@ use entity_access::domain::models::{
     AccessLevel, Entity, EntityAccessAuth, EntityAccessReceipt, EntityPermission, EntityType,
     RequiredPermission,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 use super::*;
 use models_databases::views::{
@@ -62,8 +62,8 @@ type Service = FormsServiceImpl<
     FakeImageFiles,
 >;
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).expect("valid user id")
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).expect("valid user id")
 }
 
 fn viewer(id: &'static str) -> Viewer {

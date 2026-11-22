@@ -1,3 +1,4 @@
+import { isNativeMobilePlatform } from '@core/mobile/isNativeMobilePlatform';
 import { createTabLeaderSignal } from '@core/cross-tab/tab-leader';
 import { makeEventListener } from '@solid-primitives/event-listener';
 import { makePersisted } from '@solid-primitives/storage';
@@ -7,6 +8,7 @@ import {
   createResource,
   createSignal,
   type JSX,
+  onMount,
   type Setter,
   useContext,
 } from 'solid-js';
@@ -203,6 +205,22 @@ function PlatformNotificationState(props: {
     if (permission.error !== undefined) throw permission.error;
     return res;
   }
+  // Desktop notifications are on unless the person turned them off. Ask when
+  // the app opens, and only while the browser or desktop app has not decided.
+  // Phone prompts stay on their own screen.
+  onMount(() => {
+    if (props.manuallyDisabled() === 'disabled-in-ui') return;
+    if (isNativeMobilePlatform()) return;
+    void (async () => {
+      try {
+        const current = await platformNotif.getCurrentPermission();
+        if (current !== 'default') return;
+        await requestPermission();
+      } catch (error) {
+        console.error('Could not request notification permission', error);
+      }
+    })();
+  });
 
   async function showNotification(
     data: PlatformNotificationData

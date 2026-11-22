@@ -1,6 +1,6 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -309,8 +309,8 @@ const INBOX_OWNER: &str = "macro|inbox-owner@corp.test";
 const DELEGATE: &str = "macro|delegate@corp.test";
 const OTHER_USER: &str = "macro|other@corp.test";
 
-fn user(s: &str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from(s.to_string()).unwrap()
+fn user(s: &str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from(s.to_string()).unwrap()
 }
 
 /// Runs `get_document_access` as an authenticated `user_id` whose only source

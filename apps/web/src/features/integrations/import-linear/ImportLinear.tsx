@@ -5,7 +5,7 @@ import { parseCsv } from '@core/util/csv';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { linearCsvRecordToMacroTaskDraft } from '@core/util/linearImport';
 import { buildSimpleEntityUrl } from '@core/util/url';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import {
   isCurrentQueryAccount,
   type QueryAccount,

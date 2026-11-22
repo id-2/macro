@@ -126,7 +126,7 @@ impl<P: MobilePushOps + Send + Sync + 'static> MobilePushAdapter<P> {
     pub async fn send_voip_push(
         &self,
         endpoint_arn: &str,
-        recipient_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        recipient_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
         payload: &VoipPushPayload,
     ) -> Result<String, Report> {
         if endpoint_arn.contains(":endpoint/GCM/") {
@@ -253,7 +253,7 @@ impl<P: MobilePushOps + Send + Sync + 'static> crate::domain::ports::VoipPushDel
     async fn send_voip_push(
         &self,
         endpoint_arn: &str,
-        recipient_id: &macro_user_id::user_id::MacroUserIdStr<'_>,
+        recipient_id: &rox_user_id::user_id::RoxUserIdStr<'_>,
         payload: &VoipPushPayload,
     ) -> Result<String, Report> {
         MobilePushAdapter::send_voip_push(self, endpoint_arn, recipient_id, payload).await

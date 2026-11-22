@@ -10,8 +10,8 @@ pub use entity_access_db_utils::team_share::acquire_guard;
 use entity_access_db_utils::team_share::{
     delete_direct, direct_level, replace_project_contributions, upsert_direct,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_uuid::Uuid;
+use rox_user_id::cowlike::CowLike;
+use rox_uuid::Uuid;
 use model_entity::{Entity, EntityType};
 use model_owner::{
     Owner,

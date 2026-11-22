@@ -7,23 +7,23 @@
 use std::time::Duration;
 
 use kafka_util::{InitialOffset, KafkaEventConsumer, Ungrouped};
-use macro_event_broker::{
-    EventBrokerError, KafkaConsumerAdapter, MacroEventCollection, MacroEventConsumerService,
+use rox_event_broker::{
+    EventBrokerError, KafkaConsumerAdapter, RoxEventCollection, RoxEventConsumerService,
 };
 use rdkafka::message::Message as _;
 use rootcause::prelude::{Report, ResultExt as _};
 
-use crate::domain::events::{ActivityMacroEvent, ActivityTopicEvent};
+use crate::domain::events::{ActivityRoxEvent, ActivityTopicEvent};
 use crate::domain::realtime::ActivityTopicEventConsumer;
 
 /// Maximum time to wait for topic metadata during partition assignment.
 const TOPIC_METADATA_TIMEOUT: Duration = Duration::from_secs(10);
 
-type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredMacroEvent>;
+type IndependentKafkaConsumer = KafkaConsumerAdapter<Ungrouped, DeclaredRoxEvent>;
 type ActivityEventConsumer =
-    MacroEventConsumerService<DeclaredMacroEvent, IndependentKafkaConsumer>;
+    RoxEventConsumerService<DeclaredRoxEvent, IndependentKafkaConsumer>;
 
-macro_event_broker::declare_topics!(DeclaredMacroEvent: ActivityMacroEvent);
+rox_event_broker::declare_topics!(DeclaredRoxEvent: ActivityRoxEvent);
 
 /// Independent consumer of activity topic events.
 ///
@@ -45,7 +45,7 @@ impl ActivityTopicConsumer {
                 .context("failed to assign activity topic partitions")?;
 
         tracing::info!(
-            topics = ?DeclaredMacroEvent::topics(),
+            topics = ?DeclaredRoxEvent::topics(),
             "independent activity topic consumer listening"
         );
 
@@ -91,7 +91,7 @@ impl ActivityTopicConsumer {
             };
 
             return match event {
-                DeclaredMacroEvent::ActivityMacroEvent(event) => Ok(event.into_topic_event()),
+                DeclaredRoxEvent::ActivityRoxEvent(event) => Ok(event.into_topic_event()),
             };
         }
     }

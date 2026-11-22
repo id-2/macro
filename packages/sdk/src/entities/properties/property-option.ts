@@ -3,7 +3,7 @@ import type {
   UpdatePropertyOptionRequest,
 } from '../../../generated/properties/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 export type { UpdatePropertyOptionRequest };
 
@@ -16,7 +16,7 @@ export type { UpdatePropertyOptionRequest };
  */
 export class PropertyOption {
   private constructor(
-    private readonly client: MacroClient,
+    private readonly client: RoxClient,
     /** The property definition this option belongs to. */
     readonly definitionId: string,
     readonly id: string,
@@ -25,7 +25,7 @@ export class PropertyOption {
 
   /** Wrap a record already in hand (e.g. from a list or create response). */
   static from(
-    client: MacroClient,
+    client: RoxClient,
     definitionId: string,
     record: PropertyOptionRecord,
   ): PropertyOption {

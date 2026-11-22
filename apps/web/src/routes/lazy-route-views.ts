@@ -127,6 +127,10 @@ export const SettingsRouteView = lazyNamed(
   () => import('@app/features/settings/route-views'),
   'SettingsRouteView'
 );
+export const AccountPortalRouteView = lazyNamed(
+  () => import('@app/features/settings/route-views'),
+  'AccountPortalRouteView'
+);
 export const TasksDetailRouteView = lazyNamed(
   () => import('@app/features/tasks-view/components/TasksDetailView'),
   'TasksDetailRouteView'

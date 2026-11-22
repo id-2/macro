@@ -1,7 +1,7 @@
 import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { isPlatform } from '@core/util/platform';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import {
   createNativeStagedUploadFile,

@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { PLAN_BY_TIER, type PlanTier } from '@app/features/paywall/plans';
 import CaretRightIcon from '@icon/system/regular/caret-right.svg';
 import CreditCardIcon from '@icon/system/regular/credit-card.svg';
@@ -20,11 +21,15 @@ export function CurrentPlanCard(props: {
         <IntegrationRow
           icon={<CreditCardIcon />}
           title={
-            <Show when={props.tier} fallback="Loading plan…">
-              {(tier) => `${PLAN_BY_TIER[tier()].name} plan`}
+            <Show when={props.tier} fallback="Загружаю тариф…">
+              {(tier) =>
+                tier() === 'free'
+                  ? t('settingsNav.freePlan')
+                  : `Тариф «${PLAN_BY_TIER[tier()].name}»`
+              }
             </Show>
           }
-          description="See your plan and billing details"
+          description="Ваш тариф и данные об оплате"
         >
           <CaretRightIcon class="size-4 text-ink-extra-muted" />
         </IntegrationRow>

@@ -4,7 +4,7 @@
 mod tests;
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 use uuid::Uuid;
 
@@ -57,7 +57,7 @@ impl UserApiKeysRepo for PgUserApiKeysRepo {
     #[tracing::instrument(err, skip_all)]
     async fn insert_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
         name: &str,
         hash: &[u8; 32],
@@ -80,7 +80,7 @@ impl UserApiKeysRepo for PgUserApiKeysRepo {
     }
 
     #[tracing::instrument(err, skip_all)]
-    async fn count_keys(&self, user_id: &MacroUserIdStr<'_>) -> Result<i64, Self::Err> {
+    async fn count_keys(&self, user_id: &RoxUserIdStr<'_>) -> Result<i64, Self::Err> {
         let count = sqlx::query_scalar!(
             r#"SELECT COUNT(*) as "count!" FROM "UserApiKey" WHERE user_id = $1"#,
             user_id.as_ref(),
@@ -93,7 +93,7 @@ impl UserApiKeysRepo for PgUserApiKeysRepo {
     #[tracing::instrument(err, skip_all)]
     async fn list_keys(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> Result<Vec<UserApiKeyInfo>, Self::Err> {
         let rows = sqlx::query_as!(
             UserApiKeyInfoRow,
@@ -113,7 +113,7 @@ impl UserApiKeysRepo for PgUserApiKeysRepo {
     #[tracing::instrument(err, skip_all)]
     async fn replace_keys_named(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
         name: &str,
         hash: &[u8; 32],
@@ -163,7 +163,7 @@ impl UserApiKeysRepo for PgUserApiKeysRepo {
     #[tracing::instrument(err, skip_all)]
     async fn delete_key(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         id: UserApiKeyId,
     ) -> Result<bool, Self::Err> {
         let result = sqlx::query!(
@@ -183,7 +183,7 @@ impl UserApiKeysRepo for PgUserApiKeysRepo {
     async fn find_user_id_by_key(
         &self,
         key: &UserApiKey,
-    ) -> Result<Option<MacroUserIdStr<'static>>, Self::Err> {
+    ) -> Result<Option<RoxUserIdStr<'static>>, Self::Err> {
         let hash = key.hash();
         let row = sqlx::query!(
             r#"
@@ -196,7 +196,7 @@ impl UserApiKeysRepo for PgUserApiKeysRepo {
         .fetch_optional(&self.pool)
         .await?;
         row.map(|row| {
-            MacroUserIdStr::try_from(row.user_id).map_err(|_| UserApiKeysRepoErr::InvalidUserId)
+            RoxUserIdStr::try_from(row.user_id).map_err(|_| UserApiKeysRepoErr::InvalidUserId)
         })
         .transpose()
     }

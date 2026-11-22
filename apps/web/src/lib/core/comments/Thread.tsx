@@ -10,7 +10,7 @@ import { buildSimpleEntityUrl } from '@core/util/url';
 import ArrowCounterClockwise from '@icon/system/regular/arrow-counter-clockwise.svg';
 import Check from '@icon/system/regular/check.svg';
 import CheckCircle from '@icon/system/regular/check-circle.svg';
-import { markdownToPlainText } from '@macro-inc/lexical-core';
+import { markdownToPlainText } from '@rox-one/lexical-core';
 import { usePatchThreadMutation } from '@queries/messages/mutations';
 import { Button, Layer } from '@ui';
 import type { EditorThemeClasses } from 'lexical';

@@ -1,3 +1,7 @@
+import {
+  interfaceLanguageReady,
+  setInterfaceLanguage,
+} from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import {
   cleanup,
@@ -7,7 +11,14 @@ import {
   waitFor,
 } from '@solidjs/testing-library';
 import { createSignal } from 'solid-js';
-import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { useProperty } from '../core/context';
 import { Root } from '../core/Root';
 import type { EntityProperty } from '../types';
@@ -64,6 +75,8 @@ function renderPill(options: { canEdit?: boolean; property?: EntityProperty }) {
     </Root>
   ));
 }
+
+beforeAll(() => setInterfaceLanguage('en'));
 
 beforeEach(() => {
   mocks.openProject.mockClear();
@@ -221,4 +234,17 @@ it('names a picked project from its picker while its own read loads', () => {
   expect(
     screen.getByRole('button', { name: 'Open project Website redesign' })
   ).toBeTruthy();
+});
+
+it('names the project actions in Russian', async () => {
+  setInterfaceLanguage('ru');
+  await interfaceLanguageReady(5000);
+  renderPill({});
+
+  expect(
+    screen.getByRole('button', { name: 'Открыть проект Launch' })
+  ).toBeTruthy();
+  expect(screen.getByRole('button', { name: 'Сменить проект' })).toBeTruthy();
+
+  setInterfaceLanguage('en');
 });

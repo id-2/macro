@@ -21,6 +21,7 @@
  * steer the server refused stays queued and says it was not sent.
  */
 
+import { t } from '@app/lib/i18n';
 import { useMacroMentionLinkResolver } from '@components/app/split-layout/split-router/mention-links';
 import { buildConfig } from '@core/component/LexicalMarkdown/builder/MarkdownConfigBuilder';
 import { MarkdownShell } from '@core/component/LexicalMarkdown/builder/MarkdownShell';
@@ -29,7 +30,7 @@ import { singleLineMarkdownTheme } from '@core/component/LexicalMarkdown/theme';
 import { isTouchDevice } from '@core/mobile/isTouchDevice';
 import { fireAndForget } from '@core/util/fireAndForget';
 import XIcon from '@icon/system/regular/x.svg?component-solid';
-import { stripAgentContext } from '@macro-inc/lexical-core/utils/parsers';
+import { stripAgentContext } from '@rox-one/lexical-core/utils/parsers';
 import { Button, Surface, Tooltip } from '@ui';
 import { COMMAND_PRIORITY_NORMAL, KEY_ESCAPE_COMMAND } from 'lexical';
 import {
@@ -197,7 +198,9 @@ function QueuedRow(props: QueuedRowProps) {
       ? (draft() ?? stripAgentContext(props.item.prompt ?? '')).trim()
       : '';
   const previewLabel = () =>
-    isPrompt() ? 'Attached files' : 'Compact the conversation';
+    isPrompt()
+      ? t('agentChat.attachedFiles')
+      : t('agentChat.compactConversation');
   const open = () => {
     props.onExpandedChange(true);
     focusBody?.();
@@ -264,7 +267,11 @@ function QueuedRow(props: QueuedRowProps) {
         {/* One slot, one text: the preview and the editor take turns in it. */}
         <div class="min-w-0 flex-1">
           <Tooltip
-            label={isPrompt() ? 'Edit queued message' : 'Open queued action'}
+            label={
+              isPrompt()
+                ? t('agentChat.editQueuedMessage')
+                : t('agentChat.openQueuedAction')
+            }
             as="div"
             // A block-level trigger: the default inline-flex one sizes to the
             // unbroken preview text, so the preview never truncates and runs
@@ -338,27 +345,27 @@ function QueuedRow(props: QueuedRowProps) {
             <span
               class="shrink-0 text-xs text-failure-ink"
               role="status"
-              title="This message could not be sent. It is still queued."
+              title={t('agentChat.queuedSendFailed')}
             >
-              Not sent
+              {t('agentChat.notSent')}
             </span>
           </Show>
           <Show when={props.onSteer}>
             <Button
-              aria-label="Steer"
+              aria-label={t('agentChat.steer')}
               variant="ghost"
               size="xs"
-              tooltip="Interrupt the current turn and send this message next"
+              tooltip={t('agentChat.interruptAndSendNext')}
               disabled={props.disabled}
               onClick={() => props.onSteer?.()}
               class="shrink-0"
             >
-              Steer
+              {t('agentChat.steer')}
             </Button>
           </Show>
           <Button
-            aria-label="Remove queued message"
-            tooltip="Remove queued message"
+            aria-label={t('agentChat.removeQueuedMessage')}
+            tooltip={t('agentChat.removeQueuedMessage')}
             variant="ghost"
             size="icon-sm"
             disabled={props.disabled}
@@ -602,7 +609,7 @@ function CompactBody(props: QueuedRowProps) {
         }
       }}
     >
-      Compact the conversation
+      {t('agentChat.compactConversation')}
     </div>
   );
 }

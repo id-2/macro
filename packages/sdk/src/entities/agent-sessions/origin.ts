@@ -1,5 +1,5 @@
 import type { TriggerOrigin } from '../../../generated/agent-harness/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Agent } from '../agents/agent';
 import { Message } from '../channels/message';
 import { Initiative } from '../initiatives/initiative';
@@ -71,7 +71,7 @@ type RawCaller = Extract<TriggerOrigin, { origin: 'mentioned' }>['by'];
 type RawLineage = Extract<RawCaller, { type: 'agent' }>['lineage'];
 
 function originLineage(
-  client: MacroClient,
+  client: RoxClient,
   lineage: RawLineage,
 ): SessionOriginLineage {
   if (lineage.type === 'unattributed') {
@@ -92,7 +92,7 @@ function originLineage(
 }
 
 function originCaller(
-  client: MacroClient,
+  client: RoxClient,
   caller: RawCaller,
 ): SessionOriginCaller {
   if (caller.type === 'person') {
@@ -112,7 +112,7 @@ function originCaller(
  * the session's own thread channel; other parents leave `message` unset.
  */
 export function sessionOrigin(
-  client: MacroClient,
+  client: RoxClient,
   origin: TriggerOrigin,
   channelId: string | undefined,
 ): SessionOrigin {

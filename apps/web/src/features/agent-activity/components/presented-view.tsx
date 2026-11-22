@@ -1,6 +1,7 @@
+import { t } from '@app/lib/i18n';
 import { DashboardToolView } from '@app/features/dynamic-ui/DashboardToolView.lazy';
 import type { View } from '@app/features/dynamic-ui/view';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { ErrorBoundary, Suspense } from 'solid-js';
 
 /**
@@ -15,13 +16,17 @@ export function PresentedView(props: { view: View }) {
         Telemetry.error(err, { surface: 'agent-activity-view' });
         return (
           <p class="text-xs text-ink-extra-muted" role="status">
-            Unable to display this view.
+            {t('agentChat.viewUnavailable')}
           </p>
         );
       }}
     >
       <Suspense
-        fallback={<p class="text-xs text-ink-extra-muted">Loading view…</p>}
+        fallback={
+          <p class="text-xs text-ink-extra-muted">
+            {t('agentChat.loadingView')}
+          </p>
+        }
       >
         <DashboardToolView view={props.view} pending={false} />
       </Suspense>

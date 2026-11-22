@@ -10,7 +10,7 @@ ai_tools = ["dep:ai_toolset", "dep:async-trait", "dep:schemars", "dep:uuid", "po
 inbound = [
   "dep:axum",
   "dep:axum-extra",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "dep:model-error-response",
   "dep:utoipa",
   "entity_access/inbound",
@@ -31,8 +31,8 @@ axum-extra = { workspace = true, optional = true, features = ["query"] }
 chrono = { workspace = true, features = ["serde"] }
 cowlike = { path = "../cowlike" }
 entity_access = { path = "../entity_access", optional = true, default-features = false, features = ["ports"] }
-macro_authorization = { path = "../macro_authorization", optional = true, default-features = false, features = ["axum"] }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", optional = true, default-features = false, features = ["axum"] }
+rox_user_id = { path = "../rox_user_id" }
 model-entity = { path = "../model-entity" }
 model-error-response = { path = "../model-error-response", optional = true }
 schemars = { workspace = true, optional = true }
@@ -47,7 +47,7 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 http-body-util = { workspace = true }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 model_user = { path = "../model_user" }
 rootcause = { workspace = true }
 serde_json = { workspace = true }

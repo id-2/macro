@@ -1,5 +1,5 @@
 use chrono::{TimeZone, Utc};
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 use super::*;
 use crate::domain::ids::ComputerId;
@@ -113,7 +113,7 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
         harness_id,
         team_id: TEAM,
         computer_name: "Build box".to_owned(),
-        signed_in_by: Some(MacroUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()),
+        signed_in_by: Some(RoxUserIdStr::try_from("macro|owner@example.com".to_owned()).unwrap()),
         signed_in_at: at(1, 12),
         expires_at: Some(at(20, 12)),
         last_notice: None,

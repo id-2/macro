@@ -3,10 +3,10 @@
 #[cfg(test)]
 mod test;
 
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::{
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::{
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use sqlx::PgPool;
 use std::time::Duration;
@@ -73,7 +73,7 @@ impl GithubRepo for PgGithubRepo {
     #[tracing::instrument(skip(self), err)]
     async fn get_github_link_by_user_id<'a>(
         &self,
-        macro_user_id: &MacroUserId<Lowercase<'a>>,
+        macro_user_id: &RoxUserId<Lowercase<'a>>,
     ) -> Result<Option<GithubLink>, Self::Err> {
         sqlx::query!(
         r#"
@@ -85,7 +85,7 @@ impl GithubRepo for PgGithubRepo {
         )
         .try_map(|r| Ok(GithubLink{
                 id: r.id,
-                macro_id: MacroUserIdStr::parse_from_str(&r.macro_id)
+                macro_id: RoxUserIdStr::parse_from_str(&r.macro_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
                 fusionauth_user_id: r.fusionauth_user_id,
@@ -115,7 +115,7 @@ impl GithubRepo for PgGithubRepo {
         )
         .try_map(|r| Ok(GithubLink{
                 id: r.id,
-                macro_id: MacroUserIdStr::parse_from_str(&r.macro_id)
+                macro_id: RoxUserIdStr::parse_from_str(&r.macro_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
                 fusionauth_user_id: r.fusionauth_user_id,
@@ -159,7 +159,7 @@ impl GithubRepo for PgGithubRepo {
         )
         .try_map(|r| Ok(GithubLink{
                 id: r.id,
-                macro_id: MacroUserIdStr::parse_from_str(&r.macro_id)
+                macro_id: RoxUserIdStr::parse_from_str(&r.macro_id)
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?
                 .into_owned(),
                 fusionauth_user_id: r.fusionauth_user_id,

@@ -2,14 +2,14 @@ import './globals';
 import {
   createWorkerTraceConfig,
   instrument,
-} from '@macro-inc/observability/worker';
+} from '@rox-one/observability/worker';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import endpoints from './endpoints';
 import docx from './endpoints/docx';
 import type { Bindings } from './env';
 
-// Mirrors crates/macro_cors's ALLOWED_ORIGINS/is_allowed_origin.
+// Mirrors crates/rox_cors's ALLOWED_ORIGINS/is_allowed_origin.
 const ALLOWED_ORIGINS = new Set([
   'http://localhost:5173',
   'https://dashboarddev.rox.one',

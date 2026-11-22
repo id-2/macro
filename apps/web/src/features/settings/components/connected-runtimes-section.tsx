@@ -73,8 +73,10 @@ export function MachineCardError(props: { children: JSX.Element }) {
 
 function lastConnectedText(harness: RegisteredHarness): string {
   return harness.last_connected_at
-    ? `Last connected ${new Date(harness.last_connected_at).toLocaleString()}`
-    : 'Never connected';
+    ? t('runtimeSharing.lastConnected', {
+        time: new Date(harness.last_connected_at).toLocaleString(),
+      })
+    : t('runtimeSharing.neverConnected');
 }
 
 /**
@@ -87,7 +89,11 @@ export function RuntimeName(props: { harness: RegisteredHarness }) {
       dot={
         <StatusDot
           state={props.harness.connected ? 'connected' : 'disconnected'}
-          label={props.harness.connected ? 'Connected' : 'Offline'}
+          label={
+            props.harness.connected
+              ? t('runtimeSharing.connected')
+              : t('runtimeSharing.offline')
+          }
         />
       }
       name={props.harness.name}
@@ -248,7 +254,11 @@ function PairedRuntimeRow(props: {
       dot={
         <StatusDot
           state={props.harness.connected ? 'connected' : 'disconnected'}
-          label={props.harness.connected ? 'Connected' : 'Offline'}
+          label={
+            props.harness.connected
+              ? t('runtimeSharing.connected')
+              : t('runtimeSharing.offline')
+          }
         />
       }
       meta={
@@ -277,13 +287,13 @@ function PairedRuntimeRow(props: {
           <RuntimeOptions harness={props.harness} />
           <Show when={isOwner()}>
             <ConnectAction
-              label="Rename"
+              label={t('runtimeSharing.rename')}
               variant="neutral"
               onClick={props.onRename}
             />
             <Show when={!isComputer()}>
               <ConnectAction
-                label="Remove"
+                label={t('runtimeSharing.remove')}
                 variant="danger"
                 onClick={props.onRemove}
               />

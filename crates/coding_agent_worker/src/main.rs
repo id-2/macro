@@ -144,6 +144,18 @@ enum Command {
         /// Absolute directory sessions run in; created when missing.
         #[arg(long)]
         workspace: Option<std::path::PathBuf>,
+        /// Base URL of this deployment's agent-harness service, e.g.
+        /// `https://app.rox.one/agent-harness`. Overrides what the config
+        /// file says, so an embedder can point the daemon at the deployment
+        /// its own session belongs to.
+        #[arg(long)]
+        api_url: Option<String>,
+        /// Base URL of the same deployment's storage service.
+        #[arg(long)]
+        storage_url: Option<String>,
+        /// Base URL of the same deployment's web app, for pairing links.
+        #[arg(long)]
+        web_url: Option<String>,
     },
     /// Join this Rox computer to Rox at first boot: write the config,
     /// and claim the pre-approved pairing.
@@ -312,6 +324,9 @@ async fn main() -> ExitCode {
             profile,
             agent,
             workspace,
+            api_url,
+            storage_url,
+            web_url,
         }) => {
             // stdout is the event protocol: logs go to stderr, like herdr-acp.
             let _telemetry = telemetry::install();
@@ -321,6 +336,17 @@ async fn main() -> ExitCode {
                 profile,
                 agent,
                 workspace,
+                deployment: service::DeploymentUrls {
+                    api: api_url,
+                    storage: storage_url,
+                    web: web_url,
+                },
+                // The embedder passes the signed-in user's session token so
+                // the daemon can confirm its own pairing code. Never written
+                // to the config file: it is a short-lived secret.
+                approval_token: std::env::var("ROXD_APPROVAL_TOKEN")
+                    .ok()
+                    .filter(|token| !token.trim().is_empty()),
             })
             .await
             {

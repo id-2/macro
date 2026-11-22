@@ -1,4 +1,5 @@
 import { ViewSidebar } from '@app/components/view-shell';
+import { t } from '@app/lib/i18n';
 import { cn, pressHandlers } from '@ui';
 import { children, type JSX, Show } from 'solid-js';
 import {
@@ -50,9 +51,9 @@ export function AgentSessionRow(props: {
         aria-label={props.title}
         aria-description={[
           props.failed
-            ? 'Last turn failed'
+            ? t('agentChat.lastTurnFailed')
             : conversationStateLabel(props.state),
-          props.unread ? 'Unread' : undefined,
+          props.unread ? t('agentChat.unread') : undefined,
         ]
           .filter(Boolean)
           .join(' · ')}
@@ -96,7 +97,7 @@ export function AgentSessionStatusIndicator(props: {
     >
       <span
         data-agent-status-indicator
-        aria-label={props.unread ? 'Unread' : undefined}
+        aria-label={props.unread ? t('agentChat.unread') : undefined}
         class={cn(
           'size-1.5 shrink-0 rounded-full',
           props.failed && 'bg-failure',

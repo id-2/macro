@@ -1,0 +1,15 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "UPDATE email_messages SET from_contact_id = $1 WHERE link_id = $2 AND NOT is_draft",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "43688e97cfa2b59513babc44b571aab5f35508353f3e0a6db143ff78137831c2"
+}

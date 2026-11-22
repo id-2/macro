@@ -1,8 +1,8 @@
 use std::sync::{Arc, Mutex};
 
 use chrono::TimeZone;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -26,8 +26,8 @@ impl Clock for FixedClock {
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(OWNER)
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(OWNER)
         .expect("valid user id")
         .into_owned()
 }

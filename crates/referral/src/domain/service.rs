@@ -5,18 +5,18 @@ mod test;
 
 use std::{collections::HashSet, ops::Deref};
 
-use macro_user_id::{
+use rox_user_id::{
     cowlike::CowLike,
     email::{EmailStr, ReadEmailParts},
     lowercased::Lowercase,
-    user_id::{MacroUserId, MacroUserIdStr},
+    user_id::{RoxUserId, RoxUserIdStr},
 };
 use model_entity::EntityType;
 use notification::domain::{models::SendNotificationRequestBuilder, service::NotificationIngress};
 use rootcause::compat::boxed_error::IntoBoxedError;
 
 use crate::domain::{
-    models::{InviteToMacro, ReferralCode, ReferralError},
+    models::{InviteToRox, ReferralCode, ReferralError},
     ports::{ReferralRepo, ReferralRewarder, ReferralService},
 };
 
@@ -41,7 +41,7 @@ impl<
     #[tracing::instrument(skip(self), err)]
     async fn get_referral_code_for_user<'a>(
         &self,
-        user_id: &MacroUserId<Lowercase<'a>>,
+        user_id: &RoxUserId<Lowercase<'a>>,
     ) -> Result<ReferralCode, ReferralError> {
         self.repo
             .get_referral_code_for_user(user_id)
@@ -52,7 +52,7 @@ impl<
     #[tracing::instrument(skip(self), err)]
     async fn track_referral<'a>(
         &self,
-        referred_user_id: &MacroUserId<Lowercase<'a>>,
+        referred_user_id: &RoxUserId<Lowercase<'a>>,
         referral_code: &ReferralCode,
     ) -> Result<(), ReferralError> {
         let Some(tracked) = self
@@ -63,7 +63,7 @@ impl<
         else {
             return Ok(());
         };
-        let referred = MacroUserIdStr::parse_from_str(referred_user_id.as_ref())
+        let referred = RoxUserIdStr::parse_from_str(referred_user_id.as_ref())
             .map_err(|e| ReferralError::Internal(e.into()))?
             .into_owned();
         if referred == tracked.referrer {
@@ -95,7 +95,7 @@ impl<
     #[tracing::instrument(skip(self), err)]
     async fn send_referral_invite(
         &self,
-        sending_user: MacroUserIdStr<'_>,
+        sending_user: RoxUserIdStr<'_>,
         recipient: EmailStr<'static>,
     ) -> Result<(), ReferralError> {
         let referral_code = self.get_referral_code_for_user(&sending_user.0).await?;
@@ -111,7 +111,7 @@ impl<
 
         let sender_email = Some(sending_user.email_part().email_str().to_string());
 
-        let notification = InviteToMacro {
+        let notification = InviteToRox {
             recipient_email: recipient.clone(),
             referral_code,
             sender_profile_picture_url: sender_profile_picture_url
@@ -129,7 +129,7 @@ impl<
                     secondary_notification_entity: None,
                     notification,
                     sender_id: Some(sending_user),
-                    recipient_ids: HashSet::from([MacroUserIdStr::try_from_email(
+                    recipient_ids: HashSet::from([RoxUserIdStr::try_from_email(
                         recipient.0.as_ref(),
                     )
                     .map_err(anyhow::Error::from)?]),

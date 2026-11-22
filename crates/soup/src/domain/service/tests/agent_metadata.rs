@@ -24,7 +24,7 @@ fn agent(id: AgentSessionId, pull_request: Option<&str>) -> SoupCandidate {
         name: "Agent".to_owned(),
         archived_by: None,
         archived_at: None,
-        owner_id: Owner::User(MacroUserIdStr::parse_from_str("macro|owner@example.com").unwrap()),
+        owner_id: Owner::User(RoxUserIdStr::parse_from_str("macro|owner@example.com").unwrap()),
         bot_id: Uuid::now_v7(),
         harness: "roxd".to_owned(),
         repo_url: Some("https://github.com/macro/macro".to_owned()),

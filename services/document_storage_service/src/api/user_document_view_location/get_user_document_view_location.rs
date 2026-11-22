@@ -7,7 +7,7 @@ use axum::{
     response::{IntoResponse, Json},
 };
 use entity_access::inbound::axum_extractors::DocumentAccessExtractor;
-use macro_authorization::{MacroAuthorizationExtractor, UserOrInternal};
+use rox_authorization::{RoxAuthorizationExtractor, UserOrInternal};
 use model::response::{GenericErrorResponse, GenericResponse};
 use models_permissions::share_permission::access_level::ViewAccessLevel;
 use serde::Deserialize;
@@ -36,10 +36,10 @@ pub struct Params {
 pub async fn handler(
     _access: DocumentAccessExtractor<ViewAccessLevel, EntityAccessService, AuthorizationService>,
     State(ctx): State<ApiContext>,
-    user: MacroAuthorizationExtractor<AuthorizationService, UserOrInternal>,
+    user: RoxAuthorizationExtractor<AuthorizationService, UserOrInternal>,
     Path(Params { document_id }): Path<Params>,
 ) -> impl IntoResponse {
-    match macro_db_client::user_document_view_location::get::get_user_document_view_location(
+    match rox_db_client::user_document_view_location::get::get_user_document_view_location(
         &ctx.db,
         user.authorization.user.macro_user_id.as_ref(),
         &document_id,

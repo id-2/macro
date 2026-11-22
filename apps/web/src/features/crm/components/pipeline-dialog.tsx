@@ -83,7 +83,7 @@ export function PipelineDialog(props: {
         <Panel.Body>
           <form
             class="h-full min-h-0"
-            aria-label="New pipeline"
+            aria-label={t('crm.newPipeline')}
             onSubmit={(event) => {
               event.preventDefault();
               fireAndForget(submit(), 'crm');
@@ -102,12 +102,12 @@ export function PipelineDialog(props: {
           >
             <EntityComposer.Root>
               <EntityComposer.Header>
-                <Dialog.Title class="sr-only">New pipeline</Dialog.Title>
+                <Dialog.Title class="sr-only">{t('crm.newPipeline')}</Dialog.Title>
                 <EntityComposer.Title class="mb-0 min-w-0 flex-1 self-center">
                   <input
                     autofocus
-                    aria-label="Pipeline name"
-                    placeholder="Pipeline name"
+                    aria-label={t('crm.pipelineName')}
+                    placeholder={t('crm.pipelineName')}
                     maxlength={200}
                     required
                     class="ph-no-capture w-full min-w-0 text-xl/7 font-medium outline-none bg-transparent placeholder:text-ink-placeholder"
@@ -119,8 +119,8 @@ export function PipelineDialog(props: {
                 <Button
                   variant="ghost"
                   tabIndex={-1}
-                  aria-label="Close"
-                  tooltip="Close"
+                  aria-label={t('common.close')}
+                  tooltip={t('common.close')}
                   size="icon-md"
                   disabled={pending()}
                   onClick={close}
@@ -173,7 +173,7 @@ export function PipelineDialog(props: {
               </EntityComposer.Main>
               <Show when={error()}>
                 <p role="alert" class="px-2 text-sm text-failure">
-                  Could not create this pipeline. Please try again.
+                  {t('crm.couldNotCreatePipeline')}
                 </p>
               </Show>
               <EntityComposer.Footer class="items-center">
@@ -184,7 +184,7 @@ export function PipelineDialog(props: {
                 >
                   <Checkbox.Control />
                   <Checkbox.Label class="text-xs text-ink-muted font-normal whitespace-nowrap">
-                    Share with my team
+                    {t('crm.shareWithMyTeam')}
                   </Checkbox.Label>
                 </Checkbox>
                 <EntityComposer.Submit
@@ -193,7 +193,7 @@ export function PipelineDialog(props: {
                   hasContent={Boolean(name().trim())}
                   disabled={pending() || !name().trim()}
                 >
-                  {pending() ? 'Creating…' : 'Create pipeline'}
+                  {pending() ? t('crm.creating') : t('crm.createPipeline')}
                 </EntityComposer.Submit>
               </EntityComposer.Footer>
             </EntityComposer.Root>

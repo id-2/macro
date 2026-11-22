@@ -1,12 +1,12 @@
 import { wrapXml } from '../../mentions';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 
 /** The box Rox's editors fit a message image into, as the composer does. */
 const MESSAGE_IMAGE_BOX = 400;
 
 /**
  * An image in static file storage: an upload, a render from
- * `canvas.render()`, or one made with `macro.images.generate()`. Attach it to
+ * `canvas.render()`, or one made with `rox.images.generate()`. Attach it to
  * a channel message with `channel.send(text, { images: [image] })`, show it in
  * a reply or Markdown with {@link StaticImage.toMarkdown}, or pass it back to
  * `generate` as a reference. It is not a document: never mention its `id` as
@@ -30,7 +30,7 @@ export class StaticImage {
    * before it loads.
    */
   static byId(
-    client: MacroClient,
+    client: RoxClient,
     id: string,
     size?: { width: number; height: number },
   ): StaticImage {
@@ -74,7 +74,7 @@ export class StaticImage {
   }
 }
 
-/** An image made by `macro.images.generate()`, stored as a static file. */
+/** An image made by `rox.images.generate()`, stored as a static file. */
 export class GeneratedImage extends StaticImage {
   /** @internal Built from the generation response. */
   constructor(

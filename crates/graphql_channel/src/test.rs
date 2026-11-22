@@ -6,7 +6,7 @@ use entity_access::domain::models::{
     AccessError, Entity, EntityAccessAuth, EntityAccessReceipt, EntityPermission, EntityType,
     MemberParticipantRole, ParticipantRole,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::*;
@@ -58,7 +58,7 @@ struct MemberAuthorizer {
 impl ChannelActivityAuthorizer for MemberAuthorizer {
     async fn authorize_channel_member(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         channel_id: Uuid,
     ) -> Result<EntityAccessReceipt<MemberParticipantRole>, AccessError> {
         self.calls
@@ -82,7 +82,7 @@ impl ChannelActivityAuthorizer for MemberAuthorizer {
 async fn record_channel_activity_authorizes_and_delegates_only_channel_activity() {
     let service = Arc::new(CapturingService::default());
     let authorizer = Arc::new(MemberAuthorizer::default());
-    let user = MacroUserIdStr::try_from_email("user@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("user@example.com").unwrap();
     let channel_id = Uuid::new_v4();
     let schema = Schema::build(
         QueryRoot,

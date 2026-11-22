@@ -21,7 +21,7 @@ use item_filters::{
         initiative::InitiativeLiteral,
     },
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 
 use super::models::{WorkFeedItemType, WorkFeedScope};
@@ -46,7 +46,7 @@ const GITHUB_PULL_REQUEST_SOURCE: &str = "github_pull_request";
 /// - Snippets are documents only when the caller shows them.
 /// - Tasks are documents only when the scope asks for both; asking for one
 ///   of documents and tasks keeps the other out.
-pub fn signal_filter(user: &MacroUserIdStr<'static>, scope: &WorkFeedScope) -> EntityFilterAst {
+pub fn signal_filter(user: &RoxUserIdStr<'static>, scope: &WorkFeedScope) -> EntityFilterAst {
     EntityFilterAst {
         document_filter: document_filter(scope).map(Arc::new),
         email_filter: EmailFilterAst {

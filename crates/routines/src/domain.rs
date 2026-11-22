@@ -3,7 +3,7 @@
 use anyhow::{Result, ensure};
 use async_trait::async_trait;
 use chrono::{DateTime, Datelike, Timelike, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use routine_program::{RoutineProgram, Step};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -547,31 +547,31 @@ pub trait RoutineService: Send + Sync {
     /// Create for the authenticated user; target accessibility is checked server-side.
     async fn create(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         config: &RoutineConfiguration,
     ) -> Result<RoutineInfo>;
     /// List the authenticated user's routines, including routines targeting agents.
-    async fn list(&self, user: &MacroUserIdStr<'static>) -> Result<Vec<RoutineInfo>>;
+    async fn list(&self, user: &RoxUserIdStr<'static>) -> Result<Vec<RoutineInfo>>;
     /// Read an accessible routine and its history.
-    async fn read(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<RoutineDetails>;
+    async fn read(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<RoutineDetails>;
     /// Replace configuration of an owned routine; activation is preserved.
     async fn update(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         config: &RoutineConfiguration,
     ) -> Result<RoutineInfo>;
     /// Pause/resume an owned routine independently of its configuration.
     async fn set_enabled(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
         enabled: bool,
     ) -> Result<RoutineInfo>;
     /// Permanently delete an owned routine and its schedule.
-    async fn delete(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<()>;
+    async fn delete(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<()>;
     /// Start an owned routine now, outside its schedule.
-    async fn run_now(&self, user: &MacroUserIdStr<'static>, id: Uuid) -> Result<RoutineRunStarted>;
+    async fn run_now(&self, user: &RoxUserIdStr<'static>, id: Uuid) -> Result<RoutineRunStarted>;
 }
 
 /// A saved single agent task keeps its routine instructions (`prompt`) apart

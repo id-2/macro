@@ -12,7 +12,7 @@ use crate::domain::{
 };
 use crm::domain::service::NoOpCrmService;
 use frecency::{domain::services::FrecencyQueryServiceImpl, outbound::postgres::FrecencyPgStorage};
-use macro_event_broker::NoopMacroEventBroker;
+use rox_event_broker::NoopRoxEventBroker;
 
 const PRIMARY_INBOX: Uuid = Uuid::from_u128(0xa1111111_1111_1111_1111_111111111111);
 const ALT_INBOX: Uuid = Uuid::from_u128(0xa2222222_2222_2222_2222_222222222222);
@@ -35,7 +35,7 @@ fn service(
         enqueuer: NoOpEnqueuer,
         crm_service: NoOpCrmService,
         entity_access_management_service: (),
-        macro_event_broker: NoopMacroEventBroker,
+        macro_event_broker: NoopRoxEventBroker,
         sent_undo_delay_secs: 0,
         sender_provider: std::sync::Arc::new(
             crate::domain::senders::UnavailableEmailSenderProvider,
@@ -46,8 +46,8 @@ fn service(
     }
 }
 
-fn caller() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
+fn caller() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|user1@test.com").unwrap()
 }
 
 fn reply_to(replying_to_id: Uuid) -> SendingInboxRequest<'static> {
@@ -77,7 +77,7 @@ fn reply_input(replying_to_id: Uuid) -> CreateDraftInput {
         bcc: vec![],
         body_text: Some("Thanks".to_owned()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         include_signature: None,

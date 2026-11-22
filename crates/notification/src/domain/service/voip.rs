@@ -7,7 +7,7 @@
 mod test;
 
 use futures::future;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 use crate::domain::models::apple::VoipPushPayload;
@@ -37,7 +37,7 @@ where
 {
     async fn get_voip_push_targets(
         &self,
-        recipient_ids: &[MacroUserIdStr<'_>],
+        recipient_ids: &[RoxUserIdStr<'_>],
     ) -> Result<Vec<VoipPushTarget>, Report> {
         let device_map = self.repository.get_device_endpoints(recipient_ids).await?;
 
@@ -88,7 +88,7 @@ where
                 )
             })
             .collect();
-        let jobs: Vec<(MacroUserIdStr<'static>, DeviceEndpoint, VoipPushPayload)> = pushes
+        let jobs: Vec<(RoxUserIdStr<'static>, DeviceEndpoint, VoipPushPayload)> = pushes
             .into_iter()
             .flat_map(|(target, payload)| {
                 let recipient_id = target.recipient_id;

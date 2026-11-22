@@ -1,7 +1,7 @@
 //! Viewer-scoped directory records, distinct from public user profiles.
 
 use super::page::ContactCursor;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 #[cfg(test)]
@@ -13,7 +13,7 @@ pub struct ContactId(Uuid);
 
 impl ContactId {
     /// Derive an identity from the viewer and target, never from mutable names.
-    pub fn for_viewer(viewer: &MacroUserIdStr<'_>, user: &MacroUserIdStr<'_>) -> Self {
+    pub fn for_viewer(viewer: &RoxUserIdStr<'_>, user: &RoxUserIdStr<'_>) -> Self {
         let namespace = Uuid::new_v5(&Uuid::NAMESPACE_OID, viewer.as_ref().as_bytes());
         Self(Uuid::new_v5(&namespace, user.as_ref().as_bytes()))
     }
@@ -27,7 +27,7 @@ impl ContactId {
 /// Structured name resolved by the name owner, with profile-over-address-book precedence.
 pub struct ContactName {
     /// Person whose name was resolved.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// First name, when known.
     pub first_name: Option<String>,
     /// Last name, when known.
@@ -53,7 +53,7 @@ pub struct Contact {
     /// Identity of this viewer/person relationship, not the target user identity.
     pub id: ContactId,
     /// Target user identifier; its email may belong to a non-Rox contact.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Resolved name. None lets each surface apply its existing email fallback.
     pub name: Option<String>,
 }

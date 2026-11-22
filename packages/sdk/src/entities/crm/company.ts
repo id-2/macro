@@ -1,7 +1,7 @@
 import type { GetCompanyResponses } from '../../../generated/storage/types.gen';
 import type { RichMessage } from '../../mentions';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { PropertiedEntity } from '../entity';
 import {
   DiscussionComment,
@@ -70,12 +70,12 @@ export class Company extends PropertiedEntity<CompanyDetail> {
   }
 
   /** A handle to a CRM company by id. Details load on first access. */
-  static byId(client: MacroClient, id: string): Company {
+  static byId(client: RoxClient, id: string): Company {
     return new Company(client, id);
   }
 
   /** Build a company from an API record (pre-seeded, no fetch). */
-  static from(client: MacroClient, data: CompanyDetail): Company {
+  static from(client: RoxClient, data: CompanyDetail): Company {
     return new Company(client, data.id, data);
   }
 

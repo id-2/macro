@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use std::{process::Command, sync::Mutex};
 use tracing::instrument::WithSubscriber;
 
@@ -363,7 +363,7 @@ async fn delayed_enrollment_cannot_replace_live_key_or_survive_retirement_cleanu
         domain::{ports::Repository, service::PasswordService},
         outbound::postgres::PgRepository,
     };
-    use macro_user_id::{cowlike::CowLike, user_id::MacroUserIdStr};
+    use rox_user_id::{cowlike::CowLike, user_id::RoxUserIdStr};
     let address =
         std::env::var("PASSWORDS_TEST_OPENBAO_ADDRESS").expect("explicit disposable address");
     let key_path =
@@ -395,7 +395,7 @@ async fn delayed_enrollment_cannot_replace_live_key_or_survive_retirement_cleanu
         .expect("provider"),
     );
     let owner = Actor {
-        user_id: MacroUserIdStr::parse_from_str("macro|enrollment@example.test")
+        user_id: RoxUserIdStr::parse_from_str("macro|enrollment@example.test")
             .expect("identity")
             .into_owned(),
     };

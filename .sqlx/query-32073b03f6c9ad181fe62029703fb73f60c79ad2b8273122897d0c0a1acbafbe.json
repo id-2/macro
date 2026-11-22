@@ -1,0 +1,16 @@
+{
+  "db_name": "PostgreSQL",
+  "query": "INSERT INTO email_messages(id,thread_id,link_id,provider_id,is_draft,subject,mailbox_state) VALUES($1,$2,$3,'outlook-parent',false,'Parent','{\"in_inbox\":true}')",
+  "describe": {
+    "columns": [],
+    "parameters": {
+      "Left": [
+        "Uuid",
+        "Uuid",
+        "Uuid"
+      ]
+    },
+    "nullable": []
+  },
+  "hash": "32073b03f6c9ad181fe62029703fb73f60c79ad2b8273122897d0c0a1acbafbe"
+}

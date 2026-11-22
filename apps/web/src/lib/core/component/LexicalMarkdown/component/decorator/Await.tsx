@@ -2,7 +2,7 @@ import { AgentThinking } from '@app/features/agent-activity/agent-activity';
 import {
   type AwaitDecoratorProps,
   PENDING_REPLY_TEXT,
-} from '@macro-inc/lexical-core';
+} from '@rox-one/lexical-core';
 import { type Component, Show } from 'solid-js';
 
 export const Await: Component<AwaitDecoratorProps> = (props) => {

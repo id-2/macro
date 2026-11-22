@@ -26,8 +26,8 @@ use entity_access::{
     },
     inbound::axum_extractors::ExtractorError,
 };
-use macro_authorization::{
-    MacroAuthorizationExtractor, MacroAuthorizationService, MacroAuthorizationState, UserOrInternal,
+use rox_authorization::{
+    RoxAuthorizationExtractor, RoxAuthorizationService, RoxAuthorizationState, UserOrInternal,
 };
 use uuid::Uuid;
 
@@ -60,9 +60,9 @@ impl<T, S, Svc, Auth> FromRequestParts<S> for CrmCompanyAccessLevelExtractor<T, 
 where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -78,7 +78,7 @@ where
         let company_id = extract_company_id(&path_params)?.to_string();
 
         let authorization =
-            MacroAuthorizationExtractor::<Auth, UserOrInternal>::from_request_parts(parts, state)
+            RoxAuthorizationExtractor::<Auth, UserOrInternal>::from_request_parts(parts, state)
                 .await
                 .map_err(ExtractorError::from)?;
         let macro_user_id = authorization.authorization.user.macro_user_id.clone();
@@ -136,9 +136,9 @@ impl<T, S, Svc, Auth> FromRequestParts<S> for CrmContactAccessLevelExtractor<T, 
 where
     T: RequiredPermission,
     Arc<Svc>: FromRef<S>,
-    MacroAuthorizationState<Auth>: FromRef<S>,
+    RoxAuthorizationState<Auth>: FromRef<S>,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
     S: Send + Sync + 'static,
 {
     type Rejection = ExtractorError;
@@ -154,7 +154,7 @@ where
         let contact_id = extract_contact_id(&path_params)?.to_string();
 
         let authorization =
-            MacroAuthorizationExtractor::<Auth, UserOrInternal>::from_request_parts(parts, state)
+            RoxAuthorizationExtractor::<Auth, UserOrInternal>::from_request_parts(parts, state)
                 .await
                 .map_err(ExtractorError::from)?;
         let macro_user_id = authorization.authorization.user.macro_user_id.clone();

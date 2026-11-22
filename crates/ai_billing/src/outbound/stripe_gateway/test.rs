@@ -954,7 +954,7 @@ async fn subscription_period_prefers_the_billable_subscription_to_an_unpaid_one(
 
 #[test]
 fn credit_reload_metadata_stamps_purpose_reload_and_payer() {
-    let payer = MacroUserIdStr::try_from("macro|payer@example.com".to_string()).expect("payer");
+    let payer = RoxUserIdStr::try_from("macro|payer@example.com".to_string()).expect("payer");
     let metadata = credit_reload_metadata(Uuid::from_u128(13), &payer);
 
     assert_eq!(metadata.len(), 3);
@@ -1276,8 +1276,8 @@ async fn direct_usage_invoices_are_disabled_without_contacting_stripe() {
     assert!(server.received_requests().await.unwrap().is_empty());
 }
 
-fn payer() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
+fn payer() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|payer@example.com".to_string()).unwrap()
 }
 
 #[tokio::test]

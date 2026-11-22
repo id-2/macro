@@ -1,9 +1,9 @@
 use anyhow::Context;
 use entity_registry::NonUserOwners;
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::{env_vars, maybe_env_vars};
-use macro_service_urls::AiEditingWorkerUrl;
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::{env_vars, maybe_env_vars};
+use rox_service_urls::AiEditingWorkerUrl;
 use secretsmanager_client::LocalOrRemoteSecret;
 
 use crate::cognition::core::constants::DEFAULT_DOCUMENT_BATCH_LIMIT;
@@ -74,7 +74,7 @@ maybe_env_vars!(
 );
 
 /// The configuration parameters for the application.
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// Default-off quota admission and prospective usage counting.
@@ -192,7 +192,7 @@ impl Config {
         let billing = ai_billing::config::load_ai_usage_billing()
             .map_err(|error| anyhow::anyhow!("{error}"))?;
         let mut config =
-            macro_config::ConfigLoader::load::<Config>().context("failed to load config")?;
+            rox_config::ConfigLoader::load::<Config>().context("failed to load config")?;
         config.enable_ai_usage_enforcement = enforcement;
         config.enable_ai_usage_billing = billing;
         Ok(config)

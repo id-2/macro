@@ -6,8 +6,8 @@ use chrono::Utc;
 use notification::domain::models::NotificationState;
 use uuid::Uuid;
 
-fn test_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("loader@test.com").unwrap()
+fn test_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("loader@test.com").unwrap()
 }
 
 #[tokio::test]
@@ -41,7 +41,7 @@ struct Reader(
 impl SoupNotificationEdgeReader for Reader {
     async fn get_notifications(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         keys: Vec<model_entity::Entity<'static>>,
         query: EntityNotificationQuery,
     ) -> Result<

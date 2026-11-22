@@ -121,7 +121,7 @@ async fn session_for_token(
 
 #[tokio::test]
 async fn recognizes_a_database_backed_in_memory_agent() {
-    let agent = BotId::new_from_uuid(macro_uuid::Uuid::from_u128(0x0000_5678));
+    let agent = BotId::new_from_uuid(rox_uuid::Uuid::from_u128(0x0000_5678));
     let (id, sessions) = sessions_with_harness(agent, "in-memory");
     let containers = RoutedContainers::new(unreachable_sandbox(), None, sessions);
 
@@ -169,7 +169,7 @@ async fn routes_the_sandboxed_bot_to_the_sandbox() {
 /// So is a user-owned bot, which is what an `@claude` deployment serves.
 #[tokio::test]
 async fn routes_an_owned_bot_to_the_sandbox() {
-    let owned = BotId::new_from_uuid(macro_uuid::Uuid::from_u128(0x0000_1234));
+    let owned = BotId::new_from_uuid(rox_uuid::Uuid::from_u128(0x0000_1234));
     let (id, sessions) = sessions_with(owned);
     let containers = RoutedContainers::new(unreachable_sandbox(), None, sessions);
 
@@ -388,7 +388,7 @@ async fn an_in_process_session_whose_row_is_gone_releases() {
 /// open, still streams its reply.
 #[test]
 fn only_a_background_session_with_instructions_goes_unread() {
-    let owner = macro_user_id::user_id::MacroUserIdStr::parse_from_str("macro|someone@example.com")
+    let owner = rox_user_id::user_id::RoxUserIdStr::parse_from_str("macro|someone@example.com")
         .expect("a user id");
     let mut session = test_agent_session(AgentSessionId::new());
     session.owner_id = model_owner::Owner::User(owner.clone());

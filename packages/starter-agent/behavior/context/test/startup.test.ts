@@ -83,7 +83,7 @@ describe('startup', () => {
           AGENT_WORKSPACE: '/w',
           MUPPET_RELAY_URL: 'http://127.0.0.1:4000',
           MUPPET_RELAY_TOKEN: 'capability',
-          MUPPET_CREDENTIAL_NAMES: 'MACRO_API_KEY,OTHER',
+          MUPPET_CREDENTIAL_NAMES: 'ROX_API_KEY,OTHER',
         },
         reserved
       )
@@ -94,7 +94,7 @@ describe('startup', () => {
           kind: 'relayed',
           url: 'http://127.0.0.1:4000',
           token: 'capability',
-          names: ['MACRO_API_KEY', 'OTHER'],
+          names: ['ROX_API_KEY', 'OTHER'],
         },
       },
     });
@@ -236,7 +236,7 @@ describe('runFiles', () => {
 
 describe('addresses', () => {
   const enrolled = {
-    MACRO_API_KEY: 'mak_secret',
+    ROX_API_KEY: 'mak_secret',
     MACRO_GATEWAY: 'https://dev-gateway.rox.one',
     OVERRIDE_DOCUMENT_STORAGE_SERVICE_URL: 'https://storage.internal/dss',
     OVERRIDE_AUTH_SERVICE_URL: 'https://auth.internal',
@@ -310,7 +310,7 @@ describe('addresses', () => {
   });
 
   test('needs the gateway, and URLs that parse, naming the key and never a value', () => {
-    expect(addresses({ MACRO_API_KEY: 'mak_secret' })).toEqual({
+    expect(addresses({ ROX_API_KEY: 'mak_secret' })).toEqual({
       kind: 'invalid',
       message: 'MACRO_GATEWAY is not in the credentials',
     });

@@ -6,10 +6,10 @@ use axum::{
     response::Json,
     routing::get,
 };
-use macro_authorization::{
-    OptionalMacroAuthorizationExtractor, UserOrInternalService, UserOrInternalServiceAuthorization,
+use rox_authorization::{
+    OptionalRoxAuthorizationExtractor, UserOrInternalService, UserOrInternalServiceAuthorization,
 };
-use macro_db_client::dcs::get_part_by_id::get_part_by_id;
+use rox_db_client::dcs::get_part_by_id::get_part_by_id;
 use model::citations::DocumentTextPart;
 use sqlx::PgPool;
 
@@ -37,7 +37,7 @@ pub struct Params {
 #[tracing::instrument(skip(db, user), fields(actor = tracing::field::Empty))]
 pub async fn get_citation_handler(
     State(db): State<PgPool>,
-    user: OptionalMacroAuthorizationExtractor<DcsAuthorizationService, UserOrInternalService>,
+    user: OptionalRoxAuthorizationExtractor<DcsAuthorizationService, UserOrInternalService>,
     Path(Params { id }): Path<Params>,
 ) -> Result<Json<DocumentTextPart>, (StatusCode, String)> {
     if let Some(actor) = user.acting_entity() {

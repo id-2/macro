@@ -90,7 +90,7 @@ impl PgMailboxSync {
         .await
         .map_err(db_error)?;
         let payload = serde_json::json!({"kind":"organization","thread_id":thread});
-        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",macro_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload).execute(&mut **tx).await.map_err(db_error)?;
+        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload) VALUES ($1,$2,$3,$4)",rox_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload).execute(&mut **tx).await.map_err(db_error)?;
         Ok(())
     }
 }
@@ -340,7 +340,7 @@ impl DraftRepository for PgMailboxSync {
         let correlation = sqlx::query_scalar!("SELECT agent_correlation_id FROM email_scheduled_messages WHERE message_id = $1 AND link_id = $2", lease.message_id, lease.mailbox.link_id).fetch_optional(&mut *tx).await.map_err(db_error)?.flatten();
         let payload = serde_json::json!({"kind":"message","message_id":lease.message_id,"thread_id":message.thread_id,"provider_id":draft.id.as_str(),"is_import":false,"is_new":false,"is_new_thread":false,"was_draft":true,"is_draft":false,"is_sent":true,"version":draft.version,"calendar_parts":[],"actor":checkpoint.submission_started.then_some(&checkpoint.actor_id),"agent_correlation_id":correlation});
         let dedupe = format!("send/{}/{}", lease.mailbox.link_id, lease.message_id);
-        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload,dedupe_key) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (dedupe_key) DO NOTHING",macro_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload,dedupe).execute(&mut *tx).await.map_err(db_error)?;
+        sqlx::query!("INSERT INTO email_projection_outbox (id,link_id,generation,payload,dedupe_key) VALUES ($1,$2,$3,$4,$5) ON CONFLICT (dedupe_key) DO NOTHING",rox_uuid::generate_uuid_v7(),lease.mailbox.link_id,lease.mailbox.sync_generation,payload,dedupe).execute(&mut *tx).await.map_err(db_error)?;
         // Reconcile attachments and the provider's authoritative sent timestamp.
         sqlx::query!(r#"
             INSERT INTO email_message_reconciliation (link_id,generation,provider_id,revision,is_import)

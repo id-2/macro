@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { toast } from '@core/component/Toast/Toast';
 import { fireAndForget } from '@core/util/fireAndForget';
 import {
@@ -22,7 +23,7 @@ export function CodingPreferencesSetting() {
     try {
       await setPreferences.mutateAsync({ ...current, [preference]: enabled });
     } catch {
-      toast.failure('Could not update coding preferences');
+      toast.failure(t('settingsAgents.codingPreferencesFailed'));
     }
   };
 
@@ -50,18 +51,18 @@ export function CodingPreferencesSetting() {
   );
 
   return (
-    <SettingsSection title="Coding sessions">
+    <SettingsSection title={t('settingsAgents.codingSessions')}>
       <SettingsCard>
         <DefaultRepository />
         <PreferenceRow
           preference="createTasks"
-          label="Create tasks"
-          description="Link each coding session to a Rox task"
+          label={t('settingsAgents.createTasks')}
+          description={t('settingsAgents.createTasksDescription')}
         />
         <PreferenceRow
           preference="openPullRequests"
-          label="Open pull requests"
-          description="Deliver coding work as a pull request"
+          label={t('settingsAgents.openPullRequests')}
+          description={t('settingsAgents.openPullRequestsDescription')}
         />
       </SettingsCard>
     </SettingsSection>

@@ -187,7 +187,7 @@ export function BotCreate(props: { channelId?: string; onBack: () => void }) {
           onClick={leave}
         >
           <CaretLeftIcon class="size-3 touch:size-6 shrink-0 pointer-events-none" />
-          Back to bots
+          Назад к ботам
         </Button>
         <Show when={stage() !== 'ready'}>
           <header class="flex items-center gap-3">

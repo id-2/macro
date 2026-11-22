@@ -6,7 +6,7 @@ mod test;
 
 use crate::domain::{
     events::{
-        ChatCopiedMetadata, ChatCreatedMetadata, ChatDeletedMetadata, ChatMacroEvent,
+        ChatCopiedMetadata, ChatCreatedMetadata, ChatDeletedMetadata, ChatRoxEvent,
         ChatPermanentlyDeletedMetadata, ChatRestoredMetadata, ChatUpdatedMetadata,
     },
     models::{
@@ -22,8 +22,8 @@ use entity_access::domain::models::{
     EntityPermission, OwnerAccessLevel, ViewAccessLevel,
 };
 use entity_access_management::domain::ports::EntityAccessManagementService;
-use macro_event_broker::{MacroEventBroker, NoopMacroEventBroker};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_event_broker::{RoxEventBroker, NoopRoxEventBroker};
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_owner::Owner;
 use models_permissions::share_permission::SharePermissionV2;
@@ -35,10 +35,10 @@ use std::sync::Arc;
 use unicode_segmentation::UnicodeSegmentation;
 
 /// Concrete service implementation that delegates to a [`ChatRepo`]
-pub struct ChatServiceImpl<R, ToolSetContext, Eam, B = NoopMacroEventBroker>
+pub struct ChatServiceImpl<R, ToolSetContext, Eam, B = NoopRoxEventBroker>
 where
     ToolSetContext: Clone + Send + Sync + 'static,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     // toolset should be replaced with trait;
     toolset: Arc<AsyncToolCollection<ToolSetContext>>,
@@ -50,7 +50,7 @@ where
 
 /// The user id to attribute a chat lifecycle event to, when the caller is an
 /// authenticated user.
-fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<MacroUserIdStr<'static>> {
+fn event_actor_user_id(auth: &EntityAccessAuth) -> Option<RoxUserIdStr<'static>> {
     match auth {
         EntityAccessAuth::Authenticated(user_id) => Some(user_id.clone()),
         EntityAccessAuth::Bot(_)
@@ -76,7 +76,7 @@ where
             toolset,
             context,
             entity_access_management_service,
-            event_broker: NoopMacroEventBroker,
+            event_broker: NoopRoxEventBroker,
         }
     }
 }
@@ -94,13 +94,13 @@ impl<R: ChatRepo, Eam: EntityAccessManagementService> ChatServiceImpl<R, (), Eam
     }
 }
 
-impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: MacroEventBroker>
+impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: RoxEventBroker>
     ChatServiceImpl<R, ToolSetContext, Eam, B>
 where
     ToolSetContext: Clone + Send + Sync + 'static,
 {
     /// Replaces the event broker while preserving every other service dependency.
-    pub fn with_event_broker<B2: MacroEventBroker>(
+    pub fn with_event_broker<B2: RoxEventBroker>(
         self,
         event_broker: B2,
     ) -> ChatServiceImpl<R, ToolSetContext, Eam, B2> {
@@ -114,7 +114,7 @@ where
     }
 
     /// Publish a chat lifecycle event; failures are logged and dropped.
-    fn publish_chat_event(&self, event: &ChatMacroEvent) {
+    fn publish_chat_event(&self, event: &ChatRoxEvent) {
         drop(self.event_broker.send_event(event).inspect_err(|error| {
             tracing::error!(error = ?error, "failed to schedule chat event");
         }));
@@ -156,7 +156,7 @@ where
     }
 }
 
-impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: MacroEventBroker>
+impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: RoxEventBroker>
     ChatService for ChatServiceImpl<R, ToolSetContext, Eam, B>
 where
     ToolSetContext: Clone + Send + Sync + 'static,
@@ -197,7 +197,7 @@ where
             );
         }
 
-        self.publish_chat_event(&ChatMacroEvent::created(ChatCreatedMetadata {
+        self.publish_chat_event(&ChatRoxEvent::created(ChatCreatedMetadata {
             chat_id: chat_id.clone(),
             owner,
             name,
@@ -281,7 +281,7 @@ where
             )
             .await?;
 
-        self.publish_chat_event(&ChatMacroEvent::copied(ChatCopiedMetadata {
+        self.publish_chat_event(&ChatRoxEvent::copied(ChatCopiedMetadata {
             chat_id: new_chat_id.clone(),
             source_chat_id: chat_id.clone(),
             owner: user_id.clone(),
@@ -322,7 +322,7 @@ where
             );
         }
 
-        self.publish_chat_event(&ChatMacroEvent::deleted(ChatDeletedMetadata {
+        self.publish_chat_event(&ChatRoxEvent::deleted(ChatDeletedMetadata {
             chat_id: chat_id.clone(),
             actor_user_id: event_actor_user_id(entity_access_receipt.auth()),
             project_id,
@@ -362,7 +362,7 @@ where
             );
         }
 
-        self.publish_chat_event(&ChatMacroEvent::permanently_deleted(
+        self.publish_chat_event(&ChatRoxEvent::permanently_deleted(
             ChatPermanentlyDeletedMetadata {
                 chat_id: chat_id.clone(),
                 actor_user_id: event_actor_user_id(entity_access_receipt.auth()),
@@ -464,7 +464,7 @@ where
             );
         }
 
-        self.publish_chat_event(&ChatMacroEvent::updated(ChatUpdatedMetadata {
+        self.publish_chat_event(&ChatRoxEvent::updated(ChatUpdatedMetadata {
             chat_id: chat_id.clone(),
             actor_user_id: user_id.clone(),
             name,
@@ -487,7 +487,7 @@ where
             .revert_delete(chat_id, chat.project_id.as_deref())
             .await?;
 
-        self.publish_chat_event(&ChatMacroEvent::restored(ChatRestoredMetadata {
+        self.publish_chat_event(&ChatRoxEvent::restored(ChatRestoredMetadata {
             chat_id: chat_id.clone(),
             actor_user_id: event_actor_user_id(entity_access_receipt.auth()),
             project_id: chat.project_id,
@@ -645,7 +645,7 @@ where
     }
 }
 
-impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: MacroEventBroker>
+impl<R: ChatRepo, ToolSetContext, Eam: EntityAccessManagementService, B: RoxEventBroker>
     ChatServiceImpl<R, ToolSetContext, Eam, B>
 where
     ToolSetContext: Clone + Send + Sync + 'static,

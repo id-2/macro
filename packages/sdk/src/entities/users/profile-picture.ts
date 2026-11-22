@@ -1,11 +1,11 @@
 import type { UserProfilePicture } from '../../../generated/auth/types.gen';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { StaticImage } from '../images/image';
 
 /**
  * A profile picture that is not in static file storage: an older picture
  * stored as a plain URL (such as a sign-in provider's avatar). It can be shown
- * but not passed to `macro.me.update()`.
+ * but not passed to `rox.me.update()`.
  */
 export class ExternalProfilePicture {
   /** @internal */
@@ -38,7 +38,7 @@ const STATIC_FILE_PATH =
 
 /** Read a picture row; an empty URL means the user has no picture. */
 export function toProfilePicture(
-  client: MacroClient,
+  client: RoxClient,
   row: UserProfilePicture | undefined,
 ): ProfilePicture | undefined {
   const url = row?.url?.trim();

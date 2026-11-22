@@ -4,7 +4,7 @@
 use std::collections::HashMap;
 
 use agent_session::domain::model::AgentSessionId;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{ImportEntityDbRow, PgImportRepo, run_status_strings};
@@ -29,7 +29,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self, rows), fields(rows = rows.len()), err)]
     async fn replace_plan(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         rows: &[PlanRow],
     ) -> Result<Vec<ImportEntity>> {
@@ -139,7 +139,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self, rows), fields(rows = rows.len()), err)]
     async fn update_plan_rows(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         rows: &[PlanRow],
     ) -> Result<u64> {
@@ -171,7 +171,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn attach_review(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         review_id: Uuid,
         session_id: AgentSessionId,
@@ -214,7 +214,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn transition_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         from: &[RunStatus],
         to: RunStatus,
@@ -242,7 +242,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self), fields(pages = scanned.pages, data_sources = scanned.data_sources), err)]
     async fn record_scan(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
         scanned: ScanCounts,
     ) -> Result<bool> {
@@ -267,7 +267,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self, foreign_ids), fields(objects = foreign_ids.len()), err)]
     async fn team_copies(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         foreign_ids: &[String],
     ) -> Result<Vec<ImportEntity>> {
         if foreign_ids.is_empty() {
@@ -298,7 +298,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self, shared, personal), fields(shared = shared.len(), personal = personal.len()), err)]
     async fn set_plan_sharing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         shared: &[Uuid],
         personal: &[Uuid],
     ) -> Result<u64> {
@@ -325,7 +325,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self, ids, shared), fields(rows = ids.len(), shared = shared.len()), err)]
     async fn claim_importing(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         ids: &[Uuid],
         shared: &[Uuid],
         team_id: Option<Uuid>,
@@ -381,7 +381,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn claim_team_object(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_id: Uuid,
         team_id: Uuid,
         claim: bool,
@@ -408,7 +408,7 @@ impl NotionPlanRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn wait_on(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_id: Uuid,
         holder: Uuid,
     ) -> Result<bool> {
@@ -449,7 +449,7 @@ impl PgImportRepo {
     /// transaction holding the row and the team's current holder.
     async fn try_claim_team_object(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_id: Uuid,
         team_id: Uuid,
         claim: bool,

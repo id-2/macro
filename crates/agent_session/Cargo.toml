@@ -17,9 +17,9 @@ inbound = [
   "admission",
   "dep:axum",
   "dep:entity_registry",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "entity_access/inbound",
-  "macro_authorization/axum",
+  "rox_authorization/axum",
   "schema",
 ]
 # Postgres, the connection gateway, and the model-backed name generator.
@@ -34,17 +34,17 @@ outbound = [
   "dep:entity_registry_db_utils",
   "dep:model-entity",
   "dep:reqwest",
-  "dep:macro_tower_layers",
-  "dep:macro_authorization",
+  "dep:rox_tower_layers",
+  "dep:rox_authorization",
   "dep:sqlx",
   "dep:share_permission_db_utils",
   "enterprise/outbound",
-  "macro_user_id/sqlx",
-  "macro_authorization/axum",
+  "rox_user_id/sqlx",
+  "rox_authorization/axum",
 ]
 # OpenAPI schemas for the vocabulary that reaches an HTTP boundary: the
 # router's DTOs, and the lifecycle events the webhook union carries.
-schema = ["activity/schema", "dep:utoipa", "agent_runtime_protocol/utoipa", "macro_user_id/schema", "trigger_context/schema"]
+schema = ["activity/schema", "dep:utoipa", "agent_runtime_protocol/utoipa", "rox_user_id/schema", "trigger_context/schema"]
 # Mock and in-memory port implementations, for crates that test against this one.
 test-utils = ["dep:mockall", "agent_fold/test-utils"]
 
@@ -63,14 +63,14 @@ ai_usage = { path = "../ai_usage", optional = true }
 feature_flags = { path = "../feature_flags", optional = true }
 jev = { path = "../jev", optional = true }
 dashmap = { workspace = true }
-macro_uuid = { path = "../macro_uuid" }
+rox_uuid = { path = "../rox_uuid" }
 messages = { path = "../messages", features = ["ports", "schema"] }
 mockall = { workspace = true, optional = true }
 agent_fold = { path = "../folds/agent_fold" }
 # Only the domain vocabulary; `outbound` would pull rdkafka into every
 # consumer of this crate.
-macro_event_broker = { path = "../macro_event_broker", default-features = false }
-macro_event_topics = { path = "../macro_event_topics" }
+rox_event_broker = { path = "../rox_event_broker", default-features = false }
+rox_event_topics = { path = "../rox_event_topics" }
 agent_runtime_protocol = { path = "../agent_runtime_protocol" }
 axum = { workspace = true, optional = true }
 bots = { path = "../bots", default-features = false }
@@ -89,13 +89,13 @@ models_permissions = { path = "../models_permissions" }
 share_permission_db_utils = { path = "../share_permission_db_utils", optional = true }
 shared_entity_registry = { path = "../entity_registry/shared_entity_registry" }
 clap = { workspace = true, optional = true }
-macro_authorization = { path = "../macro_authorization", default-features = false, optional = true }
-macro_user_id = { path = "../macro_user_id" }
+rox_authorization = { path = "../rox_authorization", default-features = false, optional = true }
+rox_user_id = { path = "../rox_user_id" }
 utoipa = { workspace = true, optional = true }
 rootcause = { workspace = true }
 futures = { workspace = true }
 reqwest = { workspace = true, optional = true }
-macro_tower_layers = { path = "../macro_tower_layers", optional = true }
+rox_tower_layers = { path = "../rox_tower_layers", optional = true }
 uuid = { workspace = true }
 sqlx = { workspace = true, features = ["json"], optional = true }
 chrono = { workspace = true }
@@ -127,7 +127,7 @@ model_user = { path = "../model_user" }
 non_empty = { path = "../non_empty" }
 agent_fold = { path = "../folds/agent_fold", features = ["test-utils"] }
 axum = { workspace = true, features = ["ws"] }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 opentelemetry = { workspace = true, features = ["trace"] }
 opentelemetry_sdk = { workspace = true, features = ["testing", "trace"] }
 tracing-opentelemetry = { workspace = true }

@@ -1,6 +1,6 @@
 use super::*;
 use crate::RequestContext;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use std::sync::Mutex;
 
 fn tool(name: &str) -> SearchableTool {
@@ -28,7 +28,7 @@ fn tool_loader_forwards_to_its_closure() {
 
 #[test]
 fn request_context_new_has_no_tool_search() {
-    let user = MacroUserIdStr::try_from_email("t@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("t@example.com").unwrap();
     let ctx = RequestContext::new(user);
     assert!(ctx.searchable_tools.is_empty());
     assert!(ctx.tool_loader.is_none());
@@ -36,7 +36,7 @@ fn request_context_new_has_no_tool_search() {
 
 #[test]
 fn with_tool_search_wires_catalog_and_loader() {
-    let user = MacroUserIdStr::try_from_email("t@example.com").unwrap();
+    let user = RoxUserIdStr::try_from_email("t@example.com").unwrap();
     let catalog = Arc::new(vec![tool("mcp__x__y")]);
     let loader = ToolLoader::new(|_| {});
     let ctx = RequestContext::new(user).with_tool_search(catalog, loader);

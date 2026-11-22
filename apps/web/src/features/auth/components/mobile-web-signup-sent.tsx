@@ -6,11 +6,11 @@ export function MobileWebSignupSent(props: { onBackHome: () => void }) {
       <div class="flex flex-col items-start gap-4 w-full max-w-md mx-auto mt-6">
         <RoxMark class="size-16 self-center" />
         <h2 class="text-3xl font-semibold text-ink mt-3">
-          Rox is better on desktop.
+          Rox лучше на компьютере.
         </h2>
         <p class="text-base text-ink/60 mt-4">
-          We sent a link to your inbox - open it on your computer for the full
-          Rox experience.
+          Мы отправили ссылку на вашу почту — откройте её на компьютере, чтобы
+          получить весь Rox.
         </p>
 
         <button
@@ -18,7 +18,7 @@ export function MobileWebSignupSent(props: { onBackHome: () => void }) {
           onClick={() => props.onBackHome()}
           class="w-full px-3 py-2.5 text-lg font-bold rounded-xs bg-accent text-surface border-none mt-16"
         >
-          Back to Home
+          Вернуться на главную
         </button>
       </div>
     </div>

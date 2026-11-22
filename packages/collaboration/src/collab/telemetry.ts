@@ -3,7 +3,7 @@ import {
   type Attributes,
   type Span,
   Telemetry,
-} from '@macro-inc/observability';
+} from '@rox-one/observability';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 

@@ -9,13 +9,13 @@ default = ["inbound", "outbound"]
 # The axum router serving a session's changes over HTTP.
 inbound = [
   "dep:axum",
-  "dep:macro_authorization",
+  "dep:rox_authorization",
   "entity_access/inbound",
-  "macro_authorization/axum",
+  "rox_authorization/axum",
   "schema",
 ]
 # Postgres and S3.
-outbound = ["dep:aws-sdk-s3", "dep:sqlx", "macro_user_id/sqlx"]
+outbound = ["dep:aws-sdk-s3", "dep:sqlx", "rox_user_id/sqlx"]
 # OpenAPI schemas for the router's DTOs.
 schema = ["dep:utoipa", "git_patch/schema"]
 # In-memory port implementations, for crates that test against this one.
@@ -35,9 +35,9 @@ git_patch = { path = "../git_patch" }
 github_pull_requests = { path = "../github_pull_requests", default-features = false, features = [
   "ports",
 ] }
-macro_authorization = { path = "../macro_authorization", default-features = false, optional = true }
-macro_user_id = { path = "../macro_user_id" }
-macro_uuid = { path = "../macro_uuid" }
+rox_authorization = { path = "../rox_authorization", default-features = false, optional = true }
+rox_user_id = { path = "../rox_user_id" }
+rox_uuid = { path = "../rox_uuid" }
 rootcause = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
@@ -51,5 +51,5 @@ workspace-hack = { version = "0.1", path = "../workspace-hack" }
 
 [dev-dependencies]
 agent_session = { path = "../agent_session", default-features = false, features = ["test-utils"] }
-macro_db_migrator = { path = "../macro_db_migrator" }
+rox_db_migrator = { path = "../rox_db_migrator" }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "time"] }

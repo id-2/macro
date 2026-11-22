@@ -1,6 +1,6 @@
 import type { GetForeignEntityResponses } from '../../../generated/storage/types.gen';
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { FavoritableEntity } from '../entity';
 
 type ForeignEntityDetail = GetForeignEntityResponses[200];
@@ -20,13 +20,13 @@ export class ForeignEntity extends FavoritableEntity<ForeignEntityDetail> {
   }
 
   /** A handle to a foreign entity by its internal record id. Details load on first access. */
-  static byId(client: MacroClient, id: string): ForeignEntity {
+  static byId(client: RoxClient, id: string): ForeignEntity {
     return new ForeignEntity(client, id);
   }
 
   /** Build a foreign entity from an already-fetched record (pre-seeded, no fetch). */
   static fromRecord(
-    client: MacroClient,
+    client: RoxClient,
     record: ForeignEntityDetail,
   ): ForeignEntity {
     return new ForeignEntity(client, record.id, record);

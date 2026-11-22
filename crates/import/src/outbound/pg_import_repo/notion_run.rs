@@ -7,8 +7,8 @@ use std::time::Duration;
 use agent_session::domain::model::AgentSessionId;
 use agent_session::domain::notifications::PendingNotification;
 use import_notion::domain::model::ImportScope;
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use uuid::Uuid;
 
 use super::{PgImportRepo, run_status_strings};
@@ -57,7 +57,7 @@ impl NotionRunRepo for PgImportRepo {
     #[tracing::instrument(skip(self, job), err)]
     async fn take_run(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         owner: Uuid,
         lease: Duration,
         job: &NotionJob,
@@ -100,7 +100,7 @@ impl NotionRunRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn renew_lease(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         owner: Uuid,
         lease: Duration,
     ) -> Result<bool> {
@@ -123,7 +123,7 @@ impl NotionRunRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn release_lease(&self, user: &MacroUserIdStr<'static>, owner: Uuid) -> Result<bool> {
+    async fn release_lease(&self, user: &RoxUserIdStr<'static>, owner: Uuid) -> Result<bool> {
         // Lapsed as of now, so the next adopter takes it straight away.
         let result = sqlx::query!(
             r#"
@@ -143,7 +143,7 @@ impl NotionRunRepo for PgImportRepo {
     #[tracing::instrument(skip(self), err)]
     async fn adopt_stalled_runs(
         &self,
-        user: Option<&MacroUserIdStr<'static>>,
+        user: Option<&RoxUserIdStr<'static>>,
         owner: Uuid,
         lease: Duration,
         stale_after: Duration,
@@ -184,7 +184,7 @@ impl NotionRunRepo for PgImportRepo {
         .await?;
         let mut adopted = Vec::with_capacity(rows.len());
         for row in rows {
-            let user = MacroUserIdStr::parse_from_str(&row.user_id)
+            let user = RoxUserIdStr::parse_from_str(&row.user_id)
                 .map_err(|error| anyhow::anyhow!("unparseable import run user: {error:?}"))?
                 .into_owned();
             let status = RunStatus::from_str(&row.status)
@@ -221,7 +221,7 @@ impl NotionRunRepo for PgImportRepo {
     #[tracing::instrument(skip(self, event), fields(notified = tracing::field::Empty), err)]
     async fn transition_reviewed_run<Event>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         from: &[RunStatus],
         to: RunStatus,
         error: Option<&str>,
@@ -278,7 +278,7 @@ impl NotionRunRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn root_folder(&self, user: &MacroUserIdStr<'static>) -> Result<Option<Uuid>> {
+    async fn root_folder(&self, user: &RoxUserIdStr<'static>) -> Result<Option<Uuid>> {
         let folder = sqlx::query_scalar!(
             r#"SELECT root_folder_id FROM import_run WHERE user_id = $1 AND source = $2"#,
             user.as_ref(),
@@ -290,7 +290,7 @@ impl NotionRunRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn set_root_folder(&self, user: &MacroUserIdStr<'static>, folder: Uuid) -> Result<()> {
+    async fn set_root_folder(&self, user: &RoxUserIdStr<'static>, folder: Uuid) -> Result<()> {
         sqlx::query!(
             r#"UPDATE import_run SET root_folder_id = $2 WHERE user_id = $1 AND source = $3"#,
             user.as_ref(),
@@ -303,7 +303,7 @@ impl NotionRunRepo for PgImportRepo {
     }
 
     #[tracing::instrument(skip(self), err)]
-    async fn settle_importing(&self, user: &MacroUserIdStr<'static>, reason: &str) -> Result<u64> {
+    async fn settle_importing(&self, user: &RoxUserIdStr<'static>, reason: &str) -> Result<u64> {
         let mut transaction = self.pool.begin().await?;
         let settled = sqlx::query_scalar!(
             r#"
@@ -338,7 +338,7 @@ impl WrittenObjects for PgImportRepo {
     #[tracing::instrument(skip(self, import_ids), fields(rows = import_ids.len()), err)]
     async fn written(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_ids: &[Uuid],
     ) -> Result<Vec<WrittenObject>> {
         let rows = sqlx::query_as!(
@@ -360,7 +360,7 @@ impl WrittenObjects for PgImportRepo {
     #[tracing::instrument(skip(self, objects), fields(objects = objects.len()), err)]
     async fn record_written(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         objects: &[WrittenObject],
     ) -> Result<Vec<WrittenObject>> {
         if objects.is_empty() {

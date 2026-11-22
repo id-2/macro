@@ -22,13 +22,13 @@ use entity_access::domain::service::EntityAccessServiceImpl;
 use entity_access::outbound::PgAccessRepository;
 use entity_registry::OwnerGrantPolicy;
 use entity_registry_db_utils::OwnedEntityRegistrar;
-use macro_authorization::{
-    InternalIdentityClaims, MacroAuthorizationError, MacroAuthorizationService,
-    MacroAuthorizationState,
+use rox_authorization::{
+    InternalIdentityClaims, RoxAuthorizationError, RoxAuthorizationService,
+    RoxAuthorizationState,
 };
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::{Uuid, generate_uuid_v7};
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::{Uuid, generate_uuid_v7};
 use model::user::UserContext;
 use rootcause::Report;
 use scheduled_action::{
@@ -79,10 +79,10 @@ fn page() -> PageSize {
 
 #[derive(Clone)]
 struct FakeAuth;
-impl MacroAuthorizationService for FakeAuth {
-    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<MacroAuthorizationError>> {
+impl RoxAuthorizationService for FakeAuth {
+    async fn authorize(&self, jwt: &str) -> Result<UserContext, Report<RoxAuthorizationError>> {
         if jwt != "owner" {
-            return Err(Report::new(MacroAuthorizationError::InvalidCredentials));
+            return Err(Report::new(RoxAuthorizationError::InvalidCredentials));
         }
         Ok(UserContext {
             user_id: USER.into(),
@@ -93,17 +93,17 @@ impl MacroAuthorizationService for FakeAuth {
     async fn authorize_identity(
         &self,
         jwt: &str,
-    ) -> Result<macro_authorization::ValidatedCredential, Report<MacroAuthorizationError>> {
+    ) -> Result<rox_authorization::ValidatedCredential, Report<RoxAuthorizationError>> {
         self.authorize(jwt)
             .await
-            .map(macro_authorization::ValidatedCredential::session)
+            .map(rox_authorization::ValidatedCredential::session)
     }
     async fn authorize_internal(
         &self,
         _: &str,
         _: InternalIdentityClaims,
-    ) -> Result<Option<UserContext>, Report<MacroAuthorizationError>> {
-        Err(Report::new(MacroAuthorizationError::InvalidCredentials))
+    ) -> Result<Option<UserContext>, Report<RoxAuthorizationError>> {
+        Err(Report::new(RoxAuthorizationError::InvalidCredentials))
     }
 }
 
@@ -111,7 +111,7 @@ struct FakeAccess;
 impl CurrentOwnerAccess for FakeAccess {
     async fn authorize(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         event: &EventReference,
     ) -> Result<Option<EventAccessCapability>, Report> {
         // The event actor is intentionally different from the routine owner.
@@ -238,7 +238,7 @@ type Dispatch = EventDispatchService<PgEventRunRepo, FakeAccess, Executor, Every
 #[derive(Clone, Copy)]
 struct Everyone;
 impl scheduled_action::domain::event_rollout::EventRoutineRollout for Everyone {
-    async fn enabled_for(&self, _: &MacroUserIdStr<'_>) -> Result<bool, rootcause::Report> {
+    async fn enabled_for(&self, _: &RoxUserIdStr<'_>) -> Result<bool, rootcause::Report> {
         Ok(true)
     }
 }
@@ -293,7 +293,7 @@ impl Harness {
         let app = scheduled_action_router(ScheduledActionRouterState {
             service: Arc::new(service),
             access_service: access,
-            authorization_state: MacroAuthorizationState::new(Arc::new(FakeAuth)),
+            authorization_state: RoxAuthorizationState::new(Arc::new(FakeAuth)),
         });
         Self {
             pool,

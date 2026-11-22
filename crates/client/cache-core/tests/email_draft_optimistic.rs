@@ -64,7 +64,7 @@ macro_rules! message_fields_fragment {
   }
   bodyText
   bodyHtmlSanitized
-  bodyMacro
+  bodyRox
   bodyReplyless
   attachments {
     __typename
@@ -202,7 +202,7 @@ fn message(id: &str, is_draft: bool, body: &str) -> Json {
         "labels": [],
         "bodyText": null,
         "bodyHtmlSanitized": body,
-        "bodyMacro": null,
+        "bodyRox": null,
         "bodyReplyless": null,
         "attachments": [],
         "attachmentsDraft": [],

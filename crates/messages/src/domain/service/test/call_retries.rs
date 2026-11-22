@@ -2,11 +2,11 @@ use super::*;
 
 fn persisted_call_message() -> (Repo, Uuid, PostMessage) {
     let mut repo = fixture();
-    let call_id = macro_uuid::generate_uuid_v7();
+    let call_id = rox_uuid::generate_uuid_v7();
     repo.message.id = call_id;
     repo.message.parent = MessageParent::Call(call_id);
     repo.state.root_id = call_id;
-    repo.client_message_id = Some(macro_uuid::generate_uuid_v7());
+    repo.client_message_id = Some(rox_uuid::generate_uuid_v7());
     let mut input = post_input();
     input.id = repo.client_message_id;
     (repo, call_id, input)
@@ -97,7 +97,7 @@ async fn call_retry_cannot_recover_another_actor_or_parents_message() {
     let service = MessageService::new(repo.clone(), events.clone());
     for (actor, parent) in [
         ("macro|other@example.com", call_id),
-        ("macro|author@example.com", macro_uuid::generate_uuid_v7()),
+        ("macro|author@example.com", rox_uuid::generate_uuid_v7()),
     ] {
         assert!(matches!(
             service

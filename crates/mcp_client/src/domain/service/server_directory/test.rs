@@ -1,6 +1,6 @@
 use super::*;
 use crate::domain::models::StoredCredentials;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 use std::sync::Mutex;
 
 /// In-memory [`McpServerStore`] keyed by user and URL.
@@ -21,7 +21,7 @@ impl McpServerStore for FakeServerStore {
 
     async fn load(
         &self,
-        user_id: &MacroUserIdStr<'static>,
+        user_id: &RoxUserIdStr<'static>,
         server_url: &str,
     ) -> Result<Option<McpServerRecord>, Self::Err> {
         Ok(self
@@ -35,7 +35,7 @@ impl McpServerStore for FakeServerStore {
 
     async fn delete(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
         _server_url: &str,
     ) -> Result<(), Self::Err> {
         unimplemented!()
@@ -43,14 +43,14 @@ impl McpServerStore for FakeServerStore {
 
     async fn list(
         &self,
-        _user_id: &MacroUserIdStr<'static>,
+        _user_id: &RoxUserIdStr<'static>,
     ) -> Result<Vec<McpServerRecord>, Self::Err> {
         unimplemented!()
     }
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|owner@example.com")
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|owner@example.com")
         .unwrap()
         .into_owned()
 }

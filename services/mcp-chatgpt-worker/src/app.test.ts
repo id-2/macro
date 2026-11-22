@@ -8,7 +8,7 @@ const BINDINGS = {
   RESOURCE_URL: 'https://mcp-chatgpt.test/mcp',
   AUTHORIZATION_SERVER_URL: 'https://auth.test',
   TOOL_GROUPING: 'entity',
-  MACRO_HOSTS: JSON.stringify({
+  ROX_HOSTS: JSON.stringify({
     storage: 'https://storage.test',
     auth: 'https://auth-service.test',
   }),

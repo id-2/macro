@@ -40,7 +40,7 @@ impl RecordingAnnouncer {
 }
 
 impl ToolApprovalAnnouncer for RecordingAnnouncer {
-    async fn requested(&self, approval: &ToolApproval, owner: &MacroUserIdStr<'static>) {
+    async fn requested(&self, approval: &ToolApproval, owner: &RoxUserIdStr<'static>) {
         self.heard
             .lock()
             .unwrap()
@@ -67,12 +67,12 @@ fn service() -> (Service, MemoryStore, RecordingAnnouncer) {
     service_with(HoldTiming::default())
 }
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("owner@rox.one").unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("owner@rox.one").unwrap()
 }
 
-fn asker() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from_email("asker@rox.one").unwrap()
+fn asker() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from_email("asker@rox.one").unwrap()
 }
 
 fn tools_call(progress_token: Option<serde_json::Value>) -> ToolsCall {
@@ -613,7 +613,7 @@ async fn approving_one_macro_tool_for_good_still_asks_about_anything_else() {
         prompter: TurnPrompter {
             kind: agent_session::domain::model::PrompterKind::User,
             action_id: AgentActionId::mint(),
-            user: Some(MacroUserIdStr::try_from_email("someone@rox.one").unwrap()),
+            user: Some(RoxUserIdStr::try_from_email("someone@rox.one").unwrap()),
             client: None,
         },
         ..in_process(session)

@@ -1,7 +1,7 @@
 //! Domain models for agent teammates.
 
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -45,7 +45,7 @@ pub enum TeamAgentStatus {
 pub struct TeamAgent {
     /// The agent's Macro user id (`macro|<email>`).
     #[cfg_attr(feature = "inbound", schema(value_type = String))]
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Team the agent belongs to.
     pub team_id: Uuid,
     /// Display name.
@@ -56,7 +56,7 @@ pub struct TeamAgent {
     pub personality: String,
     /// Admin who invited the agent.
     #[cfg_attr(feature = "inbound", schema(value_type = Option<String>))]
-    pub created_by: Option<MacroUserIdStr<'static>>,
+    pub created_by: Option<RoxUserIdStr<'static>>,
     /// The agent's Rox computer, once bought.
     #[cfg_attr(feature = "inbound", schema(value_type = Option<Uuid>))]
     pub computer_id: Option<ComputerId>,
@@ -105,7 +105,7 @@ pub struct CreateTeamAgent {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct PersonaSeed {
     /// Admin the brain recognizes as its creator.
-    pub creator_id: Option<MacroUserIdStr<'static>>,
+    pub creator_id: Option<RoxUserIdStr<'static>>,
     /// Display name.
     pub name: String,
     /// What the agent is responsible for.
@@ -122,13 +122,13 @@ pub struct PersonaSeed {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NewAgentAccount {
     /// The agent's Rox user id.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Its placeholder address.
     pub email: String,
     /// The team it joins.
     pub team_id: Uuid,
     /// Admin creating it.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// Display name.
     pub name: String,
     /// Profile picture URL.
@@ -141,11 +141,11 @@ pub struct NewAgentAccount {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TeamAgentRecord {
     /// The agent's Rox user id.
-    pub user_id: MacroUserIdStr<'static>,
+    pub user_id: RoxUserIdStr<'static>,
     /// Team the agent belongs to.
     pub team_id: Uuid,
     /// Admin who invited it.
-    pub created_by: Option<MacroUserIdStr<'static>>,
+    pub created_by: Option<RoxUserIdStr<'static>>,
     /// Workspace seed, including its name and profile.
     pub persona_seed: PersonaSeed,
     /// When it was invited.
@@ -169,9 +169,9 @@ pub struct ComputerPurchase {
     /// The team that pays.
     pub team_id: Uuid,
     /// The admin buying it.
-    pub created_by: MacroUserIdStr<'static>,
+    pub created_by: RoxUserIdStr<'static>,
     /// The agent it runs.
-    pub agent: MacroUserIdStr<'static>,
+    pub agent: RoxUserIdStr<'static>,
     /// The computer's size.
     pub size: ComputerSize,
     /// Display name.

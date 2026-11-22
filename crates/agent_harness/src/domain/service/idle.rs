@@ -23,7 +23,7 @@ pub const IDLE_RELEASE_NO_RETRY_FLAG: &str = "disable-agent-idle-release-retry";
 pub(super) trait IdleReleaseRetry: Send + Sync {
     fn retries<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'_>,
+        owner: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = bool> + Send + 'a>>;
 }
 
@@ -33,7 +33,7 @@ pub(super) struct FlaggedIdleReleaseRetry<F>(pub(super) F);
 impl<F: FeatureFlags> IdleReleaseRetry for FlaggedIdleReleaseRetry<F> {
     fn retries<'a>(
         &'a self,
-        owner: &'a MacroUserIdStr<'_>,
+        owner: &'a RoxUserIdStr<'_>,
     ) -> Pin<Box<dyn Future<Output = bool> + Send + 'a>> {
         Box::pin(async move {
             match self.0.load(owner).await {

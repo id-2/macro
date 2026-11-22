@@ -51,7 +51,7 @@ before touching the edit flow.
   applying edits), Canvas/DOCX/forms/spreadsheet AI endpoints, revision-checked
   markdown body reads and writes, and comment-mark anchoring.
 - Not here: the Loro/sync-service wire protocol itself, shared with the web
-  app via `@macro-inc/collaboration`; browser auth and sync HTTP policy stay
+  app via `@rox-one/collaboration`; browser auth and sync HTTP policy stay
   in `apps/web`.
 
 ## Recipes

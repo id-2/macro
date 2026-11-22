@@ -1,6 +1,6 @@
 //! Installation claims read from RoxDB.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use sqlx::PgPool;
 
 use crate::domain::{models::GithubError, ports::GithubInstallationClaims};
@@ -23,7 +23,7 @@ impl PgGithubInstallationClaims {
 
 impl GithubInstallationClaims for PgGithubInstallationClaims {
     #[tracing::instrument(skip(self), err)]
-    async fn is_linked(&self, user: &MacroUserIdStr<'_>) -> Result<bool, GithubError> {
+    async fn is_linked(&self, user: &RoxUserIdStr<'_>) -> Result<bool, GithubError> {
         sqlx::query_scalar!(
             r#"SELECT EXISTS (SELECT 1 FROM github_links WHERE macro_id = $1) AS "linked!""#,
             user.as_ref(),
@@ -39,7 +39,7 @@ impl GithubInstallationClaims for PgGithubInstallationClaims {
     #[tracing::instrument(skip(self), err)]
     async fn has_claim(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         installation_id: u64,
     ) -> Result<bool, GithubError> {
         sqlx::query_scalar!(

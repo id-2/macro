@@ -7,8 +7,8 @@ use futures::future::{BoxFuture, Either, select};
 use rootcause::Report;
 use uuid::Uuid;
 
-use crate::domain::events::{CalendarEventMetadata, CalendarMacroEvent, CalendarTopicEvent};
-use macro_event_broker::MacroEventBroker;
+use crate::domain::events::{CalendarEventMetadata, CalendarRoxEvent, CalendarTopicEvent};
+use rox_event_broker::RoxEventBroker;
 
 use super::{
     ics::{
@@ -596,7 +596,7 @@ where
     R: CalendarRepository + Clone,
     G: GoogleCalendarProvider + Clone,
     L: CalendarBackfillRepository,
-    B: MacroEventBroker + Clone,
+    B: RoxEventBroker + Clone,
 {
     /// Construct a coordinator from domain ports; supplying a watch config
     /// makes every backfill maintain push notification channels.
@@ -833,7 +833,7 @@ impl<R, G, B> GoogleCalendarBackfillService<R, G, B>
 where
     R: CalendarRepository,
     G: GoogleCalendarProvider,
-    B: MacroEventBroker,
+    B: RoxEventBroker,
 {
     /// Construct the provider backfill service.
     pub fn new(
@@ -856,7 +856,7 @@ where
     fn publish_calendar_event(&self, event: CalendarTopicEvent) {
         let _ = self
             .macro_event_broker
-            .send_event(&CalendarMacroEvent::for_change(event))
+            .send_event(&CalendarRoxEvent::for_change(event))
             .inspect_err(|error| {
                 tracing::error!(error=?error, "failed to publish calendar event");
             });

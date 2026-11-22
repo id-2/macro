@@ -17,7 +17,7 @@ use rig_agent::completion::PromptError;
 use super::*;
 use crate::domain::engine::TurnEngine;
 use crate::testing::{HangingEngine, ScriptedEngine, TestAdmission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 
 struct Harness {
     notifications: std::sync::Mutex<Vec<SessionNotification>>,
@@ -181,7 +181,7 @@ async fn record<Engine: TurnEngine, Out>(
         delivery: crate::domain::engine::ReplyDelivery::Streamed,
         session_id,
         owner: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
+            RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
         ),
         engine,
         admission,
@@ -477,7 +477,7 @@ struct WaitingAdmission(tokio::sync::Notify);
 impl AiAdmissionService for WaitingAdmission {
     fn admit<'a>(
         &'a self,
-        _: &'a MacroUserIdStr<'_>,
+        _: &'a RoxUserIdStr<'_>,
         _: ai_usage::AiFeature,
     ) -> ai_billing::domain::AdmissionFuture<'a> {
         Box::pin(async move {
@@ -536,16 +536,16 @@ struct OneAgentKey(Option<agent_api_keys::domain::ModelProvider>);
 impl agent_api_keys::domain::AgentKeys for OneAgentKey {
     async fn usable_provider(
         &self,
-        _bot_id: macro_uuid::Uuid,
-        _user: &MacroUserIdStr<'_>,
+        _bot_id: rox_uuid::Uuid,
+        _user: &RoxUserIdStr<'_>,
     ) -> agent_api_keys::domain::Result<Option<agent_api_keys::domain::ModelProvider>> {
         Ok(self.0)
     }
 
     async fn usable_key(
         &self,
-        bot_id: macro_uuid::Uuid,
-        _user: &MacroUserIdStr<'_>,
+        bot_id: rox_uuid::Uuid,
+        _user: &RoxUserIdStr<'_>,
     ) -> agent_api_keys::domain::Result<Option<agent_api_keys::domain::UsableAgentKey>> {
         Ok(self
             .0
@@ -577,7 +577,7 @@ async fn an_agent_with_its_own_key_runs_turns_on_it_without_spending_the_allowan
     let admission = Arc::new(TestAdmission::new(Err(AiAdmissionError::Denied(
         DenyReason::AllowanceExhausted,
     ))));
-    let bot = bot_id::BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot = bot_id::BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     record(
         engine.clone(),
         admission.clone(),
@@ -606,7 +606,7 @@ async fn an_agent_with_its_own_key_runs_turns_on_it_without_spending_the_allowan
 #[tokio::test]
 async fn an_agent_with_a_key_offers_only_its_providers_models() {
     let engine = Arc::new(ScriptedEngine::new(vec![]));
-    let bot = bot_id::BotId::new_from_uuid(macro_uuid::generate_uuid_v7());
+    let bot = bot_id::BotId::new_from_uuid(rox_uuid::generate_uuid_v7());
     let (_, recorded) = record(
         engine,
         Arc::new(DisabledAiAdmissionService),
@@ -1873,7 +1873,7 @@ async fn serve_with_mcp(
         delivery: crate::domain::engine::ReplyDelivery::Streamed,
         session_id,
         owner: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
+            RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
         ),
         engine,
         admission: Arc::new(DisabledAiAdmissionService),
@@ -1933,7 +1933,7 @@ async fn session_new_dials_the_advertised_servers_except_macros_own() {
         delivery: crate::domain::engine::ReplyDelivery::Streamed,
         session_id,
         owner: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
+            RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
         ),
         engine: Arc::new(ScriptedEngine::new(Vec::new())),
         admission: Arc::new(DisabledAiAdmissionService),
@@ -2026,7 +2026,7 @@ async fn first_prompt_waits_for_background_mcp_connect() {
         delivery: crate::domain::engine::ReplyDelivery::Streamed,
         session_id,
         owner: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
+            RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
         ),
         engine: Arc::clone(&engine) as Arc<dyn TurnEngine>,
         admission: Arc::new(DisabledAiAdmissionService),
@@ -2134,7 +2134,7 @@ where
         delivery: crate::domain::engine::ReplyDelivery::Streamed,
         session_id,
         owner: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
+            RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
         ),
         engine,
         admission: Arc::new(DisabledAiAdmissionService),
@@ -3116,7 +3116,7 @@ async fn turns_redial_a_session_whose_connect_lacks_code_mode_tools() {
         delivery: crate::domain::engine::ReplyDelivery::Streamed,
         session_id,
         owner: model_owner::Owner::User(
-            MacroUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
+            RoxUserIdStr::try_from_email("owner@rox.one").expect("a valid user id"),
         ),
         engine: Arc::new(ScriptedEngine::new(Vec::new())),
         admission: Arc::new(DisabledAiAdmissionService),

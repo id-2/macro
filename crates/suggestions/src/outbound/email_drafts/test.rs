@@ -1,5 +1,5 @@
 use email::outbound::EmailPgRepo;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 use sqlx::PgPool;
 
 use super::*;
@@ -8,8 +8,8 @@ use crate::outbound::pg_suggestion_repo::test::insert_user;
 const OWNER: &str = "macro|drafts-owner@example.com";
 const TEAMMATE: &str = "macro|drafts-teammate@example.com";
 
-fn user(id: &'static str) -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str(id).unwrap()
+fn user(id: &'static str) -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str(id).unwrap()
 }
 
 /// An inbox of `owner`'s.

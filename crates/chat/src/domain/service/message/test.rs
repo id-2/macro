@@ -3,7 +3,7 @@ use std::sync::{Arc, Mutex};
 use agent::types::Role;
 use attachment::{AttachmentContent, AttachmentPart, Attachments};
 use chrono::Utc;
-use macro_event_broker::{EventBrokerError, MacroEvent};
+use rox_event_broker::{EventBrokerError, RoxEvent};
 use model::chat::{ChatMessageWithAttachments, NewAttachment};
 use serde_json::json;
 
@@ -13,8 +13,8 @@ use crate::domain::models::{PatchChatMessageArgs, WebCitation};
 const CHAT_ID: &str = "3f6f8b0a-6f9f-4a3f-9c3a-2b1e5d4c7a90";
 const MESSAGE_ID: &str = "7d2c1e5a-4b3f-4c6d-8e9f-0a1b2c3d4e5f";
 
-fn test_user_id() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::parse_from_str("macro|sender@acme.com")
+fn test_user_id() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::parse_from_str("macro|sender@acme.com")
         .expect("valid user id")
         .into_owned()
 }
@@ -134,7 +134,7 @@ struct StubAttachmentService;
 impl AttachmentService for StubAttachmentService {
     async fn resolve_attachments<'a>(
         &self,
-        _user_id: MacroUserIdStr<'_>,
+        _user_id: RoxUserIdStr<'_>,
         ids: NonEmpty<&[&'a Entity<'a>]>,
     ) -> Attachments<'a> {
         let results = ids
@@ -177,8 +177,8 @@ impl RecordingEventBroker {
     }
 }
 
-impl MacroEventBroker for RecordingEventBroker {
-    fn send_event<E: MacroEvent + ?Sized>(
+impl RoxEventBroker for RecordingEventBroker {
+    fn send_event<E: RoxEvent + ?Sized>(
         &self,
         event: &E,
     ) -> std::result::Result<

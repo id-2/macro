@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { match } from 'ts-pattern';
 import { entryAction, entrySize, type FeedEntry } from './collapse-runs';
 import type { ActivityAction } from './event';
@@ -17,7 +18,9 @@ export function describeRun(entry: FeedEntry): {
   return {
     action,
     countLabel:
-      action.kind === 'property-changed' ? `${size} changes` : `${size} times`,
+      action.kind === 'property-changed'
+        ? t('activity.countChanges', { count: size })
+        : t('activity.countTimes', { count: size }),
   };
 }
 
@@ -32,42 +35,41 @@ export function describeRun(entry: FeedEntry): {
 export function describeAction(action: ActivityAction, count = 1): string {
   if (count < 2) {
     return match(action)
-      .with({ kind: 'task-added' }, () => 'added a task')
-      .with({ kind: 'task-removed' }, () => 'removed a task')
-      .with({ kind: 'created' }, () => 'created this')
-      .with({ kind: 'edited' }, () => 'made an edit')
-      .with({ kind: 'opened' }, () => 'opened this')
-      .with({ kind: 'deleted' }, () => 'deleted this')
-      .with({ kind: 'messaged' }, () => 'sent a message')
-      .with({ kind: 'email-sent' }, () => 'sent an email')
-      .with({ kind: 'property-changed' }, () => 'changed a property')
-      .with({ kind: 'participant-added' }, () => 'added a participant')
-      .with({ kind: 'participant-removed' }, () => 'removed a participant')
-      .with({ kind: 'call-started' }, () => 'started a call')
-      .with({ kind: 'responded' }, () => 'responded')
+      .with({ kind: 'task-added' }, () => t('activity.countedTaskAdded', { count: 1 }))
+      .with({ kind: 'task-removed' }, () => t('activity.countedTaskRemoved', { count: 1 }))
+      .with({ kind: 'created' }, () => t('activity.countedCreated', { count: 1 }))
+      .with({ kind: 'edited' }, () => t('activity.countedEdited', { count: 1 }))
+      .with({ kind: 'opened' }, () => t('activity.countedOpened', { count: 1 }))
+      .with({ kind: 'deleted' }, () => t('activity.countedDeleted', { count: 1 }))
+      .with({ kind: 'messaged' }, () => t('activity.countedMessaged', { count: 1 }))
+      .with({ kind: 'email-sent' }, () => t('activity.countedEmailSent', { count: 1 }))
+      .with({ kind: 'property-changed' }, () => t('activity.countedPropertyChanged', { count: 1 }))
+      .with({ kind: 'participant-added' }, () => t('activity.countedParticipantAdded', { count: 1 }))
+      .with({ kind: 'participant-removed' }, () => t('activity.countedParticipantRemoved', { count: 1 }))
+      .with({ kind: 'call-started' }, () => t('activity.countedCallStarted', { count: 1 }))
+      .with({ kind: 'responded' }, () => t('activity.countedResponded', { count: 1 }))
       .with({ kind: 'unknown' }, (unknown) => unknown.tag.replaceAll('_', ' '))
       .exhaustive();
   }
   return match(action)
-    .with({ kind: 'task-added' }, () => `added ${count} tasks`)
-    .with({ kind: 'task-removed' }, () => `removed ${count} tasks`)
-    .with({ kind: 'created' }, () => `created this ${count} times`)
-    .with({ kind: 'edited' }, () => `made ${count} edits`)
-    .with({ kind: 'opened' }, () => `opened this ${count} times`)
-    .with({ kind: 'deleted' }, () => `deleted this ${count} times`)
-    .with({ kind: 'messaged' }, () => `sent ${count} messages`)
-    .with({ kind: 'email-sent' }, () => `sent ${count} emails`)
-    .with({ kind: 'property-changed' }, () => `made ${count} property changes`)
-    .with({ kind: 'participant-added' }, () => `added ${count} participants`)
-    .with(
-      { kind: 'participant-removed' },
-      () => `removed ${count} participants`
-    )
-    .with({ kind: 'call-started' }, () => `started ${count} calls`)
-    .with({ kind: 'responded' }, () => `responded ${count} times`)
-    .with(
-      { kind: 'unknown' },
-      (unknown) => `${unknown.tag.replaceAll('_', ' ')} ${count} times`
+    .with({ kind: 'task-added' }, () => t('activity.countedTaskAdded', { count }))
+    .with({ kind: 'task-removed' }, () => t('activity.countedTaskRemoved', { count }))
+    .with({ kind: 'created' }, () => t('activity.countedCreated', { count }))
+    .with({ kind: 'edited' }, () => t('activity.countedEdited', { count }))
+    .with({ kind: 'opened' }, () => t('activity.countedOpened', { count }))
+    .with({ kind: 'deleted' }, () => t('activity.countedDeleted', { count }))
+    .with({ kind: 'messaged' }, () => t('activity.countedMessaged', { count }))
+    .with({ kind: 'email-sent' }, () => t('activity.countedEmailSent', { count }))
+    .with({ kind: 'property-changed' }, () => t('activity.countedPropertyChanged', { count }))
+    .with({ kind: 'participant-added' }, () => t('activity.countedParticipantAdded', { count }))
+    .with({ kind: 'participant-removed' }, () => t('activity.countedParticipantRemoved', { count }))
+    .with({ kind: 'call-started' }, () => t('activity.countedCallStarted', { count }))
+    .with({ kind: 'responded' }, () => t('activity.countedResponded', { count }))
+    .with({ kind: 'unknown' }, (unknown) =>
+      t('activity.countedUnknown', {
+        count,
+        tag: unknown.tag.replaceAll('_', ' '),
+      })
     )
     .exhaustive();
 }
@@ -84,49 +86,50 @@ export function describeActionForEntity(action: ActivityAction): {
 } {
   return match(action)
     .with({ kind: 'task-added' }, () => ({
-      verb: 'added a task',
-      connector: 'to',
+      verb: t('activity.verbAddedTask'),
+      connector: t('activity.connectorTo'),
     }))
     .with({ kind: 'task-removed' }, () => ({
-      verb: 'removed a task',
-      connector: 'from',
+      verb: t('activity.verbRemovedTask'),
+      connector: t('activity.connectorFrom'),
     }))
     .with({ kind: 'created' }, () => ({
-      verb: 'created',
+      verb: t('activity.verbCreated'),
     }))
-    .with({ kind: 'edited' }, () => ({ verb: 'edited' }))
-    .with({ kind: 'opened' }, () => ({ verb: 'opened' }))
+    .with({ kind: 'edited' }, () => ({ verb: t('activity.verbEdited') }))
+    .with({ kind: 'opened' }, () => ({ verb: t('activity.verbOpened') }))
     .with({ kind: 'deleted' }, () => ({
-      verb: 'deleted',
+      verb: t('activity.verbDeleted'),
     }))
     .with({ kind: 'messaged' }, () => ({
-      verb: 'sent a message',
-      connector: 'in',
+      verb: t('activity.verbMessaged'),
+      connector: t('activity.connectorIn'),
     }))
     .with({ kind: 'email-sent' }, () => ({
-      verb: 'sent an email',
-      connector: 'in',
+      verb: t('activity.verbEmailSent'),
+      connector: t('activity.connectorIn'),
     }))
     .with({ kind: 'property-changed' }, () => ({
-      verb: 'changed a property',
-      connector: 'on',
+      verb: t('activity.verbPropertyChanged'),
+      connector: t('activity.connectorOn'),
     }))
     .with({ kind: 'participant-added' }, () => ({
-      verb: 'added a participant',
-      connector: 'to',
+      verb: t('activity.verbParticipantAdded'),
+      connector: t('activity.connectorTo'),
     }))
     .with({ kind: 'participant-removed' }, () => ({
-      verb: 'removed a participant',
-      connector: 'from',
+      verb: t('activity.verbParticipantRemoved'),
+      connector: t('activity.connectorFrom'),
     }))
     .with({ kind: 'call-started' }, () => ({
-      verb: 'started a call',
-      connector: 'in',
+      verb: t('activity.verbCallStarted'),
+      connector: t('activity.connectorIn'),
     }))
-    .with({ kind: 'responded' }, () => ({ verb: 'responded', connector: 'to' }))
+    .with({ kind: 'responded' }, () => ({ verb: t('activity.verbResponded'),
+      connector: t('activity.connectorTo'), }))
     .with({ kind: 'unknown' }, (unknown) => ({
       verb: unknown.tag.replaceAll('_', ' '),
-      connector: 'on',
+      connector: t('activity.connectorOn'),
     }))
     .exhaustive();
 }

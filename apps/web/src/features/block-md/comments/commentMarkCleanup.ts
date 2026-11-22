@@ -1,4 +1,4 @@
-import type { WALStore } from '@macro-inc/collaboration/collab/wal';
+import type { WALStore } from '@rox-one/collaboration/collab/wal';
 
 /** Only cancelled publications with no pending or uncertain message write enter here. */
 export function createCommentMarkCleanup(

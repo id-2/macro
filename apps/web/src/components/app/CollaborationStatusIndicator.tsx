@@ -1,6 +1,7 @@
+import { t } from '@app/lib/i18n';
 import CloudIcon from '@icon/system/regular/cloud.svg';
 import CloudWarningIcon from '@icon/system/regular/cloud-warning.svg';
-import { SyncSourceStatus } from '@macro-inc/collaboration/collab/source';
+import { SyncSourceStatus } from '@rox-one/collaboration/collab/source';
 import { Tooltip } from '@ui';
 import { Match, Switch } from 'solid-js';
 
@@ -21,11 +22,11 @@ export function CollaborationStatusIndicator(props: {
       <Match when={props.status === SyncSourceStatus.Disconnected}>
         <Tooltip
           as="span"
-          label="You're offline. Changes will sync when you reconnect."
+          label={t('nav.offlineTooltip')}
         >
           <span
             role="status"
-            aria-label="Offline"
+            aria-label={t('nav.offline')}
             class="inline-flex size-6 shrink-0 items-center justify-center rounded-md border border-alert/20 bg-alert-bg text-alert-ink [&>svg]:size-4"
           >
             <CloudWarningIcon />
@@ -33,10 +34,10 @@ export function CollaborationStatusIndicator(props: {
         </Tooltip>
       </Match>
       <Match when={props.status === SyncSourceStatus.Connecting}>
-        <Tooltip as="span" label="Reconnecting…">
+        <Tooltip as="span" label={t('nav.reconnectingTooltip')}>
           <span
             role="status"
-            aria-label="Reconnecting"
+            aria-label={t('nav.reconnecting')}
             class="inline-flex size-6 shrink-0 items-center justify-center rounded-md border border-transparent text-ink-extra-muted [&>svg]:size-4"
           >
             <CloudIcon class="animate-pulse" />

@@ -103,7 +103,7 @@ export function FileSplitHeader(props: {
 
   const tools: BlockTool[] = [
     {
-      label: 'Ask Macro',
+      label: 'Ask Rox',
       icon: ChatWithAgentIcon,
       action: () => fireAndForget(openChatWithAgent(chatEntity()), 'file'),
     },

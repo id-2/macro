@@ -11,7 +11,7 @@ import {
 import { createBrowserOfflineSignal } from '@core/util/connectivity';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { isTransientRequestError } from '@core/util/request-error';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import type { GroupByField } from '@queries/soup/grouped/types';
 import { GroupSoupDocument } from '@service-storage/graphql/generated/graphql';
 import type { CombinedError } from '@urql/core';

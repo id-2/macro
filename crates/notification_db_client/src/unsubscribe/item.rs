@@ -68,7 +68,7 @@ pub async fn remove_unsubscribed_item_user(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use macro_db_migrator::MACRO_DB_MIGRATIONS;
+    use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
     #[sqlx::test(
         migrator = "MACRO_DB_MIGRATIONS",

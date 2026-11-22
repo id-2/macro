@@ -1,9 +1,9 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 async fn fixture(db: &PgPool) -> (PgMailboxSync, Uuid) {
     let (repo, link) = super::super::test::fixture(db).await;
-    sqlx::query!("INSERT INTO email_sync_streams(id,link_id,generation,kind,scope_id) VALUES ($1,$2,1,'contacts','root')",macro_uuid::generate_uuid_v7(),link).execute(db).await.unwrap();
+    sqlx::query!("INSERT INTO email_sync_streams(id,link_id,generation,kind,scope_id) VALUES ($1,$2,1,'contacts','root')",rox_uuid::generate_uuid_v7(),link).execute(db).await.unwrap();
     (repo, link)
 }
 fn page(emails: &[&str]) -> AddressBookPage {
@@ -26,10 +26,10 @@ async fn multiple_addresses_and_deletion_restore_header_names_without_deleting_c
     db: PgPool,
 ) {
     let (repo, link) = fixture(&db).await;
-    let header = macro_uuid::generate_uuid_v7();
+    let header = rox_uuid::generate_uuid_v7();
     sqlx::query!("INSERT INTO email_contacts(id,link_id,email_address,name) VALUES ($1,$2,'a@example.com','Header name')",header,link).execute(&db).await.unwrap();
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -49,7 +49,7 @@ async fn multiple_addresses_and_deletion_restore_header_names_without_deleting_c
     );
     due(&db, link).await;
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -81,7 +81,7 @@ async fn multiple_addresses_and_deletion_restore_header_names_without_deleting_c
 async fn stale_generation_commits_neither_cursor_nor_contact(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -120,7 +120,7 @@ async fn stale_generation_commits_neither_cursor_nor_contact(db: PgPool) {
 async fn expired_cursor_only_retires_missing_entries_at_final_page(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -129,13 +129,13 @@ async fn expired_cursor_only_retires_missing_entries_at_final_page(db: PgPool) {
         .unwrap();
     due(&db, link).await;
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     repo.reset(&work).await.unwrap();
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -161,7 +161,7 @@ async fn expired_cursor_only_retires_missing_entries_at_final_page(db: PgPool) {
         .is_none()
     );
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -192,7 +192,7 @@ async fn expired_cursor_only_retires_missing_entries_at_final_page(db: PgPool) {
 async fn an_in_flight_photo_cannot_restore_a_deleted_contact(db: PgPool) {
     let (repo, link) = fixture(&db).await;
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -200,13 +200,13 @@ async fn an_in_flight_photo_cannot_restore_a_deleted_contact(db: PgPool) {
         .await
         .unwrap();
     let photo = repo
-        .claim_photo(macro_uuid::generate_uuid_v7())
+        .claim_photo(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
     due(&db, link).await;
     let work = repo
-        .claim(macro_uuid::generate_uuid_v7())
+        .claim(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
         .unwrap();
@@ -250,7 +250,7 @@ async fn photo_claims_take_due_sources_in_order_and_skip_backed_off_and_deleted_
     "#,link).execute(&db).await.unwrap();
     let mut claimed = Vec::new();
     while let Some(lease) = repo
-        .claim_photo(macro_uuid::generate_uuid_v7())
+        .claim_photo(rox_uuid::generate_uuid_v7())
         .await
         .unwrap()
     {

@@ -70,6 +70,26 @@ fn record_request_settings(span: &tracing::Span, protocol: WireProtocol, body: &
     if let Some(effort) = effort {
         span.set_str(attr::MACRO_REQUEST_REASONING_EFFORT, effort);
     }
+    // Models as small as Groq's gpt-oss obey only names that are actually in
+    // `tools`: a name the prompt mentions but the request omits fails the whole
+    // turn provider-side. The names are our own code, so logging them is safe
+    // and makes a prompt/request drift visible where it happens.
+    if let Some(tools) = body.get("tools").and_then(Value::as_array) {
+        let names: Vec<&str> = tools
+            .iter()
+            .filter_map(|tool| {
+                tool.pointer("/function/name")
+                    .or_else(|| tool.get("name"))
+                    .and_then(Value::as_str)
+            })
+            .collect();
+        tracing::info!(
+            target: "agent::model::request",
+            count = names.len(),
+            tools = %names.join(","),
+            "model request tools"
+        );
+    }
 }
 
 // Required by Rig's CompletionModel bounds, even for explicitly built clients.

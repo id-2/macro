@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { fireAndForget } from '@core/util/fireAndForget';
 import { ThrownResultError } from '@core/util/result';
 import EnvelopeIcon from '@icon/system/regular/envelope.svg';
@@ -15,24 +16,22 @@ import {
 
 // A plausible address; the server enforces the real rules.
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const INVALID_EMAIL = 'Enter an email like jane@example.com, or leave it empty';
 // Matches the server's display-name limit.
 const MAX_NAME_CHARS = 200;
-const NAME_TOO_LONG = `Use a name of ${MAX_NAME_CHARS} characters or fewer`;
 
 export function contactCreationError(cause: unknown): string {
   if (cause instanceof ThrownResultError) {
     if (cause.errors.some((e) => e.code === 'CONFLICT')) {
-      return 'A contact with this email already exists.';
+      return t('crm.contactExists');
     }
     if (cause.errors.some((e) => e.code === 'FORBIDDEN')) {
-      return "CRM isn't enabled for your team.";
+      return t('crm.crmNotEnabled');
     }
     if (cause.errors.some((e) => e.code === 'BAD_REQUEST')) {
-      return 'Check the name and email, then try again.';
+      return t('crm.checkNameAndEmail');
     }
   }
-  return 'Failed to create contact. Try again.';
+  return t('crm.failedCreateContact');
 }
 
 /** Explicitly select any company, including one without a domain. */
@@ -106,15 +105,15 @@ export function CreateContactModal(props: {
   async function submit() {
     if (createContactMutation.isPending) return;
     if (!contactName()) {
-      setError('Enter a name');
+      setError(t('crm.enterName'));
       return;
     }
     if (Array.from(contactName()).length > MAX_NAME_CHARS) {
-      setError(NAME_TOO_LONG);
+      setError(t('crm.nameTooLong', { count: MAX_NAME_CHARS }));
       return;
     }
     if (contactEmail() && !EMAIL_PATTERN.test(contactEmail())) {
-      setError(INVALID_EMAIL);
+      setError(t('crm.invalidEmail'));
       return;
     }
 
@@ -143,7 +142,7 @@ export function CreateContactModal(props: {
         <Panel.Body>
           <form
             class="h-full min-h-0"
-            aria-label="New contact"
+            aria-label={t('crm.newContact')}
             onSubmit={(event) => {
               event.preventDefault();
               fireAndForget(submit(), 'crm');
@@ -162,16 +161,17 @@ export function CreateContactModal(props: {
           >
             <EntityComposer.Root>
               <EntityComposer.Header>
-                <Dialog.Title class="sr-only">New contact</Dialog.Title>
+                <Dialog.Title class="sr-only">{t('crm.newContact')}</Dialog.Title>
                 <EntityComposer.Title class="mb-0 min-w-0 flex-1 self-center">
                   <input
                     autofocus
-                    aria-label="Contact name"
-                    placeholder="Contact name"
+                    aria-label={t('crm.contactName')}
+                    placeholder={t('crm.contactName')}
                     autocomplete="off"
                     data-1p-ignore
                     aria-invalid={
-                      error() === 'Enter a name' || error() === NAME_TOO_LONG
+                      error() === t('crm.enterName') ||
+                      error() === t('crm.nameTooLong', { count: MAX_NAME_CHARS })
                     }
                     class="ph-no-capture w-full min-w-0 text-xl/7 font-medium outline-none bg-transparent placeholder:text-ink-placeholder"
                     value={name()}
@@ -185,8 +185,8 @@ export function CreateContactModal(props: {
                 <Button
                   variant="ghost"
                   tabIndex={-1}
-                  aria-label="Close"
-                  tooltip="Close"
+                  aria-label={t('common.close')}
+                  tooltip={t('common.close')}
                   size="icon-md"
                   disabled={createContactMutation.isPending}
                   onClick={close}
@@ -202,13 +202,13 @@ export function CreateContactModal(props: {
                   />
                   <span class="flex min-w-0 items-center">
                     <input
-                      aria-label="Email"
+                      aria-label={t('crm.email')}
                       type="email"
-                      placeholder="Email (optional), like jane@example.com"
+                      placeholder={t('crm.emailOptionalPlaceholder')}
                       autocomplete="off"
                       spellcheck={false}
                       data-1p-ignore
-                      aria-invalid={error() === INVALID_EMAIL}
+                      aria-invalid={error() === t('crm.invalidEmail')}
                       class="ph-no-capture field-sizing-content max-w-full bg-transparent text-ink outline-none placeholder:text-ink-placeholder"
                       value={email()}
                       disabled={createContactMutation.isPending}
@@ -248,8 +248,8 @@ export function CreateContactModal(props: {
                   disabled={!canSubmit()}
                 >
                   {createContactMutation.isPending
-                    ? 'Creating…'
-                    : 'Create Contact'}
+                    ? t('crm.creating')
+                    : t('crm.createContact')}
                 </EntityComposer.Submit>
               </EntityComposer.Footer>
             </EntityComposer.Root>

@@ -2,8 +2,8 @@ use crate::api::context::ApiContext;
 use anyhow::Context;
 use axum::Router;
 use axum::http::HeaderName;
-use macro_auth::constant::MACRO_REFRESH_TOKEN_HEADER;
-use macro_tower_layers::MacroRequestIdAndTracingLayer;
+use rox_auth::constant::{LEGACY_REFRESH_TOKEN_HEADER, MACRO_REFRESH_TOKEN_HEADER};
+use rox_tower_layers::RoxRequestIdAndTracingLayer;
 use native_app_service::inbound::RouterState;
 use std::net::SocketAddr;
 use std::time::Duration;
@@ -58,9 +58,12 @@ pub(crate) mod trace_capture;
 const GATEWAY_PATH_PREFIX: &str = "/auth";
 
 pub(crate) async fn setup_and_serve(state: ApiContext, port: usize) -> anyhow::Result<()> {
-    let cors = macro_cors::cors_layer_with_headers(vec![HeaderName::from_static(
-        MACRO_REFRESH_TOKEN_HEADER,
-    )]);
+    // The refresh header under its current name and the one clients built
+    // before the rename send.
+    let cors = rox_cors::cors_layer_with_headers(vec![
+        HeaderName::from_static(MACRO_REFRESH_TOKEN_HEADER),
+        HeaderName::from_static(LEGACY_REFRESH_TOKEN_HEADER),
+    ]);
 
     let env = state.environment;
     let correlation =
@@ -71,7 +74,7 @@ pub(crate) async fn setup_and_serve(state: ApiContext, port: usize) -> anyhow::R
             correlation,
             agent_correlation::inbound::propagate,
         ))
-        .layer(MacroRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
+        .layer(RoxRequestIdAndTracingLayer::new(Duration::from_millis(200)).into_inner())
         // The health router is attached here so we don't attach the logging middleware to it
         .merge(health::router())
         .layer(cors)
@@ -92,7 +95,7 @@ pub(crate) async fn setup_and_serve(state: ApiContext, port: usize) -> anyhow::R
         listener,
         app.into_make_service_with_connect_info::<SocketAddr>(),
     )
-    .with_graceful_shutdown(macro_entrypoint::shutdown_signal())
+    .with_graceful_shutdown(rox_entrypoint::shutdown_signal())
     .await
     .context("error starting service")
 }
@@ -250,7 +253,7 @@ fn api_router(state: ApiContext) -> Router {
         .nest(
             "/webhooks",
             webhooks::router().layer(axum::middleware::from_fn(
-                macro_middleware::connection_drop_prevention_handler,
+                rox_middleware::connection_drop_prevention_handler,
             )),
         )
         .with_state(state);

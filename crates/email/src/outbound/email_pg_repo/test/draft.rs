@@ -559,7 +559,7 @@ async fn test_insert_draft_message_into_existing_thread(
         bcc: vec![],
         body_text: Some("Hello".to_string()),
         body_html: Some("<p>Hello</p>".to_string()),
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -648,7 +648,7 @@ async fn test_insert_draft_message_with_new_thread(pool: Pool<Postgres>) -> anyh
         bcc: vec![],
         body_text: Some("New thread body".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -727,7 +727,7 @@ async fn test_autosave_ignores_send_time_but_immediate_send_preserves_undo_sched
         bcc: vec![],
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: Some(send_time),
         actor_id: None,
@@ -817,7 +817,7 @@ async fn test_insert_draft_message_upsert_existing(pool: Pool<Postgres>) -> anyh
         bcc: vec![],
         body_text: Some("Updated body".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -897,7 +897,7 @@ async fn test_insert_draft_message_updates_thread_metadata(
         bcc: vec![],
         body_text: None,
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -954,7 +954,7 @@ async fn test_insert_message_with_is_draft_false(pool: Pool<Postgres>) -> anyhow
         bcc: vec![],
         body_text: Some("This is a sent message".to_string()),
         body_html: None,
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,
@@ -1062,8 +1062,8 @@ fn first_save_of(
     link_id: Uuid,
     subject: &str,
 ) -> (ResolvedDraftInput, ThreadRow, Uuid) {
-    let message_db_id = macro_uuid::generate_uuid_v7();
-    let thread_db_id = macro_uuid::generate_uuid_v7();
+    let message_db_id = rox_uuid::generate_uuid_v7();
+    let thread_db_id = rox_uuid::generate_uuid_v7();
     let mut input = resolved_input(message_db_id, thread_db_id);
     input.subject = subject.to_string();
     input.draft_client_id = Some(handle);
@@ -1226,8 +1226,8 @@ async fn test_client_handle_replay_cannot_replace_a_scheduled_or_sent_winner(
 
     let repo = EmailPgRepo::new(pool.clone());
     let link = Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")?;
-    let handle = macro_uuid::generate_uuid_v7();
-    let actor = MacroUserIdStr::parse_from_str("macro|user1@test.com")?;
+    let handle = rox_uuid::generate_uuid_v7();
+    let actor = RoxUserIdStr::parse_from_str("macro|user1@test.com")?;
     let contacts = UpsertedContacts {
         from_contact_id: None,
         recipients: vec![],
@@ -1366,7 +1366,7 @@ fn resolved_input(db_id: Uuid, thread_db_id: Uuid) -> ResolvedDraftInput {
         bcc: vec![],
         body_text: Some("attacker content".to_string()),
         body_html: Some("<p>attacker content</p>".to_string()),
-        body_macro: None,
+        body_rox: None,
         headers_json: None,
         send_time: None,
         actor_id: None,

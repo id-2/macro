@@ -16,13 +16,13 @@ export function ViewTourVideo(props: { video: Video }) {
             type="button"
             onClick={() => setPlaying(true)}
             class="flex w-full items-center gap-3 rounded-lg p-2 text-left hover:bg-hover"
-            aria-label={`Watch ${props.video.title}`}
+            aria-label={`Смотреть «${props.video.title}»`}
           >
             <PlayIcon class="size-4 shrink-0" />
             <span class="min-w-0 flex-1">
               <span class="block text-xs text-ink">{props.video.title}</span>
               <span class="mt-0.5 block text-xs text-ink-muted">
-                Watch video · {props.video.duration}
+                Смотреть видео · {props.video.duration}
               </span>
             </span>
           </button>
@@ -33,8 +33,8 @@ export function ViewTourVideo(props: { video: Video }) {
             {props.video.title}
           </span>
           <Button
-            aria-label="Close video"
-            tooltip="Close video"
+            aria-label="Закрыть видео"
+            tooltip="Закрыть видео"
             variant="ghost"
             size="icon-sm"
             onClick={() => setPlaying(false)}

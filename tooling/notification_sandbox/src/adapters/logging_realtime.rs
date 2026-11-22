@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use notification::domain::ports::RealtimeSender;
 use rootcause::Report;
 use serde::Serialize;
@@ -12,9 +12,9 @@ pub struct LoggingRealtimeSender;
 impl RealtimeSender for LoggingRealtimeSender {
     async fn send_notifications<'a, T: Serialize + Send + Sync>(
         &self,
-        recipients: &[MacroUserIdStr<'a>],
+        recipients: &[RoxUserIdStr<'a>],
         _notification: &T,
-    ) -> Result<HashSet<MacroUserIdStr<'static>>, Report> {
+    ) -> Result<HashSet<RoxUserIdStr<'static>>, Report> {
         println!(
             "  [egress] Realtime: delivered to {} recipient(s)",
             recipients.len()

@@ -1,4 +1,4 @@
-import { useTauri } from '@macro/tauri';
+import { useTauri } from '@rox/tauri';
 import { createMemo, Show } from 'solid-js';
 
 export function BundleUpdateProgressBar() {

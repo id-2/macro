@@ -2,7 +2,7 @@
 
 use axum::{Json, extract::State};
 use entity_access::domain::ports::EntityAccessService;
-use macro_authorization::{ActingUser, MacroAuthorizationExtractor, MacroAuthorizationService};
+use rox_authorization::{ActingUser, RoxAuthorizationExtractor, RoxAuthorizationService};
 
 use super::DocumentRouterState;
 use crate::domain::models::{
@@ -31,10 +31,10 @@ use crate::domain::ports::DocumentService;
 pub async fn get_github_pull_request_tasks_handler<
     T: DocumentService,
     Svc: EntityAccessService,
-    Auth: MacroAuthorizationService,
+    Auth: RoxAuthorizationService,
 >(
     State(state): State<DocumentRouterState<T, Svc, Auth>>,
-    caller: MacroAuthorizationExtractor<Auth, ActingUser>,
+    caller: RoxAuthorizationExtractor<Auth, ActingUser>,
     Json(request): Json<GithubPullRequestTasksRequest>,
 ) -> Result<Json<GithubPullRequestTasksResponse>, DocumentError> {
     let user_id = caller.authorization.user.macro_user_id;

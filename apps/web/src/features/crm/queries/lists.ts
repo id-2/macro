@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { throwOnErr } from '@core/util/result';
 import { useMutation, useQuery } from '@tanstack/solid-query';
 import type { Accessor } from 'solid-js';
@@ -32,7 +33,7 @@ export function useCrmLists(
         companyIds: string[];
       }) => {
         const team = teamId();
-        if (!team) throw new Error('Join a team to create a list');
+        if (!team) throw new Error(t('crm.joinTeamToList'));
         const config: CrmListConfig = {
           kind: 'crm-list',
           teamId: team,
@@ -87,7 +88,7 @@ export function useCrmLists(
           !isCrmListConfig(list.config) ||
           list.config.teamId !== team
         )
-          throw new Error('This list is no longer available');
+          throw new Error(t('crm.listUnavailable'));
         const config = list.config;
         const companyIds = new Set(config.companyIds);
         if (input.included) companyIds.add(input.companyId);

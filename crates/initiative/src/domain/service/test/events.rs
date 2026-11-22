@@ -1,6 +1,6 @@
 use super::*;
-use crate::domain::events::{InitiativeEventPublisher, InitiativeMacroEvent, InitiativeTopicEvent};
-use macro_event_broker::MacroEvent;
+use crate::domain::events::{InitiativeEventPublisher, InitiativeRoxEvent, InitiativeTopicEvent};
+use rox_event_broker::RoxEvent;
 use std::{
     future::Future,
     pin::Pin,
@@ -70,7 +70,7 @@ async fn attributed_creation_rejects_mismatched_owner_before_creating_anything()
 impl InitiativeEventPublisher for Events {
     fn publish(
         &self,
-        event: InitiativeMacroEvent,
+        event: InitiativeRoxEvent,
     ) -> Pin<Box<dyn Future<Output = Result<(), InitiativeError>> + Send + '_>> {
         Box::pin(async move {
             self.0.lock().unwrap().push(event.event().event.clone());

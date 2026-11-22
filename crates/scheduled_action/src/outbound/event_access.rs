@@ -8,7 +8,7 @@ use entity_access::domain::{
     ports::EntityAccessService,
 };
 use github::domain::ports::GithubInstallationClaims;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use rootcause::Report;
 
 use crate::domain::{
@@ -48,7 +48,7 @@ impl<S: EntityAccessService, G: GithubInstallationClaims> CurrentOwnerAccess
 {
     async fn authorize(
         &self,
-        owner: &MacroUserIdStr<'static>,
+        owner: &RoxUserIdStr<'static>,
         event: &EventReference,
     ) -> Result<Option<EventAccessCapability>, Report> {
         let entity_id = match event.source() {

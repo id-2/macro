@@ -5,8 +5,8 @@ use std::future::Future;
 use agent_session::domain::model::AgentSessionId;
 use bot_id::BotId;
 use chrono::{DateTime, Utc};
-use macro_user_id::user_id::MacroUserIdStr;
-use macro_uuid::Uuid;
+use rox_user_id::user_id::RoxUserIdStr;
+use rox_uuid::Uuid;
 use suggestions::domain::model::{GenerationTrigger, SessionKind};
 
 use super::generation::{GenerationEvent, OverviewFacts};
@@ -26,7 +26,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
     /// one of `trigger`.
     fn admission(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         trigger: GenerationTrigger,
     ) -> impl Future<Output = Result<AdmissionFacts, Self::Err>> + Send;
 
@@ -72,7 +72,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
         &self,
         session: Uuid,
         generation: Uuid,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         agent: BotId,
         kind: SessionKind,
         surfaces: &[String],
@@ -123,7 +123,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
     /// something ended.
     fn last_routines_ok(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<DateTime<Utc>>, Self::Err>> + Send;
 
     /// A routines session of the person's, in `timezone`, finished and
@@ -131,7 +131,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
     /// gets a row outside it, to keep the cadence.
     fn routines_ok(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: &str,
         now: DateTime<Utc>,
     ) -> impl Future<Output = Result<(), Self::Err>> + Send;
@@ -141,7 +141,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
     /// older than the one stored changes nothing.
     fn record_nightly(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         outcome: NightlyOutcome,
         next_run: Option<DateTime<Utc>>,
         now: DateTime<Utc>,
@@ -152,7 +152,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
     /// same zone already.
     fn see(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
         timezone: &str,
         now: DateTime<Utc>,
         next_run: DateTime<Utc>,
@@ -162,7 +162,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
     /// user id.
     fn account(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<Uuid>, Self::Err>> + Send;
 
     /// Delete at most `limit` change-log entries written before `before`;
@@ -191,7 +191,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
     /// What the person's generations look like now.
     fn overview(
         &self,
-        user: &MacroUserIdStr<'_>,
+        user: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<OverviewFacts, Self::Err>> + Send;
 }
 
@@ -200,7 +200,7 @@ pub trait GenerationRepo: Send + Sync + 'static {
 #[async_trait::async_trait]
 pub trait Plans: Send + Sync + 'static {
     /// Whether the person is on a paid plan.
-    async fn paid(&self, user: &MacroUserIdStr<'static>) -> Result<bool, rootcause::Report>;
+    async fn paid(&self, user: &RoxUserIdStr<'static>) -> Result<bool, rootcause::Report>;
 }
 
 /// Whether an agent session is stored, to tell a session that is gone from

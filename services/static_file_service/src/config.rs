@@ -1,14 +1,14 @@
 use anyhow::Context;
-use macro_auth::InternalApiKey;
-pub use macro_env::Environment;
-use macro_env_var::env_vars;
+use rox_auth::InternalApiKey;
+pub use rox_env::Environment;
+use rox_env_var::env_vars;
 
 env_vars! {
     pub struct StaticFileServiceDynamodbTableName;
     pub struct StaticStorageBucket;
 }
 
-#[derive(macro_config::MacroConfig)]
+#[derive(rox_config::RoxConfig)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub struct Config {
     /// self explanatory
@@ -27,7 +27,7 @@ pub struct Config {
 
 impl Config {
     pub fn from_env() -> anyhow::Result<Self> {
-        macro_config::ConfigLoader::load::<Config>()
+        rox_config::ConfigLoader::load::<Config>()
             .context("failed to load static file service config")
     }
 }

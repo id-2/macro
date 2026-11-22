@@ -3,6 +3,7 @@
  * without a projection fall back to the last runtime lifecycle event.
  */
 
+import { t } from '@app/lib/i18n';
 import { match } from 'ts-pattern';
 
 export type ConversationState = 'starting' | 'working' | 'waiting' | 'dormant';
@@ -23,9 +24,9 @@ export function conversationState(
 
 export function conversationStateLabel(state: ConversationState): string {
   return match(state)
-    .with('starting', () => 'Starting')
-    .with('working', () => 'Working')
-    .with('waiting', () => 'Waiting for input')
-    .with('dormant', () => 'Dormant')
+    .with('starting', () => t('agentChat.starting'))
+    .with('working', () => t('agentChat.workingGroup'))
+    .with('waiting', () => t('agentChat.waitingForInput'))
+    .with('dormant', () => t('agentChat.dormant'))
     .exhaustive();
 }

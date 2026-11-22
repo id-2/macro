@@ -1,5 +1,5 @@
 import { unwrap } from '../../utils';
-import type { MacroClient } from '../../utils/client';
+import type { RoxClient } from '../../utils/client';
 import { Agent, type AgentOptions, agentBody } from './agent';
 
 /**
@@ -28,7 +28,7 @@ export type CodingAgent = {
  * @routing Use when the user wants to pick, read or change one of their Rox agent personas: its instructions, model, runtime, channels, apps or hosts; not any request the user asks you, the agent, to carry out.
  */
 export class AgentNamespace {
-  constructor(private readonly client: MacroClient) {}
+  constructor(private readonly client: RoxClient) {}
 
   /**
    * A lazy handle to a configurable agent. Get handles from

@@ -1,7 +1,7 @@
 #![recursion_limit = "256"]
 
 use anyhow::Context;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use memory::config::Config;
 #[path = "memory/context.rs"]
 mod context;
@@ -17,9 +17,9 @@ const EVENT_BROKER_DRAIN_TIMEOUT: Duration = Duration::from_secs(10);
 #[tracing::instrument(err)]
 async fn main() -> anyhow::Result<()> {
     let config = Config::from_env().context("failed to load memory configuration")?;
-    macro_entrypoint::MacroEntrypoint::new(config.environment).init();
+    rox_entrypoint::RoxEntrypoint::new(config.environment).init();
 
-    let user = MacroUserIdStr::try_from(config.user_id.clone())
+    let user = RoxUserIdStr::try_from(config.user_id.clone())
         .context("USER_ID must be a valid Rox user id")?;
 
     let pool = PgPoolOptions::new()

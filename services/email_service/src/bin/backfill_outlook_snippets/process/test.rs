@@ -1,5 +1,5 @@
 use super::*;
-use macro_db_migrator::MACRO_DB_MIGRATIONS;
+use rox_db_migrator::MACRO_DB_MIGRATIONS;
 
 const OUTLOOK_LINK: Uuid = uuid::uuid!("0190a000-0000-7000-8000-000000000001");
 const GMAIL_LINK: Uuid = uuid::uuid!("0190a000-0000-7000-8000-000000000002");

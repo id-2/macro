@@ -1,7 +1,7 @@
 import { fireAndForget } from '@core/util/fireAndForget';
 import CopyIcon from '@icon/system/regular/copy.svg';
 import TrashIcon from '@icon/system/regular/trash-simple.svg';
-import { Telemetry } from '@macro-inc/observability';
+import { Telemetry } from '@rox-one/observability';
 import { databaseWebhookUrl } from '@service-storage/databases';
 import type { DatabaseWebhookResponse } from '@service-storage/generated/schemas/databaseWebhookResponse';
 import type { TableDetail } from '@service-storage/generated/schemas/tableDetail';

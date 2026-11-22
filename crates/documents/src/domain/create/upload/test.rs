@@ -4,7 +4,7 @@ use tokio::sync::Notify;
 
 use bot_id::{BotId, NonSystemBotId};
 use entity_access::domain::models::{BotReceiptScope, Entity, EntityPermission};
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model::document::response::DocumentResponseMetadata;
 use models_permissions::share_permission::access_level::AccessLevel;
 use uuid::Uuid;
@@ -19,12 +19,12 @@ const DOCUMENT_ID: &str = "00000000-0000-0000-0000-000000000123";
 const PROJECT_ID: &str = "00000000-0000-0000-0000-000000000456";
 const TEAM_ID: Uuid = Uuid::from_u128(7);
 
-fn owner() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
+fn owner() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|owner@example.com".to_string()).unwrap()
 }
 
-fn other_user() -> MacroUserIdStr<'static> {
-    MacroUserIdStr::try_from("macro|other@example.com".to_string()).unwrap()
+fn other_user() -> RoxUserIdStr<'static> {
+    RoxUserIdStr::try_from("macro|other@example.com".to_string()).unwrap()
 }
 
 fn principal() -> CreationPrincipal {
@@ -201,7 +201,7 @@ fn bot_receipt(
 }
 
 fn project_receipt(
-    user: MacroUserIdStr<'static>,
+    user: RoxUserIdStr<'static>,
     entity_type: EntityType,
 ) -> EntityAccessReceipt<EditAccessLevel> {
     bot_receipt(
@@ -211,7 +211,7 @@ fn project_receipt(
     )
 }
 
-fn user_receipt(user: MacroUserIdStr<'static>) -> EntityAccessReceipt<EditAccessLevel> {
+fn user_receipt(user: RoxUserIdStr<'static>) -> EntityAccessReceipt<EditAccessLevel> {
     EntityAccessReceipt::try_new_authenticated_user(user, project(EntityType::Project), edit())
         .unwrap()
 }

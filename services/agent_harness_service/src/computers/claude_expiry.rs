@@ -13,8 +13,8 @@ use std::sync::Arc;
 use hosted_runtimes::domain::claude_sign_in::{
     ClaudeSignInNotices, ClaudeSignInStage, SignInExpiry,
 };
-use macro_user_id::cowlike::CowLike;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::cowlike::CowLike;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_entity::EntityType;
 use model_notifications::{AgentProvider, AgentSignInExpiryMetadata, AgentSignInExpiryStage};
 use notification::domain::models::SendNotificationRequestBuilder;
@@ -59,7 +59,7 @@ impl<Ingress: NotificationIngress> ClaudeSignInNotices for IngressClaudeSignInNo
     async fn team_admins(
         &self,
         team_id: Uuid,
-    ) -> Result<Vec<MacroUserIdStr<'static>>, ClaudeSignInNoticeError> {
+    ) -> Result<Vec<RoxUserIdStr<'static>>, ClaudeSignInNoticeError> {
         Ok(self
             .teams
             .get_all_team_members(&team_id)
@@ -73,7 +73,7 @@ impl<Ingress: NotificationIngress> ClaudeSignInNotices for IngressClaudeSignInNo
     async fn send(
         &self,
         expiry: SignInExpiry,
-        recipients: HashSet<MacroUserIdStr<'static>>,
+        recipients: HashSet<RoxUserIdStr<'static>>,
     ) -> Result<(), ClaudeSignInNoticeError> {
         let notification_id = notification_id(&expiry);
         let request = SendNotificationRequestBuilder {

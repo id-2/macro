@@ -15,7 +15,7 @@ const { spans } = vi.hoisted(() => ({
     events: string[];
   }[],
 }));
-vi.mock('@macro-inc/observability', () => ({
+vi.mock('@rox-one/observability', () => ({
   NOOP_SPAN: {},
   Telemetry: {
     span: (name: string) => {

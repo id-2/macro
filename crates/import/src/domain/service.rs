@@ -22,7 +22,7 @@ use agent::{AgentLoop, PredefinedModel};
 use ai_toolset::{RequestContext, ToolResult, ToolSet, ToolSetError};
 use futures::StreamExt;
 use import_notion::domain::ports::NotionConnections;
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use mcp_select::{ConnectorSelect, UserMcpTools};
 use std::collections::HashSet;
 use std::pin::Pin;
@@ -96,7 +96,7 @@ fn notion_import_failure_reason(outcome: &anyhow::Result<()>) -> String {
 /// A closure so this crate stays free of gateway dependencies; hosts without
 /// a gateway just don't set it.
 pub type ImportNotify =
-    Arc<dyn Fn(MacroUserIdStr<'static>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
+    Arc<dyn Fn(RoxUserIdStr<'static>) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
 
 /// Outcome of accepting/declining staged rows via `POST /import/run`.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize, utoipa::ToSchema)]
@@ -143,14 +143,14 @@ pub trait ImportService: Send + Sync + 'static {
     /// The full import aggregate for the user.
     fn state(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<ImportState>> + Send;
 
     /// User-triggered discovery that stages everything visible. Only Slack is
     /// supported. Returns whether a run started.
     fn start_discovery(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> impl Future<Output = Result<bool>> + Send;
 
@@ -158,7 +158,7 @@ pub trait ImportService: Send + Sync + 'static {
     /// discard `discard_ids`.
     fn run_import(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         import_ids: Vec<Uuid>,
         discard_ids: Vec<Uuid>,
     ) -> impl Future<Output = Result<RunImportOutcome>> + Send;
@@ -171,7 +171,7 @@ pub trait ImportStager: Send + Sync + 'static {
     /// the team's imported rows.
     fn stage(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         initiator: Initiator,
         source: ImportSource,
         foreign_id: &str,
@@ -181,7 +181,7 @@ pub trait ImportStager: Send + Sync + 'static {
     /// Record an entity an agent already created (chat flow) as imported.
     fn record_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         initiator: Initiator,
         source: ImportSource,
         foreign_id: &str,
@@ -192,14 +192,14 @@ pub trait ImportStager: Send + Sync + 'static {
     /// Discard one of the user's own staged rows.
     fn discard_entity(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> impl Future<Output = Result<DiscardOutcome>> + Send;
 
     /// Visible rows for the user (own + team-imported).
     fn list_entities(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: Option<ImportSource>,
         status: Option<ImportStatus>,
     ) -> impl Future<Output = Result<Vec<ImportEntity>>> + Send;
@@ -213,7 +213,7 @@ pub trait ImportFinalizer: Send + Sync + 'static {
     /// notion → md) and mark the row imported.
     fn finalize_document(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_id: Uuid,
         name: &str,
         content_markdown: &str,
@@ -249,7 +249,7 @@ pub trait NotionPageImporter: Send + Sync + 'static {
     /// Import a Notion page URL or page id for `user`.
     fn import_notion_page(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         page_url_or_id: &str,
     ) -> impl Future<Output = Result<ImportNotionPageOutcome>> + Send;
 }
@@ -267,7 +267,7 @@ pub trait NotionWorkspaceImporter: Send + Sync + 'static {
     /// is personal.
     fn prepare_notion_import(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         scope: import_notion::domain::model::ImportScope,
         sharing: Option<NotionSharing>,
         wait: Duration,
@@ -276,7 +276,7 @@ pub trait NotionWorkspaceImporter: Send + Sync + 'static {
     /// Where the user's Notion import stands.
     fn notion_import_report(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<NotionImportReport>> + Send;
 
     /// Tie the staged plan to the review presenting it in agent session
@@ -284,7 +284,7 @@ pub trait NotionWorkspaceImporter: Send + Sync + 'static {
     /// write ends.
     fn attach_notion_review(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review_id: Uuid,
         session_id: agent_session::domain::model::AgentSessionId,
     ) -> impl Future<Output = Result<u64>> + Send;
@@ -293,7 +293,7 @@ pub trait NotionWorkspaceImporter: Send + Sync + 'static {
     /// Writing runs in the background; this returns once it has started.
     fn start_notion_write(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         review_id: Uuid,
         choices: NotionWriteChoices,
     ) -> impl Future<Output = Result<NotionImportReport>> + Send;
@@ -302,7 +302,7 @@ pub trait NotionWorkspaceImporter: Send + Sync + 'static {
     /// whether anything was running.
     fn cancel_notion_import(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
     ) -> impl Future<Output = Result<bool>> + Send;
 }
 
@@ -460,7 +460,7 @@ impl<R, S, C, W: SlackWorkspaceSource, N: Send + Sync + 'static> ImportServiceIm
         }
     }
 
-    async fn notify(&self, user: &MacroUserIdStr<'static>) {
+    async fn notify(&self, user: &RoxUserIdStr<'static>) {
         if let Some(notifier) = &self.notifier {
             notifier(user.clone()).await;
         }
@@ -476,7 +476,7 @@ where
     /// Fail discovery runs that outlived their own timeout: their process died
     /// (crash or deploy) and the run would otherwise block a new discovery
     /// forever. Best-effort, so a read or a restart never fails because of it.
-    async fn reap_stale_runs(&self, user: &MacroUserIdStr<'static>) {
+    async fn reap_stale_runs(&self, user: &RoxUserIdStr<'static>) {
         match self
             .repo
             .fail_stale_runs(user, STALE_RUN_AFTER.as_secs() as i64)
@@ -490,7 +490,7 @@ where
 
     /// Spawn Slack discovery; finishes the run row either way and nudges the
     /// client.
-    fn spawn_slack_discovery(&self, user: MacroUserIdStr<'static>) {
+    fn spawn_slack_discovery(&self, user: RoxUserIdStr<'static>) {
         let service = self.clone();
         tokio::spawn(async move {
             let outcome = tokio::time::timeout(
@@ -535,7 +535,7 @@ where
     #[tracing::instrument(skip(self, user, mcp_tools, row), fields(id = %row.id), err(level = "debug"))]
     async fn import_notion_page_direct<M: ToolSet<()>>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         mcp_tools: &M,
         row: &ImportEntity,
     ) -> anyhow::Result<()> {
@@ -591,7 +591,7 @@ where
     #[tracing::instrument(skip(self, user, mcp_tools, rows), fields(pages = rows.len()), err)]
     async fn run_notion_import_session<M: ToolSet<ImportToolContext<Self>> + 'static>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         rows: &[ImportEntity],
         mcp_tools: Arc<M>,
     ) -> anyhow::Result<()> {
@@ -615,7 +615,7 @@ where
     /// Arc) across the concurrent per-page work of one batch.
     async fn connector_tools(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> anyhow::Result<Arc<UserMcpTools>> {
         let mcp_tools = self
@@ -635,7 +635,7 @@ where
     #[expect(clippy::too_many_arguments, reason = "bounded session configuration")]
     async fn drive_session<M: ToolSet<ImportToolContext<Self>> + 'static>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         model: impl ToString,
         max_turns: usize,
         toolset: NativePlusMcp<ImportToolContext<Self>, M>,
@@ -673,7 +673,7 @@ where
     /// Copy one accepted Linear/Slack row from staged metadata, refreshing Slack membership live.
     async fn import_deterministic(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         row: &ImportEntity,
         slack_batch: &mut SlackBatch<W::Session>,
     ) {
@@ -749,7 +749,7 @@ where
 
     /// Fail every row of `ids` still `importing` (agent session ended
     /// without finalizing them).
-    async fn fail_unfinished(&self, user: &MacroUserIdStr<'static>, ids: &[Uuid], reason: &str) {
+    async fn fail_unfinished(&self, user: &RoxUserIdStr<'static>, ids: &[Uuid], reason: &str) {
         for id in ids {
             match self.repo.get(user, *id).await {
                 Ok(Some(row)) if row.status == ImportStatus::Importing => {
@@ -769,7 +769,7 @@ where
     /// already `importing`.
     async fn process_notion_page<M>(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         mcp_tools: Arc<M>,
         row: &ImportEntity,
     ) -> anyhow::Result<()>
@@ -805,7 +805,7 @@ where
     }
 
     /// Run a claimed import batch in the background.
-    fn spawn_import_batch(&self, user: MacroUserIdStr<'static>, rows: Vec<ImportEntity>) {
+    fn spawn_import_batch(&self, user: RoxUserIdStr<'static>, rows: Vec<ImportEntity>) {
         let service = self.clone();
         tokio::spawn(async move {
             let batch_ids: Vec<Uuid> = rows.iter().map(|row| row.id).collect();
@@ -882,7 +882,7 @@ where
     C: EntityCreator,
 {
     #[tracing::instrument(skip(self, user), err)]
-    async fn state(&self, user: MacroUserIdStr<'static>) -> Result<ImportState> {
+    async fn state(&self, user: RoxUserIdStr<'static>) -> Result<ImportState> {
         // Self-heal on read: import jobs are in-process tasks, so a service
         // restart mid-job orphans its `importing` rows — nothing else would
         // ever move them again. Any row importing longer than the longest
@@ -910,7 +910,7 @@ where
     #[tracing::instrument(skip(self, user), err)]
     async fn start_discovery(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         source: ImportSource,
     ) -> Result<bool> {
         if source != ImportSource::Slack {
@@ -934,7 +934,7 @@ where
     #[tracing::instrument(skip(self, user, import_ids, discard_ids), fields(imports = import_ids.len(), discards = discard_ids.len()), err)]
     async fn run_import(
         &self,
-        user: MacroUserIdStr<'static>,
+        user: RoxUserIdStr<'static>,
         import_ids: Vec<Uuid>,
         discard_ids: Vec<Uuid>,
     ) -> Result<RunImportOutcome> {
@@ -981,7 +981,7 @@ where
     #[tracing::instrument(skip(self, user, metadata), err)]
     async fn stage_inner(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         initiator: Initiator,
         source: ImportSource,
         foreign_id: &str,
@@ -1071,7 +1071,7 @@ where
 {
     async fn stage(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         initiator: Initiator,
         source: ImportSource,
         foreign_id: &str,
@@ -1084,7 +1084,7 @@ where
     #[tracing::instrument(skip(self, user, metadata), err)]
     async fn record_imported(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         initiator: Initiator,
         source: ImportSource,
         foreign_id: &str,
@@ -1131,7 +1131,7 @@ where
     #[tracing::instrument(skip(self, user), err)]
     async fn discard_entity(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         id: Uuid,
     ) -> Result<DiscardOutcome> {
         if self.repo.discard(user, id).await? {
@@ -1146,7 +1146,7 @@ where
 
     async fn list_entities(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         source: Option<ImportSource>,
         status: Option<ImportStatus>,
     ) -> Result<Vec<ImportEntity>> {
@@ -1164,7 +1164,7 @@ where
     #[tracing::instrument(skip(self, user), fields(page = page_url_or_id), err)]
     async fn import_notion_page(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         page_url_or_id: &str,
     ) -> Result<ImportNotionPageOutcome> {
         let page_url_or_id = page_url_or_id.trim();
@@ -1300,7 +1300,7 @@ where
     #[tracing::instrument(skip(self, user, content_markdown), err)]
     async fn finalize_document(
         &self,
-        user: &MacroUserIdStr<'static>,
+        user: &RoxUserIdStr<'static>,
         import_id: Uuid,
         name: &str,
         content_markdown: &str,

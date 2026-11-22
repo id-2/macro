@@ -1,3 +1,4 @@
+import { t } from '@app/lib/i18n';
 import { ViewCreateButton } from '@app/components/view-shell/ViewCreateButton';
 import type { ButtonProps } from '@ui';
 import { SidebarCreateMenu } from './sidebar/sidebar-create-menu';
@@ -13,7 +14,7 @@ export function ViewCreateMenu(props: { presentation: 'sidebar' | 'toolbar' }) {
         <ViewCreateButton
           {...triggerProps}
           presentation={props.presentation}
-          aria-label="New"
+          aria-label={t('common.new')}
           menu
         />
       )}

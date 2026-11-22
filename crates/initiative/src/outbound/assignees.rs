@@ -3,7 +3,7 @@
 use crate::domain::{
     assignees::InitiativeAssignees, models::InitiativeError, ports::InitiativeRepo,
 };
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use properties::{EditReceipt, InitiativeAssigneeService, PropertiesErr};
 use std::{future::Future, pin::Pin};
 
@@ -11,7 +11,7 @@ impl<R: InitiativeRepo> InitiativeAssigneeService for InitiativeAssignees<R> {
     fn grant_assignees<'a>(
         &'a self,
         access: &'a EditReceipt,
-        users: Vec<MacroUserIdStr<'static>>,
+        users: Vec<RoxUserIdStr<'static>>,
     ) -> Pin<Box<dyn Future<Output = Result<(), PropertiesErr>> + Send + 'a>> {
         Box::pin(async move {
             self.grant(access, users)

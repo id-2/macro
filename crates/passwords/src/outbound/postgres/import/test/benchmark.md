@@ -22,7 +22,7 @@ Set the URL **inside** the Nix shell, since the shell has its own default:
 nix develop --command bash -c '
   export DATABASE_URL=postgres://user:password@localhost:5432/macrodb_pwconc
   sqlx database create
-  sqlx migrate run --source crates/macro_db_client/migrations
+  sqlx migrate run --source crates/rox_db_client/migrations
 '
 ```
 

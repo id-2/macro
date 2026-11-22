@@ -1,6 +1,6 @@
 //! Ports (trait contracts) for the user language domain.
 
-use macro_user_id::user_id::MacroUserIdStr;
+use rox_user_id::user_id::RoxUserIdStr;
 use model_user::Language;
 
 use crate::domain::models::UserLanguageError;
@@ -14,13 +14,13 @@ pub trait UserLanguageRepo: Send + Sync + 'static {
     /// the inner `None` means they follow their team's, else their browser's.
     fn get_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<Option<Language>>, Self::Err>> + Send;
 
     /// Store the user's language. Returns `false` when the user does not exist.
     fn set_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         language: Option<Language>,
     ) -> impl Future<Output = Result<bool, Self::Err>> + Send;
 }
@@ -31,14 +31,14 @@ pub trait UserLanguageService: Send + Sync + 'static {
     /// their browser's.
     fn get_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
     ) -> impl Future<Output = Result<Option<Language>, UserLanguageError>> + Send;
 
     /// Set the user's language, or clear it to follow their team's, else their
     /// browser's.
     fn set_language(
         &self,
-        user_id: &MacroUserIdStr<'_>,
+        user_id: &RoxUserIdStr<'_>,
         language: Option<Language>,
     ) -> impl Future<Output = Result<(), UserLanguageError>> + Send;
 }

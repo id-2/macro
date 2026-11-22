@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 
 use chrono::TimeZone;
-use macro_user_id::cowlike::CowLike;
+use rox_user_id::cowlike::CowLike;
 
 use super::*;
 use crate::domain::model::{NotionOption, NotionParent};
@@ -149,7 +149,7 @@ fn columns_take_the_closest_macro_type_and_titles_and_relations_wait() {
 fn people_cells_hold_only_notion_users_matched_to_team_members() {
     let alice = NotionId::parse("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa").unwrap();
     let outsider = NotionId::parse("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb").unwrap();
-    let alice_user = MacroUserIdStr::parse_from_str("macro|alice@acme.test")
+    let alice_user = RoxUserIdStr::parse_from_str("macro|alice@acme.test")
         .unwrap()
         .into_owned();
     let people: PeopleMap = [
