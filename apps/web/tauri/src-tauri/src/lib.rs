@@ -27,10 +27,10 @@ use tauri::{AppHandle, Emitter, Manager, RunEvent, Runtime};
 mod android_tls;
 mod tauri_protocol;
 
-/// The app's custom URL schemes come from the navigation plugin so the
-/// registered scheme list and the routing check cannot drift apart. `rox` is
-/// current; `macro` predates the rename and is still accepted.
-pub(crate) use navigation_plugin::scheme::{APP_SCHEME, is_app_scheme};
+/// Whether a URL scheme belongs to the app (current `rox` or legacy `macro`)
+/// comes from the navigation plugin so the registered scheme list and the
+/// routing check cannot drift apart.
+pub(crate) use navigation_plugin::scheme::is_app_scheme;
 use tauri_plugin_deep_link::DeepLinkExt;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;

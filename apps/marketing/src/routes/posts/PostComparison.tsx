@@ -49,7 +49,7 @@ export function ClickUpLogo() {
 
 export type ComparisonRow = {
   feature: string;
-  macro: string;
+  rox: string;
   them: string;
   /** Render the competitor cell in the muted "not available" color. */
   themNo?: boolean;
@@ -90,7 +90,7 @@ export function ComparisonTable(props: {
                 {(row) => (
                   <tr>
                     <th scope="row">{row.feature}</th>
-                    <td class="mvn-rox-col">{row.macro}</td>
+                    <td class="mvn-rox-col">{row.rox}</td>
                     <td classList={{ 'mvn-no': !!row.themNo }}>{row.them}</td>
                   </tr>
                 )}

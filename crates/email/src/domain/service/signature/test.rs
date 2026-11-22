@@ -42,16 +42,16 @@ fn signature_preparation_preserves_html_only_delivery() {
 #[test]
 fn appends_to_body_after_message_when_no_quote() {
     let out = inject_signature("<body><p>Hi there</p></body>", "<p>Regards</p>");
-    assert!(out.contains("macro-email-signature"), "got: {out}");
+    assert!(out.contains("rox-email-signature"), "got: {out}");
     // The signature lands after the message content.
-    assert!(out.find("Hi there").unwrap() < out.find("macro-email-signature").unwrap());
+    assert!(out.find("Hi there").unwrap() < out.find("rox-email-signature").unwrap());
 }
 
 #[test]
 fn separates_signature_from_message_with_blank_line() {
     let out = inject_signature("<body><p>Hi there</p></body>", "<p>Regards</p>");
     assert!(
-        out.contains(r#"<div class="macro-email-signature"><div><br></div><p>Regards</p></div>"#),
+        out.contains(r#"<div class="rox-email-signature"><div><br></div><p>Regards</p></div>"#),
         "got: {out}"
     );
 }
@@ -60,7 +60,7 @@ fn separates_signature_from_message_with_blank_line() {
 fn inserts_above_quote_for_replies_and_forwards() {
     let body = r#"<body><p>My reply</p><div class="rox_quote"><p>Quoted</p></div></body>"#;
     let out = inject_signature(body, "<p>Regards</p>");
-    let sig = out.find("macro-email-signature").unwrap();
+    let sig = out.find("rox-email-signature").unwrap();
     let quote = out.find("rox_quote").unwrap();
     assert!(
         sig < quote,
@@ -74,13 +74,13 @@ fn appends_to_bare_fragment_without_body_or_quote() {
     // (regression for the "selector didn't match" gap).
     let out = inject_signature("<p>Hello</p>", "<p>Regards</p>");
     assert!(out.contains("Hello"), "got: {out}");
-    assert!(out.contains("macro-email-signature"), "got: {out}");
+    assert!(out.contains("rox-email-signature"), "got: {out}");
 }
 
 #[test]
 fn is_idempotent_when_signature_already_present() {
     assert!(has_signature(
-        r#"<body><div class="macro-email-signature">x</div></body>"#
+        r#"<body><div class="rox-email-signature">x</div></body>"#
     ));
     assert!(!has_signature("<body><p>no signature here</p></body>"));
 }
@@ -89,10 +89,10 @@ fn is_idempotent_when_signature_already_present() {
 fn ignores_signature_inside_quoted_thread() {
     // Replying to a previously-signed message: the quote carries that message's
     // signature, which must not count as "already signed" for this reply.
-    let reply = r#"<body><p>My reply</p><div class="rox_quote"><p>Old</p><div class="macro-email-signature">Ryan</div></div></body>"#;
+    let reply = r#"<body><p>My reply</p><div class="rox_quote"><p>Old</p><div class="rox-email-signature">Ryan</div></div></body>"#;
     assert!(!has_signature(reply));
     // A signature in the reply's own content (above the quote) still counts.
-    let signed = r#"<body><div class="macro-email-signature">Me</div><div class="rox_quote"><p>Old</p></div></body>"#;
+    let signed = r#"<body><div class="rox-email-signature">Me</div><div class="rox_quote"><p>Old</p></div></body>"#;
     assert!(has_signature(signed));
 }
 
@@ -128,4 +128,35 @@ fn strips_server_wrapped_signature() {
         stripped.contains("Hi there"),
         "message body must remain: {stripped}"
     );
+}
+
+#[test]
+fn recognizes_and_strips_the_pre_rename_signature_marker() {
+    let legacy =
+        r#"<body><p>Hi</p><div class="macro-email-signature"><p>Regards</p></div></body>"#;
+    assert!(has_signature(legacy), "legacy marker must count as signed");
+    let stripped = strip_signature(legacy);
+    assert!(!stripped.contains("macro-email-signature"), "got: {stripped}");
+    assert!(!has_signature(&stripped), "got: {stripped}");
+    assert!(stripped.contains("Hi"), "message body must remain: {stripped}");
+
+    // A re-send of a body signed before the rename adds no second signature.
+    let mut body = Some(legacy.to_owned());
+    let mut text = None;
+    SignaturePreparation {
+        settings: Some(crate::domain::ports::LinkEmailSettings {
+            signature: Some("<p>Regards</p>".into()),
+            signature_on_replies_forwards: true,
+        }),
+        include_signature: None,
+    }
+    .apply(false, &mut body, &mut text);
+    assert_eq!(body.as_deref().unwrap().matches("email-signature").count(), 1);
+}
+
+#[test]
+fn injected_signature_uses_only_the_current_marker() {
+    let out = inject_signature("<body><p>Hi</p></body>", "<p>Regards</p>");
+    assert!(out.contains(SIGNATURE_CLASS), "got: {out}");
+    assert!(!out.contains(LEGACY_SIGNATURE_CLASS), "got: {out}");
 }

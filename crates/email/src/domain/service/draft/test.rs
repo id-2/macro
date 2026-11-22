@@ -52,7 +52,7 @@ fn keeps_signature_marker_so_injection_stays_idempotent() {
     // stripped, has_signature would miss a client-baked signature and we would
     // append a second one.
     let mut input =
-        input_with_body_html(r#"<p>hi</p><div class="macro-email-signature"><p>Regards</p></div>"#);
+        input_with_body_html(r#"<p>hi</p><div class="rox-email-signature"><p>Regards</p></div>"#);
 
     decode_and_sanitize_html_body(&mut input).expect("decodes");
 

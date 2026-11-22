@@ -5,7 +5,7 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class AuthSessionTest {
-    private val expected = "macro://android-auth/123e4567-e89b-42d3-a456-426614174000"
+    private val expected = "rox://android-auth/123e4567-e89b-42d3-a456-426614174000"
     private val session = AuthSession.Pending("https://example.com/login", expected, 42)
 
     @After fun cleanup() {

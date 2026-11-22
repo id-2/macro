@@ -544,7 +544,7 @@ async fn initial_schedule_prepares_signature_but_time_updates_preserve_content(
     .await?;
     let html = original.body_html_sanitized.as_deref().unwrap();
     assert!(html.contains("Regards"));
-    assert_eq!(html.matches("macro-email-signature").count(), 1);
+    assert_eq!(html.matches("rox-email-signature").count(), 1);
     assert_eq!(original.body_text.as_deref(), Some("Hello\n\nRegards"));
     sqlx::query!(
         "UPDATE email_settings SET signature = '<p>Changed</p>' WHERE link_id = $1",
@@ -578,7 +578,7 @@ async fn initial_schedule_prepares_signature_but_time_updates_preserve_content(
         !excluded
             .body_html_sanitized
             .unwrap()
-            .contains("macro-email-signature")
+            .contains("rox-email-signature")
     );
     Ok(())
 }

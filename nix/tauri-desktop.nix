@@ -540,7 +540,7 @@
           Exec=$out/bin/app %U
           Icon=macro
           Categories=Office;Utility;
-          MimeType=x-scheme-handler/macro;
+          MimeType=x-scheme-handler/rox;x-scheme-handler/macro;
           EOF
         '';
         meta.mainProgram = "app";

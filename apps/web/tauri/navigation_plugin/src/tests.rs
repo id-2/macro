@@ -154,6 +154,7 @@ fn popup_app_links_include_same_origin_and_rox_scheme() {
         "https://dev.rox.one/app/mail?view=all",
         "https://www.rox.one/app/mail?view=all",
         "rox:///mail?view=all",
+        "macro:///mail?view=all",
         "tauri://localhost/app/mail?view=all",
         "http://tauri.localhost/app/mail?view=all",
         "http://localhost:3000/app/mail?view=all",
@@ -462,6 +463,20 @@ fn from_url_strips_bare_app_path() {
     let url = Url::parse("https://rox.one/app").unwrap();
     let result = RoxScheme::from_url(&url).unwrap();
     assert_eq!(result.path(), "/");
+}
+
+#[test]
+fn custom_scheme_links_accept_the_current_and_legacy_schemes() {
+    for input in [
+        "rox:///login",
+        "rox://share?files=one.png",
+        "macro:///login",
+        "macro://share?files=one.png",
+    ] {
+        let url = Url::parse(input).unwrap();
+        assert!(RoxScheme::new(url).is_ok(), "{input}");
+    }
+    assert!(RoxScheme::new(Url::parse("https://rox.one/app/login").unwrap()).is_err());
 }
 
 #[test]

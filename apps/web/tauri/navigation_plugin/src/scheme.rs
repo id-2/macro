@@ -57,8 +57,8 @@ impl RoxScheme {
         }
         let query = url.query();
         let mut inner = match query {
-            Some(q) => format!("rox:///{rest}?{q}"),
-            None => format!("rox:///{rest}"),
+            Some(q) => format!("{APP_SCHEME}:///{rest}?{q}"),
+            None => format!("{APP_SCHEME}:///{rest}"),
         }
         .parse::<Url>()?;
         inner.set_fragment(fragment);

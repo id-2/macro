@@ -24,56 +24,56 @@ const ARTICLE_PREVIEW = `${ARTICLE_LEDE} ${ARTICLE_SECOND_PARAGRAPH.before}${ART
 const comparisonRows: ComparisonRow[] = [
   {
     feature: "Who it's for",
-    macro:
+    rox:
       'Startups and teams that want email, chat, docs, and tasks together in one AI-first workspace',
     them: 'Founders, salespeople, and anyone who just needs to fly through one inbox',
   },
   {
     feature: 'Pricing',
-    macro: '$40 per seat, every module included',
+    rox: '$40 per seat, every module included',
     them: '$40 per seat per month (as part of the new Superhuman Suite)',
   },
   {
     feature: 'No-cost access',
-    macro: 'Free Guest access to a workspace, with limits on storage and AI',
+    rox: 'Free Guest access to a workspace, with limits on storage and AI',
     them: "Covers Grammarly, Docs, and Go — Mail isn't included until Business",
   },
   {
     feature: 'Inbox',
-    macro:
+    rox:
       'Unified inbox across every account, plus chat, @mentions, and PRs, triaged with j / k / e',
     them: "One inbox at a time, but it's a really fast one",
   },
   {
     feature: 'Signal vs. noise',
-    macro: 'AI splits and tagging',
+    rox: 'AI splits and tagging',
     them: 'AI splits and tagging',
   },
   {
     feature: 'CRM',
-    macro: 'Deep, native CRM built into the workspace',
+    rox: 'Deep, native CRM built into the workspace',
     them: 'Read-only HubSpot, Salesforce, and Pipedrive widgets in the inbox',
   },
   {
     feature: 'Email sync',
-    macro:
+    rox:
       "Full duplex, we back up your whole mailbox so we're not rate-limited by the Gmail API after the initial backfill",
     them: 'Pulls through the Gmail/Outlook API into a local cache',
   },
   {
     feature: 'AI drafting',
-    macro:
+    rox:
       'Draft and send right from the agent, using its unified memory of you and prior interactions, without leaving the agent',
     them: 'Auto Drafts and Write with AI, matched to your voice and tone',
   },
   {
     feature: 'Multitasking',
-    macro: 'Built-in window manager, as many splits as your screen allows',
+    rox: 'Built-in window manager, as many splits as your screen allows',
     them: "One email open at a time, you can't even see your inbox alongside it",
   },
   {
     feature: 'Sharing to channels',
-    macro:
+    rox:
       'Share button posts the live, updating thread into a channel — everyone and every agent in it sees new replies as they land',
     them: 'Shared Conversations, a parallel thread that lives only inside Superhuman',
   },

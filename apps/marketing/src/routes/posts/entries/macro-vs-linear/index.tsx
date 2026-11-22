@@ -22,65 +22,65 @@ const ARTICLE_PREVIEW = ARTICLE_PARAGRAPHS.join(' ');
 const comparisonRows: ComparisonRow[] = [
   {
     feature: 'What you get',
-    macro: 'Tasks inside a full workspace',
+    rox: 'Tasks inside a full workspace',
     them: 'A focused issue tracker',
   },
   {
     feature: 'Fast, keyboard-first tasks',
-    macro: 'Yes (Linear-inspired)',
+    rox: 'Yes (Linear-inspired)',
     them: 'Yes (the benchmark)',
   },
   {
     feature: 'Create tasks from email',
-    macro: 'Yes, native',
+    rox: 'Yes, native',
     them: 'Yes, via Asks',
   },
   {
     feature: 'Create tasks from chat',
-    macro: 'Yes, bidirectional',
+    rox: 'Yes, bidirectional',
     them: 'Via integration',
   },
   {
     feature: 'Create tasks from calls',
-    macro: 'Yes (recorded, transcribed)',
+    rox: 'Yes (recorded, transcribed)',
     them: 'Via connected tools',
   },
   {
     feature: 'Links',
-    macro: 'Bidirectional with everything',
+    rox: 'Bidirectional with everything',
     them: 'Other issues and connected apps',
   },
-  { feature: 'GitHub linking', macro: 'Yes, bidirectional', them: 'Yes, deep' },
-  { feature: 'PRs in a unified inbox', macro: 'Yes', them: 'No', themNo: true },
+  { feature: 'GitHub linking', rox: 'Yes, bidirectional', them: 'Yes, deep' },
+  { feature: 'PRs in a unified inbox', rox: 'Yes', them: 'No', themNo: true },
   {
     feature: 'Chat, email, docs and CRM',
-    macro: 'Yes, native',
+    rox: 'Yes, native',
     them: 'No',
     themNo: true,
   },
   {
     feature: 'AI context',
-    macro: 'Shared memory from email, chat, docs, tasks, calls and CRM',
+    rox: 'Shared memory from email, chat, docs, tasks, calls and CRM',
     them: 'Linear workspace, code and connected tools',
   },
   {
     feature: 'Cycles, projects and roadmaps',
-    macro: 'Lightweight',
+    rox: 'Lightweight',
     them: 'Deep',
   },
   {
     feature: 'Triage, insights and workflows',
-    macro: 'Basic',
+    rox: 'Basic',
     them: 'Advanced',
   },
-  { feature: 'Third-party integrations', macro: 'Growing', them: 'Extensive' },
+  { feature: 'Third-party integrations', rox: 'Growing', them: 'Extensive' },
   {
     feature: 'Open source',
-    macro: 'Yes, end to end',
+    rox: 'Yes, end to end',
     them: 'No',
     themNo: true,
   },
-  { feature: 'Pricing', macro: 'Flat, by stage', them: 'Per seat, by tier' },
+  { feature: 'Pricing', rox: 'Flat, by stage', them: 'Per seat, by tier' },
 ];
 
 const USER_QUOTES: { name: string; text: string }[] = [

@@ -941,7 +941,7 @@ pub(super) fn resolve_target_link<'a>(
 /// body is client-supplied, and a stored thread is rendered via `innerHTML` by
 /// every user who can see it, so an unsanitized locally-authored body is stored
 /// XSS against anyone the thread is shared with. Runs before signature
-/// injection so the `.macro-email-signature` marker the server adds survives.
+/// injection so the `.rox-email-signature` marker the server adds survives.
 fn decode_and_sanitize_html_body(input: &mut CreateDraftInput) -> Result<(), EmailErr> {
     if let Some(ref html_body) = input.body_html {
         let decoded = URL_SAFE_NO_PAD.decode(html_body.as_bytes())?;

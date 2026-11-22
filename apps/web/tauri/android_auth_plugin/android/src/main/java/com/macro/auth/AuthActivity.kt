@@ -50,7 +50,7 @@ class AuthActivity : ComponentActivity() {
         }
         if (savedInstanceState == null) {
             try {
-                AuthTabIntent.Builder().build().launch(launcher, Uri.parse(session.authUrl), "macro")
+                AuthTabIntent.Builder().build().launch(launcher, Uri.parse(session.authUrl), "rox")
             } catch (_: Exception) {
                 fail("No authentication browser available")
             }

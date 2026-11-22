@@ -450,7 +450,7 @@ function escapeHtml(text: string): string {
     .replaceAll("'", "&#39;");
 }
 
-// The Rox M mark (apps/web/src/components/icon/macro-logo.svg), inlined so
+// The Rox M mark (apps/web/src/components/icon/rox-logo.svg), inlined so
 // the page stays a single self-contained response.
 const LOGO_SVG = `<svg width="34" height="34" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
   <path d="M0 10.014v6.801a.75.75 0 0 0 .225.513l2.742 2.644 2.002-.8v-7.099l-2.97-2.859z"/>

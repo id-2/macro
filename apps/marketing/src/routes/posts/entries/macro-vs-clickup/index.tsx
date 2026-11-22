@@ -20,76 +20,76 @@ const ARTICLE_PREVIEW = ARTICLE_PARAGRAPHS.join(' ');
 const comparisonRows: ComparisonRow[] = [
   {
     feature: "Who it's for",
-    macro:
+    rox:
       'Teams that want an all-in-one workspace — skewed toward power users',
     them: 'Teams that want an all-in-one workspace — skewed toward F500 orgs willing to configure it',
   },
   {
     feature: 'Pricing',
-    macro: '$40 per seat, every module included',
+    rox: '$40 per seat, every module included',
     them: '$10–$19 per seat, plus AI at $14–$33',
   },
   {
     feature: 'No-cost access',
-    macro: 'Free Guest access to a workspace, with storage and AI limits',
+    rox: 'Free Guest access to a workspace, with storage and AI limits',
     them: 'Free with storage capped at 60MB and limited AI',
   },
   {
     feature: 'Native email client',
-    macro: 'Yes, a real inbox in the app',
+    rox: 'Yes, a real inbox in the app',
     them: 'No, integrations only',
     themNo: true,
   },
   {
     feature: 'Chat and channels',
-    macro: 'Native channels with a real inbox',
+    rox: 'Native channels with a real inbox',
     them: 'ClickUp Chat',
   },
   {
     feature: 'Calls',
-    macro: 'Native, recorded and transcribed by default',
+    rox: 'Native, recorded and transcribed by default',
     them: 'Native, via SyncUps',
   },
   {
     feature: 'CRM',
-    macro: 'Native and auto-updating',
+    rox: 'Native and auto-updating',
     them: 'No native CRM; build your own from lists',
     themNo: true,
   },
   {
     feature: 'AI',
-    macro: 'Native, with full memory of your org, in every plan',
+    rox: 'Native, with full memory of your org, in every plan',
     them: 'Brain add-on layered on top',
   },
   {
     feature: 'Task depth',
-    macro: 'Linear-inspired; create a task from any message, email or call',
+    rox: 'Linear-inspired; create a task from any message, email or call',
     them: 'Extremely deep — and easy to over-configure',
   },
   {
     feature: 'GitHub linking',
-    macro: 'Bidirectional; PRs and reviews land in your inbox',
+    rox: 'Bidirectional; PRs and reviews land in your inbox',
     them: 'Two-way GitHub/GitLab sync',
   },
   {
     feature: 'Docs',
-    macro: 'Real-time, whole-document CRDT, live cursors',
+    rox: 'Real-time, whole-document CRDT, live cursors',
     them: 'Real-time with live cursors',
   },
   {
     feature: 'UI feel',
-    macro: 'Keyboard-first, IDE-like, fewer surfaces',
+    rox: 'Keyboard-first, IDE-like, fewer surfaces',
     them: 'Feature-dense; menus, toggles and settings everywhere',
   },
   {
     feature: 'Shared team memory',
-    macro: 'Yes, across every surface',
+    rox: 'Yes, across every surface',
     them: 'No',
     themNo: true,
   },
   {
     feature: 'Open source',
-    macro: 'Yes, under AGPLv3',
+    rox: 'Yes, under AGPLv3',
     them: 'No, closed source',
   },
 ];

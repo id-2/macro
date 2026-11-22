@@ -7,7 +7,17 @@ use std::cell::Cell;
 mod test;
 
 /// Marker class wrapping an injected signature.
-const SIGNATURE_CLASS: &str = "macro-email-signature";
+const SIGNATURE_CLASS: &str = "rox-email-signature";
+/// Pre-rename marker class. A body signed before the rename (an old draft, or
+/// a message stored by an older build) still carries it, so reads recognize it
+/// rather than appending a second signature or leaving a stale one in place.
+const LEGACY_SIGNATURE_CLASS: &str = "macro-email-signature";
+
+/// Selector matching a server-wrapped signature under either marker class.
+fn signature_selector() -> String {
+    format!(".{SIGNATURE_CLASS}, .{LEGACY_SIGNATURE_CLASS}")
+}
+
 
 /// Pure send-time signature policy, shared by immediate and scheduled delivery.
 /// Settings are fetched before entering the persistence transaction; application
@@ -69,7 +79,7 @@ impl SignaturePreparation {
 /// for re-sends / an old client that still bakes it in). A signature inside a
 /// quoted thread (`.rox_quote`) is the replied-to message's and is ignored.
 pub(crate) fn has_signature(body_html: &str) -> bool {
-    let Ok(sig_sel) = Selector::parse(&format!(".{SIGNATURE_CLASS}")) else {
+    let Ok(sig_sel) = Selector::parse(&signature_selector()) else {
         return false;
     };
     Html::parse_fragment(body_html).select(&sig_sel).any(|el| {
@@ -83,7 +93,7 @@ pub(crate) fn has_signature(body_html: &str) -> bool {
 }
 
 /// Injects the (already-sanitized) signature into the outgoing HTML body,
-/// wrapped in a `.macro-email-signature` marker div. Placed after the message
+/// wrapped in a `.rox-email-signature` marker div. Placed after the message
 /// but above any quoted/forwarded thread (Gmail's ordering): inserted before the
 /// first `.rox_quote` block if present, else appended to `<body>`. If neither
 /// matches (e.g. a bare fragment with no `<body>`), it is appended to the end so
@@ -144,11 +154,12 @@ pub(crate) fn inject_signature(body_html: &str, signature_html: &str) -> String 
     result
 }
 
-/// Removes any server-wrapped signature (the `.macro-email-signature` element
-/// and its contents) from the body. Used to honor an explicit
-/// `include_signature = false` even when a client already baked one in.
+/// Removes any server-wrapped signature (the `.rox-email-signature` element and
+/// its contents, or a `.macro-email-signature` left by an older build) from the
+/// body. Used to honor an explicit `include_signature = false` even when a
+/// client already baked one in.
 pub(crate) fn strip_signature(body_html: &str) -> String {
-    let selector = format!(".{SIGNATURE_CLASS}");
+    let selector = signature_selector();
     let mut output = Vec::new();
     let mut rewriter = HtmlRewriter::new(
         Settings {
