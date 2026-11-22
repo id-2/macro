@@ -26,7 +26,7 @@ pub fn run(instance: &Instance) -> Result<()> {
     println!(
         "{}",
         Style::new().bold().apply_to(format!(
-            "macro local stack — instance {} (project {})",
+            "rox local stack — instance {} (project {})",
             instance.name(),
             instance.project_name()
         ))

@@ -568,7 +568,7 @@ fn rows_read(node: &serde_json::Value, table: &str) -> f64 {
 /// grant: most of production's table belongs to someone else.
 async fn seed_background_initiatives(pool: &PgPool, count: i32) -> anyhow::Result<()> {
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
         SELECT ('a2000000-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid, 'background-' || n,
             'background-' || n || '@paths.test', 'background-stripe-' || n
         FROM generate_series(1, $1::int) n"#,

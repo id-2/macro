@@ -23,7 +23,7 @@ const config = (key: string) =>
   ).trim();
 
 const entry =
-  "[IdentityProviderValidationException]=We couldn't complete sign-in. If this Gmail address is connected as an additional inbox, sign in with the email you originally used to create your Macro account. Return to Macro and choose Continue with email, or contact support.";
+  "[IdentityProviderValidationException]=We couldn't complete sign-in. If this Gmail address is connected as an additional inbox, sign in with the email you originally used to create your Rox account. Return to Rox and choose Continue with email, or contact support.";
 const url = new URL(
   `/api/theme/${FUSIONAUTH_THEME_IDS[stack]}`,
   config('host')

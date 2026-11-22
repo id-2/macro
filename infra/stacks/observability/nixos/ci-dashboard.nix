@@ -92,7 +92,7 @@ let
 
   dashboard = {
     uid = "macro-ci";
-    title = "Macro CI";
+    title = "Rox CI";
     description = "Where CI time goes. The top section reads the exporter's push, job and step events in Loki, kept 30 days, over the selected range; set it to a day or more for percentiles. The bottom section searches the run traces in Tempo, kept 7 days: open a trace for its execution waterfall. Trace tables are bounded search results, not complete counts.";
     schemaVersion = 39;
     version = 3;
@@ -201,7 +201,7 @@ in
     {
       name = "macro-ci";
       orgId = 1;
-      folder = "Macro";
+      folder = "Rox";
       type = "file";
       disableDeletion = true;
       allowUiUpdates = false;

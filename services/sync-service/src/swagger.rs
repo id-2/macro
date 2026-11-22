@@ -14,7 +14,7 @@ use crate::domain::models::{
     info(
         title = "Sync Service",
         description = "Document sync service JSON control plane",
-        contact(name = "Macro"),
+        contact(name = "Rox"),
     ),
     modifiers(&Security),
     paths(

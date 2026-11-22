@@ -51,9 +51,9 @@ impl PgStripeIdentity {
     pub async fn mark_has_trialed(&self, user: &RoxUserIdStr<'_>) -> anyhow::Result<()> {
         sqlx::query!(
             r#"
-            UPDATE macro_user SET has_trialed = true
+            UPDATE rox_user SET has_trialed = true
             FROM "User" u
-            WHERE u.rox_user_id = macro_user.id AND u.id = $1
+            WHERE u.rox_user_id = rox_user.id AND u.id = $1
             "#,
             user.as_ref(),
         )

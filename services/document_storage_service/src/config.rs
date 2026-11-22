@@ -91,6 +91,8 @@ maybe_env_vars! {
     pub struct CallRecordingS3AccessKey;
     /// AWS secret key for call recording S3 uploads.
     pub struct CallRecordingS3Secret;
+    /// Public address of the recording warehouse, when it is not the local one.
+    pub struct CallRecordingS3Endpoint;
     /// Optional Meta test event code — routes events to Meta's test events
     /// view instead of production tracking.
     pub struct MetaTestEventCode;

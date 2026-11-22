@@ -15,5 +15,5 @@
 function populate(jwt, user, _registration) {
   jwt.fusion_user_id = user.id;
   jwt.email = user.email;
-  jwt.rox_user_id = 'macro|' + user.email;
+  jwt.macro_user_id = 'macro|' + user.email;
 }

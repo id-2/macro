@@ -5,7 +5,7 @@ import type {
   AgentSessionResponse,
   ExecutionRecord,
 } from '../generated/agent-harness/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 const sessionId = '0198a4cc-e138-7670-a308-a6b766602700';
@@ -51,7 +51,7 @@ describe('AgentSession', () => {
       }
       return Response.json(snapshot);
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -93,7 +93,7 @@ describe('AgentSession', () => {
       request = input instanceof Request ? input : new Request(input);
       return Response.json(record);
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -125,7 +125,7 @@ describe('AgentSession', () => {
       requests.push(request.url);
       return Response.json(record);
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -152,7 +152,7 @@ describe('AgentSession', () => {
   test('preserves access errors from session result endpoints', async () => {
     globalThis.fetch = (async (_input) =>
       Response.json({ message: 'Forbidden' }, { status: 403 })) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -181,7 +181,7 @@ describe('AgentSession', () => {
       request = input instanceof Request ? input : new Request(input);
       return new Response(null, { status: 204 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -202,7 +202,7 @@ describe('AgentSession', () => {
       requests.push(input instanceof Request ? input : new Request(input));
       return new Response(null, { status: 204 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -238,7 +238,7 @@ describe('AgentSession', () => {
         request.method === 'PUT' ? registration : [registration],
       );
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -267,7 +267,7 @@ describe('AgentSession', () => {
       request = input instanceof Request ? input : new Request(input);
       return Response.json({ size: 'large' }, { status: 200 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -290,7 +290,7 @@ describe('AgentSession', () => {
       requests.push(request);
       return Response.json({ size: 'small' }, { status: 200 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -319,7 +319,7 @@ describe('AgentSession', () => {
         { status: 200 },
       );
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -352,7 +352,7 @@ describe('AgentSession', () => {
       request = input instanceof Request ? input : new Request(input);
       return Response.json({ mode: 'code' }, { status: 200 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -374,7 +374,7 @@ describe('AgentSession', () => {
       request = input instanceof Request ? input : new Request(input);
       return Response.json({ branches: ['main', 'develop'] }, { status: 200 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -420,7 +420,7 @@ describe('AgentSession', () => {
       }
       return new Response(null, { status: 200 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -470,7 +470,7 @@ describe('AgentSession', () => {
       }
       return new Response(null, { status: 200 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -492,7 +492,7 @@ describe('AgentSession', () => {
         'repoUrl needs a Cursor coding agent; choose a Cursor agent persona or omit repoUrl',
         { status: 422, headers: { 'content-type': 'text/plain' } },
       )) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -513,7 +513,7 @@ describe('AgentSession', () => {
   test('a created session serializes with its web app link', async () => {
     globalThis.fetch = (async (_input) =>
       Response.json({ session }, { status: 201 })) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
       webAppUrl: 'https://app.example.test',
@@ -544,7 +544,7 @@ describe('AgentSession', () => {
         { status: 200 },
       );
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -588,7 +588,7 @@ describe('AgentSession', () => {
       request = input instanceof Request ? input : new Request(input);
       return Response.json({ bot, messages }, { status: 200 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -624,7 +624,7 @@ describe('AgentSession', () => {
         truncationNotice: null,
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -665,7 +665,7 @@ describe('AgentSession', () => {
             kind: 'tool_approval',
             approvalId: 'approval-answered',
             serverSlug: 'macro',
-            serverName: 'Macro',
+            serverName: 'Rox',
             toolName: 'send_email',
             arguments: { to: 'a' },
             requestedBy: 'macro|teammate@example.com',
@@ -702,7 +702,7 @@ describe('AgentSession', () => {
       }
       return Response.json({ status: 'approved' });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -747,7 +747,7 @@ describe('AgentSession', () => {
         pullRequestUrl: 'https://github.com/acme/web/pull/7',
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -790,7 +790,7 @@ describe('AgentSession', () => {
       }
       return new Response(null, { status: 204 });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -853,7 +853,7 @@ test('session activity keeps invocation filters and lazily advances its cursor',
         requests.length === 1 ? { occurredAt: timestamp, id: 'row-1' } : null,
     });
   }) as typeof fetch;
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'fixture',
     hosts: { 'agent-harness': 'https://agent.example.test' },
   });
@@ -879,7 +879,7 @@ test('session activity keeps invocation filters and lazily advances its cursor',
 });
 
 test('session activity rejects another session invocation without a request', () => {
-  const macro = new Macro({ token: 'fixture' });
+  const macro = new Rox({ token: 'fixture' });
   const session = macro.agentSessions.byId(sessionId);
   const foreign = macro.agentSessions
     .byId('other')

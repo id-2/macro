@@ -63,7 +63,7 @@ pub(super) async fn insert_user(pool: &PgPool) {
 
 pub(super) async fn insert_named_user(pool: &PgPool, user: &str) {
     let id = rox_uuid::generate_uuid_v7();
-    sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#, id, user)
+    sqlx::query!(r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#, id, user)
         .execute(pool).await.unwrap();
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,

@@ -225,7 +225,7 @@ fn notion_fetch_unwraps_hosted_mcp_page_content_and_properties() {
         "metadata": {"type": "page"},
         "title": "Q1 Product + Engineering Planning",
         "url": "https://app.notion.com/p/4d005e63b2fd4d079df4e376e35b7519",
-        "text": "Here is the result of \"view\" for the Page with URL https://app.notion.com/p/4d005e63b2fd4d079df4e376e35b7519 as of 2026-07-25T19:00:00Z:\n<page url=\"https://app.notion.com/p/4d005e63b2fd4d079df4e376e35b7519\">\n<properties>\n{\"Name\":\"Q1 Product + Engineering Planning\",\"Status\":\"Not started\",\"Tags\":[\"Planning\",\"Q1\"]}\n</properties>\n<content>\n## Pre-requisite reading\n\n- <page url=\"https://notion.so/preflight\">Macro 4.0 pre-flight items 🚀</page>\n- [x] Ship it\n</content>\n</page>"
+        "text": "Here is the result of \"view\" for the Page with URL https://app.notion.com/p/4d005e63b2fd4d079df4e376e35b7519 as of 2026-07-25T19:00:00Z:\n<page url=\"https://app.notion.com/p/4d005e63b2fd4d079df4e376e35b7519\">\n<properties>\n{\"Name\":\"Q1 Product + Engineering Planning\",\"Status\":\"Not started\",\"Tags\":[\"Planning\",\"Q1\"]}\n</properties>\n<content>\n## Pre-requisite reading\n\n- <page url=\"https://notion.so/preflight\">Rox 4.0 pre-flight items 🚀</page>\n- [x] Ship it\n</content>\n</page>"
     });
 
     let parsed = parse_notion_fetch_result(response);
@@ -235,7 +235,7 @@ fn notion_fetch_unwraps_hosted_mcp_page_content_and_properties() {
     );
     assert_eq!(
         parsed.body,
-        "## Pre-requisite reading\n\n- <page url=\"https://notion.so/preflight\">Macro 4.0 pre-flight items 🚀</page>\n- [x] Ship it"
+        "## Pre-requisite reading\n\n- <page url=\"https://notion.so/preflight\">Rox 4.0 pre-flight items 🚀</page>\n- [x] Ship it"
     );
     assert_eq!(parsed.properties.tags, vec!["Planning", "Q1"]);
     assert_eq!(

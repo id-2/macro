@@ -30,7 +30,7 @@ fn picture_changed() -> UserTopicEvent {
 }
 
 #[test]
-fn subscribes_to_macro_users() {
+fn subscribes_to_rox_users() {
     assert_eq!(DeclaredMacroEvent::topics(), ["rox.users"]);
 }
 

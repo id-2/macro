@@ -40,11 +40,11 @@ async fn access_as_requester_on_team(
 // Fixture helpers
 // ---------------------------------------------------------------------------
 
-/// macro_user + "User" rows so team / team_user FKs resolve.
+/// rox_user + "User" rows so team / team_user FKs resolve.
 async fn insert_user(pool: &PgPool, user_id: &str, email: &str) {
     let rox_uuid = Uuid::new_v4();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $3, $4)"#,
         rox_uuid,
         user_id,

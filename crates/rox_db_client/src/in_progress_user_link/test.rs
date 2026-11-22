@@ -1,10 +1,10 @@
 use super::*;
 use sqlx::{Pool, Postgres};
 
-async fn insert_macro_user(pool: &Pool<Postgres>, id: Uuid) -> anyhow::Result<()> {
+async fn insert_rox_user(pool: &Pool<Postgres>, id: Uuid) -> anyhow::Result<()> {
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'tester', 'tester@example.com', 'cus_test')
         "#,
         &id
@@ -17,7 +17,7 @@ async fn insert_macro_user(pool: &Pool<Postgres>, id: Uuid) -> anyhow::Result<()
 #[sqlx::test]
 async fn set_linked_email_then_get(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let rox_user_id = rox_uuid::generate_uuid_v7();
-    insert_macro_user(&pool, rox_user_id).await?;
+    insert_rox_user(&pool, rox_user_id).await?;
 
     let link_id = create_in_progress_user_link(&pool, &rox_user_id.to_string()).await?;
 
@@ -41,7 +41,7 @@ async fn google_link_records_requested_and_granted_scopes(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     let rox_user_id = rox_uuid::generate_uuid_v7();
-    insert_macro_user(&pool, rox_user_id).await?;
+    insert_rox_user(&pool, rox_user_id).await?;
     let requested = vec!["gmail".to_string(), "calendar".to_string()];
     let granted = vec!["gmail".to_string()];
 
@@ -60,7 +60,7 @@ async fn google_link_records_requested_and_granted_scopes(
 #[sqlx::test]
 async fn count_excludes_expired_links(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let rox_user_id = rox_uuid::generate_uuid_v7();
-    insert_macro_user(&pool, rox_user_id).await?;
+    insert_rox_user(&pool, rox_user_id).await?;
 
     // A link created just over 24 hours ago should no longer count toward the cap.
     let expired_link_id = create_in_progress_user_link(&pool, &rox_user_id.to_string()).await?;
@@ -93,7 +93,7 @@ async fn count_excludes_expired_links(pool: Pool<Postgres>) -> anyhow::Result<()
 #[sqlx::test]
 async fn delete_clears_row(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let rox_user_id = rox_uuid::generate_uuid_v7();
-    insert_macro_user(&pool, rox_user_id).await?;
+    insert_rox_user(&pool, rox_user_id).await?;
 
     let link_id = create_in_progress_user_link(&pool, &rox_user_id.to_string()).await?;
     set_linked_email(&pool, &link_id, "linked@example.com").await?;

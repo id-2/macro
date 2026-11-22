@@ -14,7 +14,7 @@ fn from_header_without_a_name_is_the_bare_address() {
 fn from_header_quotes_an_ascii_name_marked_as_via_macro() {
     assert_eq!(
         from_header(FROM, Some("Alice Example")),
-        r#""Alice Example (via Macro)" <no-reply@rox.one>"#
+        r#""Alice Example (via Rox)" <no-reply@rox.one>"#
     );
 }
 
@@ -25,7 +25,7 @@ fn from_header_cannot_be_broken_out_of_by_the_name() {
             FROM,
             Some("Alice \"Admin\" \\\r\nBcc: victim@example.com\" <x@example.com>")
         ),
-        r#""Alice Admin Bcc: victim@example.com <x@example.com> (via Macro)" <no-reply@rox.one>"#
+        r#""Alice Admin Bcc: victim@example.com <x@example.com> (via Rox)" <no-reply@rox.one>"#
     );
 }
 
@@ -34,7 +34,7 @@ fn from_header_caps_the_name() {
     let header = from_header(FROM, Some(&"x".repeat(100)));
     assert_eq!(
         header,
-        format!("\"{} (via Macro)\" <no-reply@rox.one>", "x".repeat(64))
+        format!("\"{} (via Rox)\" <no-reply@rox.one>", "x".repeat(64))
     );
 }
 
@@ -133,7 +133,7 @@ async fn sends_on_behalf_of_the_named_sender_with_a_text_part() {
     assert_eq!(
         *adapter.email_service.sent.lock().unwrap(),
         [Sent {
-            from: r#""Alice Example (via Macro)" <no-reply@rox.one>"#.to_string(),
+            from: r#""Alice Example (via Rox)" <no-reply@rox.one>"#.to_string(),
             to: "bob@example.com".to_string(),
             reply_to: Some("alice@example.com".to_string()),
             text_body: Some("Join us".to_string()),

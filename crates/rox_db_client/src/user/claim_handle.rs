@@ -32,7 +32,7 @@ pub async fn claim_handle(
         .map_err(|_| ClaimHandleError::InvalidIdentity)?;
     let result = sqlx::query!(
         r#"
-        UPDATE macro_user
+        UPDATE rox_user
         SET username = $2,
             mailbox_handle_claimed_at = COALESCE(mailbox_handle_claimed_at, now())
         WHERE id = $1

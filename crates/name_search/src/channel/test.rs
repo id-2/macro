@@ -45,7 +45,7 @@ async fn member_sees_matching_channels_but_non_member_does_not(
         &pool,
         &user(MEMBER),
         ChannelNameSearchScope::default(),
-        "Macro".to_string(),
+        "Rox".to_string(),
         false,
         10,
         None,
@@ -55,14 +55,14 @@ async fn member_sees_matching_channels_but_non_member_does_not(
     assert_eq!(ids(&member_results), [ROX_PLANNING, MACRO]);
     assert!(member_results.items.iter().all(|hit| {
         hit.entity_type == SearchEntityType::Channels
-            && hit.name.contains("<rox_em>Macro</rox_em>")
+            && hit.name.contains("<rox_em>Rox</rox_em>")
     }));
 
     let non_member_results = search_channel_names(
         &pool,
         &user("macro|nonmember@test.com"),
         ChannelNameSearchScope::default(),
-        "Macro".to_string(),
+        "Rox".to_string(),
         false,
         10,
         None,
@@ -120,7 +120,7 @@ async fn partial_matches_substrings_while_exact_requires_a_complete_token(
         &pool,
         &user(MEMBER),
         ChannelNameSearchScope::default(),
-        "Macro".to_string(),
+        "Rox".to_string(),
         true,
         10,
         None,
@@ -139,7 +139,7 @@ async fn former_participant_cannot_find_channel(pool: Pool<Postgres>) -> anyhow:
         &pool,
         &user("macro|former@test.com"),
         ChannelNameSearchScope::default(),
-        "Macro".to_string(),
+        "Rox".to_string(),
         false,
         10,
         None,
@@ -381,7 +381,7 @@ async fn every_term_must_match_the_stored_name_or_some_other_participant(
     assert_eq!(ids(&two_words_of_a_stored_name), [ROX_PLANNING]);
     assert_eq!(
         two_words_of_a_stored_name.items[0].name,
-        "<rox_em>Macro</rox_em> <rox_em>Plan</rox_em>ning"
+        "<rox_em>Rox</rox_em> <rox_em>Plan</rox_em>ning"
     );
     Ok(())
 }
@@ -562,7 +562,7 @@ async fn blank_terms_and_thread_cursors_are_rejected(pool: Pool<Postgres>) -> an
         &pool,
         &user(MEMBER),
         ChannelNameSearchScope::default(),
-        "Macro".to_string(),
+        "Rox".to_string(),
         false,
         10,
         Some(SearchMethodCursor::Thread {

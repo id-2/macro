@@ -118,10 +118,10 @@ fn rejects_reserved_headers_case_insensitively() {
         "x-rox-event-id",
         "X-ROX-TIMESTAMP",
         "x-Rox-Signature",
-        "X-Macro-Event",
+        "X-Rox-Event",
         "x-rox-event-id",
         "X-MACRO-TIMESTAMP",
-        "x-Macro-Signature",
+        "x-Rox-Signature",
     ] {
         let webhook = webhook(
             "https://example.com/webhook",
@@ -261,7 +261,7 @@ async fn reserved_header_configuration_is_permanent_without_dns_lookup() {
         .deliver(
             &webhook(
                 "https://unresolvable.invalid/webhook",
-                BTreeMap::from([("X-Macro-Signature".to_string(), "private".to_string())]),
+                BTreeMap::from([("X-Rox-Signature".to_string(), "private".to_string())]),
             ),
             &event(),
         )

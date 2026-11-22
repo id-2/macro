@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
 import type { MessageListItem } from '../generated/storage/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -48,7 +48,7 @@ test('mixed timeline seeds typed messages without refetching and maps typed sele
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -101,7 +101,7 @@ test('thread mutation paths retain document parent scope across cache invalidati
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });

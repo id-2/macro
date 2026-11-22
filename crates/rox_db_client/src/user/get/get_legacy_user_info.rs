@@ -47,7 +47,7 @@ pub async fn get_legacy_user_info(
             u.rox_user_id as "rox_user_id",
             u."createdAt" as "created_at?"
         FROM "User" u
-        JOIN "macro_user" mu ON u.rox_user_id = mu.id
+        JOIN "rox_user" mu ON u.rox_user_id = mu.id
         WHERE u."id" = $1
         "#,
         user_id.as_ref()

@@ -715,7 +715,7 @@ fn a_surface_shows_drafted_routines_then_picks_then_templates_each_once() {
     assert!(shown.iter().all(|suggestion| suggestion.id != pick.id));
     assert_eq!(shown[0].id, drafted.id);
     assert_eq!(shown.len(), PER_SURFACE);
-    assert_eq!(shown[2].from, SuggestionFrom::Macro);
+    assert_eq!(shown[2].from, SuggestionFrom::Rox);
 }
 
 #[test]
@@ -819,7 +819,7 @@ async fn dismissing_a_suggestion_or_a_template_removes_it_for_good_everywhere() 
     let template = tasks
         .suggestions
         .iter()
-        .find(|suggestion| suggestion.from == SuggestionFrom::Macro)
+        .find(|suggestion| suggestion.from == SuggestionFrom::Rox)
         .unwrap()
         .clone();
     h.service.dismiss(&user(), mine.id).await.unwrap();

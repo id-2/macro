@@ -12,7 +12,7 @@ import type { Disk } from '../../context/disk.ts';
 import { elapsed } from './config.ts';
 import { type AskModel, jsonIn } from './judge.ts';
 import type { Ledger } from './ledger.ts';
-import type { CallApi } from './rox.ts';
+import type { CallApi } from './macro.ts';
 import { rowId } from './place.ts';
 import type { Ask, AskRow, Asks, NewAskRow, SwitchVerdict } from './types.ts';
 

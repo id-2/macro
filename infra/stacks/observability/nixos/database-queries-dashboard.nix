@@ -111,7 +111,7 @@ let
     };
   dashboard = {
     uid = "macro-postgres-queries";
-    title = "Macro PostgreSQL queries";
+    title = "Rox PostgreSQL queries";
     schemaVersion = 39;
     version = 2;
     editable = false;
@@ -441,7 +441,7 @@ in
     {
       name = "macro-postgres-queries";
       orgId = 1;
-      folder = "Macro";
+      folder = "Rox";
       type = "file";
       disableDeletion = true;
       allowUiUpdates = false;

@@ -89,7 +89,7 @@ async fn init_without_link_id_returns_the_rox_link_without_gmail_side_effects(po
     let fusionauth_user_id = Uuid::now_v7();
     let rox_user_id = format!("macro|init-{fusionauth_user_id}@example.com");
     sqlx::query(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
     )
     .bind(fusionauth_user_id)
     .bind("ada")

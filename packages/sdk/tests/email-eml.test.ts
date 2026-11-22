@@ -1,5 +1,5 @@
 import { afterEach, expect, mock, spyOn, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 afterEach(() => mock.restore());
 
@@ -19,7 +19,7 @@ test('downloading a message returns its original source bytes', async () => {
     { preconnect: globalThis.fetch.preconnect },
   );
   spyOn(globalThis, 'fetch').mockImplementation(fetchMock);
-  const macro = new Macro({
+  const macro = new Rox({
     auth: { type: 'user', apiKey: 'mak_test' },
     hosts: { email: 'https://email.example.test' },
   });

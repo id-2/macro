@@ -556,7 +556,7 @@ impl GenAiProjector {
     /// other harness calls them by the listed name.
     fn definition_name(&self, listed: &str) -> String {
         let name: ToolName = listed.parse().unwrap_or_else(|never| match never {});
-        if self.harness == Harness::Macro
+        if self.harness == Harness::Rox
             && let ToolName::Mcp { .. } = &name
             && let Some(tool) = self.harness.reader().rox_tool(&name)
         {

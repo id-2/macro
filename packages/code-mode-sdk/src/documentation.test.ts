@@ -88,8 +88,8 @@ function fixturePages() {
       '# Child\nAnother service',
     ],
     [
-      'src/macro/classes/Macro.md',
-      '# Class: Macro\n\n## Properties\n\n| Property | Modifier | Type | Description |\n| ------ | ------ | ------ | ------ |\n| <a id="property-examplespace"></a> `exampleSpace` | `readonly` | [`ExampleNamespace`](../../entities/example/namespace/classes/ExampleNamespace.md) | Examples. |\n',
+      'src/macro/classes/Rox.md',
+      '# Class: Rox\n\n## Properties\n\n| Property | Modifier | Type | Description |\n| ------ | ------ | ------ | ------ |\n| <a id="property-examplespace"></a> `exampleSpace` | `readonly` | [`ExampleNamespace`](../../entities/example/namespace/classes/ExampleNamespace.md) | Examples. |\n',
     ],
   ]);
 }
@@ -248,11 +248,11 @@ describe('TypeDoc documentation packaging', () => {
     expect(docs.symbols.SessionReview).not.toContain('property-client');
     expect(docs.symbols.SessionReview).not.toContain('private constructor');
     expect(entity('documents')).toContain('`Document.content`');
-    expect(entity('core')).toContain('### Macro');
-    expect(docs.symbols.Macro).toContain('`agentSessions`');
-    expect(docs.symbols.Macro).toContain('`search`');
-    expect(docs.symbols.Macro).toContain('`workspace`');
-    expect(docs.symbols.Macro).toContain('`chats`');
+    expect(entity('core')).toContain('### Rox');
+    expect(docs.symbols.Rox).toContain('`agentSessions`');
+    expect(docs.symbols.Rox).toContain('`search`');
+    expect(docs.symbols.Rox).toContain('`workspace`');
+    expect(docs.symbols.Rox).toContain('`chats`');
     expect(entity('routines')).toContain('`RoutineOptions`');
     expect(entity('harnesses')).toContain('### HarnessNamespace');
     expect(entity('agents')).not.toContain('HarnessNamespace');

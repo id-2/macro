@@ -77,7 +77,7 @@ ${notify({ pages, environment })}`,
       name: `[${environment.toUpperCase()}] Stripe audit: {{kind.name}} mismatch`,
       type: 'log alert',
       query: `logs("service:authentication-service \\"stripe audit mismatch\\" ${env}").index("*").rollup("count").by("@kind").last("1d") > 0`,
-      message: `The daily Stripe audit found {{kind.name}}: Stripe and Macro disagree. It changes nothing; the findings are rows in stripe_audit_mismatch for the run. A missing_event is a webhook Stripe sent that never arrived; an unconsumed_event_type is a type the endpoint sends that no consumer applies.
+      message: `The daily Stripe audit found {{kind.name}}: Stripe and Rox disagree. It changes nothing; the findings are rows in stripe_audit_mismatch for the run. A missing_event is a webhook Stripe sent that never arrived; an unconsumed_event_type is a type the endpoint sends that no consumer applies.
 
 ${REPLAY}
 

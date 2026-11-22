@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import { DatabaseTable } from '../src/entities/databases/table';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 const host = 'https://storage.example.test';
@@ -75,7 +75,7 @@ describe('Forms', () => {
       return Response.json(registration, { status: 201 });
     }) as typeof fetch;
 
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const table = DatabaseTable.byId(macro.databases.byId(databaseId), tableId);
     const form = await macro.forms.create({
       name: 'Workshop registration',
@@ -118,7 +118,7 @@ describe('Forms', () => {
       });
     }) as typeof fetch;
 
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const form = macro.forms.byId(formId);
     const [question] = await form.questions();
     if (!question) throw new Error('Missing fixture question');
@@ -174,7 +174,7 @@ describe('Forms', () => {
         });
       return Response.json(registration);
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const outcome = await macro.forms.byId(formId).submit([]);
     if (outcome.outcome !== 'submitted')
       throw new Error('Expected a submitted response');
@@ -191,7 +191,7 @@ describe('Forms', () => {
       if (request.method !== 'GET') writes++;
       return Response.json(registration);
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const [question] = await macro.forms.byId(formId).questions();
     if (!question) throw new Error('Missing fixture question');
     await expect(
@@ -220,7 +220,7 @@ describe('Forms', () => {
         },
       });
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const form = macro.forms.byId(formId);
     expect(await form.description()).toBe('Tell us who is coming.');
     await form.update({ description: 'Updated', closesAt: null });
@@ -241,7 +241,7 @@ describe('Forms', () => {
       }
       return Response.json(registration);
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const form = macro.forms.byId(formId);
     const [section] = await form.sections();
     const [question] = await form.questions();
@@ -297,7 +297,7 @@ describe('Forms', () => {
       }
       return Response.json(registration);
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const form = macro.forms.byId(formId);
     const saved = await form.replaceLayout([]);
     expect(saved.form).toBe(form);
@@ -332,7 +332,7 @@ describe('Forms', () => {
         });
       return Response.json(registration);
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const form = macro.forms.byId(formId);
     const mine = await form.myResponse();
     if (mine.kind !== 'saved') throw new Error('a saved response');
@@ -375,7 +375,7 @@ describe('Forms', () => {
         return Response.json({ kind: 'anonymous' });
       return Response.json(registration);
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const form = macro.forms.byId(formId);
     expect(await form.myResponse()).toEqual({ kind: 'anonymous' });
     expect(paths).toEqual([`/forms/${formId}/responses/mine`]);
@@ -397,7 +397,7 @@ describe('Forms', () => {
         message: 'This workshop is full.',
       });
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const form = macro.forms.byId(formId);
     const [question] = await form.questions();
     if (!question) throw new Error('Missing fixture question');
@@ -461,7 +461,7 @@ describe('Forms', () => {
         });
       return Response.json(permissions);
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const [form] = await macro.forms.list(macro.databases.byId(databaseId));
     if (!form) throw new Error('Missing listed form');
     const summary = await form.responseSummary();
@@ -496,7 +496,7 @@ describe('Forms', () => {
       return Response.json([{ form: registration.form, access: 'view' }]);
     }) as typeof fetch;
 
-    const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+    const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
     const [form] = await macro.forms.list();
     expect(form?.id).toBe(formId);
     expect(paths).toEqual(['/forms/accessible']);
@@ -545,7 +545,7 @@ test('an accepted form response exposes its unlocked booking step', async () => 
       });
     return Response.json(registration);
   }) as typeof fetch;
-  const macro = new Macro({ token: 'user-token', hosts: { storage: host } });
+  const macro = new Rox({ token: 'user-token', hosts: { storage: host } });
   const outcome = await macro.forms.byId(formId).submit([]);
   if (outcome.outcome !== 'submitted') throw new Error('Expected acceptance');
   expect(outcome.booking?.section.id).toBe(

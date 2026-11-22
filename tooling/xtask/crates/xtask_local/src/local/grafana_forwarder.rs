@@ -27,11 +27,11 @@ mod test;
 /// The forwarder's compose service and profile.
 const SERVICE: &str = "grafana-forwarder";
 /// Its container in the global compose project.
-const CONTAINER: &str = "macro-grafana-forwarder-1";
+const CONTAINER: &str = "rox-grafana-forwarder-1";
 /// The lgtm collector's container in the global compose project.
-pub(super) const LGTM_CONTAINER: &str = "macro-lgtm-1";
+pub(super) const LGTM_CONTAINER: &str = "rox-lgtm-1";
 /// The global compose project's `services` network, which the default instance
-/// shares; other instances' are `macro-<name>_services`.
+/// shares; other instances' are `rox-<name>_services`.
 const GLOBAL_NETWORK: &str = "rox_services";
 /// Where the lgtm collector sends its copy, on the global `services` network.
 const FORWARDER_URL: &str = "http://grafana-forwarder:4318";
@@ -241,7 +241,7 @@ fn has_running_containers(network: &str) -> bool {
 
 /// Whether `name` is an instance's `services` network (`Instance::network_services`).
 fn is_instance_network(name: &str) -> bool {
-    name == GLOBAL_NETWORK || (name.starts_with("macro-") && name.ends_with("_services"))
+    name == GLOBAL_NETWORK || (name.starts_with("rox-") && name.ends_with("_services"))
 }
 
 /// The value of the lgtm copy switch in `docker inspect`'s environment lines,

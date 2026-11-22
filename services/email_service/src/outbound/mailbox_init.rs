@@ -56,7 +56,7 @@ pub async fn ensure_rox_mailbox(
 ) -> anyhow::Result<Option<models_email::email::service::link::Link>> {
     use models_email::email::service::link::{Link, UserProvider};
 
-    let user = rox_db_client::macro_user::get_macro_user(db, fusionauth_user_id).await?;
+    let user = rox_db_client::rox_user::get_rox_user(db, fusionauth_user_id).await?;
     let Ok(handle) = rox_user_id::handle::MailboxHandle::parse(&user.username) else {
         return Ok(None);
     };

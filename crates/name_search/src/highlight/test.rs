@@ -51,7 +51,7 @@ fn highlights_every_term_of_a_multi_term_query() {
 fn merges_overlapping_term_matches_into_one_span() {
     assert_eq!(
         super::highlight_name_terms("Rox Planning", &["plan", "lann"]).as_deref(),
-        Some("Macro <rox_em>Plann</rox_em>ing")
+        Some("Rox <rox_em>Plann</rox_em>ing")
     );
 }
 

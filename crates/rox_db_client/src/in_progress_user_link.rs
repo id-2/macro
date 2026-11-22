@@ -123,7 +123,7 @@ pub async fn delete_day_old_in_progress_user_links(
     Ok(())
 }
 
-pub async fn get_macro_user_id_by_link_id(
+pub async fn get_rox_user_id_by_link_id(
     db: &sqlx::Pool<sqlx::Postgres>,
     link_id: &uuid::Uuid,
 ) -> anyhow::Result<Uuid> {

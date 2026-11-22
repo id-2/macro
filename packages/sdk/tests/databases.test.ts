@@ -6,7 +6,7 @@ import type {
 } from '../generated/storage/types.gen';
 import { DatabaseTable } from '../src/entities/databases/table';
 import { DatabaseView } from '../src/entities/databases/view';
-import { Macro, RoxOpRefusedError } from '../src/macro';
+import { Rox, RoxOpRefusedError } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 const databaseId = '0198a4cc-e138-7670-a308-a6b766602700';
@@ -16,7 +16,7 @@ const definitionId = '0198a4cc-e138-7670-a308-a6b766602709';
 const host = 'https://storage.example.test';
 
 function client() {
-  return new Macro({ token: 'user-token', hosts: { storage: host } });
+  return new Rox({ token: 'user-token', hosts: { storage: host } });
 }
 
 const ticketsTable: Table = {
@@ -93,7 +93,7 @@ afterEach(() => {
 
 describe('Database', () => {
   test('links a table and a view, opening the database on them', () => {
-    const database = new Macro({
+    const database = new Rox({
       token: 'user-token',
       hosts: { storage: host },
       webAppUrl: 'https://app.example.test',

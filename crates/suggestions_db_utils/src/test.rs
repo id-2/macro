@@ -8,7 +8,7 @@ const OWNER: &str = "macro|suggestions-db-utils@rox.one";
 async fn setup(pool: &PgPool) -> (Uuid, Uuid) {
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
         rox_user_id,
         OWNER,
     )

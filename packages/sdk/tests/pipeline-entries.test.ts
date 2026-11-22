@@ -3,7 +3,7 @@ import type { PipelineEntry as PipelineEntryRecord } from '../generated/storage/
 import { Company } from '../src/entities/crm/company';
 import { Contact } from '../src/entities/crm/contact';
 import { Document } from '../src/entities/documents/document';
-import { Macro, PipelineEntry } from '../src/macro';
+import { Rox, PipelineEntry } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -113,7 +113,7 @@ test('entries are written and read by field name and handle, never by column id'
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -252,7 +252,7 @@ test('a write reads the pipeline first, so a failed read writes nothing', async 
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });

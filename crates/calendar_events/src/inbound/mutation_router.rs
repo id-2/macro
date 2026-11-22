@@ -95,7 +95,10 @@ where
     T: Send + Sync + 'static,
 {
     Router::new()
-        .route("/calendars", get(list_calendars::<S, L, Auth>))
+        .route(
+            "/calendars",
+            get(list_calendars::<S, L, Auth>).post(create_calendar::<S, L, Auth>),
+        )
         .route("/events", post(create_calendar_event::<S, L, Auth>))
         .route(
             "/events/{event_id}",
@@ -755,6 +758,51 @@ where
         .list_visible_calendars(user.authorization.user.rox_user_id.as_ref())
         .await?;
     Ok(Json(ListCalendarsResponse { calendars }))
+}
+
+/// Request body creating a calendar Rox keeps itself.
+#[derive(Debug, Deserialize, utoipa::ToSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct CreateCalendarRequest {
+    /// Display name of the new calendar.
+    pub name: String,
+    /// IANA time zone the calendar anchors all-day events in.
+    pub time_zone: Option<String>,
+}
+
+/// Create a calendar under the requester's personal Rox mailbox.
+#[tracing::instrument(skip_all, err)]
+#[utoipa::path(
+    post,
+    path = "/calendars",
+    tag = "calendar_events",
+    request_body = CreateCalendarRequest,
+    responses(
+        (status = 201, description = "The created calendar", body = VisibleCalendar),
+        (status = 400, description = "The calendar name is empty", body = CalendarMutationApiError),
+        (status = 401, description = "Authentication required"),
+        (status = 503, description = "Transient failure", body = CalendarMutationApiError),
+    )
+)]
+pub async fn create_calendar<S, L, Auth>(
+    State(state): State<CalendarMutationRouterState<S, L, Auth>>,
+    user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
+    Json(request): Json<CreateCalendarRequest>,
+) -> Result<(StatusCode, Json<VisibleCalendar>), CalendarMutationApiError>
+where
+    S: CalendarMutationService,
+    L: MeetingLinkProvider,
+    Auth: RoxAuthorizationService,
+{
+    let calendar = state
+        .service
+        .create_calendar(
+            user.authorization.user.rox_user_id.as_ref(),
+            &request.name,
+            request.time_zone.as_deref(),
+        )
+        .await?;
+    Ok((StatusCode::CREATED, Json(calendar)))
 }
 
 /// Resolve an update's scope from its transport pair. An omitted scope

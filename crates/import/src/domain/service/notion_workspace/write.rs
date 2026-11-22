@@ -223,7 +223,7 @@ pub(super) fn notion_links(
         .iter()
         .filter_map(|(id, person)| {
             let link = NotionUserLink {
-                user_id: person.macro_user.clone()?,
+                user_id: person.rox_user.clone()?,
                 email: person.email.clone()?,
             };
             Some((id.clone(), link))

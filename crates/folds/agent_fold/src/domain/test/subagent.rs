@@ -224,7 +224,7 @@ fn the_inmem_agents_subagent_tool_folds_to_a_subagent_not_a_rox_tool() {
         !agent.parts.iter().any(|part| matches!(
             part,
             MessagePart::ToolUse {
-                detail: ToolDetail::Macro { .. },
+                detail: ToolDetail::Rox { .. },
                 ..
             }
         )),
@@ -274,7 +274,7 @@ fn the_fixtures_name_their_harnesses() {
         (SUBAGENT_CLAUDE_CODE, Harness::ClaudeCode),
         (SUBAGENT_OPENCODE, Harness::OpenCode),
         (SUBAGENT_CURSOR, Harness::Cursor),
-        (SUBAGENT_ROX_INMEM, Harness::Macro),
+        (SUBAGENT_ROX_INMEM, Harness::Rox),
     ] {
         let mut machine = FoldMachineImpl::new();
         for entry in parse_log(fixture) {

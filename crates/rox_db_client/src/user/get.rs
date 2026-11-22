@@ -79,7 +79,7 @@ pub async fn get_user_id_by_email(
 /// Used to distinguish "this email belongs to the same macro user" from a true cross-user
 /// account merge.
 #[tracing::instrument(skip(db))]
-pub async fn get_macro_user_id_by_email(
+pub async fn get_rox_user_id_by_email(
     db: &sqlx::Pool<sqlx::Postgres>,
     email: &str,
 ) -> Result<Option<uuid::Uuid>, sqlx::Error> {
@@ -93,6 +93,54 @@ pub async fn get_macro_user_id_by_email(
     )
     .fetch_optional(db)
     .await
+}
+
+/// A product account that already owns an email, read before signup decides
+/// whether that email may claim the account.
+#[derive(Debug, Clone)]
+pub struct ExistingUserForSignup {
+    /// The `User` row id, `macro|{email}` for accounts created by signup.
+    pub id: String,
+    /// The account's linked login: the FusionAuth user id.
+    pub rox_user_id: uuid::Uuid,
+    /// The organization the profile belongs to, if any.
+    pub organization_id: Option<i32>,
+    /// The Stripe customer the profile was created with, if any.
+    pub stripe_customer_id: Option<String>,
+}
+
+/// Returns the product account that owns `email`, if one exists.
+///
+/// Signup uses this to tell an email whose account has no login yet (adoptable)
+/// from one already linked to a different login (rejected).
+#[tracing::instrument(skip(db))]
+pub async fn get_existing_user_for_signup(
+    db: &sqlx::Pool<sqlx::Postgres>,
+    email: &str,
+) -> Result<Option<ExistingUserForSignup>, sqlx::Error> {
+    let row = sqlx::query!(
+        r#"
+        SELECT
+            "id",
+            "rox_user_id",
+            "organizationId" as "organization_id?",
+            "stripeCustomerId" as "stripe_customer_id?"
+        FROM "User"
+        WHERE LOWER("email") = LOWER($1)
+        ORDER BY "createdAt" ASC NULLS LAST
+        LIMIT 1
+        "#,
+        email
+    )
+    .fetch_optional(db)
+    .await?;
+
+    Ok(row.map(|row| ExistingUserForSignup {
+        id: row.id,
+        rox_user_id: row.rox_user_id,
+        organization_id: row.organization_id,
+        stripe_customer_id: row.stripe_customer_id,
+    }))
 }
 
 /// Gets the user id and stripe customer id for a given email
@@ -212,7 +260,7 @@ pub async fn get_user_profile(
 
 /// Gets the user's rox_user_id (UUID) and id (RoxUserIdStr) by email
 #[tracing::instrument(skip(db), err)]
-pub async fn get_user_macro_user_id_and_id_by_email(
+pub async fn get_user_rox_user_id_and_id_by_email(
     db: &sqlx::Pool<sqlx::Postgres>,
     email: &str,
 ) -> Result<(uuid::Uuid, String), sqlx::Error> {

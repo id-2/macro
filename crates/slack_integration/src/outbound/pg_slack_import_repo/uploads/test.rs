@@ -11,7 +11,7 @@ async fn fixture(pool: &PgPool) -> (PgSlackImportRepo, TeamId, TeamId) {
     let team = Uuid::now_v7();
     let foreign = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'archive', 'archive@example.com', 'archive-customer'), ($2, 'foreign', 'foreign@example.com', 'foreign-customer')",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'archive', 'archive@example.com', 'archive-customer'), ($2, 'foreign', 'foreign@example.com', 'foreign-customer')",
         user, foreign,
     ).execute(pool).await.unwrap();
     sqlx::query!(

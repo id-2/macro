@@ -238,7 +238,7 @@ const policy = new aws.iam.RolePolicy('observability-storage', {
           Action: ['cloudwatch:PutMetricData'],
           Resource: '*',
           Condition: {
-            StringEquals: { 'cloudwatch:namespace': 'Macro/Observability' },
+            StringEquals: { 'cloudwatch:namespace': 'Rox/Observability' },
           },
         },
       ],
@@ -488,7 +488,7 @@ for (const [name, path] of [
 ]) {
   new aws.cloudwatch.MetricAlarm(name, {
     ...alarm,
-    namespace: 'Macro/Observability',
+    namespace: 'Rox/Observability',
     metricName: 'disk_used_percent',
     threshold: 80,
     dimensions: { InstanceId: instance.id, path, fstype: 'ext4' },
@@ -498,7 +498,7 @@ for (const [name, path] of [
 }
 new aws.cloudwatch.MetricAlarm('observability-memory', {
   ...alarm,
-  namespace: 'Macro/Observability',
+  namespace: 'Rox/Observability',
   metricName: 'mem_used_percent',
   threshold: 90,
   dimensions: { InstanceId: instance.id },

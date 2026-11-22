@@ -1153,7 +1153,7 @@ where
                             "gave up waiting for the turn gate; a mirror is still following a run started elsewhere"
                         );
                         return Err(SessionError::Rejected(PromptRefusal::plain(
-                            "Cursor is still busy with a run started outside Macro, and Macro \
+                            "Cursor is still busy with a run started outside Rox, and Rox \
                              stopped waiting for it. Send another message once that run has \
                              finished, or stop the session to interrupt it.",
                         )));

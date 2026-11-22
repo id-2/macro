@@ -47,7 +47,7 @@ async fn seeds_team_channel_with_team_id(pool: Pool<Postgres>) -> anyhow::Result
     let channel_id: Uuid = "33333333-3333-3333-3333-333333333333".parse().unwrap();
 
     sqlx::query(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id)
          VALUES ('55555555-5555-5555-5555-555555555555', 'owner', 'owner@example.com', 'stripe-test')",
     )
     .execute(&pool)

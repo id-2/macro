@@ -777,7 +777,7 @@ impl EgressTarget {
     /// What to call this target in a log line.
     pub fn name(&self) -> String {
         match self {
-            Self::McpServer(McpDestination::Macro) => "macro".to_owned(),
+            Self::McpServer(McpDestination::Rox) => "macro".to_owned(),
             Self::McpServer(McpDestination::Preview) => "macro-preview".to_owned(),
             Self::McpServer(McpDestination::Connected(slug)) => slug.as_str().to_owned(),
             Self::McpServer(McpDestination::Custom(key)) => format!("custom {key}"),
@@ -797,7 +797,7 @@ pub enum McpDestination {
     /// Internal, session-scoped live preview tools.
     Preview,
     /// Rox's own MCP server, available to every session.
-    Macro,
+    Rox,
     /// One of the owner's Pipedream-connected apps.
     Connected(McpServerSlug),
     /// One of the owner's custom MCP servers - added by URL, with Rox's
@@ -825,7 +825,7 @@ impl McpDestination {
             return Some(Self::Preview);
         }
         if path == ROX_MCP_PATH {
-            return Some(Self::Macro);
+            return Some(Self::Rox);
         }
         if let Some(key) = path.strip_prefix(CUSTOM_MCP_PATH_PREFIX) {
             return CustomMcpServerKey::parse(key).map(Self::Custom);

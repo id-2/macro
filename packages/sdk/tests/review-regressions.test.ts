@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 
@@ -23,7 +23,7 @@ test('scheduled drafts clamp page size and advance by the actual request limit',
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -58,7 +58,7 @@ test('reminders and team calendar replace relation IDs with handles', async () =
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -102,7 +102,7 @@ test('access resolution accepts equivalent handles and rejects different entitie
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });

@@ -534,7 +534,7 @@ fn actor(notification: &FeedNotification) -> Option<InboxActor> {
         ),
         NotifEvent::AiResponse(_)
         | NotifEvent::Reminder(_)
-        | NotifEvent::CalendarEventReminder(_) => Some(InboxActor::Macro),
+        | NotifEvent::CalendarEventReminder(_) => Some(InboxActor::Rox),
         NotifEvent::TaskAssigned(task) => Some(InboxActor::User(task.assigned_by.clone())),
         _ => notification.sender_id.clone().map(InboxActor::User),
     }

@@ -10,7 +10,7 @@ This document describes the custom URL parsing functionality added to the unfurl
 - **Pattern**: `notion.so/[workspace]/[title-with-dashes]-[uuid]` or `notion.so/[title-with-dashes]-[uuid]`
 - **Examples**:
   - `https://www.notion.so/macrocom/Enterprise-Product-Bottlenecks-5acb869109a747c1a1a92bbf1891ff2d` → "Enterprise Product Bottlenecks"
-  - `https://www.notion.so/Macro-Work-Thoughts-e52b32630b2e45fab665b3e5c566cf3b` → "Macro Work Thoughts"
+  - `https://www.notion.so/Rox-Work-Thoughts-e52b32630b2e45fab665b3e5c566cf3b` → "Rox Work Thoughts"
   - `https://www.notion.so/craft-ventures/Craft-Ventures-Operating-Playbooks-9db7bdccfc0f47be96076c122513691c` → "Craft Ventures Operating Playbooks"
 - **Fallback**: Returns "Notion" if URL parsing fails
 

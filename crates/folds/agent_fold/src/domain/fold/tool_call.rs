@@ -39,7 +39,7 @@ impl FoldState {
         // detail it opened with and reads into that.
         let detail = match harness::tool_shape(reader, &name, &frame) {
             ToolShape::Harness => tool_detail(reader, &frame),
-            ToolShape::Macro(_) => rox_detail(reader, &frame),
+            ToolShape::Rox(_) => rox_detail(reader, &frame),
             ToolShape::UserTool(tool) => user_tool_detail(reader, tool, &frame),
             ToolShape::View => view_detail(reader, &frame),
             ToolShape::Subagent => subagent_detail(reader, &name, &frame),
@@ -141,7 +141,7 @@ impl FoldState {
         }
 
         match detail {
-            ToolDetail::Macro { .. } | ToolDetail::UserTool { .. } => {
+            ToolDetail::Rox { .. } | ToolDetail::UserTool { .. } => {
                 patch_rox_detail(reader, name, detail, &frame);
             }
             ToolDetail::View { .. } => {
@@ -224,7 +224,7 @@ pub(super) fn rox_detail(reader: &dyn HarnessReader, frame: &ToolFrame<'_>) -> T
         None => (None, None),
         Some((value, error)) => (Some(value), error),
     };
-    ToolDetail::Macro {
+    ToolDetail::Rox {
         input: reader.tool_input(frame).unwrap_or(serde_json::Value::Null),
         output,
         error,
@@ -287,7 +287,7 @@ pub(super) fn patch_rox_detail(
     frame: &ToolFrame<'_>,
 ) {
     match detail {
-        ToolDetail::Macro {
+        ToolDetail::Rox {
             input,
             output,
             error,
@@ -400,7 +400,7 @@ pub(super) fn patch_detail(
         }
         // Patched by `patch_rox_detail` / `patch_subagent_detail`, which
         // have the name and the harness's result shapes to hand.
-        ToolDetail::Macro { .. }
+        ToolDetail::Rox { .. }
         | ToolDetail::View { .. }
         | ToolDetail::UserTool { .. }
         | ToolDetail::Subagent { .. } => {}

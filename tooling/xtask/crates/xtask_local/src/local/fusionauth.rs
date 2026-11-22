@@ -134,7 +134,12 @@ fn kickstart_ready(instance: &Instance) -> Result<KickstartReady> {
         .pointer("/requests")
         .and_then(serde_json::Value::as_array)
         .with_context(|| format!("{} has no requests", path.display()))?;
-    let url = |request: &serde_json::Value| request.get("url").and_then(serde_json::Value::as_str);
+    let url = |request: &serde_json::Value| -> Option<String> {
+        request
+            .get("url")
+            .and_then(serde_json::Value::as_str)
+            .map(str::to_owned)
+    };
     let last = requests
         .last()
         .and_then(url)

@@ -140,11 +140,11 @@ async fn real_sdk_nested_calls_are_authenticated_and_concurrent() {
         unattended: None,
     };
     let source = r#"
-import { Macro } from '@macro-inc/sdk';
+import { Rox } from '@macro-inc/sdk';
 import Handlebars from 'handlebars';
 export async function main({token, hosts, macro: supplied, session, execution}) {
-  if (!(supplied instanceof Macro) || session.id !== "00000000-0000-0000-0000-000000000001" || execution.id !== "00000000-0000-0000-0000-000000000002") throw new Error("Missing SDK handles");
-  const macro = new Macro({token, hosts});
+  if (!(supplied instanceof Rox) || session.id !== "00000000-0000-0000-0000-000000000001" || execution.id !== "00000000-0000-0000-0000-000000000002") throw new Error("Missing SDK handles");
+  const macro = new Rox({token, hosts});
   console.log('x'.repeat(650));
   const values = await Promise.all(['one', 'two'].map(input => macro.ai.decide({input, questions: {yes: 'Is this relevant?'}})));
   const document = macro.documents.byId('fixture-document');
@@ -288,9 +288,9 @@ async fn links_point_at_the_deployment_web_app() {
         ..RunEnvironment::default()
     };
     let source = r#"
-import { Macro } from '@macro-inc/sdk';
+import { Rox } from '@macro-inc/sdk';
 export async function main({token, hosts, webAppUrl, macro: supplied}) {
-  const constructed = new Macro({token, hosts, webAppUrl});
+  const constructed = new Rox({token, hosts, webAppUrl});
   return {
     supplied: supplied.forms.byId('fixture-form').webUrl(),
     constructed: constructed.documents.byId('fixture-document').webUrl(),

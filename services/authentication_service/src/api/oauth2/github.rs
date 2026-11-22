@@ -91,7 +91,7 @@ async fn link_user(
     code: &str,
 ) -> Result<(), GithubLinkError> {
     let fusionauth_user_id =
-        rox_db_client::in_progress_user_link::get_macro_user_id_by_link_id(&ctx.db, link_id)
+        rox_db_client::in_progress_user_link::get_rox_user_id_by_link_id(&ctx.db, link_id)
             .await?;
 
     // SAFETY: we don't support multi-profile at this time but we do need to support the method for

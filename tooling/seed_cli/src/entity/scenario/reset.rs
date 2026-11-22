@@ -80,7 +80,7 @@ DELETE FROM "SharePermission" WHERE id IN (SELECT id FROM sp_ids)"#
         format!("DELETE FROM rox_user_email_verification WHERE rox_user_id::text LIKE '{m}'"),
         format!("DELETE FROM rox_user_info WHERE rox_user_id::text LIKE '{m}'"),
         format!(r#"DELETE FROM "User" WHERE "rox_user_id"::text LIKE '{m}'"#),
-        format!("DELETE FROM macro_user WHERE id::text LIKE '{m}'"),
+        format!("DELETE FROM rox_user WHERE id::text LIKE '{m}'"),
     ]
 }
 
@@ -104,7 +104,7 @@ pub fn reset_user_statements(emails: &[String]) -> Vec<String> {
         .collect::<Vec<_>>()
         .join(", ");
     let user_ids = format!(r#"SELECT id FROM "User" WHERE email IN ({emails})"#);
-    let macro_user_ids = format!("SELECT id FROM macro_user WHERE email IN ({emails})");
+    let rox_user_ids = format!("SELECT id FROM rox_user WHERE email IN ({emails})");
 
     vec![
         format!(r#"DELETE FROM "RolesOnUsers" WHERE "userId" IN ({user_ids})"#),
@@ -112,8 +112,8 @@ pub fn reset_user_statements(emails: &[String]) -> Vec<String> {
             "DELETE FROM contacts_connections WHERE user1 IN ({user_ids}) OR user2 IN ({user_ids})"
         ),
         format!("DELETE FROM rox_user_email_verification WHERE email IN ({emails})"),
-        format!("DELETE FROM rox_user_info WHERE rox_user_id IN ({macro_user_ids})"),
+        format!("DELETE FROM rox_user_info WHERE rox_user_id IN ({rox_user_ids})"),
         format!(r#"DELETE FROM "User" WHERE email IN ({emails})"#),
-        format!("DELETE FROM macro_user WHERE email IN ({emails})"),
+        format!("DELETE FROM rox_user WHERE email IN ({emails})"),
     ]
 }

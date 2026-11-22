@@ -21,7 +21,7 @@ for authenticated Rox users or explicit global service contexts; one load return
 
 ## Boundaries
 
-- Depends on: `rox_user_id`, `rox_env` (the `environment` person property
+- Depends on: `macro_user_id`, `rox_env` (the `environment` person property
   every load sends).
 - Used by: `agent_harness_service` (agent modes, routine templates),
   `authentication_service` (`enable-outlook`, `enable-agent-teammates`),

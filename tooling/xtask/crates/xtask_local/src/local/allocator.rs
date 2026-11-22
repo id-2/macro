@@ -21,13 +21,13 @@ use super::stage::Stage;
 #[cfg(test)]
 mod test;
 
-/// The instance a Compose project belongs to: `macro` is the default instance's.
+/// The instance a Compose project belongs to: `rox` is the default instance's.
 fn instance_of_project(project: &str) -> Option<&str> {
     if project == DEFAULT_NAME {
         return Some(DEFAULT_NAME);
     }
     project
-        .strip_prefix("macro-")
+        .strip_prefix("rox-")
         .filter(|name| !name.is_empty())
 }
 
@@ -40,7 +40,7 @@ fn instance_of_network(network: &str) -> Option<&str> {
             network
                 .strip_suffix("_services")
                 .or_else(|| network.strip_suffix("_auth-internal"))
-                .and_then(|project| project.strip_prefix("macro-"))
+                .and_then(|project| project.strip_prefix("rox-"))
         })?;
     (!name.is_empty()).then_some(name)
 }

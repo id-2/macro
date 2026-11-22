@@ -29,7 +29,7 @@ logically-combinable query form.
 ## Boundaries
 
 - Depends on: `filter_ast`, `document_sub_type`, `notification_state`,
-  `model_file_type`, `model_owner`, `rox_user_id`.
+  `model_file_type`, `model_owner`, `macro_user_id`.
 - Used by: crates building soup/search queries (`graphql_soup`,
   `database_sql`/`databases_sql`, `email`, `channels`, `crm`, `call`,
   `github_pull_requests`, `ai_tools`, `search_service`, `item_filter_index`);

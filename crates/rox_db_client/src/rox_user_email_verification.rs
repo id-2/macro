@@ -1,5 +1,5 @@
 #[tracing::instrument(skip(db))]
-pub async fn get_macro_user_email_verification(
+pub async fn get_rox_user_email_verification(
     db: &sqlx::Pool<sqlx::Postgres>,
     email: &str,
 ) -> anyhow::Result<Option<bool>> {
@@ -18,7 +18,7 @@ pub async fn get_macro_user_email_verification(
 }
 
 #[tracing::instrument(skip(db))]
-pub async fn upsert_macro_user_email_verification(
+pub async fn upsert_rox_user_email_verification(
     db: &sqlx::Pool<sqlx::Postgres>,
     rox_user_id: &str,
     email: &str,
@@ -55,7 +55,7 @@ mod tests {
         is_verified: bool,
     }
 
-    async fn get_macro_user_email_verification(
+    async fn get_rox_user_email_verification(
         pool: &Pool<Postgres>,
         rox_user_id: &str,
         email: &str,
@@ -86,7 +86,7 @@ mod tests {
         // create macro user
         sqlx::query!(
             r#"
-            INSERT INTO "macro_user" ("id", "email", "stripe_customer_id", "username")
+            INSERT INTO "rox_user" ("id", "email", "stripe_customer_id", "username")
             VALUES ($1, $2, $3, $4)
         "#,
             &rox_uuid::string_to_uuid("11111111-1111-1111-1111-111111111111")?,
@@ -99,7 +99,7 @@ mod tests {
 
         sqlx::query!(
             r#"
-            INSERT INTO "macro_user" ("id", "email", "stripe_customer_id", "username")
+            INSERT INTO "rox_user" ("id", "email", "stripe_customer_id", "username")
             VALUES ($1, $2, $3, $4)
         "#,
             &rox_uuid::string_to_uuid("22222222-2222-2222-2222-222222222222")?,
@@ -114,7 +114,7 @@ mod tests {
         let email = "test@rox.one".to_string();
         let is_verified = false;
 
-        upsert_macro_user_email_verification(
+        upsert_rox_user_email_verification(
             &pool,
             &rox_user_id.to_string(),
             &email,
@@ -123,7 +123,7 @@ mod tests {
         .await?;
 
         assert_eq!(
-            get_macro_user_email_verification(&pool, &rox_user_id.to_string(), &email).await?,
+            get_rox_user_email_verification(&pool, &rox_user_id.to_string(), &email).await?,
             Some(RoxUserEmailVerification {
                 rox_user_id: rox_user_id.clone(),
                 email: "test@rox.one".to_string(),
@@ -132,11 +132,11 @@ mod tests {
         );
 
         // update is_verified
-        upsert_macro_user_email_verification(&pool, &rox_user_id.to_string(), &email, true)
+        upsert_rox_user_email_verification(&pool, &rox_user_id.to_string(), &email, true)
             .await?;
 
         assert_eq!(
-            get_macro_user_email_verification(&pool, &rox_user_id.to_string(), &email).await?,
+            get_rox_user_email_verification(&pool, &rox_user_id.to_string(), &email).await?,
             Some(RoxUserEmailVerification {
                 rox_user_id: rox_user_id.clone(),
                 email: "test@rox.one".to_string(),
@@ -145,7 +145,7 @@ mod tests {
         );
 
         // update rox_user_id
-        upsert_macro_user_email_verification(
+        upsert_rox_user_email_verification(
             &pool,
             "22222222-2222-2222-2222-222222222222",
             &email,
@@ -154,7 +154,7 @@ mod tests {
         .await?;
 
         assert_eq!(
-            get_macro_user_email_verification(
+            get_rox_user_email_verification(
                 &pool,
                 "22222222-2222-2222-2222-222222222222",
                 &email

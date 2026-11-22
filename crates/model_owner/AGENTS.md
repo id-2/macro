@@ -25,7 +25,7 @@ ownership. A typed owner reference (`Owner`/`OwnerType`) for Rox entities
 
 ## Boundaries
 
-- Depends on: `bot_id`, `rox_user_id`.
+- Depends on: `bot_id`, `macro_user_id`.
 - Used by: nearly every domain crate with typed ownership — `agent_session`,
   `agent_trigger`, `bots`, `channels`, `databases_sql`, `documents`,
   `entity_access`, `entity_registry`, `model`, `model_notifications`,

@@ -23,7 +23,7 @@ const REQUESTER: &str = "macro|refresh-requester@example.com";
 async fn insert_user(pool: &PgPool, id: &str) {
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
         rox_user_id,
         id,
         id,

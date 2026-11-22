@@ -35,7 +35,7 @@ fn every_list_narrows_and_empty_lists_match_all() {
     let completed_runs_in_one_repo = selector(json!({
         "events": ["workflow_run"],
         "actions": ["completed"],
-        "repositories": ["Macro-Inc/macro"],
+        "repositories": ["Rox-Inc/macro"],
     }));
 
     assert!(completed_runs_in_one_repo.accepts(&delivery(

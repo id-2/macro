@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 
@@ -26,7 +26,7 @@ describe('Task.forPullRequest', () => {
         ],
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -49,7 +49,7 @@ describe('Task.forPullRequest', () => {
   });
 
   test('rejects URLs that are not GitHub pull requests', async () => {
-    const macro = new Macro({ token: 'user-token' });
+    const macro = new Rox({ token: 'user-token' });
     await expect(
       macro.tasks.forPullRequest(
         'https://github.com/macro-inc/macro/issues/12',
@@ -89,7 +89,7 @@ describe('Task.slug', () => {
       }
       return new Response(`unexpected ${path}`, { status: 404 });
     }) as typeof fetch;
-    return new Macro({
+    return new Rox({
       token: 'user-token',
       hosts: {
         storage: 'https://storage.example.test',
@@ -154,7 +154,7 @@ describe('Task.create', () => {
         documentId: '0198a4cc-e138-7670-a308-a6b766602720',
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -225,7 +225,7 @@ describe('Task.create', () => {
         documentId: '0198a4cc-e138-7670-a308-a6b766602721',
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: {
         auth: 'https://auth.example.test',
@@ -284,7 +284,7 @@ describe('Task.create', () => {
         documentId: '0198a4cc-e138-7670-a308-a6b766602722',
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -328,7 +328,7 @@ describe('Task.summaries', () => {
         ],
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -397,7 +397,7 @@ describe('InitiativeNamespace.summaries', () => {
         ],
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -432,7 +432,7 @@ describe('Task.findSimilar', () => {
         ],
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -460,7 +460,7 @@ describe('Task.findSimilar', () => {
       );
       return Response.json({ results: [] });
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token' });
+    const macro = new Rox({ token: 'user-token' });
 
     await expect(
       macro.tasks.findSimilar({
@@ -474,7 +474,7 @@ describe('Task.findSimilar', () => {
   });
 
   test('refuses a missing title and a missing options object', async () => {
-    const macro = new Macro({ token: 'user-token' });
+    const macro = new Rox({ token: 'user-token' });
 
     await expect(
       macro.tasks.findSimilar({} as unknown as { title: string }),
@@ -496,7 +496,7 @@ describe('Task.create options', () => {
       );
       return Response.json({ documentId: 'task-1' });
     }) as typeof fetch;
-    const macro = new Macro({ token: 'user-token' });
+    const macro = new Rox({ token: 'user-token' });
 
     await expect(
       macro.tasks.create({

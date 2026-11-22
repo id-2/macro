@@ -18,7 +18,7 @@ use uuid::Uuid;
 async fn seed_team(pool: &PgPool, team_id: Uuid, owner_id: &str) -> sqlx::Result<()> {
     let rox_user_id = Uuid::now_v7();
     sqlx::query(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)"#,
     )
     .bind(rox_user_id)
     .bind(owner_id)

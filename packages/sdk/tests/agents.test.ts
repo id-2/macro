@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import type { Agent as AgentRecord } from '../generated/storage/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 
@@ -58,7 +58,7 @@ describe('agents', () => {
         { status: 201 },
       );
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -127,7 +127,7 @@ describe('agents', () => {
     };
     globalThis.fetch = (async (_input) =>
       Response.json([record])) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -150,7 +150,7 @@ describe('agents', () => {
 
   test('a built-in persona says where to read it instead of failing opaquely', async () => {
     globalThis.fetch = (async (_input) => Response.json([])) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -166,7 +166,7 @@ describe('agents', () => {
       requests.push(request);
       return Response.json({});
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });

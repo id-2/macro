@@ -64,13 +64,12 @@ impl RustService {
     /// every other binary in the same invocation. Keep them additive: a service
     /// that needs its own invocation costs a second build of the whole tree.
     ///
-    /// `authentication_service` opts into local passwordless code responses and
-    /// out of the login-code throttles; `search_processing_service` opts out of
-    /// pdfium, whose bundled library is amd64-only and absent from the runtime
-    /// image.
+    /// `authentication_service` opts out of the login-code throttles;
+    /// `search_processing_service` opts out of pdfium, whose bundled library is
+    /// amd64-only and absent from the runtime image.
     pub fn local_features(&self) -> &'static [&'static str] {
         match self.cargo_bin {
-            "authentication_service" => &["return_passwordless_code", "no_rate_limit"],
+            "authentication_service" => &["no_rate_limit"],
             "search_processing_service" => &["no_pdf"],
             _ => &[],
         }

@@ -3,7 +3,7 @@ import type {
   ParsedMessage,
   TransferDraftResponse,
 } from '../generated/email/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 afterEach(() => mock.restore());
 
@@ -49,7 +49,7 @@ for (const action of [
       { preconnect: globalThis.fetch.preconnect },
     );
     spyOn(globalThis, 'fetch').mockImplementation(fetchMock);
-    const macro = new Macro({
+    const macro = new Rox({
       auth: { type: 'user', apiKey: 'mak_test' },
       hosts: { email: 'https://email.example.test' },
     });
@@ -106,7 +106,7 @@ test('an upload keeps its captured generation after Send and Undo restore a newe
       { preconnect: globalThis.fetch.preconnect },
     ),
   );
-  const macro = new Macro({
+  const macro = new Rox({
     auth: { type: 'user', apiKey: 'mak_test' },
     hosts: { email: 'https://email.example.test' },
   });

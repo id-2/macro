@@ -536,7 +536,7 @@ async fn appearance_validates_and_emits_only_changed_metadata() {
     world.lock().unwrap().broker_events.clear();
     let receipt = || receipt::<EditAccessLevel>(db, OWNER, AccessLevel::Edit);
     let invalid = model_entity::EntityAppearance {
-        icon: Some(model_entity::AppearanceIcon::Macro {
+        icon: Some(model_entity::AppearanceIcon::Rox {
             name: "unknown-icon".into(),
         }),
         color: None,

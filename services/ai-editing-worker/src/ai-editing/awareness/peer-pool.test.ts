@@ -5,7 +5,7 @@ const colors = ['red', 'green'];
 
 describe('PeerPool', () => {
   it('labels every concurrent writer with the editor', async () => {
-    const pool = PeerPool.forEditor('Macro', { colors });
+    const pool = PeerPool.forEditor('Rox', { colors });
     const peers = await Promise.all([
       pool.borrow(),
       pool.borrow(),
@@ -44,7 +44,7 @@ describe('PeerPool', () => {
   });
 
   it('release of an unknown peer is a no-op', async () => {
-    const pool = PeerPool.forEditor('Macro', { colors });
+    const pool = PeerPool.forEditor('Rox', { colors });
     const a = await pool.borrow();
     pool.release({ name: 'X', color: 'blue', peerId: 0n }); // never borrowed
     pool.release(a);
@@ -53,7 +53,7 @@ describe('PeerPool', () => {
   });
 
   it('blocks borrows past max until a slot frees', async () => {
-    const pool = PeerPool.forEditor('Macro', { colors, max: 2 });
+    const pool = PeerPool.forEditor('Rox', { colors, max: 2 });
     const [a] = await Promise.all([pool.borrow(), pool.borrow()]);
 
     let third: { name: string } | undefined;

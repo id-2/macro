@@ -831,13 +831,13 @@ where
             .into_iter()
             .map(|notion_user| {
                 let email = notion_user.email.map(|email| email.to_lowercase());
-                let macro_user = email.as_ref().and_then(|email| {
+                let rox_user = email.as_ref().and_then(|email| {
                     members
                         .iter()
                         .find(|member| &member.email == email)
                         .map(|member| member.user_id.clone())
                 });
-                (notion_user.id, Person { email, macro_user })
+                (notion_user.id, Person { email, rox_user })
             })
             .collect()
     }

@@ -61,7 +61,7 @@ async fn test_get_stripe_customer_id(pool: Pool<Postgres>) -> anyhow::Result<()>
     fixtures(path = "../../../fixtures", scripts("teams"))
 )]
 async fn test_has_user_trialed(pool: Pool<Postgres>) -> anyhow::Result<()> {
-    sqlx::query("UPDATE macro_user SET has_trialed = FALSE WHERE email = 'user4@user.com'")
+    sqlx::query("UPDATE rox_user SET has_trialed = FALSE WHERE email = 'user4@user.com'")
         .execute(&pool)
         .await?;
 
@@ -1816,7 +1816,7 @@ async fn test_toggle_auto_join_domain_rejects_generic_domain(
 ) -> anyhow::Result<()> {
     let team_id = rox_uuid::string_to_uuid("33333333-3333-3333-3333-333333333333")?;
     sqlx::query(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ('a5555555-5555-5555-5555-555555555555', 'owner@gmail.com', 'owner@gmail.com', 'cus_gmail_owner')",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ('a5555555-5555-5555-5555-555555555555', 'owner@gmail.com', 'owner@gmail.com', 'cus_gmail_owner')",
     )
     .execute(&pool)
     .await?;
@@ -1968,19 +1968,19 @@ async fn test_add_user_to_team(pool: Pool<Postgres>) -> anyhow::Result<()> {
 async fn test_included_seat_survives_remove_and_rollback(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    let agent_macro_user_id = uuid::Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_0a11);
+    let agent_rox_user_id = uuid::Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_0a11);
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'agent@example.com', 'agent@example.com', 'cus_agent_test')
         "#,
-        agent_macro_user_id,
+        agent_rox_user_id,
     )
     .execute(&pool)
     .await?;
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id, "isAgent") VALUES ('macro|agent@example.com', 'agent@example.com', $1, TRUE)"#,
-        agent_macro_user_id,
+        agent_rox_user_id,
     )
     .execute(&pool)
     .await?;
@@ -2298,7 +2298,7 @@ async fn invite_reminder_claims_respect_the_limit(pool: Pool<Postgres>) -> anyho
 async fn agent_invites_are_visible_to_the_invitee(pool: Pool<Postgres>) -> anyhow::Result<()> {
     let rox_user_id = uuid::Uuid::new_v4();
     sqlx::query!(
-        r#"INSERT INTO "macro_user" (id, username, email, stripe_customer_id)
+        r#"INSERT INTO "rox_user" (id, username, email, stripe_customer_id)
            VALUES ($1, 'owner@example.com', 'owner@example.com', 'cus_owner')"#,
         rox_user_id,
     )
@@ -2336,7 +2336,7 @@ async fn get_user_display_name_joins_the_set_name_parts(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     for statement in [
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
             ('b1111111-1111-1111-1111-111111111111', 'full@example.com', 'full@example.com', 'cus_full'),
             ('b2222222-2222-2222-2222-222222222222', 'first@example.com', 'first@example.com', 'cus_first'),
             ('b3333333-3333-3333-3333-333333333333', 'unset@example.com', 'unset@example.com', 'cus_unset'),

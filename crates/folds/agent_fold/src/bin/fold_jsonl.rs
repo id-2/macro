@@ -544,7 +544,7 @@ fn render_tool(label: &str, status: ToolStatus, detail: &ToolDetail) -> String {
                 let _ = writeln!(out, "{}", indent(&format!("error: {error}")));
             }
         }
-        ToolDetail::Macro {
+        ToolDetail::Rox {
             input,
             output,
             error,

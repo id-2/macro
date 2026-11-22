@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const realFetch = globalThis.fetch;
 afterEach(() => {
@@ -14,7 +14,7 @@ test('a request whose path still has a {param} throws, and is never sent', async
       headers: { 'content-type': 'application/json' },
     });
   }) as typeof fetch;
-  const macro = new Macro({ auth: { type: 'user', apiKey: 'mak_test' } });
+  const macro = new Rox({ auth: { type: 'user', apiKey: 'mak_test' } });
   const channel = '0190a3c4-0000-7000-8000-0000000000d1';
   // What a caller passing the wrong field name ends up with.
   const message = macro.channels
@@ -34,7 +34,7 @@ test('a filled path is sent as it is', async () => {
       headers: { 'content-type': 'application/json' },
     });
   }) as typeof fetch;
-  const macro = new Macro({ auth: { type: 'user', apiKey: 'mak_test' } });
+  const macro = new Rox({ auth: { type: 'user', apiKey: 'mak_test' } });
   await macro.channels.byId('0190a3c4-0000-7000-8000-0000000000d1').type();
   expect(sent.map((url) => new URL(url).pathname)).toEqual([
     '/dss/channels/0190a3c4-0000-7000-8000-0000000000d1',

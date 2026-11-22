@@ -465,7 +465,7 @@ fn bot_summary_rejects_ownerless_bots() {
         id: BotId::new_from_uuid(Uuid::new_v4()),
         kind: BotKind::System,
         owner: None,
-        name: "Macro".to_string(),
+        name: "Rox".to_string(),
         handle: "macro".to_string(),
         description: None,
         avatar_url: None,

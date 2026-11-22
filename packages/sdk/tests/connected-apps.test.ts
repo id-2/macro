@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -38,7 +38,7 @@ describe('connected apps', () => {
         structuredContent: null,
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'test-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -127,7 +127,7 @@ describe('connected apps', () => {
           '<m-connect-app>{"appSlug":"linear","name":"Linear"}</m-connect-app>',
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'test-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });
@@ -191,7 +191,7 @@ describe('connected apps', () => {
         unsearched: [{ kind: 'custom', key: '0123456789abcdef', name: 'Wiki' }],
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'test-token',
       hosts: { 'agent-harness': 'https://agent.example.test' },
     });

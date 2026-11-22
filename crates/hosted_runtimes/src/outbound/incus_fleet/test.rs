@@ -515,7 +515,7 @@ fn listing_ignores_foreign_and_unlabelled_computers_before_parsing_them() {
 }
 
 #[test]
-fn exec_runs_as_the_macro_user_from_its_home() {
+fn exec_runs_as_the_rox_user_from_its_home() {
     assert_eq!(
         exec_command(&["harnessd"]),
         ExecCommand {

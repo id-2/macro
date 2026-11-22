@@ -17,7 +17,7 @@ The inbound Axum API supports:
 Validation sends a signed `webhook.validation.test` event to the configured
 endpoint and persists the result in `is_valid`. Validation attempts use the
 existing `rate_limit` crate with the key
-`per-user-validate-webhook:{rox_user_id}:{webhook_id}` and a limit of 10
+`per-user-validate-webhook:{macro_user_id}:{webhook_id}` and a limit of 10
 attempts per 3600-second window.
 
 ### Management lifecycle events

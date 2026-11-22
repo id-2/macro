@@ -19,11 +19,11 @@ fn rox_id(s: &str) -> RoxUserIdStr<'_> {
     RoxUserIdStr::try_from(s).unwrap()
 }
 
-/// macro_user + "User" rows so rox_user_links FKs resolve.
+/// rox_user + "User" rows so rox_user_links FKs resolve.
 async fn insert_user(pool: &Pool<Postgres>, rox_id: &str, email: &str) {
     let rox_uuid = Uuid::new_v4();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $3, $4)"#,
         rox_uuid,
         rox_id,
@@ -636,7 +636,7 @@ async fn fetch_inbox_details_defaults_settings_when_row_missing(
 }
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
-async fn fetch_link_by_email_finds_link_owned_by_another_macro_user(
+async fn fetch_link_by_email_finds_link_owned_by_another_rox_user(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
     // A shared external mailbox connected by one macro user as a data-source link

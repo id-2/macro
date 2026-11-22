@@ -9,7 +9,7 @@ fn main() {
     println!("=== Notion URLs ===");
     let notion_urls = [
         "https://www.notion.so/macrocom/Enterprise-Product-Bottlenecks-5acb869109a747c1a1a92bbf1891ff2d",
-        "https://www.notion.so/Macro-Work-Thoughts-e52b32630b2e45fab665b3e5c566cf3b",
+        "https://www.notion.so/Rox-Work-Thoughts-e52b32630b2e45fab665b3e5c566cf3b",
         "https://www.notion.so/craft-ventures/Craft-Ventures-Operating-Playbooks-9db7bdccfc0f47be96076c122513691c",
         "https://www.notion.so", // Should return "Notion" as fallback
     ];

@@ -83,7 +83,7 @@ async fn insert_owner_principal(pool: &Pool<Postgres>, principal: &str, rox_user
     let rox_user_id = uuid::Uuid::parse_str(rox_user_id).unwrap();
     sqlx::query(
         r#"
-        INSERT INTO "macro_user" ("id", "username", "email", "stripe_customer_id")
+        INSERT INTO "rox_user" ("id", "username", "email", "stripe_customer_id")
         VALUES ($1, $2, $3, $4)
         "#,
     )

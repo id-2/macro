@@ -278,7 +278,7 @@ export class WafObservability extends pulumi.ComponentResource {
     const datadogPipeline = new datadog.LogsCustomPipeline(
       `${name}-datadog-pipeline`,
       {
-        name: 'Macro Cloud Storage AWS WAF',
+        name: 'Rox Cloud Storage AWS WAF',
         description:
           'Parses and normalizes blocked or challenged AWS WAF requests for cloud-storage-service.',
         isEnabled: true,

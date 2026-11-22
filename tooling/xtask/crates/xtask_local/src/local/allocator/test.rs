@@ -4,9 +4,9 @@ use super::*;
 fn networks_map_back_to_their_instance() {
     assert_eq!(instance_of_network("databases-crmgp"), Some("crmgp"));
     assert_eq!(instance_of_network("auth-crmgp"), Some("crmgp"));
-    assert_eq!(instance_of_network("macro-crmgp_services"), Some("crmgp"));
+    assert_eq!(instance_of_network("rox-crmgp_services"), Some("crmgp"));
     assert_eq!(
-        instance_of_network("macro-crmgp_auth-internal"),
+        instance_of_network("rox-crmgp_auth-internal"),
         Some("crmgp")
     );
     assert_eq!(instance_of_network("databases"), None);
@@ -17,9 +17,9 @@ fn networks_map_back_to_their_instance() {
 
 #[test]
 fn projects_map_back_to_their_instance() {
-    assert_eq!(instance_of_project("macro-crmgp"), Some("crmgp"));
-    assert_eq!(instance_of_project("macro"), Some(DEFAULT_NAME));
-    assert_eq!(instance_of_project("macro-"), None);
+    assert_eq!(instance_of_project("rox-crmgp"), Some("crmgp"));
+    assert_eq!(instance_of_project("rox"), Some(DEFAULT_NAME));
+    assert_eq!(instance_of_project("rox-"), None);
     assert_eq!(instance_of_project("someone-else"), None);
 }
 
@@ -35,9 +35,9 @@ fn only_named_instances_are_grouped_for_their_windows() {
         published: Vec::new(),
     };
     let containers = [
-        container(Some("macro-up")),
-        container(Some("macro-up")),
-        container(Some("macro")),
+        container(Some("rox-up")),
+        container(Some("rox-up")),
+        container(Some("rox")),
         container(Some("other")),
         container(None),
     ];
@@ -57,8 +57,8 @@ fn an_instance_claims_its_own_networks_by_name() {
         BTreeSet::from([
             "databases-agent-a".to_string(),
             "auth-agent-a".to_string(),
-            "macro-agent-a_services".to_string(),
-            "macro-agent-a_auth-internal".to_string(),
+            "rox-agent-a_services".to_string(),
+            "rox-agent-a_auth-internal".to_string(),
         ])
     );
 }

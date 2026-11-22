@@ -25,7 +25,7 @@ const LINK: Uuid = Uuid::from_u128(0x3);
 
 #[test]
 fn an_idempotent_replay_keeps_the_link_already_on_the_event() {
-    let description = format!(r#"<p>Join Macro call: <a href="{URL}">{URL}</a></p>"#);
+    let description = format!(r#"<p>Join Rox call: <a href="{URL}">{URL}</a></p>"#);
     assert!(carries_url(None, Some(&description), URL));
     assert_eq!(
         first_rox_call_url(Some("Office"), Some(&description)).as_deref(),

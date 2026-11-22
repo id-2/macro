@@ -34,7 +34,7 @@ pub struct Person {
     /// Their email, when Notion shared it.
     pub email: Option<String>,
     /// Their Rox account, when the email matched a team member.
-    pub macro_user: Option<RoxUserIdStr<'static>>,
+    pub rox_user: Option<RoxUserIdStr<'static>>,
 }
 
 /// The Rox columns a data source's properties become.
@@ -381,7 +381,7 @@ pub fn cell(value: &NotionValue, column: &PlannedColumn, people: &PeopleMap) -> 
             };
             let users: Vec<EntityRef> = ids
                 .into_iter()
-                .filter_map(|id| people.get(id)?.macro_user.clone())
+                .filter_map(|id| people.get(id)?.rox_user.clone())
                 .map(|user| EntityRef {
                     entity_type: EntityKind::User,
                     entity_id: user.as_ref().to_string(),

@@ -44,7 +44,7 @@ where
             ));
         }
 
-        let claimed_macro_user_id = claims
+        let claimed_rox_user_id = claims
             .user_id
             .as_deref()
             .map(RoxUserIdStr::parse_from_str)
@@ -64,7 +64,7 @@ where
             .map_err(|error| repository_error(error, "find acting user"))?
             .ok_or_else(|| Report::new(RoxAuthorizationError::ActingUserNotAuthorized))?;
 
-        let macro_user_id_matches = claimed_macro_user_id
+        let rox_user_id_matches = claimed_rox_user_id
             .as_ref()
             .is_none_or(|claimed| claimed.as_ref() == acting_user.rox_user_id.as_ref());
         let fusion_user_id_matches = claims
@@ -75,7 +75,7 @@ where
             .organization_id
             .is_none_or(|claimed| Some(claimed) == acting_user.organization_id);
 
-        if !macro_user_id_matches || !fusion_user_id_matches || !organization_id_matches {
+        if !rox_user_id_matches || !fusion_user_id_matches || !organization_id_matches {
             return Err(Report::new(
                 RoxAuthorizationError::ActingUserNotAuthorized,
             ));

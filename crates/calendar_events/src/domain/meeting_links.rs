@@ -105,7 +105,7 @@ const JOIN_LINE_LABEL: &str = "Join Rox call";
 
 /// The wording earlier releases wrote into the same join line. Events saved
 /// before the rename still carry it, so finding and stripping recognize both.
-const LEGACY_JOIN_LINE_LABEL: &str = "Join Macro call";
+const LEGACY_JOIN_LINE_LABEL: &str = "Join Rox call";
 
 /// Write a meeting link into an event's location and description.
 ///

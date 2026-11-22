@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalMacroEnv = process.env.ROX_ENV;
 
@@ -14,7 +14,7 @@ afterEach(() => {
 test('uses production services when no environment is configured', () => {
   delete process.env.ROX_ENV;
 
-  const macro = new Macro({ token: 'test-token' });
+  const macro = new Rox({ token: 'test-token' });
 
   expect(macro._client.hosts.storage).toBe('https://gateway.rox.one/dss');
   expect(macro.webAppUrl).toBe('https://rox.one');

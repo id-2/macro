@@ -214,7 +214,7 @@ async fn a_prompt_without_a_user_mention_tag_never_asks_the_lexical_service() {
 }
 
 #[tokio::test]
-async fn ids_that_are_not_macro_users_are_skipped() {
+async fn ids_that_are_not_rox_users_are_skipped() {
     let access = access(vec![(owner(), AccessLevel::Owner)]);
     let mentions = LexicalPromptMentions::new(
         FixedMentions(Ok(vec![

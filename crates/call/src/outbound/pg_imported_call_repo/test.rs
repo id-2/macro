@@ -187,7 +187,7 @@ async fn source_records_list_one_providers_calls_for_their_owner_latest_first(po
     let untimed_id = service.ingest(untimed).await.unwrap();
 
     let mut rox_provider = snapshot("import-a", revision);
-    rox_provider.source.provider = CallProvider::Macro;
+    rox_provider.source.provider = CallProvider::Rox;
     rox_provider.source.external_id = ExternalCallId("rox_call".into());
     let rox_provider_id = service.ingest(rox_provider).await.unwrap();
 
@@ -231,7 +231,7 @@ async fn source_records_list_one_providers_calls_for_their_owner_latest_first(po
     assert_eq!(records[2].attendees, vec!["Guest".to_string()]);
 
     let rox_records = service
-        .list_source_records(&user("import-a"), CallProvider::Macro)
+        .list_source_records(&user("import-a"), CallProvider::Rox)
         .await
         .unwrap();
     let rox_ids: Vec<Uuid> = rox_records.iter().map(|r| r.id).collect();

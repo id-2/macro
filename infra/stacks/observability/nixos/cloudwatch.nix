@@ -7,7 +7,7 @@
     logfile = "";
   };
   metrics = {
-    namespace = "Macro/Observability";
+    namespace = "Rox/Observability";
     append_dimensions.InstanceId = "\${aws:InstanceId}";
     metrics_collected = {
       disk = {

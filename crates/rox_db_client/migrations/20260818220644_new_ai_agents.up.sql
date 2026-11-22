@@ -56,5 +56,5 @@ ALTER TABLE bots
 
 -- Seed the "Rox Coder" system bot (bot_id::ROX_CODER_BOT_ID).
 INSERT INTO bots (id, kind, name, handle, has_agent)
-VALUES ('00000000-0000-0000-0000-00000000a9e7', 'system', 'Macro Coder', 'coder', true)
+VALUES ('00000000-0000-0000-0000-00000000a9e7', 'system', 'Rox Coder', 'coder', true)
 ON CONFLICT (id) DO NOTHING;

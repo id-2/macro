@@ -47,7 +47,7 @@ INSERT INTO email_messages (id, thread_id, provider_thread_id, link_id, from_con
 VALUES
     ('ee000002-0000-0000-0000-000000000002', '11111111-1111-1111-1111-111111111111', 'provider-thread-1', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
      'c0000001-0000-0000-0000-000000000001', 'ee000001-0000-0000-0000-000000000001', 'Re: Hello World', true, false, true, false,
-     '[{"Macro-In-Reply-To": "ee000001-0000-0000-0000-000000000001"}]',
+     '[{"Rox-In-Reply-To": "ee000001-0000-0000-0000-000000000001"}]',
      '2025-01-11 10:00:00+00', '2025-01-11 10:00:00+00');
 
 -- msg3: A regular message in thread 2 (for testing draft insert into existing thread)

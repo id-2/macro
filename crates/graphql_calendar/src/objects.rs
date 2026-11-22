@@ -597,6 +597,8 @@ pub enum GraphqlCalendarProvider {
     Google,
     /// Microsoft Outlook calendar.
     Outlook,
+    /// Rox-owned calendar stored locally.
+    Rox,
 }
 
 impl From<CalendarProvider> for GraphqlCalendarProvider {
@@ -604,6 +606,7 @@ impl From<CalendarProvider> for GraphqlCalendarProvider {
         match provider {
             CalendarProvider::Google => Self::Google,
             CalendarProvider::Outlook => Self::Outlook,
+            CalendarProvider::Rox => Self::Rox,
         }
     }
 }

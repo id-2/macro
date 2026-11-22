@@ -99,7 +99,7 @@ async fn answers_macros_own_destination_with_a_minted_token() {
             &owner(),
             BotId::TEST_A,
             uuid::Uuid::nil(),
-            &McpDestination::Macro,
+            &McpDestination::Rox,
         )
         .await
         .expect("resolved")
@@ -128,7 +128,7 @@ async fn reuses_a_token_until_it_nears_expiry() {
                 &owner(),
                 BotId::TEST_A,
                 uuid::Uuid::nil(),
-                &McpDestination::Macro,
+                &McpDestination::Rox,
             )
             .await
             .expect("resolved");
@@ -148,7 +148,7 @@ async fn each_agent_of_one_owner_gets_its_own_token() {
 
     for agent in [BotId::TEST_A, BotId::TEST_B, BotId::TEST_A] {
         credentials
-            .resolve(&owner(), agent, uuid::Uuid::nil(), &McpDestination::Macro)
+            .resolve(&owner(), agent, uuid::Uuid::nil(), &McpDestination::Rox)
             .await
             .expect("resolved");
     }
@@ -172,7 +172,7 @@ async fn a_token_about_to_expire_is_replaced() {
                 &owner(),
                 BotId::TEST_A,
                 uuid::Uuid::nil(),
-                &McpDestination::Macro,
+                &McpDestination::Rox,
             )
             .await
             .expect("resolved");
@@ -221,7 +221,7 @@ async fn refuses_a_cleartext_url_unless_local_dev_permits_it() {
             &owner(),
             BotId::TEST_A,
             uuid::Uuid::nil(),
-            &McpDestination::Macro,
+            &McpDestination::Rox,
         )
         .await
         .expect("resolved")
@@ -255,7 +255,7 @@ async fn sessions_of_the_same_agent_never_share_mcp_credentials() {
     let second = uuid::Uuid::now_v7();
     for session in [first, second, first] {
         credentials
-            .resolve(&owner(), BotId::TEST_A, session, &McpDestination::Macro)
+            .resolve(&owner(), BotId::TEST_A, session, &McpDestination::Rox)
             .await
             .unwrap();
     }

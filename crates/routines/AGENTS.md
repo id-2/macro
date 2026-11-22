@@ -41,7 +41,7 @@ credential, so a routine `CreateRoutine` makes is always top-level, and
 
 ## Boundaries
 
-- Depends on: `ai_toolset`, `rox_authorization`, `rox_user_id`,
+- Depends on: `ai_toolset`, `rox_authorization`, `macro_user_id`,
   `routine_program` (the step model and its validation).
 - Used by: `ai_tools`.
 

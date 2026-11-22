@@ -17,7 +17,7 @@ export type DraftOptions = Omit<
   | 'thread_db_id'
   | 'body_text'
   | 'body_html'
-  | 'body_rox'
+  | 'body_macro'
   | 'headers_json'
   | 'include_signature'
   | 'draft_generation'
@@ -362,7 +362,7 @@ export function draftBody(options: DraftOptions): ApiDraftInput {
             .replaceAll('+', '-')
             .replaceAll('/', '_')
             .replaceAll('=', ''),
-    body_rox: bodyMacro,
+    body_macro: bodyMacro,
     headers_json: headers,
     include_signature: includeSignature,
     draft_generation: draftGeneration,

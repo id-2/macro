@@ -350,7 +350,7 @@ async fn live_metadata_routes_and_share_reject_cross_team_access(pool: sqlx::PgP
     ] {
         let rox_user_id = Uuid::now_v7();
         sqlx::query!(
-            "INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,$2,$2,$3)",
+            "INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES ($1,$2,$2,$3)",
             rox_user_id,
             email,
             format!("fixture-{rox_user_id}")

@@ -211,7 +211,7 @@ in
       contactPoints = [
         {
           orgId = 1;
-          name = "Macro team email";
+          name = "Rox team email";
           receivers = [
             {
               uid = "macro-team-sns";
@@ -259,7 +259,7 @@ in
         }
       ];
     };
-    # Every prod alert goes to GoAlert, which posts it to the Macro Alerts
+    # Every prod alert goes to GoAlert, which posts it to the Rox Alerts
     # channel and re-posts until acknowledged. Paging criticals go to the
     # paging service, everything else to `Notify`. GoAlert dedups by alert
     # fingerprint, so repeats only refresh the open alert.
@@ -280,7 +280,7 @@ in
           repeat_interval = "4h";
           routes = [
             {
-              receiver = "Macro team email";
+              receiver = "Rox team email";
               object_matchers = [
                 [
                   "environment"
@@ -326,14 +326,14 @@ in
         {
           orgId = 1;
           name = "Prod";
-          folder = "Macro";
+          folder = "Rox";
           interval = "1m";
           rules = prodRules;
         }
         {
           orgId = 1;
           name = "Datadog dev migration";
-          folder = "Macro";
+          folder = "Rox";
           interval = "1m";
           rules = [
             (rule "dd-1291772-critical" "[DEV] Document text extractor failing" "1291772" extractor "critical"

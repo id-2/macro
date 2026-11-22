@@ -278,7 +278,7 @@ describe('composeAgentContextPrompt with a trigger', () => {
           channel_type: 'public',
         },
         prompt_message_id: 'm2',
-        sender: { id: 'bot|macro', name: 'Macro' },
+        sender: { id: 'bot|macro', name: 'Rox' },
         agent_request: {
           on_behalf_of: {
             id: 'macro|julia@example.com',
@@ -294,11 +294,11 @@ describe('composeAgentContextPrompt with a trigger', () => {
     expect(hiddenContext(markdown)).toBe(
       [
         '<trigger kind="mentioned">',
-        '  <note>Macro mentioned you, and that mention opened this session. Their message is the prompt. Macro is another agent asking on behalf of Julia; Julia did not write this message. Address your reply to Macro in the discussion, where Julia can read it too.</note>',
+        '  <note>Rox mentioned you, and that mention opened this session. Their message is the prompt. Rox is another agent asking on behalf of Julia; Julia did not write this message. Address your reply to Rox in the discussion, where Julia can read it too.</note>',
         '  <discussion>',
         '    <channel id="c1" name="eng" type="public"/>',
         '    <origin>This prompt was posted in a channel thread, not the agent session view. Your reply is posted back into that thread, and it is where the user will answer anything you ask.</origin>',
-        '    <sender name="Macro" id="bot|macro"/>',
+        '    <sender name="Rox" id="bot|macro"/>',
         '    <agent_request hops="1">',
         '      <on_behalf_of name="Julia" email="julia@example.com" id="macro|julia@example.com"/>',
         '    </agent_request>',

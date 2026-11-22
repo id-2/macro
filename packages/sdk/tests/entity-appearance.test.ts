@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { type EntityAppearance, Macro } from '../src/macro';
+import { type EntityAppearance, Rox } from '../src/macro';
 import { RoxApiError } from '../src/utils';
 import { setDefaultRequestVerbHeader } from '../src/utils/activity';
 
@@ -13,7 +13,7 @@ const cases = [
   {
     name: 'document',
     path: '/documents/appearance-test',
-    entity: (macro: Macro) => macro.documents.byId('appearance-test'),
+    entity: (macro: Rox) => macro.documents.byId('appearance-test'),
     detail: (appearance: EntityAppearance) => ({
       data: { documentMetadata: { appearance } },
     }),
@@ -21,25 +21,25 @@ const cases = [
   {
     name: 'initiative',
     path: '/initiatives/appearance-test',
-    entity: (macro: Macro) => macro.initiatives.byId('appearance-test'),
+    entity: (macro: Rox) => macro.initiatives.byId('appearance-test'),
     detail: (appearance: EntityAppearance) => ({ appearance }),
   },
   {
     name: 'form',
     path: '/forms/appearance-test',
-    entity: (macro: Macro) => macro.forms.byId('appearance-test'),
+    entity: (macro: Rox) => macro.forms.byId('appearance-test'),
     detail: (appearance: EntityAppearance) => ({ form: { appearance } }),
   },
   {
     name: 'database',
     path: '/databases/appearance-test',
-    entity: (macro: Macro) => macro.databases.byId('appearance-test'),
+    entity: (macro: Rox) => macro.databases.byId('appearance-test'),
     detail: (appearance: EntityAppearance) => ({ database: { appearance } }),
   },
   {
     name: 'routine',
     path: '/scheduled-actions/appearance-test',
-    entity: (macro: Macro) => macro.routines.byId('appearance-test'),
+    entity: (macro: Rox) => macro.routines.byId('appearance-test'),
     detail: (appearance: EntityAppearance) => ({ appearance }),
   },
 ];
@@ -67,7 +67,7 @@ for (const entry of cases) {
       { preconnect: originalFetch.preconnect },
     );
     const entity = entry.entity(
-      new Macro({
+      new Rox({
         token: 'test-token',
         hosts: {
           storage: 'https://appearance.example.test',

@@ -24,7 +24,7 @@ fn viewer() -> Viewer {
 
 async fn insert_user(pool: &PgPool) {
     let id = rox_uuid::generate_uuid_v7();
-    sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#, id, USER)
+    sqlx::query!(r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#, id, USER)
         .execute(pool).await.unwrap();
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,

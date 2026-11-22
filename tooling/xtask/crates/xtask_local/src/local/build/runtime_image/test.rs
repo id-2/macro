@@ -41,11 +41,11 @@ fn another_worktrees_recipe_cannot_replace_the_same_runtime_reference() {
     );
     assert_ne!(without_git, with_git);
     assert_ne!(
-        format!("macro-local-runtime:{without_git}"),
-        format!("macro-local-runtime:{with_git}")
+        format!("rox-local-runtime:{without_git}"),
+        format!("rox-local-runtime:{with_git}")
     );
     assert_eq!(
         runtime_image_tag(platform).unwrap(),
-        format!("macro-local-runtime:{}", content_key(platform).unwrap())
+        format!("rox-local-runtime:{}", content_key(platform).unwrap())
     );
 }

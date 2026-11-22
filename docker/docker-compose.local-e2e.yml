@@ -59,7 +59,12 @@ x-local-e2e-env: &local-e2e-env
 
 services:
   authentication-service:
-    environment: *local-e2e-env
+    environment:
+      <<: *local-e2e-env
+      # The email-code test reads the code from the start response instead of
+      # Mailpit. This is the local-e2e override only; the stack's own default
+      # is off, so a public stand never returns a sign-in code.
+      PASSWORDLESS_RETURN_CODE: "true"
   connection_gateway:
     environment: *local-e2e-env
   contacts_service:

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 const host = 'https://storage.example.test';
@@ -24,7 +24,7 @@ function serve(handler: (request: Request) => Response | Promise<Response>) {
 }
 
 function macro() {
-  return new Macro({ token: 'user-token', hosts: { storage: host } });
+  return new Rox({ token: 'user-token', hosts: { storage: host } });
 }
 
 function row(id: string, name: string) {

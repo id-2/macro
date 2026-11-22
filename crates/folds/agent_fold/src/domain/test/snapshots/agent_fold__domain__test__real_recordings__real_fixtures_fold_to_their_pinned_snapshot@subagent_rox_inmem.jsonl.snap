@@ -1,7 +1,7 @@
 ---
 source: crates/folds/agent_fold/src/domain/test/real_recordings.rs
 expression: messages
-input_file: crates/folds/agent_fold/fixtures/real/subagent_rox_inmem.jsonl
+input_file: crates/folds/agent_fold/fixtures/real/subagent_macro_inmem.jsonl
 ---
 [
     FoldedMessage {

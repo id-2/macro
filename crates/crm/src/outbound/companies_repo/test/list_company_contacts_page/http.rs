@@ -145,7 +145,7 @@ async fn page(
 async fn add_member(pool: &PgPool, team_id: Uuid, user: &str) -> anyhow::Result<()> {
     let id = Uuid::now_v7();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)"#,
         id,
         user,
         format!("stripe_{id}"),

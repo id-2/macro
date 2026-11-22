@@ -205,6 +205,9 @@ impl ViewerCapabilities {
                 rsvp: true,
                 ..Self::NONE
             },
+            // A local event has no invitation to answer and no other copy
+            // of the meeting, so a guest holds nothing on it.
+            CalendarProvider::Rox => Self::NONE,
         }
     }
 }

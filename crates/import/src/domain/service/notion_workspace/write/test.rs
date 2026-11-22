@@ -79,7 +79,7 @@ fn every_planned_page_gets_a_document_id_before_anything_is_written() {
             id('4'),
             Person {
                 email: Some("teo@acme.test".to_string()),
-                macro_user: Some(
+                rox_user: Some(
                     RoxUserIdStr::parse_from_str("macro|teo@acme.test")
                         .unwrap()
                         .into_owned(),
@@ -90,7 +90,7 @@ fn every_planned_page_gets_a_document_id_before_anything_is_written() {
             id('5'),
             Person {
                 email: Some("outsider@else.test".to_string()),
-                macro_user: None,
+                rox_user: None,
             },
         ),
     ]

@@ -7,14 +7,14 @@ async fn legacy_enable_and_disable_abort_before_purge_with_or_without_settings(
     pool: PgPool,
 ) -> anyhow::Result<()> {
     let user = "macro|rollout@example.com";
-    let macro_user = Uuid::now_v7();
+    let rox_user = Uuid::now_v7();
     let team = Uuid::now_v7();
     let company = Uuid::now_v7();
     let linked = Uuid::now_v7();
     let independent = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
-        macro_user,
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
+        rox_user,
         user
     )
     .execute(&pool)
@@ -22,7 +22,7 @@ async fn legacy_enable_and_disable_abort_before_purge_with_or_without_settings(
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         user,
-        macro_user
+        rox_user
     )
     .execute(&pool)
     .await?;

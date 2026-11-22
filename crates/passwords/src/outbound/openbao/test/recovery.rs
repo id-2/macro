@@ -187,7 +187,7 @@ async fn accepted_create_survives_postwrite_lookup_interruption_and_same_operati
             .into_owned(),
     };
     let rox_user_id = uuid::Uuid::now_v7();
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,'enrollment@example.test','enrollment@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}"))
+    sqlx::query!("INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES ($1,'enrollment@example.test','enrollment@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}"))
         .execute(&pool).await.expect("fixture account");
     sqlx::query!(
         r#"INSERT INTO "User"(id,email,rox_user_id) VALUES ($1,'enrollment@example.test',$2)"#,

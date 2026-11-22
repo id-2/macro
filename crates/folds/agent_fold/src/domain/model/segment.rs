@@ -399,7 +399,7 @@ fn tool_row(
             named_label(&named, status),
             input.as_ref().and_then(input_detail),
         ),
-        ToolDetail::Macro { input, .. } => (named_label(&named, status), input_detail(input)),
+        ToolDetail::Rox { input, .. } => (named_label(&named, status), input_detail(input)),
         ToolDetail::View { .. } => (named_label(&named, status), None),
         ToolDetail::UserTool { outcome, .. } => (user_tool_label(&named, outcome), None),
         ToolDetail::Subagent { title, .. } => verbed(&DELEGATE, Some(truncate(title))),

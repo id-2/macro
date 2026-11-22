@@ -1,7 +1,7 @@
 import { afterEach, expect, test } from 'bun:test';
 import type { TagSetResponse } from '../generated/properties/types.gen';
 import type { SoupApiItem } from '../generated/storage/types.gen';
-import { Macro, type WorkspaceType } from '../src/macro';
+import { Rox, type WorkspaceType } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -9,7 +9,7 @@ afterEach(() => {
 });
 const nil = '00000000-0000-0000-0000-000000000000';
 const macro = () =>
-  new Macro({
+  new Rox({
     token: 'test-token',
     hosts: {
       storage: 'https://storage.test',

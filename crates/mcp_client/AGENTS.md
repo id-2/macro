@@ -52,7 +52,7 @@ through `rmcp`, returning the result to the caller's tool-calling loop.
 
 - Depends on: `agent`, `ai_toolset`, `authentication_service_client`,
   `rox_authorization` (feature `axum`),
-  `rox_user_id`, `rmcp`.
+  `macro_user_id`, `rmcp`.
 - Used by: `agent_egress`, `agent_harness`, `ai_tools`, `mcp_select`,
   `onboarding`.
 

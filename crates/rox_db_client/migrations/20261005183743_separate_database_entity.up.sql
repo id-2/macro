@@ -47,4 +47,4 @@ CREATE TRIGGER database_entities_storage_cleanup
     FOR EACH ROW EXECUTE FUNCTION delete_database_entity_storage();
 
 COMMENT ON TABLE databases IS 'Reusable database storage identity; no app ownership, display metadata, or trash state.';
-COMMENT ON TABLE database_entities IS 'Optional Macro entity for a database resource; its primary key is also the resource foreign key.';
+COMMENT ON TABLE database_entities IS 'Optional Rox entity for a database resource; its primary key is also the resource foreign key.';

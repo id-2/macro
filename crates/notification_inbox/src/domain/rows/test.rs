@@ -626,7 +626,7 @@ fn rows_say_who_they_are_from() {
             at(25)
         )[0]
         .actor,
-        Some(InboxActor::Macro)
+        Some(InboxActor::Rox)
     );
 
     // Mail from outside Rox has no actor.

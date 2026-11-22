@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -17,7 +17,7 @@ function macroAnswering(outcome: unknown) {
     requests.push({ url: request.url, body: await request.clone().json() });
     return Response.json(outcome);
   }) as typeof fetch;
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'test-token',
     hosts: { 'agent-harness': 'https://agent.example.test' },
     webAppUrl: 'https://rox.one',

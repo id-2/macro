@@ -565,7 +565,7 @@ pub trait CallRepository: Send + Sync + 'static {
     /// transcript row for that `speaker_id` has the same non-NULL
     /// `diarized_speaker_id`; all distinct non-NULL `voice_id`s observed on
     /// those rows are returned. The `speaker_id` is resolved through the
-    /// canonical `User` row to get the `macro_user.id` used by
+    /// canonical `User` row to get the `rox_user.id` used by
     /// `rox_user_voice`.
     fn get_stable_speaker_voices_for_call_record(
         &self,
@@ -1361,13 +1361,13 @@ impl VoiceRepository for NoOpVoiceRepository {
 
     async fn link_user_voice(
         &self,
-        _macro_user_id: &Uuid,
+        _rox_user_id: &Uuid,
         _voice_id: &Uuid,
     ) -> Result<(), Self::Err> {
         Ok(())
     }
 
-    async fn get_user_voices(&self, _macro_user_id: &Uuid) -> Result<Vec<Uuid>, Self::Err> {
+    async fn get_user_voices(&self, _rox_user_id: &Uuid) -> Result<Vec<Uuid>, Self::Err> {
         Ok(Vec::new())
     }
 

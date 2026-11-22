@@ -11,7 +11,10 @@ use rate_limit::domain::{
 };
 use user_events::{UserMacroEvent, UserPictureChangedMetadata};
 
-use crate::api::{context::ApiContext, middleware::rate_limit::RATE_LIMIT_ENABLED};
+use crate::api::{
+    context::ApiContext,
+    middleware::rate_limit::rate_limit_applies,
+};
 
 #[cfg(test)]
 mod test;
@@ -44,7 +47,7 @@ fn throttle_result(result: RateLimitResult) -> Result<(), ApiError> {
 /// Rejects a set request when the user already changed their picture this
 /// second.
 pub(super) async fn throttle_set(ctx: &ApiContext, user_id: &str) -> Result<(), ApiError> {
-    if !RATE_LIMIT_ENABLED {
+    if !rate_limit_applies(ctx.environment) {
         return Ok(());
     }
     let key = RateLimitKey::builder(&"profile-picture-set")

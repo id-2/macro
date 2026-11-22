@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import type { BookingLinkDraft } from '../../sdk/generated/calendar/types.gen';
-import { Macro } from '../../sdk/src/macro';
+import { Rox } from '../../sdk/src/macro';
 import { runOperation } from './call';
 import { catalog, handleClasses } from './generated/catalog';
 import { InputValidators } from './validate';
@@ -28,7 +28,7 @@ function macroAnswering(respond: (request: Recorded) => Response) {
       return respond(recorded);
     }
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'test-token',
     env: 'dev',
     hosts: {

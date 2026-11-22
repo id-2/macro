@@ -58,7 +58,7 @@ pub enum CallCreatedVia {
 #[strum(serialize_all = "snake_case")]
 pub enum CallProvider {
     /// A Rox-native call or transcript.
-    Macro,
+    Rox,
     /// A call or transcript imported from Granola.
     Granola,
 }

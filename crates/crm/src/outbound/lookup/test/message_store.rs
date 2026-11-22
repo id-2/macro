@@ -22,7 +22,7 @@ const USER: &str = "macro|message-test@example.com";
 async fn setup(pool: &PgPool) {
     let user_id = Uuid::now_v7();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'message-test', 'message-test@example.com', 'message-test')"#,
         user_id
     )

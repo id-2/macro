@@ -37,7 +37,7 @@ fn lifecycle(session: &str, event_type: &str, mut metadata: Value) -> Value {
         "session_id": session,
         "session_name": "Compare the supplier quotes",
         "bot_id": bot_id::ROX_NEW_BOT_ID,
-        "bot_name": "Macro",
+        "bot_name": "Rox",
         "owner_id": OWNER,
         "origin": null,
         "source": "user",

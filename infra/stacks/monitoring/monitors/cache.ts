@@ -7,7 +7,7 @@ import { notify } from '../notify';
 
 // https://us5.datadoghq.com/monitors/1062487
 adopted('macro-cache-available-memory-low', {
-  name: '[PROD] Macro Cache Available Memory Low',
+  name: '[PROD] Rox Cache Available Memory Low',
   type: 'query alert',
   query:
     'avg(last_1h):avg:aws.elasticache.database_memory_usage_percentage{name:macro-cache-prod*} > 90',

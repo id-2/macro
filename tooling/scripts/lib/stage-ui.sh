@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
-stage_ui_verbose="${ROX_LOCAL_VERBOSE:-0}"
-stage_ui_dry_run="${ROX_LOCAL_DRY_RUN:-0}"
+stage_ui_verbose="${ROX_LOCAL_VERBOSE:-${ROX_LOCAL_VERBOSE:-0}}"
+stage_ui_dry_run="${ROX_LOCAL_DRY_RUN:-${ROX_LOCAL_DRY_RUN:-0}}"
 stage_ui_is_tty=false
 stage_ui_current_pid=""
 stage_ui_width=48

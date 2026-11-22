@@ -39,7 +39,7 @@ pub fn endpoint_rows(instance: &Instance) -> Vec<(&'static str, String, u16)> {
         (
             "postgres",
             format!(
-                "postgres://user:password@localhost:{}/macrodb",
+                "postgres://user:password@localhost:{}/roxdb",
                 instance.port(Port::Postgres)
             ),
             instance.port(Port::Postgres),
@@ -129,7 +129,7 @@ pub fn print(
         Style::new()
             .green()
             .bold()
-            .apply_to(format!("✓ macro {} stack ready", mode.label()))
+            .apply_to(format!("✓ rox {} stack ready", mode.label()))
     );
     row("mode", mode.label().to_string());
     row(

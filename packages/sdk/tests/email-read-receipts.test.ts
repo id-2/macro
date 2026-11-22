@@ -1,7 +1,7 @@
 import { afterEach, expect, mock, spyOn, test } from 'bun:test';
 import type { ThreadReadReceipts } from '../generated/email/types.gen';
 import { EmailMessage } from '../src/entities/email/message';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 afterEach(() => mock.restore());
 
@@ -35,7 +35,7 @@ test('thread read receipts return message handles with camelCase fields', async 
       { preconnect: globalThis.fetch.preconnect },
     ),
   );
-  const macro = new Macro({
+  const macro = new Rox({
     auth: { type: 'user', apiKey: 'mak_test' },
     hosts: { email: 'https://email.example.test' },
   });

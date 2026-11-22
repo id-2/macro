@@ -62,7 +62,7 @@ impl<Installations: GithubSyncRepo, Client: GithubSyncClient>
             .get(url)
             .bearer_auth(token)
             .header("Accept", accept)
-            .header("User-Agent", "Macro-Agent-Changes")
+            .header("User-Agent", "Rox-Agent-Changes")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .send()
             .await

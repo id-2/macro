@@ -51,7 +51,7 @@ pub trait RoxApiTokens: Send + Sync {
 
 /// Layers Rox's own MCP destination over another resolver.
 ///
-/// [`McpDestination::Macro`] is answered here; everything else passes
+/// [`McpDestination::Rox`] is answered here; everything else passes
 /// straight through to `Inner`. The two destinations arrive from different
 /// routes, so there is no name for a connected app to collide with.
 pub struct WithMacroMcp<Inner, Tokens> {
@@ -84,7 +84,7 @@ where
     Inner: McpCredentials,
     Tokens: RoxApiTokens,
 {
-    /// Wrap `inner`, answering [`McpDestination::Macro`] at `url` with tokens
+    /// Wrap `inner`, answering [`McpDestination::Rox`] at `url` with tokens
     /// from `tokens`.
     ///
     /// `local_cleartext` permits an `http` URL, and the caller must gate it on
@@ -164,7 +164,7 @@ where
         session: uuid::Uuid,
         destination: &McpDestination,
     ) -> Result<McpResolution, EgressError> {
-        if *destination != McpDestination::Macro {
+        if *destination != McpDestination::Rox {
             return self.inner.resolve(owner, agent, session, destination).await;
         }
 
@@ -342,7 +342,7 @@ impl RoxApiTokenSigner {
         // owner with no row is a session created wrong, which is ours to fix,
         // not something the sandbox can retry its way out of.
         let (fusion_root_id, rox_user_id) =
-            rox_db_client::user::get::get_user_macro_user_id_and_id_by_email(
+            rox_db_client::user::get::get_user_rox_user_id_and_id_by_email(
                 &self.pool,
                 owner.email_str(),
             )

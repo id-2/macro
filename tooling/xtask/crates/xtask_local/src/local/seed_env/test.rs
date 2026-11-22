@@ -7,7 +7,7 @@ fn default_instance_reproduces_the_fixed_ports() {
 
     assert!(
         rendered
-            .contains(r#"export DATABASE_URL="${DATABASE_URL:-postgres://user:password@localhost:5432/macrodb}""#),
+            .contains(r#"export DATABASE_URL="${DATABASE_URL:-postgres://user:password@localhost:5432/roxdb}""#),
         "{rendered}"
     );
     assert!(
@@ -45,7 +45,7 @@ fn named_instance_shifts_into_its_port_window() {
     // Every emitted port sits in the instance's stride, and each keeps its
     // per-port offset (Postgres is the stride base).
     assert!(
-        render(&instance).contains(&format!("localhost:{base}/macrodb")),
+        render(&instance).contains(&format!("localhost:{base}/roxdb")),
         "postgres should bind the stride base {base}"
     );
     assert_eq!(instance.port(Port::Postgres), base);

@@ -426,7 +426,7 @@ impl PgGithubPullRequestRepo {
         .await
     }
 
-    async fn github_user_ids_for_macro_user(
+    async fn github_user_ids_for_rox_user(
         &self,
         rox_user_id: &str,
     ) -> Result<Vec<String>, sqlx::Error> {
@@ -494,7 +494,7 @@ impl GithubPullRequestListingRepository for PgGithubPullRequestRepo {
             let Some(requesting_user) = requesting_user.as_deref() else {
                 return Ok(Vec::new());
             };
-            let github_user_ids = self.github_user_ids_for_macro_user(requesting_user).await?;
+            let github_user_ids = self.github_user_ids_for_rox_user(requesting_user).await?;
             let Some(involves_me) = github_user_ids
                 .into_iter()
                 .map(|id| Expr::val(GithubPullRequestLiteral::Involves(id)))

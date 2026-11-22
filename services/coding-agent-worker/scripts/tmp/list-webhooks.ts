@@ -1,7 +1,7 @@
-import { Macro } from '@rox-one/sdk';
+import { Rox } from '@rox-one/sdk';
 import { env } from '../../src/env';
 
-const macro = new Macro({}).requestedAs(env.ROX_USER_ID);
+const macro = new Rox({}).requestedAs(env.ROX_USER_ID);
 const hooks = await macro.webhooks.list();
 for (const h of hooks) {
   console.log({

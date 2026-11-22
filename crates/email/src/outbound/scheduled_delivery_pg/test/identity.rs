@@ -256,7 +256,7 @@ async fn duplicate_attachment_references_survive_reconciliation(
     .execute(&pool)
     .await?;
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'delivery-user', 'sent-cache@example.com', 'cus_delivery_test')",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'delivery-user', 'sent-cache@example.com', 'cus_delivery_test')",
         sfs,
     ).execute(&pool).await?;
     sqlx::query!(

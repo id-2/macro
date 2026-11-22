@@ -31,7 +31,7 @@ export function requireAccount(region: string): void {
     'get-caller-identity'
   );
   if (identity.Account !== ACCOUNT) {
-    throw new Error(`Use the Macro AWS account (${ACCOUNT})`);
+    throw new Error(`Use the Rox AWS account (${ACCOUNT})`);
   }
 }
 

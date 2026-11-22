@@ -1,13 +1,13 @@
-/// Merges to_merge_macro_user_id into rox_user_id
+/// Merges to_merge_rox_user_id into rox_user_id
 /// This transaction is not committed and will need to be manually committed by the caller
 #[tracing::instrument(skip(transaction))]
 pub async fn merge_accounts(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     rox_user_id: &str,
-    to_merge_macro_user_id: &str,
+    to_merge_rox_user_id: &str,
 ) -> anyhow::Result<()> {
     let rox_user_id = rox_uuid::string_to_uuid(rox_user_id)?;
-    let to_merge_macro_user_id = rox_uuid::string_to_uuid(to_merge_macro_user_id)?;
+    let to_merge_rox_user_id = rox_uuid::string_to_uuid(to_merge_rox_user_id)?;
 
     // Update the user profiles to point to the new macro user id
     sqlx::query!(
@@ -15,7 +15,7 @@ pub async fn merge_accounts(
         UPDATE "User" SET "rox_user_id" = $1 WHERE "rox_user_id" = $2
         "#,
         &rox_user_id,
-        &to_merge_macro_user_id
+        &to_merge_rox_user_id
     )
     .execute(transaction.as_mut())
     .await?;
@@ -26,7 +26,7 @@ pub async fn merge_accounts(
         UPDATE "rox_user_email_verification" SET "rox_user_id" = $1 WHERE "rox_user_id" = $2
         "#,
         &rox_user_id,
-        &to_merge_macro_user_id
+        &to_merge_rox_user_id
     )
     .execute(transaction.as_mut())
     .await?;
@@ -34,9 +34,9 @@ pub async fn merge_accounts(
     // Delete the old macro user
     sqlx::query!(
         r#"
-        DELETE FROM "macro_user" WHERE "id" = $1
+        DELETE FROM "rox_user" WHERE "id" = $1
         "#,
-        &to_merge_macro_user_id
+        &to_merge_rox_user_id
     )
     .execute(transaction.as_mut())
     .await?;

@@ -41,7 +41,7 @@ distribution.
 - `teammate_feed` (`src/outbound/pg_activity_repo/team_feed.sql`) reads other
   domains' tables to decide in SQL which teammate rows the viewer may see:
   `team_user`, `entity_access`, `comms_channel_participants`, `email_links`,
-  `rox_user_links`, `email_threads`, and `call_entities`. It mirrors
+  `macro_user_links`, `email_threads`, and `call_entities`. It mirrors
   `EntityAccessService::get_users_by_entity`; change both together.
 - Used by: most domain crates with activity surfaces (`documents`, `forms`,
   `databases`, `initiative`, `messages`, `channels`, `soup`, `call`, `chat`,

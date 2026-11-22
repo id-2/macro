@@ -262,7 +262,7 @@ pub trait GithubSyncService: Send + Sync + 'static {
     /// Begins an authenticated GitHub App installation setup flow.
     fn begin_installation_setup(
         &self,
-        _macro_user_id: &RoxUserIdStr<'_>,
+        _rox_user_id: &RoxUserIdStr<'_>,
         _team_id: Option<uuid::Uuid>,
     ) -> impl Future<Output = Result<String, GithubError>> + Send {
         async {

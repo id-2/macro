@@ -235,7 +235,7 @@ fn created_by_system_stays_on_the_owner_feed() {
         actor: Actor::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
         on_behalf_of: Some(user("macro|owner@example.com")),
         channel_type: ChannelType::Private,
-        channel_name: Some("Macro Support x owner".to_string()),
+        channel_name: Some("Rox Support x owner".to_string()),
         participant_user_ids: vec![user("macro|owner@example.com")],
     }));
 

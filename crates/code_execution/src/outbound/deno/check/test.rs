@@ -1,8 +1,8 @@
 use super::*;
 
-const CONTEXT: &str = r#"import type { Macro } from '@macro-inc/sdk';
+const CONTEXT: &str = r#"import type { Rox } from '@macro-inc/sdk';
 declare global {
-  interface StepContext { macro: Macro; trigger: Record<string, unknown> }
+  interface StepContext { macro: Rox; trigger: Record<string, unknown> }
 }
 "#;
 

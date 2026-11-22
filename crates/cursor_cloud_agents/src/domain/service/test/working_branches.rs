@@ -162,7 +162,7 @@ async fn replay_retains_only_latest_branch_across_repository_url_aliases() {
         ("run-fake-2", "github.com/macro-inc/macro", "cursor/new"),
         (
             "run-fake-3",
-            "HTTPS://GITHUB.com/Macro-Inc/Macro.git/",
+            "HTTPS://GITHUB.com/Rox-Inc/Rox.git/",
             "cursor/latest",
         ),
     ] {

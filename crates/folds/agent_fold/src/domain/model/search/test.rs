@@ -92,7 +92,7 @@ fn searchable_text_includes_folded_json_and_visible_failure() {
         id: ToolUseId("tool-1".to_owned()),
         name: ToolName::native("CreateDocument"),
         status: ToolStatus::Failed,
-        detail: ToolDetail::Macro {
+        detail: ToolDetail::Rox {
             input: json!({ "name": "Search notes" }),
             output: None,
             error: Some("document creation failed".to_owned()),

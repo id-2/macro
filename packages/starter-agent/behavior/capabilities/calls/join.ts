@@ -25,7 +25,7 @@ import {
   type JoinRequest,
   refusal,
   refusalExits,
-} from './rox.ts';
+} from './macro.ts';
 import { type RetryOptions, retry, roomConnect, tokenRetry } from './retry.ts';
 import {
   agentVoice,

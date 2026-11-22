@@ -90,7 +90,7 @@ async fn an_event_file_imports_onto_the_picked_calendar_with_its_join_link() {
     // they add keeps the call the file names, unlike a channel share's.
     use crate::domain::ports::CalendarSnapshotImporter;
     let call = "https://rox.one/app/meet/join/0123456789abcdef0123456789abcdef";
-    let description = format!("Agenda\n\nJoin Macro call: {call}");
+    let description = format!("Agenda\n\nJoin Rox call: {call}");
     let applied_id = Uuid::now_v7();
     let repo = FakeRepo {
         persisted_event_id: Some(applied_id),

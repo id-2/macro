@@ -29,7 +29,7 @@ domain.
 
 ## Boundaries
 
-- Depends on: `fractional_index`, `rox_user_id`, `rox_uuid` — no
+- Depends on: `fractional_index`, `macro_user_id`, `rox_uuid` — no
   `workspace-hack`, so new dependencies must stay wasm-compatible.
 - Used by: `crm`, `databases`, `database_sql`, `databases_sql`,
   `document_storage_service`, `forms`, `graphql_crm`, `models_forms`.

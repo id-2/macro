@@ -98,7 +98,7 @@ fn a_task_list_row_maps_its_named_columns_onto_task_fields_and_keeps_the_rest_in
         alice.clone(),
         Person {
             email: Some("alice@acme.test".to_string()),
-            macro_user: None,
+            rox_user: None,
         },
     )]
     .into_iter()

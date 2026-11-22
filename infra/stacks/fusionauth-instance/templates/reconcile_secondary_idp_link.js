@@ -25,7 +25,7 @@ function reconcile(user, registration, jwt, id_token, tokens) {
 
   if (!jwtEmail || !userEmail || jwtEmail !== userEmail) {
     throw new Error(
-      'This Google account is linked as a secondary inbox to another Macro account. Sign in with your primary email or contact support.'
+      'This Google account is linked as a secondary inbox to another Rox account. Sign in with your primary email or contact support.'
     );
   }
 

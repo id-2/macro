@@ -87,7 +87,7 @@ pub(super) async fn linked_mailbox(
 ) -> PgCalendarRepository {
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
         rox_user_id,
         OWNER,
         format!("cus_{rox_user_id}"),

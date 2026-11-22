@@ -18,14 +18,14 @@ mod test;
 /// The recipe-specific runtime reference shared by build and compose generation.
 /// Other worktrees with different recipes cannot replace this tag.
 pub fn runtime_image_tag(target: Target) -> Result<String> {
-    Ok(format!("macro-local-runtime:{}", content_key(target)?))
+    Ok(format!("rox-local-runtime:{}", content_key(target)?))
 }
 
 const DOCKERFILE_REL: &str = "docker/Dockerfile.runtime";
 
 /// Image label carrying the content key of the inputs the image was built
 /// from. A matching label is what lets a run skip the build entirely.
-const KEY_LABEL: &str = "com.macro.local-runtime-key";
+const KEY_LABEL: &str = "com.rox.local-runtime-key";
 
 /// Reconcile the runtime image for the host arch through BuildKit.
 ///

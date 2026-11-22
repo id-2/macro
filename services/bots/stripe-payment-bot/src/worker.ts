@@ -98,8 +98,8 @@ export default {
         storageUrl: env.ROX_STORAGE_URL,
       })(formatNotification(notification));
     } catch (error) {
-      console.error('Failed to post Stripe notification to Macro', error);
-      return new Response('Failed to post Stripe notification to Macro', {
+      console.error('Failed to post Stripe notification to Rox', error);
+      return new Response('Failed to post Stripe notification to Rox', {
         status: 502,
       });
     }

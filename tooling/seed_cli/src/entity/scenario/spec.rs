@@ -512,9 +512,9 @@ impl ScenarioSpec {
         format!("macro|{}", self.users[key].email)
     }
 
-    /// The derived `macro_user` uuid for a user key.
-    pub fn macro_user_uuid(&self, key: &str) -> Uuid {
-        derive_id(&self.scenario, "macro_user", key)
+    /// The derived `rox_user` uuid for a user key.
+    pub fn rox_user_uuid(&self, key: &str) -> Uuid {
+        derive_id(&self.scenario, "rox_user", key)
     }
 
     /// The derived team uuid for a team key.

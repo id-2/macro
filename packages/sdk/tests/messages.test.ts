@@ -6,7 +6,7 @@ import type {
   MessageThread,
 } from '../generated/storage/types.gen';
 import { hydrateMessageEvent } from '../src/events/hydrate/message';
-import { Macro, msg } from '../src/macro';
+import { Rox, msg } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 const host = 'https://storage.example.test';
@@ -76,7 +76,7 @@ function serve(handler: (request: Request) => Response | Promise<Response>) {
 }
 
 function macro() {
-  return new Macro({ token: 'user-token', hosts: { storage: host } });
+  return new Rox({ token: 'user-token', hosts: { storage: host } });
 }
 
 describe('shared message API contracts', () => {
@@ -513,7 +513,7 @@ describe('shared message API contracts', () => {
         return Response.json({ message_id: rootId });
       return new Response(null, { status: 404 });
     });
-    const team = new Macro({
+    const team = new Rox({
       auth: { type: 'bot', token: 'mbot_team' },
       hosts: { storage: host },
     });
@@ -521,7 +521,7 @@ describe('shared message API contracts', () => {
     expect(requests[1]?.headers.get('x-rox-bot-token')).toBe('mbot_team');
     expect(requests[1]?.headers.get('x-rox-bot-scope')).toBe('team');
     owner = { type: 'user', user_id: 'macro|owner@example.com' };
-    const user = new Macro({
+    const user = new Rox({
       auth: { type: 'bot', token: 'mbot_user' },
       hosts: { storage: host },
     });

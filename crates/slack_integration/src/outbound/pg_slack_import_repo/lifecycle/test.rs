@@ -14,7 +14,7 @@ pub(crate) async fn fixture_parts(
 ) -> (PgSlackImportRepo, TeamId, ImportEvent) {
     let user = Uuid::now_v7();
     let team = Uuid::now_v7();
-    sqlx::query!("INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'lifecycle', 'lifecycle@example.com', 'lifecycle-customer')", user).execute(pool).await.unwrap();
+    sqlx::query!("INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'lifecycle', 'lifecycle@example.com', 'lifecycle-customer')", user).execute(pool).await.unwrap();
     sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|lifecycle@example.com', 'lifecycle@example.com', $1)"#, user).execute(pool).await.unwrap();
     sqlx::query!("INSERT INTO team (id, name, owner_id) VALUES ($1, 'Lifecycle', 'macro|lifecycle@example.com')", team).execute(pool).await.unwrap();
     let team = team.try_into().unwrap();

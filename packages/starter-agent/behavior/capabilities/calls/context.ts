@@ -10,7 +10,7 @@ import { isoText } from '@rox-one/muppet/utilities/time';
 import { jsonLine } from '../../context/disk.ts';
 import type { Base } from '../../context/index.ts';
 import type { People, Work } from '../../contracts.ts';
-import type { Chat } from '../chat/rox.ts';
+import type { Chat } from '../chat/macro.ts';
 import { readAsks } from './asks.ts';
 import { callsPaths } from './config.ts';
 import { ledgerPorts } from './context/ledgers.ts';
@@ -19,7 +19,7 @@ import { connectRoom, publishScreen } from './context/rooms.ts';
 import { shareContext } from './context/share.ts';
 import { voicePorts } from './context/voice.ts';
 import { idList } from './ledger.ts';
-import { sdkCalls } from './rox.ts';
+import { sdkCalls } from './macro.ts';
 import { askerLine, openingLine, pendingPlaced } from './place.ts';
 import { liveJoins, pollMs, pulse, type Watcher, watchState } from './watch.ts';
 

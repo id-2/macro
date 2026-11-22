@@ -47,12 +47,41 @@ MACRO_API_URL = os.environ.get("MACRO_API_URL", "http://localhost:8080")
 INTERNAL_CALL_SECRET = os.environ.get("INTERNAL_CALL_SECRET", "")
 GROQ_STT_MODEL = "whisper-large-v3-turbo"
 GROQ_DEFAULT_API_BASE = "https://api.groq.com/openai/v1"
+# Local stand is Russian-first. Groq rejects an empty `language` with
+# `400 invalid_language`, so the worker pins an explicit code by default
+# instead of leaving the choice to auto-detect.
+DEFAULT_STT_LANGUAGE = "ru"
 
 
 def groq_api_base() -> str:
     """Groq OpenAI-compatible base. `GROQ_API_BASE` overrides the public address."""
     base = os.environ.get("GROQ_API_BASE", "").strip()
     return base or GROQ_DEFAULT_API_BASE
+
+
+def stt_language() -> str:
+    """Explicit STT language code; `STT_LANGUAGE` overrides the Russian default."""
+    language = os.environ.get("STT_LANGUAGE", "").strip()
+    if language:
+        return language
+    if "STT_LANGUAGE" in os.environ:
+        logger.warning(
+            "STT_LANGUAGE is blank; using the default language %r",
+            DEFAULT_STT_LANGUAGE,
+        )
+    return DEFAULT_STT_LANGUAGE
+
+
+def stt_detect_language() -> bool:
+    """Whether the provider should detect the language itself.
+
+    Auto-detect makes the plugin send an empty `language`, which the hosted
+    Groq API rejects with `400 invalid_language`. Leave it off (the default)
+    unless the deployment talks to a provider that accepts an unset language.
+    """
+    raw = os.environ.get("STT_DETECT_LANGUAGE", "").strip().lower()
+    return raw in {"1", "true", "yes", "on"}
+
 
 # Cosine distance threshold for in-call Resemblyzer speaker clustering.
 # Lower = stricter / more new diarized ids; higher = looser / more reuse.
@@ -164,15 +193,24 @@ class Transcriber(Agent):
         http_client: httpx.AsyncClient,
         voice_encoder: VoiceEncoder | None = None,
     ):
+        detect_language = stt_detect_language()
+        stt_options: dict[str, object] = {
+            "model": GROQ_STT_MODEL,
+            "base_url": groq_api_base(),
+        }
+        if detect_language:
+            # The plugin blanks `language` for this mode, so it only works
+            # against providers that accept an unset language.
+            stt_options["detect_language"] = True
+            logger.info("groq stt language=auto-detect")
+        else:
+            stt_options["language"] = stt_language()
+            logger.info("groq stt language=%s", stt_options["language"])
+
         super().__init__(
             instructions="Transcribe user speech.",
-            stt=groq.STT(
-                model=GROQ_STT_MODEL,
-                base_url=groq_api_base(),
-                # Meetings are not pinned to English. The plugin reads
-                # GROQ_API_KEY itself; the key is never passed here.
-                detect_language=True,
-            ),
+            # The plugin reads GROQ_API_KEY itself; the key is never passed here.
+            stt=groq.STT(**stt_options),
         )
         self.participant_identity = participant_identity
         self.channel_id = channel_id

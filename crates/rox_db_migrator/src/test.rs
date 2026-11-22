@@ -232,7 +232,7 @@ async fn explicit_primary_preserves_legacy_writes_and_crm_consent_guard(pool: Pg
     let link = Uuid::new_v4();
     let team = Uuid::new_v4();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
         Uuid::new_v4(),
         owner,
         "legacy@example.com",
@@ -241,8 +241,8 @@ async fn explicit_primary_preserves_legacy_writes_and_crm_consent_guard(pool: Pg
     .execute(&pool)
     .await
     .unwrap();
-    let macro_user = sqlx::query_scalar!(
-        "SELECT id FROM macro_user WHERE email = $1",
+    let rox_user = sqlx::query_scalar!(
+        "SELECT id FROM rox_user WHERE email = $1",
         "legacy@example.com"
     )
     .fetch_one(&pool)
@@ -252,7 +252,7 @@ async fn explicit_primary_preserves_legacy_writes_and_crm_consent_guard(pool: Pg
         "INSERT INTO \"User\" (id, email, rox_user_id) VALUES ($1, $2, $3)",
         owner,
         "legacy@example.com",
-        macro_user
+        rox_user
     )
     .execute(&pool)
     .await

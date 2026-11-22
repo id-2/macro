@@ -108,7 +108,7 @@ async fn committed_deletion_purges_activity_even_when_description_cleanup_fails(
 #[tokio::test]
 async fn appearance_validates_and_records_only_changes() {
     let invalid = model_entity::EntityAppearance {
-        icon: Some(model_entity::AppearanceIcon::Macro {
+        icon: Some(model_entity::AppearanceIcon::Rox {
             name: "unknown-icon".into(),
         }),
         color: None,

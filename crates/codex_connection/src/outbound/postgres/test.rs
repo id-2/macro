@@ -39,7 +39,7 @@ impl StateCipher for Cipher {
 async fn user(pool: &PgPool, id: &str) {
     let uuid = Uuid::now_v7();
     let email = format!("{uuid}@example.com");
-    sqlx::query!(r#"WITH created AS (INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$3) RETURNING id) INSERT INTO "User" ("id", "email", "rox_user_id") SELECT $4,$2,id FROM created"#,uuid,email,format!("stripe_{uuid}"),id).execute(pool).await.unwrap();
+    sqlx::query!(r#"WITH created AS (INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$3) RETURNING id) INSERT INTO "User" ("id", "email", "rox_user_id") SELECT $4,$2,id FROM created"#,uuid,email,format!("stripe_{uuid}"),id).execute(pool).await.unwrap();
 }
 fn attempt() -> LoginAttempt {
     LoginAttempt {

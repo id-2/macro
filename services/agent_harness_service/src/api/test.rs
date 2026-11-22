@@ -259,7 +259,7 @@ async fn gateway_egress_preserves_tokens_targets_and_git_query_strings() {
             "DELETE",
             "/mcp-macro",
             "Bearer session",
-            EgressTarget::McpServer(McpDestination::Macro),
+            EgressTarget::McpServer(McpDestination::Rox),
         ),
         (
             "GET",

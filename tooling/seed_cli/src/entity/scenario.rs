@@ -86,7 +86,7 @@ fn reset_users_sql(users: &[LocalE2eUser]) -> String {
         .map(|user| sql_string(&user.user_id))
         .collect::<Vec<_>>()
         .join(", ");
-    let macro_user_ids = users
+    let rox_user_ids = users
         .iter()
         .map(|user| sql_string(&user.rox_user_id))
         .collect::<Vec<_>>()
@@ -99,12 +99,12 @@ fn reset_users_sql(users: &[LocalE2eUser]) -> String {
 
     format!(
         r#"DELETE FROM "User" WHERE id IN ({user_ids}) OR email IN ({emails});
-DELETE FROM macro_user WHERE id IN ({macro_user_ids}) OR email IN ({emails});"#,
+DELETE FROM rox_user WHERE id IN ({rox_user_ids}) OR email IN ({emails});"#,
     )
 }
 
 fn seed_users_sql(users: &[LocalE2eUser]) -> String {
-    let macro_user_values = values_sql(users.iter().map(|user| {
+    let rox_user_values = values_sql(users.iter().map(|user| {
         vec![
             sql_string(&user.rox_user_id),
             sql_string(&user.username),
@@ -159,8 +159,8 @@ ON CONFLICT DO NOTHING;"#
     };
 
     format!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id, has_trialed) VALUES
-  {macro_user_values}
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id, has_trialed) VALUES
+  {rox_user_values}
 ON CONFLICT (id) DO UPDATE SET
   username = EXCLUDED.username,
   email = EXCLUDED.email,

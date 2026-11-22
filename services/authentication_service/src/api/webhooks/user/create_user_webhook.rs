@@ -15,7 +15,7 @@ use rox_authorization::{InternalOnly, RoxAuthorizationExtractor};
 use rand::Rng;
 
 use crate::service::user::agent_signup::AGENT_SIGNUP_DATA_KEY;
-use crate::service::user::create_user::create_user;
+use crate::service::user::create_user::{adopt_user, create_user};
 use crate::service::user::support_channel_welcome::{
     AuthorizedSupportChannelMessages, post_support_channel_welcome,
 };
@@ -221,7 +221,7 @@ async fn verify_user_email_webhook(
     let fusionauth_user_id = req.event.user.id;
     let email = req.event.user.email.to_lowercase();
 
-    rox_db_client::rox_user_email_verification::upsert_macro_user_email_verification(
+    rox_db_client::rox_user_email_verification::upsert_rox_user_email_verification(
         &ctx.db,
         &fusionauth_user_id,
         &email,
@@ -324,37 +324,88 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
         return Ok(());
     }
 
-    // check if user exists
-    if let Ok((user_id, _stripe_customer_id)) =
-        rox_db_client::user::get::get_user_id_and_stripe_customer_id_by_email(&ctx.db, &email)
-            .await
-    {
-        // The macro_user already exists for that email
-        // We do not allow a user to login through their secondary linked account for SSO so we shouldn't allow for passwordless either
-        tracing::warn!(existing_user_id=?user_id, "email already belongs to an existing user; rejecting signup through secondary account link");
-
-        anyhow::bail!("cannot login through secondary account link");
-    }
-
     let is_agent = requested_agent || has_pending_agent_invite(&ctx.teams_service, &email).await?;
     tracing::Span::current().record("is_agent", is_agent);
 
-    tracing::info!(
-        has_first_name = first_name.is_some(),
-        has_last_name = last_name.is_some(),
-        "creating user"
-    );
-    let start_time = std::time::Instant::now();
-    let (user_id, organization_id) = create_user(
-        &fusionauth_user_id,
-        &username,
-        &email,
-        req.event.user.verified,
-        &ctx.db,
-        &ctx.stripe_client,
-        is_agent,
+    // The email may already own a product account. An account with no login yet
+    // is adopted by this signup — its profile, history and roles were created
+    // before the account ever had a way to sign in. An account already linked to
+    // another login is never taken over: that would hand this user someone
+    // else's data.
+    let adopted_existing = match rox_db_client::user::get::get_existing_user_for_signup(
+        &ctx.db, &email,
     )
-    .await?;
+    .await?
+    {
+        Some(existing) => {
+            match ctx
+                .auth_client
+                .get_user_active(&existing.rox_user_id.to_string())
+                .await
+            {
+                // The stored login still exists in the identity provider, so the
+                // account belongs to somebody who can already sign in.
+                Ok(_) => {
+                    tracing::warn!(existing_user_id=?existing.id, "email already belongs to an account linked to another login; rejecting signup");
+                    anyhow::bail!("cannot login through secondary account link");
+                }
+                // The stored login no longer exists: the account was orphaned
+                // (imported, or its identity provider record was lost). Adopt it.
+                Err(FusionAuthClientError::UserDoesNotExist) => {
+                    tracing::info!(existing_user_id=?existing.id, "email belongs to an account with no login; adopting it for the new login");
+                    let adopted = adopt_user(
+                        &fusionauth_user_id,
+                        &email,
+                        req.event.user.verified,
+                        &existing,
+                        &ctx.db,
+                    )
+                    .await?;
+                    match adopted {
+                        Some(link) => {
+                            tracing::info!(user_id=?link.0, "adopted existing account for the new login");
+                            Some(link)
+                        }
+                        None => {
+                            tracing::warn!(existing_user_id=?existing.id, "account was linked by another signup while this one ran; rejecting signup");
+                            anyhow::bail!("cannot login through secondary account link");
+                        }
+                    }
+                }
+                // Cannot tell whether the login exists. Refuse rather than guess:
+                // failing here makes FusionAuth drop the freshly created login,
+                // so a retry starts clean instead of linking data to a stranger.
+                Err(e) => {
+                    tracing::error!(error=?e, "unable to check whether the existing account has a login");
+                    return Err(e.into());
+                }
+            }
+        }
+        None => None,
+    };
+
+    let start_time = std::time::Instant::now();
+    let (user_id, organization_id, adopted) = match adopted_existing {
+        Some((user_id, organization_id)) => (user_id, organization_id, true),
+        None => {
+            tracing::info!(
+                has_first_name = first_name.is_some(),
+                has_last_name = last_name.is_some(),
+                "creating user"
+            );
+            let (user_id, organization_id) = create_user(
+                &fusionauth_user_id,
+                &username,
+                &email,
+                req.event.user.verified,
+                &ctx.db,
+                &ctx.stripe_client,
+                is_agent,
+            )
+            .await?;
+            (user_id, organization_id, false)
+        }
+    };
 
     let span = tracing::Span::current();
     span.record("user_id", user_id.as_str());
@@ -367,12 +418,15 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
     );
 
     // Mark the account as freshly created so the auth callback completing this
-    // flow can attribute the login as a signup (analytics). Best-effort.
-    let _ = ctx
-        .rox_cache_client
-        .mark_user_just_signed_up(&email)
-        .await
-        .inspect_err(|e| tracing::error!(error=?e, "unable to mark user as just signed up"));
+    // flow can attribute the login as a signup (analytics). Best-effort. An
+    // adopted account is not a new signup.
+    if !adopted {
+        let _ = ctx
+            .rox_cache_client
+            .mark_user_just_signed_up(&email)
+            .await
+            .inspect_err(|e| tracing::error!(error=?e, "unable to mark user as just signed up"));
+    }
 
     // Authoritative signup analytics: fired here so every creation path
     // (SSO, passwordless, iOS) counts exactly once, even if the user never
@@ -395,7 +449,7 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
         let has_organization = organization_id.is_some();
         async move {
             // Seed the profile with the name the identity provider gave us (Google
-            // SSO). Keyed on the FusionAuth id, which is macro_user.id — `user_id`
+            // SSO). Keyed on the FusionAuth id, which is rox_user.id — `user_id`
             // here is the "macro|{email}" User profile id.
             if first_name.is_some() || last_name.is_some() {
                 let _ = rox_db_client::user::update_user_name::update_user_name(
@@ -409,6 +463,11 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
                 .inspect_err(
                     |e| tracing::error!(error=?e, "unable to set user name from identity provider"),
                 );
+            }
+
+            // A returning account is not a new signup, so it counts nowhere.
+            if adopted {
+                return;
             }
 
             let _ = analytics_client
@@ -511,8 +570,8 @@ async fn create_user_webhook(ctx: &ApiContext, req: FusionAuthUserWebhook) -> an
     });
 
     // Agents get an SDK token instead: no marketing sequence, sample content,
-    // or support channel.
-    if !is_agent {
+    // or support channel. An adopted account already has all of that.
+    if !is_agent && !adopted {
         spawn_human_signup_content(ctx, &user_id, &email);
     }
 

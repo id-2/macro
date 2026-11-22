@@ -119,7 +119,7 @@ async fn test_track_referral_nonexistent_referrer(pool: Pool<Postgres>) {
         .unwrap()
         .into_owned();
 
-    // Valid short UUID but no matching macro_user
+    // Valid short UUID but no matching rox_user
     let converter = ShortUuidConverter::default();
     let fake_uuid = uuid::Uuid::parse_str("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa").unwrap();
     let code = ReferralCode(converter.from_uuid(&fake_uuid));

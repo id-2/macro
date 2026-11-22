@@ -22,7 +22,7 @@ use crate::domain::ports::EmailSender;
 const FROM_NAME_MAX_CHARS: usize = 64;
 
 /// Marks a display name as someone Rox sends for, so it never reads as Rox's own mail.
-const FROM_NAME_SUFFIX: &str = " (via Macro)";
+const FROM_NAME_SUFFIX: &str = " (via Rox)";
 
 /// RFC 2047 caps an encoded word at 75 characters; `=?UTF-8?Q?` and `?=` take 12 of them.
 const ENCODED_WORD_MAX_TEXT_LEN: usize = 63;

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import * as publicSdk from '../../sdk/src/macro';
 import { Rox as PublicMacro } from '../../sdk/src/macro';
 import * as preinstalledSdk from './index';
-import { Macro } from './index';
+import { Rox } from './index';
 
 describe('preinstalled SDK', () => {
   it('preserves every public runtime export, including documented helpers', () => {
@@ -25,8 +25,8 @@ describe('preinstalled SDK', () => {
     );
   });
   it('exports the actual SDK class and its nested entity handles', () => {
-    expect(Macro).toBe(PublicMacro);
-    const macro = new Macro({ token: 'fixture', env: 'prod' });
+    expect(Rox).toBe(PublicMacro);
+    const macro = new Rox({ token: 'fixture', env: 'prod' });
     const session = macro.agentSessions.byId('fixture-session');
     const execution = session.codeExecutions.byId('fixture-execution');
     expect(execution.session()).toBe(session);

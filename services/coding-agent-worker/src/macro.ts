@@ -1,4 +1,4 @@
-import { Macro } from '@rox-one/sdk';
+import { Rox } from '@rox-one/sdk';
 import { env } from './env';
 import { ensureWebhook } from './webhook';
 
@@ -9,6 +9,6 @@ const webhookSecret = await ensureWebhook(`${env.PUBLIC_URL}/macro-events`);
 /** The one Rox SDK client, shared by everything in this worker. The SDK
  * resolves service hosts itself (ROX_ENV, plus the local-stack portmap
  * when it's `local`). */
-export const macro = new Macro({ webhookSecret }).requestedAs(
+export const macro = new Rox({ webhookSecret }).requestedAs(
   env.ROX_USER_ID
 );

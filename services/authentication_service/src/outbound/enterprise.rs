@@ -62,7 +62,7 @@ pub struct PgMemberDirectory(PgPool);
 impl MemberDirectory for PgMemberDirectory {
     async fn fusion_user_id(&self, user: &RoxUserIdStr<'_>) -> Result<String> {
         let fusion_user_id = sqlx::query_scalar!(
-            r#"SELECT u.id FROM "User" u JOIN macro_user m ON m.id = u.rox_user_id WHERE lower(m.email) = lower($1)"#,
+            r#"SELECT u.id FROM "User" u JOIN rox_user m ON m.id = u.rox_user_id WHERE lower(m.email) = lower($1)"#,
             user.email_str(),
         )
         .fetch_optional(&self.0)

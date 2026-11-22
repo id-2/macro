@@ -36,7 +36,7 @@ const TEAM_ID: Uuid = Uuid::from_u128(0x0190_0000_0000_7000_8000_0000_0000_0001)
 async fn insert_fixtures(pool: &PgPool) {
     sqlx::raw_sql(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+        INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
             ('01900000-0000-7000-8000-00000000000a', 'agent-a', 'agent-a@example.com', 'cus_a'),
             ('01900000-0000-7000-8000-00000000000b', 'agent-b', 'agent-b@example.com', 'cus_b'),
             ('01900000-0000-7000-8000-00000000000c', 'admin', 'admin@example.com', 'cus_c'),

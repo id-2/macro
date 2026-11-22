@@ -1,5 +1,5 @@
 import { afterEach, expect, mock, spyOn, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 afterEach(() => mock.restore());
 
@@ -32,7 +32,7 @@ function serveInbox(threadCount: number) {
 }
 
 function client() {
-  return new Macro({
+  return new Rox({
     auth: { type: 'user', apiKey: 'mak_test' },
     hosts: { email: 'https://email.example.test' },
   });

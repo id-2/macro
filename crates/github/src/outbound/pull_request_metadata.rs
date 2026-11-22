@@ -17,7 +17,7 @@ use crate::domain::models::{
 const GITHUB_API_BASE_URL: &str = "https://api.github.com";
 const METADATA_PAGE_SIZE: u16 = 100;
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(15);
-const USER_AGENT: &str = "Macro-Auth-Service";
+const USER_AGENT: &str = "Rox-Auth-Service";
 
 /// Fetch GitHub pull request details with comments and check runs when available.
 pub(crate) async fn fetch_pull_request_metadata(

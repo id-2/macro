@@ -297,16 +297,16 @@ fn stacks_never_see_each_others_cookies() {
     // Same service response, different names in the shared jar.
     assert_eq!(
         apply(&a.set_cookie, set_cookie),
-        "macro-agent-a--local-macro-access-token=tok; Path=/; Secure; HttpOnly; SameSite=None"
+        "rox-agent-a--local-macro-access-token=tok; Path=/; Secure; HttpOnly; SameSite=None"
     );
     assert_eq!(
         apply(&b.set_cookie, set_cookie),
-        "macro-agent-b--local-macro-access-token=tok; Path=/; Secure; HttpOnly; SameSite=None"
+        "rox-agent-b--local-macro-access-token=tok; Path=/; Secure; HttpOnly; SameSite=None"
     );
 
-    let jar = "macro-agent-a--local-macro-access-token=from-a; \
-               macro-agent-a--local-macro-refresh-token=refresh-a; \
-               macro-agent-b--local-macro-access-token=from-b; login=true";
+    let jar = "rox-agent-a--local-macro-access-token=from-a; \
+               rox-agent-a--local-macro-refresh-token=refresh-a; \
+               rox-agent-b--local-macro-access-token=from-b; login=true";
     assert_eq!(
         apply(&a.cookie, jar),
         "local-macro-access-token=from-a; local-macro-refresh-token=refresh-a"
@@ -319,14 +319,14 @@ fn a_stack_signed_out_of_its_own_session_sends_no_foreign_token() {
     let a = cookie_rewrites(&Instance::derive(Some("agent-a"), Some(41_000)).unwrap());
 
     for jar in [
-        "macro-agent-b--local-macro-access-token=from-b",
-        "macro-agent-b--local-macro-access-token=from-b; login=true",
+        "rox-agent-b--local-macro-access-token=from-b",
+        "rox-agent-b--local-macro-access-token=from-b; login=true",
         // Tokens from before namespacing, or set on a service's own port.
         "local-macro-access-token=old; login=true",
         "login=true; local-macro-refresh-token=old",
         // A longer instance name that starts with this one is still foreign.
-        "macro-agent-a-2--local-macro-access-token=other",
-        "__Host-macro-agent-a-2--rox_mcp_oauth=other",
+        "rox-agent-a-2--local-macro-access-token=other",
+        "__Host-rox-agent-a-2--rox_mcp_oauth=other",
     ] {
         assert_eq!(apply(&a.cookie, jar), "", "jar: {jar}");
     }
@@ -341,15 +341,15 @@ fn prefixed_cookie_names_keep_their_browser_prefix() {
     for (from_service, in_jar) in [
         (
             "__Host-rox_mcp_oauth=bind; Path=/; Secure",
-            "__Host-macro-agent-a--rox_mcp_oauth=bind; Path=/; Secure",
+            "__Host-rox-agent-a--rox_mcp_oauth=bind; Path=/; Secure",
         ),
         (
             "__Secure-session=s; Path=/; Secure",
-            "__Secure-macro-agent-a--session=s; Path=/; Secure",
+            "__Secure-rox-agent-a--session=s; Path=/; Secure",
         ),
         // Leading underscores without a browser prefix are ordinary names.
-        ("_ga=1; Path=/", "macro-agent-a--_ga=1; Path=/"),
-        ("__other=1", "macro-agent-a--__other=1"),
+        ("_ga=1; Path=/", "rox-agent-a--_ga=1; Path=/"),
+        ("__other=1", "rox-agent-a--__other=1"),
     ] {
         let jar = apply(&a.set_cookie, from_service);
         assert_eq!(jar, in_jar);
@@ -370,20 +370,20 @@ fn a_bare_copy_never_shadows_the_stacks_own_cookie() {
 
     for (jar, reaches_service) in [
         (
-            "__Host-macro-agent-a--rox_mcp_oauth=mine; __Host-rox_mcp_oauth=bare",
+            "__Host-rox-agent-a--rox_mcp_oauth=mine; __Host-rox_mcp_oauth=bare",
             "__Host-rox_mcp_oauth=mine",
         ),
         (
-            "__Host-macro-preview=bare; __Host-macro-agent-a--macro-preview=mine",
+            "__Host-macro-preview=bare; __Host-rox-agent-a--macro-preview=mine",
             "__Host-macro-preview=mine",
         ),
         (
-            "local-macro-access-token=bare; macro-agent-a--local-macro-access-token=mine",
+            "local-macro-access-token=bare; rox-agent-a--local-macro-access-token=mine",
             "local-macro-access-token=mine",
         ),
         // JavaScript-set and analytics cookies aren't for services.
         (
-            "_ga=1; macro-agent-a--local-macro-access-token=mine; __Secure-x=1",
+            "_ga=1; rox-agent-a--local-macro-access-token=mine; __Secure-x=1",
             "local-macro-access-token=mine",
         ),
     ] {
@@ -399,25 +399,25 @@ fn request_rules_respect_cookie_boundaries() {
     for (jar, reaches_service) in [
         // A value that looks like a prefix is left alone.
         (
-            "macro-agent-a--x=__Host-macro-agent-a--y",
-            "x=__Host-macro-agent-a--y",
+            "rox-agent-a--x=__Host-rox-agent-a--y",
+            "x=__Host-rox-agent-a--y",
         ),
         (
-            "macro-agent-a--x=macro-agent-a--y; macro-agent-a--z=1",
-            "x=macro-agent-a--y; z=1",
+            "rox-agent-a--x=rox-agent-a--y; rox-agent-a--z=1",
+            "x=rox-agent-a--y; z=1",
         ),
         // A nameless cookie is dropped without taking its neighbour along.
-        ("local-macro-flag; macro-agent-a--login=true", "login=true"),
+        ("local-macro-flag; rox-agent-a--login=true", "login=true"),
         (
-            "macro-agent-a--a=1; nameless; macro-agent-a--b=2",
+            "rox-agent-a--a=1; nameless; rox-agent-a--b=2",
             "a=1; b=2",
         ),
         // Cookies joined without a space, or with extra whitespace.
         (
-            "macro-agent-a--a=1;macro-agent-b--b=2;macro-agent-a--c=3",
+            "rox-agent-a--a=1;rox-agent-b--b=2;rox-agent-a--c=3",
             "a=1; c=3",
         ),
-        ("  macro-agent-a--a=1 ;\tlocal-macro-x=2", "a=1 "),
+        ("  rox-agent-a--a=1 ;\tlocal-macro-x=2", "a=1 "),
         ("", ""),
     ] {
         assert_eq!(apply(&a.cookie, jar), reaches_service, "jar: {jar:?}");
@@ -434,14 +434,14 @@ fn deleting_a_cookie_deletes_the_prefixed_copy() {
             &a.set_cookie,
             "local-macro-access-token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
         ),
-        "macro-agent-a--local-macro-access-token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
+        "rox-agent-a--local-macro-access-token=; Path=/; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT"
     );
     assert_eq!(
         apply(
             &a.set_cookie,
             "__Host-macro-preview=; Path=/; Secure; Max-Age=0"
         ),
-        "__Host-macro-agent-a--macro-preview=; Path=/; Secure; Max-Age=0"
+        "__Host-rox-agent-a--macro-preview=; Path=/; Secure; Max-Age=0"
     );
     // A nameless Set-Cookie has nothing to prefix and is left as sent.
     assert_eq!(apply(&a.set_cookie, "flag; Path=/"), "flag; Path=/");
@@ -461,9 +461,9 @@ fn no_cookie_rewrite_has_an_empty_replacement() {
 fn only_local_stacks_namespace_cookies() {
     let local = caddyfile(&test_instance(), Mode::Local, true);
     assert!(
-        local.contains("request_header Cookie \"; (__Host-|__Secure-)?macro-agent-a--\" \";!$1\"")
+        local.contains("request_header Cookie \"; (__Host-|__Secure-)?rox-agent-a--\" \";!$1\"")
     );
-    assert!(local.contains("Set-Cookie \"^macro-agent-a--__Host-\" \"__Host-macro-agent-a--\""));
+    assert!(local.contains("Set-Cookie \"^rox-agent-a--__Host-\" \"__Host-rox-agent-a--\""));
 
     // `run_dev` shares cookies with the dev gateway's own services.
     assert!(!caddyfile(&test_instance(), Mode::Dev, true).contains("Set-Cookie"));
@@ -558,33 +558,66 @@ fn real_caddy_applies_the_generated_cookie_rules() {
     assert_eq!(
         set_cookies,
         [
-            "macro-agent-a--local-macro-access-token=tok; Path=/; Secure; HttpOnly",
-            "__Host-macro-agent-a--rox_mcp_oauth=bind; Path=/; Secure",
-            "__Secure-macro-agent-a--s=1; Path=/; Secure",
-            "macro-agent-a--_ga=1; Path=/",
-            "macro-agent-a--local-macro-refresh-token=; Path=/; Max-Age=0",
+            "rox-agent-a--local-macro-access-token=tok; Path=/; Secure; HttpOnly",
+            "__Host-rox-agent-a--rox_mcp_oauth=bind; Path=/; Secure",
+            "__Secure-rox-agent-a--s=1; Path=/; Secure",
+            "rox-agent-a--_ga=1; Path=/",
+            "rox-agent-a--local-macro-refresh-token=; Path=/; Max-Age=0",
         ]
     );
 
     for (jar, reaches_service) in [
         (
-            "macro-agent-a--local-macro-access-token=mine; macro-agent-b--local-macro-access-token=theirs; login=true",
+            "rox-agent-a--local-macro-access-token=mine; rox-agent-b--local-macro-access-token=theirs; login=true",
             "local-macro-access-token=mine",
         ),
         (
-            "__Host-macro-agent-a--rox_mcp_oauth=mine; __Host-rox_mcp_oauth=bare",
+            "__Host-rox-agent-a--rox_mcp_oauth=mine; __Host-rox_mcp_oauth=bare",
             "__Host-rox_mcp_oauth=mine",
         ),
         (
-            "local-macro-flag; macro-agent-a--x=__Host-macro-agent-a--y;macro-agent-a--z=1",
-            "x=__Host-macro-agent-a--y; z=1",
+            "local-macro-flag; rox-agent-a--x=__Host-rox-agent-a--y;rox-agent-a--z=1",
+            "x=__Host-rox-agent-a--y; z=1",
         ),
         (
-            "macro-agent-b--local-macro-access-token=theirs; local-macro-access-token=old",
+            "rox-agent-b--local-macro-access-token=theirs; local-macro-access-token=old",
             "",
         ),
     ] {
         assert_eq!(request(jar).1, reaches_service, "jar: {jar}");
     }
     let _ = std::fs::remove_dir_all(&dir);
+}
+
+/// Local issues one session cookie for `.rox.one`, so both certificate names
+/// must be served by this proxy. `my.rox.one` is a short alias: same backend
+/// routes, same cookie namespacing, and the site root sent to the `/app` mount
+/// the bundle's router is built on.
+#[test]
+fn local_serves_my_rox_one_from_the_site_root() {
+    let headless = caddyfile(&test_instance(), Mode::Local, true);
+    assert!(headless.contains(":{$PROXY_PORT}, :443 {"));
+    let my = headless
+        .split_once("\nhttps://my.rox.one {")
+        .map(|(_, rest)| rest)
+        .expect("my.rox.one host block");
+    assert!(my.contains("    tls /etc/caddy/certs/server.pem"));
+    assert!(my.contains("reverse_proxy authentication-service:8080"));
+    assert!(my.contains("handle_path /app/* {"));
+    assert!(my.contains("root * /srv/frontend"));
+    assert!(my.contains("try_files {path} /index.html"));
+    // The router only resolves paths under `/app`, so the site root must not
+    // serve an unroutable index.html.
+    assert!(my.contains("redir * /app{uri} 308"));
+    assert!(
+        my.contains("Set-Cookie \"^([^=;]*)=\" \"rox-agent-a--$1=\""),
+        "both hostnames must share one cookie namespace"
+    );
+
+    // Without the bundle there is no second frontend, and Dev keeps the one
+    // listener it shares with the deployed stack.
+    assert!(!caddyfile(&test_instance(), Mode::Local, false).contains("my.rox.one"));
+    let dev = caddyfile(&test_instance(), Mode::Dev, true);
+    assert!(!dev.contains(":443"));
+    assert!(!dev.contains("my.rox.one"));
 }

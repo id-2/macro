@@ -13,7 +13,7 @@ use super::{stage::Stage, workspace_root};
 /// but host tooling connects via localhost:<mapped-port>).
 fn host_database_url(instance: &Instance) -> String {
     format!(
-        "postgres://user:password@localhost:{}/macrodb",
+        "postgres://user:password@localhost:{}/roxdb",
         instance.port(Port::Postgres)
     )
 }

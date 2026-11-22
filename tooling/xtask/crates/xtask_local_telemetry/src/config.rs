@@ -31,7 +31,8 @@ const FORWARDER_DIR: &str = "forwarder";
 const LOOPBACK_HOSTS: &[&str] = &["localhost", "127.0.0.1", "[::1]"];
 /// The shared OTLP ingest route, the one CI's `export-ci-telemetry` sends to.
 pub const DEFAULT_ENDPOINT: &str = "https://otlp.macro-internal.com";
-/// The environment variable that turns telemetry off (or on, under CI).
+/// The environment variable that turns telemetry off (or on, under CI). The
+/// Rox-era spelling (`ROX_LOCAL_TELEMETRY`) is still read as a fallback.
 pub const SWITCH_VAR: &str = "ROX_LOCAL_TELEMETRY";
 
 /// Where settings are read, where events are buffered, and how a missing
@@ -103,16 +104,18 @@ pub enum Switch {
 }
 
 impl Switch {
-    /// Read `ROX_LOCAL_TELEMETRY`, then `CI`. Unset means off: this local runner
-    /// does not export launch timing unless the variable is explicitly on.
+    /// Read `ROX_LOCAL_TELEMETRY` (else its `ROX_` spelling), then `CI`. Unset
+    /// means off: this local runner does not export launch timing unless the
+    /// variable is explicitly on.
     pub fn from_env() -> Self {
         let value = |name: &str| {
             std::env::var_os(name)
                 .map(|value| value.to_string_lossy().trim().to_ascii_lowercase())
                 .filter(|value| !value.is_empty())
         };
+        let switch = value(SWITCH_VAR).or_else(|| value("ROX_LOCAL_TELEMETRY"));
         let ci = value("CI").is_some_and(|ci| ci != "0" && ci != "false");
-        Self::parse(value(SWITCH_VAR).as_deref(), ci)
+        Self::parse(switch.as_deref(), ci)
     }
 
     pub(crate) fn parse(switch: Option<&str>, ci: bool) -> Self {

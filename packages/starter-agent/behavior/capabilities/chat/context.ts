@@ -6,7 +6,7 @@ import { batches } from '../../context/stream.ts';
 import type { Conversation, Queued } from './entry.ts';
 import { history } from './history.ts';
 import { Screen } from './listen.ts';
-import { sdkChat } from './rox.ts';
+import { sdkChat } from './macro.ts';
 import { typing } from './typing.ts';
 
 /** The owner of chat's state directories. */

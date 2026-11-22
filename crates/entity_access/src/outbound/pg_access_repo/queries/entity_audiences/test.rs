@@ -13,7 +13,7 @@ const GUEST: &str = "macro|guest@corp.test";
 async fn insert_user(pool: &PgPool, user_id: &str) {
     let rox_uuid = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
         rox_uuid,
         user_id,
     )

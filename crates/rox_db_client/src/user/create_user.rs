@@ -7,7 +7,7 @@ mod test;
 
 /// Creates a new user in the database and attaches provided roles
 ///
-/// `macro_user_customer_id` supplies the required legacy account key. Only an
+/// `rox_user_customer_id` supplies the required legacy account key. Only an
 /// actual Stripe customer belongs in the optional profile billing field.
 #[expect(clippy::too_many_arguments, reason = "too annoying to fix")]
 #[tracing::instrument(skip(db))]
@@ -17,7 +17,7 @@ pub async fn create_user(
     username: &str,
     email: &str,
     is_verified: bool,
-    macro_user_customer_id: &str,
+    rox_user_customer_id: &str,
     stripe_customer_id: Option<&str>,
     organization_id: Option<i32>,
     roles: HashSet<String>,
@@ -30,7 +30,7 @@ pub async fn create_user(
     // Create macro user
     let rox_user_id = sqlx::query!(
         r#"
-        INSERT INTO "macro_user" (
+        INSERT INTO "rox_user" (
             "id", "username", "stripe_customer_id", "email", "has_trialed",
             "mailbox_handle_claimed_at"
         )
@@ -39,7 +39,7 @@ pub async fn create_user(
         "#,
         &id,
         username,
-        macro_user_customer_id,
+        rox_user_customer_id,
         email,
         false, // has_trialed
         rox_user_id::handle::MailboxHandle::parse(username).is_ok()
@@ -96,6 +96,119 @@ pub async fn create_user(
     transaction.commit().await?;
 
     Ok(id)
+}
+
+/// Links a freshly minted login to a product account that had none.
+///
+/// A login id lives on `rox_user.id`, and every table that points at a macro
+/// user follows that id through `ON UPDATE CASCADE`. Renaming the row is
+/// therefore the whole link: the account keeps its roles, documents, email
+/// verification and profile, and the new login reaches them.
+///
+/// `roles` are granted only when the account has none, so an account that was
+/// already provisioned never gains entitlements it did not have.
+///
+/// Returns the profile row `(id, organizationId)` that the new login now owns,
+/// or `None` when the account is no longer unclaimed — a concurrent signup
+/// linked it first. Callers must treat `None` as "reject the signup".
+#[expect(clippy::too_many_arguments, reason = "keeps the whole link in one statement")]
+#[tracing::instrument(skip(db, roles))]
+pub async fn adopt_rox_user_login(
+    db: &Pool<Postgres>,
+    unlinked_rox_user_id: &uuid::Uuid,
+    new_rox_user_id: &str,
+    email: &str,
+    is_verified: bool,
+    organization_id: Option<i32>,
+    roles: HashSet<String>,
+) -> anyhow::Result<Option<(String, Option<i32>)>> {
+    let new_rox_user_id = rox_uuid::string_to_uuid(new_rox_user_id)?;
+
+    let mut transaction = db.begin().await?;
+
+    let linked = sqlx::query!(
+        r#"
+        UPDATE "rox_user"
+        SET "id" = $1
+        WHERE "id" = $2
+        "#,
+        &new_rox_user_id,
+        unlinked_rox_user_id
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    if linked.rows_affected() == 0 {
+        // Another signup renamed the row first; this one keeps its old login.
+        return Ok(None);
+    }
+
+    sqlx::query!(
+        r#"
+        INSERT INTO "rox_user_email_verification" ("rox_user_id", "email", "is_verified")
+        VALUES ($1, $2, $3)
+        ON CONFLICT ("rox_user_id", "email") DO UPDATE
+        SET "is_verified" = "rox_user_email_verification"."is_verified" OR EXCLUDED."is_verified"
+        "#,
+        &new_rox_user_id,
+        email,
+        is_verified
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    // The rename cascades into "User"; an account with no profile for this
+    // email was never a signup target, so leave the login unlinked.
+    let profile = sqlx::query!(
+        r#"
+        UPDATE "User"
+        SET "organizationId" = COALESCE("organizationId", $1)
+        WHERE "rox_user_id" = $2
+        AND LOWER("email") = LOWER($3)
+        RETURNING "id", "organizationId" as "organization_id?"
+        "#,
+        organization_id,
+        &new_rox_user_id,
+        email
+    )
+    .fetch_optional(&mut *transaction)
+    .await?;
+
+    let Some(profile) = profile else {
+        transaction.rollback().await?;
+        return Ok(None);
+    };
+
+    let has_roles: bool = sqlx::query_scalar!(
+        r#"
+        SELECT EXISTS (
+            SELECT 1 FROM "RolesOnUsers" WHERE "userId" = $1
+        ) as "exists!"
+        "#,
+        profile.id
+    )
+    .fetch_one(&mut *transaction)
+    .await?;
+
+    if !has_roles {
+        for role in roles {
+            sqlx::query!(
+                r#"
+                INSERT INTO "RolesOnUsers" ("userId", "roleId")
+                VALUES ($1, $2)
+                ON CONFLICT ("userId", "roleId") DO NOTHING
+                "#,
+                profile.id,
+                role
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+    }
+
+    transaction.commit().await?;
+
+    Ok(Some((profile.id, profile.organization_id)))
 }
 
 /// Creates a new user profile in the database and attaches provided roles

@@ -280,7 +280,7 @@ impl Pdf {
     }
 
     fn finish(mut self, catalog: u32) -> Vec<u8> {
-        let info = self.add("<< /Producer (Macro) >>");
+        let info = self.add("<< /Producer (Rox) >>");
         let mut out = b"%PDF-1.4\n%\xE2\xE3\xCF\xD3\n".to_vec();
         let mut offsets = Vec::with_capacity(self.objects.len());
         for (k, body) in self.objects.iter().enumerate() {

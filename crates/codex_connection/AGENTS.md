@@ -24,7 +24,7 @@ sessions.
 
 ## Boundaries
 
-- Depends on: `codex_cloud_agents` (domain types), `rox_user_id`.
+- Depends on: `codex_cloud_agents` (domain types), `macro_user_id`.
 - Used by: `agent_harness`, `authentication_service`, `agent_harness_service`.
 
 ## Recipes

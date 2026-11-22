@@ -7,7 +7,7 @@ use super::*;
 async fn insert_fixtures(pool: &PgPool) {
     sqlx::raw_sql(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+        INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
             ('01900000-0000-7000-8000-00000000000a', 'admin', 'admin@rox.one', 'cus_a'),
             ('01900000-0000-7000-8000-00000000000b', 'gone', 'gone@rox.one', 'cus_b'),
             ('01900000-0000-7000-8000-00000000000c', 'sam', 'sam@agents.macro.invalid', 'cus_c'),

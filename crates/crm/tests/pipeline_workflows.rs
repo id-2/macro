@@ -109,7 +109,7 @@ async fn fixture(pool: &PgPool) -> Fixture {
     for id in [OWNER, MEMBER] {
         let uid = Uuid::now_v7();
         sqlx::query!(
-            "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$2)",
+            "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$2)",
             uid,
             id
         )

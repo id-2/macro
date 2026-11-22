@@ -18,6 +18,73 @@ use super::identity;
 #[cfg(test)]
 mod test;
 
+/// The SMTP relay FusionAuth sends its own mail through (passwordless codes).
+///
+/// Read from the same `SMTP_*` variables the Rust services use, so one env edit
+/// moves both senders between the Mailpit sink and a real relay such as Resend.
+/// The defaults keep the local Mailpit arrangement.
+struct MailSettings {
+    host: String,
+    port: u16,
+    security: String,
+    username: Option<String>,
+    password: Option<String>,
+    from_email: String,
+    from_name: String,
+}
+
+impl MailSettings {
+    fn from_env() -> Self {
+        let env = |name: &str| {
+            std::env::var(name)
+                .ok()
+                .map(|value| value.trim().to_string())
+                .filter(|value| !value.is_empty())
+        };
+        let host = env("SMTP_HOST").unwrap_or_else(|| "mailpit".to_string());
+        // FusionAuth spells the same choice NONE / TLS (STARTTLS) / SSL.
+        let security = match env("SMTP_TLS").map(|v| v.to_ascii_lowercase()).as_deref() {
+            Some("starttls") => "TLS",
+            Some("ssl") | Some("smtps") | Some("tls") => "SSL",
+            _ => "NONE",
+        }
+        .to_string();
+        Self {
+            port: env("SMTP_PORT")
+                .and_then(|value| value.parse().ok())
+                .unwrap_or(1025),
+            host,
+            security,
+            username: env("SMTP_USERNAME"),
+            password: env("SMTP_PASSWORD"),
+            from_email: env("SMTP_FROM_ADDRESS").unwrap_or_else(|| identity::MAIL_FROM.to_string()),
+            from_name: env("SMTP_FROM_NAME").unwrap_or_else(|| "Rox".to_string()),
+        }
+    }
+
+    /// Tenant `emailConfiguration` for FusionAuth.
+    fn tenant_email_configuration(&self, template_id: &str) -> Value {
+        let mut config = json!({
+            "host": self.host,
+            "port": self.port,
+            "security": self.security,
+            "defaultFromEmail": self.from_email,
+            "defaultFromName": self.from_name,
+            "passwordlessEmailTemplateId": template_id,
+        });
+        let object = config
+            .as_object_mut()
+            .expect("emailConfiguration is an object");
+        if let Some(username) = &self.username {
+            object.insert("username".to_string(), json!(username));
+        }
+        if let Some(password) = &self.password {
+            object.insert("password".to_string(), json!(password));
+        }
+        config
+    }
+}
+
 /// What the local `google`/`google_gmail` OIDC identity providers
 /// authenticate against: a real Google OAuth web client from the run env
 /// (the Internal client in the `macro-email-testing` GCP project — see the
@@ -250,6 +317,9 @@ pub fn build(
     let key_id = identity::JWT_SIGNING_KEY_ID;
     let lambda_id = identity::POPULATE_JWT_LAMBDA_ID;
     let template_id = identity::PASSWORDLESS_EMAIL_TEMPLATE_ID;
+    // Same SMTP_* variables the Rust services read: one env edit moves both
+    // senders between Mailpit and a real relay.
+    let mail = MailSettings::from_env();
 
     // Kickstart executes these in order, so each request must come after the
     // entities it references. Dependency chain:
@@ -293,14 +363,16 @@ pub fn build(
             "url": format!("/api/email/template/{template_id}"),
             "body": { "emailTemplate": {
                 "name": "Passwordless Login (local)",
-                "defaultSubject": "Your Rox login code",
-                "defaultHtmlTemplate": "<p>Your Rox login code:</p><h1>${code}</h1>",
-                "defaultTextTemplate": "Your Rox login code: ${code}",
-                "fromEmail": identity::MAIL_FROM,
+                "defaultSubject": "Код для входа в Rox",
+                "defaultHtmlTemplate": "<p>Ваш код для входа в Rox:</p><h1>${code}</h1>",
+                "defaultTextTemplate": "Ваш код для входа в Rox: ${code}",
+                "fromEmail": mail.from_email,
             }}
         }),
-        // 4. Tenant — with SMTP pointed at Mailpit + the passwordless template,
-        // so FusionAuth-sent passwordless codes land in Mailpit. PATCH, not
+        // 4. Tenant — mail via the configured `SMTP_*` relay (Mailpit by
+        // default, Resend when the env points there) plus the passwordless
+        // template, so FusionAuth-sent login codes leave through the same
+        // transport as the rest of the stack. PATCH, not
         // POST: `variables.defaultTenantId` (below) pins FusionAuth's built-in
         // default tenant to our fixed id, and this request reconfigures that
         // tenant in place. Local stays single-tenant this way — a second
@@ -329,14 +401,7 @@ pub fn build(
                     "refreshTokenTimeToLiveInMinutes": 43200,
                     "timeToLiveInSeconds": 3600,
                 },
-                "emailConfiguration": {
-                    "host": "mailpit",
-                    "port": 1025,
-                    "security": "NONE",
-                    "defaultFromEmail": identity::MAIL_FROM,
-                    "defaultFromName": "Rox Local",
-                    "passwordlessEmailTemplateId": template_id,
-                },
+                "emailConfiguration": mail.tenant_email_configuration(template_id),
                 // Make the passwordless code a 6-digit number (matches the dev
                 // Pulumi tenant config), not FusionAuth's default long token.
                 "externalIdentifierConfiguration": {

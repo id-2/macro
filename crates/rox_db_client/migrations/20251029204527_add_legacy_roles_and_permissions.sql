@@ -4,7 +4,7 @@
 -- Roles
 INSERT INTO "Role" (id,description)
 	VALUES ('corporate','Users who negotiated a license outside of stripe'),
-        ('partner_sales','Partner of Macro'),
+        ('partner_sales','Partner of Rox'),
         ('professional_subscriber','User who is subscribed to Professional Tier on Stripe'),
         ('self_serve','Ability to manage stripe subscription'),
         ('super_admin','An employee at macro able to modify org settings'),
@@ -12,7 +12,7 @@ INSERT INTO "Role" (id,description)
         ('manage_organization_subscription','Ability to manage an organizations stripe subscription'),
         ('email_tool','Ability to use the email tool via macro.com'),
         ('email_tool_on_prem','Ability to use the on prem organization specific email tool via org.com'),
-        ('ai_subscriber','Ability to use Macro AI features'),
+        ('ai_subscriber','Ability to use Rox AI features'),
         ('editor_user','Ability to use the editor feature') ON CONFLICT DO NOTHING;
 
 -- Permissions
@@ -25,7 +25,7 @@ INSERT INTO "Permission" (id,description) VALUES
         ('write:discount','Able to generate discount codes'),
         ('write:it_panel','Able to access the IT Panel for an organization'),
         ('write:email_tool','Able to use the email compare tool'),
-        ('write:ai_features','Able to use Macro AI features'),
+        ('write:ai_features','Able to use Rox AI features'),
         ('read:docx_editor','Able to use editor feature') ON CONFLICT DO NOTHING;
 
 -- RolesOnPermissions

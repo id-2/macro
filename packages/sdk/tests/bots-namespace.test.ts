@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import type { Bot } from '../generated/storage/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 
@@ -32,7 +32,7 @@ describe('BotsNamespace', () => {
         headers: { 'content-type': 'application/json' },
       });
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       auth: { type: 'bot', token: 'mbot_team_owned', scope: 'team' },
       hosts: { storage: 'https://storage.example.test' },
     });

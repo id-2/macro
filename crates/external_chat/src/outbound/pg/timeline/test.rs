@@ -33,7 +33,7 @@ async fn share_link_enable_writes_one_audit_and_repeated_enable_does_not_duplica
     migrate_for_test(&pool).await;
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)"#,
         rox_user_id,
         OWNER,
         "external-chat-owner@example.com",

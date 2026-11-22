@@ -85,7 +85,7 @@ fn domain_parts_serialize_directly_into_the_browser_contract() {
         })
     );
     assert_eq!(
-        serde_json::to_value(ToolDetail::Macro {
+        serde_json::to_value(ToolDetail::Rox {
             input: json!({ "documentId": "x" }),
             output: None,
             error: None,

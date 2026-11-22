@@ -144,6 +144,12 @@ pub(crate) type TeamsServiceType = teams::domain::team_service::TeamServiceImpl<
     >,
 >;
 
+/// Whether `POST /login/passwordless` may return the sign-in code. A newtype
+/// because `ApiContext` already derives `FromRef` for the one plain `bool` it
+/// can hold.
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct PasswordlessReturnCode(pub bool);
+
 pub(crate) type RateLimiter = RateLimitServiceImpl<RedisRateLimitAdapter<redis::Client>>;
 
 pub(crate) type InviteRewardsType = crate::outbound::invite_rewards::BillingInviteRewards<
@@ -330,6 +336,9 @@ pub(crate) struct ApiContext {
     pub ai_payment_gateway: Arc<ai_billing::outbound::StripePaymentGateway>,
     /// Whether Gmail link consent requests the Google Calendar scope.
     pub calendar_scope_enabled: bool,
+    /// Return the sign-in code in the passwordless start response. Only a
+    /// stack that cannot read its email turns this on.
+    pub passwordless_return_code: PasswordlessReturnCode,
     /// Google's OAuth authorization endpoint, where a Gmail link sends the browser.
     pub google_authorization_url: url::Url,
     /// Signs and verifies the `state` on account-link OAuth round trips.

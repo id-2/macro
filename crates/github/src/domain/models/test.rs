@@ -67,7 +67,7 @@ const SHORT_UUID_C: &str = "2ZbZ7wJQfEMWyBSycKYTYr";
 #[test]
 fn extract_case_insensitive() {
     let text = format!(
-        "fixes MACRO-{SHORT_UUID_A} and also macro-{SHORT_UUID_B} and Macro-{SHORT_UUID_C}"
+        "fixes MACRO-{SHORT_UUID_A} and also macro-{SHORT_UUID_B} and Rox-{SHORT_UUID_C}"
     );
     let ids = RoxTaskId::extract_from_text(&text);
     assert_eq!(ids.len(), 3);

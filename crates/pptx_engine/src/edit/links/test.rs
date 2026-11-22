@@ -132,17 +132,17 @@ fn shapes_take_links_of_their_own() {
         let s = &outline.shapes[0];
         (s.link.clone(), s.link_tip.clone())
     };
-    set(&mut pres, "https://rox.one", Some("Macro"));
+    set(&mut pres, "https://rox.one", Some("Rox"));
     assert_eq!(
         shape_link(&mut pres),
-        (Some("https://rox.one".into()), Some("Macro".into()))
+        (Some("https://rox.one".into()), Some("Rox".into()))
     );
     // The text itself is not linked.
     assert_eq!(run_link(&mut pres), (None, None));
     let mut reopened = Presentation::open(pres.save().unwrap()).unwrap();
     assert_eq!(
         shape_link(&mut reopened),
-        (Some("https://rox.one".into()), Some("Macro".into()))
+        (Some("https://rox.one".into()), Some("Rox".into()))
     );
     set(&mut reopened, "#lastslide", None);
     assert_eq!(shape_link(&mut reopened), (Some("#lastslide".into()), None));

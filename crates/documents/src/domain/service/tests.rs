@@ -3947,7 +3947,7 @@ async fn appearance_rejects_non_markdown_and_special_document_types() {
 async fn appearance_validates_before_persistence() {
     let service = make_test_service(make_mock_repo());
     let invalid = model_entity::EntityAppearance {
-        icon: Some(model_entity::AppearanceIcon::Macro {
+        icon: Some(model_entity::AppearanceIcon::Rox {
             name: "invalid-icon".into(),
         }),
         color: None,

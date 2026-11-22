@@ -14,7 +14,7 @@ async fn entries_list_referencing_rows_from_visible_live_pipelines(pool: PgPool)
     let teammate = format!("macro|entries-{}@rox.one", Uuid::now_v7());
     let teammate_id = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$2)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1,$2,$2,$2)",
         teammate_id,
         teammate
     )

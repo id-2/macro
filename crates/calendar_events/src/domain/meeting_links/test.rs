@@ -806,9 +806,9 @@ fn stripping_takes_back_the_join_line_and_a_call_only_location() {
 #[test]
 fn a_join_line_written_before_the_rename_is_still_stripped() {
     for text in [
-        format!("Agenda\nJoin Macro call: [{URL}]"),
-        format!("Agenda\nJoin Macro call: {URL}"),
-        "Agenda\nJoin Macro call".to_string(),
+        format!("Agenda\nJoin Rox call: [{URL}]"),
+        format!("Agenda\nJoin Rox call: {URL}"),
+        "Agenda\nJoin Rox call".to_string(),
     ] {
         let (description, location) = strip_rox_call(&text, URL, URL);
         assert_eq!(description, "Agenda", "{text}");

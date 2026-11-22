@@ -9,6 +9,15 @@ pub struct CalendarProviders<G, O> {
     /// Microsoft Graph adapter.
     pub outlook: O,
 }
+
+/// A local calendar has no provider behind it: reaching one is a defect, so
+/// it is refused permanently rather than retried.
+fn no_local_provider() -> CalendarProviderError {
+    CalendarProviderError::new(
+        CalendarProviderErrorKind::Permanent,
+        "a local calendar has no external calendar provider",
+    )
+}
 impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationProvider
     for CalendarProviders<G, O>
 {
@@ -23,6 +32,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
             CalendarProvider::Outlook => {
                 self.outlook.delete_created_event(token, target, key).await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn create_event(
@@ -36,6 +46,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
             CalendarProvider::Outlook => {
                 self.outlook.create_event(access_token, target, draft).await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn update_event(
@@ -56,6 +67,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     .update_event(access_token, target, provider_event_id, patch)
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn refresh_event(
@@ -75,6 +87,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     .refresh_event(access_token, target, master_provider_event_id)
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn update_event_instance(
@@ -108,6 +121,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     )
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn delete_event(
@@ -127,6 +141,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     .delete_event(access_token, target, provider_event_id)
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn delete_event_instance(
@@ -157,6 +172,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     )
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn truncate_recurring_event(
@@ -187,6 +203,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     )
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn rsvp_event(
@@ -223,6 +240,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     )
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn add_attendees(
@@ -259,6 +277,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     )
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn import_event(
@@ -276,6 +295,7 @@ impl<G: CalendarMutationProvider, O: CalendarMutationProvider> CalendarMutationP
                     .import_event(access_token, target, source)
                     .await
             }
+            CalendarProvider::Rox => Err(no_local_provider()),
         }
     }
     async fn stop_watch_channel(

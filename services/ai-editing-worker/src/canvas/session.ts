@@ -80,7 +80,7 @@ export async function withCanvasSession<T>(
   source: CanvasSource,
   signal: AbortSignal,
   run: (session: CanvasSession) => Promise<T>,
-  editorName = 'Macro',
+  editorName = 'Rox',
   artifacts = false
 ): Promise<T> {
   const manager = new LoroManager(schema({}), {

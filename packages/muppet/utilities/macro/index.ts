@@ -8,7 +8,7 @@
  *     const online = stayOnline({ apiKey });
  *     behavior().use(chat({ macro }))
  */
-import { Macro } from '@rox-one/sdk';
+import { Rox } from '@rox-one/sdk';
 
 /** Rox's connection gateway, which presence is a socket to. */
 export const gateway = 'wss://gateway.rox.one/connection-gateway/';
@@ -18,11 +18,11 @@ export const macroClient = ({
   apiKey,
 }: {
   readonly apiKey: () => Promise<string>;
-}): (() => Promise<Macro>) => {
-  let client: Promise<Macro> | undefined;
+}): (() => Promise<Rox>) => {
+  let client: Promise<Rox> | undefined;
   return () => {
     client ??= apiKey()
-      .then((key) => new Macro({ auth: { type: 'user', apiKey: key } }))
+      .then((key) => new Rox({ auth: { type: 'user', apiKey: key } }))
       .catch((error: unknown) => {
         client = undefined;
         throw error;

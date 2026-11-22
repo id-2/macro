@@ -29,7 +29,7 @@ pub enum GitCredentialRejection {
     /// Nothing presented: challenge so git asks for credentials.
     Missing,
     /// A Rox credential failed.
-    Macro(RoxAuthorizationRejection),
+    Rox(RoxAuthorizationRejection),
 }
 
 impl IntoResponse for GitCredentialRejection {
@@ -41,7 +41,7 @@ impl IntoResponse for GitCredentialRejection {
                 "authentication required\n",
             )
                 .into_response(),
-            GitCredentialRejection::Macro(rejection) => rejection.into_response(),
+            GitCredentialRejection::Rox(rejection) => rejection.into_response(),
         }
     }
 }
@@ -68,7 +68,7 @@ where
         let user =
             OptionalMacroAuthorizationExtractor::<Auth, UserOnly>::from_request_parts(parts, state)
                 .await
-                .map_err(GitCredentialRejection::Macro)?
+                .map_err(GitCredentialRejection::Rox)?
                 .authorization
                 .ok_or(GitCredentialRejection::Missing)?;
 

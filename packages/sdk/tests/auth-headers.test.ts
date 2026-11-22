@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 import { requestAuthHeaders } from '../src/utils/client';
 
 describe('requestAuthHeaders', () => {
@@ -58,7 +58,7 @@ describe('requestedAs', () => {
   test('throws at construction for a user apiKey', () => {
     expect(
       () =>
-        new Macro({
+        new Rox({
           auth: { type: 'user', apiKey: 'mak_abc' },
           requestedAs: 'macro|w@x.com',
         }),

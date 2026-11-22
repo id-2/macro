@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -37,7 +37,7 @@ test('person search makes one ranked server search and keeps its order', async (
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     auth: { type: 'user', apiKey: 'mak_test' },
     hosts: { contacts: 'https://contacts.test', auth: 'https://auth.test' },
   });
@@ -73,7 +73,7 @@ test('person search failures propagate and a blank query is refused', async () =
     async () => Response.json(null, { status }),
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     auth: { type: 'user', apiKey: 'mak_test' },
     hosts: { contacts: 'https://contacts.test' },
   });

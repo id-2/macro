@@ -8,7 +8,7 @@ const MAILBOX_EMAIL: &str = "support@external.test";
 async fn insert_user(pool: &Pool<Postgres>, rox_id: &str, email: &str) {
     let rox_uuid = Uuid::new_v4();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $3, $4)"#,
         rox_uuid,
         rox_id,
@@ -74,7 +74,7 @@ async fn promote_dedups_to_single_link_with_two_edges(pool: Pool<Postgres>) -> a
 
     // is_primary is generated as `link.email == rox_id's email`. The minted rox_id
     // embeds the mailbox email, so the promoted mailbox is a real shared user, not inbox-only.
-    // The returned fusion id is the minted macro_user.id, which grant relocation reuses as
+    // The returned fusion id is the minted rox_user.id, which grant relocation reuses as
     // the FusionAuth stub's id.
     let mailbox_user = sqlx::query!(
         r#"SELECT email, rox_user_id FROM "User" WHERE id = $1"#,
@@ -235,7 +235,7 @@ async fn promote_marks_mailbox_and_teardown_removes_everything(
     let deleted = delete_promoted_mailbox_user(&mut conn, &mailbox_rox_id).await?;
     assert_eq!(deleted, Some(promoted.mailbox_fusion_id));
 
-    // The minted User, its macro_user, the marker, and both edges are gone.
+    // The minted User, its rox_user, the marker, and both edges are gone.
     let user = sqlx::query!(r#"SELECT id FROM "User" WHERE id = $1"#, mailbox_rox_id)
         .fetch_optional(&pool)
         .await?;

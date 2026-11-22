@@ -8,7 +8,7 @@ a failed load returns `Err`, leaving fallback policy to the caller.
 ```rust
 use feature_flags::{FeatureFlags, FlagSnapshot, FlagValue};
 use feature_flags::outbound::fake::FakeFeatureFlags;
-use rox_user_id::user_id::RoxUserIdStr;
+use macro_user_id::user_id::RoxUserIdStr;
 
 # async fn example() -> Result<(), rootcause::Report> {
 let user_id = RoxUserIdStr::parse_from_str("macro|person@example.com")?;

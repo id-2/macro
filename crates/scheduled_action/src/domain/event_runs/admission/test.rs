@@ -233,7 +233,7 @@ fn failed_ci_routine() -> EventActionConfiguration {
             "github": {
                 "events": ["workflow_run"],
                 "actions": ["completed"],
-                "repositories": ["Macro-Inc/macro"],
+                "repositories": ["Rox-Inc/macro"],
             },
             "match": [
                 { "path": ["workflow_run", "name"], "equals": "CI" },

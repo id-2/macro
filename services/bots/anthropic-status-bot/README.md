@@ -20,7 +20,7 @@ Statuspage webhook ──POST──> /webhook/{WEBHOOK_SECRET}
 ```
 
 Channel delivery uses the [Rox SDK](../../../packages/sdk)
-(`Macro._client.storage.postChannelBotWebhook`) with bot auth
+(`Rox._client.storage.postChannelBotWebhook`) with bot auth
 (`x-rox-bot-token`, user scope) — the endpoint's preferred auth. The bot
 must be a participant of `CHANNEL_ID`.
 

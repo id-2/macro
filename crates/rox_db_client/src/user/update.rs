@@ -1,4 +1,4 @@
-pub async fn upsert_macro_user_id(
+pub async fn upsert_rox_user_id(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     user_id: &str,
     rox_user_id: &str,
@@ -30,7 +30,7 @@ struct UserProfileInfo {
     pub profile_picture_hash: Option<String>,
 }
 
-pub async fn migrate_macro_user_info(
+pub async fn migrate_rox_user_info(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     fusionauth_user_id: &str,
     user_id: &str,

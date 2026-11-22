@@ -31,7 +31,7 @@ import {
   placePrefix,
 } from './config.ts';
 import { JoinInput } from './join.ts';
-import { type CallApi, refusalOfExit } from './rox.ts';
+import { type CallApi, refusalOfExit } from './macro.ts';
 import type { Asks, NewAskRow, NewPlaceRow, Placed } from './types.ts';
 
 /** How often the world is read when nothing wakes the watcher sooner. */

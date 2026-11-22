@@ -1,5 +1,5 @@
 import type { Env } from '../../../../packages/sdk/src/config';
-import { Macro } from '../../../../packages/sdk/src/macro';
+import { Rox } from '../../../../packages/sdk/src/macro';
 import { unwrap } from '../../../../packages/sdk/src/utils';
 
 export type ChannelConfig = {
@@ -18,7 +18,7 @@ export type ChannelBroadcaster = (content: string) => Promise<void>;
 export function createChannelBroadcaster(
   config: ChannelConfig
 ): ChannelBroadcaster {
-  const macro = new Macro({
+  const macro = new Rox({
     env: config.env,
     auth: { type: 'bot', token: config.botToken, scope: 'team' },
     hosts: config.storageUrl ? { storage: config.storageUrl } : undefined,

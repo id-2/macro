@@ -193,7 +193,7 @@ impl McpCredentials for SpyCredentials {
         let slug = match destination {
             McpDestination::Connected(slug) => slug.clone(),
             McpDestination::Preview => unreachable!("preview must never resolve owner credentials"),
-            McpDestination::Macro => McpServerSlug::parse("macro").expect("slug"),
+            McpDestination::Rox => McpServerSlug::parse("macro").expect("slug"),
             // Recorded under a fixed name: the key is a digest, and the
             // tests only care that the custom destination was resolved.
             McpDestination::Custom(_) => McpServerSlug::parse("custom").expect("slug"),
@@ -1225,7 +1225,7 @@ async fn a_session_without_a_repository_can_use_mcp_but_cannot_mint_git_credenti
         SpyGithubTokens::default(),
         SpyForwarder::answering(&[]),
     );
-    for target in [EgressTarget::McpServer(McpDestination::Macro), datadog()] {
+    for target in [EgressTarget::McpServer(McpDestination::Rox), datadog()] {
         service
             .proxy(
                 &SessionToken::new("token"),
@@ -1449,7 +1449,7 @@ async fn a_tool_call_to_macros_own_server_is_held_under_its_name() {
     service
         .proxy(
             &SessionToken::new("token"),
-            EgressTarget::McpServer(McpDestination::Macro),
+            EgressTarget::McpServer(McpDestination::Rox),
             json_request(TOOLS_CALL),
         )
         .await
@@ -1598,7 +1598,7 @@ async fn a_public_web_search_in_a_gated_turn_goes_straight_through() {
     service
         .proxy(
             &SessionToken::new("token"),
-            EgressTarget::McpServer(McpDestination::Macro),
+            EgressTarget::McpServer(McpDestination::Rox),
             json_request(
                 r#"{"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"WebSearch","arguments":{"input":"rust"}}}"#,
             ),

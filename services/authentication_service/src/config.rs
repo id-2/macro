@@ -236,6 +236,12 @@ pub struct Config {
     /// calendar feature isn't using yet.
     #[rox_config_default(false)]
     pub calendar_scope_enabled: bool,
+    /// Return the one-time sign-in code in `POST /login/passwordless`'s
+    /// response. Off by default: a public stand must never hand out a session
+    /// to someone who does not hold the mailbox. Local stacks without a real
+    /// inbox set `PASSWORDLESS_RETURN_CODE=true`.
+    #[rox_config_default(false)]
+    pub passwordless_return_code: bool,
 }
 
 /// Complete Microsoft OAuth credentials used to enable Outlook account linking.

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import type { Bot as BotRecord } from '../generated/storage/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 
@@ -64,8 +64,8 @@ function serve(...responses: { status: number; body?: unknown }[]): Call[] {
   return calls;
 }
 
-function macro(): Macro {
-  return new Macro({
+function macro(): Rox {
+  return new Rox({
     auth: { type: 'user', token: 'user-key' },
     hosts: { storage: 'https://storage.example.test' },
   });

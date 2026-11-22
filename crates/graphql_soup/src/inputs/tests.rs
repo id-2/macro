@@ -4,7 +4,7 @@ use models_pagination::{CursorVal, Query};
 use super::date_ranges::{GraphqlDateBucketRange, GraphqlPropertyBucketingType};
 use super::*;
 
-fn test_macro_user_id() -> RoxUserIdStr<'static> {
+fn test_rox_user_id() -> RoxUserIdStr<'static> {
     RoxUserIdStr::parse_from_str("macro|user@example.com")
         .unwrap()
         .into_owned()
@@ -21,7 +21,7 @@ fn maps_email_view_to_soup_request() {
         filters: None,
         sort_direction: None,
     }))
-    .into_request(test_macro_user_id(), vec![])
+    .into_request(test_rox_user_id(), vec![])
     .unwrap();
 
     assert_eq!(request.email_preview_view.to_string(), "sent");
@@ -38,7 +38,7 @@ fn defaults_email_view_to_inbox() {
         filters: None,
         sort_direction: None,
     }))
-    .into_request(test_macro_user_id(), vec![])
+    .into_request(test_rox_user_id(), vec![])
     .unwrap();
 
     assert_eq!(request.email_preview_view.to_string(), "inbox");
@@ -61,7 +61,7 @@ fn maps_soup_cursor_continuation() {
         email_view: Some(GraphqlEmailView::Sent),
         sort_direction: None,
     })
-    .into_request(test_macro_user_id(), vec![])
+    .into_request(test_rox_user_id(), vec![])
     .unwrap();
 
     assert_eq!(request.limit, 25);
@@ -81,7 +81,7 @@ fn maps_notified_at_to_notified_soup_request() {
         filters: None,
         sort_direction: None,
     }))
-    .into_request(test_macro_user_id(), vec![])
+    .into_request(test_rox_user_id(), vec![])
     .unwrap();
 
     assert_eq!(request.limit, 500);
@@ -105,7 +105,7 @@ fn continues_a_notified_cursor_as_a_notified_request() {
         email_view: None,
         sort_direction: None,
     })
-    .into_request(test_macro_user_id(), vec![])
+    .into_request(test_rox_user_id(), vec![])
     .unwrap();
 
     assert_eq!(request.limit, 500);
@@ -123,7 +123,7 @@ fn rejects_ascending_notified_at() {
         filters: None,
         sort_direction: Some(GraphqlSortDirection::Asc),
     }))
-    .into_request(test_macro_user_id(), vec![]);
+    .into_request(test_rox_user_id(), vec![]);
 
     assert!(result.is_err());
 }
@@ -143,7 +143,7 @@ fn rejects_grouped_notified_at() {
         sort_method: Some(GraphqlSimpleSortMethod::NotifiedAt),
         filters: None,
     }))
-    .into_request(test_macro_user_id());
+    .into_request(test_rox_user_id());
 
     assert!(result.is_err());
 }
@@ -163,7 +163,7 @@ fn maps_initial_grouped_input() {
         sort_method: Some(GraphqlSimpleSortMethod::UpdatedAt),
         filters: None,
     }))
-    .into_request(test_macro_user_id())
+    .into_request(test_rox_user_id())
     .unwrap();
 
     assert_eq!(request.limit, 42);
@@ -195,7 +195,7 @@ fn maps_grouped_cursor_continuation() {
         group_key: "document".to_owned(),
         cursor: cursor.to_string(),
     })
-    .into_request(test_macro_user_id())
+    .into_request(test_rox_user_id())
     .unwrap();
 
     assert_eq!(request.limit, 25);
@@ -288,7 +288,7 @@ fn date_range_grouping_preserves_custom_keys_and_timestamp_sorting() {
         sort_method: Some(GraphqlSimpleSortMethod::UpdatedAt),
         filters: None,
     }))
-    .into_request(test_macro_user_id())
+    .into_request(test_rox_user_id())
     .unwrap();
     assert_eq!(request.limit, 25);
     let (property, ranges) = request.grouping.field.date_ranges().unwrap();
@@ -313,7 +313,7 @@ fn property_sort_keeps_null_position_without_a_query_context() {
         filters: None,
         sort_direction: Some(GraphqlSortDirection::Asc),
     }))
-    .into_request(test_macro_user_id(), vec![])
+    .into_request(test_rox_user_id(), vec![])
     .unwrap();
     let SoupQuery::Property(query) = request.cursor else {
         panic!("expected property sort")
@@ -335,7 +335,7 @@ fn property_sort_keeps_null_position_without_a_query_context() {
         email_view: None,
         sort_direction: None,
     })
-    .into_request(test_macro_user_id(), vec![])
+    .into_request(test_rox_user_id(), vec![])
     .unwrap();
     let SoupQuery::Property(query) = continued.cursor else {
         panic!("expected property cursor")

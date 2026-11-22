@@ -27,7 +27,7 @@ mod test;
 const GITHUB_API_BASE_URL: &str = "https://api.github.com";
 /// GitHub's name in error messages users see.
 const GITHUB: &str = "GitHub";
-const USER_AGENT: &str = "Macro-Auth-Service";
+const USER_AGENT: &str = "Rox-Auth-Service";
 const REQUEST_TIMEOUT: Duration = Duration::from_secs(30);
 
 fn upstream(failure: UpstreamFailure) -> GithubError {
@@ -386,7 +386,7 @@ impl GithubOauth for GithubOauthImpl {
             .client
             .get(format!("{}/user", self.api_base_url()))
             .header("Authorization", format!("Bearer {}", access_token))
-            .header("User-Agent", "Macro-Auth-Service")
+            .header("User-Agent", "Rox-Auth-Service")
             .timeout(Duration::from_secs(30))
             .send()
             .await
@@ -418,7 +418,7 @@ impl GithubOauth for GithubOauthImpl {
                 .client
                 .get(format!("{}/user/emails", self.api_base_url()))
                 .header("Authorization", format!("Bearer {}", access_token))
-                .header("User-Agent", "Macro-Auth-Service")
+                .header("User-Agent", "Rox-Auth-Service")
                 .timeout(Duration::from_secs(30))
                 .send()
                 .await
@@ -471,7 +471,7 @@ impl GithubOauth for GithubOauthImpl {
             .client
             .get(format!("{}/user", self.api_base_url()))
             .header("Authorization", format!("Bearer {}", access_token))
-            .header("User-Agent", "Macro-Auth-Service")
+            .header("User-Agent", "Rox-Auth-Service")
             .timeout(Duration::from_secs(30))
             .send()
             .await

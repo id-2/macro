@@ -18,7 +18,7 @@ for (const arn of [secretArn, ingestSecretArn]) {
       arn
     )
   ) {
-    throw new Error('Secrets must belong to Macro in us-east-1');
+    throw new Error('Secrets must belong to Rox in us-east-1');
   }
 }
 if (!/^ami-[a-f0-9]+$/.test(amiId) || !/^subnet-[a-f0-9]+$/.test(subnetId)) {

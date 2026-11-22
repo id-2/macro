@@ -167,7 +167,7 @@ async fn insert_github_link(pool: &PgPool, rox_id: &str, github_user_id: &str) {
 
     sqlx::query(
         r#"
-        INSERT INTO public.macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO public.rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         "#,
     )
@@ -177,7 +177,7 @@ async fn insert_github_link(pool: &PgPool, rox_id: &str, github_user_id: &str) {
     .bind(format!("cus_{rox_user_id}"))
     .execute(pool)
     .await
-    .expect("macro_user row should be inserted");
+    .expect("rox_user row should be inserted");
 
     sqlx::query(
         r#"

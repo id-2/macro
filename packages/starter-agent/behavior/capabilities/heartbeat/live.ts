@@ -10,7 +10,7 @@ import { readJson, writeJson } from '../../context/disk.ts';
 import { githubToken } from '../../context/identity.ts';
 import { output } from '../../context/shell.ts';
 import type { People } from '../../contracts.ts';
-import type { Chat } from '../chat/rox.ts';
+import type { Chat } from '../chat/macro.ts';
 import { type RepositoryState, type Sources, snapshot } from './collect.ts';
 import { commit } from './commit.ts';
 import { limits, logs, settings } from './config.ts';

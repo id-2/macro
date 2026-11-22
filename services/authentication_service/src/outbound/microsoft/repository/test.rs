@@ -5,7 +5,7 @@ use rox_db_migrator::ROX_DB_MIGRATIONS;
 
 async fn owner(db: &PgPool) -> Uuid {
     let id = rox_uuid::generate_uuid_v7();
-    sqlx::query!("INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'outlook-tester', 'outlook-owner@example.com', 'cus_outlook_test')",id).execute(db).await.unwrap();
+    sqlx::query!("INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'outlook-tester', 'outlook-owner@example.com', 'cus_outlook_test')",id).execute(db).await.unwrap();
     id
 }
 
@@ -335,7 +335,7 @@ async fn deleted_owner_grants_expire_without_another_sign_in_and_teardown_grants
     sqlx::query!("INSERT INTO email_links(id,rox_id,fusionauth_user_id,email_address,provider,grant_id,grant_generation) VALUES($1,'macro|outlook-test@example.com',$2,'outlook-test@example.com','OUTLOOK',$3,2)",link,owner.to_string(),grants[1]).execute(&db).await.unwrap();
     sqlx::query!("UPDATE email_links SET grant_id=$2,grant_generation=3,is_sync_active=false,disconnect_requested_at=now() WHERE id=$1",link,grants[2]).execute(&db).await.unwrap();
     sqlx::query!("INSERT INTO email_mailbox_custodians(link_id,actor_id,fusionauth_user_id,grant_id,grant_generation,granted_scopes) VALUES($1,'macro|outlook-test@example.com',$2,$3,4,'{}')",link,owner.to_string(),grants[3]).execute(&db).await.unwrap();
-    sqlx::query!("DELETE FROM macro_user WHERE id=$1", owner)
+    sqlx::query!("DELETE FROM rox_user WHERE id=$1", owner)
         .execute(&db)
         .await
         .unwrap();

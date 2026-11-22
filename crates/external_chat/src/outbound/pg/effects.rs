@@ -29,7 +29,7 @@ impl EffectsRepository for PgExternalChatRepository {
                 revision: row.effect_revision,
                 first_publication: row.published_revision == 0 && row.content_revision == 0 && row.deleted_at.is_none(),
                 origin: match row.origin.as_str() {
-                    "macro" => Origin::Macro,
+                    "macro" => Origin::Rox,
                     "history" => Origin::History,
                     "remote" => Origin::Remote,
                     other => return Err(corrupt(format_args!("message origin {other:?}"))),

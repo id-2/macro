@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
 import type { ColumnDetail, TableDetail } from '../generated/storage/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -90,7 +90,7 @@ test('stage rules use stable handles and reject fields from another pipeline bef
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });

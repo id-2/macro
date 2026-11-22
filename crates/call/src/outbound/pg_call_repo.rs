@@ -1990,7 +1990,7 @@ impl CallRepository for PgCallRepo {
     /// same non-NULL `diarized_speaker_id`; all distinct non-NULL `voice_id`s
     /// on those rows are returned. Ambiguous, missing, or unresolved speakers
     /// are skipped. The returned `rox_user_id` is the user's canonical
-    /// `macro_user.id`, suitable for linking to `voice_id` in `rox_user_voice`.
+    /// `rox_user.id`, suitable for linking to `voice_id` in `rox_user_voice`.
     #[tracing::instrument(err, skip(self))]
     async fn get_stable_speaker_voices_for_call_record(
         &self,

@@ -64,7 +64,7 @@ async fn captured_wire_body(streaming: bool) -> Value {
     );
     let request = CompletionRequest {
         model: None,
-        preamble: Some("You are Macro.".into()),
+        preamble: Some("You are Rox.".into()),
         chat_history: rig_core::OneOrMany::many(vec![
             Message::user("Find my notes"),
             Message::assistant("Searching."),
@@ -112,7 +112,7 @@ async fn assert_cached_wire_body(streaming: bool) {
     let ephemeral = json!({"type": "ephemeral"});
     assert_eq!(body["tools"][0].get("cache_control"), None);
     assert_eq!(body["tools"][1]["cache_control"], ephemeral);
-    assert_eq!(body["system"][0]["text"], "You are Macro.");
+    assert_eq!(body["system"][0]["text"], "You are Rox.");
     assert_eq!(body["system"][0]["cache_control"], ephemeral);
     assert_eq!(body["cache_control"], ephemeral);
     assert!(

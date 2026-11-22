@@ -2367,7 +2367,7 @@ async fn pr_merged_sets_task_status_completed() {
 }
 
 #[tokio::test]
-async fn pr_merged_credits_the_linked_macro_user_who_merged() {
+async fn pr_merged_credits_the_linked_rox_user_who_merged() {
     let (service, doc_service) = make_sync_service_with_repo_and_doc_service(
         StubSyncRepo::new().with_github_link("333", "macro|merger@example.com"),
     );
@@ -3060,7 +3060,7 @@ async fn github_pr_status_changed_user_source_does_not_notify_nonparticipant() {
 }
 
 #[tokio::test]
-async fn github_pr_status_changed_does_not_notify_any_macro_user_linked_to_actor() {
+async fn github_pr_status_changed_does_not_notify_any_rox_user_linked_to_actor() {
     let team_id: uuid::Uuid = "dddddddd-dddd-dddd-dddd-dddddddddddd".parse().unwrap();
     let repo = StubSyncRepo::new()
         .with_installation_sources("12345", vec![GithubAppInstallationSource::Team(team_id)])
@@ -4702,7 +4702,7 @@ async fn review_requested_notifies_only_mapped_reviewer_in_team() {
 }
 
 #[tokio::test]
-async fn review_requested_fans_out_to_all_macro_users_sharing_reviewer_github_account() {
+async fn review_requested_fans_out_to_all_rox_users_sharing_reviewer_github_account() {
     // The requested reviewer's GitHub account (id 333) is shared by two Rox
     // users, both of whom are members of the source team. The notification
     // should fan out to both of them.

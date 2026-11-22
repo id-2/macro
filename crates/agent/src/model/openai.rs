@@ -55,10 +55,12 @@ impl<'a, H: HttpClientExt + Clone + Default + std::fmt::Debug + 'static>
     /// Unlike the Responses API, the Chat Completions API does not coerce tools
     /// into a strict subset, so tools are already sent verbatim.
     pub fn completion(&self) -> CompatibleCompletionModel<H> {
-        CompatibleCompletionModel(
-            self.client
+        CompatibleCompletionModel {
+            model: self
+                .client
                 .completion_model(completion_model_id(&self.model)),
-        )
+            strip_reasoning: self.model.provider() == "groq",
+        }
     }
 
     /// Best-effort reasoning config, flattened into the request by rig, or
@@ -106,10 +108,25 @@ impl<'a, H: HttpClientExt + Clone + Default + std::fmt::Debug + 'static>
 /// result metadata and explain the unsupported transport instead of failing
 /// the next turn or sending encoded pixels as text, including on history replay.
 #[derive(Clone)]
-pub struct CompatibleCompletionModel<H>(openai::completion::CompletionModel<H>);
+pub struct CompatibleCompletionModel<H> {
+    model: openai::completion::CompletionModel<H>,
+    /// Drop assistant reasoning blocks from the request history.
+    ///
+    /// Groq rejects `reasoning_content` on assistant messages with a 400
+    /// (`property 'reasoning_content' is unsupported`), so the second and
+    /// later turns of a tool loop would fail. llama.cpp/DeepSeek-style servers
+    /// instead require the reasoning they emitted to be echoed back, so this
+    /// is set only for providers known to reject it.
+    strip_reasoning: bool,
+}
 
-fn compatible_media(mut request: CompletionRequest) -> CompletionRequest {
-    use rig_core::message::{Message, ToolResultContent, UserContent};
+/// Adapt a request to what an OpenAI-compatible Chat Completions endpoint
+/// accepts: tool images become a note (no endpoint carries them), and, when
+/// `strip_reasoning` is set, assistant reasoning blocks are removed while the
+/// text and tool calls of the same turn stay intact.
+fn compatible_request(mut request: CompletionRequest, strip_reasoning: bool) -> CompletionRequest {
+    use rig_core::OneOrMany;
+    use rig_core::message::{AssistantContent, Message, ToolResultContent, UserContent};
     for message in request.chat_history.iter_mut() {
         if let Message::User { content } = message {
             for part in content.iter_mut() {
@@ -125,6 +142,34 @@ fn compatible_media(mut request: CompletionRequest) -> CompletionRequest {
             }
         }
     }
+    if !strip_reasoning {
+        return request;
+    }
+    // A turn that was only reasoning has nothing left to send; dropping it
+    // keeps the tool call and its result paired.
+    let messages: Vec<Message> = request
+        .chat_history
+        .iter()
+        .filter_map(|message| match message {
+            Message::Assistant { id, content } => {
+                let content: Vec<AssistantContent> = content
+                    .iter()
+                    .filter(|part| !matches!(part, AssistantContent::Reasoning(_)))
+                    .cloned()
+                    .collect();
+                OneOrMany::many(content)
+                    .ok()
+                    .map(|content| Message::Assistant {
+                        id: id.clone(),
+                        content,
+                    })
+            }
+            other => Some(other.clone()),
+        })
+        .collect();
+    if let Ok(history) = OneOrMany::many(messages) {
+        request.chat_history = history;
+    }
     request
 }
 
@@ -136,22 +181,31 @@ impl<H: HttpClientExt + Clone + Default + std::fmt::Debug + 'static> CompletionM
         <openai::completion::CompletionModel<H> as CompletionModel>::StreamingResponse;
     type Client = openai::CompletionsClient<H>;
     fn make(client: &Self::Client, model: impl Into<String>) -> Self {
-        Self(openai::completion::CompletionModel::make(client, model))
+        // `make` has no routed id, so no provider is known here; every model
+        // the router builds goes through `completion()` instead.
+        Self {
+            model: openai::completion::CompletionModel::make(client, model),
+            strip_reasoning: false,
+        }
     }
     async fn completion(
         &self,
         request: CompletionRequest,
     ) -> Result<CompletionResponse<Self::Response>, CompletionError> {
-        self.0.completion(compatible_media(request)).await
+        self.model
+            .completion(compatible_request(request, self.strip_reasoning))
+            .await
     }
     async fn stream(
         &self,
         request: CompletionRequest,
     ) -> Result<StreamingCompletionResponse<Self::StreamingResponse>, CompletionError> {
-        self.0.stream(compatible_media(request)).await
+        self.model
+            .stream(compatible_request(request, self.strip_reasoning))
+            .await
     }
     fn composes_native_output_with_tools(&self) -> bool {
-        self.0.composes_native_output_with_tools()
+        self.model.composes_native_output_with_tools()
     }
 }
 

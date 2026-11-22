@@ -125,7 +125,7 @@ pub enum InboxActor {
         name: String,
     },
     /// Rox itself: reminders and AI chat responses.
-    Macro,
+    Rox,
 }
 
 /// What the viewer can do from a row. Kinds are added with the row types

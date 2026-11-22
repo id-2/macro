@@ -51,7 +51,7 @@ fn mention_preview_items_serialize_the_preview_contract() {
             viewer_event_id: Some(event_id),
             viewer_copy: Some(crate::domain::models::CalendarMentionViewerCopy::Snapshot),
             viewer_calendar_ids: Vec::new(),
-            title: "Smart Macro Discussion".to_string(),
+            title: "Smart Rox Discussion".to_string(),
             description: Some("Agenda: <b>roadmap</b>".to_string()),
             time: crate::domain::models::EventTime::Timed {
                 starts_at,
@@ -88,7 +88,7 @@ fn mention_preview_items_serialize_the_preview_contract() {
     assert_eq!(json["type"], "access");
     assert!(json["event"]["viewerEventId"].is_null());
     assert!(json["event"].get("viewerCopy").is_none());
-    assert_eq!(json["event"]["title"], "Smart Macro Discussion");
+    assert_eq!(json["event"]["title"], "Smart Rox Discussion");
 
     let no_access = CalendarMentionPreviewItem {
         event_id,

@@ -97,7 +97,7 @@ pub async fn handler(
     }
 
     // get the user's rox_user_id through their email
-    let to_merge_macro_user_id =
+    let to_merge_rox_user_id =
         rox_db_client::user::get::get_user_rox_id_by_email(&ctx.db, &req.email)
             .await
             .map_err(|e| {
@@ -115,7 +115,7 @@ pub async fn handler(
     let code = rox_db_client::account_merge_request::create_account_merge_request(
         &ctx.db,
         &user_context.fusion_user_id,
-        &to_merge_macro_user_id,
+        &to_merge_rox_user_id,
     )
     .await
     .map_err(|e| {

@@ -256,7 +256,7 @@ const MODEL_LINE: &str = "\n\nYou are the anthropic/claude-opus-4-8 model. If th
 
 fn split_prompt(task: &str) -> SystemPrompt {
     SystemPrompt::split(
-        "# Identity\nYou are Macro.\n",
+        "# Identity\nYou are Rox.\n",
         format!("\n<session_instructions>\n{task}\n</session_instructions>"),
     )
 }
@@ -305,7 +305,7 @@ async fn loading_a_tool_keeps_every_request_prefix() {
         },
     ]);
     let system = json!([
-        {"type": "text", "text": "# Identity\nYou are Macro.\n", "cache_control": {"type": "ephemeral"}},
+        {"type": "text", "text": "# Identity\nYou are Rox.\n", "cache_control": {"type": "ephemeral"}},
         {
             "type": "text",
             "text": format!("\n<session_instructions>\ntask A\n</session_instructions>{MODEL_LINE}"),
@@ -355,7 +355,7 @@ async fn sessions_with_different_instructions_share_the_shared_system_block() {
     assert_eq!(first[0]["tools"], second[0]["tools"]);
     let shared = json!({
         "type": "text",
-        "text": "# Identity\nYou are Macro.\n",
+        "text": "# Identity\nYou are Rox.\n",
         "cache_control": {"type": "ephemeral"},
     });
     assert_eq!(first[0]["system"][0], shared);
@@ -535,7 +535,7 @@ async fn other_providers_receive_the_prompt_joined_as_before() {
     let (joined_bodies, _) = run_session(
         &joined,
         "openai/gpt-5.5",
-        "# Identity\nYou are Macro.\n\n<session_instructions>\ntask A\n</session_instructions>",
+        "# Identity\nYou are Rox.\n\n<session_instructions>\ntask A\n</session_instructions>",
         "hi",
     )
     .await;

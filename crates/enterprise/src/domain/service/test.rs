@@ -21,7 +21,7 @@ struct FakeRepo(Arc<Mutex<State>>);
 impl EnterpriseRepository for FakeRepo {
     async fn bind_verified(
         &self,
-        _macro_user_id: &RoxUserIdStr<'_>,
+        _rox_user_id: &RoxUserIdStr<'_>,
         identity: VerifiedRoxIdentity,
     ) -> Result<()> {
         self.0.lock().unwrap().bindings.push(identity);

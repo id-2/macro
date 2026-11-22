@@ -8,7 +8,7 @@ const generatedEntries = [...new Glob('generated/*/index.ts').scanSync('.')];
 await rm('dist', { recursive: true, force: true });
 
 await build({
-  entryPoints: ['src/rox.ts', ...generatedEntries],
+  entryPoints: ['src/macro.ts', ...generatedEntries],
   bundle: true,
   format: 'esm',
   splitting: true,

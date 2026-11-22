@@ -204,7 +204,7 @@ async fn the_rox_route_names_macros_own_server() {
         egress.seen(),
         vec![(
             "session-token".to_owned(),
-            EgressTarget::McpServer(McpDestination::Macro)
+            EgressTarget::McpServer(McpDestination::Rox)
         )]
     );
 }

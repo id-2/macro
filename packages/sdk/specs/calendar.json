@@ -2415,7 +2415,7 @@
           },
           "emailReminders": {
             "type": "boolean",
-            "description": "Whether email reminders are delivered by the provider or Macro."
+            "description": "Whether email reminders are delivered by the provider or Rox."
           },
           "guestPolicy": {
             "type": "boolean",
@@ -3055,7 +3055,7 @@
         "properties": {
           "method": {
             "type": "string",
-            "description": "Provider method, stored verbatim; only `popup` fires Macro\nnotifications."
+            "description": "Provider method, stored verbatim; only `popup` fires Rox\nnotifications."
           },
           "minutes": {
             "type": "integer",

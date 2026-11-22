@@ -9,7 +9,7 @@ pub(crate) async fn folder_fixture(pool: PgPool) -> (PgRepository, Actor, Record
             .expect("fixture")
             .into_owned(),
     };
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'folder@example.test','folder@example.test',$2)",account,format!("fixture-{account}"))
+    sqlx::query!("INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES($1,'folder@example.test','folder@example.test',$2)",account,format!("fixture-{account}"))
         .execute(&pool).await.expect("account");
     sqlx::query!(
         r#"INSERT INTO "User"(id,email,rox_user_id) VALUES($1,'folder@example.test',$2)"#,
@@ -77,7 +77,7 @@ pub(crate) async fn another_team(pool: &PgPool) -> (TeamId, Actor) {
             .expect("fixture")
             .into_owned(),
     };
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'other-folder@example.test','other-folder@example.test',$2)",account,format!("fixture-{account}"))
+    sqlx::query!("INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES($1,'other-folder@example.test','other-folder@example.test',$2)",account,format!("fixture-{account}"))
         .execute(pool).await.expect("other account");
     sqlx::query!(
         r#"INSERT INTO "User"(id,email,rox_user_id) VALUES($1,'other-folder@example.test',$2)"#,

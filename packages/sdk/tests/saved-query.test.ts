@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
 import { DatabaseTable } from '../src/entities/databases/table';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 import { RoxApiError, RoxError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
@@ -35,7 +35,7 @@ function serve(answer: (request: Request) => Response) {
 }
 
 const macro = () =>
-  new Macro({ token: 'token', hosts: { storage: 'https://storage.test' } });
+  new Rox({ token: 'token', hosts: { storage: 'https://storage.test' } });
 
 test('saveQuery saves the SQL with its chart columns and returns the live block', async () => {
   const requests = serve(() => Response.json(saved, { status: 201 }));

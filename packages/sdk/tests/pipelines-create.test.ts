@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -45,7 +45,7 @@ test('create sends stages and fields in one call and returns the pipeline', asyn
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });

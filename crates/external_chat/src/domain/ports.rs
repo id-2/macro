@@ -230,7 +230,7 @@ pub enum Origin {
     /// Someone at the provider: a person's phone or app.
     Remote,
     /// A deliberate send from Rox.
-    Macro,
+    Rox,
     /// Earlier messages imported after adding the chat.
     History,
 }

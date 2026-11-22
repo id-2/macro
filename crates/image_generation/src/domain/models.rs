@@ -221,7 +221,7 @@ impl GenerateImageError {
                 "the image was saved but its channel markup could not be composed".to_string()
             }
             Self::Storage(_) => {
-                "the image was generated but could not be saved to Macro".to_string()
+                "the image was generated but could not be saved to Rox".to_string()
             }
             Self::Admission(error) => error.to_string(),
             Self::UserRequired => self.to_string(),

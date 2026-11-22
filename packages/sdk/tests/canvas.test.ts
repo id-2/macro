@@ -5,7 +5,7 @@ import {
   CanvasRevisionConflictError,
   DocumentEditRefusedError,
   EditOutcomeUnknownError,
-  Macro,
+  Rox,
   StaticImage,
 } from '../src/macro';
 
@@ -15,7 +15,7 @@ afterEach(() => {
 });
 
 const macro = () =>
-  new Macro({
+  new Rox({
     token: 'test-user-token',
     hosts: {
       storage: 'https://storage.example.test',

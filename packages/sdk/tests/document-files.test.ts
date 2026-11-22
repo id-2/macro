@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -9,7 +9,7 @@ afterEach(() => {
 const STORAGE = 'https://storage.example.test';
 
 const macro = () =>
-  new Macro({ token: 'test-user-token', hosts: { storage: STORAGE } });
+  new Rox({ token: 'test-user-token', hosts: { storage: STORAGE } });
 
 function recordRequests(respond: (request: Request) => Response): Request[] {
   const requests: Request[] = [];

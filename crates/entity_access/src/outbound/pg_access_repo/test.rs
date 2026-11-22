@@ -475,7 +475,7 @@ async fn insert_pg_user(pool: &PgPool, user_id: &str, email: &str) -> anyhow::Re
     let rox_user_id = Uuid::new_v4();
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $2)
         "#,
         rox_user_id,
@@ -1205,7 +1205,7 @@ const REMINDER_STRANGER: &str = "macro|reminder-stranger@example.com";
 async fn insert_reminder_user(pool: &PgPool, id: &str) -> anyhow::Result<()> {
     let rox_user_id = Uuid::new_v4();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $2, $2)"#,
         rox_user_id,
         id,

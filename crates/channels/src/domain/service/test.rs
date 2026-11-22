@@ -851,7 +851,7 @@ async fn create_system_channel_event_uses_system_actor() {
     svc.create_system_channel(
         rox_id("macro|owner@test.com"),
         crate::domain::models::CreateChannelRequest {
-            name: Some("Macro Support x owner".to_string()),
+            name: Some("Rox Support x owner".to_string()),
             channel_type: ChannelType::Private,
             team_id: None,
             auto_join_team: false,
@@ -871,7 +871,7 @@ async fn create_system_channel_event_uses_system_actor() {
             ..
         }] if actor == &Sender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID)
             && owner.as_ref() == "macro|owner@test.com"
-            && name == "Macro Support x owner"
+            && name == "Rox Support x owner"
     ));
 }
 
@@ -923,7 +923,7 @@ async fn signup_support_channel_via_user_create_channel_attributes_created_to_ow
         sender("macro|owner@test.com"),
         None,
         crate::domain::models::CreateChannelRequest {
-            name: Some("Macro Support x owner".to_string()),
+            name: Some("Rox Support x owner".to_string()),
             channel_type: ChannelType::Private,
             team_id: None,
             auto_join_team: false,
@@ -938,7 +938,7 @@ async fn signup_support_channel_via_user_create_channel_attributes_created_to_ow
         events.as_slice(),
         [ChannelEvent::ChannelCreated { actor, channel_name: Some(name), .. }]
             if actor == &sender("macro|owner@test.com")
-                && name == "Macro Support x owner"
+                && name == "Rox Support x owner"
     ));
 }
 

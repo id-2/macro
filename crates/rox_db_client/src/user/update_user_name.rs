@@ -49,7 +49,7 @@ mod tests {
         let orig_first = "Alice".to_string();
         let orig_last = "Smith".to_string();
         sqlx::query!(
-            r#"INSERT INTO macro_user (id, stripe_customer_id, username, email) VALUES ($1, 'bogus', 'username', 'bogus')"#,
+            r#"INSERT INTO rox_user (id, stripe_customer_id, username, email) VALUES ($1, 'bogus', 'username', 'bogus')"#,
             &user_id,
         )
         .execute(&pool)

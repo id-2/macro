@@ -207,7 +207,7 @@ async fn hidden_sessions_leave_the_allowlist_unless_named(pool: PgPool) {
     let viewer = "macro|agent-session-list-viewer@example.com";
     let rox_user_id = uuid::Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
         rox_user_id,
         viewer,
     )

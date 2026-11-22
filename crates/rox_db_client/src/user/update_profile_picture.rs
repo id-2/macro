@@ -40,12 +40,12 @@ pub async fn get_profile_pictures(
         return Ok(ProfilePictures::default());
     }
 
-    let macro_user_id_list: Vec<(String, uuid::Uuid)> = sqlx::query!(
+    let rox_user_id_list: Vec<(String, uuid::Uuid)> = sqlx::query!(
         r#"
         SELECT 
             u.id as user_profile_id, 
             mu.id as rox_user_id
-        FROM macro_user mu
+        FROM rox_user mu
         JOIN "User" u ON mu.id = u.rox_user_id
         WHERE u.id = ANY($1)
         "#,
@@ -55,19 +55,19 @@ pub async fn get_profile_pictures(
     .fetch_all(db)
     .await?;
 
-    let macro_user_id_list: HashMap<uuid::Uuid, String> = macro_user_id_list
+    let rox_user_id_list: HashMap<uuid::Uuid, String> = rox_user_id_list
         .into_iter()
         .map(|(id, rox_user_id)| (rox_user_id, id))
         .collect();
 
-    let macro_user_ids: Vec<uuid::Uuid> = macro_user_id_list.keys().copied().collect();
+    let rox_user_ids: Vec<uuid::Uuid> = rox_user_id_list.keys().copied().collect();
 
     let pictures: Vec<(uuid::Uuid, String, Option<String>)> = sqlx::query!(
         r#"
         SELECT rox_user_id, profile_picture as "profile_picture!", profile_picture_hash FROM rox_user_info
         WHERE rox_user_id = ANY($1) and profile_picture IS NOT NULL
         "#,
-        &macro_user_ids
+        &rox_user_ids
     )
     .map(|row| (row.rox_user_id, row.profile_picture, row.profile_picture_hash))
     .fetch_all(db)
@@ -76,7 +76,7 @@ pub async fn get_profile_pictures(
     let result: Vec<UserProfilePicture> = pictures
         .into_iter()
         .filter_map(|(rox_user_id, url, checksum)| {
-            macro_user_id_list
+            rox_user_id_list
             .get(&rox_user_id)
             .map(|user_id| UserProfilePicture {
                 id: user_id.to_string(),

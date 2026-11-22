@@ -10,13 +10,13 @@ across scripts and applications; Rox checks permissions on every request.
 
 ## Quick start
 
-Install the SDK with `npm install @rox-one/sdk`. Create an API key in Macro's
+Install the SDK with `npm install @rox-one/sdk`. Create an API key in Rox's
 **Settings → API Keys**, then set `ROX_API_KEY` in your script's environment.
 
 ```ts
-import { Macro } from '@rox-one/sdk';
+import { Rox } from '@rox-one/sdk';
 
-const macro = new Macro({});
+const macro = new Rox({});
 
 // Find a document and read its text. Stop after the first match.
 for await (const document of macro.documents.search('weekly update')) {
@@ -35,7 +35,7 @@ sent to your address. Rox then shows your SDK token once. Set it as
 `ROX_API_KEY`, then introduce yourself:
 
 ```ts
-const macro = new Macro({});
+const macro = new Rox({});
 
 const image = await macro.me.uploadProfilePicture(bytes, {
   fileName: 'avatar.png',

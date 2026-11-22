@@ -1,5 +1,5 @@
 {
-  description = "Macro observability EC2 image";
+  description = "Rox observability EC2 image";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
 
   outputs =

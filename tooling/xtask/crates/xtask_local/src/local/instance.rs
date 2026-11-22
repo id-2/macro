@@ -1,17 +1,17 @@
 //! Per-instance isolation: names, networks, volumes, and host ports.
 //!
-//! The default instance is named `macro` and keeps the exact resource names
-//! and host ports the repo uses today, so existing worktrees and muscle memory
-//! are untouched. A named instance (`--instance agent-a`) derives a disjoint
-//! set of project name, networks, and volumes. Its port window and Docker
-//! subnet come from [`super::allocator`], so concurrent stacks can't collide.
+//! The default instance is named `rox` and owns the plain `rox` Compose
+//! project and the fixed host ports. A named instance (`--instance agent-a`)
+//! derives a disjoint set of project name, networks, and volumes. Its port
+//! window and Docker subnet come from [`super::allocator`], so concurrent
+//! stacks can't collide.
 
 use anyhow::{Context, Result, bail};
 pub use xtask_ports::Port;
 
 use super::{allocator, repo_root};
 
-/// The reserved default instance name. Maps to today's frozen `macro` Compose
+/// The reserved default instance name. Maps to the frozen `rox` Compose
 /// project and the fixed base ports.
 pub const DEFAULT_NAME: &str = xtask_ports::DEFAULT_INSTANCE;
 
@@ -85,7 +85,7 @@ impl Instance {
         let project_name = if name.as_str() == DEFAULT_NAME {
             DEFAULT_NAME.to_string()
         } else {
-            format!("macro-{}", name.0)
+            format!("rox-{}", name.0)
         };
         let port_base = port_base.unwrap_or_else(|| xtask_ports::hashed_window(name.as_str()));
         Ok(Instance {
@@ -173,19 +173,19 @@ impl Instance {
     }
 
     pub fn volume_postgres(&self) -> String {
-        self.suffixed_underscore("rox_postgres_data")
+        self.project_volume("postgres_data")
     }
 
     pub fn volume_redis(&self) -> String {
-        self.suffixed_underscore("rox_redis_data")
+        self.project_volume("redis_data")
     }
 
     pub fn volume_opensearch(&self) -> String {
-        self.suffixed_underscore("rox_opensearch_data")
+        self.project_volume("opensearch_data")
     }
 
     pub fn volume_kafka(&self) -> String {
-        self.suffixed_underscore("rox_kafka_data")
+        self.project_volume("kafka_data")
     }
 
     pub fn volume_fusionauth_db(&self) -> String {
@@ -210,6 +210,14 @@ impl Instance {
         } else {
             format!("{base}-{}", self.name.0)
         }
+    }
+
+    /// A data volume named after the Compose project, like the LocalStack and
+    /// MinIO volumes: `rox_postgres_data` for the default project and
+    /// `rox-one_postgres_data` for a named one. The brand appears once; the
+    /// instance suffix alone would repeat it (`rox_postgres_data_rox`).
+    fn project_volume(&self, kind: &str) -> String {
+        format!("{}_{kind}", self.project_name)
     }
 
     fn suffixed_underscore(&self, base: &str) -> String {

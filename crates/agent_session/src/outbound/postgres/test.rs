@@ -54,7 +54,7 @@ fn user_id(value: &str) -> RoxUserIdStr<'static> {
 /// The fixed owner every [`new_session`] fixture uses.
 pub(super) const OWNER: &str = "macro|agent-session-owner@example.com";
 
-/// Insert a `"User"` row (and its `macro_user` parent) for user-owned sessions
+/// Insert a `"User"` row (and its `rox_user` parent) for user-owned sessions
 /// and their user history.
 async fn insert_user(pool: &PgPool, user_id: &str) {
     let email = user_id.strip_prefix("macro|").unwrap_or(user_id);
@@ -62,7 +62,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) {
     // was already seeded by an earlier call.
     let rox_user_id = sqlx::query_scalar!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username
         RETURNING id
@@ -74,7 +74,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) {
     )
     .fetch_one(pool)
     .await
-    .expect("insert macro_user");
+    .expect("insert rox_user");
     sqlx::query!(
         r#"
         INSERT INTO "User" (id, email, rox_user_id)

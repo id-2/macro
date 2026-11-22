@@ -44,7 +44,7 @@ fn created(fake: &Fake, input: &CreateDraftInput) -> CreatedDraft {
         body_text: None,
         body_html: None,
         body_rox: None,
-        headers_json: Some(serde_json::json!({"Macro-In-Reply-To": "x"})),
+        headers_json: Some(serde_json::json!({"Rox-In-Reply-To": "x"})),
         send_time: input.send_time,
     }
 }

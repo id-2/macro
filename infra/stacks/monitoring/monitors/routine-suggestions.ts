@@ -121,7 +121,7 @@ const COUNT = (metric: string, tags = ENV_VALUE, by = '') =>
 const dashboard = new datadog.Dashboard('routine-suggestions', {
   title: 'Routine suggestions',
   description:
-    'Routine suggestions in agent-harness-service: generations, time to first suggestion, per-surface fill, rejected suggestions, the fallback to Macro templates, and saves and dismissals by surface and kind. Declared in infra/stacks/monitoring/monitors/routine-suggestions.ts; see docs/runbooks/routine-suggestions.md.',
+    'Routine suggestions in agent-harness-service: generations, time to first suggestion, per-surface fill, rejected suggestions, the fallback to Rox templates, and saves and dismissals by surface and kind. Declared in infra/stacks/monitoring/monitors/routine-suggestions.ts; see docs/runbooks/routine-suggestions.md.',
   layoutType: 'ordered',
   templateVariables: [{ name: 'env', prefix: 'env', default: 'prod' }],
   widgets: [
@@ -132,7 +132,7 @@ const dashboard = new datadog.Dashboard('routine-suggestions', {
         'bars'
       ),
       lines(
-        'Fallback rate: generations with only Macro templates (failed / finished)',
+        'Fallback rate: generations with only Rox templates (failed / finished)',
         `${COUNT('generation', `${ENV_VALUE},outcome:failed`)} / ${COUNT('generation', `${ENV_VALUE},!outcome:cancelled`)}`
       ),
       lines(
@@ -229,7 +229,7 @@ prodMonitor('routine-suggestions-failures', {
   query: `sum(last_1h):${FAILURE_RATE} > 0.1`,
   monitorThresholds: { critical: '0.1' },
   pages: false,
-  description: `{{value}} of routine suggestion generations in the last hour failed (beyond a ${FAILURE_FLOOR}-generation floor): no session suggested anything after a retry, so those people get Macro's templates only.`,
+  description: `{{value}} of routine suggestion generations in the last hour failed (beyond a ${FAILURE_FLOOR}-generation floor): no session suggested anything after a retry, so those people get Rox's templates only.`,
   dashboard: dashboard.url,
   runbook: `${RUNBOOK}#generations-failing`,
   alertDetail: '{{value}} of generations failed (threshold {{threshold}})',

@@ -3,10 +3,10 @@
  * request names real ids, and the call is started in the DM it opened.
  */
 import { afterEach, expect, test } from 'bun:test';
-import { Macro } from '@rox-one/sdk';
+import { Rox } from '@rox-one/sdk';
 import { Temporal } from 'temporal-polyfill';
 import { idList, ledger } from '../ledger.ts';
-import { sdkCalls } from '../rox.ts';
+import { sdkCalls } from '../macro.ts';
 import { macroPlaceFacts, placeCall } from '../place.ts';
 import { type NewPlaceRow, PlaceRow } from '../types.ts';
 
@@ -77,7 +77,7 @@ const memoryDisk = () => {
 test("the owner's 'call me' in a DM places the call, with real ids in every request", async () => {
   const requests: string[] = [];
   fakeMacro(requests);
-  const macro = new Macro({ auth: { type: 'user', apiKey: 'mak_test' } });
+  const macro = new Rox({ auth: { type: 'user', apiKey: 'mak_test' } });
   const api = sdkCalls({
     macro: async () => macro,
     connectRoom: async () => {
@@ -122,7 +122,7 @@ test("the owner's 'call me' in a DM places the call, with real ids in every requ
 test("a message passed as { channelId, messageId } is refused, and Rox isn't asked", async () => {
   const requests: string[] = [];
   fakeMacro(requests);
-  const macro = new Macro({ auth: { type: 'user', apiKey: 'mak_test' } });
+  const macro = new Rox({ auth: { type: 'user', apiKey: 'mak_test' } });
   const api = sdkCalls({
     macro: async () => macro,
     connectRoom: async () => {

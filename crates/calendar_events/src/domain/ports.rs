@@ -611,6 +611,28 @@ pub struct RetiredCalendarEvent {
     pub team_ooo_changed: bool,
 }
 
+/// A Rox-local event, addressed for a patch or a delete the same way a synced
+/// copy is: the identity a write needs, without any provider behind it.
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct LocalEventTarget {
+    /// Rox entity identifier.
+    pub event_id: Uuid,
+    /// Rox user who owns the entity.
+    pub owner_id: String,
+    /// Connected inbox the calendar belongs to.
+    pub email_link_id: Uuid,
+    /// Calendar account the calendar belongs to.
+    pub account_id: Uuid,
+    /// Persisted Rox calendar identifier.
+    pub calendar_id: Uuid,
+    /// Provider-style identifier stored on the source row.
+    pub provider_event_id: String,
+    /// Whether the addressed calendar prohibits mutation.
+    pub is_read_only: bool,
+    /// This account's role on the addressed calendar.
+    pub observed_access_role: Option<String>,
+}
+
 /// Persistence operations used by calendar business logic.
 pub trait CalendarRepository: Send + Sync + 'static {
     /// Apply the actual scopes returned by Google and atomically schedule any
@@ -910,6 +932,56 @@ pub trait CalendarRepository: Send + Sync + 'static {
         requester_id: &str,
     ) -> impl Future<Output = Result<Vec<VisibleCalendar>, Report>> + Send;
 
+    /// Create a calendar Rox keeps itself for the requester's personal Rox
+    /// mailbox: the account row when the inbox has none yet, and the
+    /// calendar under it. No provider is contacted.
+    fn create_local_calendar(
+        &self,
+        requester_id: &str,
+        name: &str,
+        time_zone: Option<&str>,
+    ) -> impl Future<Output = Result<VisibleCalendar, Report>> + Send {
+        let _ = (requester_id, name, time_zone);
+        std::future::ready(Err(rootcause::report!(
+            "this calendar store cannot create local calendars"
+        )))
+    }
+
+    /// The mutation target of a Rox-local event, resolved the same way
+    /// [`get_event_mutation_target`](Self::get_event_mutation_target)
+    /// resolves a synced one.
+    fn local_event_target(
+        &self,
+        requester_id: &str,
+        event_id: Uuid,
+        calendar_id: Option<Uuid>,
+    ) -> impl Future<Output = Result<Option<LocalEventTarget>, Report>> + Send {
+        let _ = (requester_id, event_id, calendar_id);
+        std::future::ready(Ok(None))
+    }
+
+    /// Rebuild a stored Rox-local event, as writing a patch to it needs the
+    /// whole current content.
+    fn load_local_event(
+        &self,
+        owner_id: &str,
+        event_id: Uuid,
+    ) -> impl Future<Output = Result<Option<CalendarEvent>, Report>> + Send {
+        let _ = (owner_id, event_id);
+        std::future::ready(Ok(None))
+    }
+
+    /// Remove a Rox-local event and everything hanging off it. Returns
+    /// whether a row was there to remove.
+    fn delete_local_event(
+        &self,
+        owner_id: &str,
+        event_id: Uuid,
+    ) -> impl Future<Output = Result<bool, Report>> + Send {
+        let _ = (owner_id, event_id);
+        std::future::ready(Ok(false))
+    }
+
     /// The IANA time zone of the requester's primary calendar, resolved the
     /// same way [`get_creation_target`](Self::get_creation_target) picks its
     /// default target.
@@ -1053,6 +1125,20 @@ pub trait CalendarMutationService: Send + Sync + 'static {
         calendar_id: Option<Uuid>,
         draft: CalendarEventDraft,
     ) -> impl Future<Output = Result<CalendarEvent, CalendarMutationError>> + Send;
+
+    /// Create a calendar Rox keeps itself in Postgres for the requester's
+    /// personal Rox mailbox. No provider is called.
+    fn create_calendar(
+        &self,
+        requester_id: &str,
+        name: &str,
+        time_zone: Option<&str>,
+    ) -> impl Future<Output = Result<VisibleCalendar, CalendarMutationError>> + Send {
+        let _ = (requester_id, name, time_zone);
+        std::future::ready(Err(CalendarMutationError::InvalidInput(
+            "this calendar backend cannot create calendars".to_string(),
+        )))
+    }
 
     /// List the calendars the requester can see, flagged for writability.
     fn list_visible_calendars(

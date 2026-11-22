@@ -9,7 +9,7 @@ use std::collections::{HashMap, HashSet};
 
 /// gets a list of thread ids with the macro user id for the user
 #[tracing::instrument(skip(pool), err)]
-pub async fn get_paginated_thread_ids_with_macro_user_id(
+pub async fn get_paginated_thread_ids_with_rox_user_id(
     pool: &PgPool,
     thread_limit: i64,
     thread_offset: i64,
@@ -34,7 +34,7 @@ pub async fn get_paginated_thread_ids_with_macro_user_id(
 
 /// gets a list of thread ids with the macro user id, filtered to threads updated since a given timestamp.
 #[tracing::instrument(skip(pool), err)]
-pub async fn get_paginated_thread_ids_with_macro_user_id_since(
+pub async fn get_paginated_thread_ids_with_rox_user_id_since(
     pool: &PgPool,
     thread_limit: i64,
     thread_offset: i64,
@@ -67,7 +67,7 @@ pub async fn get_paginated_thread_ids_with_macro_user_id_since(
 /// without tripping a recovery conflict. Threads that do not exist are absent
 /// from the result.
 #[tracing::instrument(skip(pool, thread_ids), err)]
-pub async fn get_thread_ids_with_macro_user_id_by_ids(
+pub async fn get_thread_ids_with_rox_user_id_by_ids(
     pool: &PgPool,
     thread_ids: &[Uuid],
 ) -> anyhow::Result<Vec<(Uuid, String)>> {

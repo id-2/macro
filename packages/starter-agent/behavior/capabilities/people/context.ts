@@ -6,7 +6,7 @@ import type { ChatContext } from '../chat/context.ts';
 import { type PeopleClaude, sdkAsk } from './ask.ts';
 import { appraiseModel, contextLines, logStream, owner } from './config.ts';
 import { keeping, peoplePort } from './keep.ts';
-import { sdkAuthorOf } from './rox.ts';
+import { sdkAuthorOf } from './macro.ts';
 import { store } from './store.ts';
 
 const ownerOnlyFile = 0o600;

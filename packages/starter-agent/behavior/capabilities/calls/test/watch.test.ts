@@ -11,7 +11,7 @@ import {
 import { after, callsPaths, placePrefix } from '../config.ts';
 import { running } from '../context/processes.ts';
 import type { JoinInput } from '../join.ts';
-import type { CallApi } from '../rox.ts';
+import type { CallApi } from '../macro.ts';
 import type { AskRow, NewAskRow, NewPlaceRow, Placed } from '../types.ts';
 import {
   followCalls,

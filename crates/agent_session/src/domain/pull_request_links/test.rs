@@ -259,7 +259,7 @@ async fn sessions_for_a_pull_request_are_the_linked_ones_the_viewer_can_view() {
     let unrelated = AgentSessionId::new();
     let links = Arc::new(StubLinks::with_agent_link(
         visible,
-        "Macro-Inc/Macro/pull/7",
+        "Rox-Inc/Rox/pull/7",
     ));
     links.links.lock().unwrap().extend([
         (
@@ -291,7 +291,7 @@ async fn sessions_for_pull_requests_answers_each_requested_pull_request_in_order
     let hidden = AgentSessionId::new();
     let links = Arc::new(StubLinks::with_agent_link(
         visible,
-        "Macro-Inc/Macro/pull/7",
+        "Rox-Inc/Rox/pull/7",
     ));
     links.links.lock().unwrap().extend([
         (

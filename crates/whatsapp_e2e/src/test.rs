@@ -390,10 +390,10 @@ impl World {
 
 async fn user(pool: &PgPool, id: &str) {
     let email = id.trim_start_matches("macro|");
-    let macro_user = Uuid::now_v7();
+    let rox_user = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)",
-        macro_user,
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)",
+        rox_user,
         id,
         email
     )
@@ -404,7 +404,7 @@ async fn user(pool: &PgPool, id: &str) {
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
         id,
         email,
-        macro_user
+        rox_user
     )
     .execute(pool)
     .await
@@ -769,7 +769,7 @@ async fn a_rox_attachment_reaches_the_group_intact(pool: PgPool) {
     let replica = world.replica().await;
     let (_, binding) = world.alice_adopted().await;
 
-    let photo = b"a photo attached in Macro".repeat(40);
+    let photo = b"a photo attached in Rox".repeat(40);
     let uploaded = world
         .external
         .upload_attachment(

@@ -25,7 +25,7 @@ async fn metadata_grants_intents_folders_and_deletion_are_team_isolated(pool: Pg
             .expect("fixture prefix");
         let rox_user_id = Uuid::now_v7();
         sqlx::query!(
-            "INSERT INTO macro_user (id,username,email,stripe_customer_id) VALUES ($1,$2,$2,$3)",
+            "INSERT INTO rox_user (id,username,email,stripe_customer_id) VALUES ($1,$2,$2,$3)",
             rox_user_id,
             email,
             format!("fixture-{rox_user_id}")
@@ -681,7 +681,7 @@ async fn stale_totp_setup_and_removal_cannot_override_a_newer_enrollment_or_remo
         .expect("identity")
         .into_owned();
     let rox_user_id = Uuid::now_v7();
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'revision@example.test','revision@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}")).execute(&pool).await.expect("account");
+    sqlx::query!("INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES($1,'revision@example.test','revision@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}")).execute(&pool).await.expect("account");
     sqlx::query!(
         r#"INSERT INTO "User"(id,email,rox_user_id) VALUES($1,'revision@example.test',$2)"#,
         owner.as_ref(),
@@ -802,7 +802,7 @@ async fn first_erasure_and_quarantine_are_not_starved_by_repeat_tombstones(pool:
     let team = TeamId(Uuid::now_v7());
     let item = ItemId(Uuid::now_v7());
     let account = Uuid::now_v7();
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES($1,'queue@example.test','queue@example.test',$2)", account, format!("fixture-{account}"))
+    sqlx::query!("INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES($1,'queue@example.test','queue@example.test',$2)", account, format!("fixture-{account}"))
         .execute(&pool).await.expect("account");
     sqlx::query!(r#"INSERT INTO "User"(id,email,rox_user_id) VALUES('macro|queue@example.test','queue@example.test',$1)"#, account)
         .execute(&pool).await.expect("user");

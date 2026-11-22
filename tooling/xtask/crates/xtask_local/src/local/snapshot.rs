@@ -76,7 +76,7 @@ const STATEFUL_SERVICES: &[&str] = &["postgres", "search", "kafka", "fusionauth"
 // process environment directly is correct here.
 #[allow(clippy::disallowed_methods)]
 pub fn root_dir() -> Result<PathBuf> {
-    if let Some(dir) = std::env::var_os("ROX_STACK_SNAPSHOT_DIR") {
+    if let Some(dir) = super::env_compat::maybe("STACK_SNAPSHOT_DIR") {
         return Ok(PathBuf::from(dir));
     }
     let home = std::env::var_os("HOME").context("HOME is not set")?;

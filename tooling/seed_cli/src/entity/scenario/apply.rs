@@ -259,7 +259,7 @@ async fn seed_users(ctx: &SeedCliContext, spec: &ScenarioSpec) -> anyhow::Result
             .adopt_or_seed_user(crate::service::db::AdoptOrSeedUserArgs {
                 email: user.email.clone(),
                 user_id: spec.user_id(key),
-                derived_macro_user_id: spec.macro_user_uuid(key),
+                derived_rox_user_id: spec.rox_user_uuid(key),
                 first_name: user
                     .first_name
                     .clone()
@@ -995,7 +995,7 @@ async fn seed_emails(ctx: &SeedCliContext, spec: &ScenarioSpec) -> anyhow::Resul
 
         for delegate in &account.delegated_to {
             ctx.db
-                .insert_macro_user_link(
+                .insert_rox_user_link(
                     &spec.user_id(delegate),
                     &spec.user_id(&account.owner),
                     link.id,

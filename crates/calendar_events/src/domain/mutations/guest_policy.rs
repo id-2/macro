@@ -60,5 +60,8 @@ fn require_policy_support(provider: CalendarProvider) -> Result<(), CalendarMuta
         CalendarProvider::Outlook => Err(CalendarMutationError::ProviderRejected(
             OUTLOOK_HAS_NO_GUEST_POLICY.to_string(),
         )),
+        // A local calendar keeps the policy on its own row; there is no
+        // provider to disagree with it.
+        CalendarProvider::Rox => Ok(()),
     }
 }

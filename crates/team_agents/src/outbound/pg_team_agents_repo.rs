@@ -80,7 +80,7 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
 
         sqlx::query!(
             r#"
-            INSERT INTO macro_user (id, username, email, stripe_customer_id)
+            INSERT INTO rox_user (id, username, email, stripe_customer_id)
             VALUES ($1, $2, $3, $4)
             "#,
             rox_user_id,
@@ -159,11 +159,11 @@ impl TeamAgentRepository for PgTeamAgentsRepo {
 
     #[tracing::instrument(skip_all, err)]
     async fn delete_account(&self, user_id: &RoxUserIdStr<'_>) -> Result<(), Self::Err> {
-        // Deleting macro_user cascades to "User" and everything keyed on it,
+        // Deleting rox_user cascades to "User" and everything keyed on it,
         // including the team membership, the team_agents row and agent_repos.
         sqlx::query!(
             r#"
-            DELETE FROM macro_user
+            DELETE FROM rox_user
             WHERE id = (SELECT rox_user_id FROM "User" WHERE id = $1)
             "#,
             user_id.as_ref(),

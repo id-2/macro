@@ -3,7 +3,7 @@ use tokio::io::{AsyncReadExt, AsyncWriteExt};
 use super::*;
 
 #[test]
-fn exec_attaches_stdin_as_the_macro_user_without_a_tty() {
+fn exec_attaches_stdin_as_the_rox_user_without_a_tty() {
     assert_eq!(
         exec_args(
             COMPUTER_ID,

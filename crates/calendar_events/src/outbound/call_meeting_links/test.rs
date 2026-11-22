@@ -45,7 +45,7 @@ fn provider_validation_failures_surface_as_invalid_input() {
 }
 
 #[test]
-fn requester_ids_must_be_macro_user_ids() {
+fn requester_ids_must_be_rox_user_ids() {
     assert!(requester("macro|owner@example.com").is_ok());
     assert!(matches!(
         requester("not a user id"),

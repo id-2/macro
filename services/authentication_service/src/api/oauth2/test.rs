@@ -256,7 +256,7 @@ fn consent_failures_are_classified_from_entra_errors() {
         (
             Some("access_denied"),
             Some(
-                "AADSTS65001: The user or administrator has not consented to use the application with ID 'a1b2' named 'Macro'. Send an interactive authorization request for this user and resource.",
+                "AADSTS65001: The user or administrator has not consented to use the application with ID 'a1b2' named 'Rox'. Send an interactive authorization request for this user and resource.",
             ),
             ConsentFailure::AdminConsentRequired,
         ),
@@ -301,7 +301,7 @@ fn consent_failures_are_classified_from_entra_errors() {
 fn aadsts_codes_are_extracted_without_the_rest_of_the_description() {
     assert_eq!(
         aadsts_code(
-            "AADSTS65001: The user or administrator has not consented to use the application with ID 'a1b2' named 'Macro' for user person@contoso.com."
+            "AADSTS65001: The user or administrator has not consented to use the application with ID 'a1b2' named 'Rox' for user person@contoso.com."
         ),
         Some("AADSTS65001")
     );

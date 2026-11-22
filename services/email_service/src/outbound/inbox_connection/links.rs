@@ -60,7 +60,7 @@ impl<R: ConnectionLinkLookup> ConnectionLinks for PgConnectionLinks<R> {
     }
 
     async fn account_fusion_id(&self, email: &str) -> Result<Option<Uuid>, Self::Err> {
-        rox_db_client::user::get::get_macro_user_id_by_email(&self.db, email)
+        rox_db_client::user::get::get_rox_user_id_by_email(&self.db, email)
             .await
             .map_err(|error| anyhow::Error::from(error).into())
     }

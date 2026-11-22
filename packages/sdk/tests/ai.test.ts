@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { Macro, type StructuredCompletionResponse } from '../src/macro';
+import { Rox, type StructuredCompletionResponse } from '../src/macro';
 import { RoxApiError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
@@ -8,7 +8,7 @@ afterEach(() => {
 });
 
 const macro = () =>
-  new Macro({
+  new Rox({
     token: 'user-token',
     hosts: { cognition: 'https://cognition.example.test' },
   });

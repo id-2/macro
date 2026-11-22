@@ -66,9 +66,17 @@ pub fn default_redirect_url() -> Url {
     }
 }
 
+/// The DOMAIN attribute of the session cookies, or `None` for a host-only
+/// cookie.
+///
+/// Local names the parent domain so every local hostname under `rox.one`
+/// (`app.rox.one` and `my.rox.one`, both served by the local reverse proxy)
+/// shares one session. Hosts outside that suffix — `localhost`, a machine
+/// name, a tunnel — receive no session cookie at all, because browsers drop a
+/// `Set-Cookie` whose domain is not a suffix of the request host.
 fn domain<'a>() -> Option<&'a str> {
     match Environment::new_or_prod() {
-        Environment::Local => None,
+        Environment::Local => Some(".rox.one"),
         Environment::Production | Environment::Develop => Some("rox.one"),
     }
 }
@@ -76,7 +84,11 @@ fn domain<'a>() -> Option<&'a str> {
 fn same_site() -> SameSite {
     match Environment::new_or_prod() {
         Environment::Production => SameSite::Strict,
-        Environment::Local | Environment::Develop => SameSite::None,
+        // `app.rox.one` and `my.rox.one` are one site, so Lax still carries the
+        // session between them; it costs nothing there and keeps the cookie
+        // off third-party requests.
+        Environment::Local => SameSite::Lax,
+        Environment::Develop => SameSite::None,
     }
 }
 

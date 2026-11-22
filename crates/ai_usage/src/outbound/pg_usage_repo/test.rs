@@ -104,7 +104,7 @@ async fn usage_references_the_agent_key_that_paid_for_it(pool: PgPool) {
     let key_id = sqlx::query_scalar!(
         r#"
         WITH owner_identity AS (
-            INSERT INTO macro_user (id, username, email, stripe_customer_id)
+            INSERT INTO rox_user (id, username, email, stripe_customer_id)
             VALUES (gen_random_uuid(), 'owner@example.com', 'owner@example.com', 'stripe_owner')
             RETURNING id
         ), owner_profile AS (

@@ -23,8 +23,8 @@ struct UserIdRow {
 }
 
 struct DocumentMentionRow {
-    document_name: String,
-    owner: RoxUserIdStr<'static>,
+    document_name: Option<String>,
+    owner: Option<RoxUserIdStr<'static>>,
     file_type: Option<String>,
     sub_type: Option<String>,
 }
@@ -87,8 +87,8 @@ impl ChannelSideEffectContext for PgChannelSideEffectContext {
             DocumentMentionRow,
             r#"
             SELECT
-                d.name AS document_name,
-                d.owner AS "owner: RoxUserIdStr",
+                COALESCE(d.name, chr(39)||chr(39)) AS document_name,
+                COALESCE(d.owner, '') AS "owner: RoxUserIdStr",
                 d."fileType" AS file_type,
                 dst.sub_type::text AS sub_type
             FROM "Document" d
@@ -103,8 +103,8 @@ impl ChannelSideEffectContext for PgChannelSideEffectContext {
         Ok(mentions
             .into_iter()
             .map(|mention| ChannelDocumentMention {
-                document_name: mention.document_name,
-                owner: mention.owner,
+                document_name: mention.document_name.unwrap_or_default(),
+                owner: mention.owner.expect("document owner is non-null"),
                 file_type: mention.file_type,
                 sub_type: mention.sub_type,
             })
@@ -189,7 +189,7 @@ async fn get_sender_profile_picture_url(
         r#"
         SELECT mui.profile_picture as "profile_picture!"
         FROM "User" u
-        JOIN macro_user mu ON mu.id = u.rox_user_id
+        JOIN rox_user mu ON mu.id = u.rox_user_id
         JOIN rox_user_info mui ON mui.rox_user_id = mu.id
         WHERE u.id = $1
           AND mui.profile_picture IS NOT NULL

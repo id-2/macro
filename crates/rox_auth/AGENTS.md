@@ -24,7 +24,7 @@ internal API key, and the Axum JWT-decode middleware.
 
 ## Boundaries
 
-- Depends on: `rox_env`, `rox_env_var`, `rox_user_id`, `remote_env_var`.
+- Depends on: `rox_env`, `rox_env_var`, `macro_user_id`, `remote_env_var`.
 - Used by: `rox_authorization`, `agent_egress`, `ai_tools`, `decode_jwt`,
   `local_e2e_test_support`, `search_service`.
 

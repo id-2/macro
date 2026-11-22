@@ -241,12 +241,12 @@ fn named_instances_use_their_own_external_project_networks() {
 
     let services = &value["networks"]["services"];
     assert_eq!(services["external"], Value::from(true));
-    assert_eq!(services["name"], Value::from("macro-agent-a_services"));
+    assert_eq!(services["name"], Value::from("rox-agent-a_services"));
     let auth_internal = &value["networks"]["auth-internal"];
     assert_eq!(auth_internal["external"], Value::from(true));
     assert_eq!(
         auth_internal["name"],
-        Value::from("macro-agent-a_auth-internal")
+        Value::from("rox-agent-a_auth-internal")
     );
 }
 
@@ -256,7 +256,7 @@ fn relay_image_tag_follows_its_dockerfile() {
     let tag = sdk_webhook_relay_image(b"FROM alpine\nRUN a\n");
     assert_ne!(tag, sdk_webhook_relay_image(b"FROM alpine\nRUN b\n"));
     assert_eq!(tag, sdk_webhook_relay_image(b"FROM alpine\nRUN a\n"));
-    assert!(tag.starts_with("macro-sdk-webhook-relay:"));
+    assert!(tag.starts_with("rox-sdk-webhook-relay:"));
 }
 
 /// Every instance runs the repository-built images under tags keyed by their

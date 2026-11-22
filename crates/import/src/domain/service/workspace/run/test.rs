@@ -621,7 +621,7 @@ async fn teammate(pool: &PgPool, label: &str, team: Uuid) -> RoxUserIdStr<'stati
     let email = format!("{label}@example.com");
     let user_id = format!("macro|{email}");
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $2)",
         id,
         label,
         email,

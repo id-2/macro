@@ -155,7 +155,7 @@ impl From<ToolCallStatus> for ToolStatus {
 /// rendered) and a kind this fold does not yet know about.
 ///
 /// Four variants are chosen by *name* rather than kind: Rox's own tools
-/// ([`Self::Macro`], [`Self::View`], [`Self::UserTool`]) arrive as ACP `other`, and what a
+/// ([`Self::Rox`], [`Self::View`], [`Self::UserTool`]) arrive as ACP `other`, and what a
 /// reader wants for them is the tool's own JSON, not a generic card; a
 /// delegation ([`Self::Subagent`]) is a tool call by whatever name its
 /// harness gives it. The harness layer decides which names are which.
@@ -244,7 +244,7 @@ pub enum ToolDetail {
     /// server, or called in-process by Rox's own agent. Input and output
     /// are the tool's own JSON, any MCP envelope already removed, so a
     /// reader that knows the tool renders it without parsing the wire.
-    Macro {
+    Rox {
         /// The tool's arguments, as it defines them.
         #[specta(type = specta_typescript::Unknown)]
         input: serde_json::Value,

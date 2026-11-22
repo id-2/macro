@@ -232,7 +232,7 @@ async fn inbox_move_does_not_replace_an_existing_destination_reply(
 ) -> anyhow::Result<()> {
     sqlx::query!(
         r#"UPDATE email_messages SET headers_jsonb = $1 WHERE id = $2"#,
-        serde_json::json!([{"Macro-In-Reply-To": "ee000001-0000-0000-0000-000000000001"}]),
+        serde_json::json!([{"Rox-In-Reply-To": "ee000001-0000-0000-0000-000000000001"}]),
         Uuid::parse_str("ee000005-0000-0000-0000-000000000005")?,
     )
     .execute(&pool)

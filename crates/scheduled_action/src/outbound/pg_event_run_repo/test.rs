@@ -32,7 +32,7 @@ async fn action(pool: &PgPool, filters: Value) -> Uuid {
 async fn action_with_id(pool: &PgPool, id: Uuid, filters: Value) {
     let user_id = generate_uuid_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2) ON CONFLICT DO NOTHING",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2) ON CONFLICT DO NOTHING",
         user_id,
         USER,
     )
@@ -41,7 +41,7 @@ async fn action_with_id(pool: &PgPool, id: Uuid, filters: Value) {
     .unwrap();
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id)
-           SELECT $1, $1, id FROM macro_user WHERE email = $1 ON CONFLICT DO NOTHING"#,
+           SELECT $1, $1, id FROM rox_user WHERE email = $1 ON CONFLICT DO NOTHING"#,
         USER,
     )
     .execute(pool)
@@ -311,7 +311,7 @@ async fn admission_skips_invalid_first_and_middle_pages_without_truncating_fanou
     action_with_id(&pool, malformed_owner, valid.clone()).await;
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id)
-           SELECT $1, $1, id FROM macro_user WHERE email = $2"#,
+           SELECT $1, $1, id FROM rox_user WHERE email = $2"#,
         "invalid private owner",
         USER,
     )

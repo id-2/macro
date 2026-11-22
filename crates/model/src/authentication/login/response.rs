@@ -8,8 +8,9 @@ pub struct SsoRequiredResponse {
 
 #[derive(serde::Serialize, serde::Deserialize, Debug, Default, ToSchema)]
 pub struct PasswordlessStartedResponse {
-    /// The one-time login code, returned only by local environments so dev
-    /// tooling can complete the flow without reading the email.
+    /// The one-time login code, present only when the service runs with
+    /// `PASSWORDLESS_RETURN_CODE=true` (a local stack that cannot read email).
+    /// A public deployment never returns it.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub code: Option<String>,
 }

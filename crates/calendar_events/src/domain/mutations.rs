@@ -13,6 +13,7 @@ mod details;
 mod guest_policy;
 pub(crate) mod invite;
 mod join;
+mod local;
 mod organizer_copy;
 mod replacement;
 
@@ -315,6 +316,9 @@ where
         if target.is_read_only {
             return Err(CalendarMutationError::ReadOnly);
         }
+        if local::is_local(target.token_identity.provider) {
+            return self.create_local_event(target, draft).await;
+        }
         self.require_provider_writes(target.token_identity.provider)?;
         validate_conference(target.token_identity.provider, draft.conference)?;
         guest_policy::validate_draft_guest_policy(target.token_identity.provider, &mut draft)?;
@@ -368,6 +372,14 @@ where
                     .to_string(),
             ));
         }
+        if let Some(local_target) = self
+            .repository
+            .local_event_target(requester_id, event_id, calendar_id)
+            .await
+            .map_err(internal)?
+        {
+            return self.update_local_event(local_target, patch, scope).await;
+        }
         let target = self
             .resolve_mutation_target(requester_id, event_id, calendar_id)
             .await?;
@@ -394,6 +406,17 @@ where
         calendar_id: Option<Uuid>,
         scope: CalendarDeletionScope,
     ) -> Result<(), CalendarMutationError> {
+        if let Some(local_target) = self
+            .repository
+            .local_event_target(requester_id, event_id, calendar_id)
+            .await
+            .map_err(internal)?
+        {
+            if !matches!(scope, CalendarDeletionScope::All) {
+                return Err(CalendarMutationError::OccurrenceNotFound);
+            }
+            return self.delete_local_event(&local_target).await;
+        }
         let target = self
             .resolve_mutation_target(requester_id, event_id, calendar_id)
             .await?;
@@ -569,6 +592,33 @@ where
             .list_visible_calendars(requester_id)
             .await
             .map_err(internal)
+    }
+
+    #[tracing::instrument(skip(self, requester_id), err)]
+    async fn create_calendar(
+        &self,
+        requester_id: &str,
+        name: &str,
+        time_zone: Option<&str>,
+    ) -> Result<super::models::VisibleCalendar, CalendarMutationError> {
+        let name = name.trim();
+        if name.is_empty() {
+            return Err(CalendarMutationError::InvalidInput(
+                "a calendar needs a name".to_string(),
+            ));
+        }
+        let calendar = self
+            .repository
+            .create_local_calendar(requester_id, name, time_zone)
+            .await
+            .map_err(internal)?;
+        // An open client hears about the new calendar through this poke and
+        // reads it on its next delta run; a calendar list that only catches up
+        // on reload would look like the creation never happened.
+        self.refresh
+            .calendar_changed(requester_id, calendar.email_link_id, false)
+            .await;
+        Ok(calendar)
     }
 
     #[tracing::instrument(skip(self, requester_id), err)]

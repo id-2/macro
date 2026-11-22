@@ -5,7 +5,7 @@
 import { behavior } from '@rox-one/muppet/core/behavior';
 import { module } from '@rox-one/muppet/core/capability';
 import type { ChatContext } from './context.ts';
-import type { Line, Posted } from './rox.ts';
+import type { Line, Posted } from './macro.ts';
 
 /**
  * The message to send, trimmed. A flag where a message should be is a

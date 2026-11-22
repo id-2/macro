@@ -35,13 +35,13 @@ fn claude_code_reads_its_namespaced_tool_name() {
 fn rox_inmem_reads_its_namespaced_tool_name() {
     let frame = Frame::new().meta(json!({"macro": {"toolName": "ReadContent"}}));
     assert_eq!(
-        Harness::Macro.reader().reported_tool_name(&frame.view()),
+        Harness::Rox.reader().reported_tool_name(&frame.view()),
         Some(ToolName::native("ReadContent"))
     );
     // Another harness's namespace is not this one's.
     let other = Frame::new().meta(json!({"claudeCode": {"toolName": "Bash"}}));
     assert_eq!(
-        Harness::Macro.reader().reported_tool_name(&other.view()),
+        Harness::Rox.reader().reported_tool_name(&other.view()),
         None
     );
 }
@@ -54,7 +54,7 @@ fn terminal_output_and_exit_are_read_for_any_harness() {
         "terminal_output": {"terminal_id": "t1", "data": "\u{1b}[0mhello"},
         "terminal_exit": {"terminal_id": "t1", "exit_code": 2, "signal": null},
     }));
-    for harness in [Harness::Unknown, Harness::ClaudeCode, Harness::Macro] {
+    for harness in [Harness::Unknown, Harness::ClaudeCode, Harness::Rox] {
         let reader = harness.reader();
         assert_eq!(
             reader.terminal_output(&frame.view()),
@@ -107,7 +107,7 @@ fn recognizes_harnesses_from_their_announced_names() {
         ("OpenCode", Harness::OpenCode),
         ("codex-acp", Harness::Codex),
         ("cursor-acp", Harness::Cursor),
-        ("macro-inmem", Harness::Macro),
+        ("macro-inmem", Harness::Rox),
         ("hermes-agent", Harness::Hermes),
         ("openclaw", Harness::OpenClaw),
         ("zed", Harness::Unknown),
@@ -134,7 +134,7 @@ fn sniffs_a_harness_from_the_frames_it_wrote() {
         Frame::new().meta(json!({"claudeCode": {"toolName": "Bash"}, "terminal_output": {}}));
     assert_eq!(Harness::sniff(&claude.view()), Some(Harness::ClaudeCode));
     let rox_ = Frame::new().meta(json!({"macro": {"toolName": "ReadContent"}}));
-    assert_eq!(Harness::sniff(&rox_.view()), Some(Harness::Macro));
+    assert_eq!(Harness::sniff(&rox_.view()), Some(Harness::Rox));
     let anonymous = Frame::new().meta(json!({"terminal_output": {"data": "x"}}));
     assert_eq!(Harness::sniff(&anonymous.view()), None);
     assert_eq!(Harness::sniff(&Frame::new().view()), None);
@@ -149,7 +149,7 @@ fn every_harness_has_a_reader() {
         Harness::OpenCode,
         Harness::Codex,
         Harness::Cursor,
-        Harness::Macro,
+        Harness::Rox,
         Harness::Hermes,
         Harness::OpenClaw,
         Harness::Unknown,

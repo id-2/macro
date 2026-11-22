@@ -57,7 +57,7 @@ let
   };
   # ECS uses "dev"; browser and sync telemetry use "development".
   applications =
-    (dashboard "macro-dev-telemetry" "Macro dev telemetry" [
+    (dashboard "macro-dev-telemetry" "Rox dev telemetry" [
       (panel 1 "Logs per second by service" loki [
         {
           refId = "A";
@@ -139,7 +139,7 @@ let
       ];
     };
   database =
-    (dashboard "macro-database" "Macro database and Lambda health" [
+    (dashboard "macro-database" "Rox database and Lambda health" [
       (panel 1 "Database CPU" cloudwatch [
         (cwTarget "AWS/RDS" "CPUUtilization" { DBInstanceIdentifier = "$database"; } "Average")
       ] "percent")
@@ -191,7 +191,7 @@ in
     {
       name = "macro";
       orgId = 1;
-      folder = "Macro";
+      folder = "Rox";
       type = "file";
       disableDeletion = true;
       allowUiUpdates = false;

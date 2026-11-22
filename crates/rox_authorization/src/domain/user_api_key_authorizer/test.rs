@@ -84,7 +84,7 @@ impl UserApiKeyAuthorizationRepo for FakeRepo {
 
 fn resolved_user() -> ResolvedApiKeyUser {
     ResolvedApiKeyUser {
-        rox_user_id: RoxUserIdStr::try_from(USER_ID.to_string()).expect("valid Macro user id"),
+        rox_user_id: RoxUserIdStr::try_from(USER_ID.to_string()).expect("valid Rox user id"),
         fusion_user_id: FUSION_USER_ID.to_string(),
         organization_id: Some(ORGANIZATION_ID),
         account_manager: None,

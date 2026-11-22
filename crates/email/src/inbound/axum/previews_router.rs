@@ -83,21 +83,21 @@ where
     )
 )]
 #[tracing::instrument(
-    skip(links, macro_user, service),
+    skip(links, rox_user, service),
     fields(
-        actor = %macro_user.acting_entity(),
+        actor = %rox_user.acting_entity(),
         fusionauth_user_id = tracing::field::Empty,
     )
 )]
 async fn cursor_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(service): State<EmailRouterState<T>>,
-    Cached(macro_user): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(rox_user): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Cached(MultiEmailLinkExtractor(links, _)): Cached<MultiEmailLinkExtractor<T, Auth>>,
     PreviewViewPathExtractor(preview_view): PreviewViewPathExtractor,
     extract::Query(params): extract::Query<GetPreviewsCursorParams>,
     cursor: Option<CursorWithValAndFilter<Uuid, SimpleSortMethod, ()>>,
 ) -> Result<Json<ApiPaginatedThreadCursor>, GetPreviewsCursorError> {
-    let user = &macro_user.authorization.user;
+    let user = &rox_user.authorization.user;
     let span = tracing::Span::current();
     span.record(
         "fusionauth_user_id",

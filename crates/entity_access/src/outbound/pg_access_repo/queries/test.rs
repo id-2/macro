@@ -10,11 +10,11 @@ const OWNER: &str = "macro|sharedbox@corp.test";
 const DELEGATE: &str = "macro|primary@corp.test";
 const BOT_OWNER: &str = "macro|bot-owner@corp.test";
 
-/// macro_user + "User" rows so rox_user_links FKs resolve.
+/// rox_user + "User" rows so rox_user_links FKs resolve.
 async fn insert_user(pool: &PgPool, user_id: &str, email: &str) {
     let rox_uuid = Uuid::new_v4();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
            VALUES ($1, $2, $3, $4)"#,
         rox_uuid,
         user_id,

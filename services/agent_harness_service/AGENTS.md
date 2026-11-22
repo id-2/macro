@@ -106,7 +106,7 @@ Pulumi stacks; they do not host extra agent processes.
   harness belongs to the computer's team: its owner and admins manage it
   (Claude sign-in included) and every member can run agents on it.
   `src/computers/default_agent.rs` creates the team's `<buyer first name>'s Agent`
-  (`Agent` without one, read from `rox_user_info`) coding agent through
+  (`Agent` without one, read from `macro_user_info`) coding agent through
   `BotService::create_agent` as the buyer (roxd harness, `default` model, all
   channels, owner connections, the bots default of bypassing permissions on a
   computer), skipping a harness `HarnessAssignments::bots_on_harness` already

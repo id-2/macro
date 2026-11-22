@@ -39,7 +39,7 @@ export function aiLabel(name: string): string {
  * The editor a request that names nobody runs as: the Rox agent, the same
  * default the canvas path and the web client use. Never a person's name.
  */
-export const DEFAULT_EDITOR_NAME = 'Macro';
+export const DEFAULT_EDITOR_NAME = 'Rox';
 /** Palette names must resolve to `--color-<name>` (see collaboration/color.ts). */
 export const COLORS = ['cyan', 'red', 'yellow', 'green', 'violet', 'pink'];
 

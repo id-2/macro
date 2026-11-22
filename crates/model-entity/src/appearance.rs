@@ -45,7 +45,7 @@ pub struct EntityAppearance {
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum AppearanceIcon {
     /// A stable name from Rox's original, distinct icon catalog.
-    Macro {
+    Rox {
         /// Catalog name without the SVG extension.
         name: String,
     },
@@ -102,7 +102,7 @@ impl EntityAppearance {
     pub fn validate(&self) -> Result<(), String> {
         match &self.icon {
             None => Ok(()),
-            Some(AppearanceIcon::Macro { name }) => {
+            Some(AppearanceIcon::Rox { name }) => {
                 if icons::ICON_NAMES.contains(&name.as_str()) {
                     Ok(())
                 } else {

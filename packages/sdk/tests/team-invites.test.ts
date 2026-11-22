@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 import { RoxApiError, RoxError, RoxNotFoundError } from '../src/utils';
 
 const TEAM_ID = '0198a4cc-e138-7670-a308-a6b766602700';
@@ -31,8 +31,8 @@ function serve(routes: Record<string, Route>): Request[] {
   return requests;
 }
 
-function macro(): Macro {
-  return new Macro({
+function macro(): Rox {
+  return new Rox({
     auth: { type: 'user', apiKey: 'mak_test' },
     hosts: { auth: 'https://auth.test' },
     webAppUrl: 'https://app.example.test',

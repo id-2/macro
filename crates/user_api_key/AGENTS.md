@@ -24,7 +24,7 @@ whose hash lives in `account_manager_grants` rather than `"UserApiKey"`.
 
 ## Boundaries
 
-- Depends on: `rox_user_id`, `rox_authorization` (feature `inbound`).
+- Depends on: `macro_user_id`, `rox_authorization` (feature `inbound`).
 - Used by: `services/document_storage_service`,
   `services/authentication_service` (agent setup).
 

@@ -1,4 +1,4 @@
 name: link-sharing
-description: Macro Link Sharing Infra and related resources
+description: Rox Link Sharing Infra and related resources
 runtime:
   name: nodejs

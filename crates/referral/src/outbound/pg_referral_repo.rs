@@ -75,7 +75,7 @@ impl ReferralRepo for PgReferralRepo {
             r#"
             SELECT u.id
             FROM "User" u
-            JOIN macro_user m ON m.id = u.rox_user_id
+            JOIN rox_user m ON m.id = u.rox_user_id
             WHERE m.id = $1
             ORDER BY lower(u.email) = lower(m.email) DESC, u.id
             LIMIT 1
@@ -130,7 +130,7 @@ impl ReferralRepo for PgReferralRepo {
 
         // make sure this user exists
         sqlx::query!(
-            "SELECT 1 as exists FROM macro_user WHERE id = $1",
+            "SELECT 1 as exists FROM rox_user WHERE id = $1",
             &referrer_id
         )
         .fetch_one(&self.pool)

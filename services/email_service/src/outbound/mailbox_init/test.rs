@@ -20,7 +20,7 @@ async fn actor(db: &PgPool, email: &str) -> (Uuid, RoxUserIdStr<'static>) {
     let id = rox_uuid::generate_uuid_v7();
     let rox_id = RoxUserIdStr::try_from(format!("macro|{email}")).unwrap();
     sqlx::query!(
-        "INSERT INTO macro_user (id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
+        "INSERT INTO rox_user (id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
         id,
         rox_id.as_ref(),
         email,
@@ -562,7 +562,7 @@ async fn concurrent_gmail_and_outlook_connections_share_one_remaining_free_slot(
 async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
     let owner = actor(&db, "legacy@example.com").await;
     assert_eq!(
-        rox_db_client::macro_user::get_macro_user(&db, &owner.0.to_string())
+        rox_db_client::rox_user::get_rox_user(&db, &owner.0.to_string())
             .await
             .unwrap()
             .username,
@@ -593,7 +593,7 @@ async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
     .await
     .unwrap();
     sqlx::query!(
-        "UPDATE macro_user SET username = 'ada', mailbox_handle_claimed_at = now() WHERE id = $1",
+        "UPDATE rox_user SET username = 'ada', mailbox_handle_claimed_at = now() WHERE id = $1",
         owner.0
     )
     .execute(&db)
@@ -671,7 +671,7 @@ async fn rox_init_uses_the_claimed_handle_without_a_gmail_client(db: PgPool) {
 async fn rox_writer_gate_enforces_reader_only_rollout(db: PgPool) {
     let owner = actor(&db, "reader-rollout@example.com").await;
     sqlx::query!(
-        "UPDATE macro_user SET username = 'ada', mailbox_handle_claimed_at = now() WHERE id = $1",
+        "UPDATE rox_user SET username = 'ada', mailbox_handle_claimed_at = now() WHERE id = $1",
         owner.0
     )
     .execute(&db)
@@ -727,7 +727,7 @@ async fn rox_writer_gate_enforces_reader_only_rollout(db: PgPool) {
 async fn gmail_connected_after_rox_stays_non_primary(db: PgPool) {
     let owner = actor(&db, "owner@example.com").await;
     sqlx::query!(
-        "UPDATE macro_user SET username = 'ada', mailbox_handle_claimed_at = now() WHERE id = $1",
+        "UPDATE rox_user SET username = 'ada', mailbox_handle_claimed_at = now() WHERE id = $1",
         owner.0
     )
     .execute(&db)

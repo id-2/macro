@@ -212,8 +212,8 @@ export function packageEntityDocs(
   // Where each namespace class is reached from: `macro.tasks`.
   const accessors = new Map<string, string>();
   for (const match of relink(
-    'src/macro/classes/Macro.md',
-    pages.get('src/macro/classes/Macro.md') ?? ''
+    'src/macro/classes/Rox.md',
+    pages.get('src/macro/classes/Rox.md') ?? ''
   ).matchAll(
     /^\| <a id="property-[^"]+"><\/a> `([^`]+)` \| `readonly` \| `([^`]+)`/gm
   ))

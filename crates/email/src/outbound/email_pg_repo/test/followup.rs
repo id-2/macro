@@ -412,7 +412,7 @@ async fn followup_uses_delegated_inbox_and_rechecks_revocation(
 ) -> anyhow::Result<()> {
     let thread = uuid::uuid!("11111111-1111-1111-1111-111111111111");
     let link = uuid::uuid!("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa");
-    sqlx::query!(r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+    sqlx::query!(r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
         ('d1000000-0000-0000-0000-000000000001', 'owner', 'user1@test.com', 'followup_owner'),
         ('d1000000-0000-0000-0000-000000000002', 'delegate', 'delegate@test.com', 'followup_delegate')"#).execute(&pool).await?;
     sqlx::query!(

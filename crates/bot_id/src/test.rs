@@ -71,18 +71,18 @@ fn recognizes_the_names_earlier_releases_showed() {
     let coder = system_bot(ROX_CODER_BOT_ID).unwrap();
 
     // Mention tags and rows written before the rename name the same bots.
-    assert!(is_legacy_display_name(ai, "Macro"));
+    assert!(is_legacy_display_name(ai, "Rox"));
     assert!(is_legacy_display_name(ai, "  macro "));
     assert!(is_legacy_display_name(new, "MACRO"));
-    assert!(is_legacy_display_name(coder, "Macro Coder"));
+    assert!(is_legacy_display_name(coder, "Rox Coder"));
 
     // The current names and unrelated names are not legacy aliases.
     assert!(!is_legacy_display_name(ai, "Rox"));
-    assert!(!is_legacy_display_name(ai, "Macro Coder"));
-    assert!(!is_legacy_display_name(coder, "Macro"));
+    assert!(!is_legacy_display_name(ai, "Rox Coder"));
+    assert!(!is_legacy_display_name(coder, "Rox"));
     assert!(!is_legacy_display_name(
         system_bot(CURSOR_BOT_ID).unwrap(),
-        "Macro"
+        "Rox"
     ));
 }
 

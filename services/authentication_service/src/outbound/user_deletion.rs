@@ -154,7 +154,7 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionGateway for UserDeletionAdap
     #[tracing::instrument(skip(self), err)]
     async fn delete_billing_customer(&self, account: &Uuid) -> Result<(), Report> {
         let customer_id =
-            match rox_db_client::macro_user::get_macro_user(&self.db, &account.to_string()).await
+            match rox_db_client::rox_user::get_rox_user(&self.db, &account.to_string()).await
             {
                 Ok(account) => account.stripe_customer_id,
                 // A retry after the account row is gone has nothing left to delete.
@@ -208,7 +208,7 @@ impl<T: TeamService, O: OnboardingRepo> UserDeletionGateway for UserDeletionAdap
 
     #[tracing::instrument(skip(self), err)]
     async fn delete_account(&self, account: &Uuid) -> Result<(), Report> {
-        rox_db_client::macro_user::delete_macro_user(&self.db, account)
+        rox_db_client::rox_user::delete_rox_user(&self.db, account)
             .await
             .into_rootcause()
             .context("failed to delete macro user")?;

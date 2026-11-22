@@ -6,7 +6,7 @@ import { Message } from '../src/entities/channels/message';
 import { Chat } from '../src/entities/chats/chat';
 import { Document } from '../src/entities/documents/document';
 import { EmailThread } from '../src/entities/email/thread';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -14,7 +14,7 @@ afterEach(() => {
 });
 const nil = '00000000-0000-0000-0000-000000000000';
 const macro = () =>
-  new Macro({
+  new Rox({
     token: 'test-token',
     hosts: {
       search: 'https://search.test',

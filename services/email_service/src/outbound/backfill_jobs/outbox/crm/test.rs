@@ -89,21 +89,21 @@ async fn send_message(
 }
 
 async fn consent(pool: &PgPool) -> anyhow::Result<(CompaniesRepositoryImpl, Uuid, Uuid)> {
-    let macro_user = Uuid::now_v7();
+    let rox_user = Uuid::now_v7();
     let team = Uuid::now_v7();
     let link = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
-        macro_user,
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
+        rox_user,
         USER,
-        format!("stripe_{macro_user}")
+        format!("stripe_{rox_user}")
     )
     .execute(pool)
     .await?;
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         USER,
-        macro_user
+        rox_user
     )
     .execute(pool)
     .await?;

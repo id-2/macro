@@ -398,7 +398,7 @@ async fn delayed_enrollment_cannot_replace_live_key_or_survive_retirement_cleanu
             .into_owned(),
     };
     let rox_user_id = uuid::Uuid::now_v7();
-    sqlx::query!("INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,'enrollment@example.test','enrollment@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}")).execute(&pool).await.expect("account");
+    sqlx::query!("INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES ($1,'enrollment@example.test','enrollment@example.test',$2)",rox_user_id,format!("fixture-{rox_user_id}")).execute(&pool).await.expect("account");
     sqlx::query!(
         r#"INSERT INTO "User"(id,email,rox_user_id) VALUES ($1,'enrollment@example.test',$2)"#,
         owner.user_id.as_ref(),

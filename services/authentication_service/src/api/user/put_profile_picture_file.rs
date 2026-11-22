@@ -14,7 +14,7 @@ use super::profile_picture_change::{
 };
 use crate::api::{
     context::{ApiContext, AuthorizationService},
-    middleware::rate_limit::RATE_LIMIT_ENABLED,
+    middleware::rate_limit::rate_limit_applies,
 };
 
 #[cfg(test)]
@@ -155,7 +155,7 @@ pub async fn create_upload_handler(
 
     let user_id = authorization.authorization.user.rox_user_id.as_ref();
 
-    let ticket = if RATE_LIMIT_ENABLED {
+    let ticket = if rate_limit_applies(ctx.environment) {
         let key = RateLimitKey::builder(&"profile-picture-upload")
             .append(&user_id)
             .finish();

@@ -218,10 +218,14 @@ maybe_env_vars! {
 }
 
 /// Published warehouse address for LiveKit Cloud, when one can be opened
-/// from outside this machine. The in-network name `localstack` is not used.
+/// from outside this machine. A dedicated recording address wins. The
+/// in-network name `localstack` is not used.
 fn recording_warehouse_endpoint() -> Option<String> {
-    let candidate = rox_aws_config::LocalAwsPublicUrl::new()
+    let candidate = config::CallRecordingS3Endpoint::new()
         .map(|url| url.as_ref().to_owned())
+        .or_else(|| {
+            rox_aws_config::LocalAwsPublicUrl::new().map(|url| url.as_ref().to_owned())
+        })
         .or_else(|| rox_aws_config::LocalAwsUrl::new().map(|url| url.as_ref().to_owned()))?;
     call::domain::models::cloud_reachable_warehouse_endpoint(&candidate).map(str::to_owned)
 }
@@ -987,9 +991,16 @@ async fn run_server() -> anyhow::Result<()> {
             Environment::Local => Arc::new(search_service::LocalTermMatching),
             _ => Arc::new(search_service::FlaggedTermMatching::new(flags.clone())),
         };
-    let call_service_builder = call_service_builder.with_programmatic_call_gate(
-        call::outbound::programmatic_calls::FlaggedProgrammaticCalls(flags),
-    );
+    // The hosted flag service is unreachable from a Local deployment, so the
+    // programmatic call switch resolves from configuration there instead.
+    let call_service_builder = match config.environment {
+        Environment::Local => call_service_builder.with_programmatic_call_gate(
+            call::outbound::programmatic_calls::LocalProgrammaticCalls::from_env(),
+        ),
+        _ => call_service_builder.with_programmatic_call_gate(
+            call::outbound::programmatic_calls::FlaggedProgrammaticCalls(flags),
+        ),
+    };
     let call_public_rate_limiter = RateLimitServiceImpl {
         repo: RedisRateLimitAdapter {
             redis: redis_client.clone(),

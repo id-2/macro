@@ -770,7 +770,7 @@ fn summary_json(
         "mailpit_url": mailpit_url,
         "localstack_url": format!("http://localhost:{}", instance.port(Port::LocalStack)),
         "postgres_url": format!(
-            "postgres://user:password@localhost:{}/macrodb",
+            "postgres://user:password@localhost:{}/roxdb",
             instance.port(Port::Postgres)
         ),
         "logs_cmd": format!("docker compose -p {} logs -f", instance.project_name()),

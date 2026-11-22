@@ -196,7 +196,7 @@ impl SearchText {
                     (None, None) => {}
                 }
             }
-            ToolDetail::Macro {
+            ToolDetail::Rox {
                 input,
                 output,
                 error,

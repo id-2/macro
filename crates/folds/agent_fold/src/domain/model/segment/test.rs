@@ -44,7 +44,7 @@ fn rox_tool(id: &str, name: &str, input: serde_json::Value, status: ToolStatus) 
         id: ToolUseId(id.to_owned()),
         name: ToolName::native(name),
         status,
-        detail: ToolDetail::Macro {
+        detail: ToolDetail::Rox {
             input,
             output: None,
             error: None,
@@ -151,7 +151,7 @@ fn code_without_observed_requests_reads_as_workspace_work() {
             tool: "ExecuteCode".into(),
         },
         status: ToolStatus::Completed,
-        detail: ToolDetail::Macro {
+        detail: ToolDetail::Rox {
             input: serde_json::json!({}),
             output: Some(serde_json::json!({"activity": []})),
             error: None,
@@ -198,7 +198,7 @@ fn code_mode_lookups_are_not_steps() {
         id: ToolUseId(id.into()),
         name,
         status: ToolStatus::Completed,
-        detail: ToolDetail::Macro {
+        detail: ToolDetail::Rox {
             input: serde_json::json!({"query": "documents"}),
             output: None,
             error: None,
@@ -255,7 +255,7 @@ fn an_unfinished_or_failed_code_run_still_reads_as_workspace_work() {
             tool: "ExecuteCode".into(),
         },
         status,
-        detail: ToolDetail::Macro {
+        detail: ToolDetail::Rox {
             input: serde_json::json!({}),
             output: None,
             error: None,

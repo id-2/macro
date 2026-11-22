@@ -55,7 +55,7 @@ export async function renderSdkDocs(
     ...new Bun.Glob('generated/*/types.gen.ts').scanSync(sdk),
     // Specta-generated review types the review handles are typed with.
     'generated/agent-reviews/index.ts',
-    'src/rox.ts',
+    'src/macro.ts',
     'src/config.ts',
     'src/mentions.ts',
     'src/events/receiver.ts',

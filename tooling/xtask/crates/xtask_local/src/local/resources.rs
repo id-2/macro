@@ -290,7 +290,7 @@ pub const QUEUES: &[Queue] = &[
 /// Every local S3 bucket and the env var that references it.
 pub const BUCKETS: &[Bucket] = &[
     Bucket {
-        name: "macro-email-attachments",
+        name: "rox-email-attachments",
         env_key: "ATTACHMENT_BUCKET",
     },
     Bucket {
@@ -310,7 +310,7 @@ pub const BUCKETS: &[Bucket] = &[
         env_key: "UPLOAD_STAGING_BUCKET",
     },
     Bucket {
-        name: "macro-call-recording-local",
+        name: "rox-call-recording-local",
         env_key: "CALL_RECORDING_BUCKET_NAME",
     },
     Bucket {

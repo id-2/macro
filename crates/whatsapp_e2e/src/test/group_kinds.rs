@@ -67,10 +67,10 @@ async fn a_disappearing_group_is_kept_in_rox_and_rox_sends_disappear(pool: PgPoo
         "Rox keeps it"
     );
 
-    let send = world.send(ALICE, &binding, "kept in Macro").await;
+    let send = world.send(ALICE, &binding, "kept in Rox").await;
     let received = world
         .customer
-        .wait_for_message(TIMEOUT, |message| message.text() == Some("kept in Macro"))
+        .wait_for_message(TIMEOUT, |message| message.text() == Some("kept in Rox"))
         .await
         .expect("the customer's phone receives Alice's message");
     assert_eq!(

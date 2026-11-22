@@ -337,7 +337,7 @@ async fn a_companies_export_restores_stage_and_owner_on_a_new_private_pipeline()
         },
         Files {
             file: Some(CsvFile {
-                name: "Macro Customers Oct 16 2026".into(),
+                name: "Rox Customers Oct 16 2026".into(),
                 text: "Company,Domains,Stage,Owner,Revenue,Last interaction\n\
                        Acme,acme.com,Lead,,,2026-10-16\n\
                        Beta,beta.io,Churned,jane@rox.one,,2026-10-15\n\
@@ -358,7 +358,7 @@ async fn a_companies_export_restores_stage_and_owner_on_a_new_private_pipeline()
 
     let created = service.workflows.created.lock().unwrap();
     assert_eq!(created.len(), 1);
-    assert_eq!(created[0].name, "Macro Customers Oct 16 2026");
+    assert_eq!(created[0].name, "Rox Customers Oct 16 2026");
     assert_eq!(created[0].sharing, PipelineSharing::Private);
 
     let pipeline = outcome.pipeline.unwrap();

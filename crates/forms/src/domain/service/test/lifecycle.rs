@@ -352,7 +352,7 @@ async fn appearance_validates_preserves_dates_and_emits_only_changes() {
     let forms = service(&world);
     let receipt = || form_receipt::<EditAccessLevel>(RSVP_FORM, EDITOR, AccessLevel::Edit);
     let invalid = model_entity::EntityAppearance {
-        icon: Some(model_entity::AppearanceIcon::Macro {
+        icon: Some(model_entity::AppearanceIcon::Rox {
             name: "unknown-icon".into(),
         }),
         color: None,

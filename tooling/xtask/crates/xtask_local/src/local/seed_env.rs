@@ -74,7 +74,7 @@ fn values(instance: &Instance) -> Vec<(&'static str, String)> {
     vec![
         (
             "DATABASE_URL",
-            format!("postgres://user:password@localhost:{postgres}/macrodb"),
+            format!("postgres://user:password@localhost:{postgres}/roxdb"),
         ),
         ("LOCAL_AWS_URL", format!("http://localhost:{localstack}")),
         (

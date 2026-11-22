@@ -213,11 +213,11 @@ impl<'a, T, U> SendNotificationRequest<'a, T, U> {
         type_disabled_users: HashSet<RoxUserIdStr<'a>>,
     ) -> (Self, Vec<RecipientExclusion<'a>>) {
         let recipient_is_sender = |id: FilteredRecipient<'a>| match (id, &self.req.sender_id) {
-            (FilteredRecipient::Allowed(macro_user_id_str), Some(sender))
-                if sender == &macro_user_id_str =>
+            (FilteredRecipient::Allowed(rox_user_id_str), Some(sender))
+                if sender == &rox_user_id_str =>
             {
                 FilteredRecipient::Excluded(RecipientExclusion {
-                    user_id: macro_user_id_str,
+                    user_id: rox_user_id_str,
                     reason: ExclusionReason::IsSender,
                 })
             }
@@ -225,11 +225,11 @@ impl<'a, T, U> SendNotificationRequest<'a, T, U> {
         };
 
         let user_muted_notifs = |id: FilteredRecipient<'a>| match id {
-            FilteredRecipient::Allowed(macro_user_id_str)
-                if muted_users.contains(&macro_user_id_str) =>
+            FilteredRecipient::Allowed(rox_user_id_str)
+                if muted_users.contains(&rox_user_id_str) =>
             {
                 FilteredRecipient::Excluded(RecipientExclusion {
-                    user_id: macro_user_id_str,
+                    user_id: rox_user_id_str,
                     reason: ExclusionReason::MutedNotifications,
                 })
             }
@@ -237,11 +237,11 @@ impl<'a, T, U> SendNotificationRequest<'a, T, U> {
         };
 
         let notif_type_is_ignored = |id: FilteredRecipient<'a>| match id {
-            FilteredRecipient::Allowed(macro_user_id_str)
-                if unsubscribed_users.contains(&macro_user_id_str) =>
+            FilteredRecipient::Allowed(rox_user_id_str)
+                if unsubscribed_users.contains(&rox_user_id_str) =>
             {
                 FilteredRecipient::Excluded(RecipientExclusion {
-                    user_id: macro_user_id_str,
+                    user_id: rox_user_id_str,
                     reason: ExclusionReason::UnsubscribedFromItem,
                 })
             }
@@ -249,11 +249,11 @@ impl<'a, T, U> SendNotificationRequest<'a, T, U> {
         };
 
         let user_disabled_type = |id: FilteredRecipient<'a>| match id {
-            FilteredRecipient::Allowed(macro_user_id_str)
-                if type_disabled_users.contains(&macro_user_id_str) =>
+            FilteredRecipient::Allowed(rox_user_id_str)
+                if type_disabled_users.contains(&rox_user_id_str) =>
             {
                 FilteredRecipient::Excluded(RecipientExclusion {
-                    user_id: macro_user_id_str,
+                    user_id: rox_user_id_str,
                     reason: ExclusionReason::DisabledNotificationType,
                 })
             }

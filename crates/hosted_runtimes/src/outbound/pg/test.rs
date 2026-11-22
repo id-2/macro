@@ -29,7 +29,7 @@ async fn insert_team(pool: &PgPool) {
     let rox_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0011);
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'owner@example.com', 'owner@example.com', 'stripe_owner')
         "#,
         rox_user_id,
@@ -636,17 +636,17 @@ async fn deleting_the_buyer_keeps_computers_and_reservations(pool: PgPool) {
     insert_team(&pool).await;
     let repo = PgComputerRepo::new(pool.clone(), policy());
     host(&repo, "reference-host", 24, 0, 1).await;
-    let buyer_macro_user = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0022);
+    let buyer_rox_user = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0022);
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'buyer@example.com', 'buyer@example.com', 'stripe_buyer')",
-        buyer_macro_user,
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'buyer@example.com', 'buyer@example.com', 'stripe_buyer')",
+        buyer_rox_user,
     )
     .execute(&pool)
     .await
     .unwrap();
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|buyer@example.com', 'buyer@example.com', $1)"#,
-        buyer_macro_user,
+        buyer_rox_user,
     )
     .execute(&pool)
     .await

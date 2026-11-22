@@ -6434,7 +6434,7 @@ export type CropMode = 'fill' | 'fit';
  * One per-diarized-speaker override, used in [`EditCallTranscriptRequest`].
  *
  * `custom_speaker = None` clears any existing override for this
- * `diarized_speaker_id`; `Some(rox_user_id)` sets it. The string is
+ * `diarized_speaker_id`; `Some(macro_user_id)` sets it. The string is
  * expected to parse as a `RoxUserId` (e.g. `macro|alice@example.com`);
  * the service layer rejects malformed values with `400 Bad Request`.
  */
@@ -33787,7 +33787,7 @@ export type PasswordsCreateFolderData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -33815,7 +33815,7 @@ export type PasswordsRemoveFolderData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -33844,7 +33844,7 @@ export type PasswordsRenameFolderData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -33873,7 +33873,7 @@ export type PasswordsMoveFolderData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -33931,7 +33931,7 @@ export type PasswordsCreateData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -33959,7 +33959,7 @@ export type PasswordsRemoveData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34011,7 +34011,7 @@ export type PasswordsPatchData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34040,7 +34040,7 @@ export type PasswordsUpdateData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34092,7 +34092,7 @@ export type PasswordsCopyData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34144,7 +34144,7 @@ export type PasswordsRevealData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34196,7 +34196,7 @@ export type PasswordsShareData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34225,7 +34225,7 @@ export type PasswordsRemoveTotpData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34254,7 +34254,7 @@ export type PasswordsSetTotpData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34283,7 +34283,7 @@ export type PasswordsTotpData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;
@@ -34335,7 +34335,7 @@ export type PasswordsCopyUsernameData = {
         /**
          * Required CSRF header; send 1
          */
-        'X-Macro-Passwords': string;
+        'X-Rox-Passwords': string;
     };
     path: {
         team: string;

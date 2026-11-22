@@ -66,7 +66,7 @@ async fn insert_user(pool: &PgPool, id: &str) {
     let stripe_customer_id = format!("cus_{rox_user_id}");
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         "#,
         rox_user_id,
@@ -4863,7 +4863,7 @@ async fn mention_previews_resolve_through_the_shared_uid(pool: PgPool) {
         author_link,
         author_provider,
         "meeting@example.com",
-        "Smart Macro Discussion",
+        "Smart Rox Discussion",
         1,
     );
     let author_event_id = author_copy.event.id;
@@ -4873,7 +4873,7 @@ async fn mention_previews_resolve_through_the_shared_uid(pool: PgPool) {
         attendee_link,
         attendee_provider,
         "meeting@example.com",
-        "Smart Macro Discussion",
+        "Smart Rox Discussion",
         1,
     );
     let attendee_event_id = attendee_copy.event.id;
@@ -4918,7 +4918,7 @@ async fn mention_previews_resolve_through_the_shared_uid(pool: PgPool) {
         panic!("author preview should be accessible: {:?}", previews[0]);
     };
     assert_eq!(own.viewer_event_id, Some(author_event_id));
-    assert_eq!(own.title, "Smart Macro Discussion");
+    assert_eq!(own.title, "Smart Rox Discussion");
     assert!(own.is_recurring);
     assert_eq!(own.attendee_count, 1);
     assert_eq!(previews[1], CalendarMentionPreview::DoesNotExist);
@@ -5673,7 +5673,7 @@ async fn insert_shared_calendar(
         account_id,
         ProviderCalendar {
             provider_calendar_id: "c_shared@group.calendar.google.com".to_string(),
-            name: "Macro Vacation".to_string(),
+            name: "Rox Vacation".to_string(),
             description: None,
             time_zone: Some("UTC".to_string()),
             color: None,
@@ -7035,7 +7035,7 @@ async fn a_writable_copy_outranks_a_fresher_copy_whose_calendar_role_is_unknown(
             account_id,
             ProviderCalendar {
                 provider_calendar_id: "c_shared@group.calendar.google.com".to_string(),
-                name: "Macro Vacation".to_string(),
+                name: "Rox Vacation".to_string(),
                 description: None,
                 time_zone: Some("UTC".to_string()),
                 color: None,

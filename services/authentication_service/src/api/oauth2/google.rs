@@ -187,7 +187,7 @@ async fn link_user(
     // account — attaching it to the requester would capture the owner's sign-in. Only
     // mailboxes with no macro user of their own link under the requester.
     let idp_link_owner =
-        match rox_db_client::user::get::get_macro_user_id_by_email(&ctx.db, &user_info_email)
+        match rox_db_client::user::get::get_rox_user_id_by_email(&ctx.db, &user_info_email)
             .await
         {
             Ok(Some(mailbox_owner_fa)) => mailbox_owner_fa.to_string(),

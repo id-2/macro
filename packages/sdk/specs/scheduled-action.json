@@ -3332,7 +3332,7 @@
           },
           "suggest": {
             "type": "boolean",
-            "description": "Offered unpicked as a suggestion from Macro."
+            "description": "Offered unpicked as a suggestion from Rox."
           },
           "surfaces": {
             "type": "array",
@@ -3586,7 +3586,7 @@
             "oneOf": [
               {
                 "type": "string",
-                "description": "The type of an entity in Macro",
+                "description": "The type of an entity in Rox",
                 "enum": [
                   "user",
                   "chat",
@@ -3748,7 +3748,7 @@
             "oneOf": [
               {
                 "type": "string",
-                "description": "The type of an entity in Macro",
+                "description": "The type of an entity in Rox",
                 "enum": [
                   "user",
                   "chat",
@@ -4135,7 +4135,7 @@
       },
       "EntityType": {
         "type": "string",
-        "description": "The type of an entity in Macro",
+        "description": "The type of an entity in Rox",
         "enum": [
           "user",
           "chat",

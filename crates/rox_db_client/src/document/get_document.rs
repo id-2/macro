@@ -133,13 +133,13 @@ pub async fn get_basic_document(
     let document: DocumentBasic = sqlx::query!(
         r#"
         SELECT
-            d.id as "document_id",
-            d.owner,
-            d.name as "document_name",
+            d.id as "document_id?",
+            d.owner as "owner?",
+            d.name as "document_name?",
             d."branchedFromId" as "branched_from_id",
             d."branchedFromVersionId" as "branched_from_version_id",
             d."documentFamilyId" as "document_family_id",
-            d."fileType" as "file_type",
+            d."fileType" as "file_type?",
             dt.sub_type as "sub_type?: DocumentSubType",
             d."projectId" as "project_id",
             d."deletedAt"::timestamptz as "deleted_at"
@@ -154,9 +154,9 @@ pub async fn get_basic_document(
     )
     .try_map(|row| {
         Ok(DocumentBasic {
-            document_id: row.document_id,
-            document_name: row.document_name,
-            owner: Owner::from_principal_str(&row.owner)
+            document_id: row.document_id.unwrap_or_default(),
+            document_name: row.document_name.unwrap_or_default(),
+            owner: Owner::from_principal_str(row.owner.as_deref().unwrap_or_default())
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?,
             file_type: row.file_type,
             sub_type: row.sub_type,
@@ -184,13 +184,13 @@ pub async fn get_basic_documents(
     let documents: Vec<DocumentBasic> = sqlx::query!(
         r#"
         SELECT
-            d.id as "document_id",
-            d.owner,
-            d.name as "document_name",
+            d.id as "document_id?",
+            d.owner as "owner?",
+            d.name as "document_name?",
             d."branchedFromId" as "branched_from_id",
             d."branchedFromVersionId" as "branched_from_version_id",
             d."documentFamilyId" as "document_family_id",
-            d."fileType" as "file_type",
+            d."fileType" as "file_type?",
             dt.sub_type as "sub_type?: DocumentSubType",
             d."projectId" as "project_id",
             d."deletedAt"::timestamptz as "deleted_at"
@@ -204,9 +204,9 @@ pub async fn get_basic_documents(
     )
     .try_map(|row| {
         Ok(DocumentBasic {
-            document_id: row.document_id,
-            document_name: row.document_name,
-            owner: Owner::from_principal_str(&row.owner)
+            document_id: row.document_id.unwrap_or_default(),
+            document_name: row.document_name.unwrap_or_default(),
+            owner: Owner::from_principal_str(row.owner.as_deref().unwrap_or_default())
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?,
             file_type: row.file_type,
             sub_type: row.sub_type,
@@ -231,13 +231,13 @@ pub async fn get_deleted_document_info(
     let document: DocumentBasic = sqlx::query!(
         r#"
         SELECT
-            d.id as "document_id",
-            d.owner,
-            d.name as "document_name",
+            d.id as "document_id?",
+            d.owner as "owner?",
+            d.name as "document_name?",
             d."branchedFromId" as "branched_from_id",
             d."branchedFromVersionId" as "branched_from_version_id",
             d."documentFamilyId" as "document_family_id",
-            d."fileType" as "file_type",
+            d."fileType" as "file_type?",
             dt.sub_type as "sub_type?: DocumentSubType",
             d."projectId" as "project_id",
             d."deletedAt"::timestamptz as "deleted_at"
@@ -251,9 +251,9 @@ pub async fn get_deleted_document_info(
     )
     .try_map(|row| {
         Ok(DocumentBasic {
-            document_id: row.document_id,
-            document_name: row.document_name,
-            owner: Owner::from_principal_str(&row.owner)
+            document_id: row.document_id.unwrap_or_default(),
+            document_name: row.document_name.unwrap_or_default(),
+            owner: Owner::from_principal_str(row.owner.as_deref().unwrap_or_default())
                 .map_err(|e| sqlx::Error::Decode(Box::new(e)))?,
             file_type: row.file_type,
             sub_type: row.sub_type,
@@ -279,17 +279,17 @@ pub async fn get_document(
     let document_metadata: DocumentMetadata = sqlx::query!(
         r#"
         SELECT
-            d.id as "document_id",
+            d.id as "document_id!",
                 d.appearance,
             d.owner as "owner",
             COALESCE(db.id, di.id) as "document_version_id!",
-            d.name as "document_name",
+            d.name as "document_name!",
             d."branchedFromId" as "branched_from_id",
             d."branchedFromVersionId" as "branched_from_version_id",
             d."documentFamilyId" as "document_family_id",
             d."createdAt"::timestamptz as "created_at",
             d."updatedAt"::timestamptz as "updated_at",
-            d."fileType" as "file_type",
+            d."fileType" as "file_type?",
             db.bom_parts as "document_bom?",
             di.modification_data as "modification_data?",
             d."projectId" as "project_id",
@@ -401,17 +401,17 @@ pub async fn get_document_version(
     let document_metadata: DocumentMetadata = sqlx::query!(
         r#"
         SELECT
-            d.id as "document_id",
+            d.id as "document_id!",
                 d.appearance,
             d.owner as "owner",
-            d.name as "document_name",
+            d.name as "document_name!",
             COALESCE(di.id, db.id) as "document_version_id!",
             d."branchedFromId" as "branched_from_id",
             d."branchedFromVersionId" as "branched_from_version_id",
             d."documentFamilyId" as "document_family_id",
             d."createdAt"::timestamptz as "created_at",
             d."updatedAt"::timestamptz as "updated_at",
-            d."fileType" as "file_type",
+            d."fileType" as "file_type?",
             db.bom_parts as "document_bom?",
             di.modification_data as "modification_data?",
             d."projectId" as "project_id?",

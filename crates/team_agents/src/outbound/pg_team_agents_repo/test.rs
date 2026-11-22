@@ -8,7 +8,7 @@ async fn insert_team(pool: &PgPool) {
     let rox_user_id = Uuid::from_u128(0x0193_a1b2_0000_7000_8000_0000_0000_0011);
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'admin@example.com', 'admin@example.com', 'cus_admin')
         "#,
         rox_user_id,

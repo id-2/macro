@@ -1112,7 +1112,7 @@ fn contact_sync_system_channel_created_with_subject() {
         actor: Sender::new_from_bot(bot_id::ROX_SYSTEM_BOT_ID),
         on_behalf_of: Some(user("owner@example.com")),
         channel_type: ChannelType::Private,
-        channel_name: Some("Macro Support x owner".to_string()),
+        channel_name: Some("Rox Support x owner".to_string()),
         participant_user_ids: users(&["owner@example.com", "teo@rox.one"]),
     };
 

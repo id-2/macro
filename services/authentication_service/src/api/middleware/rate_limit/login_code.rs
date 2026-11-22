@@ -19,7 +19,7 @@ pub(in crate::api) async fn handler(
     req: Request,
     next: Next,
 ) -> Result<Response, Response> {
-    if !super::RATE_LIMIT_ENABLED {
+    if !super::rate_limit_applies(ctx.environment) {
         tracing::trace!("rate limit disabled");
         return Ok(next.run(req).await);
     }

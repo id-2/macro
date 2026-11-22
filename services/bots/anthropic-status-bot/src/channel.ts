@@ -1,5 +1,5 @@
 import type { Env } from '../../../../packages/sdk/src/config';
-import { Macro } from '../../../../packages/sdk/src/macro';
+import { Rox } from '../../../../packages/sdk/src/macro';
 import { unwrap } from '../../../../packages/sdk/src/utils';
 
 export type ChannelConfig = {
@@ -22,7 +22,7 @@ export type ChannelPoster = (content: string) => Promise<void>;
  * channel; the user scope requires no acting user for this endpoint.
  */
 export function createChannelPoster(config: ChannelConfig): ChannelPoster {
-  const macro = new Macro({
+  const macro = new Rox({
     env: config.env ?? 'prod',
     auth: { type: 'bot', token: config.botToken, scope: 'user' },
   });

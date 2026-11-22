@@ -49,7 +49,7 @@ async fn insert_user(pool: &PgPool, user_id: &str) {
     let email = user_id.trim_start_matches("macro|");
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)"#,
         rox_user_id,
         email,
         format!("cus_{rox_user_id}"),

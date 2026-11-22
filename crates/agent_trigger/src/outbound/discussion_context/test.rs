@@ -1278,7 +1278,7 @@ async fn an_agent_asking_for_a_person_names_them_and_counts_its_hop() {
         }),
         ..posted(&parent, id, Some(1), "unused@example.com", content, minute)
     };
-    let rox_reply = by_bot(2, bot_id::ROX_NEW_BOT_ID, "Macro", "@Cursor fix it", 1);
+    let rox_reply = by_bot(2, bot_id::ROX_NEW_BOT_ID, "Rox", "@Cursor fix it", 1);
     let prompt = by_bot(3, bot_id::CURSOR_BOT_ID, "Cursor", "@Rox done, check", 2);
 
     let mut source = MockMessageReader::new();

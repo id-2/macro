@@ -12,7 +12,7 @@ async fn signed_in_computers_carry_their_signer_report_and_last_notice(pool: PgP
     let rox_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0011);
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'owner@example.com', 'owner@example.com', 'stripe_owner')
         "#,
         rox_user_id,

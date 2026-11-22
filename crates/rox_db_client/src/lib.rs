@@ -23,7 +23,7 @@ pub mod instructions;
 pub mod item_access;
 pub mod items;
 pub mod job;
-pub mod macro_user;
+pub mod rox_user;
 pub mod rox_user_email_verification;
 pub mod rox_user_links;
 pub mod notification;

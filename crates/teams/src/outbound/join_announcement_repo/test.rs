@@ -187,7 +187,7 @@ async fn people_already_on_rox_are_not_claimed(pool: PgPool) {
     set_auto_join_domain(&pool, "user.com").await;
     let rox_user_id = Uuid::from_u128(0xe1);
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, 'cus_existing')"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, 'cus_existing')"#,
         rox_user_id,
         "Existing@user.com",
     )

@@ -112,7 +112,7 @@ async fn shared_thread_reply_starts_a_thread_in_the_recipients_inbox(
     assert_eq!(saved.draft.provider_thread_id, None);
     assert_eq!(
         saved.draft.headers_json,
-        Some(serde_json::json!([{ "Macro-In-Reply-To": parent.to_string() }]))
+        Some(serde_json::json!([{ "Rox-In-Reply-To": parent.to_string() }]))
     );
 
     // Saving again (an autosave with the server id) keeps the same reply.
@@ -166,7 +166,7 @@ async fn reply_cannot_adopt_a_draft_planted_for_an_unshared_message(
     // A draft whose client-written header names a message in another inbox.
     let mut planted = reply_to(parent);
     planted.replying_to_id = None;
-    planted.headers_json = Some(serde_json::json!([{ "Macro-In-Reply-To": parent.to_string() }]));
+    planted.headers_json = Some(serde_json::json!([{ "Rox-In-Reply-To": parent.to_string() }]));
     service
         .save_draft_for_user_impl(recipient(), Some(recipient_inbox), planted)
         .await?;

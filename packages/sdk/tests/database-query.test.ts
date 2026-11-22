@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
 import { DatabaseTable } from '../src/entities/databases/table';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 
@@ -34,7 +34,7 @@ test('SQL queries hydrate source rows, cross-database relations and reusable ver
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -99,7 +99,7 @@ test('successful SQL writes return inserted row handles and invalidate the scope
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({ token: 'token' });
+  const macro = new Rox({ token: 'token' });
   const database = macro.databases.byId('db-1');
   expect(await database.name()).toBe('Before');
   const result = await database.query(
@@ -132,7 +132,7 @@ test('SQL aggregates and virtual people results do not invent database row handl
       }),
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({ token: 'token' });
+  const macro = new Rox({ token: 'token' });
   const result = await macro.databases.query(
     'SELECT COUNT(*) FROM macro.people',
   );
@@ -162,7 +162,7 @@ test('SQL writes invalidate equivalent database handles without replacing the sc
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({ token: 'token' });
+  const macro = new Rox({ token: 'token' });
   const scoped = macro.databases.byId('db-1');
   const other = macro.databases.byId('db-1');
   expect(await scoped.name()).toBe('Before');
@@ -192,7 +192,7 @@ test('zero-match SQL writes return a typed target without fabricating changed ve
       }),
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({ token: 'token' });
+  const macro = new Rox({ token: 'token' });
   const result = await macro.databases.query(
     "DELETE FROM Guests WHERE Name = 'Nobody'",
   );

@@ -122,7 +122,7 @@ export async function editCanvas(
   instructions: string,
   model: LanguageModel,
   signal: AbortSignal,
-  editorName = 'Macro',
+  editorName = 'Rox',
   options: CanvasAgentOptions = {}
 ) {
   const SYSTEM = options.artifacts

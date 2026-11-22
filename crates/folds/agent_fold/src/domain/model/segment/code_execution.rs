@@ -90,7 +90,7 @@ pub(super) fn rows(
 
 fn operations(detail: &ToolDetail) -> Option<Vec<Operation>> {
     let output = match detail {
-        ToolDetail::Macro { output, .. } => output.as_ref(),
+        ToolDetail::Rox { output, .. } => output.as_ref(),
         ToolDetail::Other { result, .. } => result.as_ref(),
         _ => None,
     }?;

@@ -5,7 +5,7 @@ import type { Comment } from '../src/entities/documents/comment';
 import type { Document } from '../src/entities/documents/document';
 import type {
   EntityReference,
-  Macro,
+  Rox,
   RoutineEventFilter,
   SharePermissionOptions,
   TimelineOptions,
@@ -19,32 +19,32 @@ type Accepts<Input, Value> = Value extends Input ? true : false;
 export type EntityInputContracts = [
   AssertFalse<
     Accepts<
-      NonNullable<Parameters<Macro['routines']['create']>[0]['agent']>,
+      NonNullable<Parameters<Rox['routines']['create']>[0]['agent']>,
       string
     >
   >,
   AssertTrue<
     Accepts<
-      NonNullable<Parameters<Macro['routines']['create']>[0]['agent']>,
+      NonNullable<Parameters<Rox['routines']['create']>[0]['agent']>,
       Agent
     >
   >,
   AssertFalse<
     Accepts<
       NonNullable<
-        Parameters<Macro['initiatives']['create']>[0]['members']
+        Parameters<Rox['initiatives']['create']>[0]['members']
       >[number],
       string
     >
   >,
   AssertFalse<
     Accepts<
-      Parameters<Macro['entityMentions']['create']>[0],
+      Parameters<Rox['entityMentions']['create']>[0],
       { type: 'document'; entity: string }
     >
   >,
   AssertFalse<
-    Accepts<Parameters<Macro['crm']['pipelines']['byId']>[0], number>
+    Accepts<Parameters<Rox['crm']['pipelines']['byId']>[0], number>
   >,
   AssertFalse<
     Accepts<
@@ -65,14 +65,14 @@ export type EntityInputContracts = [
   AssertFalse<
     Accepts<
       Parameters<
-        ReturnType<Macro['email']['draftById']>['removeAttachment']
+        ReturnType<Rox['email']['draftById']>['removeAttachment']
       >[0],
       string
     >
   >,
   AssertFalse<
     Accepts<
-      Parameters<ReturnType<Macro['documents']['byId']>['access']['grant']>[0],
+      Parameters<ReturnType<Rox['documents']['byId']>['access']['grant']>[0],
       string
     >
   >,
@@ -83,15 +83,15 @@ export type EntityOutputContracts = [
   AssertTrue<
     Accepts<
       { id: string; delete(): Promise<void> },
-      Awaited<ReturnType<Macro['routines']['create']>>
+      Awaited<ReturnType<Rox['routines']['create']>>
     >
   >,
   AssertFalse<
-    Accepts<Awaited<ReturnType<Macro['apiKeys']['create']>>['key'], string>
+    Accepts<Awaited<ReturnType<Rox['apiKeys']['create']>>['key'], string>
   >,
   AssertTrue<
     Accepts<
-      Awaited<ReturnType<Macro['crm']['pipelines']['create']>>['rows'] extends (
+      Awaited<ReturnType<Rox['crm']['pipelines']['create']>>['rows'] extends (
         ...args: never[]
       ) => AsyncGenerator<infer Row>
         ? Row
@@ -105,14 +105,14 @@ export type EntityOutputContracts = [
 export type QueryInputContracts = [
   AssertFalse<
     Accepts<
-      NonNullable<Parameters<Macro['databases']['query']>[1]>['database'],
+      NonNullable<Parameters<Rox['databases']['query']>[1]>['database'],
       string
     >
   >,
   AssertFalse<
     Accepts<
       NonNullable<
-        NonNullable<Parameters<Macro['databases']['query']>[1]>['baseVersions']
+        NonNullable<Parameters<Rox['databases']['query']>[1]>['baseVersions']
       >[number]['table'],
       string
     >
@@ -120,9 +120,9 @@ export type QueryInputContracts = [
   AssertTrue<
     Accepts<
       NonNullable<
-        NonNullable<Parameters<Macro['databases']['query']>[1]>['baseVersions']
+        NonNullable<Parameters<Rox['databases']['query']>[1]>['baseVersions']
       >[number],
-      Awaited<ReturnType<Macro['databases']['query']>>['readVersions'][number]
+      Awaited<ReturnType<Rox['databases']['query']>>['readVersions'][number]
     >
   >,
 ];

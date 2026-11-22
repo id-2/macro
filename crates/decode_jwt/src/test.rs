@@ -268,7 +268,7 @@ fn wrong_issuer_returns_invalid() {
 }
 
 #[test]
-fn invalid_macro_user_id_in_token_returns_invalid_user_id() {
+fn invalid_rox_user_id_in_token_returns_invalid_user_id() {
     let exp = SystemTime::now()
         .duration_since(UNIX_EPOCH)
         .unwrap()

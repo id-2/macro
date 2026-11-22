@@ -7,7 +7,7 @@ nix develop --command bun apps/web/scripts/desktop-release.mjs manifest \
 # A failed publication can be resumed if every existing asset has identical bytes.
 if ! gh release view "$RELEASE_TAG" --repo "$RELEASE_REPOSITORY" >/dev/null 2>&1; then
   gh release create "$RELEASE_TAG" --repo "$RELEASE_REPOSITORY" --verify-tag \
-    --title "Macro $RELEASE_TAG" --notes "Desktop release $RELEASE_TAG" --latest=false
+    --title "Rox $RELEASE_TAG" --notes "Desktop release $RELEASE_TAG" --latest=false
 fi
 work_dir=$(mktemp -d)
 trap 'rm -rf "$work_dir"' EXIT

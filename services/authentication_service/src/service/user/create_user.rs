@@ -1,3 +1,4 @@
+use rox_db_client::user::get::ExistingUserForSignup;
 use rox_db_client::user::organization::{
     get_organization_roles_for_user, match_user_to_organization,
 };
@@ -23,6 +24,13 @@ fn is_local_stripe_stub() -> bool {
 /// has a UNIQUE constraint, so it must be unique per user.
 fn local_stripe_customer_id(email: &str) -> String {
     format!("local-stripe-customer-{email}")
+}
+
+fn new_personal_account_roles() -> std::collections::HashSet<String> {
+    ["self_serve", "professional_subscriber", "sub_opus"]
+        .into_iter()
+        .map(str::to_string)
+        .collect()
 }
 
 /// Creates a new user
@@ -59,7 +67,7 @@ pub async fn create_user(
     };
     // The legacy account key is required, but a profile without a real Stripe
     // customer must leave billing absent so free team creation skips Stripe.
-    let macro_user_customer_id = stripe_customer_id
+    let rox_user_customer_id = stripe_customer_id
         .clone()
         .unwrap_or_else(|| local_stripe_customer_id(email));
 
@@ -69,7 +77,7 @@ pub async fn create_user(
         Some(organization_id) => {
             get_organization_roles_for_user(db, organization_id, email).await?
         }
-        None => ["self_serve".to_string()].into_iter().collect(),
+        None => new_personal_account_roles(),
     };
 
     tracing::info!(organization_id=?organization_id, roles=?roles, "resolved organization and roles for new user");
@@ -81,7 +89,7 @@ pub async fn create_user(
         username,
         email,
         is_verified,
-        &macro_user_customer_id,
+        &rox_user_customer_id,
         stripe_customer_id.as_deref(),
         organization_id,
         roles,
@@ -97,6 +105,61 @@ pub async fn create_user(
     }
 
     Ok((user_id, organization_id))
+}
+
+/// Onboards a new FusionAuth login onto a product account that had none.
+///
+/// The account keeps its profile, organization, roles, documents and billing
+/// identity; only the login id it answers to changes. Nothing external is
+/// created — no Stripe customer, no welcome sequence — because the account and
+/// its history already exist.
+///
+/// Returns the `(user_id, organization_id)` to continue onboarding with, or
+/// `None` when another login claimed the account first; callers must treat
+/// `None` as a rejected signup.
+#[tracing::instrument(skip(db, existing), err)]
+pub async fn adopt_user(
+    fusionauth_user_id: &str,
+    email: &str,
+    is_verified: bool,
+    existing: &ExistingUserForSignup,
+    db: &sqlx::Pool<sqlx::Postgres>,
+) -> anyhow::Result<Option<(String, Option<i32>)>> {
+    let organization_id = match existing.organization_id {
+        Some(organization_id) => Some(organization_id),
+        None => match_user_to_organization(db, email).await?,
+    };
+
+    let roles = match organization_id {
+        Some(organization_id) => {
+            get_organization_roles_for_user(db, organization_id, email).await?
+        }
+        None => new_personal_account_roles(),
+    };
+
+    let adopted = rox_db_client::user::create_user::adopt_rox_user_login(
+        db,
+        &existing.rox_user_id,
+        fusionauth_user_id,
+        email,
+        is_verified,
+        organization_id,
+        roles,
+    )
+    .await?;
+
+    let Some((user_id, organization_id)) = adopted else {
+        return Ok(None);
+    };
+
+    if organization_id.is_some() {
+        rox_db_client::organization::delete_organization_invitation(db.clone(), email).await?;
+        tracing::info!(organization_id=?organization_id, "deleted pending organization invitation");
+    }
+
+    tracing::info!(%user_id, organization_id=?organization_id, "linked new login to existing account");
+
+    Ok(Some((user_id, organization_id)))
 }
 
 /// Creates a stripe customer for the user
@@ -133,7 +196,7 @@ pub async fn create_user_profile(
         Some(organization_id) => {
             get_organization_roles_for_user(db, organization_id, email).await?
         }
-        None => ["self_serve".to_string()].into_iter().collect(),
+        None => new_personal_account_roles(),
     };
 
     tracing::trace!(roles=?roles, "got roles for user");

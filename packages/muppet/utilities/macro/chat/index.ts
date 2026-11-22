@@ -7,7 +7,7 @@
  *     behavior().use(chat({ macro: macroClient({ apiKey }) }))
  *       .on((sources) => sources.messages, async (message, { wake, chat }) => …)
  */
-import type { Macro } from '@rox-one/sdk';
+import type { Rox } from '@rox-one/sdk';
 import { behavior } from '../../../core/behavior.ts';
 import { module } from '../../../core/capability.ts';
 import { source } from '../../../core/event.ts';
@@ -152,7 +152,7 @@ export const nameFromId = (id: string): string =>
 export const sdkChat = ({
   macro: connect,
 }: {
-  readonly macro: () => Promise<Macro>;
+  readonly macro: () => Promise<Rox>;
 }): Chat => {
   let me: Promise<string> | undefined;
   const myId = () => {
@@ -162,7 +162,7 @@ export const sdkChat = ({
     return me;
   };
   type Sent = Awaited<
-    ReturnType<ReturnType<Macro['channels']['byId']>['send']>
+    ReturnType<ReturnType<Rox['channels']['byId']>['send']>
   >;
   const line = async (message: Sent): Promise<Line> => {
     const author = await message.author();
@@ -518,7 +518,7 @@ export const chatting = module({
  * another implementation, e.g. a fake in tests.
  */
 export const chat = (
-  from: { readonly macro: () => Promise<Macro> } | { readonly chat: Chat }
+  from: { readonly macro: () => Promise<Rox> } | { readonly chat: Chat }
 ) => {
   const port = 'chat' in from ? from.chat : sdkChat(from);
   return behavior()

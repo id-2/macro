@@ -24,7 +24,7 @@ pub enum GraphqlNotificationInboxActorKind {
     /// An agent.
     Agent,
     /// Rox itself.
-    Macro,
+    Rox,
 }
 
 /// Who a row is from: a person, an agent, or Rox itself.
@@ -54,8 +54,8 @@ impl From<InboxActor> for GraphqlNotificationInboxActor {
                 principal_id: Some(bot_id.to_string()),
                 name: Some(name),
             },
-            InboxActor::Macro => Self {
-                kind: GraphqlNotificationInboxActorKind::Macro,
+            InboxActor::Rox => Self {
+                kind: GraphqlNotificationInboxActorKind::Rox,
                 principal_id: None,
                 name: None,
             },

@@ -66,7 +66,7 @@ impl<
         };
 
         let reviewers = self
-            .macro_users_for_github_user_id(&reviewer_github_user_id)
+            .rox_users_for_github_user_id(&reviewer_github_user_id)
             .await;
         if reviewers.is_empty() {
             tracing::trace!(
@@ -141,9 +141,9 @@ impl<
             _ => (GithubPrCommentKind::Issue, GithubPrMentionLocation::Comment),
         };
 
-        let mentioned_users = self.mentioned_macro_users(&body).await;
+        let mentioned_users = self.mentioned_rox_users(&body).await;
         let participant_users = self
-            .pull_request_participant_macro_user_ids(pull_request, upserts)
+            .pull_request_participant_rox_user_ids(pull_request, upserts)
             .await;
         let snippet = GithubPrNotificationCommon::snippet(&body);
         let sender = self.notification_sender(event).await;
@@ -235,7 +235,7 @@ impl<
             }
         };
 
-        let authors = self.pull_request_author_macro_users(event).await;
+        let authors = self.pull_request_author_rox_users(event).await;
         let review_github_id = event
             .payload
             .get("review")
@@ -245,7 +245,7 @@ impl<
         let review_snippet =
             (!body.trim().is_empty()).then(|| GithubPrNotificationCommon::snippet(&body));
 
-        let mentioned_users = self.mentioned_macro_users(&body).await;
+        let mentioned_users = self.mentioned_rox_users(&body).await;
         let sender = self.notification_sender(event).await;
         for upsert in upserts {
             let recipients = self.notification_recipient_ids(&upsert.source).await;
@@ -338,7 +338,7 @@ impl<
             return;
         }
 
-        let mentioned_users = self.macro_users_for_logins(&logins).await;
+        let mentioned_users = self.rox_users_for_logins(&logins).await;
         if mentioned_users.is_empty() {
             return;
         }
@@ -375,7 +375,7 @@ impl<
     /// users linked to that GitHub account via `github_links`. Returns an empty
     /// set (with a trace) when unmapped; a single GitHub account may be linked
     /// to several Rox users, so all of them are returned.
-    async fn pull_request_author_macro_users(
+    async fn pull_request_author_rox_users(
         &self,
         event: &ValidatedGithubWebhookEvent,
     ) -> HashSet<RoxUserIdStr<'static>> {
@@ -391,7 +391,7 @@ impl<
         };
 
         let authors = self
-            .macro_users_for_github_user_id(&author_github_user_id)
+            .rox_users_for_github_user_id(&author_github_user_id)
             .await;
         if authors.is_empty() {
             tracing::trace!(
@@ -406,7 +406,7 @@ impl<
     /// Resolve a single GitHub user ID to the Rox users linked to it via
     /// `github_links`. Unmapped GitHub user IDs and invalid Rox IDs are
     /// skipped. A GitHub account may be linked to several Rox users.
-    async fn macro_users_for_github_user_id(
+    async fn rox_users_for_github_user_id(
         &self,
         github_user_id: &str,
     ) -> HashSet<RoxUserIdStr<'static>> {
@@ -451,14 +451,14 @@ impl<
 
     /// Resolve the Rox users @mentioned in `text` via their `github_links`
     /// login mappings. Unmapped logins and invalid Rox IDs are skipped.
-    async fn mentioned_macro_users(&self, text: &str) -> HashSet<RoxUserIdStr<'static>> {
-        self.macro_users_for_logins(&extract_github_mentions(text))
+    async fn mentioned_rox_users(&self, text: &str) -> HashSet<RoxUserIdStr<'static>> {
+        self.rox_users_for_logins(&extract_github_mentions(text))
             .await
     }
 
     /// Resolve GitHub logins to Rox users via their `github_links` login
     /// mappings. Unmapped logins and invalid Rox IDs are skipped.
-    async fn macro_users_for_logins(&self, logins: &[String]) -> HashSet<RoxUserIdStr<'static>> {
+    async fn rox_users_for_logins(&self, logins: &[String]) -> HashSet<RoxUserIdStr<'static>> {
         if logins.is_empty() {
             return HashSet::new();
         }

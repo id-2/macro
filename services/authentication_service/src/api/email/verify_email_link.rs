@@ -92,7 +92,7 @@ pub async fn handler(
     }
 
     // set email link to validated
-    rox_db_client::rox_user_email_verification::upsert_macro_user_email_verification(
+    rox_db_client::rox_user_email_verification::upsert_rox_user_email_verification(
         &ctx.db,
         &link.rox_user_id.to_string(),
         &link.email,

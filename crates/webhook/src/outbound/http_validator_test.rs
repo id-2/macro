@@ -124,9 +124,9 @@ fn detects_reserved_headers_case_insensitively() {
         "x-rox-event-id",
         "X-Rox-Timestamp",
         "X-Rox-Event",
-        "X-Macro-Signature",
+        "X-Rox-Signature",
         "x-rox-event-id",
-        "X-Macro-Timestamp",
+        "X-Rox-Timestamp",
         "x-rox-event",
     ] {
         assert!(is_reserved_header(name), "{name} should be reserved");

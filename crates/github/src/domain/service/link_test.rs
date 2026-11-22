@@ -135,7 +135,7 @@ impl GithubRepo for StubGithubRepo {
 
     async fn get_github_link_by_user_id<'a>(
         &self,
-        _macro_user_id: &RoxUserId<Lowercase<'a>>,
+        _rox_user_id: &RoxUserId<Lowercase<'a>>,
     ) -> Result<Option<GithubLink>, Self::Err> {
         Ok(self.state.lock().unwrap().link_by_user_id.clone())
     }

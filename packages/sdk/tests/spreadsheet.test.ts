@@ -2,7 +2,7 @@ import { afterEach, expect, test } from 'bun:test';
 import {
   DocumentEditRefusedError,
   EditOutcomeUnknownError,
-  Macro,
+  Rox,
   RevisionConflictError,
 } from '../src/macro';
 import { RoxApiError } from '../src/utils';
@@ -13,7 +13,7 @@ afterEach(() => {
 });
 
 const macro = () =>
-  new Macro({
+  new Rox({
     token: 'test-user-token',
     hosts: { storage: 'https://storage.example.test' },
   });

@@ -1,6 +1,6 @@
 import { afterEach, expect, mock, spyOn, test } from 'bun:test';
 import type { ArchiveThreadsRequest } from '../generated/email/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 afterEach(() => mock.restore());
 
@@ -21,7 +21,7 @@ test('archiving many threads sends one request per 100 and resolves to the threa
     { preconnect: globalThis.fetch.preconnect },
   );
   spyOn(globalThis, 'fetch').mockImplementation(fetchMock);
-  const macro = new Macro({
+  const macro = new Rox({
     auth: { type: 'user', apiKey: 'mak_test' },
     hosts: { email: 'https://email.example.test' },
   });

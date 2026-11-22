@@ -29,7 +29,7 @@ holds. Design: `docs/architecture/stripe-event-inbox.md`.
 
 ## Boundaries
 
-- Depends on: `async-stripe` (ids and raw reads), `rox_user_id`.
+- Depends on: `async-stripe` (ids and raw reads), `macro_user_id`.
 - Used by: `services/authentication_service` (webhook, worker, audit,
   `POST /internal/stripe_inbox/replay`).
 

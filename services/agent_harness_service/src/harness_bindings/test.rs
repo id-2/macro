@@ -302,12 +302,12 @@ async fn a_reader_cannot_prompt_a_coding_agent(pool: PgPool) {
         (OWNER, "bindings@example.com"),
         (reader.as_ref(), "reader@example.com"),
     ] {
-        let macro_user = rox_uuid::generate_uuid_v7();
+        let rox_user = rox_uuid::generate_uuid_v7();
         sqlx::query!(
-            "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
-            macro_user,
+            "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
+            rox_user,
             email,
-            format!("stripe_{macro_user}"),
+            format!("stripe_{rox_user}"),
         )
         .execute(&pool)
         .await
@@ -316,7 +316,7 @@ async fn a_reader_cannot_prompt_a_coding_agent(pool: PgPool) {
             r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3)"#,
             id,
             email,
-            macro_user,
+            rox_user,
         )
         .execute(&pool)
         .await

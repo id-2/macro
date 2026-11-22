@@ -138,7 +138,7 @@ pub(super) async fn insert_user_mapping(
 ) -> anyhow::Result<()> {
     sqlx::query(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (id) DO NOTHING
         "#,
@@ -824,7 +824,7 @@ async fn archive_call_returns_no_result_when_call_is_missing(
 }
 
 /// Test helper: give `user_id` a brand new team owned by that user. Inserts
-/// the parent `macro_user` and `User` rows that the `team_user` FK requires.
+/// the parent `rox_user` and `User` rows that the `team_user` FK requires.
 pub(super) async fn give_user_a_team(
     pool: &Pool<Postgres>,
     user_id: &str,
@@ -833,7 +833,7 @@ pub(super) async fn give_user_a_team(
     let rox_user_id = Uuid::now_v7();
 
     sqlx::query(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, '')"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, '')"#,
     )
     .bind(rox_user_id)
     .bind(user_id)

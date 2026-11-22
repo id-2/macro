@@ -161,7 +161,7 @@ fn parse_user_mention_invalid_json() {
 
 #[test]
 fn parse_bare_uuid_bot_mention() {
-    let input = r#"<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Macro"}</m-user-mention> there will come a day when I shall liberate you"#;
+    let input = r#"<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Rox"}</m-user-mention> there will come a day when I shall liberate you"#;
     let out = ParsedXmlText::parse(input).unwrap();
     assert_matches!(out.0, [
         TextSegment::Xml(XmlTag::User(ParsedUserMention { user_id, .. })),
@@ -173,7 +173,7 @@ fn parse_bare_uuid_bot_mention() {
 
 #[test]
 fn parse_prefixed_bot_mention() {
-    let input = r#"<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Macro"}</m-user-mention>"#;
+    let input = r#"<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Rox"}</m-user-mention>"#;
     let out = ParsedXmlText::parse(input).unwrap();
     assert_matches!(out.0, [
         TextSegment::Xml(XmlTag::User(ParsedUserMention { user_id, .. })),
@@ -184,7 +184,7 @@ fn parse_prefixed_bot_mention() {
 
 #[test]
 fn bot_mention_renders_display_name() {
-    let input = r#"hi <m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Macro"}</m-user-mention> ok"#;
+    let input = r#"hi <m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Rox"}</m-user-mention> ok"#;
     let parsed = ParsedXmlText::parse(input).unwrap();
     let rendered = PlainTextFormatter::format_xml_text(parsed).0;
     assert_eq!(rendered, "hi Rox ok");
@@ -192,7 +192,7 @@ fn bot_mention_renders_display_name() {
 
 #[test]
 fn legacy_coder_name_renders_the_current_name() {
-    let input = r#"<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a9e7","email":"Macro Coder"}</m-user-mention>"#;
+    let input = r#"<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a9e7","email":"Rox Coder"}</m-user-mention>"#;
     let parsed = ParsedXmlText::parse(input).unwrap();
     let rendered = PlainTextFormatter::format_xml_text(parsed).0;
     assert_eq!(rendered, "Rox Coder");
@@ -250,7 +250,7 @@ fn unknown_bot_mention_without_name_fields_uses_generic_label() {
 
 #[test]
 fn bot_mention_null_formatter_strips_mention() {
-    let input = r#"hi <m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Macro"}</m-user-mention> ok"#;
+    let input = r#"hi <m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Rox"}</m-user-mention> ok"#;
     let parsed = ParsedXmlText::parse(input).unwrap();
     let rendered = NullXmlFormatter::format_xml_text(parsed).0;
     assert_eq!(rendered, "hi  ok");

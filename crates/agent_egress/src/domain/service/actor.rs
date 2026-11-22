@@ -46,13 +46,13 @@ where
         let id = request["id"].clone();
         let listing = request["method"] == "tools/list";
         let requester = grant.prompter.as_ref().and_then(TurnPrompter::acting_user);
-        let public = matches!(destination, McpDestination::Macro)
+        let public = matches!(destination, McpDestination::Rox)
             && !listing
             && !spends_owner_access(
                 ROX_SERVER_SLUG,
                 request["params"]["name"].as_str().unwrap_or_default(),
             );
-        let rox_tools = matches!(destination, McpDestination::Macro);
+        let rox_tools = matches!(destination, McpDestination::Rox);
         let (actor, user) = if listing || public {
             // Keep the session owner's configured catalog. Selecting requester
             // changes execution credentials, not which integrations are advertised.
@@ -237,7 +237,7 @@ where
             McpDestination::Custom(key) => {
                 (format!("custom-{key}"), "custom MCP server".to_owned())
             }
-            McpDestination::Macro | McpDestination::Preview => {
+            McpDestination::Rox | McpDestination::Preview => {
                 return Err(EgressError::Unroutable(
                     "only connected apps and custom servers are exchanged here".into(),
                 ));

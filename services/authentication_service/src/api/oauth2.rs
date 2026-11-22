@@ -275,7 +275,7 @@ async fn verify_pending_link_owner(
     ctx: &ApiContext,
     state: &AccountLinkState,
 ) -> Result<(), Response> {
-    let owner = rox_db_client::in_progress_user_link::get_macro_user_id_by_link_id(
+    let owner = rox_db_client::in_progress_user_link::get_rox_user_id_by_link_id(
         &ctx.db,
         &state.link_id,
     )

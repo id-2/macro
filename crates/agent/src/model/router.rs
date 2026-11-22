@@ -62,6 +62,9 @@ env_var! {
 
 maybe_env_var! {
     struct GroqApiKey;
+}
+
+maybe_env_var! {
     struct GroqApiBase;
 }
 

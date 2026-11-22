@@ -128,7 +128,7 @@ in
     {
       name = "macro-prod-alerts";
       orgId = 1;
-      folder = "Macro";
+      folder = "Rox";
       type = "file";
       disableDeletion = true;
       allowUiUpdates = false;

@@ -109,7 +109,7 @@ try {
 
     const source =
       runtime === 'core'
-        ? "import { Macro, Rox } from '@rox-one/sdk'; if (Macro !== Rox) throw new Error('Macro must alias Rox'); console.log(Rox.name);"
+        ? "import { Rox, Rox } from '@rox-one/sdk'; if (Rox !== Rox) throw new Error('Rox must alias Rox'); console.log(Rox.name);"
         : `import { connectRoom, publishScreen } from '@rox-one/sdk/calls/${runtime}';
            console.log(connectRoom, publishScreen);`;
     await run(['node', '--input-type=module', '-e', source], consumer);

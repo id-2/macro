@@ -734,13 +734,13 @@ pub async fn create_mention_handler<
     Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    macro_user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
+    rox_user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Json(req): Json<CreateEntityMentionRequest>,
 ) -> Result<(StatusCode, Json<CreateEntityMentionResponse>), ChannelsHandlerErr> {
-    let macro_user = &macro_user.authorization.user;
+    let rox_user = &rox_user.authorization.user;
     require_document_edit_access(
         state.access_service.as_ref(),
-        &macro_user.rox_user_id,
+        &rox_user.rox_user_id,
         &req.source_entity_type,
         &req.source_entity_id,
     )
@@ -753,7 +753,7 @@ pub async fn create_mention_handler<
             source_entity_id: req.source_entity_id,
             entity_type: req.entity_type,
             entity_id: req.entity_id,
-            user_id: Some(macro_user.user_context.user_id.clone()),
+            user_id: Some(rox_user.user_context.user_id.clone()),
         })
         .await?;
 
@@ -795,10 +795,10 @@ pub async fn delete_mention_handler<
     Auth: RoxAuthorizationService,
 >(
     State(state): State<ChannelsRouterState<S, Svc, Auth>>,
-    macro_user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
+    rox_user: RoxAuthorizationExtractor<Auth, UserOrInternal>,
     Path(mention_id): Path<Uuid>,
 ) -> Result<(StatusCode, Json<DeleteEntityMentionResponse>), ChannelsHandlerErr> {
-    let macro_user = &macro_user.authorization.user;
+    let rox_user = &rox_user.authorization.user;
     let mention = state
         .service
         .get_entity_mention(mention_id)
@@ -807,7 +807,7 @@ pub async fn delete_mention_handler<
 
     require_document_edit_access(
         state.access_service.as_ref(),
-        &macro_user.rox_user_id,
+        &rox_user.rox_user_id,
         &mention.source_entity_type,
         &mention.source_entity_id,
     )

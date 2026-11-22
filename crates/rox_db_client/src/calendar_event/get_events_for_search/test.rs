@@ -154,7 +154,7 @@ async fn shared_ids_cover_live_shares_the_member_holds_no_copy_of(pool: Pool<Pos
 async fn insert_user(pool: &Pool<Postgres>, id: &str) {
     let rox_user_id = Uuid::now_v7();
     sqlx::query(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
     )
     .bind(rox_user_id)
     .bind(id)

@@ -16,7 +16,7 @@ import {
 } from '../asks.ts';
 import { after } from '../config.ts';
 import { ledger } from '../ledger.ts';
-import type { MessageFacts } from '../rox.ts';
+import type { MessageFacts } from '../macro.ts';
 import { AskRow, type NewAskRow } from '../types.ts';
 
 const assistant = 'macro|agent@example.com';

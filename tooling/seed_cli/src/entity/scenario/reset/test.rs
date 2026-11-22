@@ -45,7 +45,7 @@ fn covers_every_seeded_table() {
         "rox_user_email_verification",
         "rox_user_info",
         "\"User\"",
-        "macro_user",
+        "rox_user",
     ] {
         assert!(all.contains(table), "missing table {table}");
     }

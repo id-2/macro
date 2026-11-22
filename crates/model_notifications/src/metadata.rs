@@ -1750,7 +1750,7 @@ impl notification::domain::models::NotificationExtEmail for CalendarEventReminde
         notification::domain::models::queue_message::EmailContent::new(
             format!("Reminder: {}", title.replace(['\r', '\n'], " ")),
             format!(
-                "<p>{}</p><p>{}</p><p>Calendar reminder from Macro.</p>",
+                "<p>{}</p><p>{}</p><p>Calendar reminder from Rox.</p>",
                 html_escape::encode_text(&title),
                 html_escape::encode_text(&when)
             ),

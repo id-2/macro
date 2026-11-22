@@ -91,7 +91,7 @@ describe('Canvas model loop', () => {
         'Add one box',
         model,
         new AbortController().signal,
-        'Macro',
+        'Rox',
         {
           render: async () => ({
             revision: 'frozen',
@@ -177,7 +177,7 @@ describe('Canvas model loop', () => {
         'Design a diagram',
         model,
         new AbortController().signal,
-        'Macro',
+        'Rox',
         {
           render: async (snapshot) => {
             images++;
@@ -287,7 +287,7 @@ describe('Canvas model loop', () => {
           'Design a box',
           model,
           new AbortController().signal,
-          'Macro',
+          'Rox',
           {
             render: async (snapshot, options) => {
               images++;

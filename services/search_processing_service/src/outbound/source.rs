@@ -312,7 +312,7 @@ impl BackfillSource for PgBackfillSource {
             if page.is_empty() {
                 return Ok(SourcePage::empty());
             }
-            let rows = email_db_client::threads::get::get_thread_ids_with_macro_user_id_by_ids(
+            let rows = email_db_client::threads::get::get_thread_ids_with_rox_user_id_by_ids(
                 &self.db, page,
             )
             .await
@@ -329,7 +329,7 @@ impl BackfillSource for PgBackfillSource {
 
         let rows = match req.since {
             Some(since) => {
-                email_db_client::threads::get::get_paginated_thread_ids_with_macro_user_id_since(
+                email_db_client::threads::get::get_paginated_thread_ids_with_rox_user_id_since(
                     &self.db,
                     self.page_sizes.emails as i64,
                     offset as i64,
@@ -338,7 +338,7 @@ impl BackfillSource for PgBackfillSource {
                 .await
                 .map_err(BackfillError::Source)?
             }
-            None => email_db_client::threads::get::get_paginated_thread_ids_with_macro_user_id(
+            None => email_db_client::threads::get::get_paginated_thread_ids_with_rox_user_id(
                 &self.db,
                 self.page_sizes.emails as i64,
                 offset as i64,

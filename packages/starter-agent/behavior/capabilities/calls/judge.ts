@@ -13,7 +13,7 @@ import type { Clock } from '@rox-one/muppet/utilities/time';
 import { z } from 'zod';
 import { type Pending, pending, ruleOut, type World } from './arbiter.ts';
 import { after, elapsed } from './config.ts';
-import type { CallApi } from './rox.ts';
+import type { CallApi } from './macro.ts';
 import { atText } from './types.ts';
 
 /** A quick model is enough: the answer is one JSON object, and anything unclear is a no. */

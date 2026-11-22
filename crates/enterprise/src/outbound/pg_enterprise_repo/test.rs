@@ -32,7 +32,7 @@ async fn migrate_for_test(pool: &PgPool) {
 async fn create_user(pool: &PgPool, email: &str) -> RoxUserIdStr<'static> {
     let rox_uuid = Uuid::new_v4();
     sqlx::query(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $3, $4)",
     )
     .bind(rox_uuid)
     .bind(email)

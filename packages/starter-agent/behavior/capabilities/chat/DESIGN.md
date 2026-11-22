@@ -6,7 +6,7 @@ owner, and it needs nothing but `ROX_API_KEY`: sending, reading, the relevance s
 
 | File                     | What it holds                                                                     |
 | ------------------------ | --------------------------------------------------------------------------------- |
-| `rox.ts`               | The `Chat` port and `sdkChat`, the thin adapter over Rox's SDK.                 |
+| `macro.ts`               | The `Chat` port and `sdkChat`, the thin adapter over Rox's SDK.                 |
 | `listen.ts`, `screen.ts` | Is a message for the agent: the pure decision, and the questions the screen asks. |
 | `history.ts`             | Every message heard, per channel, and the ones still waiting for a reply.         |
 | `prompt.ts`              | What a reply run is asked.                                                        |

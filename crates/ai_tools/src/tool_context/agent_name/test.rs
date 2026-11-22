@@ -12,7 +12,7 @@ use sqlx::PgPool;
 async fn agents_are_named_by_their_own_bot_rows(pool: PgPool) -> anyhow::Result<()> {
     let rox_user_id = uuid::Uuid::now_v7();
     sqlx::query(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'owner@example.com', 'owner@example.com', 'stripe_owner')",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'owner@example.com', 'owner@example.com', 'stripe_owner')",
     )
     .bind(rox_user_id)
     .execute(&pool)

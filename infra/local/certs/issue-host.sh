@@ -38,7 +38,7 @@ openssl_bin="$(resolve_openssl)"
   -set_serial "0x$("$openssl_bin" rand -hex 16)" -days 365 \
   -out "$output_dir/server-leaf.pem" \
   -extfile <(printf '%s\n' \
-    "subjectAltName=DNS:localhost,DNS:*.localhost,DNS:$host,IP:127.0.0.1,IP:::1" \
+    "subjectAltName=DNS:localhost,DNS:*.localhost,DNS:$host,DNS:app.rox.one,DNS:my.rox.one,IP:127.0.0.1,IP:::1" \
     'basicConstraints=critical,CA:FALSE' \
     'keyUsage=critical,digitalSignature' \
     'extendedKeyUsage=serverAuth')

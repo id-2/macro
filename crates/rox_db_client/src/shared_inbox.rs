@@ -13,7 +13,7 @@ mod test;
 pub struct PromotedSharedInbox {
     /// The rox_id minted for the mailbox. The re-homed link and both edges point at it.
     pub mailbox_rox_id: String,
-    /// The uuid minted as the mailbox's `macro_user.id`. Grant relocation creates the
+    /// The uuid minted as the mailbox's `rox_user.id`. Grant relocation creates the
     /// mailbox's FusionAuth user with this same id, so the two stay aligned.
     pub mailbox_fusion_id: Uuid,
     /// The surviving (re-homed) `email_links` row — its id is unchanged, so the one
@@ -44,7 +44,7 @@ pub async fn promote_link_to_shared(
 
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         "#,
         &fusionauth_user_id,
@@ -157,9 +157,9 @@ pub async fn is_promoted_shared_mailbox(
 
 /// Deletes the macro user minted for a promoted shared mailbox once its single link has
 /// been torn down. Removing the `User` row cascades its `rox_user_links` edges and the
-/// `promoted_shared_mailboxes` marker; the backing `macro_user` row is removed explicitly.
+/// `promoted_shared_mailboxes` marker; the backing `rox_user` row is removed explicitly.
 /// No-op (returning `None`) when `rox_id` is not a promoted mailbox; otherwise returns
-/// the deleted `macro_user.id`, which callers can match against a link's
+/// the deleted `rox_user.id`, which callers can match against a link's
 /// `fusionauth_user_id` to recognize the mailbox's relocated FusionAuth stub.
 #[tracing::instrument(skip(conn), err)]
 pub async fn delete_promoted_mailbox_user(
@@ -182,7 +182,7 @@ pub async fn delete_promoted_mailbox_user(
         return Ok(None);
     };
 
-    sqlx::query!(r#"DELETE FROM macro_user WHERE id = $1"#, row.rox_user_id)
+    sqlx::query!(r#"DELETE FROM rox_user WHERE id = $1"#, row.rox_user_id)
         .execute(&mut *conn)
         .await?;
 

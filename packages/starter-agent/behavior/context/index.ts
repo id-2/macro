@@ -23,7 +23,7 @@ import {
   withheldCredentials,
 } from '@rox-one/muppet/utilities/credentials';
 import type { Clock } from '@rox-one/muppet/utilities/time';
-import { Macro } from '@rox-one/sdk';
+import { Rox } from '@rox-one/sdk';
 import {
   type Authority,
   authority,
@@ -76,7 +76,7 @@ export type Base = {
   /** Joins path parts. Injected so nothing else imports a path library. */
   readonly join: (...parts: readonly string[]) => string;
   /** The agent in Rox, as its own account. Connects on first use. */
-  readonly macro: () => Promise<Macro>;
+  readonly macro: () => Promise<Rox>;
   /** The environment that makes a child process act as the agent. */
   readonly environment: () => Promise<
     Readonly<Record<string, string | undefined>>
@@ -376,7 +376,7 @@ export const base = (
   const found = source(startup, { file: config.secrets, sops: config.sops });
   if (found.kind === 'invalid') return found;
   const { credentials, addresses, relay: given } = found.value;
-  let macro: Promise<Macro> | undefined;
+  let macro: Promise<Rox> | undefined;
   let relay: Promise<Relayed> | undefined;
   const ownRelay = () => {
     relay ??= Promise.all([addresses(), credentials.get(macroKey)]).then(
@@ -412,10 +412,10 @@ export const base = (
       given === undefined
         ? Promise.all([addresses(), credentials.get(macroKey)]).then(
             ([{ hosts }, apiKey]) =>
-              new Macro({ auth: { type: 'user', apiKey }, hosts })
+              new Rox({ auth: { type: 'user', apiKey }, hosts })
           )
         : Promise.resolve(
-            new Macro({
+            new Rox({
               auth: { type: 'user', apiKey: given.token },
               hosts: relayHosts(given.url),
             })

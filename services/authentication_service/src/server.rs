@@ -964,6 +964,9 @@ async fn run_server() -> anyhow::Result<()> {
             rate_limit_service: rate_limit,
             event_broker: rox_event_broker.clone(),
             calendar_scope_enabled: config.calendar_scope_enabled,
+            passwordless_return_code: crate::api::context::PasswordlessReturnCode(
+                config.passwordless_return_code,
+            ),
             google_authorization_url,
             account_link_state_key,
             jwt_args,

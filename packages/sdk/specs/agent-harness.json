@@ -6726,7 +6726,7 @@
       },
       "EntityType": {
         "type": "string",
-        "description": "The type of an entity in Macro",
+        "description": "The type of an entity in Rox",
         "enum": [
           "user",
           "chat",

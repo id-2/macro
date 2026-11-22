@@ -10,7 +10,7 @@ import type { Clock } from '@rox-one/muppet/utilities/time';
 import { finished, mayPlace, type Target } from './arbiter.ts';
 import { elapsed, placePrefix } from './config.ts';
 import type { IdList, Ledger } from './ledger.ts';
-import type { CallApi } from './rox.ts';
+import type { CallApi } from './macro.ts';
 import type {
   Asked,
   NewPlaceRow,

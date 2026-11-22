@@ -64,7 +64,7 @@ impl Endpoints {
             proxy_url: proxy::url(instance),
             frontend_url: frontend::url(instance),
             postgres_url: format!(
-                "postgres://user:password@localhost:{}/macrodb",
+                "postgres://user:password@localhost:{}/roxdb",
                 instance.port(Port::Postgres)
             ),
             fusionauth_url: format!("http://localhost:{}", instance.port(Port::FusionAuth)),

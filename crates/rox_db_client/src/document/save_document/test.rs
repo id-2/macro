@@ -4,7 +4,7 @@ use model_entity::{AppearanceColor, AppearanceIcon, EntityAppearance};
 #[sqlx::test(fixtures(path = "../../../fixtures", scripts("basic_user_with_documents")))]
 async fn content_save_returns_the_stored_appearance(pool: PgPool) -> anyhow::Result<()> {
     let appearance = EntityAppearance {
-        icon: Some(AppearanceIcon::Macro {
+        icon: Some(AppearanceIcon::Rox {
             name: "star".into(),
         }),
         color: Some(AppearanceColor::Blue),

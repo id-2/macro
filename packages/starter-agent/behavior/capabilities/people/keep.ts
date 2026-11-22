@@ -17,7 +17,7 @@ import {
   shouldReflect,
 } from './appraise.ts';
 import { type Present, section, shown } from './card.ts';
-import type { AuthorOf } from './rox.ts';
+import type { AuthorOf } from './macro.ts';
 import type { Who } from './rules.ts';
 import type { Person, Store } from './store.ts';
 import { worthAppraising } from './transcript.ts';

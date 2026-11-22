@@ -10,7 +10,7 @@ import { PeerPool } from './peer-pool';
 
 describe('aiLabel', () => {
   it('suffixes the editor name so the web client pins its cursor tag', () => {
-    expect(aiLabel('Macro')).toBe('Macro (AI)');
+    expect(aiLabel('Rox')).toBe('Rox (AI)');
     expect(aiLabel('  Grunk  ')).toBe('Grunk (AI)');
   });
 
@@ -23,7 +23,7 @@ describe('aiLabel', () => {
     expect(label).toBe(`${'x'.repeat(64)} (AI)`);
   });
 
-  it('labels an edit that names no editor as Macro', () => {
+  it('labels an edit that names no editor as Rox', () => {
     expect(aiLabel(DEFAULT_EDITOR_NAME)).toBe('Rox (AI)');
   });
 });
@@ -124,7 +124,7 @@ describe('realAwarenessSource (no live mirror)', () => {
   it('broadcasts the borrowed peer name as the cursor user readers see', async () => {
     const sent: Uint8Array[] = [];
     const { mirror, doc } = fakeLoro({ c1: mapC('t1', { text: textC() }) });
-    const pool = PeerPool.forEditor('Macro');
+    const pool = PeerPool.forEditor('Rox');
     const [a, b] = await Promise.all([pool.borrow(), pool.borrow()]);
     for (const peer of [a, b]) {
       realAwarenessSource({

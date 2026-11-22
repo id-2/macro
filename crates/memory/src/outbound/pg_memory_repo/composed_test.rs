@@ -9,7 +9,7 @@ use sqlx::PgPool;
 async fn explicit_edits_compare_revisions_and_cascade(pool: PgPool) {
     sqlx::query!(
         r#"WITH created AS (
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, rox_user_id)
     SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
@@ -47,7 +47,7 @@ async fn explicit_edits_compare_revisions_and_cascade(pool: PgPool) {
 async fn generation_is_atomic_and_daily_rows_are_immutable(pool: PgPool) {
     sqlx::query!(
         r#"WITH created AS (
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, rox_user_id)
     SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,
@@ -87,7 +87,7 @@ async fn generation_is_atomic_and_daily_rows_are_immutable(pool: PgPool) {
 async fn leases_preserve_first_failed_day_and_catch_up_sequentially(pool: PgPool) {
     sqlx::query!(
         r#"WITH created AS (
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'memory@example.com', 'memory@example.com', 'stripe_memory') RETURNING id
     ) INSERT INTO "User" (id, email, rox_user_id)
     SELECT 'macro|memory@example.com', 'memory@example.com', id FROM created"#,

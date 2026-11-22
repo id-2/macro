@@ -35,7 +35,7 @@ pub fn parse_id(id: ID, field: &str) -> async_graphql::Result<Uuid> {
 
 /// Parse a string field into an owned [`RoxUserIdStr`], reporting the field
 /// name on error.
-pub fn parse_macro_user_id(
+pub fn parse_rox_user_id(
     value: String,
     field: &str,
 ) -> async_graphql::Result<RoxUserIdStr<'static>> {

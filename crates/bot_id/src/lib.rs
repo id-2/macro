@@ -214,8 +214,8 @@ pub fn system_bot_by_handle(handle: &str) -> Option<&'static SystemBot> {
 /// Rows, mention tags and messages written while the product was called Rox
 /// still carry these, and they name the same bots the registry does now, so
 /// a reader of an old mention should see the current name.
-const LEGACY_AI_NAMES: &[&str] = &["Macro"];
-const LEGACY_CODER_NAMES: &[&str] = &["Macro Coder"];
+const LEGACY_AI_NAMES: &[&str] = &["Rox"];
+const LEGACY_CODER_NAMES: &[&str] = &["Rox Coder"];
 
 /// Whether `name` is a name earlier releases showed for `bot`.
 ///

@@ -85,7 +85,7 @@ fn rox_mcp_calls_fold_to_rox_and_user_tool_details() {
     let (name, status, detail) = tools[0];
     assert_eq!(name, "ReadContent");
     assert_eq!(status, ToolStatus::Completed);
-    let ToolDetail::Macro {
+    let ToolDetail::Rox {
         input,
         output,
         error,
@@ -127,7 +127,7 @@ fn rox_mcp_calls_fold_to_rox_and_user_tool_details() {
     let (name, status, detail) = tools[2];
     assert_eq!(name, "ListEntities");
     assert_eq!(status, ToolStatus::Failed);
-    let ToolDetail::Macro { output, error, .. } = detail else {
+    let ToolDetail::Rox { output, error, .. } = detail else {
         panic!("ListEntities folds to a Rox detail: {detail:?}");
     };
     assert_eq!(
@@ -311,7 +311,7 @@ fn tool_shape_puts_rox_tools_first_and_leaves_the_rest_to_the_harness() {
     let claude = Harness::ClaudeCode.reader();
     assert_eq!(
         harness::tool_shape(claude, &parse("mcp__rox__ReadContent"), &other.view()),
-        ToolShape::Macro("ReadContent")
+        ToolShape::Rox("ReadContent")
     );
     assert_eq!(
         harness::tool_shape(claude, &parse("mcp__rox__SendEmail"), &other.view()),
@@ -344,7 +344,7 @@ fn tool_shape_puts_rox_tools_first_and_leaves_the_rest_to_the_harness() {
         ToolShape::Subagent
     );
     // Rox's own agent calls its tools by bare name.
-    let inmem = Harness::Macro.reader();
+    let inmem = Harness::Rox.reader();
     assert_eq!(
         harness::tool_shape(inmem, &parse("SendEmail"), &other.view()),
         ToolShape::UserTool("SendEmail")
@@ -380,7 +380,7 @@ fn subagent_result_reads_rox_subagent_through_the_harness_wrapper() {
         answer("ten")
     );
     // Natively: bare.
-    let inmem = Harness::Macro.reader();
+    let inmem = Harness::Rox.reader();
     let bare = Frame::new().raw_output(json!({"result": "ten"}));
     assert_eq!(
         harness::subagent_result(inmem, &parse("Subagent"), &bare.view()),
@@ -412,7 +412,7 @@ fn subagent_result_reads_rox_subagent_through_the_harness_wrapper() {
 /// Rox's in-process agent calls the same tools natively, with bare output.
 #[test]
 fn the_inmem_harness_reads_native_names_as_rox_tools_with_bare_output() {
-    let reader = Harness::Macro.reader();
+    let reader = Harness::Rox.reader();
     assert_eq!(
         reader.rox_tool(&ToolName::native("SendEmail")),
         Some("SendEmail")

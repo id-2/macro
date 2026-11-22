@@ -132,7 +132,7 @@ fn makes_blank_designs() {
     let created = apply(
         &mut doc,
         r#"[{"op":"create","parent":"0:1","node":{"type":"FRAME","name":"Desktop","x":0,"y":0,"width":1440,"height":1024}},
-            {"op":"create","parent":"0:1","node":{"type":"TEXT","x":100,"y":100,"width":1,"height":1,"props":{"characters":"Hi Macro","fontSize":32}}}]"#,
+            {"op":"create","parent":"0:1","node":{"type":"TEXT","x":100,"y":100,"width":1,"height":1,"props":{"characters":"Hi Rox","fontSize":32}}}]"#,
     );
     let reopened = Document::open(&save(&doc, &bytes).unwrap()).unwrap();
     let frame = find(&reopened, &created[0]);
@@ -141,7 +141,7 @@ fn makes_blank_designs() {
     let text = find(&reopened, &created[1]);
     assert_eq!(
         text.text_content.as_ref().map(|c| c.characters.as_ref()),
-        Some("Hi Macro")
+        Some("Hi Rox")
     );
     let layout = text.text_layout.as_ref().unwrap();
     assert_eq!(layout.glyphs.len(), 8);

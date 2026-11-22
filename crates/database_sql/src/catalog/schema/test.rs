@@ -57,7 +57,7 @@ fn people_join_the_databases_unless_the_scoped_database_has_its_own() {
         &Schema {
             databases: vec![DatabaseSchema {
                 id: own,
-                name: "Macro".into(),
+                name: "Rox".into(),
                 tables: vec![TableSchema {
                     id: TableId::from_uuid(Uuid::from_u128(0x7a)),
                     name: "People".into(),

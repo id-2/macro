@@ -258,12 +258,12 @@ impl Harness {
     async fn new(pool: PgPool, runner: FakeRunner) -> Self {
         let user_id = generate_uuid_v7();
         sqlx::query!(
-            "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2) ON CONFLICT DO NOTHING",
+            "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2) ON CONFLICT DO NOTHING",
             user_id, USER,
         ).execute(&pool).await.unwrap();
         sqlx::query!(
             r#"INSERT INTO "User" (id, email, rox_user_id)
-           SELECT $1, $1, id FROM macro_user WHERE email = $1 ON CONFLICT DO NOTHING"#,
+           SELECT $1, $1, id FROM rox_user WHERE email = $1 ON CONFLICT DO NOTHING"#,
             USER,
         )
         .execute(&pool)

@@ -29,7 +29,7 @@ pub use entity_type::{
     GraphqlCacheDeletion, GraphqlEntity, GraphqlEntityType, GraphqlSoupEntityType,
 };
 pub use extract::extract_part;
-pub use filter_input::{IntoFilterExpr, optional_tree, parse_id, parse_macro_user_id, parse_uuid};
+pub use filter_input::{IntoFilterExpr, optional_tree, parse_id, parse_rox_user_id, parse_uuid};
 pub use limit::parse_limit;
 pub use owner_type::GraphqlOwnerType;
 pub use property_filter::{

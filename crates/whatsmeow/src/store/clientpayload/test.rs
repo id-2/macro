@@ -73,7 +73,7 @@ fn login_payload_matches_go() {
 
 #[test]
 fn os_info_changes_the_user_agent_and_device_props_like_go() {
-    let os_info = Some(("Macro".to_owned(), [1, 2, 3]));
+    let os_info = Some(("Rox".to_owned(), [1, 2, 3]));
     let device = device_with_fixed_keys();
     let mut payload = build_base_client_payload(get_wa_version(), os_info.clone());
     let mut expected = device.get_client_payload().unwrap();

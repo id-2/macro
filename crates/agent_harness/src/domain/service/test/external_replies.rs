@@ -461,9 +461,9 @@ async fn an_unauthorized_destination_never_reserves_or_posts_a_reply() {
 async fn creation_retries_repair_reservation_for_both_primary_key_and_thread_conflicts(
     pool: sqlx::PgPool,
 ) {
-    let macro_user = rox_uuid::generate_uuid_v7();
-    sqlx::query!("INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, 'asker@example.com', 'asker@example.com', 'external-reply-test')", macro_user).execute(&pool).await.unwrap();
-    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|asker@example.com', 'asker@example.com', $1)"#, macro_user).execute(&pool).await.unwrap();
+    let rox_user = rox_uuid::generate_uuid_v7();
+    sqlx::query!("INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, 'asker@example.com', 'asker@example.com', 'external-reply-test')", rox_user).execute(&pool).await.unwrap();
+    sqlx::query!(r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ('macro|asker@example.com', 'asker@example.com', $1)"#, rox_user).execute(&pool).await.unwrap();
     use bots::domain::models::{BotOwner, CreateBotRequest};
     use bots::domain::ports::BotRepo;
     let bot = bots::outbound::pg_bots_repo::PgBotsRepo::new(pool.clone())

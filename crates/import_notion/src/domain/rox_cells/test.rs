@@ -157,14 +157,14 @@ fn people_cells_hold_only_notion_users_matched_to_team_members() {
             alice.clone(),
             Person {
                 email: Some("alice@acme.test".to_string()),
-                macro_user: Some(alice_user),
+                rox_user: Some(alice_user),
             },
         ),
         (
             outsider.clone(),
             Person {
                 email: Some("guest@elsewhere.test".to_string()),
-                macro_user: None,
+                rox_user: None,
             },
         ),
     ]

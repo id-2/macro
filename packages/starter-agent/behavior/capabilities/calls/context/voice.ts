@@ -34,7 +34,7 @@ import {
 import { eventLog, trackRecorder } from '../events.ts';
 import type { CallPeople, JoinPorts, Outbound } from '../join.ts';
 import type { IdList } from '../ledger.ts';
-import type { CallApi } from '../rox.ts';
+import type { CallApi } from '../macro.ts';
 import { callScreen } from '../session.ts';
 import type { MakeShare, Placed, PlaceInput, PlaceOutcome } from '../types.ts';
 import { currentVoiceFile, voiceFetchMs } from '../voice-file.ts';

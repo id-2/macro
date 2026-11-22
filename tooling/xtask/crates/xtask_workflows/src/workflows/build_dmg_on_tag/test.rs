@@ -399,7 +399,7 @@ fn cloudkit_tcp_guard_is_wired_into_both_desktop_workflows() {
             .find("xcrun notarytool submit \"$credentials_dir/updater-app.zip\"")
             .unwrap();
         let app_guard = notarize_script
-            .find("run_stapler_pair updater-app/Macro.app")
+            .find("run_stapler_pair updater-app/Rox.app")
             .unwrap();
         assert!(dmg_submit < dmg_guard && dmg_guard < app_submit && app_submit < app_guard);
     }

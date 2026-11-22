@@ -1,5 +1,5 @@
 import { match, P } from 'ts-pattern';
-import type { Macro } from '../../sdk/src/macro';
+import type { Rox } from '../../sdk/src/macro';
 import { RoxApiError, RoxError } from '../../sdk/src/utils/unwrap';
 import type { Catalog, Operation, PathStep } from './catalog';
 import { DEFAULT_MAX_ITEMS, MAX_ITEMS_INPUT } from './tools';
@@ -222,7 +222,7 @@ export function errorResult(error: unknown): OperationResult {
 export async function runOperation(options: {
   operation: Operation;
   input: Readonly<Record<string, unknown>>;
-  macro: Macro;
+  macro: Rox;
   catalog: Catalog;
   classes: HandleClasses;
   validators: InputValidators;

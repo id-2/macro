@@ -140,7 +140,7 @@ fn key_env(vars: impl Iterator<Item = (String, String)>) -> Vec<(String, String)
 /// Where entries live: `ROX_LOCAL_DEP_CACHE_DIR`, else the user cache dir.
 /// `None` when neither it nor `HOME` is set.
 pub fn root_dir() -> Option<PathBuf> {
-    if let Some(dir) = std::env::var_os("ROX_LOCAL_DEP_CACHE_DIR") {
+    if let Some(dir) = super::super::env_compat::maybe("LOCAL_DEP_CACHE_DIR") {
         return Some(PathBuf::from(dir));
     }
     let cache = std::env::var_os("XDG_CACHE_HOME")

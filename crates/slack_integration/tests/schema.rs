@@ -44,7 +44,7 @@ async fn fixture_with_history(pool: &PgPool, history: bool) -> Transaction<'_, P
     let mut tx = pool.begin().await.unwrap();
     execute(&mut tx, &format!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ('{TEAM}', 'schema', 'schema@example.com', 'schema-customer');
         INSERT INTO "User" (id, email, rox_user_id)
         VALUES ('macro|schema@example.com', 'schema@example.com', '{TEAM}');

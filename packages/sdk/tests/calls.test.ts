@@ -4,7 +4,7 @@ import {
   AlreadyConnectedError,
   CallEndedError,
   InOtherCallError,
-  Macro,
+  Rox,
 } from '../src/macro';
 import { RoxClient } from '../src/utils/client';
 
@@ -33,7 +33,7 @@ function serve(routes: Record<string, Route>): Request[] {
 }
 
 function macro() {
-  return new Macro({
+  return new Rox({
     auth: { type: 'user', apiKey: 'test_key' },
     hosts: { storage: 'https://storage.test' },
   });

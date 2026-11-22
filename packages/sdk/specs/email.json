@@ -645,7 +645,7 @@
     "/email/contacts/unblock": {
       "post": {
         "tags": ["Contacts"],
-        "summary": "Durably remove Macro-managed sender blocking in the selected inbox.",
+        "summary": "Durably remove Rox-managed sender blocking in the selected inbox.",
         "operationId": "unblock_sender",
         "requestBody": {
           "content": {
@@ -2227,7 +2227,7 @@
       "delete": {
         "tags": ["Links"],
         "summary": "Removes a linked inbox.",
-        "description": "For an inbox the caller owns this enqueues a full cascade teardown\n(`LinkManagerMessage::DeleteLink`). For an inbox reached via delegation it\nonly drops the `rox_user_links` edge, leaving the owner's data intact.",
+        "description": "For an inbox the caller owns this enqueues a full cascade teardown\n(`LinkManagerMessage::DeleteLink`). For an inbox reached via delegation it\nonly drops the `macro_user_links` edge, leaving the owner's data intact.",
         "operationId": "delete_link",
         "parameters": [
           {
@@ -2908,7 +2908,7 @@
       "delete": {
         "tags": ["Sync"],
         "summary": "Disables inbox syncing for the selected inbox.",
-        "description": "The inbox is the caller's primary, or the one named by `X-Email-Link-Id`,\nwhich may be an inbox the caller only reaches through delegation. Removal\ntherefore follows the same policy as `DELETE /email/links/{link_id}`: an\nowner's inbox is torn down, while a delegate only loses their\n`rox_user_links` edge and the owner's data stays intact.",
+        "description": "The inbox is the caller's primary, or the one named by `X-Email-Link-Id`,\nwhich may be an inbox the caller only reaches through delegation. Removal\ntherefore follows the same policy as `DELETE /email/links/{link_id}`: an\nowner's inbox is torn down, while a delegate only loses their\n`macro_user_links` edge and the owner's data stays intact.",
         "operationId": "disable_sync",
         "parameters": [
           {
@@ -4238,7 +4238,7 @@
             "type": ["string", "null"],
             "description": "HTML body (base64 URL_SAFE_NO_PAD encoded). Sanitized before storage."
           },
-          "body_rox": {
+          "body_macro": {
             "type": ["string", "null"],
             "description": "Rox body format."
           },
@@ -4329,7 +4329,7 @@
             "type": ["string", "null"],
             "description": "HTML body (decoded)."
           },
-          "body_rox": {
+          "body_macro": {
             "type": ["string", "null"],
             "description": "Rox body."
           },
@@ -4531,7 +4531,7 @@
           "body_html_sanitized": {
             "type": ["string", "null"]
           },
-          "body_rox": {
+          "body_macro": {
             "type": ["string", "null"]
           },
           "body_replyless": {
@@ -5924,7 +5924,7 @@
         "properties": {
           "method": {
             "type": "string",
-            "description": "Provider method, stored verbatim; only `popup` fires Macro\nnotifications."
+            "description": "Provider method, stored verbatim; only `popup` fires Rox\nnotifications."
           },
           "minutes": {
             "type": "integer",
@@ -6886,7 +6886,7 @@
           "body_html_sanitized": {
             "type": ["string", "null"]
           },
-          "body_rox": {
+          "body_macro": {
             "type": ["string", "null"]
           },
           "body_text": {

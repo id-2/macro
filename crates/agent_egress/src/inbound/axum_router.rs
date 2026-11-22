@@ -136,7 +136,7 @@ async fn rox_mcp_handler<Service>(
 where
     Service: EgressService,
 {
-    mcp_proxy(state, McpDestination::Macro, request).await
+    mcp_proxy(state, McpDestination::Rox, request).await
 }
 
 /// One MCP request through the proxy, whichever destination its route named.

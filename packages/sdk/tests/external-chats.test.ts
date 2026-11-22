@@ -4,7 +4,7 @@ import {
   ExternalChatParticipant,
   ExternalChatSend,
   ExternalChatUpload,
-  Macro,
+  Rox,
 } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
@@ -92,7 +92,7 @@ function fixture(handler: (request: Request) => Response | Promise<Response>) {
     requests.push(request.clone());
     return handler(request);
   }) as typeof fetch;
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'owner-api-token',
     hosts: {
       storage: 'https://storage.example.test',

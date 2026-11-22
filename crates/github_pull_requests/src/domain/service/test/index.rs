@@ -42,7 +42,7 @@ async fn missing_row_recovers_all_verified_sources_and_case_variants() {
     }]);
     rich.metadata["base"] = serde_json::json!({"name":"main", "sha":"base-sha"});
     rich.metadata["head"] = serde_json::json!({"name":"feature", "sha":"head-sha"});
-    let mut sparse = candidate(2, "Macro/App/pull/7");
+    let mut sparse = candidate(2, "Rox/App/pull/7");
     sparse.metadata["status"] = "closed".into();
     rows.stored.lock().unwrap().extend([sparse, rich]);
     let summary = index(&rows).await;

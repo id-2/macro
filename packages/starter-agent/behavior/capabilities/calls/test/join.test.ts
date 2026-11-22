@@ -25,7 +25,7 @@ import {
   type JoinRequest,
   refusal,
   refusalExits,
-} from '../rox.ts';
+} from '../macro.ts';
 import { stubBrain } from '../replay.ts';
 import type { RoomHandlers } from '../room.ts';
 import { CallEvent, type NewPlaceRow, type Placed } from '../types.ts';

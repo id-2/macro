@@ -1,7 +1,7 @@
 # Freeze the Docker Compose project name so every checkout/worktree uses the
 # same local database containers and Compose-managed resources.
 # Local setup is single-instance by design.
-name: macro
+name: rox
 
 services: 
   postgres:
@@ -88,7 +88,7 @@ services:
       context: ../infra/local/opensearch
     # `cargo x` stacks replace this tag with one keyed by the Dockerfile's
     # content (`gen_compose::opensearch_image`), so a changed image is rebuilt.
-    image: macro-local-opensearch:core-icu
+    image: rox-local-opensearch:core-icu
     environment:
       cluster.name: search 
       discovery.type: single-node

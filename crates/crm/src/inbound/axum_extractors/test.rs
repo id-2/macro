@@ -832,7 +832,7 @@ async fn contact_mutation_http_contract_covers_addresses_and_company_links(
     let team = uuid(TEAM_ID);
     let user = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
         user,
         USER_ID,
         format!("stripe_{user}")
@@ -1093,7 +1093,7 @@ async fn contact_detail_http_contract_carries_the_company_summary(
     let team = uuid(TEAM_ID);
     let user = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
         user,
         USER_ID,
         format!("stripe_{user}")

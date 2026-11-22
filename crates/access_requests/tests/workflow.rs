@@ -823,7 +823,7 @@ async fn seed_harness(pool: &PgPool) -> ShareEntity {
         let email = format!("{name}@requests.test");
         let id = user(name);
         sqlx::query!(
-            r#"INSERT INTO macro_user (id, username, email, stripe_customer_id)
+            r#"INSERT INTO rox_user (id, username, email, stripe_customer_id)
             VALUES ($1, $2, $2, $3)"#,
             rox_user_id,
             email,

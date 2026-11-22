@@ -71,11 +71,11 @@ async fn test_link_by_fusionauth_and_rox_id_wrong_rox_id(
 async fn test_inboxes_for_rox_id_includes_own_and_delegated(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    // rox_user_links FK-references "User" (which FK-references macro_user), so
+    // rox_user_links FK-references "User" (which FK-references rox_user), so
     // the delegating and delegated accounts must exist as real users.
     sqlx::query(
         r#"
-        INSERT INTO "macro_user" (id, username, email, stripe_customer_id) VALUES
+        INSERT INTO "rox_user" (id, username, email, stripe_customer_id) VALUES
             ('c1000000-0000-0000-0000-000000000001', 'alice', 'alice@test.com', 'stripe_alice'),
             ('c2000000-0000-0000-0000-000000000002', 'shared', 'shared@test.com', 'stripe_shared')
         "#,
@@ -329,10 +329,10 @@ async fn test_link_by_fusionauth_email_provider_wrong_fusionauth(
 async fn test_owned_link_for_thread_resolves_own_and_delegated(
     pool: Pool<Postgres>,
 ) -> anyhow::Result<()> {
-    // rox_user_links FK-references "User" (which FK-references macro_user).
+    // rox_user_links FK-references "User" (which FK-references rox_user).
     sqlx::query(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES
+        INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES
             ('d1000000-0000-0000-0000-000000000001'::uuid, 'child', 'child@test.com', 'stripe_child'),
             ('d2000000-0000-0000-0000-000000000002'::uuid, 'primary', 'primary@test.com', 'stripe_primary'),
             ('d3000000-0000-0000-0000-000000000003'::uuid, 'stranger', 'stranger@test.com', 'stripe_stranger')

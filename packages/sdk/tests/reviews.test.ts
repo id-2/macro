@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, test } from 'bun:test';
 import type { ReviewRecord_Serialize } from '../generated/agent-reviews';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -42,7 +42,7 @@ function setup() {
     const list = request.method === 'GET' && request.url.endsWith('/reviews');
     return Response.json(list ? [fixture] : fixture);
   }) as typeof fetch;
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'test-token',
     hosts: { 'agent-harness': 'https://agent.example.test' },
   });

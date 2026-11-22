@@ -1,7 +1,7 @@
-# GoAlert on-call paging, its Postgres, and the Macro Alerts relay.
+# GoAlert on-call paging, its Postgres, and the Rox Alerts relay.
 #
 # Everything here runs in Ohio and talks only to loopback, so paging keeps
-# working while production or its database is down. Pages reach the Macro
+# working while production or its database is down. Pages reach the Rox
 # Alerts channel through the relay; phone paging (Twilio) is not set up yet.
 {
   config,
@@ -18,13 +18,13 @@ let
     partOf = [ "observability-secrets.service" ];
   };
   relayUrl = "http://127.0.0.1:8090/goalert";
-  # services/bots/goalert-bot: posts alerts to Macro Alerts with thread replies and
+  # services/bots/goalert-bot: posts alerts to Rox Alerts with thread replies and
   # mentions. The webhook secret follows this prefix in the escalation step URL.
   goalertBotUrl = "https://goalert-bot.macroverse.workers.dev/goalert/";
   # GoAlert's config.Config, applied with `goalert set-config` before every
   # start. `@name@` strings are replaced with the credential of that name.
   goalertConfig = {
-    General.ApplicationName = "Macro On-Call";
+    General.ApplicationName = "Rox On-Call";
     # Google login, with Grafana's OAuth client. GoAlert cannot restrict OIDC
     # logins to a domain; the client's Internal audience keeps them to Workspace
     # accounts. Basic auth stays on for the break-glass `admin` login, created
@@ -124,7 +124,7 @@ in
     };
 
     macro-alerts-relay = needsSecrets // {
-      description = "Forward GoAlert notifications to Macro Alerts";
+      description = "Forward GoAlert notifications to Rox Alerts";
       wantedBy = [ "multi-user.target" ];
       serviceConfig = {
         DynamicUser = true;

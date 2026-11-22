@@ -187,10 +187,10 @@ async fn seed_unread(pool: &PgPool) -> anyhow::Result<UnreadFixture> {
         (UNREAD_CHILD, child_link),
         (UNREAD_STRANGER, stranger_link),
     ] {
-        let macro_user = Uuid::now_v7();
+        let rox_user = Uuid::now_v7();
         sqlx::query!(
-            "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
-            macro_user,
+            "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
+            rox_user,
             user,
         )
         .execute(pool)
@@ -198,7 +198,7 @@ async fn seed_unread(pool: &PgPool) -> anyhow::Result<UnreadFixture> {
         sqlx::query!(
             r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
             user,
-            macro_user,
+            rox_user,
         )
         .execute(pool)
         .await?;

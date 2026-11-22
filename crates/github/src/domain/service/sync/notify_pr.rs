@@ -73,7 +73,7 @@ impl<
         }
 
         let participant_user_ids = self
-            .pull_request_participant_macro_user_ids(pull_request, upserts)
+            .pull_request_participant_rox_user_ids(pull_request, upserts)
             .await;
         if participant_user_ids.is_empty() {
             return;
@@ -178,7 +178,7 @@ impl<
         })
     }
 
-    pub(super) async fn pull_request_participant_macro_user_ids(
+    pub(super) async fn pull_request_participant_rox_user_ids(
         &self,
         pull_request: &EnrichedGithubPullRequest,
         upserts: &[PullRequestForeignEntityUpsert],
@@ -189,7 +189,7 @@ impl<
             return HashSet::new();
         }
 
-        let user_ids = self.macro_users_for_github_user_ids(&github_user_ids).await;
+        let user_ids = self.rox_users_for_github_user_ids(&github_user_ids).await;
         if user_ids.is_empty() {
             tracing::trace!(
                 participant_github_user_count = github_user_ids.len(),
@@ -223,7 +223,7 @@ impl<
         github_user_ids
     }
 
-    async fn macro_users_for_github_user_ids(
+    async fn rox_users_for_github_user_ids(
         &self,
         github_user_ids: &HashSet<String>,
     ) -> HashSet<RoxUserIdStr<'static>> {

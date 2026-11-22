@@ -51,7 +51,7 @@ async fn snapshot(pool: &PgPool) -> Vec<Value> {
 async fn candidates_retain_older_cross_source_and_case_variant_metadata(pool: PgPool) {
     for (key, source, metadata) in [
         (
-            "Macro-Inc/App/pull/1",
+            "Rox-Inc/App/pull/1",
             "github_pull_request",
             json!({"n":1}),
         ),
@@ -149,7 +149,7 @@ async fn candidate_scan_reads_past_a_sql_page_without_duplicates(pool: PgPool) {
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn initialization_and_retries_never_rewrite_existing_columns_or_timestamps(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
-    let original = row("Macro/App/pull/7", Some(99));
+    let original = row("Rox/App/pull/7", Some(99));
     assert_eq!(
         repo.initialize_indexed_row(&original).await.unwrap(),
         PullRequestIndexOutcome::Inserted
@@ -168,7 +168,7 @@ async fn initialization_and_retries_never_rewrite_existing_columns_or_timestamps
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn conflicting_keys_unverified_rows_and_real_renames_remain_untouched(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
-    let original = row("Macro/App/pull/7", Some(99));
+    let original = row("Rox/App/pull/7", Some(99));
     repo.initialize_indexed_row(&original).await.unwrap();
     let before = snapshot(&pool).await;
     for candidate in [
@@ -206,7 +206,7 @@ async fn initialization_winning_after_empty_rename_lookup_allows_case_only_live_
 ) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     assert_eq!(repo.github_key_for(99, 7).await.unwrap(), None);
-    repo.initialize_indexed_row(&row("Macro/App/pull/7", Some(99)))
+    repo.initialize_indexed_row(&row("Rox/App/pull/7", Some(99)))
         .await
         .unwrap();
     let mut update = GithubPullRequestWrite::from_metadata(&json!({
@@ -217,18 +217,18 @@ async fn initialization_winning_after_empty_rename_lookup_allows_case_only_live_
     .unwrap();
     repo.upsert_row(&update).await.unwrap();
     let stored = repo
-        .pull_request_row("Macro/App/pull/7")
+        .pull_request_row("Rox/App/pull/7")
         .await
         .unwrap()
         .unwrap();
     assert_eq!(stored.title.as_deref(), Some("live title"));
-    assert_eq!(stored.github_key, "Macro/App/pull/7");
+    assert_eq!(stored.github_key, "Rox/App/pull/7");
     assert_eq!(stored.labels.len(), 1);
     assert_eq!(snapshot(&pool).await.len(), 1);
     let before = snapshot(&pool).await;
     update.repository_id = Some(100);
     assert!(repo.upsert_row(&update).await.is_err());
-    update.github_key = "Macro/App/pull/7".into();
+    update.github_key = "Rox/App/pull/7".into();
     assert!(repo.upsert_row(&update).await.is_err());
     update.repository_id = Some(99);
     update.github_key = "macro/renamed/pull/7".into();
@@ -247,7 +247,7 @@ async fn live_first_initialization_preserves_live_values_and_timestamps(pool: Pg
         .unwrap();
     let before = snapshot(&pool).await;
     assert_eq!(
-        repo.initialize_indexed_row(&row("Macro/App/pull/7", Some(99)))
+        repo.initialize_indexed_row(&row("Rox/App/pull/7", Some(99)))
             .await
             .unwrap(),
         PullRequestIndexOutcome::AlreadyPresent
@@ -270,7 +270,7 @@ async fn normalized_lock_serializes_initialization_and_live_updates(pool: PgPool
     let initialize_repo = repo.clone();
     let mut initialize = tokio::spawn(async move {
         initialize_repo
-            .initialize_indexed_row(&row("Macro/App/pull/7", Some(99)))
+            .initialize_indexed_row(&row("Rox/App/pull/7", Some(99)))
             .await
     });
     assert!(
@@ -311,7 +311,7 @@ async fn normalized_lock_serializes_initialization_and_live_updates(pool: PgPool
 async fn simultaneous_case_variant_initializations_insert_once(pool: PgPool) {
     let repo = PgGithubPullRequestRepo::new(pool.clone());
     let other = repo.clone();
-    let first = row("Macro/App/pull/7", Some(99));
+    let first = row("Rox/App/pull/7", Some(99));
     let second = row("macro/app/pull/7", Some(99));
     let (left, right) = tokio::join!(
         repo.initialize_indexed_row(&first),

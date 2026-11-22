@@ -8,25 +8,25 @@ use rand::seq::SliceRandom;
 pub async fn create_account_merge_request(
     db: &sqlx::Pool<sqlx::Postgres>,
     rox_user_id: &str,
-    to_merge_macro_user_id: &str,
+    to_merge_rox_user_id: &str,
 ) -> anyhow::Result<String> {
     let id = rox_uuid::generate_uuid_v7();
     let rox_user_id = rox_uuid::string_to_uuid(rox_user_id)
         .context("failed to convert rox_user_id to uuid")?;
-    let to_merge_macro_user_id = rox_uuid::string_to_uuid(to_merge_macro_user_id)
-        .context("failed to convert to_merge_macro_user_id to uuid")?;
+    let to_merge_rox_user_id = rox_uuid::string_to_uuid(to_merge_rox_user_id)
+        .context("failed to convert to_merge_rox_user_id to uuid")?;
 
     let code = generate_code(6);
 
     let code = sqlx::query!(
         r#"
-        INSERT INTO "account_merge_request" (id, rox_user_id, to_merge_macro_user_id, code, created_at)
+        INSERT INTO "account_merge_request" (id, rox_user_id, to_merge_rox_user_id, code, created_at)
         VALUES ($1, $2, $3, $4, NOW())
         RETURNING "code"
         "#,
         &id,
         &rox_user_id,
-        &to_merge_macro_user_id,
+        &to_merge_rox_user_id,
         &code
     ).map(|row| row.code).fetch_one(db).await?;
 

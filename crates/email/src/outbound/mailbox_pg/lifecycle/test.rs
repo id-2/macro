@@ -77,7 +77,7 @@ async fn user(db: &PgPool, name: &str) {
     let id = rox_uuid::generate_uuid_v7();
     let actor = actor(name);
     sqlx::query!(
-        "INSERT INTO macro_user(id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
+        "INSERT INTO rox_user(id,username,email,stripe_customer_id) VALUES ($1,$2,$3,$4)",
         id,
         name,
         format!("{name}@example.com"),

@@ -15,20 +15,20 @@ fn encrypted(seed: u8) -> EncryptedCursorApiKey {
 
 /// The table's foreign key means a key needs a real user to belong to.
 ///
-/// A Rox user is two rows: `macro_user` holds the identity and `"User"` the
+/// A Rox user is two rows: `rox_user` holds the identity and `"User"` the
 /// profile that references it. `cursor_configs` keys on `"User"."id"`, the
 /// text id that `RoxUserIdStr` carries — not the `rox_user_id` uuid.
 async fn insert_user(pool: &Pool<Postgres>, user_id: &str) -> anyhow::Result<()> {
     let email = format!("{user_id}@example.com");
     sqlx::query!(
         r#"
-        WITH new_macro_user AS (
-            INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        WITH new_rox_user AS (
+            INSERT INTO rox_user (id, username, email, stripe_customer_id)
             VALUES (gen_random_uuid(), $2, $2, $3)
             RETURNING id
         )
         INSERT INTO "User" ("id", "email", "rox_user_id")
-        SELECT $1, $2, new_macro_user.id FROM new_macro_user
+        SELECT $1, $2, new_rox_user.id FROM new_rox_user
         "#,
         user_id,
         email,

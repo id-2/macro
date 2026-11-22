@@ -76,7 +76,7 @@ async fn choosing_owner_still_holds_the_call_without_executing_it() {
     let response = service
         .proxy(
             &SessionToken::new("session"),
-            EgressTarget::McpServer(McpDestination::Macro),
+            EgressTarget::McpServer(McpDestination::Rox),
             request,
         )
         .await
@@ -104,7 +104,7 @@ async fn missing_selection_and_missing_requester_never_resolve_credentials() {
         let response = service
             .proxy(
                 &SessionToken::new("session"),
-                EgressTarget::McpServer(McpDestination::Macro),
+                EgressTarget::McpServer(McpDestination::Rox),
                 request,
             )
             .await
@@ -162,7 +162,7 @@ async fn deferred_mcp_catalog_requires_an_actor_without_changing_provider_argume
     let response = service
         .proxy(
             &SessionToken::new("session"),
-            EgressTarget::McpServer(McpDestination::Macro),
+            EgressTarget::McpServer(McpDestination::Rox),
             json_request(r#"{"jsonrpc":"2.0","id":1,"method":"tools/list"}"#),
         )
         .await
@@ -222,7 +222,7 @@ async fn an_owner_approval_cannot_execute_after_the_original_turn_is_superseded(
     )
     .with_owner_approvals(Approve)
     .with_actor_mcp(Arc::new(ActorTransport::default()));
-    let response = service.proxy(&SessionToken::new("session"), EgressTarget::McpServer(McpDestination::Macro), json_request(r#"{"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"ListEmails","arguments":{"acting_as":"owner"}}}"#)).await.unwrap();
+    let response = service.proxy(&SessionToken::new("session"), EgressTarget::McpServer(McpDestination::Rox), json_request(r#"{"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"ListEmails","arguments":{"acting_as":"owner"}}}"#)).await.unwrap();
     assert_eq!(body_json(response).await["result"]["isError"], true);
     assert!(!service.forward.was_called());
 }
@@ -250,7 +250,7 @@ async fn rox_tools_are_attributed_to_the_sessions_agent_not_one_the_caller_names
     let response = service
         .proxy(
             &SessionToken::new("session"),
-            EgressTarget::McpServer(McpDestination::Macro),
+            EgressTarget::McpServer(McpDestination::Rox),
             request,
         )
         .await
@@ -350,7 +350,7 @@ async fn an_in_process_exchange_never_reaches_rox_or_preview() {
         gated(prompted_by(None), SpyCredentials::knowing()).with_actor_mcp(transport.clone());
     let grant = service.session_grant(AgentSessionId::new()).await.unwrap();
 
-    for destination in [McpDestination::Macro, McpDestination::Preview] {
+    for destination in [McpDestination::Rox, McpDestination::Preview] {
         let refused = service
             .exchange_as(
                 &grant,

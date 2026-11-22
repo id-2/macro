@@ -31,8 +31,8 @@ pub struct AdoptOrSeedUserArgs {
     pub email: String,
     /// The `macro|email` user id.
     pub user_id: String,
-    /// Derived uuid used when no `macro_user` row exists for the email.
-    pub derived_macro_user_id: Uuid,
+    /// Derived uuid used when no `rox_user` row exists for the email.
+    pub derived_rox_user_id: Uuid,
     /// First name for `rox_user_info`.
     pub first_name: String,
     /// Last name for `rox_user_info`.
@@ -581,7 +581,7 @@ impl SeedDb {
 
     /// Delegate an email link from its owner to another user.
     #[tracing::instrument(skip(self), err)]
-    pub async fn insert_macro_user_link(
+    pub async fn insert_rox_user_link(
         &self,
         primary_rox_id: &str,
         child_rox_id: &str,
@@ -601,14 +601,14 @@ impl SeedDb {
     }
 
     /// Seed one user, adopting rows the signup webhook may already have
-    /// created for the email (their `macro_user` id wins over the derived
+    /// created for the email (their `rox_user` id wins over the derived
     /// one so login-created accounts stay intact).
     #[tracing::instrument(skip(self), err)]
     pub async fn adopt_or_seed_user(&self, args: AdoptOrSeedUserArgs) -> anyhow::Result<()> {
         let AdoptOrSeedUserArgs {
             email,
             user_id,
-            derived_macro_user_id,
+            derived_rox_user_id,
             first_name,
             last_name,
             stripe_customer_id,
@@ -620,7 +620,7 @@ impl SeedDb {
         let mut transaction = self.inner.begin().await?;
 
         let existing: Option<Uuid> =
-            sqlx::query_scalar!("SELECT id FROM macro_user WHERE email = $1 LIMIT 1", email)
+            sqlx::query_scalar!("SELECT id FROM rox_user WHERE email = $1 LIMIT 1", email)
                 .fetch_optional(transaction.as_mut())
                 .await?;
 
@@ -628,16 +628,16 @@ impl SeedDb {
             Some(id) => id,
             None => {
                 sqlx::query!(
-                    r#"INSERT INTO macro_user (id, username, email, stripe_customer_id, has_trialed)
+                    r#"INSERT INTO rox_user (id, username, email, stripe_customer_id, has_trialed)
                        VALUES ($1, $2, $3, $4, false)"#,
-                    derived_macro_user_id,
+                    derived_rox_user_id,
                     email,
                     email,
                     stripe_customer_id,
                 )
                 .execute(transaction.as_mut())
                 .await?;
-                derived_macro_user_id
+                derived_rox_user_id
             }
         };
 

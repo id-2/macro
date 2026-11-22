@@ -47,7 +47,7 @@ impl SearchProvider for FakeProvider {
         Ok(Billed {
             credits: Some(1),
             value: vec![WebSearchResult {
-                title: "Macro".into(),
+                title: "Rox".into(),
                 url: "https://rox.one/".into(),
                 snippet: "Rox is a workspace.".into(),
                 published_at: None,
@@ -216,7 +216,7 @@ async fn search_returns_results_and_meters_the_caller() {
     assert_eq!(
         json_body(response).await,
         json!({ "results": [{
-            "title": "Macro",
+            "title": "Rox",
             "url": "https://rox.one/",
             "snippet": "Rox is a workspace."
         }] })

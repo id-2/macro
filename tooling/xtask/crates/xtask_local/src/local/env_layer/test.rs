@@ -4,21 +4,21 @@ use super::*;
 fn keeps_resolved_database_url_when_shell_has_local_default() {
     assert!(!should_overlay_process_env(
         "DATABASE_URL",
-        "postgres://user:password@localhost:5432/macrodb"
+        "postgres://user:password@localhost:5432/roxdb"
     ));
     assert!(!should_overlay_process_env(
         "DATABASE_URL",
-        "postgres://user:password@postgres:5432/macrodb"
+        "postgres://user:password@postgres:5432/roxdb"
     ));
     // The published port a host-side `sqlx`/`prepare_db` run exports reaches
     // this container's own loopback, so it must not displace the in-network URL.
     assert!(!should_overlay_process_env(
         "DATABASE_URL",
-        "postgresql://user:password@127.0.0.1:24200/macrodb"
+        "postgresql://user:password@127.0.0.1:24200/roxdb"
     ));
     assert!(!should_overlay_process_env(
         "DATABASE_URL",
-        "postgres://user:password@[::1]:24200/macrodb"
+        "postgres://user:password@[::1]:24200/roxdb"
     ));
 }
 
@@ -26,7 +26,7 @@ fn keeps_resolved_database_url_when_shell_has_local_default() {
 fn still_allows_non_local_database_overrides() {
     assert!(should_overlay_process_env(
         "DATABASE_URL",
-        "postgres://user:password@dev.example.com:5432/macrodb"
+        "postgres://user:password@dev.example.com:5432/roxdb"
     ));
 }
 

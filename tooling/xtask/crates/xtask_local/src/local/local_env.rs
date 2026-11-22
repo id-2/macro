@@ -216,6 +216,12 @@ impl LocalEnv {
             "OVERRIDE_STATIC_FILE_PUBLIC_URL".into(),
             self.static_file_public_url.clone(),
         );
+        // Returning the sign-in code in the response would let anyone who
+        // types a known address in take that person's session without the
+        // mailbox, so a local stack keeps the product's behavior by default.
+        // A developer who cannot read Mailpit opts in per run:
+        // `PASSWORDLESS_RETURN_CODE=true just run_local`.
+        env.insert("PASSWORDLESS_RETURN_CODE".into(), "false".into());
         // Pipedream's hosted Connect UI refuses to be opened from an origin
         // outside this list, and document_cognition's own local default only
         // names port 3000 - a named instance's frontend lives on a derived
@@ -328,7 +334,7 @@ struct InfraEnv {
 impl InfraEnv {
     fn local(browser_origin: &str) -> Self {
         InfraEnv {
-            database_url: "postgres://user:password@postgres:5432/macrodb".into(),
+            database_url: "postgres://user:password@postgres:5432/roxdb".into(),
             redis_uri: "redis://redis:6379".into(),
             opensearch_url: "http://search:9200".into(),
             local_aws_url: "http://localstack:4566".into(),
@@ -511,6 +517,37 @@ impl InfraEnv {
     }
 }
 
+fn apply_recording_warehouse(env: &mut BTreeMap<String, String>) {
+    let Some(home) = std::env::var_os("HOME") else {
+        return;
+    };
+    let path = std::path::PathBuf::from(home).join(".config/macro/rox-recording-warehouse.env");
+    let Ok(text) = std::fs::read_to_string(path) else {
+        return;
+    };
+    let mut values = BTreeMap::new();
+    for line in text.lines() {
+        let Some((key, value)) = line.split_once('=') else {
+            continue;
+        };
+        if !value.is_empty() {
+            values.insert(key, value);
+        }
+    }
+    let map = [
+        ("RECORDING_S3_BUCKET", "CALL_RECORDING_S3_BUCKET"),
+        ("RECORDING_S3_REGION", "CALL_RECORDING_S3_REGION"),
+        ("RECORDING_S3_ACCESS_KEY", "CALL_RECORDING_S3_ACCESS_KEY"),
+        ("RECORDING_S3_SECRET", "CALL_RECORDING_S3_SECRET"),
+        ("RECORDING_S3_ENDPOINT", "CALL_RECORDING_S3_ENDPOINT"),
+    ];
+    for (from, to) in map {
+        if let Some(value) = values.get(from) {
+            env.insert((*to).into(), (*value).into());
+        }
+    }
+}
+
 /// S3 buckets and DynamoDB tables, emitted straight from the shared
 /// [`resources`] catalog so they can't drift from what LocalStack provisions.
 struct StorageEnv;
@@ -537,6 +574,7 @@ impl StorageEnv {
             env.insert("CALL_RECORDING_S3_REGION".into(), "us-east-1".into());
             env.insert("CALL_RECORDING_S3_ACCESS_KEY".into(), "test".into());
             env.insert("CALL_RECORDING_S3_SECRET".into(), "test".into());
+            apply_recording_warehouse(env);
         }
         for table in resources::TABLES {
             env.insert(table.env_key.into(), table.name.into());
@@ -576,25 +614,57 @@ impl QueueEnv {
     }
 }
 
-/// Mail: SES sends are routed to Mailpit SMTP (see the `ses_client` transport).
+/// Mail: SES sends are routed to SMTP (see the `ses_client` transport) — the
+/// Mailpit sink by default, or a real relay when the operator's shell carries
+/// `SMTP_*` overrides (e.g. Resend for a publicly reachable stand).
 struct MailEnv {
-    smtp_host: &'static str,
-    smtp_port: &'static str,
+    smtp_host: String,
+    smtp_port: String,
+    smtp_tls: Option<String>,
+    smtp_username: Option<String>,
+    smtp_password: Option<String>,
     sender_base_address: &'static str,
 }
 
 impl MailEnv {
     fn local() -> Self {
+        let read = |name: &str| {
+            std::env::var(name)
+                .ok()
+                .map(|value| value.trim().to_string())
+                .filter(|value| !value.is_empty())
+        };
+        let smtp_host = read("SMTP_HOST").unwrap_or_else(|| "mailpit".to_string());
+        let smtp_port = read("SMTP_PORT").unwrap_or_else(|| {
+            if smtp_host == "mailpit" {
+                "1025"
+            } else {
+                "587"
+            }
+            .to_string()
+        });
         MailEnv {
-            smtp_host: "mailpit",
-            smtp_port: "1025",
+            smtp_host,
+            smtp_port,
+            smtp_tls: read("SMTP_TLS"),
+            smtp_username: read("SMTP_USERNAME"),
+            smtp_password: read("SMTP_PASSWORD"),
             sender_base_address: "rox.local",
         }
     }
 
     fn write(&self, env: &mut BTreeMap<String, String>) {
-        env.insert("SMTP_HOST".into(), self.smtp_host.into());
-        env.insert("SMTP_PORT".into(), self.smtp_port.into());
+        env.insert("SMTP_HOST".into(), self.smtp_host.clone());
+        env.insert("SMTP_PORT".into(), self.smtp_port.clone());
+        if let Some(tls) = &self.smtp_tls {
+            env.insert("SMTP_TLS".into(), tls.clone());
+        }
+        if let Some(username) = &self.smtp_username {
+            env.insert("SMTP_USERNAME".into(), username.clone());
+        }
+        if let Some(password) = &self.smtp_password {
+            env.insert("SMTP_PASSWORD".into(), password.clone());
+        }
         env.insert(
             "SENDER_BASE_ADDRESS".into(),
             self.sender_base_address.into(),
@@ -835,7 +905,7 @@ impl BootStubEnv {
         // email_service / connection_gateway open their own Postgres pool.
         env.insert(
             "ROX_DB_URL".into(),
-            "postgres://user:password@postgres:5432/macrodb".into(),
+            "postgres://user:password@postgres:5432/roxdb".into(),
         );
         // The harness requires Pipedream credentials even when integrations
         // are unused. Real credentials can override these boot placeholders.
@@ -859,7 +929,7 @@ impl BootStubEnv {
         env.insert("PIPEDREAM_WEBHOOK_SECRET".into(), "local".into());
         // search_processing_service; the local cluster has the security plugin
         // disabled so these are accepted but ignored (same as opensearch.rs).
-        env.insert("OPENSEARCH_USERNAME".into(), "macrouser".into());
+        env.insert("OPENSEARCH_USERNAME".into(), "roxuser".into());
         env.insert("OPENSEARCH_PASSWORD".into(), "local".into());
         // Local document URLs use the instance endpoint supplied by InfraEnv;
         // signing is skipped by the `is_local_aws()` branch.
@@ -994,6 +1064,10 @@ impl BootStubEnv {
         // (`anthropic::Config::dangrously_try_from_env`); a dummy satisfies the
         // loader, real model calls just fail.
         env.insert("ANTHROPIC_API_KEY".into(), "local-anthropic-key".into());
+        // the ai editing worker's env validation requires all three model keys
+        // at boot (`services/ai-editing-worker/src/env.ts`); a dummy satisfies
+        // the loader, real provider calls just fail.
+        env.insert("CEREBRAS_API_KEY".into(), "local-cerebras-key".into());
         // the harness cognition module's MCP provider registry requires the
         // pre-registered OAuth creds (Slack + GitHub) at boot.
         env.insert(

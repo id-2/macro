@@ -55,7 +55,7 @@ fn unique_user() -> RoxUserIdStr<'static> {
 async fn insert_user(pool: &PgPool, user_id: &str) {
     let rox_user_id = rox_uuid::generate_uuid_v7();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
         rox_user_id,
         user_id,
     )

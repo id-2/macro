@@ -52,15 +52,15 @@ impl Default for StarterBlueprint {
         Self {
             database_id: DatabaseId::new(),
             table_id: TableId::new(),
-            name: "Getting started",
-            table_name: "Ideas",
-            title_name: "Name",
-            stage_name: "Stage",
-            stages: ["To do", "Doing", "Done"],
+            name: "Начало работы",
+            table_name: "Идеи",
+            title_name: "Название",
+            stage_name: "Этап",
+            stages: ["Сделать", "В работе", "Готово"],
             rows: [
-                ("Add your first idea", 0),
-                ("Try moving a card", 1),
-                ("Explore table and board views", 2),
+                ("Добавьте первую идею", 0),
+                ("Попробуйте перетащить карточку", 1),
+                ("Изучите таблицу и доску", 2),
             ],
         }
     }

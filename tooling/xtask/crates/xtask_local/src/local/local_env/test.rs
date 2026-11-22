@@ -133,6 +133,7 @@ fn emits_required_keys() {
         "SNS_FCM_PLATFORM_ARN",
         "MCP_CREDENTIALS_KEY_SECRET_NAME",
         "ANTHROPIC_API_KEY",
+        "CEREBRAS_API_KEY",
         "SLACK_MCP_CLIENT_ID",
         "SLACK_MCP_CLIENT_SECRET",
         "OPENAI_DOMAIN_VERIFICATION_TOKEN",
@@ -196,7 +197,7 @@ fn boot_stubs_are_local_only() {
     );
     assert_eq!(
         env.get("ROX_DB_URL").map(String::as_str),
-        Some("postgres://user:password@postgres:5432/macrodb")
+        Some("postgres://user:password@postgres:5432/roxdb")
     );
     // INTERNAL_API_KEY must agree with the internal-auth key other services
     // validate against, or every internal call 401s.
@@ -212,7 +213,7 @@ fn boot_stubs_are_local_only() {
     );
     assert_eq!(
         env.get("OPENSEARCH_USERNAME").map(String::as_str),
-        Some("macrouser")
+        Some("roxuser")
     );
 }
 

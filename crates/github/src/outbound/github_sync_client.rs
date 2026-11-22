@@ -110,7 +110,7 @@ impl GithubSyncClientImpl {
             ))
             .header("Authorization", format!("Bearer {}", jwt.as_str()))
             .header("Accept", "application/vnd.github+json")
-            .header("User-Agent", "Macro-Auth-Service")
+            .header("User-Agent", "Rox-Auth-Service")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .json(&body)
             .send()
@@ -201,7 +201,7 @@ impl GithubSyncClient for GithubSyncClientImpl {
                 ))
                 .header("Authorization", format!("Bearer {access_token}"))
                 .header("Accept", "application/vnd.github+json")
-                .header("User-Agent", "Macro-Auth-Service")
+                .header("User-Agent", "Rox-Auth-Service")
                 .header("X-GitHub-Api-Version", "2022-11-28")
                 .send()
                 .await
@@ -255,7 +255,7 @@ impl GithubSyncClient for GithubSyncClientImpl {
             .get(format!("{}/user", self.api_base_url()))
             .header("Authorization", format!("Bearer {access_token}"))
             .header("Accept", "application/vnd.github+json")
-            .header("User-Agent", "Macro-Auth-Service")
+            .header("User-Agent", "Rox-Auth-Service")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .send()
             .await
@@ -290,7 +290,7 @@ impl GithubSyncClient for GithubSyncClientImpl {
             ))
             .header("Authorization", format!("Bearer {}", jwt.as_str()))
             .header("Accept", "application/vnd.github+json")
-            .header("User-Agent", "Macro-Auth-Service")
+            .header("User-Agent", "Rox-Auth-Service")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .send()
             .await
@@ -335,7 +335,7 @@ impl GithubSyncClient for GithubSyncClientImpl {
             ))
             .header("Authorization", format!("Bearer {}", jwt.as_str()))
             .header("Accept", "application/vnd.github+json")
-            .header("User-Agent", "Macro-Auth-Service")
+            .header("User-Agent", "Rox-Auth-Service")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .send()
             .await
@@ -403,7 +403,7 @@ impl GithubSyncClient for GithubSyncClientImpl {
             ))
             .header("Authorization", format!("Bearer {access_token}"))
             .header("Accept", "application/vnd.github+json")
-            .header("User-Agent", "Macro-Auth-Service")
+            .header("User-Agent", "Rox-Auth-Service")
             .header("X-GitHub-Api-Version", "2022-11-28")
             .json(&serde_json::json!({ "body": body }))
             .send()
@@ -471,7 +471,7 @@ impl GithubSyncClient for GithubSyncClientImpl {
                 ))
                 .header("Authorization", format!("Bearer {access_token}"))
                 .header("Accept", "application/vnd.github+json")
-                .header("User-Agent", "Macro-Auth-Service")
+                .header("User-Agent", "Rox-Auth-Service")
                 .header("X-GitHub-Api-Version", "2022-11-28")
                 .send()
                 .await

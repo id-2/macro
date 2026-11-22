@@ -367,7 +367,7 @@ impl Harness {
     /// tries them.
     const KNOWN: &'static [Self] = &[
         Self::ClaudeCode,
-        Self::Macro,
+        Self::Rox,
         Self::Codex,
         Self::OpenCode,
         Self::Cursor,
@@ -380,7 +380,7 @@ impl Harness {
     pub fn reader(self) -> &'static dyn HarnessReader {
         match self {
             Self::ClaudeCode => &claude_code::ClaudeCode,
-            Self::Macro => &rox_inmem::RoxInmem,
+            Self::Rox => &rox_inmem::RoxInmem,
             Self::OpenCode => &opencode::OpenCode,
             Self::Codex => &codex::Codex,
             Self::Cursor => &cursor::Cursor,
@@ -417,7 +417,7 @@ pub enum ToolShape<'name> {
     Harness,
     /// A Rox tool, by the name Rox gives it. Its input and output are the
     /// tool's own JSON once the harness's wrapper is off.
-    Macro(&'name str),
+    Rox(&'name str),
     /// A Rox user tool, by name: the agent drafts it, the user finishes it.
     UserTool(&'name str),
     /// A Rox tool whose result is a view shown to the person.
@@ -445,7 +445,7 @@ pub fn tool_shape<'name>(
         Some(RoxTool::User(tool)) => ToolShape::UserTool(tool),
         Some(RoxTool::Subagent) => ToolShape::Subagent,
         Some(RoxTool::View) => ToolShape::View,
-        Some(RoxTool::Other(tool)) => ToolShape::Macro(tool),
+        Some(RoxTool::Other(tool)) => ToolShape::Rox(tool),
         None if reader.is_subagent(name, frame) => ToolShape::Subagent,
         None => ToolShape::Harness,
     }

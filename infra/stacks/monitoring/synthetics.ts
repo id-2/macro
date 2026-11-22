@@ -44,7 +44,7 @@ export const appWelcomeHealthCheck = new datadog.SyntheticsTest(
       minLocationFailed: 1,
       httpVersion: 'any',
       retry: { count: 0, interval: 300 },
-      monitorName: 'Macro App is Down',
+      monitorName: 'Rox App is Down',
       monitorOptions: {
         notificationPresetName: 'show_all',
         renotifyInterval: RENOTIFY_MINUTES,

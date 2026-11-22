@@ -10,7 +10,7 @@ fn shaped(body: Value) -> Result<Option<Value>, PromptLayoutError> {
 fn a_body_without_a_layout_is_left_alone() {
     let body = json!({
         "model": "claude-opus-4-8",
-        "system": [{"type": "text", "text": "You are Macro.", "cache_control": {"type": "ephemeral"}}],
+        "system": [{"type": "text", "text": "You are Rox.", "cache_control": {"type": "ephemeral"}}],
         "messages": [{"role": "user", "content": [{"type": "text", "text": "hi"}]}],
     });
     assert_eq!(shaped(body), Ok(None));
@@ -21,7 +21,7 @@ fn a_body_without_a_layout_is_left_alone() {
 fn shared_system_block_gets_its_own_breakpoint() {
     let body = json!({
         "system": [
-            {"type": "text", "text": "You are Macro."},
+            {"type": "text", "text": "You are Rox."},
             {"type": "text", "text": "<session_instructions>Task A</session_instructions>", "cache_control": {"type": "ephemeral"}},
         ],
         "messages": [{"role": "user", "content": [{"type": "text", "text": "hi"}]}],
@@ -32,7 +32,7 @@ fn shared_system_block_gets_its_own_breakpoint() {
         shaped(body),
         Ok(Some(json!({
             "system": [
-                {"type": "text", "text": "You are Macro.", "cache_control": {"type": "ephemeral"}},
+                {"type": "text", "text": "You are Rox.", "cache_control": {"type": "ephemeral"}},
                 {"type": "text", "text": "<session_instructions>Task A</session_instructions>", "cache_control": {"type": "ephemeral"}},
             ],
             "messages": [{"role": "user", "content": [{"type": "text", "text": "hi"}]}],
@@ -45,13 +45,13 @@ fn shared_system_block_gets_its_own_breakpoint() {
 fn shared_system_needs_exactly_two_blocks_the_first_unmarked() {
     let layout = json!({"cache_shared_system": true, "tool_references": []});
     for system in [
-        json!([{"type": "text", "text": "You are Macro."}]),
+        json!([{"type": "text", "text": "You are Rox."}]),
         json!([
-            {"type": "text", "text": "You are Macro.", "cache_control": {"type": "ephemeral"}},
+            {"type": "text", "text": "You are Rox.", "cache_control": {"type": "ephemeral"}},
             {"type": "text", "text": "Task A"},
         ]),
         json!([
-            {"type": "text", "text": "You are Macro."},
+            {"type": "text", "text": "You are Rox."},
             {"type": "text", "text": "Task A"},
             {"type": "text", "text": "Memory"},
         ]),
@@ -185,7 +185,7 @@ fn a_layout_cannot_exceed_four_breakpoints() {
             {"name": "B", "input_schema": {"type": "object", "properties": {"cache_control": {"type": "string"}}}, "cache_control": {"type": "ephemeral"}},
         ],
         "system": [
-            {"type": "text", "text": "You are Macro."},
+            {"type": "text", "text": "You are Rox."},
             {"type": "text", "text": "Task A", "cache_control": {"type": "ephemeral"}},
         ],
         "messages": [],

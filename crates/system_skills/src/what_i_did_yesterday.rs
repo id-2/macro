@@ -32,7 +32,7 @@ Link each event to its Rox item or external URL. After the timeline, add a two-o
 "##;
 
 static INTENT: &str = "Day-recap requests produce a chronological, linked timeline of the user's own actions \
-     across Macro, GitHub, and connected integrations, grouped by part of day and followed by a short \
+     across Rox, GitHub, and connected integrations, grouped by part of day and followed by a short \
      summary of the day's main work.";
 
 /// The skill's instructions as a composable prompt section.

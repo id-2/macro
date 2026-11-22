@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from 'bun:test';
 import type { ScheduledActionResponse } from '../generated/scheduled-action/types.gen';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 import { RoxApiError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
@@ -31,7 +31,7 @@ test('routine creation maps agent handles, seeds detail and uses shared auth and
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     auth: { type: 'bot', token: 'mbot_test' },
     requestedAs: record.owner,
     hosts: { 'scheduled-action': 'https://routines.test' },
@@ -78,7 +78,7 @@ test('routine creation sends code and Ask AI steps that write as the user', asyn
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'user',
     hosts: { 'scheduled-action': 'https://routines.test' },
   });
@@ -167,7 +167,7 @@ test('routine writes invalidate detail only after success', async () => {
     },
     { preconnect: originalFetch.preconnect },
   );
-  const routine = new Macro({
+  const routine = new Rox({
     token: 'user',
     hosts: { 'scheduled-action': 'https://routines.test' },
   }).routines.byId('routine-1');
@@ -207,7 +207,7 @@ test('routine execution returns typed transcript handles and scoped history', as
     },
     { preconnect: originalFetch.preconnect },
   );
-  const routine = new Macro({
+  const routine = new Rox({
     token: 'user',
     hosts: { 'scheduled-action': 'https://routines.test' },
   }).routines.byId('routine-1');
@@ -232,7 +232,7 @@ test('routine options carry run visibility and updates that omit it keep it', as
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     auth: { type: 'bot', token: 'mbot_test' },
     requestedAs: record.owner,
     hosts: { 'scheduled-action': 'https://routines.test' },
@@ -264,7 +264,7 @@ test('a rejected routine create carries the server validation message', async ()
       }),
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'user',
     hosts: { 'scheduled-action': 'https://routines.test' },
   });

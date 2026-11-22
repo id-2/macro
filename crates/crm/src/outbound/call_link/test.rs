@@ -16,7 +16,7 @@ async fn seed_team(pool: &PgPool, crm_enabled: bool) -> Uuid {
     for user_id in [MEMBER, TEAMMATE] {
         let rox_user_id = Uuid::now_v7();
         sqlx::query(
-            "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
+            "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $3)",
         )
         .bind(rox_user_id)
         .bind(user_id)

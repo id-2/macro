@@ -29,7 +29,7 @@ const TEAMMATE: &str = "macro|teammate@example.com";
 async fn team_computer(pool: &PgPool, team_id: Uuid) -> (ComputerId, HarnessId) {
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES
             ('00000000-0000-4000-8000-000000000001', 'buyer@example.com', 'buyer@example.com', 'stripe_buyer'),
             ('00000000-0000-4000-8000-000000000002', 'teammate@example.com', 'teammate@example.com', 'stripe_teammate')

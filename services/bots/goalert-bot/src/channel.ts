@@ -1,5 +1,5 @@
 import type { Env } from '../../../../packages/sdk/src/config';
-import { Macro } from '../../../../packages/sdk/src/macro';
+import { Rox } from '../../../../packages/sdk/src/macro';
 import type { RichMessage } from '../../../../packages/sdk/src/mentions';
 
 export type ChannelConfig = {
@@ -32,7 +32,7 @@ export type AlertChannel = {
  * bot would drop `requestedAs` and use the default team scope instead.
  */
 export function createAlertChannel(config: ChannelConfig): AlertChannel {
-  const bot = new Macro({
+  const bot = new Rox({
     env: config.env ?? 'prod',
     auth: { type: 'bot', token: config.botToken, scope: 'user' },
   });

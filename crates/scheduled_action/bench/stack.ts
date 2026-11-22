@@ -6,7 +6,7 @@ import { closeSync, existsSync, mkdirSync, openSync, readFileSync, statSync, unl
 import { homedir, loadavg } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 
-import { Macro } from '../../../packages/sdk/src/macro';
+import { Rox } from '../../../packages/sdk/src/macro';
 
 export type Stack = {
   instance: string;
@@ -25,7 +25,7 @@ export type Stack = {
 const REPO = resolve(import.meta.dir, '../../..');
 
 /** `run_local`'s instance with no `--instance`, which keeps the base compose file's ports. */
-const DEFAULT_INSTANCE = 'macro';
+const DEFAULT_INSTANCE = 'rox';
 /** Its Postgres port (`Port::Postgres` in `xtask_ports`). */
 const DEFAULT_POSTGRES_PORT = 5432;
 
@@ -66,7 +66,7 @@ export function stack(instance: string, tempo: string): Stack {
   return {
     instance,
     // Postgres takes the first port of the instance's block.
-    postgres: `postgres://user:password@localhost:${portBase(instance)}/macrodb`,
+    postgres: `postgres://user:password@localhost:${portBase(instance)}/roxdb`,
     owner: resolve(dirname(path), '../../../..'),
     auth: portmap.hosts.auth,
     harness: portmap.hosts.cognition.replace(/\/cognition$/, ''),
@@ -131,9 +131,9 @@ export async function login(at: Stack, email: string): Promise<string> {
 }
 
 /** An SDK client acting as the holder of `token`, pointed at the stack. */
-export function sdk(at: Stack, token: string): Macro {
+export function sdk(at: Stack, token: string): Rox {
   const h = at.hosts;
-  return new Macro({
+  return new Rox({
     token,
     env: 'local',
     webAppUrl: at.webApp,
@@ -287,8 +287,8 @@ export function runningHarnesses(): string[] {
     .toString()
     .split('\n')
     .map((line) => line.trim())
-    .filter((line) => line.startsWith('macro-'))
-    .map((line) => line.replace(/^macro-/, '').replace(/-agent_harness_service-\d+$/, ''));
+    .filter((line) => line.startsWith('rox-'))
+    .map((line) => line.replace(/^rox-/, '').replace(/-agent_harness_service-\d+$/, ''));
 }
 
 // ---------- which build answers ----------
@@ -347,8 +347,9 @@ export async function restoreHarness(at: Stack, bin: string | undefined) {
 async function recreateHarness(at: Stack, override?: string) {
   const generated = join(at.owner, 'infra/local/generated', at.instance);
   const env = join(generated, 'local.generated.env');
+  const project = at.instance === DEFAULT_INSTANCE ? DEFAULT_INSTANCE : `rox-${at.instance}`;
   const compose = [
-    `COMPOSE_PROJECT_NAME=macro-${at.instance}`,
+    `COMPOSE_PROJECT_NAME=${project}`,
     `ROX_ENV_FILE=${env}`,
     'docker compose --project-directory .',
     `--env-file ${env}`,

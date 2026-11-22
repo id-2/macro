@@ -29,7 +29,7 @@ pub async fn get_existing_users(
 }
 
 /// Gets all user ids in the database with null macro user id
-pub async fn get_all_user_ids_stripe_customer_id_with_null_macro_user_id(
+pub async fn get_all_user_ids_stripe_customer_id_with_null_rox_user_id(
     db: &sqlx::Pool<sqlx::Postgres>,
     limit: i64,
     cursor: Option<String>,

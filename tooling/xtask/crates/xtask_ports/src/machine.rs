@@ -12,7 +12,7 @@ mod test;
 /// A container, attributed to the instance whose Compose project created it.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Container {
-    /// The instance it belongs to (`macro` for the default instance's), or
+    /// The instance it belongs to (`rox` for the default instance's), or
     /// `None` for containers no instance created.
     pub owner: Option<String>,
     /// Whether it is running.

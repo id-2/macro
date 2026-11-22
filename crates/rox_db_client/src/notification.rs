@@ -32,10 +32,10 @@ pub async fn get_basic_cloud_storage_item_metadata(
             let row = sqlx::query!(
                 r#"
                 SELECT
-                    d.id as "document_id",
-                    d.owner,
-                    d.name as "document_name",
-                    d."fileType" as "file_type",
+                    d.id as "document_id?",
+                    d.owner as "owner?",
+                    d.name as "document_name?",
+                    d."fileType" as "file_type?",
                     dst.sub_type as "sub_type?: DocumentSubType"
                 FROM
                     "Document" d
@@ -49,13 +49,13 @@ pub async fn get_basic_cloud_storage_item_metadata(
             .await
             .context("unable to get document metadata")?;
 
-            let owner = RoxUserIdStr::parse_from_str(&row.owner)
+            let owner = RoxUserIdStr::parse_from_str(row.owner.as_deref().unwrap_or_default())
                 .map_err(|e| anyhow::anyhow!("invalid owner id: {e}"))?
                 .into_owned();
 
             Ok(BasicCloudStorageItemMetadata {
-                item_id: row.document_id,
-                item_name: row.document_name,
+                item_id: row.document_id.unwrap_or_default(),
+                item_name: row.document_name.unwrap_or_default(),
                 item_owner: owner,
                 file_type: row.file_type,
                 sub_type: row.sub_type.map(|st| st.to_string()),
@@ -115,10 +115,10 @@ pub async fn get_basic_cloud_storage_documents_metadata(
     let rows = sqlx::query!(
         r#"
         SELECT
-            d.id as "document_id",
-            d.owner,
-            d.name as "document_name",
-            d."fileType" as "file_type",
+            d.id as "document_id?",
+            d.owner as "owner?",
+            d.name as "document_name?",
+            d."fileType" as "file_type?",
             dst.sub_type as "sub_type?: DocumentSubType"
         FROM
             "Document" d
@@ -134,11 +134,11 @@ pub async fn get_basic_cloud_storage_documents_metadata(
     let result = rows
         .into_iter()
         .map(|row| {
-            RoxUserIdStr::parse_from_str(&row.owner)
+            RoxUserIdStr::parse_from_str(row.owner.as_deref().unwrap_or_default())
                 .map_err(|e| anyhow::anyhow!("invalid owner id: {e}"))
                 .map(|owner| BasicCloudStorageItemMetadata {
-                    item_id: row.document_id,
-                    item_name: row.document_name,
+                    item_id: row.document_id.unwrap_or_default(),
+                    item_name: row.document_name.unwrap_or_default(),
                     item_owner: owner.into_owned(),
                     file_type: row.file_type,
                     sub_type: row.sub_type.map(|st| st.to_string()),

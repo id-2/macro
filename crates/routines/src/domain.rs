@@ -255,7 +255,7 @@ pub struct NotEditableHere(String);
 
 impl std::fmt::Display for NotEditableHere {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{} Edit it on the routine's page in Macro.", self.0)
+        write!(f, "{} Edit it on the routine's page in Rox.", self.0)
     }
 }
 

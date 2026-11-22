@@ -4,14 +4,14 @@ pub mod add_user_role;
 
 /// Given a users email, it will udpate their has_trialed
 #[tracing::instrument(skip_all, err)]
-pub async fn update_macro_user_has_trialed<'a>(
+pub async fn update_rox_user_has_trialed<'a>(
     db: &sqlx::Pool<sqlx::Postgres>,
     email: &Email<Lowercase<'a>>,
     has_trialed: bool,
 ) -> anyhow::Result<()> {
     sqlx::query!(
         r#"
-        UPDATE macro_user
+        UPDATE rox_user
         SET has_trialed = $2
         WHERE email = $1
         "#,
@@ -24,7 +24,7 @@ pub async fn update_macro_user_has_trialed<'a>(
     Ok(())
 }
 
-pub async fn update_macro_user_id(
+pub async fn update_rox_user_id(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     user_id: &str,
     rox_user_id: &str,

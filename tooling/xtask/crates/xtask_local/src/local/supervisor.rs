@@ -674,7 +674,7 @@ pub fn supervise(mode: Mode, flags: &RunLocalFlags, run: &RunArgs) -> Result<()>
             Start::Resume
         };
         stage.section(&format!(
-            "macro {} stack (detached, {}) — instance {}",
+            "rox {} stack (detached, {}) — instance {}",
             mode.label(),
             match start {
                 Start::Fresh => "fresh",

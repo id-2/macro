@@ -10,12 +10,12 @@ use rand::RngCore;
 use crate::api::context::ApiContext;
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]
-struct ChallengeRequest {
+pub(in crate::api) struct ChallengeRequest {
     email: String,
 }
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]
-struct RegisterPasskeyRequest {
+pub(in crate::api) struct RegisterPasskeyRequest {
     email: String,
     credential_id: String,
     client_data_json: String,
@@ -23,7 +23,7 @@ struct RegisterPasskeyRequest {
 }
 
 #[derive(serde::Deserialize, utoipa::ToSchema)]
-struct AssertPasskeyRequest {
+pub(in crate::api) struct AssertPasskeyRequest {
     email: String,
     credential_id: String,
     client_data_json: String,

@@ -85,7 +85,7 @@ const TITLES = {
   reachedCap: (name: string) => `${name} spend reached its monthly cap`,
 };
 
-const ACCOUNT_DESCRIPTION = `Macro's account with {{provider.name}} is refusing requests ({{reason.name}}), so every AI feature on that provider fails until billing is fixed.
+const ACCOUNT_DESCRIPTION = `Rox's account with {{provider.name}} is refusing requests ({{reason.name}}), so every AI feature on that provider fails until billing is fixed.
 
 - [Failure logs](https://us5.datadoghq.com/logs?query=%22ai%20provider%20account%20unavailable%22)
 - Fix it in the provider's billing console: pay the invoice, add credit, or raise the spending limit.`;
@@ -182,7 +182,7 @@ for (const { provider, name, usd: cap } of MONTHLY_CAPS) {
   const spend = `sum(current_1mo):${QUERIES.monthToDate(provider)}`;
   const description = `Priced ${name} spend this month is \${{value}} against its $${cap} monthly cap. At the cap ${name} suspends the account and every request on it fails.
 
-Raise the cap in ${name}'s billing console, then update MONTHLY_CAPS in infra/stacks/monitoring/monitors/ai-providers.ts. Priced spend is Macro's estimate from ai_pricing; the console is the source of truth.`;
+Raise the cap in ${name}'s billing console, then update MONTHLY_CAPS in infra/stacks/monitoring/monitors/ai-providers.ts. Priced spend is Rox's estimate from ai_pricing; the console is the source of truth.`;
 
   prodMonitor(`ai-${provider}-spend-nearing-cap`, {
     title: TITLES.nearingCap(name),

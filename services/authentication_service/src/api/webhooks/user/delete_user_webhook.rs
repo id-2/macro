@@ -39,7 +39,7 @@ pub async fn handler(
 
     // if fusionauth_user_id is part of an account_merge_request, return early as we are in
     // the process of merging the accounts
-    if rox_db_client::account_merge_request::check_merge_request_for_to_merge_macro_user_id(
+    if rox_db_client::account_merge_request::check_merge_request_for_to_merge_rox_user_id(
         &ctx.db,
         &fusionauth_user_id,
     )
@@ -56,7 +56,7 @@ pub async fn handler(
         return Ok(StatusCode::OK.into_response());
     }
 
-    let macro_user = match rox_db_client::macro_user::get_macro_user(&ctx.db, &fusionauth_user_id)
+    let rox_user = match rox_db_client::rox_user::get_rox_user(&ctx.db, &fusionauth_user_id)
         .await
     {
         Ok(user) => user,
@@ -91,7 +91,7 @@ pub async fn handler(
 
     // Await the durable cleanup so FusionAuth can retry failures. Acknowledging
     // before cleanup would strand resources if a service is unavailable.
-    delete_user(ctx, macro_user, fusionauth_user_id, user_ids)
+    delete_user(ctx, rox_user, fusionauth_user_id, user_ids)
         .await
         .map_err(|error| {
             tracing::error!(error=?error, "unable to complete user deletion; FusionAuth will retry");
@@ -107,10 +107,10 @@ pub async fn handler(
 }
 
 #[tracing::instrument(
-    skip(ctx, macro_user, fusionauth_user_id, user_ids),
+    skip(ctx, rox_user, fusionauth_user_id, user_ids),
     fields(
         fusionauth_user_id = %fusionauth_user_id,
-        stripe_customer_id = ?macro_user.stripe_customer_id,
+        stripe_customer_id = ?rox_user.stripe_customer_id,
         user_ids = ?user_ids,
         profile_count = user_ids.len(),
     ),
@@ -118,7 +118,7 @@ pub async fn handler(
 )]
 async fn delete_user(
     ctx: ApiContext,
-    macro_user: rox_db_client::macro_user::RoxUser,
+    rox_user: rox_db_client::rox_user::RoxUser,
     fusionauth_user_id: String,
     user_ids: Vec<String>,
 ) -> anyhow::Result<()> {
@@ -289,7 +289,7 @@ async fn delete_user(
     let start_time = std::time::Instant::now();
     crate::service::user::delete_user::delete_user_data(
         ctx.user_deletion.as_ref(),
-        &macro_user.id,
+        &rox_user.id,
         &users,
     )
     .await

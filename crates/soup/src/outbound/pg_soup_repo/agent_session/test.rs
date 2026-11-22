@@ -76,7 +76,7 @@ async fn seed(pool: &PgPool) -> anyhow::Result<Fixture> {
     for user in [OWNER, MEMBER, STRANGER] {
         let rox_user_id = Uuid::now_v7();
         sqlx::query!(
-            "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
+            "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
             rox_user_id,
             user,
         )

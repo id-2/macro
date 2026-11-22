@@ -226,7 +226,7 @@ async fn test_dynamic_filter_by_project_ids(pool: PgPool) {
     let rox_user_id = Uuid::new_v4();
 
     sqlx::query(
-        r#"INSERT INTO "macro_user" ("id", "username", "email", "stripe_customer_id") VALUES ($1, $2, $3, $4)"#,
+        r#"INSERT INTO "rox_user" ("id", "username", "email", "stripe_customer_id") VALUES ($1, $2, $3, $4)"#,
     )
     .bind(rox_user_id)
     .bind("test@example.com")
@@ -323,7 +323,7 @@ async fn test_dynamic_filter_by_project_ids_include_root(pool: PgPool) {
     let rox_user_id = Uuid::new_v4();
 
     sqlx::query(
-        r#"INSERT INTO "macro_user" ("id", "username", "email", "stripe_customer_id") VALUES ($1, $2, $3, $4)"#,
+        r#"INSERT INTO "rox_user" ("id", "username", "email", "stripe_customer_id") VALUES ($1, $2, $3, $4)"#,
     )
     .bind(rox_user_id)
     .bind("test@example.com")
@@ -764,15 +764,15 @@ async fn test_dynamic_filter_document_task_include_cbm_atm_nc(pool: PgPool) {
     let test_user_id = RoxUserIdStr::parse_from_str("macro|test@example.com").unwrap();
 
     // Ensure owner row exists for foreign keys from Document.owner.
-    let macro_user_uuid = Uuid::new_v4();
+    let rox_user_uuid = Uuid::new_v4();
     sqlx::query(
         r#"
-        INSERT INTO "macro_user" ("id", "username", "email", "stripe_customer_id")
+        INSERT INTO "rox_user" ("id", "username", "email", "stripe_customer_id")
         VALUES ($1, 'test', $2, 'stripe_test')
         ON CONFLICT ("id") DO NOTHING
         "#,
     )
-    .bind(macro_user_uuid)
+    .bind(rox_user_uuid)
     .bind("test@example.com")
     .execute(&pool)
     .await
@@ -787,7 +787,7 @@ async fn test_dynamic_filter_document_task_include_cbm_atm_nc(pool: PgPool) {
     )
     .bind(test_user_id.as_ref())
     .bind("test@example.com")
-    .bind(macro_user_uuid)
+    .bind(rox_user_uuid)
     .execute(&pool)
     .await
     .unwrap();
@@ -917,15 +917,15 @@ async fn test_dynamic_filter_document_task_include_cbm_atm_nc(pool: PgPool) {
 }
 
 async fn setup_date_filter_user(pool: &PgPool, user_id: &RoxUserIdStr<'_>) {
-    let macro_user_uuid = Uuid::new_v4();
+    let rox_user_uuid = Uuid::new_v4();
     sqlx::query(
         r#"
-        INSERT INTO "macro_user" ("id", "username", "email", "stripe_customer_id")
+        INSERT INTO "rox_user" ("id", "username", "email", "stripe_customer_id")
         VALUES ($1, 'test', $2, 'stripe_test')
         ON CONFLICT ("id") DO NOTHING
         "#,
     )
-    .bind(macro_user_uuid)
+    .bind(rox_user_uuid)
     .bind("test@example.com")
     .execute(pool)
     .await
@@ -940,7 +940,7 @@ async fn setup_date_filter_user(pool: &PgPool, user_id: &RoxUserIdStr<'_>) {
     )
     .bind(user_id.as_ref())
     .bind("test@example.com")
-    .bind(macro_user_uuid)
+    .bind(rox_user_uuid)
     .execute(pool)
     .await
     .unwrap();

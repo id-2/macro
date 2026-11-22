@@ -44,7 +44,7 @@ import {
   type Ledger,
   ledger,
 } from '../ledger.ts';
-import type { CallApi } from '../rox.ts';
+import type { CallApi } from '../macro.ts';
 import {
   type Held,
   lockWaitMs,

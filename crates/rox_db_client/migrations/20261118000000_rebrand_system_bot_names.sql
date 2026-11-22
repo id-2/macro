@@ -6,9 +6,9 @@
 UPDATE bots
 SET name = 'Rox'
 WHERE kind = 'system'
-  AND name = 'Macro';
+  AND name = 'Rox';
 
 UPDATE bots
 SET name = 'Rox Coder'
 WHERE kind = 'system'
-  AND name = 'Macro Coder';
+  AND name = 'Rox Coder';

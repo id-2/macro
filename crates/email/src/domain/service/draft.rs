@@ -887,7 +887,7 @@ fn apply_reply_target(
 
     // Generate Rox-In-Reply-To header
     input.headers_json = Some(serde_json::json!([{
-        "Macro-In-Reply-To": reply_target.db_id.to_string()
+        "Rox-In-Reply-To": reply_target.db_id.to_string()
     }]));
 }
 

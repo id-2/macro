@@ -52,7 +52,7 @@ listings, and calls all go through Connect, with no Pipedream fallback.
 ## Boundaries
 
 - Depends on: `ai_toolset`, `mcp_toolset`, `rox_authorization`,
-  `rox_user_id`, `connect_client` (the only Connect crate Rox may use).
+  `macro_user_id`, `connect_client` (the only Connect crate Rox may use).
 - Used by: `ai_tools`, `import_notion`, `import_tracker`, `import_linear`,
   `import_jira`, `agent_egress`, `agent_harness`,
   `granola_sync`, `mcp_select`, `services/agent_harness_service`.

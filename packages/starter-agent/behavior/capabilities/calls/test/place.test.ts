@@ -590,7 +590,7 @@ test("placeCall: a failure says so in a line for people; Rox's error is only in 
       ...ports,
       target: () =>
         Promise.reject(
-          new Error('RoxApiError: Macro API error 400: Invalid URL')
+          new Error('RoxApiError: Rox API error 400: Invalid URL')
         ),
     }
   );
@@ -615,7 +615,7 @@ test("placeCall: a message id that isn't one is refused before Rox is asked", as
       ...ports,
       message: async () => {
         asked++;
-        throw new Error('asked Macro');
+        throw new Error('asked Rox');
       },
     }
   );
@@ -636,7 +636,7 @@ test("placeCall: a who that's neither a person nor a channel id is refused befor
       ...ports,
       target: async () => {
         looked++;
-        throw new Error('asked Macro');
+        throw new Error('asked Rox');
       },
     }
   );

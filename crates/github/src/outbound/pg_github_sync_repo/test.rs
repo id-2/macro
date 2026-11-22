@@ -304,8 +304,8 @@ async fn test_resolve_team_task_references_returns_all_teams_sharing_a_slug(pool
     // the service can detect the ambiguity.
     sqlx::query!(
         r#"
-        WITH new_macro_user AS (
-            INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        WITH new_rox_user AS (
+            INSERT INTO rox_user (id, username, email, stripe_customer_id)
             VALUES ('99999999-9999-9999-9999-999999999999'::uuid, 'owner3', 'owner3@test.com', 'cus_test3')
         ), new_user AS (
             INSERT INTO "User" (id, email, rox_user_id)
@@ -640,7 +640,7 @@ async fn insert_user_account(
 ) {
     sqlx::query(
         r#"
-        INSERT INTO public.macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO public.rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         "#,
     )

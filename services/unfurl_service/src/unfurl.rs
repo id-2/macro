@@ -440,9 +440,9 @@ mod tests {
         assert_eq!(title1, "Enterprise Product Bottlenecks");
 
         let notion_url2 =
-            "https://www.notion.so/Macro-Work-Thoughts-e52b32630b2e45fab665b3e5c566cf3b";
+            "https://www.notion.so/Rox-Work-Thoughts-e52b32630b2e45fab665b3e5c566cf3b";
         let title2 = GetUnfurlResponse::get_title(notion_url2, &empty_tags);
-        assert_eq!(title2, "Macro Work Thoughts");
+        assert_eq!(title2, "Rox Work Thoughts");
 
         let notion_url3 = "https://www.notion.so/craft-ventures/Craft-Ventures-Operating-Playbooks-9db7bdccfc0f47be96076c122513691c";
         let title3 = GetUnfurlResponse::get_title(notion_url3, &empty_tags);

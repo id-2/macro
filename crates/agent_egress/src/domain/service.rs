@@ -209,7 +209,7 @@ where
             {
                 let mut value: serde_json::Value = serde_json::from_slice(&bytes)
                     .map_err(|error| EgressError::Internal(rootcause::report!(error).into()))?;
-                let public = matches!(destination, McpDestination::Macro)
+                let public = matches!(destination, McpDestination::Rox)
                     && rpc.method == "tools/call"
                     && !spends_owner_access(
                         ROX_SERVER_SLUG,
@@ -262,7 +262,7 @@ where
             }
 
             EgressTarget::McpServer(
-                destination @ (McpDestination::Macro
+                destination @ (McpDestination::Rox
                 | McpDestination::Connected(_)
                 | McpDestination::Custom(_)),
             ) => {
@@ -393,7 +393,7 @@ where
             let (parts, bytes) = read_mcp_body(request).await?;
             let (server_slug, server_name) = match destination {
                 // Session-scoped previews spend nobody's access; exempt above.
-                McpDestination::Macro | McpDestination::Preview => {
+                McpDestination::Rox | McpDestination::Preview => {
                     (ROX_SERVER_SLUG.to_owned(), "Rox".to_owned())
                 }
                 McpDestination::Connected(slug) => {

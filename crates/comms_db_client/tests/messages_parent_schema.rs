@@ -343,7 +343,7 @@ async fn channel_message_backfill_scan_skips_document_rows(
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
 async fn pdf_anchors_reference_document_thread_rows(pool: Pool<Postgres>) -> anyhow::Result<()> {
     sqlx::query(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id)
          VALUES ('55555555-5555-5555-5555-555555555555', 'owner', 'owner@example.com', 'stripe-test')",
     )
     .execute(&pool)

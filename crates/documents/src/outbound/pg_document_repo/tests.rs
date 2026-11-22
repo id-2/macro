@@ -814,7 +814,7 @@ async fn direct_user_access_sources(pool: &Pool<Postgres>) -> Vec<String> {
 async fn insert_second_team(pool: &Pool<Postgres>) {
     sqlx::query(
         r#"
-        INSERT INTO public."macro_user" ("id", "username", "email", "stripe_customer_id")
+        INSERT INTO public."rox_user" ("id", "username", "email", "stripe_customer_id")
         VALUES ($1, 'other', 'other@user.com', 'stripe_id_other')
         ON CONFLICT DO NOTHING
         "#,

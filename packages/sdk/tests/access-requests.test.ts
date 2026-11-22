@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 import { RoxApiError, RoxForbiddenError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
@@ -52,7 +52,7 @@ describe('EntityAccess.request', () => {
           : record('pending', 3),
       );
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -81,7 +81,7 @@ describe('EntityAccess.request', () => {
       bodies.push(await request.json());
       return Response.json(record('pending', 1));
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -99,7 +99,7 @@ describe('RoxForbiddenError', () => {
         { message: 'Access denied' },
         { status: 403 },
       )) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -118,7 +118,7 @@ describe('RoxForbiddenError', () => {
   test('other failures stay plain API errors', async () => {
     globalThis.fetch = (async (_input) =>
       Response.json({ message: 'Not found' }, { status: 404 })) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -152,7 +152,7 @@ describe('Harness access', () => {
           : record('pending', 1),
       );
     }) as typeof fetch;
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });

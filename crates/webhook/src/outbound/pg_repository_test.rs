@@ -49,7 +49,7 @@ async fn insert_user_with_id(pool: &PgPool, user_id: &str, email: &str) -> anyho
     let stripe_customer_id = format!("stripe_{rox_user_id}");
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (id) DO NOTHING
         "#,

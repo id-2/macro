@@ -2,7 +2,7 @@ import { afterEach, expect, test } from 'bun:test';
 import {
   DocumentEditRefusedError,
   EditOutcomeUnknownError,
-  Macro,
+  Rox,
 } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
@@ -11,7 +11,7 @@ afterEach(() => {
 });
 
 const macro = () =>
-  new Macro({
+  new Rox({
     token: 'test-user-token',
     hosts: { storage: 'https://storage.example.test' },
   });

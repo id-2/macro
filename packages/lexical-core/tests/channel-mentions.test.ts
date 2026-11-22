@@ -70,7 +70,7 @@ describe('extractChannelMentionsFromMarkdown', () => {
   it('extracts user mentions and re-tags bot principals', () => {
     const markdown =
       '<m-user-mention>{"userId":"macro|a@b.com","email":"a@b.com"}</m-user-mention> and ' +
-      '<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Macro"}</m-user-mention>';
+      '<m-user-mention>{"userId":"bot|00000000-0000-0000-0000-00000000a1a1","email":"Rox"}</m-user-mention>';
     expect(extractChannelMentionsFromMarkdown(markdown)).toEqual([
       { entityType: 'user', entityId: 'macro|a@b.com' },
       {

@@ -33,7 +33,7 @@ async fn claimed_handles_are_unique_without_silent_suffixes(pool: sqlx::PgPool) 
     ));
 
     let username = sqlx::query_scalar!(
-        "SELECT username FROM macro_user WHERE id = $1",
+        "SELECT username FROM rox_user WHERE id = $1",
         uuid::Uuid::parse_str(&first).unwrap()
     )
     .fetch_one(&pool)
@@ -49,7 +49,7 @@ async fn case_variant_claimed_handle_is_taken_without_a_suffix(pool: sqlx::PgPoo
     insert_user(&pool, &first, "first@example.com", "first@example.com").await;
     insert_user(&pool, &second, "second@example.com", "second@example.com").await;
     sqlx::query!(
-        "UPDATE macro_user SET username = 'ADA', mailbox_handle_claimed_at = now() WHERE id = $1",
+        "UPDATE rox_user SET username = 'ADA', mailbox_handle_claimed_at = now() WHERE id = $1",
         uuid::Uuid::parse_str(&first).unwrap()
     )
     .execute(&pool)
@@ -61,7 +61,7 @@ async fn case_variant_claimed_handle_is_taken_without_a_suffix(pool: sqlx::PgPoo
         Err(ClaimHandleError::Taken)
     ));
     let username = sqlx::query_scalar!(
-        "SELECT username FROM macro_user WHERE id = $1",
+        "SELECT username FROM rox_user WHERE id = $1",
         uuid::Uuid::parse_str(&second).unwrap()
     )
     .fetch_one(&pool)
@@ -86,7 +86,7 @@ async fn second_claim_of_the_same_handle_fails_without_renaming_the_owner(pool: 
     ));
 
     let owner_username = sqlx::query_scalar!(
-        "SELECT username FROM macro_user WHERE id = $1",
+        "SELECT username FROM rox_user WHERE id = $1",
         uuid::Uuid::parse_str(&owner).unwrap()
     )
     .fetch_one(&pool)
@@ -95,7 +95,7 @@ async fn second_claim_of_the_same_handle_fails_without_renaming_the_owner(pool: 
     assert_eq!(owner_username, "ada");
 
     let second_username = sqlx::query_scalar!(
-        "SELECT username FROM macro_user WHERE id = $1",
+        "SELECT username FROM rox_user WHERE id = $1",
         uuid::Uuid::parse_str(&second).unwrap()
     )
     .fetch_one(&pool)
@@ -117,7 +117,7 @@ async fn legacy_username_is_preserved_until_claimed(pool: sqlx::PgPool) {
         .unwrap();
 
     let username = sqlx::query_scalar!(
-        "SELECT username FROM macro_user WHERE id = $1",
+        "SELECT username FROM rox_user WHERE id = $1",
         uuid::Uuid::parse_str(&user).unwrap()
     )
     .fetch_one(&pool)

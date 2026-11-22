@@ -504,7 +504,7 @@ let
 
   dashboard = {
     uid = "macro-run-local";
-    title = "Macro run_local";
+    title = "Rox run_local";
     description = "Where `just run_local` time goes, from the local telemetry events (on by default) in Loki (service_name=local-telemetry, kept 30 days) and each run's trace in Tempo (kept 7 days). Set the range to a day or more for percentiles; the Machine variable narrows every panel. The last row shows the local stacks' own traces and logs from machines that turned on `services = true`.";
     schemaVersion = 39;
     version = 2;
@@ -696,7 +696,7 @@ in
     {
       name = "macro-run-local";
       orgId = 1;
-      folder = "Macro";
+      folder = "Rox";
       type = "file";
       disableDeletion = true;
       allowUiUpdates = false;

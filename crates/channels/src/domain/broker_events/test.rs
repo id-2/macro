@@ -62,7 +62,7 @@ fn created_event_wire_shape_includes_on_behalf_of() {
             actor: actor.clone(),
             on_behalf_of: Some(user_id("macro|owner@example.com")),
             channel_type: ChannelType::Private,
-            channel_name: Some("Macro Support x owner".to_string()),
+            channel_name: Some("Rox Support x owner".to_string()),
             participant_user_ids: vec![user_id("macro|owner@example.com")],
         }),
     );
@@ -79,7 +79,7 @@ fn created_event_wire_shape_includes_on_behalf_of() {
                 "actor": actor.as_ref(),
                 "on_behalf_of": "macro|owner@example.com",
                 "channel_type": "private",
-                "channel_name": "Macro Support x owner",
+                "channel_name": "Rox Support x owner",
                 "participant_user_ids": [
                     "macro|owner@example.com",
                 ],

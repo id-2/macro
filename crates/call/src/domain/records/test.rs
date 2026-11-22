@@ -12,7 +12,7 @@ fn source_requires_a_supported_provider() {
     });
 
     for (value, expected) in [
-        ("macro", CallProvider::Macro),
+        ("macro", CallProvider::Rox),
         ("granola", CallProvider::Granola),
     ] {
         source["provider"] = json!(value);
@@ -41,7 +41,7 @@ fn transcript_provider_is_optional_but_validated_when_present() {
 
     for (value, expected) in [
         (json!(null), None),
-        (json!("macro"), Some(CallProvider::Macro)),
+        (json!("macro"), Some(CallProvider::Rox)),
         (json!("granola"), Some(CallProvider::Granola)),
     ] {
         transcript["provider"] = value.clone();

@@ -1,4 +1,4 @@
-import { Macro } from '@rox-one/sdk';
+import { Rox } from '@rox-one/sdk';
 import { env } from './env';
 
 const STATE_FILE = new URL('../.webhook.json', import.meta.url);
@@ -11,7 +11,7 @@ type WebhookState = { id: string; secret: string };
  * signing secret. Reuses (and repairs) the registration in the state file;
  * registers fresh when there is none or it was deleted server-side. */
 export async function ensureWebhook(deliveryUrl: string): Promise<string> {
-  const macro = new Macro({}).requestedAs(env.ROX_USER_ID);
+  const macro = new Rox({}).requestedAs(env.ROX_USER_ID);
 
   const saved = await readState();
   if (saved) {

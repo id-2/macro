@@ -209,10 +209,10 @@ fn a_basic_credential_renders_as_github_expects() {
 
 #[test]
 fn a_repo_slug_rejects_rather_than_repairs() {
-    let slug = RepoSlug::parse("Macro-Inc", "wolf.1_x").expect("slug");
-    assert_eq!(slug.owner(), "Macro-Inc");
+    let slug = RepoSlug::parse("Rox-Inc", "wolf.1_x").expect("slug");
+    assert_eq!(slug.owner(), "Rox-Inc");
     assert_eq!(slug.name(), "wolf.1_x");
-    assert_eq!(slug.to_string(), "Macro-Inc/wolf.1_x");
+    assert_eq!(slug.to_string(), "Rox-Inc/wolf.1_x");
 
     for (owner, name) in [
         ("", "repo"),
@@ -422,7 +422,7 @@ fn a_repeated_git_service_parameter_does_not_escalate() {
 fn an_mcp_destination_is_read_off_the_proxy_path() {
     assert_eq!(
         McpDestination::from_path("/mcp-macro"),
-        Some(McpDestination::Macro)
+        Some(McpDestination::Rox)
     );
     assert_eq!(
         McpDestination::from_path("/mcp/google_sheets"),

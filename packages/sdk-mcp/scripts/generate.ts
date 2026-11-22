@@ -56,7 +56,7 @@ const OPAQUE_TYPES = new Set([
   'WeakMap',
 ]);
 
-const program = ts.createProgram([`${sdkRoot}src/rox.ts`], {
+const program = ts.createProgram([`${sdkRoot}src/macro.ts`], {
   strict: true,
   target: ts.ScriptTarget.ES2022,
   module: ts.ModuleKind.ESNext,
@@ -750,10 +750,10 @@ function addOperations(
   }
 }
 
-const macroFile = program.getSourceFile(`${sdkRoot}src/rox.ts`);
+const macroFile = program.getSourceFile(`${sdkRoot}src/macro.ts`);
 const macroClass = macroFile?.statements.find(
   (statement): statement is ts.ClassDeclaration =>
-    ts.isClassDeclaration(statement) && statement.name?.text === 'Macro'
+    ts.isClassDeclaration(statement) && statement.name?.text === 'Rox'
 );
 if (!macroClass) throw new Error('Rox class not found');
 

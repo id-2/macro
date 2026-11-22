@@ -1245,6 +1245,8 @@ pub enum CalendarEventSource {
     Google(ProviderEventSource),
     /// Event fetched from Microsoft Outlook Calendar.
     Outlook(ProviderEventSource),
+    /// Event Rox keeps itself for a personal Rox mailbox.
+    Local(ProviderEventSource),
 }
 
 impl CalendarEventSource {
@@ -1253,18 +1255,19 @@ impl CalendarEventSource {
         match self {
             Self::Google(_) => "google",
             Self::Outlook(_) => "outlook",
+            Self::Local(_) => "local",
         }
     }
     /// Provider identity and raw source facts, independent of its transport.
     pub fn details(&self) -> &ProviderEventSource {
         match self {
-            Self::Google(source) | Self::Outlook(source) => source,
+            Self::Google(source) | Self::Outlook(source) | Self::Local(source) => source,
         }
     }
     /// Mutable source facts used when constructing a normalized projection.
     pub fn details_mut(&mut self) -> &mut ProviderEventSource {
         match self {
-            Self::Google(source) | Self::Outlook(source) => source,
+            Self::Google(source) | Self::Outlook(source) | Self::Local(source) => source,
         }
     }
 }
@@ -1279,6 +1282,9 @@ pub enum CalendarProvider {
     Google,
     /// Microsoft Graph calendar attached to an Outlook grant.
     Outlook,
+    /// A calendar Rox itself keeps in Postgres for a personal Rox mailbox:
+    /// no external calendar service is involved.
+    Rox,
 }
 impl CalendarProvider {
     /// Parse the owning email domain's stored provider discriminator.
@@ -1286,6 +1292,7 @@ impl CalendarProvider {
         match value {
             "GMAIL" => Some(Self::Google),
             "OUTLOOK" => Some(Self::Outlook),
+            "ROX" => Some(Self::Rox),
             _ => None,
         }
     }
@@ -1294,7 +1301,20 @@ impl CalendarProvider {
         match self {
             Self::Google => "GMAIL",
             Self::Outlook => "OUTLOOK",
+            Self::Rox => "ROX",
         }
+    }
+    /// Account-level discriminator stored on `calendar_accounts`.
+    pub fn account_provider(self) -> &'static str {
+        match self {
+            Self::Google => "google",
+            Self::Outlook => "outlook",
+            Self::Rox => "rox",
+        }
+    }
+    /// Whether Rox keeps this calendar itself, with no provider to call.
+    pub fn is_local(self) -> bool {
+        matches!(self, Self::Rox)
     }
 }
 
@@ -1675,6 +1695,19 @@ impl CalendarCapabilities {
             custom_recurrence: true,
             reset_rsvp: true,
             guest_policy: true,
+        }
+    }
+    /// A calendar Rox keeps itself: events are stored locally, so there is
+    /// no conferencing system to attach and no provider-side guest policy.
+    pub fn local() -> Self {
+        Self {
+            conference_provider: None,
+            remove_conference: false,
+            auto_decline: false,
+            email_reminders: false,
+            custom_recurrence: false,
+            reset_rsvp: false,
+            guest_policy: false,
         }
     }
     /// Outlook capabilities depend on the calendar's conferencing entitlement.

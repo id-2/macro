@@ -33,7 +33,7 @@ depended-on crates in the backend.
 ## Boundaries
 
 - Depends on: `model-entity`, `model_owner`, `models_entity_access_management`,
-  `models_permissions`, `rox_user_id`, `bot_id`.
+  `models_permissions`, `macro_user_id`, `bot_id`.
 - Used by: nearly every domain crate that authorizes a request (`documents`,
   `chat`, `projects`, `crm`, `forms`, `databases`, `channels`, `agent_session`,
   `graphql_*` crates, and most services) — a signature change here ripples

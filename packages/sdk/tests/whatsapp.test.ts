@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from 'bun:test';
-import { ExternalChat, Macro, WhatsAppChat } from '../src/macro';
+import { ExternalChat, Rox, WhatsAppChat } from '../src/macro';
 
 const originalFetch = globalThis.fetch;
 afterEach(() => {
@@ -22,7 +22,7 @@ function fixture(handler: (request: Request) => Response | Promise<Response>) {
     requests.push(request.clone());
     return handler(request);
   }) as typeof fetch;
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'owner-api-token',
     hosts: { storage: 'https://storage.example.test' },
   });

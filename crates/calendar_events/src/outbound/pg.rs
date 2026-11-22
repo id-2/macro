@@ -48,7 +48,7 @@ use crate::domain::{
     ports::{
         CalendarBackfillRepository, CalendarEventChange, CalendarEventWrite,
         CalendarEventWriteOutcome, CalendarReminderDispatchRepo, CalendarRepository,
-        GoogleCalendarSyncRepository, RetiredCalendarEvent,
+        GoogleCalendarSyncRepository, LocalEventTarget, RetiredCalendarEvent,
     },
 };
 
@@ -326,22 +326,21 @@ struct VisibleCalendarRow {
 }
 
 fn visible_calendar(row: VisibleCalendarRow) -> VisibleCalendar {
-    let outlook = row.provider == "outlook";
-    VisibleCalendar {
-        provider: if outlook {
-            CalendarProvider::Outlook
-        } else {
-            CalendarProvider::Google
-        },
-        capabilities: if outlook {
+    let (provider, capabilities) = match row.provider.as_str() {
+        "outlook" => (
+            CalendarProvider::Outlook,
             CalendarCapabilities::outlook(
                 row.online_meeting_providers
                     .iter()
                     .any(|provider| provider == "teamsForBusiness"),
-            )
-        } else {
-            CalendarCapabilities::google()
-        },
+            ),
+        ),
+        "rox" => (CalendarProvider::Rox, CalendarCapabilities::local()),
+        _ => (CalendarProvider::Google, CalendarCapabilities::google()),
+    };
+    VisibleCalendar {
+        provider,
+        capabilities,
         id: row.id,
         email_link_id: row.email_link_id,
         email_address: row.email_address,
@@ -1398,7 +1397,7 @@ impl CalendarRepository for PgCalendarRepository {
                 viewer_event.inbox_organizes AS "inbox_organizes?",
                 viewer_event.inbox_attends AS "inbox_attends?",
                 COALESCE(occurrence_override.title, viewer_event.title) AS "title?",
-                -- A channel share is capped after its Macro call comes out,
+                -- A channel share is capped after its Rox call comes out,
                 -- since the join line closes the description.
                 CASE
                     WHEN viewer_event.is_channel_shared
@@ -2775,8 +2774,310 @@ impl CalendarRepository for PgCalendarRepository {
     }
 
     #[tracing::instrument(skip(self, requester_id), err)]
+    async fn create_local_calendar(
+        &self,
+        requester_id: &str,
+        name: &str,
+        time_zone: Option<&str>,
+    ) -> Result<VisibleCalendar, Report> {
+        let mut tx = self.pool.begin().await.map_err(report)?;
+        let link = sqlx::query_as::<_, (Uuid, String)>(
+            r#"
+            SELECT id, email_address::text
+            FROM email_links
+            WHERE rox_id = $1 AND provider::text = 'ROX'
+            ORDER BY is_primary DESC, created_at ASC
+            LIMIT 1
+            "#,
+        )
+        .bind(requester_id)
+        .fetch_optional(&mut *tx)
+        .await
+        .map_err(report)?
+        .ok_or_else(|| rootcause::report!("the requester has no personal Rox mailbox"))?;
+        let (email_link_id, email_address) = link;
+
+        let account_id = sqlx::query_scalar::<_, Uuid>(
+            r#"
+            INSERT INTO calendar_accounts (
+                id, owner_id, email_link_id, provider, provider_account_id, sync_status
+            )
+            VALUES ($1, $2, $3, 'rox', $3::text, 'ready')
+            ON CONFLICT (email_link_id) DO UPDATE SET
+                owner_id = EXCLUDED.owner_id,
+                provider = EXCLUDED.provider,
+                provider_account_id = EXCLUDED.provider_account_id,
+                sync_status = 'ready',
+                last_sync_error = NULL,
+                updated_at = now()
+            RETURNING id
+            "#,
+        )
+        .bind(Uuid::now_v7())
+        .bind(requester_id)
+        .bind(email_link_id)
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(report)?;
+
+        let calendar_id = Uuid::now_v7();
+        let provider_calendar_id = format!("rox:{calendar_id}");
+        let is_primary = sqlx::query_scalar::<_, bool>(
+            r#"
+            INSERT INTO calendars (
+                id, account_id, provider_calendar_id, name, time_zone,
+                access_role, is_primary, is_selected
+            )
+            VALUES (
+                $1, $2, $3, $4, $5, 'owner',
+                NOT EXISTS (
+                    SELECT 1 FROM calendars existing
+                    WHERE existing.account_id = $2
+                      AND existing.is_primary
+                      AND NOT existing.is_deleted
+                ),
+                true
+            )
+            RETURNING is_primary
+            "#,
+        )
+        .bind(calendar_id)
+        .bind(account_id)
+        .bind(&provider_calendar_id)
+        .bind(name)
+        .bind(time_zone)
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(report)?;
+
+        // A calendar that is never logged is invisible to a client that syncs
+        // by delta: no provider poll follows a locally created calendar, so
+        // the log row written here is the only thing that tells such a client
+        // to re-read its calendar list.
+        let mut log = ChangeLogBatch::default();
+        log.record(email_link_id, CalendarChangeOp::UpsertCalendar(calendar_id));
+        log.commit(tx).await?;
+
+        Ok(VisibleCalendar {
+            provider: CalendarProvider::Rox,
+            capabilities: CalendarCapabilities::local(),
+            id: calendar_id,
+            email_link_id,
+            email_address,
+            name: name.to_string(),
+            color: None,
+            is_primary,
+            is_writable: true,
+            is_subscription: false,
+            contributes_to_availability: true,
+            sync_error: None,
+            default_reminders: Vec::new(),
+        })
+    }
+
+    #[tracing::instrument(skip(self, requester_id), err)]
+    async fn local_event_target(
+        &self,
+        requester_id: &str,
+        event_id: Uuid,
+        calendar_id: Option<Uuid>,
+    ) -> Result<Option<LocalEventTarget>, Report> {
+        let row = sqlx::query_as::<
+            _,
+            (
+                Uuid,
+                String,
+                Uuid,
+                Uuid,
+                Uuid,
+                String,
+                bool,
+                Option<String>,
+            ),
+        >(
+            r#"
+            SELECT
+                event.id,
+                event.owner_id,
+                source.source_link_id,
+                source.account_id,
+                source.calendar_id,
+                source.provider_event_id,
+                source.is_read_only,
+                calendar.access_role
+            FROM calendar_events event
+            JOIN calendar_event_sources source
+                ON source.event_id = event.id
+               AND source.source_kind = 'local'
+            JOIN calendars calendar
+                ON calendar.id = source.calendar_id
+               AND calendar.account_id = source.account_id
+            JOIN calendar_accounts account ON account.id = source.account_id
+            WHERE event.id = $1
+              AND event.owner_id = $2
+              AND NOT calendar.is_deleted
+              AND account.sync_status <> 'disabled'
+              AND ($3::uuid IS NULL OR source.calendar_id = $3)
+            ORDER BY source.source_sequence DESC, source.id DESC
+            LIMIT 1
+            "#,
+        )
+        .bind(event_id)
+        .bind(requester_id)
+        .bind(calendar_id)
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(report)?;
+        Ok(row.map(
+            |(
+                event_id,
+                owner_id,
+                email_link_id,
+                account_id,
+                calendar_id,
+                provider_event_id,
+                is_read_only,
+                observed_access_role,
+            )| LocalEventTarget {
+                event_id,
+                owner_id,
+                email_link_id,
+                account_id,
+                calendar_id,
+                provider_event_id,
+                is_read_only,
+                observed_access_role,
+            },
+        ))
+    }
+
+    #[tracing::instrument(skip(self, owner_id), err)]
+    async fn load_local_event(
+        &self,
+        owner_id: &str,
+        event_id: Uuid,
+    ) -> Result<Option<CalendarEvent>, Report> {
+        use sqlx::Row;
+
+        let row = sqlx::query(
+            r#"
+            SELECT
+                id, owner_id, ical_uid, title, description, location, status,
+                visibility, transparency, event_type,
+                starts_at, ends_at, start_date, end_date, time_zone,
+                recurrence_lines, organizer_email, organizer_name,
+                creator_email, creator_name, conference_url, conference_provider,
+                sequence, is_read_only,
+                reminders_use_default, reminder_overrides,
+                guests_can_modify, guests_can_invite_others, guests_can_see_other_guests,
+                is_snapshot, created_at, updated_at,
+                (SELECT source.calendar_id FROM calendar_event_sources source
+                    WHERE source.event_id = calendar_events.id
+                      AND source.source_kind = 'local'
+                    LIMIT 1) AS calendar_id
+            FROM calendar_events
+            WHERE id = $1 AND owner_id = $2
+            "#,
+        )
+        .bind(event_id)
+        .bind(owner_id)
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(report)?;
+        let Some(row) = row else {
+            return Ok(None);
+        };
+        let reminder_overrides: serde_json::Value = row.try_get("reminder_overrides")?;
+        let mut attendees = fetch_attendees(&self.pool, &[event_id]).await?;
+        Ok(Some(CalendarEvent {
+            id: row.try_get("id")?,
+            owner_id: row.try_get("owner_id")?,
+            ical_uid: row.try_get("ical_uid")?,
+            calendar_id: row.try_get("calendar_id")?,
+            sources: Vec::new(),
+            title: row.try_get("title")?,
+            description: row.try_get("description")?,
+            location: row.try_get("location")?,
+            status: event_status(row.try_get::<String, _>("status")?.as_str()),
+            visibility: event_visibility(row.try_get::<String, _>("visibility")?.as_str()),
+            transparency: event_transparency(
+                row.try_get::<String, _>("transparency")?.as_str(),
+            ),
+            event_type: event_type(row.try_get::<String, _>("event_type")?.as_str()),
+            time: row_time(
+                row.try_get("starts_at")?,
+                row.try_get("ends_at")?,
+                row.try_get("start_date")?,
+                row.try_get("end_date")?,
+                row.try_get("time_zone")?,
+            )?,
+            recurrence_lines: row.try_get("recurrence_lines")?,
+            organizer_email: row.try_get("organizer_email")?,
+            organizer_name: row.try_get("organizer_name")?,
+            creator_email: row.try_get("creator_email")?,
+            creator_name: row.try_get("creator_name")?,
+            conference_url: row.try_get("conference_url")?,
+            conference_provider: row
+                .try_get::<Option<String>, _>("conference_provider")?
+                .map(|value| conference_provider(&value)),
+            sequence: row.try_get::<i32, _>("sequence")? as u32,
+            is_read_only: row.try_get("is_read_only")?,
+            attendees: attendees.remove(&event_id).unwrap_or_default(),
+            reminders: EventReminders {
+                use_default: row.try_get("reminders_use_default")?,
+                overrides: serde_json::from_value(reminder_overrides).unwrap_or_default(),
+            },
+            guest_policy: GuestPolicy {
+                can_modify: row.try_get("guests_can_modify")?,
+                can_invite_others: row.try_get("guests_can_invite_others")?,
+                can_see_other_guests: row.try_get("guests_can_see_other_guests")?,
+            },
+            is_snapshot: row.try_get("is_snapshot")?,
+            viewer_can: ViewerCapabilities::NONE,
+            created_at: row.try_get("created_at")?,
+            updated_at: row.try_get("updated_at")?,
+        }))
+    }
+
+    #[tracing::instrument(skip(self, owner_id), err)]
+    async fn delete_local_event(&self, owner_id: &str, event_id: Uuid) -> Result<bool, Report> {
+        let mut tx = self.pool.begin().await.map_err(report)?;
+        let source = sqlx::query_as::<_, (Uuid, Uuid)>(
+            r#"
+            SELECT source.source_link_id, source.calendar_id
+            FROM calendar_event_sources source
+            JOIN calendar_events event ON event.id = source.event_id
+            WHERE source.event_id = $1
+              AND source.source_kind = 'local'
+              AND event.owner_id = $2
+            LIMIT 1
+            "#,
+        )
+        .bind(event_id)
+        .bind(owner_id)
+        .fetch_optional(&mut *tx)
+        .await
+        .map_err(report)?;
+        let Some((source_link_id, _calendar_id)) = source else {
+            return Ok(false);
+        };
+        // Sources, occurrences, attendees, overrides, and reminder firings
+        // all cascade from the event row.
+        sqlx::query("DELETE FROM calendar_events WHERE id = $1 AND owner_id = $2")
+            .bind(event_id)
+            .bind(owner_id)
+            .execute(&mut *tx)
+            .await
+            .map_err(report)?;
+        let mut log = ChangeLogBatch::default();
+        log.record(source_link_id, CalendarChangeOp::DeleteEvent(event_id));
+        log.commit(tx).await?;
+        Ok(true)
+    }
+
+    #[tracing::instrument(skip(self, requester_id), err)]
     async fn owned_inboxes(&self, requester_id: &str) -> Result<Vec<OwnedInbox>, Report> {
-        sqlx::query!(
+        Ok(sqlx::query!(
             r#"
             SELECT
                 link.id AS link_id,
@@ -2800,16 +3101,18 @@ impl CalendarRepository for PgCalendarRepository {
         .await
         .map_err(report)?
         .into_iter()
-        .map(|row| {
-            Ok(OwnedInbox {
+        .filter_map(|row| {
+            // A personal Rox mailbox is not a Google or Outlook inbox.
+            // One such link must not blank the whole calendar.
+            let provider = CalendarProvider::from_link(&row.provider)?;
+            Some(OwnedInbox {
                 link_id: row.link_id,
                 email: row.email_address,
-                provider: CalendarProvider::from_link(&row.provider)
-                    .ok_or_else(|| rootcause::report!("unsupported calendar provider"))?,
+                provider,
                 writable_calendar_ids: row.writable_calendar_ids,
             })
         })
-        .collect()
+        .collect())
     }
 
     #[tracing::instrument(skip(self), err)]

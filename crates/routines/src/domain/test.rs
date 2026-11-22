@@ -128,7 +128,7 @@ fn routines_with_what_these_tools_cant_state_are_not_editable_here() {
         assert!(
             error
                 .to_string()
-                .ends_with("Edit it on the routine's page in Macro."),
+                .ends_with("Edit it on the routine's page in Rox."),
             "{error}"
         );
     }

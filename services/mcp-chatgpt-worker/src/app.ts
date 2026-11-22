@@ -23,7 +23,7 @@ import {
 } from '@modelcontextprotocol/sdk/types.js';
 import { match } from 'ts-pattern';
 import { HOSTS, type ServiceName } from '../../../packages/sdk/src/config';
-import { Macro } from '../../../packages/sdk/src/macro';
+import { Rox } from '../../../packages/sdk/src/macro';
 import type { Config } from './config';
 
 /** Where MCP clients discover this resource server's authorization server. */
@@ -134,7 +134,7 @@ export function createHandler(config: Config) {
       }
       span.setAttr('mcp.operation', selected.operation.name);
       span.setAttr('mcp.hint', selected.operation.hint);
-      const macro = new Macro({
+      const macro = new Rox({
         token,
         env: config.ROX_ENV,
         ...(Object.keys(hosts).length ? { hosts } : {}),

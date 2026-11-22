@@ -681,7 +681,7 @@ pub struct EmailThreadMetadataLoader<R> {
 impl<R> EmailThreadMetadataLoader<R> {
     /// Create a metadata DataLoader scoped to the requesting user.
     ///
-    /// `viewer_id` is the viewer's opaque account id (`macro_user.id`), logged
+    /// `viewer_id` is the viewer's opaque account id (`rox_user.id`), logged
     /// instead of the email-bearing `user_id` when a thread is unavailable.
     pub fn new(user_id: RoxUserIdStr<'static>, viewer_id: Option<Uuid>, reader: R) -> Self {
         Self {
@@ -748,7 +748,7 @@ pub struct EmailThreadMailProjectionLoader<R> {
 impl<R> EmailThreadMailProjectionLoader<R> {
     /// Create a Mail projection DataLoader scoped to the requesting user.
     ///
-    /// `viewer_id` is the viewer's opaque account id (`macro_user.id`), logged
+    /// `viewer_id` is the viewer's opaque account id (`rox_user.id`), logged
     /// instead of the email-bearing `user_id` when a thread is unavailable.
     pub fn new(user_id: RoxUserIdStr<'static>, viewer_id: Option<Uuid>, reader: R) -> Self {
         Self {

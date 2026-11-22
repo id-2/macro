@@ -124,7 +124,7 @@ fn errors_describe_what_the_agent_can_do_about_them() {
     );
     assert_eq!(
         description(SaveImageError::Internal(rootcause::report!("save failed")).into()),
-        "the image was generated but could not be saved to Macro"
+        "the image was generated but could not be saved to Rox"
     );
     for error in [
         ReadImageError::Unavailable,

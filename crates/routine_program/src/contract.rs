@@ -20,13 +20,13 @@ pub const CODE_STEPS: &str = include_str!("code_steps.md");
 /// receives. The SDK's own declarations come from the checker. A step
 /// checked with the rest of its routine (see [`RoutineProgram::check_files`])
 /// sees `steps` typed with the outputs of the steps before it.
-pub const STEP_CONTEXT: &str = r#"import type { Macro } from '@macro-inc/sdk';
+pub const STEP_CONTEXT: &str = r#"import type { Rox } from '@macro-inc/sdk';
 
 declare global {
   /** What a routine code step's `main` receives. */
   interface RoutineStepContext<Steps, Knobs> {
     /** Rox's SDK, acting as the routine's owner. */
-    macro: Macro;
+    macro: Rox;
     /** This run. */
     run: RoutineRunInfo;
     /** The routine this step belongs to. */

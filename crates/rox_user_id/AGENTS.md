@@ -1,4 +1,4 @@
-# rox_user_id
+# macro_user_id
 
 ## What it is
 
@@ -31,7 +31,7 @@ backend.
 
 ## Checks
 
-- `cargo test -p rox_user_id` (`SQLX_OFFLINE` unset).
+- `cargo test -p macro_user_id` (`SQLX_OFFLINE` unset).
 
 ## Gotchas
 

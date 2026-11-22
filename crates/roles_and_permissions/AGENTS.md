@@ -20,7 +20,7 @@ item-level sharing — see Scope).
 
 ## Boundaries
 
-- Depends on: `rox_user_id`, `non_empty`.
+- Depends on: `macro_user_id`, `non_empty`.
 - Used by: `agent_inmem`, `ai_billing`, `chat`, `teams`.
 
 ## Recipes

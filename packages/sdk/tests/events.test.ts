@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from 'bun:test';
-import { Macro } from '../src/macro';
+import { Rox } from '../src/macro';
 import { RoxError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
@@ -54,7 +54,7 @@ describe('RoxEvents', () => {
       });
     }) as typeof fetch;
 
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -94,7 +94,7 @@ describe('RoxEvents', () => {
       });
     }) as typeof fetch;
 
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -113,7 +113,7 @@ describe('RoxEvents', () => {
   });
 
   test('listen() throws when there are no filters or handlers', async () => {
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -121,7 +121,7 @@ describe('RoxEvents', () => {
   });
 
   test('webhook() requires a signing secret', () => {
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       hosts: { storage: 'https://storage.example.test' },
     });
@@ -135,7 +135,7 @@ describe('RoxEvents', () => {
     const signature = await sign(secret, timestamp, rawBody);
     const received = Promise.withResolvers<string>();
 
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       webhookSecret: secret,
       hosts: { storage: 'https://storage.example.test' },
@@ -161,7 +161,7 @@ describe('RoxEvents', () => {
   });
 
   test('webhook() rejects a bad signature', async () => {
-    const macro = new Macro({
+    const macro = new Rox({
       token: 'user-token',
       webhookSecret: 'whsec_test',
       hosts: { storage: 'https://storage.example.test' },

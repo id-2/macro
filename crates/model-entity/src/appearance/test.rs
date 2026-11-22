@@ -3,10 +3,10 @@ use super::*;
 #[test]
 fn rejects_unknown_glyphs_and_non_emoji_input() {
     for icon in [
-        AppearanceIcon::Macro {
+        AppearanceIcon::Rox {
             name: "../star".into(),
         },
-        AppearanceIcon::Macro {
+        AppearanceIcon::Rox {
             name: "not-a-macro-icon".into(),
         },
         AppearanceIcon::Emoji {
@@ -67,7 +67,7 @@ fn accepts_joined_emoji_and_independent_color() {
     );
     assert!(
         EntityAppearance {
-            icon: Some(AppearanceIcon::Macro {
+            icon: Some(AppearanceIcon::Rox {
                 name: "star".into()
             }),
             color: None,

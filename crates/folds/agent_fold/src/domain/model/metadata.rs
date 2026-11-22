@@ -33,7 +33,7 @@ pub enum Harness {
     /// Cursor cloud agents, through this repository's `cursor_cloud_agents`.
     Cursor,
     /// Rox's own in-process agent, `agent_inmem`.
-    Macro,
+    Rox,
     /// Nous Research's Hermes agent.
     Hermes,
     /// OpenClaw.

@@ -162,7 +162,7 @@ pub(super) async fn reserve_in(
         r#"INSERT INTO external_chat_person (id, chat_id, user_id, display_name) VALUES ($1, $2, $3, $4)
         ON CONFLICT (id) DO UPDATE SET display_name = COALESCE(excluded.display_name, external_chat_person.display_name),
             user_id = COALESCE(excluded.user_id, external_chat_person.user_id)
-        RETURNING xmax = 0 AS "created!", display_name IS NOT NULL AS "named!", user_id IS NOT NULL AS "macro_user!""#,
+        RETURNING xmax = 0 AS "created!", display_name IS NOT NULL AS "named!", user_id IS NOT NULL AS "rox_user!""#,
         person,
         binding.id,
         associated_user,
@@ -184,7 +184,7 @@ pub(super) async fn reserve_in(
         from_me = message.from_me,
         person_created = stored.created,
         person_named = stored.named,
-        macro_user = stored.macro_user,
+        rox_user = stored.rox_user,
     )
     .in_scope(|| {});
     // A new person's picture is checked once; Rox users show their Rox
@@ -193,7 +193,7 @@ pub(super) async fn reserve_in(
     // `remote_id` from adoption.
     let direct_peer =
         binding.kind == ExternalChatKind::Direct && aliases.contains(&binding.remote_id);
-    if stored.created && !stored.macro_user && !group_itself && !direct_peer {
+    if stored.created && !stored.rox_user && !group_itself && !direct_peer {
         let preferred = aliases
             .iter()
             .find(|jid| jid.ends_with("@lid"))

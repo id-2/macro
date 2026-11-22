@@ -49,7 +49,7 @@ impl UserProfile {
         nonempty(self.display_name.as_deref()).or_else(|| nonempty(self.real_name.as_deref()))
     }
 
-    fn macro_user(&self) -> Option<RoxUserIdStr<'static>> {
+    fn rox_user(&self) -> Option<RoxUserIdStr<'static>> {
         // This constructor validates and lowercases without stripping dots/plus aliases.
         RoxUserIdStr::try_from_email(self.email.as_deref()?).ok()
     }
@@ -136,7 +136,7 @@ impl UserDirectory {
         if user.is_system_author() {
             return None;
         }
-        user.profile.as_ref()?.macro_user()
+        user.profile.as_ref()?.rox_user()
     }
 
     /// DMs require exactly two source members and two distinct mapped identities.
@@ -174,7 +174,7 @@ impl UserDirectory {
                     message
                         .user_profile
                         .as_ref()
-                        .and_then(UserProfile::macro_user)
+                        .and_then(UserProfile::rox_user)
                 });
             if let Some(mapped) = mapped {
                 return ResolvedAuthor::User(mapped);

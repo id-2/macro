@@ -45,7 +45,7 @@ pub enum SuggestionFrom {
     /// AI suggested it for this person, with a reason.
     ForYou,
     /// One of Rox's catalog routines, as a template.
-    Macro,
+    Rox,
 }
 
 /// What is suggested: a catalog routine with its knobs, or a routine AI

@@ -46,7 +46,7 @@ pub(super) const MINIO_ROOT_USER: &str = "ANOTREAL";
 pub(super) const MINIO_ROOT_PASSWORD: &str = "notrealrnrELgWzOk3IfjzDKtFBhDby";
 pub const MAILPIT_IMAGE: &str = "axllent/mailpit:v1.20";
 pub const CADDY_IMAGE: &str = "caddy:2-alpine";
-const SDK_WEBHOOK_RELAY_IMAGE: &str = "macro-sdk-webhook-relay";
+const SDK_WEBHOOK_RELAY_IMAGE: &str = "rox-sdk-webhook-relay";
 
 /// Base-compose services that bind fixed host ports but aren't in our inventory
 /// (reached via the proxy / container network, not the host). For named
@@ -229,7 +229,9 @@ pub fn generate(
                     .map(|s| s.to_string())
                     .collect(),
                 )),
-                env_file: Some(dct::StringOrList::Simple("${ROX_ENV_FILE}".to_string())),
+                env_file: Some(dct::StringOrList::Simple(
+                    "${ROX_ENV_FILE:-${ROX_ENV_FILE}}".to_string(),
+                )),
                 networks: net_aliases(&[("services", &["gmail-forwarder"])]),
                 ..Default::default()
             }),
@@ -263,6 +265,28 @@ pub fn generate(
     )
     .with_context(|| format!("writing {}", path.display()))?;
     Ok(path)
+}
+
+/// Whether this host can bind the privileged HTTPS port itself. Another
+/// listener (Tailscale Serve, a second stack) would shadow a published :443 and
+/// silently break the no-port hostnames, so the compose generator asks first.
+/// A port already held by this project's own proxy counts as ours, otherwise
+/// regenerating the compose file while the stack runs would drop the publish.
+fn host_owns_port_443(instance: &Instance) -> bool {
+    if std::net::TcpListener::bind("0.0.0.0:443").is_ok() {
+        return true;
+    }
+    let owner = format!("{}-proxy-1", instance.project_name());
+    Command::new("docker")
+        .args(["ps", "--filter", "publish=443", "--format", "{{.Names}}"])
+        .output()
+        .ok()
+        .map(|output| {
+            String::from_utf8_lossy(&output.stdout)
+                .lines()
+                .any(|name| name.trim() == owner)
+        })
+        .unwrap_or(false)
 }
 
 fn published_ports(mode: Mode, instance: &Instance, service: &RustService) -> Vec<String> {
@@ -433,7 +457,14 @@ fn add_minio_service(services: &mut IndexMap<String, Option<dct::Service>>) {
         "minio".to_string(),
         Some(dct::Service {
             image: Some(MINIO_IMAGE.to_string()),
-            command: Some(dct::Command::Simple("mini -dir=/data".to_string())),
+            // `s3.externalUrl` is the host SeaweedFS uses to verify SigV4
+            // signatures. The SDK signs presigned URLs against this same
+            // upstream endpoint, while Caddy forwards the browser's original
+            // Host, so without it every presigned PUT/GET fails with
+            // SignatureDoesNotMatch.
+            command: Some(dct::Command::Simple(
+                "mini -dir=/data -s3.externalUrl=http://minio:8333".to_string(),
+            )),
             environment: kv(&[
                 ("AWS_ACCESS_KEY_ID", MINIO_ROOT_USER),
                 ("AWS_SECRET_ACCESS_KEY", MINIO_ROOT_PASSWORD),
@@ -473,6 +504,13 @@ fn add_proxy_service(
         )));
     }
     let mut ports = vec![format!("{proxy_port}:{proxy_port}")];
+    // The no-port hostnames (`https://app.rox.one`) need host :443. Publish it
+    // only when the host owns that port; where another service (for example
+    // Tailscale Serve) already takes 443, publishing here would be shadowed and
+    // silently break the address without a port.
+    if host_owns_port_443(instance) {
+        ports.push("443:443".to_string());
+    }
     // Incus reverse tunnels dial the host loopback; Docker computers use the
     // proxy's services-network name and need no host DNS or guest CA changes.
     let computer_gateway_port = instance.port(Port::ComputerGateway);
@@ -928,17 +966,17 @@ pub fn content_tagged_images() -> [ContentTaggedImage; 3] {
     [
         ContentTaggedImage {
             service: "search",
-            repository: "macro-local-opensearch",
+            repository: "rox-local-opensearch",
             inputs: || Ok(vec!["infra/local/opensearch".to_string()]),
         },
         ContentTaggedImage {
             service: "sync_service",
-            repository: "macro-local-sync-service",
+            repository: "rox-local-sync-service",
             inputs: sync_service_inputs,
         },
         ContentTaggedImage {
             service: "lexical_service",
-            repository: "macro-local-lexical-service",
+            repository: "rox-local-lexical-service",
             inputs: lexical_service_inputs,
         },
     ]

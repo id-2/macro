@@ -61,7 +61,7 @@ pub struct LocalE2eChannelAlias {
 /// User row from `seed/local_e2e/users.json`.
 #[derive(Clone, Debug, Deserialize)]
 pub struct SeedUser {
-    /// Stable database id in `macro_user`.
+    /// Stable database id in `rox_user`.
     pub rox_user_id: String,
     /// Stable FusionAuth id used in locally generated JWTs.
     pub fusion_user_id: String,

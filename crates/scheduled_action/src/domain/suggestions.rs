@@ -642,7 +642,7 @@ where
             bail!(ActionPolicyError::NotFound);
         };
         self.repo.dismiss_template(user, routine.key).await?;
-        span.record("routine.suggestion.from", SuggestionFrom::Macro.as_ref());
+        span.record("routine.suggestion.from", SuggestionFrom::Rox.as_ref());
         let origin = template_origin(routine.surfaces);
         tracing::info!(
             event = "routine_suggestions.dismissed",
@@ -723,7 +723,7 @@ fn origin_of(
 
 fn template_origin(surfaces: &[Surface]) -> SuggestionOrigin {
     SuggestionOrigin {
-        from: SuggestionFrom::Macro.as_ref(),
+        from: SuggestionFrom::Rox.as_ref(),
         kind: "catalog",
         surface: surfaces.first().map(|surface| surface_name(*surface)),
     }
@@ -857,7 +857,7 @@ pub fn fill(
             if ids.insert(id) {
                 shown.push(RoutineSuggestion {
                     id,
-                    from: SuggestionFrom::Macro,
+                    from: SuggestionFrom::Rox,
                     surfaces: routine.surfaces.to_vec(),
                     reason: None,
                     keep_probability: None,

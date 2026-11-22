@@ -38,7 +38,7 @@ pub async fn get_user_profile_picture(
         r#"
         SELECT mui.profile_picture as "profile_picture!"
         FROM "User" u
-        JOIN macro_user mu ON mu.id = u.rox_user_id
+        JOIN rox_user mu ON mu.id = u.rox_user_id
         JOIN rox_user_info mui ON mui.rox_user_id = mu.id
         WHERE u.id = $1 AND mui.profile_picture IS NOT NULL
         "#,

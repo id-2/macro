@@ -28,7 +28,7 @@ by several services, each piece gated behind its own Cargo feature.
 
 - Depends on: `agent_correlation` (to keep attribution across the spawned task).
 - Depends on (feature-gated): `rox_db_client`, `entity_access_db_utils`,
-  `ip_extractor`, `rox_user_id`, `model_user`.
+  `ip_extractor`, `macro_user_id`, `model_user`.
 - Used by: `document_storage_service`, `notification_service`,
   `document_cognition_service`, `authentication_service`,
   `image_proxy_service`, `search_processing_service`, `convert_service`,

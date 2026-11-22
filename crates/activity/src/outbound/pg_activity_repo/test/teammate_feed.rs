@@ -10,13 +10,13 @@ const LONER: &str = "macro|loner@example.com";
 async fn insert_user(pool: &PgPool, id: &str) {
     let rox_user_id = Uuid::now_v7();
     sqlx::query!(
-        r#"INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
+        r#"INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)"#,
         rox_user_id,
         id,
     )
     .execute(pool)
     .await
-    .expect("macro_user should insert");
+    .expect("rox_user should insert");
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $1, $2)"#,
         id,

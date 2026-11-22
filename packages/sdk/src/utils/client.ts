@@ -350,7 +350,7 @@ function resolveAuth(opts: RoxOpts): RoxAuth {
       envApiKey ??
       (() => {
         throw new Error(
-          'no Macro credential. Set ROX_API_KEY (API key or bearer token) or ROX_BOT_TOKEN, or pass token/auth to new Rox().',
+          'no Rox credential. Set ROX_API_KEY (API key or bearer token) or ROX_BOT_TOKEN, or pass token/auth to new Rox().',
         );
       }),
   };

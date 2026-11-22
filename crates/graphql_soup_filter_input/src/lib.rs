@@ -171,7 +171,7 @@ fn parse_id(id: ID, field: &str) -> InputResult<Uuid> {
 }
 
 /// Parse a Rox user id with a field-specific error.
-fn parse_macro_user_id(value: String, field: &str) -> InputResult<RoxUserIdStr<'static>> {
+fn parse_rox_user_id(value: String, field: &str) -> InputResult<RoxUserIdStr<'static>> {
     RoxUserIdStr::parse_from_str(&value)
         .map(CowLike::into_owned)
         .map_err(|err| InputError::new(format!("invalid {field} `{value}`: {err}")))
@@ -1120,12 +1120,12 @@ impl IntoFilterExpr<ChannelLiteral> for GraphqlChannelLiteral {
         let literal = match self {
             Self::ThreadId(id) => ChannelLiteral::ThreadId(parse_id(id, "threadId")?),
             Self::Mention(mention) => {
-                ChannelLiteral::Mention(parse_macro_user_id(mention, "mention")?)
+                ChannelLiteral::Mention(parse_rox_user_id(mention, "mention")?)
             }
             Self::OrganizationId(id) => ChannelLiteral::OrganizationId(id),
             Self::TeamId(id) => ChannelLiteral::TeamId(parse_id(id, "teamId")?),
             Self::ChannelId(id) => ChannelLiteral::ChannelId(parse_id(id, "channelId")?),
-            Self::Sender(sender) => ChannelLiteral::Sender(parse_macro_user_id(sender, "sender")?),
+            Self::Sender(sender) => ChannelLiteral::Sender(parse_rox_user_id(sender, "sender")?),
             Self::ChannelType(channel_type) => {
                 ChannelLiteral::ChannelType(channel_type.into_model())
             }
@@ -1190,10 +1190,10 @@ impl IntoFilterExpr<ChannelThreadLiteral> for GraphqlChannelThreadLiteral {
             Self::ThreadId(id) => ChannelThreadLiteral::ThreadId(parse_id(id, "threadId")?),
             Self::ChannelId(id) => ChannelThreadLiteral::ChannelId(parse_id(id, "channelId")?),
             Self::RootSender(sender) => {
-                ChannelThreadLiteral::RootSender(parse_macro_user_id(sender, "rootSender")?)
+                ChannelThreadLiteral::RootSender(parse_rox_user_id(sender, "rootSender")?)
             }
             Self::Participant(participant) => {
-                ChannelThreadLiteral::Participant(parse_macro_user_id(participant, "participant")?)
+                ChannelThreadLiteral::Participant(parse_rox_user_id(participant, "participant")?)
             }
             Self::NotificationState(state) => ChannelThreadLiteral::NotificationState(state.into()),
             Self::HasReplies(has_replies) => ChannelThreadLiteral::HasReplies(has_replies),
@@ -1226,7 +1226,7 @@ impl IntoFilterExpr<CallLiteral> for GraphqlCallLiteral {
             Self::CallId(id) => CallLiteral::CallId(parse_id(id, "callId")?),
             Self::ChannelId(id) => CallLiteral::ChannelId(parse_id(id, "channelId")?),
             Self::Speaker(speaker) => {
-                CallLiteral::Speaker(parse_macro_user_id(speaker, "speaker")?)
+                CallLiteral::Speaker(parse_rox_user_id(speaker, "speaker")?)
             }
             Self::Status(status) => CallLiteral::Status(status.into_model()),
             Self::Attended(attended) => CallLiteral::Attended(attended),

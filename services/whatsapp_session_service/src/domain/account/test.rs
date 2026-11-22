@@ -267,13 +267,13 @@ async fn insert_pairing_account(pool: &PgPool) -> (Uuid, Uuid) {
     let user_id = "macro|whatsapp-owner";
     sqlx::query!(
         r#"
-        WITH new_macro_user AS (
-            INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        WITH new_rox_user AS (
+            INSERT INTO rox_user (id, username, email, stripe_customer_id)
             VALUES (gen_random_uuid(), $2, $2, 'stripe_owner')
             RETURNING id
         )
         INSERT INTO "User" ("id", "email", "rox_user_id")
-        SELECT $1, $2, new_macro_user.id FROM new_macro_user
+        SELECT $1, $2, new_rox_user.id FROM new_rox_user
         "#,
         user_id,
         "owner@example.com",

@@ -10,7 +10,7 @@ async fn seed_session(pool: &PgPool) -> AgentSessionId {
     let email = OWNER.strip_prefix("macro|").unwrap_or(OWNER);
     let rox_user_id = sqlx::query_scalar!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $3, $4)
         ON CONFLICT (username) DO UPDATE SET username = EXCLUDED.username
         RETURNING id
@@ -22,7 +22,7 @@ async fn seed_session(pool: &PgPool) -> AgentSessionId {
     )
     .fetch_one(pool)
     .await
-    .expect("insert macro_user");
+    .expect("insert rox_user");
     sqlx::query!(
         r#"INSERT INTO "User" (id, email, rox_user_id) VALUES ($1, $2, $3) ON CONFLICT (id) DO NOTHING"#,
         OWNER,

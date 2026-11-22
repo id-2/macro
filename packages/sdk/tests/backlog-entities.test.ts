@@ -7,7 +7,7 @@ import type {
   Meeting,
   TableDetail,
 } from '../generated/storage/types.gen';
-import { DraftAttachment, Macro, PipelineView } from '../src/macro';
+import { DraftAttachment, Rox, PipelineView } from '../src/macro';
 import { RoxApiError } from '../src/utils';
 
 const originalFetch = globalThis.fetch;
@@ -55,7 +55,7 @@ test('draft editing encodes Unicode HTML and every write stays in the draft inbo
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { email: 'https://email.test' },
   });
@@ -118,7 +118,7 @@ test('attachments cannot be removed through a different draft', async () => {
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({ token: 'token' });
+  const macro = new Rox({ token: 'token' });
   const first = macro.email.draftById('one');
   const second = macro.email.draftById('two');
   const attachment = DraftAttachment.byId(macro._client, first, 'attachment');
@@ -142,7 +142,7 @@ test('scheduled draft iteration is lazy, keeps inbox selection, and stops on bre
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { email: 'https://email.test' },
   });
@@ -187,7 +187,7 @@ test('meeting mutations keep invitation lookup for channel and older meetings', 
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     webAppUrl: 'https://web.test',
     hosts: { storage: 'https://storage.test' },
@@ -240,7 +240,7 @@ test('access resolution preserves the resolved snapshot when pending listings no
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -270,7 +270,7 @@ test('API key metadata serialization excludes creation secrets and deletion erro
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'caller-token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -309,7 +309,7 @@ test('pairing claims distinguish pending responses and expose credentials separa
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -376,7 +376,7 @@ test('pipeline reads and ops stay under its sharing boundary and invalidate the 
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -422,7 +422,7 @@ test('typed sharing grants translate channel handles and preserve explicit grant
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: {
       'agent-harness': 'https://agents.test',
@@ -460,7 +460,7 @@ test('team slug lookup validates the actual document response rather than trusti
       ),
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });
@@ -500,7 +500,7 @@ test('chat send receipts expose a scoped response message and cancellation never
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { cognition: 'https://ai.test' },
   });
@@ -542,7 +542,7 @@ test('pipeline view positions use the pipeline route and reject foreign handles 
     },
     { preconnect: originalFetch.preconnect },
   );
-  const macro = new Macro({
+  const macro = new Rox({
     token: 'token',
     hosts: { storage: 'https://storage.test' },
   });

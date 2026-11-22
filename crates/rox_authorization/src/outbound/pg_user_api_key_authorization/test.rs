@@ -13,7 +13,7 @@ async fn insert_user_and_key(pool: &PgPool, user_id: &str, email: &str, key: &st
     let rox_user_id = Uuid::new_v4();
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, $2, $2, $3)
         "#,
         rox_user_id,
@@ -52,7 +52,7 @@ async fn insert_user_and_key(pool: &PgPool, user_id: &str, email: &str, key: &st
 }
 
 #[sqlx::test(migrator = "ROX_DB_MIGRATIONS")]
-async fn finds_owner_from_user_id_and_macro_user_id(pool: PgPool) {
+async fn finds_owner_from_user_id_and_rox_user_id(pool: PgPool) {
     let fusion_user_id = insert_user_and_key(&pool, USER_ID, USER_EMAIL, API_KEY).await;
     let repo = PgUserApiKeyAuthorizationRepo::new(pool);
 

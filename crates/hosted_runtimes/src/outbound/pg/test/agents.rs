@@ -7,7 +7,7 @@ async fn insert_agent(pool: &PgPool) -> RoxUserIdStr<'static> {
     let rox_user_id = Uuid::from_u128(0x0000_0000_0000_7000_8000_0000_0000_0022);
     sqlx::query!(
         r#"
-        INSERT INTO macro_user (id, username, email, stripe_customer_id)
+        INSERT INTO rox_user (id, username, email, stripe_customer_id)
         VALUES ($1, 'ada-1@agents.macro.invalid', 'ada-1@agents.macro.invalid', 'cus_agent_ada')
         "#,
         rox_user_id,

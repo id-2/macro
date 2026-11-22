@@ -137,17 +137,17 @@ where
         (status = 500, body = ErrorResponse),
     )
 )]
-#[tracing::instrument(err, skip(state, macro_user, body))]
+#[tracing::instrument(err, skip(state, rox_user, body))]
 pub async fn update_thread_labels_handler<T: EmailService, Auth: RoxAuthorizationService>(
     State(state): State<EmailRouterState<T>>,
-    Cached(macro_user): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
+    Cached(rox_user): Cached<RoxAuthorizationExtractor<Auth, UserOrInternal>>,
     Path(thread_id): Path<Uuid>,
     Json(body): Json<UpdateThreadLabelRequest>,
 ) -> Result<Json<UpdateThreadLabelsResponse>, UpdateThreadLabelError> {
     let result = state
         .inner
         .update_thread_labels_for_user(
-            macro_user.authorization.user.rox_user_id.clone(),
+            rox_user.authorization.user.rox_user_id.clone(),
             thread_id,
             body.label_id,
             body.value,

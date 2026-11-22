@@ -157,7 +157,7 @@ async fn execute(
 }
 
 #[tokio::test]
-async fn valid_bearer_returns_macro_user_id() {
+async fn valid_bearer_returns_rox_user_id() {
     let service = FakeAuthorizationService::default();
 
     let response = execute(&service, RequestCredentials::Bearer("valid"), "{ userId }").await;

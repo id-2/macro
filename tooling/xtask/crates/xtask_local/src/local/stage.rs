@@ -131,8 +131,8 @@ impl Stage {
         console::set_colors_enabled(!no_color);
         Stage {
             is_tty,
-            verbose: env_flag("ROX_LOCAL_VERBOSE"),
-            dry_run: env_flag("ROX_LOCAL_DRY_RUN"),
+            verbose: super::env_compat::flag("LOCAL_VERBOSE"),
+            dry_run: super::env_compat::flag("LOCAL_DRY_RUN"),
             quiet: false,
             timings: Arc::new(Mutex::new(Vec::new())),
             job: None,
@@ -254,7 +254,7 @@ impl Stage {
             Style::new().dim().apply_to(format_elapsed(total)),
         );
 
-        if let Some(path) = std::env::var_os("ROX_LOCAL_TIMINGS") {
+        if let Some(path) = super::env_compat::maybe("LOCAL_TIMINGS") {
             let entries: Vec<String> = timings
                 .iter()
                 .map(|(label, d)| {
@@ -582,13 +582,6 @@ fn drain(reader: Option<&mut impl Read>) -> Vec<u8> {
         let _ = r.read_to_end(&mut buf);
     }
     buf
-}
-
-// xtask is host tooling, not a service reading APP_SECRETS_JSON, so reading the
-// process environment directly is correct here.
-#[allow(clippy::disallowed_methods)]
-fn env_flag(name: &str) -> bool {
-    std::env::var(name).map(|v| v == "1").unwrap_or(false)
 }
 
 fn format_elapsed(d: Duration) -> String {

@@ -415,7 +415,7 @@ async fn personal_blocks_only_affect_the_contributors_mailbox(pool: PgPool) -> a
     let other = "macro|colleague@example.com";
     let user = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
         user,
         other
     )

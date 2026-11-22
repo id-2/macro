@@ -2224,8 +2224,8 @@ async fn assert_policy_matrix<const N: usize>(policies: [(&str, [StatusCode; 6])
 
 #[test]
 fn policies_report_typed_acting_entity_variants_with_display_parity() {
-    let user = macro_user_authentication(VALID_USER_ID);
-    let internal_user = macro_user_authentication(STANDARD_INTERNAL_USER_ID);
+    let user = rox_user_authentication(VALID_USER_ID);
+    let internal_user = rox_user_authentication(STANDARD_INTERNAL_USER_ID);
     let bot = bot_authentication(BotScope::User, Some(BOT_ACTING_USER_ID));
 
     let direct_user = RoxAuthorization::User(user.clone());
@@ -2295,12 +2295,12 @@ fn policies_report_typed_acting_entity_variants_with_display_parity() {
     assert_display_parity::<AnyPrincipal>(bot_principal);
 }
 
-fn macro_user_authentication(user_id: &str) -> RoxUserAuthentication {
+fn rox_user_authentication(user_id: &str) -> RoxUserAuthentication {
     RoxUserAuthentication {
         origin: crate::CredentialOrigin::Session,
         agent_id: None,
         agent_via: None,
-        rox_user_id: RoxUserIdStr::try_from(user_id.to_owned()).expect("valid Macro user ID"),
+        rox_user_id: RoxUserIdStr::try_from(user_id.to_owned()).expect("valid Rox user ID"),
         user_context: user_context(user_id, None),
     }
 }

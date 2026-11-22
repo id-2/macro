@@ -84,7 +84,7 @@ async fn privacy_http_preserves_records_and_enforces_mailbox_and_role_boundaries
     let (repo, team, link) = setup(&pool).await?;
     let user = Uuid::now_v7();
     sqlx::query!(
-        "INSERT INTO macro_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
+        "INSERT INTO rox_user (id, username, email, stripe_customer_id) VALUES ($1, $2, $2, $2)",
         user,
         MEMBER
     )
