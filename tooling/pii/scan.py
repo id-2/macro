@@ -331,7 +331,7 @@ def run_gitleaks() -> int:
         parents = merge_parents()
         if not parents:
             return subprocess.run(command, cwd=ROOT, check=False).returncode
-        with tempfile.TemporaryDirectory(prefix="macro-pii-") as directory:
+        with tempfile.TemporaryDirectory(prefix="rox-pii-") as directory:
             report_path = Path(directory) / "gitleaks.json"
             result = subprocess.run(
                 [*command, "--exit-code", "42", "--report-format", "json", "--report-path", str(report_path)],

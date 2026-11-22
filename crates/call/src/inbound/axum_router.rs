@@ -367,6 +367,11 @@ where
 
 static INTERNAL_CALL_HEADER: &str = "x-rox-internal-call";
 
+/// The pre-rename internal header. A transcription worker deployed before the
+/// rename still sends it, so it is accepted on read; new callers use the name
+/// above.
+static LEGACY_INTERNAL_CALL_HEADER: &str = "x-macro-internal-call";
+
 /// Axum extractor that validates the `x-rox-internal-call` header against
 /// the shared secret stored in the [`CallService`].
 pub struct InternalCallAccessExtractor(());
@@ -384,6 +389,7 @@ where
         let token = parts
             .headers
             .get(INTERNAL_CALL_HEADER)
+            .or_else(|| parts.headers.get(LEGACY_INTERNAL_CALL_HEADER))
             .and_then(|v| v.to_str().ok())
             .ok_or((
                 StatusCode::BAD_REQUEST,

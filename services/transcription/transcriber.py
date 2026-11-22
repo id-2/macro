@@ -503,7 +503,7 @@ class Transcriber(Agent):
                     resp = await self.http_client.post(
                         f"{MACRO_API_URL}/call/{self.channel_id}/transcript",
                         json=segment,
-                        headers={"x-macro-internal-call": INTERNAL_CALL_SECRET},
+                        headers={"x-rox-internal-call": INTERNAL_CALL_SECRET},
                     )
                     resp.raise_for_status()
                     break

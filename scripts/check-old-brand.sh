@@ -41,6 +41,21 @@ scan_content() {
   fi
 }
 
+# Python services talk to the Rust side through headers and paths that the
+# previous scan types never covered. The four names below are read on purpose:
+# they keep sessions and transcripts from pre-rename deployments working.
+scan_python() {
+  local hits
+  hits=$(grep -rnE '\bmacro[-_]' --include='*.py' services tooling 2>/dev/null \
+    | grep -vE 'macro-access-token|macro-refresh-token|x-macro-internal-call|macro://' \
+    | head -20)
+  if [ -n "$hits" ]; then
+    echo "Old name in Python services:"
+    printf '%s\n' "$hits"
+    fail=1
+  fi
+}
+
 scan_names() {
   local names
   names=$(find crates services apps/web/src packages -type f \( -name 'macro_*' -o -name '*_macro_*' \) 2>/dev/null | grep -v '/migrations/' | head -20)
@@ -52,6 +67,7 @@ scan_names() {
 }
 
 scan_content
+scan_python
 scan_names
 
 if [ "$fail" -ne 0 ]; then
